@@ -60,8 +60,13 @@ BEGIN
 	FROM sys_fprocess WHERE fid = v_check_fid;
 
 	-- replace variables (usando COALESCE para evitar NULLs)
-	v_exceptable_id = concat(replace (v_process_except_table, 'anl_', ''), '_id');
-	v_exceptable_catalog = concat(replace (v_process_except_table, 'anl_', ''), 'cat_id');
+	IF v_process_except_table = 'anl_polygon' THEN
+		v_exceptable_id = 'pol_id';
+		v_exceptable_catalog = 'pol_type';
+	ELSE
+		v_exceptable_id = concat(replace (v_process_except_table, 'anl_', ''), '_id');
+		v_exceptable_catalog = concat(replace (v_process_except_table, 'anl_', ''), 'cat_id');
+	END IF;
 	v_process_query_text = COALESCE(replace(v_process_query_text, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_query_text);
 	v_process_info_msg = COALESCE(replace(v_process_info_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_info_msg);
 	v_process_except_msg = COALESCE(replace(v_process_except_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_except_msg);

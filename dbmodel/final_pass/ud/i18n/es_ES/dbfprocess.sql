@@ -52,7 +52,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (638, 'nodos con reguladores de caudal con longitudes diferentes y el mismo to_arc.', 'Todos los elementos del regulador de caudal con el mismo node_id y to_arc tienen la misma longitud', 'Compruebe que todos los elementos del regulador de caudal tienen la misma longitud'),
     (640, NULL, NULL, 'Dynamic omunit analysis'),
     (642, NULL, NULL, 'Treatment type calculation	'),
-    (644, 'barranco cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todas las características de los barrancos con id entero.', 'Barranco cuyo id no es un entero'),
+    (644, 'intervalos de raingage mayor que el intervalo de su serie temporal.', 'Ningún intervalo de raingage es mayor al intervalo de su serie temporal.', 'Intervalo de raingage mayor que intervalo de su serie temporal'),
     (-1, NULL, NULL, 'Hay'),
     (101, NULL, NULL, 'Comprobación del proyecto Qgis'),
     (102, NULL, NULL, 'Esquema de coherencia de datos'),

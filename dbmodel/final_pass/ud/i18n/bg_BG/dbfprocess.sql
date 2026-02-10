@@ -49,7 +49,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'virtualpumps with null values at least on mandatory column curve_id. virtualpumps with null values at least on mandatory column curve_id.', 'Virtualpumps checked. No mandatory values for curve_id missed. Virtualpumps checked. No mandatory values for curve_id missed.', 'Null values on virtualpump curve_id '),
     (637, NULL, NULL, 'Fluid type calculation	'),
     (638, 'nodes with flowregulators with different lengths and same to_arc.', 'All flow regulator elements with the same node_id and to_arc have the same length', 'Check that all flow regulator elements have the same length'),
-    (644, 'gully which id is not an integer. Please, check your data before continue.', 'All gullies features with id integer.', 'Gully which id is not an integer'),
+    (644, 'raingage intervals grater than its timeseries interval.', 'No raingage interval is grater than timseries interval.', 'Raingage interval grater than timeseries interval'),
     (-1, NULL, NULL, 'There is'),
     (101, NULL, NULL, 'Qgis project check'),
     (102, NULL, NULL, 'Schema data consistency'),

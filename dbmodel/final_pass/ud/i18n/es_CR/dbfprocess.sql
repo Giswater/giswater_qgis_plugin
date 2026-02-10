@@ -49,7 +49,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'virtualpumps with null values at least on mandatory column curve_id. bombas virtuales con valores nulos al menos en la columna obligatoria curve_id.', 'Bombas virtuales comprobadas. No faltan valores obligatorios para curve_id. Bombas virtuales comprobadas. No se han omitido valores obligatorios para curve_id.', 'Valores nulos en virtualpump curve_id'),
     (637, NULL, NULL, 'Cálculo del tipo de fluido'),
     (638, 'nodos con reguladores de caudal con longitudes diferentes y el mismo to_arc.', 'Todos los elementos del regulador de caudal con el mismo node_id y to_arc tienen la misma longitud', 'Compruebe que todos los elementos del regulador de caudal tienen la misma longitud'),
-    (644, 'barranco cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todas las características de los barrancos con id entero.', 'Barranco cuyo id no es un entero'),
+    (644, 'intervalos de raingage mayor que el intervalo de su serie temporal.', 'Ningún intervalo de raingage es mayor al intervalo de su serie temporal.', 'Intervalo de raingage mayor que intervalo de su serie temporal'),
     (-1, NULL, NULL, 'Hay'),
     (101, NULL, NULL, 'Comprobación del proyecto Qgis'),
     (102, NULL, NULL, 'Esquema de coherencia de datos'),

@@ -49,7 +49,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'bombes virtuals amb valors nuls almenys a la columna obligatòria curve_id.bombes virtuals amb valors nuls almenys a la columna obligatòria curve_id.', 'Bombes virtuals revisades.No s''han perdut cap valor obligatori per a curve_id.Bombes virtuals revisades.No s''han perdut cap valor obligatori per a curve_id.', 'Valors nuls a virtualpump curve_id'),
     (637, NULL, NULL, 'Càlcul del tipus de fluid'),
     (638, 'nodes amb reguladors de flux amb diferents longituds i el mateix to_arc.', 'Tots els elements reguladors de flux amb el mateix node_id i to_arc tenen la mateixa longitud', 'Comproveu que tots els elements reguladors de cabal tinguin la mateixa longitud'),
-    (644, 'gully el qual id no és un nombre enter.Si us plau, comproveu les vostres dades abans de continuar.', 'Totes les característiques dels barrancs amb identificador sencer.', 'Gully el qual id no és un nombre enter'),
+    (644, 'intervals de raingage més gran que el interval de la seva serie temporal.', 'Cap interval de raingage és major al interval de la seva serie temporal.', 'Interval de raingage més gran que interval de la seva serie temporal'),
     (-1, NULL, NULL, 'Hi ha'),
     (101, NULL, NULL, 'Comprovació del projecte Qgis'),
     (102, NULL, NULL, 'Coherència de dades de l''esquema'),

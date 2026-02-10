@@ -88,6 +88,8 @@ v_workspace text;
 v_dscenarioused integer;
 v_psectorused integer;
 
+v_rec record;
+
 BEGIN
 
 	--  Search path
@@ -201,406 +203,43 @@ BEGIN
 		END IF;
 
 
-		RAISE NOTICE '1- Check subcatchments';
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment WHERE outlet_id is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column oulet_id on subcatchment table have been checked without any values missed.'));
-		END IF;
+		v_querytext = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+		AND addparam IS NULL 
+		AND query_text IS NOT NULL 
+		AND function_name ILIKE ''%gw_fct_pg2epa_check_result%'' AND function_name NOT ILIKE ''%gw_fct_pg2epa_check_result_%''
+		AND active ORDER BY fid ASC
+		';
 
-		-- check area
-		SELECT (sum(st_area(the_geom)/10000))::integer, (sum(area))::integer  INTO v_count, v_count_2 FROM ve_inp_subcatchment WHERE area IS NOT NULL;
-		IF v_count > v_count_2*2 AND v_count < v_count_2*10 OR (v_count_2 > v_count*2 AND v_count_2 < v_count*10) THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING-369: Total area informed (',v_count_2,' ha.) has important difference from total shape area (',v_count,' ha.).'));
-			v_count=0;
-		ELSIF v_count > v_count_2*10 OR v_count_2 > v_count*10 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: Total area informed (',v_count_2,' ha.) has big difference from total shape area (',v_count,' ha.).'));
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Total area informed (',v_count_2,' ha.) is similar than total shape area (',v_count,' ha.).'));
-		END IF;
+		-- loop for checks
+		FOR v_rec IN EXECUTE v_querytext
+		LOOP
+			EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+			"form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
+		END LOOP;
 
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where rg_id is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' inp_subcatchment(s) with null values on mandatory column rg_id column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column rg_id on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where area is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column area on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where width is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column width on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where slope is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column slope on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where clength is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column clength on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where nimp is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column nimp on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where nperv is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column nperv on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where simp is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column simp on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where sperv is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column sperv on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where zero is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column zero on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where routeto is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column routeto on scenario subcatchments have been checked without any values missed.'));
-		END IF;
-
-
-		SELECT count(*) INTO v_count FROM ve_inp_subcatchment where rted is null;
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: Column rted on scenario subcatchments have been checked without any values missed.'));
-		END IF;
 
 		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN config_param_user ON hydrology_id=value::integer WHERE cur_user=current_user AND parameter = 'inp_options_hydrology_current';
 
-		IF v_infiltration='CURVE_NUMBER' THEN
+		IF v_infiltration IS NOT NULL THEN
 
-			SELECT count(*) INTO v_count FROM ve_inp_subcatchment where (curveno is null)
-			OR (conduct_2 is null) OR (drytime_2 is null);
+			v_querytext = '
+			SELECT * FROM sys_fprocess 
+			WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+			AND addparam IS NULL 
+			AND query_text IS NOT NULL 
+			AND function_name ILIKE ''%gw_fct_pg2epa_check_result_'||lower(v_infiltration)||'%''
+			AND active ORDER BY fid ASC
+			';
 
-			IF v_count > 0 THEN
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3,
-				concat('ERROR-369: There is/are ',v_count, ' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).',
-				'Acording EPA SWMM user''s manual, conduct_2 is deprecated, but is mandatory to fill it. Any value is valid because it will be ignored by SWMM.'));
-				v_count=0;
-			ELSE
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1,
-				concat('INFO: Mandatory columns for ''CURVE_NUMBER'' infitration method (curveno, drytime_2) have been checked without any values missed.'));
-			END IF;
+			-- loop for checks
+			FOR v_rec IN EXECUTE v_querytext
+			LOOP
+				EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+				"form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
+			END LOOP;
 
-		ELSIF v_infiltration='GREEN_AMPT' THEN
-
-			SELECT count(*) INTO v_count FROM ve_inp_subcatchment where (suction is null)
-			OR (conduct_2 is null) OR (initdef is null);
-
-			IF v_count > 0 THEN
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',
-				v_count,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction, conduct, initdef).'));
-				v_count=0;
-			ELSE
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1,
-				concat('INFO: Mandatory columns for ''GREEN_AMPT'' infitration method (suction, conduct, initdef) have been checked without any values missed.'));
-			END IF;
-
-
-		ELSIF v_infiltration='HORTON' OR v_infiltration='MODIFIED_HORTON' THEN
-
-			SELECT count(*) INTO v_count FROM ve_inp_subcatchment where (maxrate is null)
-			OR (minrate is null) OR (decay is null) OR (drytime is null) OR (maxinfil is null);
-
-			IF v_count > 0 THEN
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,
-				' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil).'));
-				v_count=0;
-			ELSE
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1,
-				concat('INFO: Mandatory columns for ''MODIFIED_HORTON'' infitration method (maxrate, minrate, decay, drytime, maxinfil) have been checked without any values missed.'));
-			END IF;
-		END IF;
-	END IF;
-
-	RAISE NOTICE '2 - Check if there are features with sector_id = 0';
-
-	v_querytext = 'SELECT a.feature , count(*)  FROM  (
-				SELECT arc_id, ''ARC'' as feature FROM ve_arc WHERE sector_id = 0 UNION
-				SELECT node_id, ''NODE'' FROM ve_node WHERE sector_id = 0 )a GROUP BY feature ';
-
-	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'
-	INTO v_count;
-
-		IF v_count > 0 THEN
-			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''ARC'';'
-			INTO v_count;
-			IF v_count > 0 THEN
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-370: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
-			END IF;
-
-			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''NODE'';'
-			INTO v_count;
-			IF v_count > 0 THEN
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR-370: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
-			END IF;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: All features have sector_id different than 0.'));
-			v_count=0;
-		END IF;
-
-	RAISE NOTICE '3 - Check if there are conflicts with dscenarios (396)';
-	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
-
-		FOR object_rec IN SELECT
-		json_array_elements_text('["junction", "conduit", "raingage", "frorifice", "frweir", "froutlet", "froutlet", "storage",  "outfall",  "treatment", "lids" ]'::json) as tabname,
-		json_array_elements_text('["node_id" , "arc_id",  "rg_id",    "element_id",      "element_id",   "element_id",     "element_id",     "node_id",  "node_id",  "node_id",   "subc_id, lidco_id"]'::json) as colname,
- 		json_array_elements_text('["anl_node" ,"anl_arc", "",        "anl_nodarc",     "anl_nodarc",  "anl_nodarc",    "anl_nodarc",    "anl_node", "anl_node", "anl_node",  "anl_polygon"]'::json) as tablename
-		LOOP
-
-			EXECUTE 'SELECT count(*) FROM (SELECT count(*) FROM ve_inp_dscenario_'||object_rec.tabname||' GROUP BY '||object_rec.colname||' HAVING count(*) > 1) a' INTO v_count;
-			IF v_count > 0 THEN
-
-				IF object_rec.tablename IN ('anl_arc', 'anl_node') THEN
-
-					EXECUTE 'INSERT INTO '||object_rec.tablename||' ('||object_rec.colname||', fid, descript, the_geom) 
-					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM ve_inp_dscenario_'||object_rec.tabname||
-					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
-
-					INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (',object_rec.tablename,'): There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
-
-				ELSIF object_rec.tablename = 'anl_nodarc' THEN
-
-					EXECUTE 'INSERT INTO anl_arc (arc_id, fid, descript, the_geom)
-					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM ve_inp_dscenario_'||object_rec.tabname||
-					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
-
-					INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_arc): There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
-
-				ELSIF object_rec.tablename = 'anl_polygon' THEN
-
-					EXECUTE 'INSERT INTO anl_polygon (pol_id, pol_type, fid, descript, the_geom)
-					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM ve_inp_dscenario_'||object_rec.tabname||
-					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
-
-					INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (',object_rec.tablename,'): There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
-
-				ELSE
-					INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
-				END IF;
-			ELSE
-				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 1, concat('INFO: There is not confict on enabled dscenarios for ',upper(object_rec.tabname),'.'));
-			END IF;
-		END LOOP;
-	ELSE
-		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: There are not dscenarios selected.'));
-	END IF;
-
-
-	RAISE NOTICE '4 - Check if y0 is higger than ymax on nodes (401)';
-	v_count = (SELECT count(*) FROM temp_t_node WHERE y0 > ymax);
-	IF v_count > 0 THEN
-		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR-401: There is/are ', v_count, ' nodes with y0 higger then ymax.'));
-	ELSE
-		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes has y0 lower than ymax.'));
-	END IF;
-
-
-	RAISE NOTICE '5 - Check if node_id and arc_id defined on CONTROLS exists (402)';
-	-- nodes
-	FOR object_rec IN SELECT json_array_elements_text('["NODE"]'::json) as tabname
-	LOOP
-		v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
-		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
-		LEFT JOIN temp_t_node b USING (node_id)
-		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
-		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
-		OR a.sector_id::text != b.sector_id::text) a';
-
-		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		IF v_count > 0 THEN
-			i = i+1;
-			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' CONTROLS with ',lower(object_rec.tabname),' not present on this result. Controls id''s:',v_querytext));
-		END IF;
-	END LOOP;
-
-	IF v_count = 0 AND i = 0 THEN
-		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct node id values.'));
-	END IF;
-
-	-- links
-	FOR object_rec IN SELECT json_array_elements_text('["LINK", "PUMP", "ORIFICE", "WEIR"]'::json) as tabname
-	LOOP
-		v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
-		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
-		LEFT JOIN temp_t_arc b USING (arc_id)
-		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL  
-		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
-		OR a.sector_id::text != b.sector_id::text) a';
-
-		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		IF v_count > 0 THEN
-			i = i+1;
-			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' CONTROLS with ',lower(object_rec.tabname),' not present on this result. Controls id''s:',v_querytext));
-		END IF;
-	END LOOP;
-
-	IF v_count = 0 AND i = 0 THEN
-		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: All CONTROLS has correct arc id values.'));
-	END IF;
-
-	IF v_networkmode = 2 or v_networkmode = 3 THEN
-
-		RAISE NOTICE '6 - Check arc_id null for gully (455)';
-		SELECT count(*) INTO v_count FROM (SELECT * FROM ve_gully g,  selector_sector s
-		WHERE g.sector_id = s.sector_id AND cur_user=current_user AND arc_id IS NULL) a1;
-
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '455',concat(
-			'ERROR-455: There is/are ',v_count,' gullies with missed information on arc_id (outlet) values.'),v_count);
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id , 1,  '455','INFO: No gullies found without arc_id (outlet) values.', v_count);
-		END IF;
-
-		RAISE NOTICE '7 - Check gullies with null values on (custom_)top_elev (456)';
-		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_t_gully WHERE top_elev IS NULL) a1;
-
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '456',concat(
-			'ERROR-456: There is/are ',v_count,' gullies with null values on top_elev/custom_top_elev columns.'),v_count);
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id , 1,  '456','INFO: No gullies found with null values on top_elev.', v_count);
-		END IF;
-
-		RAISE NOTICE '8 - Check gullies with null values on (custom)width (457)';
-		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_t_gully WHERE width IS NULL) a1;
-
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '457',concat(
-			'ERROR-457: There is/are ',v_count,' gullies with null values on width/custom_width columns.'),v_count);
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id , 1,  '457','INFO: No gullies found with null values on width.', v_count);
-		END IF;
-
-		RAISE NOTICE '9 - Check gullies with null values on (custom)length (458)';
-		SELECT count(*) INTO v_count FROM (SELECT * FROM temp_t_gully WHERE length IS NULL) a1;
-
-		IF v_count > 0 THEN
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, '458',concat(
-			'ERROR-458: There is/are ',v_count,' gullies with null values on length/custom_length columns.'),v_count);
-			v_count=0;
-		ELSE
-			INSERT INTO t_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-			VALUES (v_fid, v_result_id , 1,  '458','INFO: No gullies found with null values on length.', v_count);
 		END IF;
 	END IF;
 
