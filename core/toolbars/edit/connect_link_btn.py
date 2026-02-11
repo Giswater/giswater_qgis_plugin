@@ -244,7 +244,7 @@ class GwConnectLinkButton(GwMaptool):
         self.tbl_ids.model().removeRows(0, self.tbl_ids.model().rowCount())
 
         # Fill table with selected features
-        tools_gw.fill_tableview_rows(self.tbl_ids, field)
+        tools_gw.fill_tableview_rows(self.tbl_ids, field['value'])
 
         # Update "Set to arc" button state after adding connecs
         self._update_set_to_arc_button_state()
