@@ -194,3 +194,21 @@ INSERT INTO sys_message (id,error_message,log_level,project_type,"source",messag
 VALUES (4572,'Number of dscenarios used: %v_dscenarioused%',0,'utils','core','AUDIT');
 INSERT INTO sys_message (id,error_message,log_level,project_type,"source",message_type)
 VALUES (4574,'Number of psectors used: %v_psectorused%',0,'utils','core','AUDIT');
+
+-- 12/02/2026
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'dscenario_id', 0, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'name', 1, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'descript', 2, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'dscenario_type', 3, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'parent_id', 4, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'expl_id', 5, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'active', 6, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'log', 7, true, NULL, NULL, NULL, NULL);
