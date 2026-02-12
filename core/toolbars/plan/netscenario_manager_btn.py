@@ -318,7 +318,8 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Get selected netscenario id
         index = self.tbl_netscenario.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_id')
+        value = index.sibling(index.row(), col_idx).data()
 
         # Execute toolbox function
         dlg_functions = self._open_toolbox_function(3264)
@@ -366,7 +367,8 @@ class GwNetscenarioManagerButton(GwAction):
             return
 
         # Get selected netscenario ids
-        values = [index.sibling(index.row(), 0).data() for index in selected_list]
+        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_netscenario, 'netscenario_id')
+        values = [index.sibling(index.row(), col_idx).data() for index in selected_list]
 
         msg = ("CAUTION! Deleting a netscenario will delete data from features related to the netscenario.\n"
                   "Are you sure you want to delete these records?")

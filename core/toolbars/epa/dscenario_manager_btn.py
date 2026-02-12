@@ -595,7 +595,8 @@ class GwDscenarioManagerButton(GwAction):
 
             # Get selected scenario id
             index = self.tbl_dscenario.selectionModel().currentIndex()
-            value = index.sibling(index.row(), 0).data()
+            col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+            value = index.sibling(index.row(), col_idx).data()
             tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'target'), f"{value}", 0)
         return dlg_functions
 
@@ -611,7 +612,8 @@ class GwDscenarioManagerButton(GwAction):
 
         # Get selected dscenario id
         index = self.tbl_dscenario.selectionModel().currentIndex()
-        value = index.sibling(index.row(), 0).data()
+        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+        value = index.sibling(index.row(), col_idx).data()
 
         # Execute toolbox function
         dlg_functions = self._open_toolbox_function(fct_id, view)
@@ -1044,7 +1046,8 @@ class GwDscenarioManagerButton(GwAction):
         else:
             # Get selected netscenario id
             index = self.tbl_dscenario.selectionModel().currentIndex()
-            feature_id = index.sibling(index.row(), 0).data()
+            col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+            feature_id = index.sibling(index.row(), col_idx).data()
             self.selected_dscenario_id = feature_id
             if feature_id is None:
                 msg = "Any record selected"
