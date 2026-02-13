@@ -212,3 +212,7 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'active', 6, true, NULL, NULL, NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
 VALUES('dscenariomanager_form', 'utils', 've_cat_dscenario', 'log', 7, true, NULL, NULL, NULL, NULL);
+
+-- 13/02/2026
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
+VALUES(710, 'Check storages with null values on mandatory column storage_type.', 'ud', NULL, 'core', NULL, 'Check epa-data', NULL, 3, 'storages with null values on mandatory column storage_type.', NULL, NULL, 'SELECT * FROM t_inp_storage WHERE storage_type IS NULL', 'Column storage_type on storage table have been checked without any values missed.', '[gw_fct_pg2epa_check_data]', true);
