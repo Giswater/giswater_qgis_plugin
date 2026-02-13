@@ -40,7 +40,7 @@ DECLARE
 	v_sql_arcs text;
 	v_sql_nodes text;
 v_filter_arc text;
-rec record;
+rec_table text;
 v_sql_topology text;
 v_node text;
 v_exists bool;
@@ -51,8 +51,7 @@ v_exists bool;
 	v_featureinfo JSON;
 
 	--Return
-	v_count_1 integer = 0;
-	v_count_2 integer = 0;
+v_count integer = 0;
 
 	v_result json;
 	v_result_info json;
@@ -113,52 +112,40 @@ BEGIN
 			 join cm.om_campaign_x_arc b using (arc_id)  	
 			 where lot_id = '||v_lot_id||' and b.the_geom is not null '||v_filter_arc||' and st_isvalid(b.the_geom) is true';
 
+	-- Query of new topology
+	v_sql_topology = '
+		select a.arc_id, b.node_id as node_1, c.node_id as node_2
+		FROM ('||v_sql_arcs||') a 
+		left join ('||v_sql_nodes||') b on st_dwithin (ST_Startpoint(a.arc_geom), b.node_geom, 0.01)
+		left join ('||v_sql_nodes||') c on st_dwithin (ST_Endpoint(a.arc_geom), c.node_geom, 0.01)
+		';
+
+
 
 	-- Know if there is any arc to be updated (for later manage the process)
 	execute 'SELECT EXISTS (SELECT 1 FROM ('||v_sql_arcs||'))' into v_exists;
 
 
-	if v_exists then
-		-- Start process	
-		for rec in select 'ST_Startpoint' as vertex union select 'ST_Endpoint' as vertex
-		loop
+
+	if v_exists then -- Start process
 			
-			v_sql_topology = '
-			with resu as (
-				 select row_number() over() as rwid, a.arc_id, a.arc_geom, b.node_id, 
-				 ROW_NUMBER() OVER(PARTITION BY a.arc_id ORDER BY a.arc_id, ST_Distance('||rec.vertex||'(a.arc_geom), b.node_geom) asc) 
-				 as rw from ('||v_sql_arcs||') a 
-				 left join ('||v_sql_nodes||') b on st_dwithin ('||rec.vertex||'(a.arc_geom), b.node_geom, 0.01)
-				 )
-			select arc_id, node_id from resu where rw = 1';
-	
-						
-			if rec.vertex = 'ST_Startpoint' then 
-				v_node = 'node_1';
-				execute 'select count(*) from ('||v_sql_topology||')' into v_count_1;
-			else 
-				v_node = 'node_2';
-				execute 'select count(*) from ('||v_sql_topology||')' into v_count_2;
-			end if;
-			
-			execute '
-			update cm.om_campaign_lot_x_arc t
-			set '||v_node||' = a.node_id from ('||v_sql_topology||')a
-			where t.arc_id = a.arc_id';
-	
-			execute '
-			update cm.ap_tuberia t
-			set '||v_node||' = a.node_id from ('||v_sql_topology||')a
-			where t.arc_id = a.arc_id';
-	
-			execute '
-			update cm.om_campaign_x_arc t
-			set '||v_node||' = a.node_id from ('||v_sql_topology||')a
-			where t.arc_id = a.arc_id';
-			
+		
+		FOREACH rec_table IN ARRAY ARRAY['cm.om_campaign_lot_x_arc', 'cm.ap_tuberia', 'cm.om_campaign_x_arc']
+		LOOP
+		
+		raise notice '%', rec_table;
+
+		execute '
+		update '||rec_table||' t
+		set node_1 = a.node_1, node_2 = a.node_2 from ('||v_sql_topology||')a
+		where t.arc_id = a.arc_id';
+
 		end loop;
 
 	end if;
+
+
+	execute 'select count(*) from ('||v_sql_arcs||')' into v_count;
 
 	-- get diagnostics and return
 	CREATE TEMP TABLE IF NOT EXISTS t_audit_check_data (LIKE audit_check_data INCLUDING ALL);
@@ -166,7 +153,7 @@ BEGIN
 
 	-- Total udpated rows
 	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-	SELECT v_fid, 999, 0, concat((select (v_count_1+v_count_2)/2), ' updated arcs of the Lot '||v_lot_id||'');
+	SELECT v_fid, 999, 0, concat('Se han actualizado ', v_count, ' arcos del lote '||v_lot_id||'');
 
 	-- Build return	
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -178,7 +165,7 @@ BEGIN
 
 	
 	select json_build_object('level', log_level, 'text', error_message) into v_message 
-	from sys_message where id = 3700;
+	from ap.sys_message where id = 3700;
 
     DROP TABLE IF EXISTS t_audit_check_data;
 
