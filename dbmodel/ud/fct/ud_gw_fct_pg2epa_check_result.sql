@@ -169,8 +169,8 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4006", "function":"2858", "parameters":{"v_eparesult":"'||v_result_id||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4560", "function":"2858", "parameters":{"v_createdby":"'||current_user||'", "v_date":"'||to_char(now(),'YYYY-MM-DD HH-MM-SS')||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4562", "function":"2858", "parameters":{"v_exportmodeval":"'||v_exportmodeval||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4564", "function":"2858", "parameters":{"v_hydroscenarioval":"'||v_hydroscenarioval||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4566", "function":"2858", "parameters":{"v_dwfscenarioval":"'||v_dwfscenarioval||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4564", "function":"2858", "parameters":{"v_hydroscenarioval":"'||COALESCE(v_hydroscenarioval, '')||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4566", "function":"2858", "parameters":{"v_dwfscenarioval":"'||COALESCE(v_dwfscenarioval, '')||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4568", "function":"2858", "parameters":{"v_dumpsubc":"'||v_dumpsubc::text||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4570", "function":"2858", "parameters":{"v_workspace":"'||COALESCE(v_workspace, '')||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4572", "function":"2858", "parameters":{"v_dscenarioused":"'||v_dscenarioused||'"}, "fid":"'||v_fid||'", "criticity":"4", "tempTable":"t_"}}$$)';
