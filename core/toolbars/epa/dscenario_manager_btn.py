@@ -511,8 +511,7 @@ class GwDscenarioManagerButton(GwAction):
         if fields:
             self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, fields)
             self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, fields)
-        # TODO: config_form_tableview
-        # widget = tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 'tbl_dscenario', Qt.SortOrder.DescendingOrder, True)
+        tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 've_cat_dscenario', Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(self.tbl_dscenario)
         # Optionally set current scenario label if context provided
 

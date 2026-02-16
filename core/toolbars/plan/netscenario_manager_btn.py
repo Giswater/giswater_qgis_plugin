@@ -272,8 +272,7 @@ class GwNetscenarioManagerButton(GwAction):
         if fields:
             self.tbl_netscenario = tools_gw.add_tableview_header(self.tbl_netscenario, fields)
             self.tbl_netscenario = tools_gw.fill_tableview_rows(self.tbl_netscenario, fields)
-        # TODO: config_form_tableview
-        # widget = tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'tbl_netscenario', Qt.SortOrder.DescendingOrder, True)
+        tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'v_ui_plan_netscenario', Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(self.tbl_netscenario)
 
         return complet_list
