@@ -109,18 +109,19 @@ class GwGo2EpaManagerButton(GwAction):
 
         if complet_list is False:
             return False, False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
-                continue
-            model = self.dlg_manager.tbl_rpt_cat_result.model()
-            if model is None:
-                model = QStandardItemModel()
-                self.dlg_manager.tbl_rpt_cat_result.setModel(model)
-            model.removeRows(0, model.rowCount())
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if data.get('hidden'):
+            return False, False
+        model = self.dlg_manager.tbl_rpt_cat_result.model()
+        if model is None:
+            model = QStandardItemModel()
+            self.dlg_manager.tbl_rpt_cat_result.setModel(model)
+        model.removeRows(0, model.rowCount())
 
-            if field['value']:
-                self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, field)
-                self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, field)
+        if fields:
+            self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, fields)
+            self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, fields)
 
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
         tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
