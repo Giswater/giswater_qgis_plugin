@@ -15,10 +15,10 @@ CREATE TABLE audit.log (
     feature_id text,
     action text,
     query text,
-    query_sql text NULL,
-    olddata json,
-    newdata json,
-    user_name text,
+    sql text NULL,
+    old_value json,
+    new_value json,
+    insert_by text,
     schema text
 );
 

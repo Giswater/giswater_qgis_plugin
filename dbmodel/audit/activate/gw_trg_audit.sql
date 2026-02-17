@@ -106,14 +106,14 @@ BEGIN
 
     IF (TG_OP = 'INSERT') OR row_to_json(NEW.*)::text = row_to_json(OLD.*)::text THEN
 
-        -- Build query_sql
+        -- Build sql
         v_columns := string_agg(quote_ident(key), ', ') FROM json_each(v_new_data);
         v_values := string_agg(quote_literal(value), ', ') FROM json_each(v_new_data);
 
         v_sql := format('INSERT INTO temp_PARENT_SCHEMA_%I (%s) VALUES (%s)', v_child_table, v_columns, v_values);
         v_sql := REPLACE(regexp_replace(v_sql, '''(null|true|false|[0-9]+(\\.[0-9]+)?)''', '\1', 'g'), '"', '');
 
-        INSERT INTO audit.log (schema, table_name, user_name, action, newdata, query, query_sql, id_name, feature_id)
+        INSERT INTO audit.log (schema, table_name, insert_by, action, new_value, query, sql, id_name, feature_id)
         VALUES (TG_TABLE_SCHEMA::TEXT, v_child_table, session_user::TEXT, 'I', v_new_data, current_query(), v_sql, v_feature_idname, v_feature_id);
         RETURN NEW;
 
@@ -130,7 +130,7 @@ BEGIN
             v_sql := REPLACE(regexp_replace(v_sql, '''(null|true|false|[0-9]+(\\.[0-9]+)?)''', '\1', 'g'), '"', '');
         END IF;
 
-        INSERT INTO audit.log (schema, table_name, user_name, action, olddata, newdata, query, query_sql, id_name, feature_id)
+        INSERT INTO audit.log (schema, table_name, insert_by, action, old_value, new_value, query, sql, id_name, feature_id)
         VALUES (TG_TABLE_SCHEMA::TEXT, v_child_table, session_user::TEXT, 'U', v_old_data, v_new_data, current_query(), v_sql, v_feature_idname, v_feature_id);
         RETURN NEW;
 
@@ -138,8 +138,8 @@ BEGIN
 
         v_sql := format('DELETE FROM temp_PARENT_SCHEMA_%I WHERE %I = %L', v_child_table, v_feature_idname, v_feature_id);
 
-        INSERT INTO audit.log (schema, table_name, user_name, action, olddata, query, query_sql, id_name, feature_id)
-        VALUES (TG_TABLE_SCHEMA::TEXT, v_child_table, session_user::TEXT, 'D',v_old_data, current_query(), v_sql, v_feature_idname, v_feature_id);
+        INSERT INTO audit.log (schema, table_name, insert_by, action, old_value, query, sql, id_name, feature_id)
+        VALUES (TG_TABLE_SCHEMA::TEXT, v_child_table, session_user::TEXT, 'D', v_old_data, current_query(), v_sql, v_feature_idname, v_feature_id);
         RETURN OLD;
 
     END IF;

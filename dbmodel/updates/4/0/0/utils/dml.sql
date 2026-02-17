@@ -2056,7 +2056,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "module": "audit"
 }'::json, NULL, false, 0);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('audit_results', 'SELECT id, tstamp, "action", query, user_name FROM audit.log WHERE id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('audit_results', 'SELECT id, tstamp, "action", query, insert_by FROM audit.log WHERE id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",

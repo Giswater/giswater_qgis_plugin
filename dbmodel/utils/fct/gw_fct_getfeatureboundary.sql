@@ -72,7 +72,7 @@ BEGIN
 
 			v_querytext := concat(
 		        v_querytext,
-		        ' SELECT ST_SetSRID(ST_GeomFromText(olddata->>''the_geom''), ',v_epsg,') AS the_geom FROM audit.log ',
+		        ' SELECT ST_SetSRID(ST_GeomFromText(old_value->>''the_geom''), ',v_epsg,') AS the_geom FROM audit.log ',
 		        ' WHERE action = ''D''',
 		        ' AND table_name = ', quote_literal(v_table),
 		        ' AND schema = current_schema()',
@@ -83,7 +83,7 @@ BEGIN
 		        FOR v_key, v_val IN SELECT * FROM json_each_text(v_extra::json) LOOP
 		            v_querytext := concat(
 		                v_querytext,
-		                ' AND olddata->>', quote_literal(v_key), ' = ', quote_literal(v_val)
+		                ' AND old_value->>', quote_literal(v_key), ' = ', quote_literal(v_val)
 		            );
 		        END LOOP;
 		    END IF;

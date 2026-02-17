@@ -106,11 +106,12 @@ CREATE TABLE audit.log (
   "schema" text NULL,
   table_name text NULL,
   id_name text NULL,
-  user_name text NULL,
+  insert_by text NULL,
   "action" text NULL,
-  olddata json NULL,
-  newdata json NULL,
+  old_value json NULL,
+  new_value json NULL,
   query text NULL,
+  sql text NULL,
   tstamp timestamp NULL DEFAULT now(),
   CONSTRAINT log_pkey PRIMARY KEY (id)
 );

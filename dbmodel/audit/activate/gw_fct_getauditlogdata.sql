@@ -46,11 +46,11 @@ BEGIN
 
 	IF v_log_id IS NOT NULL THEN
 		-- Get data from specific log
-		SELECT olddata, newdata INTO v_olddata, v_newdata
+		SELECT old_value, new_value INTO v_olddata, v_newdata
 		FROM log WHERE id = v_log_id;
 
 	ELSE
-		SELECT newdata, tstamp, id_name
+		SELECT new_value, tstamp, id_name
 		INTO v_newdata, v_tstamp, v_idname
 		FROM log
 		WHERE feature_id = v_feature_id
@@ -58,7 +58,7 @@ BEGIN
 		AND "schema" = v_schema_parent
 		ORDER BY tstamp DESC LIMIT 1;
 
-		SELECT newdata INTO v_olddata
+		SELECT new_value INTO v_olddata
 		FROM log
         WHERE feature_id = v_feature_id
 		AND table_name = v_table_name
@@ -117,8 +117,8 @@ BEGIN
 	RETURN jsonb_build_object(
 	        'status', 'Accepted',
 	        'version', v_version,
-	        'olddata', COALESCE(v_olddata, '{}'),
-			'newdata', COALESCE(v_newdata, '{}')
+	        'old_value', COALESCE(v_olddata, '{}'),
+			'new_value', COALESCE(v_newdata, '{}')
 	    );
 
 	EXCEPTION

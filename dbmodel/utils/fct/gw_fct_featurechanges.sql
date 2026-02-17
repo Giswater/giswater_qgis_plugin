@@ -101,9 +101,9 @@ BEGIN
 				'node_id as "nodeId", serial_number as "serialNumber", brand_id as brand, ' ||
 				'model_id as model, descript as descript, comment as "aresepId" ' ||
 				'FROM v_element_x_node WHERE updated_at >= '''||v_lastfeeding||''' AND element_id IN ' ||
-				'(SELECT (newdata->>''node_id'')::int FROM audit.log WHERE EXISTS ' ||
+				'(SELECT (new_value->>''node_id'')::int FROM audit.log WHERE EXISTS ' ||
 				'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key ' ||
-				'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL ' ||
+				'WHERE old_value->key IS NOT NULL AND new_value->key IS NOT NULL ' ||
 				'AND table_name ILIKE ''%_node%'' AND schema = ''SCHEMA_NAME''))')
 			INTO v_fields;
 			IF v_fields IS NOT NULL THEN
@@ -115,9 +115,9 @@ BEGIN
 				'connec_id as "connecId", serial_number as "serialNumber", brand_id as brand, ' ||
 				'model_id as model, descript as descript, comment as "aresepId" ' ||
 				'FROM v_element_x_connec WHERE updated_at >= '''||v_lastfeeding||''' AND element_id IN ' ||
-				'(SELECT (newdata->>''connec_id'')::int FROM audit.log WHERE EXISTS ' ||
+				'(SELECT (new_value->>''connec_id'')::int FROM audit.log WHERE EXISTS ' ||
 				'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''conneccat_id'', ''asset_id'']) AS key ' ||
-				'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL ' ||
+				'WHERE old_value->key IS NOT NULL AND new_value->key IS NOT NULL ' ||
 				'AND table_name ILIKE ''%_connec%'' AND schema = ''SCHEMA_NAME''))')
 			INTO v_fields;
 			IF v_fields IS NOT NULL THEN
@@ -177,9 +177,9 @@ BEGIN
 
 				v_query := concat(v_query, ', created_at as "createdAt", updated_at as "updatedAt"',
 					' FROM ve_', v_feat, ' WHERE updated_at >= ''', v_lastfeeding, ''' AND ', v_feat, '_id IN ',
-					'(SELECT (newdata->>''', v_feat, '_id'')::int FROM audit.log WHERE EXISTS ',
+					'(SELECT (new_value->>''', v_feat, '_id'')::int FROM audit.log WHERE EXISTS ',
 					'(SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''', v_feat, 'cat_id'', ''asset_id'']) AS key ',
-					'WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL AND table_name ILIKE ''%_', v_feat, '%'' AND schema = ''SCHEMA_NAME''))'
+					'WHERE old_value->key IS NOT NULL AND new_value->key IS NOT NULL AND table_name ILIKE ''%_', v_feat, '%'' AND schema = ''SCHEMA_NAME''))'
 				);
 			END IF;
 

@@ -79,8 +79,8 @@ BEGIN
     IF v_idname IS NOT NULL THEN
         --capture values of id and geometry
         IF rec.query ILIKE '%st_geomfromwkb%' or rec.query ILIKE '%the_geom%' THEN
-            v_feature_geom = ((rec.newdata::json)->> 'the_geom')::text;
-            v_feature_id = ((rec.newdata::json)->> concat('',v_idname,''))::text;
+            v_feature_geom = ((rec.new_value::json)->> 'the_geom')::text;
+            v_feature_id = ((rec.new_value::json)->> concat('',v_idname,''))::text;
 raise notice 'rec.query,%',rec.query;
 
     raise notice 'rec.table_name,%',rec.table_name;
@@ -106,11 +106,11 @@ raise notice 'rec.query,%',rec.query;
             END IF;
 
          --insert on man tables
-        ELSIF rec.action = 'I' AND rec.query ilike 'INSERT%' AND rec.table_name ilike 'man_%' and rec.newdata is not null THEN
+        ELSIF rec.action = 'I' AND rec.query ilike 'INSERT%' AND rec.table_name ilike 'man_%' and rec.new_value is not null THEN
             raise notice 'insert2';
             v_query := 'UPDATE ' || quote_ident(rec.table_name) ||' SET ';
 
-            select array_agg(row_to_json(a)) into v_text from json_each(rec.newdata)a;
+            select array_agg(row_to_json(a)) into v_text from json_each(rec.new_value)a;
 
                 --   Get id column type
                 EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a

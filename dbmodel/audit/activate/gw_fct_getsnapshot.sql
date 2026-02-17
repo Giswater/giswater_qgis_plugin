@@ -76,7 +76,7 @@ BEGIN
 				AND table_name = v_table ORDER BY feature_id, tstamp DESC
 			LOOP
 				-- Apply changes from logs into temporal tables
-				EXECUTE (v_record.query_sql);
+				EXECUTE (v_record.sql);
 			END LOOP;
 
 			-- Get column names from v_table

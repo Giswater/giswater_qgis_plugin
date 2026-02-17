@@ -8,9 +8,9 @@ or (at your option) any later version.
 SET search_path = audit, public, pg_catalog;
 
 CREATE or replace VIEW audit.v_log AS
-SELECT user_name,  count (*) , action, date FROM
-(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log)a
-group by user_name, date, action
+SELECT insert_by,  count (*) , action, date FROM
+(SELECT insert_by, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log)a
+group by insert_by, date, action
 ORDER BY date desc;
 
 GRANT ALL ON TABLE audit.v_log TO role_plan;
