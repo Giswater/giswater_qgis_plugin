@@ -206,6 +206,10 @@ class GwToolBoxButton(GwAction):
 
     def _open_function(self, index):
 
+        # Check if there is another function open
+        if not self._manage_open_dialogs():
+            return
+
         # this '0' refers to the index of the item in the selected row
         self.function_selected = index.sibling(index.row(), 0).data()
 
@@ -880,5 +884,27 @@ class GwToolBoxButton(GwAction):
             writer.writerows(all_rows)
         msg = "The csv file has been successfully exported"
         tools_qgis.show_info(msg)
+
+    def _manage_open_dialogs(self):
+        """ Manage open dialogs """
+        msg = None
+        if getattr(self, 'dlg_functions', None) is not None and not isdeleted(self.dlg_functions):
+            msg = "There is another function dialog open."
+
+        # Check if there is another report open
+        if getattr(self, 'dlg_reports', None) is not None and not isdeleted(self.dlg_reports):
+            msg = "There is another report open. Please close it first."
+
+        if msg:
+            if hasattr(self, 'toolbox_task') and self.toolbox_task is not None:
+                msg += " Please wait for the current process to finish and close the dialog."
+                tools_qt.show_info_box(msg)
+                return False
+            msg += " Do you want to close the current dialog and open the new one?"
+            if tools_qt.show_question(msg):
+                tools_gw.close_dialog(self.dlg_functions)
+                return True
+            return False
+        return True
 
     # endregion
