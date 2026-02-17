@@ -175,17 +175,17 @@ class GwAudit:
         # Add widgets in form for each value
         done_values = []
         for result in results:
-            old_data = result['olddata']
-            new_data = result['newdata']
+            old_value = result['old_value']
+            new_value = result['new_value']
 
             # Check results
-            if not old_data or not new_data:
+            if not old_value or not new_value:
                 msg = "No results"
                 tools_qgis.show_warning(msg, dialog=self.dlg_audit_manager)
                 return
 
-            for row, (key, new_value) in enumerate(new_data.items()):
-                old_value = str(old_data.get(key, ""))
+            for row, (key, new_value) in enumerate(new_value.items()):
+                old_value = str(old_value.get(key, ""))
                 new_value = str(new_value)
 
                 # Check if the value has changed
