@@ -211,7 +211,7 @@ BEGIN
             EXECUTE format(
                 'CREATE OR REPLACE TRIGGER %I ' ||
                 'AFTER INSERT OR UPDATE OR DELETE ON cm.%I ' ||
-                'FOR EACH ROW EXECUTE PROCEDURE cm_audit.gw_trg_cm_log(%L, %L, %L)',
+                'FOR EACH ROW EXECUTE PROCEDURE audit.gw_trg_cm_log(%L, %L, %L)',
                 trigger_name, rec.table_name, feature_type, mission_type, mission_id_column
             );
         END IF;
@@ -231,7 +231,7 @@ BEGIN
         EXECUTE format(
             'CREATE OR REPLACE TRIGGER %I ' ||
             'AFTER INSERT OR UPDATE OR DELETE ON cm.%I ' ||
-            'FOR EACH ROW EXECUTE PROCEDURE cm_audit.gw_trg_cm_log(%L, %L, %L)',
+            'FOR EACH ROW EXECUTE PROCEDURE audit.gw_trg_cm_log(%L, %L, %L)',
             trigger_name, rec.table_name, feature_type, mission_type, mission_id_column
         );
     END LOOP;
@@ -250,7 +250,7 @@ BEGIN
         EXECUTE format(
             'CREATE OR REPLACE TRIGGER %I ' ||
             'AFTER INSERT OR UPDATE OR DELETE ON cm.%I ' ||
-            'FOR EACH ROW EXECUTE PROCEDURE cm_audit.gw_trg_cm_log(%L, %L, %L)',
+            'FOR EACH ROW EXECUTE PROCEDURE audit.gw_trg_cm_log(%L, %L, %L)',
             trigger_name, rec.table_name, feature_type, mission_type, mission_id_column
         );
     END LOOP;
@@ -259,7 +259,7 @@ BEGIN
     EXECUTE format(
         'CREATE OR REPLACE TRIGGER trg_log_om_campaign ' ||
         'AFTER INSERT OR UPDATE OR DELETE ON cm.om_campaign ' ||
-        'FOR EACH ROW EXECUTE PROCEDURE cm_audit.gw_trg_cm_log(%L, %L, %L)',
+        'FOR EACH ROW EXECUTE PROCEDURE audit.gw_trg_cm_log(%L, %L, %L)',
         'campaign', 'campaign', 'campaign_id'
     );
 
@@ -267,7 +267,7 @@ BEGIN
     EXECUTE format(
         'CREATE OR REPLACE TRIGGER trg_log_om_campaign_lot ' ||
         'AFTER INSERT OR UPDATE OR DELETE ON cm.om_campaign_lot ' ||
-        'FOR EACH ROW EXECUTE PROCEDURE cm_audit.gw_trg_cm_log(%L, %L, %L)',
+        'FOR EACH ROW EXECUTE PROCEDURE audit.gw_trg_cm_log(%L, %L, %L)',
         'lot', 'lot', 'lot_id'
     );
 END

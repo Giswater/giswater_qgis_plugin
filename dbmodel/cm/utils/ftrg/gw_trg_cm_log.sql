@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3460
 
-CREATE OR REPLACE FUNCTION cm_audit.gw_trg_cm_log() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION audit.gw_trg_cm_log() RETURNS trigger AS $$
 DECLARE
     v_feature_type TEXT := TG_ARGV[0];
     v_mission_type TEXT := TG_ARGV[1];
@@ -23,7 +23,7 @@ DECLARE
     v_prev_search_path text;
 BEGIN
     v_prev_search_path := current_setting('search_path');
-    PERFORM set_config('search_path', 'cm_audit, public', true);
+    PERFORM set_config('search_path', 'audit, public', true);
 
     v_feature_id_column := v_feature_type || '_id';
 
@@ -48,21 +48,21 @@ BEGIN
             RETURN NULL; -- No changes, do not log
         END IF;
 
-        INSERT INTO cm_audit.log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        INSERT INTO audit.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
         VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, LEFT(current_query(), 100), old_json, new_json, current_user, clock_timestamp());
         PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
 
     ELSIF TG_OP = 'INSERT' THEN
         new_json := to_jsonb(NEW);
-        INSERT INTO cm_audit.log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        INSERT INTO audit.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
         VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, LEFT(current_query(), 100), NULL, new_json, current_user, clock_timestamp());
         PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
         old_json := to_jsonb(OLD);
-        INSERT INTO cm_audit.log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
+        INSERT INTO audit.cm_log(table_name, mission_type, mission_id, feature_id, feature_type, "action", sql, old_value, new_value, insert_by, insert_at)
         VALUES (TG_TABLE_NAME, v_mission_type, v_mission_id_value, v_feature_id_value, v_feature_type, TG_OP, LEFT(current_query(), 100), old_json, NULL, current_user, clock_timestamp());
         PERFORM set_config('search_path', v_prev_search_path, true);
         RETURN OLD;

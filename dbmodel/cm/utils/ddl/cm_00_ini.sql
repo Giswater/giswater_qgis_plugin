@@ -12,4 +12,4 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 CREATE SCHEMA cm;
-CREATE SCHEMA cm_audit;
+CREATE SCHEMA IF NOT EXISTS audit;
