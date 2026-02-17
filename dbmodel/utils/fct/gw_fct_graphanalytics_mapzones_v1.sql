@@ -873,7 +873,7 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
 				
-				-- check if there are arcs fore nodeParents that are not toArc, neither inlet_arc 
+				-- check if there are arcs for nodeParents that are not toArc, neither inlet_arc 
 				SELECT string_agg(mapzone_arcs, '')
 				INTO message
 				FROM (
@@ -911,7 +911,7 @@ BEGIN
 				) sub;
 				
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 				END IF;
@@ -1022,7 +1022,7 @@ BEGIN
 	END IF; --v_from_zero
 
 	-- check if there are any errors in grapfconfig, when v_from_zero FALSE
-	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 1) > 0 THEN
+	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 2) > 0 THEN
 
 		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, expl_id, name)
 		VALUES (0,0, array[0]::int[], array[0]::int[], 'Disconnected');
