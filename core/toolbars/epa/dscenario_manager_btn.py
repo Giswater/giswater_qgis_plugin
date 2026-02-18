@@ -279,7 +279,7 @@ class GwDscenarioManagerButton(GwAction):
         # Fill table
         self.tbl_dscenario = self.dlg_dscenario_manager.findChild(QTableView, 'tbl_dscenario')
 
-        self._fill_manager_table('ve_cat_dscenario')
+        self._fill_manager_table('ve_cat_dscenario', dialog=self.dlg_dscenario_manager)
 
         # CheckBox filter
         self.filter_active = self.dlg_dscenario_manager.findChild(QCheckBox, 'chk_active')
@@ -294,7 +294,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                        've_cat_dscenario', None))
+                                                                        've_cat_dscenario', None, dialog=self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 've_inp_dscenario', 'Dscenario'))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
                                                 self.dlg_dscenario_manager, 've_cat_dscenario', 3156))
@@ -308,7 +308,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_dscenario_manager, self.tbl_dscenario, 've_cat_dscenario'))
         self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
-        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table, 've_cat_dscenario'))
+        self.dlg_dscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table, 've_cat_dscenario', dialog=self.dlg_dscenario_manager))
 
         self.dlg_dscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_dscenario_manager))
@@ -511,7 +511,7 @@ class GwDscenarioManagerButton(GwAction):
         if fields:
             self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, fields)
             self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, fields)
-        tools_gw.set_tablemodel_config(self.dlg_dscenario_manager, self.tbl_dscenario, 've_cat_dscenario', Qt.SortOrder.DescendingOrder)
+        tools_gw.set_tablemodel_config(dialog, self.tbl_dscenario, 've_cat_dscenario', Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(self.tbl_dscenario)
         # Optionally set current scenario label if context provided
 
@@ -1109,7 +1109,7 @@ class GwDscenarioManagerButton(GwAction):
         if json_result and json_result.get('status') == 'Accepted':
             tools_gw.close_dialog(dialog)
             # Refresh tableview
-            self._fill_manager_table(tablename)
+            self._fill_manager_table(tablename, dialog=dialog)
             return
         msg = "Error"
         tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
