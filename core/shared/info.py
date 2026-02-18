@@ -411,7 +411,7 @@ class GwInfo(QObject):
                 continue
             if field.get('tabname') not in ('tab_data', 'tab_none'):
                 continue
-            if 'spacer' in field['widgettype']:
+            if field['widgettype'] in ('spacer', 'label'):
                 continue
 
             widget = dialog.findChild(QWidget, field['widgetname'])
