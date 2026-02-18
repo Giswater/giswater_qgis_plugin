@@ -6,9 +6,38 @@ or (at your option) any later version.
 */
 
 /*
-SELECT ws_36.gw_fct_utils_owner_all('ws', 'role_system')
-*/
+FUNCTION: gw_fct_utils_owner_all(schema_name, new_owner)
 
+PURPOSE:
+  Transfers ownership of all database objects within a specified schema to a new role.
+  This utility is essential for schema administration tasks such as role migrations,
+  permission restructuring, and post-import ownership corrections.
+
+PARAMETERS:
+  - schema_name (character varying): Name of the schema containing objects to reassign
+  - new_owner (character varying): Name of the role that will become the owner
+
+RETURN:
+  boolean: TRUE on successful completion, raises exception on failure
+
+HANDLES:
+  - Tables
+  - Views
+  - Sequences
+  - Functions
+
+EXAMPLE USAGE:
+  SELECT gw_fct_utils_owner_all('ws', 'role_system');
+
+NOTES:
+  - The executing user must own the objects or be a superuser
+  - The target role (new_owner) must already exist in the database
+  - Ownership transfer is performed in order: Tables → Views → Sequences → Functions
+  - If any ALTER statement fails, the function will halt and raise an exception
+
+COMPATIBLE VERSIONS:
+  PostgreSQL 8.0+ (quote_ident support required)
+*/
 
 CREATE OR REPLACE FUNCTION gw_fct_utils_owner_all(schema_name character varying, new_owner character varying)
   RETURNS boolean AS
