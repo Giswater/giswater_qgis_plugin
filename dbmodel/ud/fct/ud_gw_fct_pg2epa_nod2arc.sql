@@ -96,7 +96,7 @@ BEGIN
 			JOIN temp_t_element ON temp_t_element.element_id = man_frelem.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a
-		ORDER BY flw_type, node_id, to_arc, element_id
+		ORDER BY node_id, to_arc, flw_type, element_id
 
 	LOOP
 		-- Getting data from node
