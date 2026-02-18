@@ -34,9 +34,6 @@ NOTES:
   - The target role (new_owner) must already exist in the database
   - Ownership transfer is performed in order: Tables → Views → Sequences → Functions
   - If any ALTER statement fails, the function will halt and raise an exception
-
-COMPATIBLE VERSIONS:
-  PostgreSQL 8.0+ (quote_ident support required)
 */
 
 CREATE OR REPLACE FUNCTION gw_fct_utils_owner_all(schema_name character varying, new_owner character varying)
@@ -67,18 +64,11 @@ BEGIN
 
 	-- Sequences
 	FOR rec_object IN 
-		SELECT c.relname, u.usename, n.nspname
-		FROM pg_class c, pg_user u, pg_namespace n
-		WHERE c.relowner = u.usesysid 
-			AND n.oid = c.relnamespace
-			AND c.relkind = 'S' 
-			AND n.nspname = schema_name
-			AND relnamespace IN (
-					SELECT oid
-					FROM pg_namespace
-					WHERE nspname NOT LIKE 'pg_%'
-					AND nspname != 'information_schema'
-				)
+		    SELECT c.relname
+			FROM pg_class c
+			JOIN pg_namespace n ON n.oid = c.relnamespace
+			WHERE c.relkind = 'S' 
+				AND n.nspname = schema_name
 	LOOP
         EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.relname)||' OWNER TO '|| quote_ident(new_owner);
 	END LOOP;
