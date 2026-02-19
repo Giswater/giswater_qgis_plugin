@@ -37,7 +37,7 @@ VALUES(4444, 'There is no topology from the selected node.', 'The node is isolat
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
 VALUES(3542, 'gw_fct_cm_topological_trace', 'ws', 'function', 'json', 'json', 'Function to visualize the topology of the lot from a SELECTED NODE.
 
-The available lots for the analysis are the ones that take part into de SELECTED CAMPAIGN.', 'role_om', NULL, 'core', NULL);
+The available lots for the analysis are the ones that take part into de SELECTED CAMPAIGN.', 'role_om', NULL, 'cm', NULL);
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3542, '[CM] Visualize Lot topology', '{"featureType":[]}'::json, '[
   {
@@ -67,7 +67,7 @@ INSERT INTO sys_function
 VALUES(3540, 'gw_fct_cm_build_topology', 'ws', 'function', 'json', 'json', 'Function to build or update the topology of a Lot. 
 
 
-Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'core', NULL);
+Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'cm', NULL);
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3540, '[CM] Reconnect Lot topology', '{"featureType":[]}'::json, '[
   {
@@ -96,3 +96,16 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
     "layoutorder": 5
   }
 ]'::json, NULL, true, '{4}');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3544, 'gw_fct_cm_check_node_orphan', 'ws', 'function', 'json', 'json', 'Function to show orphan nodes of the selected lot. That is: the nodes that are neither node_1 nor node_2 or any arc.', 'role_om', NULL, 'cm', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3546, 'gw_fct_cm_check_node_duplicated', 'ws', 'function', 'json', 'json', 'Funcion to show duplicated nodes of the selected lot 3.
+
+The tolerance from which nodes are detected is 10 cm.', 'role_om', NULL, 'cm', NULL);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3548, 'gw_fct_cm_check_arc_duplicated', 'ws', 'function', 'json', 'json', 'Function to show duplicated arcs in the lot.', 'role_om', NULL, 'cm', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3550, 'gw_fct_cm_check_node_document', 'ws', 'function', 'json', 'json', 'Function to show the nodes that do not have related documents. 
+
+Specific node type can be excluded from the search.', 'role_om', NULL, 'cm', NULL);
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(-3, 'There are ', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(-2, 'There is ', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
