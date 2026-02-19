@@ -156,13 +156,13 @@ class GwDscenarioManagerButton(GwAction):
                                                                         dialog=self.dlg_hydrology_manager,
                                                                         scenario_type="hydrology"))
         self.dlg_hydrology_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_hydrology_manager, 've_cat_hydrology', 3294))
+                                                self.dlg_hydrology_manager, 've_cat_hydrology', 3294, 'hydrology_id'))
         self.dlg_hydrology_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3100,
                                                                        've_cat_hydrology', dialog=self.dlg_hydrology_manager, scenario_type="hydrology"))
         self.dlg_hydrology_manager.btn_update.clicked.connect(partial(self._manage_properties,
                                                 self.dlg_hydrology_manager, 've_cat_hydrology', True))
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_hydrology_manager, 've_cat_hydrology', scenario_type="hydrology"))
+                                                self.dlg_hydrology_manager, 've_cat_hydrology', scenario_type="hydrology", column_name="hydrology_id"))
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_hydrology_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_hydrology_manager, self.tbl_dscenario, 've_cat_hydrology', 'inp_options_hydrology_current', scenario_type="hydrology"))
@@ -226,13 +226,13 @@ class GwDscenarioManagerButton(GwAction):
                                                                   dialog=self.dlg_dwf_manager,
                                                                   scenario_type="dwf"))
         self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dwf_manager, 've_cat_dwf', 3296))
+                                                self.dlg_dwf_manager, 've_cat_dwf', 3296, 'id'))
         self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
                                                                  've_cat_dwf', dialog=self.dlg_dwf_manager, scenario_type="dwf"))
         self.dlg_dwf_manager.btn_update.clicked.connect(partial(self._manage_properties,
                                                 self.dlg_dwf_manager, 've_cat_dwf', True))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_dwf_manager, 've_cat_dwf', scenario_type="dwf"))
+                                                self.dlg_dwf_manager, 've_cat_dwf', scenario_type="dwf", column_name="id"))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_dwf_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_dwf_manager, self.tbl_dscenario, 've_cat_dwf', 'inp_options_dwfscenario_current', scenario_type="dwf"))
@@ -297,13 +297,13 @@ class GwDscenarioManagerButton(GwAction):
                                                                         've_cat_dscenario', None, dialog=self.dlg_dscenario_manager))
         self.dlg_dscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 've_inp_dscenario', 'Dscenario'))
         self.dlg_dscenario_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dscenario_manager, 've_cat_dscenario', 3156))
+                                                self.dlg_dscenario_manager, 've_cat_dscenario', 3156, 'dscenario_id'))
         self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
                                                                        've_cat_dscenario'))
         self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._manage_properties,
                                                 self.dlg_dscenario_manager, 've_cat_dscenario', True))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_dscenario_manager, 've_cat_dscenario'))
+                                                self.dlg_dscenario_manager, 've_cat_dscenario', column_name='dscenario_id'))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_dscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
                                                 self.dlg_dscenario_manager, self.tbl_dscenario, 've_cat_dscenario'))
@@ -599,7 +599,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'target'), f"{value}", 0)
         return dlg_functions
 
-    def _duplicate_selected_dscenario(self, dialog, view, fct_id):
+    def _duplicate_selected_dscenario(self, dialog, view, fct_id, column_name):
         """ Duplicates the selected dscenario """
 
         # Get selected row
@@ -611,16 +611,16 @@ class GwDscenarioManagerButton(GwAction):
 
         # Get selected dscenario id
         index = self.tbl_dscenario.selectionModel().currentIndex()
-        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, column_name)
         value = index.sibling(index.row(), col_idx).data()
 
         # Execute toolbox function
-        dlg_functions = self._open_toolbox_function(fct_id, view)
+        dlg_functions = self._open_toolbox_function(fct_id, view, dialog=dialog)
         # Set dscenario_id in combo copyFrom
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'copyFrom'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
-    def _delete_selected_dscenario(self, dialog, view, scenario_type=None):
+    def _delete_selected_dscenario(self, dialog, view, scenario_type=None, column_name=None):
         """ Deletes the selected dscenario """
 
         # Get selected row
@@ -630,8 +630,9 @@ class GwDscenarioManagerButton(GwAction):
             tools_qgis.show_warning(msg, dialog=dialog)
             return
 
-        # Get selected dscenario id
-        values = [index.sibling(index.row(), 0).data() for index in selected_list]
+        # Get selected id
+        col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, column_name)
+        values = [index.sibling(index.row(), col_idx).data() for index in selected_list]
 
         msg = ("CAUTION! Deleting a dscenario will delete data from features related to the dscenario.\n"
                   "Are you sure you want to delete these records?")
@@ -1076,13 +1077,13 @@ class GwDscenarioManagerButton(GwAction):
         self.props_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.props_dlg))
         self.props_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.props_dlg))
         self.props_dlg.btn_accept.clicked.connect(partial(self._accept_props_dlg, self.props_dlg, tablename, pkey,
-                                                          self.selected_dscenario_id, self.my_json_add))
+                                                          self.selected_dscenario_id, self.my_json_add, dialog))
 
         # Open dlg
         title = f"Properties for Dscenario: {self.selected_dscenario_id}"
         tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic', title=title)
 
-    def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
+    def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json, main_dialog=None):
         """ Accept the properties dialog """
 
         if not my_json:
@@ -1109,7 +1110,7 @@ class GwDscenarioManagerButton(GwAction):
         if json_result and json_result.get('status') == 'Accepted':
             tools_gw.close_dialog(dialog)
             # Refresh tableview
-            self._fill_manager_table(tablename, dialog=dialog)
+            self._fill_manager_table(tablename, dialog=main_dialog)
             return
         msg = "Error"
         tools_qgis.show_warning(msg, parameter=json_result, dialog=dialog)
