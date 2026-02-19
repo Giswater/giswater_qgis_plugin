@@ -160,7 +160,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3100,
                                                                        've_cat_hydrology', dialog=self.dlg_hydrology_manager, scenario_type="hydrology"))
         self.dlg_hydrology_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_hydrology_manager, 've_cat_hydrology', True))
+                                                self.dlg_hydrology_manager, 've_cat_hydrology', True, column_name='hydrology_id'))
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
                                                 self.dlg_hydrology_manager, 've_cat_hydrology', scenario_type="hydrology", column_name="hydrology_id"))
         self.dlg_hydrology_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
@@ -175,7 +175,7 @@ class GwDscenarioManagerButton(GwAction):
             partial(self.update_current_scenario, self.dlg_hydrology_manager, qtbl=self.tbl_dscenario,
                     scenario_type="hydrology", col_id_name="hydrology_id", view_name="ve_cat_hydrology",))
 
-        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_hydrology_manager, 've_cat_hydrology'))
+        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_hydrology_manager, 've_cat_hydrology', column_name='hydrology_id'))
 
         self.dlg_hydrology_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_hydrology_manager))
@@ -230,7 +230,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
                                                                  've_cat_dwf', dialog=self.dlg_dwf_manager, scenario_type="dwf"))
         self.dlg_dwf_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_dwf_manager, 've_cat_dwf', True))
+                                                self.dlg_dwf_manager, 've_cat_dwf', True, column_name='id'))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
                                                 self.dlg_dwf_manager, 've_cat_dwf', scenario_type="dwf", column_name="id"))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
@@ -245,7 +245,7 @@ class GwDscenarioManagerButton(GwAction):
             partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf",
                     col_id_name="id", view_name="ve_cat_dwf"))
 
-        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_dwf_manager, 've_cat_dwf'))
+        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_dwf_manager, 've_cat_dwf', column_name='id'))
 
         self.dlg_dwf_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_dwf_manager))
@@ -301,7 +301,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3042,
                                                                        've_cat_dscenario'))
         self.dlg_dscenario_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_dscenario_manager, 've_cat_dscenario', True))
+                                                self.dlg_dscenario_manager, 've_cat_dscenario', True, column_name='dscenario_id'))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
                                                 self.dlg_dscenario_manager, 've_cat_dscenario', column_name='dscenario_id'))
         self.dlg_dscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
@@ -703,7 +703,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.main_tab.setCurrentIndex(default_tab_idx)
 
         # Connect signals
-        self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties, self.dlg_dscenario_manager, 've_cat_dscenario'))
+        self.dlg_dscenario.btn_properties.clicked.connect(partial(self._manage_properties, self.dlg_dscenario_manager, 've_cat_dscenario', column_name='dscenario_id'))
         self.dlg_dscenario.btn_toc.clicked.connect(partial(self._manage_add_layers, 've_inp_dscenario', 'Dscenario'))
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
@@ -1030,7 +1030,7 @@ class GwDscenarioManagerButton(GwAction):
             except Exception:
                 pass
 
-    def _manage_properties(self, dialog, view, feature_id=None):
+    def _manage_properties(self, dialog, view, feature_id=None, column_name=None):
         tablename = view
         pkey = self.views_dict[view]
 
@@ -1046,7 +1046,7 @@ class GwDscenarioManagerButton(GwAction):
         else:
             # Get selected netscenario id
             index = self.tbl_dscenario.selectionModel().currentIndex()
-            col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+            col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, column_name)
             feature_id = index.sibling(index.row(), col_idx).data()
             self.selected_dscenario_id = feature_id
             if feature_id is None:
