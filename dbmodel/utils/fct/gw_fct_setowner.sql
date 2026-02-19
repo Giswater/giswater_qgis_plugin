@@ -7,14 +7,51 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 3024
 
+/*
+FUNCTION: gw_fct_setowner(p_data json)
+
+PURPOSE:
+  Transfers ownership of all database objects within the current schema to a new role
+  using a JSON-based interface. This API function provides a standardized way to
+  perform ownership transfer operations, integrating with Giswater's client-server
+  architecture for schema administration and role management tasks.
+
+PARAMETERS:
+  - p_data (json): JSON object containing:
+    * client.lang (text): Client language code (e.g., "ES", "EN")
+    * data.owner (text): Name of the role that will become the new owner
+
+RETURN:
+  json: Standardized response object containing:
+    * status: Operation status ("Accepted" on success)
+    * message: Result message with level and text
+    * version: Giswater version number
+    * body: Additional data including form and info objects
+
+HANDLES:
+  - Schema ownership
+  - Tables (processed from sys_table catalog)
+  - Views (processed from sys_table catalog)
+  - Sequences (all sequences in the schema)
+  - Functions (project-type specific functions from sys_function)
+
+EXAMPLE USAGE:
+  SELECT SCHEMA_NAME.gw_fct_setowner($${"client":{"lang":"ES"}, "data":{"owner":"role_admin"}}$$);
+
+NOTES:
+  - The executing user must have sufficient privileges to change ownership
+  - The target role must already exist in the database
+  - sys_table is processed first to ensure catalog integrity
+  - Function signatures are normalized (CHARACTER VARYING → VARCHAR, BOOLEAN → BOOL)
+  - Only functions matching the current project_type are processed
+  - Returns Giswater-standard JSON response for client integration
+  - INCONSISTENCY: Sequences use GRANT ALL instead of ALTER OWNER (unlike tables/views),
+    which grants privileges rather than transferring ownership.
+*/
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setowner(p_data json)
   RETURNS json AS
 $BODY$
-
-
-/*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_setowner($${"client":{"lang":"ES"}, "data":{"owner":"role_admin"}}$$);
-*/
 
 
 
