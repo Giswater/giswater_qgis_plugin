@@ -659,7 +659,7 @@ BEGIN
 	SELECT array_agg(fid) INTO v_fids_to_run
 	FROM cm.sys_fprocess
 	WHERE
-		active AND query_text IS NOT NULL AND (addparam IS NULL) AND function_name ILIKE '%gw_fct_cm_check_project%'
+		active AND query_text IS NOT NULL AND (addparam IS NULL) AND function_name ILIKE '%gw_fct_cm_check%'
 		AND CASE
 			WHEN fid IN (200, 201) THEN v_check_management_configs
 			WHEN fid IN (202, 203) THEN v_check_data_related
@@ -1312,7 +1312,7 @@ BEGIN
 			AND active
 			AND query_text IS NOT NULL
 			AND (addparam IS NULL)
-			AND function_name ILIKE ''%gw_fct_cm_check_project%''
+			AND function_name ILIKE ''%gw_fct_cm_check%''
 			AND fid = ANY(' || quote_literal(v_fids_to_run) || ')
 			ORDER BY fid ASC
 		';

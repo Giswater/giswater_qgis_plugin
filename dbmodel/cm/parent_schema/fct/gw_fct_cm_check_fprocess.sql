@@ -126,7 +126,7 @@ BEGIN
 	-- get text variables according to singular/plural values
 	IF v_count = 1 THEN
 		EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_getmessage($${"data":{"message":"-2", "function":"3428", "is_process":true}}$$)::JSON->>''text''' INTO v_text_aux;
-	ELSIF v_count > 1 THEN
+	ELSIF v_count > 1 OR v_count = 0 THEN
 		EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_getmessage($${"data":{"message":"-3", "function":"3428", "is_process":true}}$$)::JSON->>''text''' INTO v_text_aux;
 	END IF;
 	v_text_aux := concat(substring(v_text_aux, 1, 1), lower(substring(v_text_aux, 2, char_length(v_text_aux) -1)));
