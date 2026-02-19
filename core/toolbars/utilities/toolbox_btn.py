@@ -679,7 +679,8 @@ class GwToolBoxButton(GwAction):
         parent_name = combo.property('parentname')
         parent_combo = dialog.findChild(QComboBox, parent_name)
         if parent_combo:
-            parent_value = parent_combo.currentText()
+            parent_data = parent_combo.currentData()
+            parent_value = parent_data[0] if parent_data else parent_combo.currentText()
             filter_query = combo.property('filterquery')
             if filter_query:
                 filter_query = filter_query.replace('{parent_value}', parent_value)
@@ -691,8 +692,7 @@ class GwToolBoxButton(GwAction):
                 for i in range(0, len(result)):
                     elem = [result[i][0], result[i][1]]
                     combolist.append(elem)
-                for record in combolist:
-                    combo.addItem(record[0], record)
+                tools_qt.fill_combo_values(combo, combolist)
 
     def _populate_cmb_type(self, feature_types):
 
