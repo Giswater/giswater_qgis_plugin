@@ -126,6 +126,7 @@ DECLARE
     v_feature_rows integer;
     -- arc missing-node check helpers
     v_missing_arc_nodes_count integer := 0;
+	v_missing_arc_nodes_count_aux integer := 0;
     v_has_any_arcs boolean := false;
 
 BEGIN
@@ -523,29 +524,25 @@ BEGIN
 				);
 			END IF;
 
-            FOR v_rec_check IN EXECUTE v_querytext
-			LOOP
-				INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
-				VALUES (
-					v_fid,
-					current_user,
-					3, -- Critical Error
-					format('ERROR: Arc ID %s in table %s is missing node_1 or node_2. Please run topocontrol.', v_rec_check.arc_id, v_rec.table_name),
-					1
-				);
+            EXECUTE format('SELECT count(*) FROM (%s) AS subq', v_querytext)
+        	INTO v_missing_arc_nodes_count_aux;
 
-				INSERT INTO t_cm_arc(arc_id, descript, the_geom, fid)
-				VALUES (v_rec_check.arc_id, 'Arc missing start/end node', v_rec_check.the_geom, v_fid);
-
-				v_any_issue_found := true;
-                v_missing_arc_nodes_count := v_missing_arc_nodes_count + 1;
-			END LOOP;
+			v_missing_arc_nodes_count = v_missing_arc_nodes_count + v_missing_arc_nodes_count_aux;
 		END IF;
 	END LOOP;
-    -- If no missing-node arcs were found but there ARE arcs in scope, add an explicit OK message
-    IF v_has_any_arcs AND v_missing_arc_nodes_count = 0 THEN
+	-- If no missing-node arcs were found but there ARE arcs in scope, add an explicit OK message
+    IF v_missing_arc_nodes_count = 0 THEN
         INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
         VALUES (v_fid, current_user, 1, 'INFO: All arcs are connected to both start and end nodes (node_1 and node_2).', 0);
+	ELSE
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message, fcount)
+		VALUES (
+			v_fid,
+			current_user,
+			3, -- Critical Error
+			format('ERROR: There are %s arcs without node_1 or node_2.', v_missing_arc_nodes_count),
+			1
+		);
     END IF;
 	-- ENDSECTION
 
