@@ -7,13 +7,60 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2552
 
+/*
+FUNCTION: gw_fct_admin_role_permissions()
+
+PURPOSE:
+  Establishes and maintains the complete role hierarchy and permission structure for a
+  Giswater database schema. This administrative function creates all standard Giswater
+  roles if they don't exist, configures their hierarchical relationships, and grants
+  appropriate permissions on database objects (tables, views, sequences, functions).
+  Essential for initial database setup and permission maintenance.
+
+PARAMETERS:
+  None
+
+RETURN:
+  void: Function completes silently on success, raises exception on failure
+
+HANDLES:
+  Roles (created with hierarchical inheritance):
+    - role_basic: Base role with SELECT permissions (all other roles inherit from this)
+    - role_om: Operations & Maintenance (inherits: role_basic)
+    - role_edit: Editing capabilities (inherits: role_om)
+    - role_epa: EPA modeling capabilities (inherits: role_edit)
+    - role_plan: Planning capabilities (inherits: role_epa)
+    - role_admin: Administrative capabilities (inherits: role_plan)
+    - role_system: System-level operations (inherits: role_admin)
+    - role_crm: Customer Relationship Management (standalone role)
+  
+  Permissions:
+    - Database connection grants
+    - Schema access (main schema and optional utils schema)
+    - Table/View SELECT for role_basic, specific grants per sys_table.sys_role
+    - Sequence ALL permissions
+    - Function execution permissions
+    - Special handling for VPN database users (per admin_vpn_permissions config)
+    - Publish user permissions (per admin_publish_user config)
+
+EXAMPLE USAGE:
+  SELECT SCHEMA_NAME.gw_fct_admin_role_permissions();
+
+NOTES:
+  - Must be executed by a superuser or role owner
+  - Role hierarchy ensures cascading permissions (e.g., role_admin inherits all lower permissions)
+  - Grants role_admin to postgres user and current superuser automatically
+  - VPN mode (admin_vpn_permissions): revokes database access from role_basic, grants individually per cat_users
+  - Publish user receives generic SELECT permissions across all tables
+  - Processes optional utils schema if admin_utils_schema config is enabled
+  - Uses sys_table catalog to determine role-specific table permissions
+  - ALTER DEFAULT PRIVILEGES ensures future tables inherit role_basic SELECT permissions
+  - Functions receive ALL permissions (note: may be downgraded to SELECT in future versions)
+*/
+
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_role_permissions();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_role_permissions() RETURNS void AS
 $BODY$
-
-/*
-SELECT SCHEMA_NAME.gw_fct_admin_role_permissions()
-*/
 
 DECLARE
 
