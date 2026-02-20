@@ -1100,3 +1100,7 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 VALUES('netscenariomanager_form', 'ws', 'v_ui_plan_netscenario', 'active', 6, true, NULL, NULL, NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
 VALUES('netscenariomanager_form', 'ws', 'v_ui_plan_netscenario', 'log', 7, true, NULL, NULL, NULL, NULL);
+
+-- 20/02/2026
+
+UPDATE config_form_fields SET "datatype"='datetime' WHERE formname='mincut' AND formtype='form_mincut' AND columnname='exec_start' AND tabname='tab_mincut';
