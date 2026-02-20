@@ -578,10 +578,8 @@ class GwDscenarioManagerButton(GwAction):
         # Append logic dynamically for specific functions
         if function == 3292:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "dwf_id"))
-            column_name = "dwf_id"
         if function == 3290:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "hydrology_id"))
-            column_name = "hydrology_id"
         if function in dscenario_functions:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "dscenario"))
 
@@ -589,6 +587,10 @@ class GwDscenarioManagerButton(GwAction):
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect, aux_params=aux_params)
 
         if function in (3100, 3102):  # hydrology & dwf scenarios
+            if function == 3100:
+                column_name = "hydrology_id"
+            elif function == 3102:
+                column_name = "dwf_id"
             selected_list = self.tbl_dscenario.selectionModel().selectedRows()
             if len(selected_list) == 0:
                 return
