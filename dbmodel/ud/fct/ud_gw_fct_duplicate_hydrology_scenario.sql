@@ -99,7 +99,7 @@ BEGIN
 
 	-- setting the infitration data from source scenario
 	SELECT infiltration INTO v_inp_hydrology FROM cat_hydrology WHERE hydrology_id = v_copyfrom;
-	p_data = replace(p_data::text, ', "text":"', concat(' ,"infiltration":"',v_inp_hydrology,'", "text":"'));
+	p_data := jsonb_set(p_data::jsonb, '{data,parameters,infiltration}', to_jsonb(v_inp_hydrology))::json;
 
 	-- Create empty hydrology_scenario
 	EXECUTE 'SELECT gw_fct_create_hydrology_scenario_empty($$'||p_data||'$$);';
