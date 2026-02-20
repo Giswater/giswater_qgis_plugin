@@ -578,8 +578,10 @@ class GwDscenarioManagerButton(GwAction):
         # Append logic dynamically for specific functions
         if function == 3292:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "dwf_id"))
+            column_name = "dwf_id"
         if function == 3290:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "hydrology_id"))
+            column_name = "hydrology_id"
         if function in dscenario_functions:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "dscenario"))
 
@@ -593,7 +595,7 @@ class GwDscenarioManagerButton(GwAction):
 
             # Get selected scenario id
             index = self.tbl_dscenario.selectionModel().currentIndex()
-            col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, 'dscenario_id')
+            col_idx = tools_qt.get_col_index_by_col_name(self.tbl_dscenario, column_name)
             value = index.sibling(index.row(), col_idx).data()
             tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'target'), f"{value}", 0)
         return dlg_functions
