@@ -145,21 +145,22 @@ class GwWorkspaceManagerButton(GwAction):
 
         if complet_list is False:
             return False, False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
-                continue
-            model = self.tbl_wrkspcm.model()
-            if model is None:
-                model = QStandardItemModel()
-                self.tbl_wrkspcm.setModel(model)
-            model.removeRows(0, model.rowCount())
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if data.get('hidden'):
+            return False
+        model = self.tbl_wrkspcm.model()
+        if model is None:
+            model = QStandardItemModel()
+            self.tbl_wrkspcm.setModel(model)
+        model.removeRows(0, model.rowCount())
 
-            if field['value']:
-                self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, field)
-                self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, field)
-            # TODO: config_form_tableview
-            # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', Qt.SortOrder.DescendingOrder, True)
-            tools_qt.set_tableview_config(self.tbl_wrkspcm, selection_mode=QAbstractItemView.SelectionMode.SingleSelection)
+        if fields:
+            self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, fields)
+            self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, fields)
+        # TODO: config_form_tableview
+        # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', Qt.SortOrder.DescendingOrder, True)
+        tools_qt.set_tableview_config(self.tbl_wrkspcm, selection_mode=QAbstractItemView.SelectionMode.SingleSelection)
 
         return complet_list
 

@@ -222,19 +222,19 @@ class GwAudit:
         if complet_list is False:
             return False
 
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
-                continue
-            model = self.dlg_audit_manager.tbl_audit.model()
-            if model is None:
-                model = QStandardItemModel()
-                self.dlg_audit_manager.tbl_audit.setModel(model)
-            model.removeRows(0, model.rowCount())
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if data.get('hidden'):
+            return False
+        model = self.dlg_audit_manager.tbl_audit.model()
+        if model is None:
+            model = QStandardItemModel()
+            self.dlg_audit_manager.tbl_audit.setModel(model)
+        model.removeRows(0, model.rowCount())
 
-            # Check if has data
-            if field['value']:
-                self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, field)
-                self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, field)
+        if fields:
+            self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, fields)
+            self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, fields)
 
         tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, 'audit_results')
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.EditTrigger.NoEditTriggers)

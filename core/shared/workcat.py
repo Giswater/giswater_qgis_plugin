@@ -76,17 +76,19 @@ class GwWorkcat:
         complet_list = tools_gw.get_list(view, filter_name=filter_text, id_field="id")
         if complet_list is False:
             return False
-        for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'):
-                continue
-            model = self.dlg_man.tbl_workcat.model()
-            if model is None:
-                model = QStandardItemModel()
-                self.dlg_man.tbl_workcat.setModel(model)
-            model.removeRows(0, model.rowCount())
-            if field['value']:
-                self.dlg_man.tbl_workcat = tools_gw.add_tableview_header(self.dlg_man.tbl_workcat, field)
-                self.dlg_man.tbl_workcat = tools_gw.fill_tableview_rows(self.dlg_man.tbl_workcat, field)
+        data = complet_list['body']['data']
+        fields = data['fields']
+        if data.get('hidden'):
+            return False
+        model = self.dlg_man.tbl_workcat.model()
+        if model is None:
+            model = QStandardItemModel()
+            self.dlg_man.tbl_workcat.setModel(model)
+        model.removeRows(0, model.rowCount())
+
+        if fields:
+            self.dlg_man.tbl_workcat = tools_gw.add_tableview_header(self.dlg_man.tbl_workcat, fields)
+            self.dlg_man.tbl_workcat = tools_gw.fill_tableview_rows(self.dlg_man.tbl_workcat, fields)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_workcat, 'cat_work', Qt.SortOrder.AscendingOrder)
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         return True

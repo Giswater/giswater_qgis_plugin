@@ -3248,11 +3248,11 @@ class GwInfo(QObject):
 def get_list(table_name, id_name=None, filter=None):
     """ Mount and execute the query for gw_fct_getlist """
 
-    feature = f'"tableName":"{table_name}"'
     filter_fields = '"limit": -1'
     if id_name and filter:
         filter_fields += f', "{id_name}": {{"filterSign":"=", "value":"{filter}"}}'
-    body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+    extras = f'"tableName":"{table_name}"'
+    body = tools_gw.create_body(filter_fields=filter_fields, extras=extras)    
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
         return False
@@ -3293,20 +3293,22 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
         non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
 
     # values
-    for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']:
-            continue
-        model = tbl.model()
-        if model is None:
-            model = QStandardItemModel()
-            tbl.setModel(model)
-        model.removeRows(0, model.rowCount())
+    data = complet_list['body']['data']
+    fields = data['fields']
+    if not data.get('hidden'):
+        return False
+    model = tbl.model()
+    if model is None:
+        model = QStandardItemModel()
+        tbl.setModel(model)
+    model.removeRows(0, model.rowCount())
 
-        if field['value']:
-            tbl = tools_gw.add_tableview_header(tbl, field)
-            tbl = tools_gw.fill_tableview_rows(tbl, field)
-        tools_qt.set_tableview_config(tbl)
-        model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+    if fields:
+        tbl = tools_gw.add_tableview_header(tbl, fields)
+        tbl = tools_gw.fill_tableview_rows(tbl, fields)
+    tools_qt.set_tableview_config(tbl)
+    model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))
+
     try:
         tbl.doubleClicked.disconnect()
     except Exception:
