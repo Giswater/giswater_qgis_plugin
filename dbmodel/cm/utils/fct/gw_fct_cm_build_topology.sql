@@ -1,6 +1,6 @@
 -- DROP FUNCTION gw_fct_cm_build_topology(json);
 
-CREATE OR REPLACE FUNCTION gw_fct_cm_build_topology(p_data json)
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_build_topology(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -33,17 +33,19 @@ DECLARE
 	-- Input params
 	v_lot_id integer;
 	v_arc_id integer;
+	v_campaign_id integer;
 	
 	v_update_type integer;
 
 	-- vars
 	v_sql_arcs text;
 	v_sql_nodes text;
-v_filter_arc text;
-rec_table text;
-v_sql_topology text;
-v_node text;
-v_exists bool;
+	v_filter_arc text;
+	rec_table text;
+	v_sql_topology text;
+	v_node text;
+	v_exists bool;
+	v_lot_id_array integer[];
 
 	-- Custom for campaign types
 	v_prev_search_path text;
@@ -51,12 +53,12 @@ v_exists bool;
 	v_featureinfo JSON;
 
 	--Return
-v_count integer = 0;
+	v_count integer = 0;
 
 	v_result json;
 	v_result_info json;
 	v_fid integer = 999;
-v_message json;
+	v_message json;
 	v_return json;
 
 	
@@ -75,10 +77,16 @@ BEGIN
 	v_lot_id := (p_data -> 'data' -> 'parameters' ->> 'lotId')::int;
 	v_update_type := (p_data -> 'data' -> 'parameters' ->> 'updateType')::int;
 	v_arc_id := (p_data -> 'data' -> 'parameters' ->> 'arcId')::int;
-
+	v_campaign_id := (p_data -> 'data' -> 'parameters' ->> 'campaignId')::int;
 
 	
 	-- Choose which arcs are going to be updated
+	IF v_lot_id IS NULL THEN
+		SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE status IN (3,4,6) AND campaign_id = v_campaign_id GROUP BY campaign_id;
+	ELSE
+		v_lot_id_array := array[v_lot_id];
+	END IF;
+
 	if v_update_type is not null then
 
 		if v_update_type = 1 then -- all the arcs of the lot
@@ -98,19 +106,19 @@ BEGIN
 	end if;
 
 	-- Available nodes to build topology of arcs
-	v_sql_nodes = '
+	v_sql_nodes = format('
 		select a.node_id, b.the_geom as node_geom 	
 		from cm.om_campaign_lot_x_node a 	
 		join cm.om_campaign_x_node b using (node_id) 	
-		where lot_id = '||v_lot_id||' and b.the_geom is not null';
+		where lot_id in (%s) and b.the_geom is not null', array_to_string(v_lot_id_array, ','));
 
 
 	-- Arcs that are going to be updated
-	v_sql_arcs = '
+	v_sql_arcs = format('
 	select a.arc_id, b.the_geom as arc_geom 	
 			 from cm.om_campaign_lot_x_arc a 	
 			 join cm.om_campaign_x_arc b using (arc_id)  	
-			 where lot_id = '||v_lot_id||' and b.the_geom is not null '||v_filter_arc||' and st_isvalid(b.the_geom) is true';
+			 where lot_id in (%s) and b.the_geom is not null %s and st_isvalid(b.the_geom) is true', array_to_string(v_lot_id_array, ','), v_filter_arc);
 
 	-- Query of new topology
 	v_sql_topology = '
@@ -130,7 +138,7 @@ BEGIN
 	if v_exists then -- Start process
 			
 		
-		FOREACH rec_table IN ARRAY ARRAY['cm.om_campaign_lot_x_arc', 'cm.ap_tuberia', 'cm.om_campaign_x_arc']
+		FOREACH rec_table IN ARRAY ARRAY['cm.om_campaign_lot_x_arc', 'cm.PARENT_SCHEMA_pipe', 'cm.om_campaign_x_arc']
 		LOOP
 		
 		raise notice '%', rec_table;
@@ -153,7 +161,7 @@ BEGIN
 
 	-- Total udpated rows
 	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
-	SELECT v_fid, 999, 0, concat('Se han actualizado ', v_count, ' arcos del lote '||v_lot_id||'');
+	SELECT v_fid, 999, 0, concat('Se han actualizado ', v_count, ' arcos del lote '||array_to_string(v_lot_id_array, ',')||'');
 
 	-- Build return	
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
@@ -165,7 +173,7 @@ BEGIN
 
 	
 	select json_build_object('level', log_level, 'text', error_message) into v_message 
-	from ap.sys_message where id = 3700;
+	from PARENT_SCHEMA.sys_message where id = 3700;
 
     DROP TABLE IF EXISTS t_audit_check_data;
 

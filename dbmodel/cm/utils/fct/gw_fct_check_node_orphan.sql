@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 -- DROP FUNCTION PARENT_SCHEMA.gw_fct_cm_check_node_orphan(json);
 
-CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_fct_cm_check_node_orphan(p_data json)
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_check_node_orphan(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -27,12 +27,14 @@ v_version text;
 v_srid integer;
 
 v_lot_id integer;
+v_campaign_id integer;
 
 
 -- Vars
 
 v_sql_result TEXT;
 v_count int = 0;
+v_lot_id_array integer[];
 
 
 
@@ -51,6 +53,13 @@ BEGIN
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
    
    	v_lot_id := (p_data ->'data' ->'parameters'->>'lotId')::integer;
+	v_campaign_id := (p_data ->'data' ->'parameters'->>'campaignId')::integer;
+
+	IF v_lot_id IS NULL THEN
+		SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE status IN (3,4,6) AND campaign_id = v_campaign_id GROUP BY campaign_id;
+	ELSE
+		v_lot_id_array := array[v_lot_id];
+	END IF;
 
 	CREATE TEMP TABLE IF NOT EXISTS t_audit_check_data (LIKE audit_check_data INCLUDING ALL);
 
@@ -60,22 +69,22 @@ BEGIN
 	 SELECT node_1 AS node_id FROM cm.om_campaign_x_arc WHERE node_1 IS NOT NULL UNION
 	 SELECT node_2 AS node_id FROM cm.om_campaign_x_arc WHERE node_2 IS NOT NULL
 	 ), moc AS ( 
-	 	SELECT node_id FROM mec JOIN cm.om_campaign_lot_x_node USING (node_id) WHERE lot_id = %L
+	 	SELECT node_id FROM mec JOIN cm.om_campaign_lot_x_node USING (node_id) WHERE lot_id IN (%s)
 	 )
 	 SELECT a.node_id, b.nodecat_id, b.the_geom FROM cm.om_campaign_lot_x_node a 
 	 left join cm.om_campaign_x_node b using (node_id) 
 	 left join PARENT_SCHEMA.cat_feature_node c on c.id = b.nodecat_id
-	 WHERE a.lot_id = %L
+	 WHERE a.lot_id IN (%s)
 	 AND a.node_id NOT IN (SELECT node_id FROM moc)',
-	v_lot_id,    
-    v_lot_id
+	array_to_string(v_lot_id_array, ','),
+	array_to_string(v_lot_id_array, ',')
     );
 
    	EXECUTE 'select count(*) from ('||v_sql_result||')' INTO v_count;
    
    	-- Report results
    	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	SELECT 999, 1, concat('There are ', v_count, ' orphan nodes in the lot ', v_lot_id, '.');
+	SELECT 999, 1, concat('There are ', v_count, ' orphan nodes in the lot ', array_to_string(v_lot_id_array, ', '), '.');
 
    	-- Return results
 	-- temporal table for nodes

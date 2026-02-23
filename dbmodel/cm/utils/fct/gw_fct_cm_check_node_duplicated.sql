@@ -5,9 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
--- DROP FUNCTION PARENT_SCHEMA.gw_fct_cm_check_node_document(json);
+-- DROP FUNCTION cm.gw_fct_cm_check_node_duplicated(json);
 
-CREATE OR REPLACE FUNCTION cm.gw_fct_cm_check_node_document(p_data json)
+CREATE OR REPLACE FUNCTION cm.gw_fct_cm_check_node_duplicated(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -15,8 +15,8 @@ AS $function$
 /*EXAMPLE
 
 
-SELECT gw_fct_cm_check_node_document($${"client":{"device":4, "lang":"es_CR", "version":"4.7.0", "infoType":1, "epsg":8908}, "form":{}, "feature":{}, 
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"lotId":"16", "excludeNodecatId":null}, "aux_params":null}}$$);
+SELECT gw_fct_cm_check_node_duplicated($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{},"data":{"parameters":{"nodeId":1}}}$$);
 
 */
 
@@ -29,16 +29,12 @@ v_srid integer;
 v_lot_id integer;
 v_campaign_id integer;
 
-
 -- Vars
 
 v_sql_result TEXT;
 v_count int = 0;
 v_tolerance NUMERIC = 0;
-rec record;
-v_exclude_nodecat text;
 v_lot_id_array integer[];
-
 
 -- Return
 v_result json;
@@ -49,67 +45,44 @@ v_result_point json;
 
 BEGIN
 
-    SET search_path = "PARENT_SCHEMA","cm", public;
+    SET search_path = "ap","cm", public;
 
 	-- Init params
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
    
+	v_campaign_id := (p_data ->'data' ->'parameters'->>'campaignId')::integer;
    	v_lot_id := (p_data ->'data' ->'parameters'->>'lotId')::integer;
-   	v_campaign_id := (p_data ->'data' ->'parameters'->>'campaignId')::integer;
    	v_tolerance := (p_data ->'data' ->'parameters'->>'searchTolerance')::numeric;
-   	v_exclude_nodecat := (p_data ->'data' ->'parameters'->>'excludeNodecatId')::text;
 
 	IF v_lot_id IS NULL THEN
-		SELECT array_agg(lot_id) INTO v_lot_id_array FROM om_campaign_lot WHERE status IN (3,4,6) AND campaign_id = v_campaign_id GROUP BY campaign_id;
+		SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE status IN (3,4,6) AND campaign_id = v_campaign_id GROUP BY campaign_id;
 	ELSE
 		v_lot_id_array := array[v_lot_id];
 	END IF;
 
-	SELECT string_agg(quote_literal(trim(elemento)), ', ') into v_exclude_nodecat
-	from unnest(string_to_array(v_exclude_nodecat, ',')) AS elemento;
-
-	v_exclude_nodecat = coalesce(v_exclude_nodecat, quote_literal(''));
-
 	CREATE TEMP TABLE IF NOT EXISTS t_audit_check_data (LIKE audit_check_data INCLUDING ALL);
 
-	CREATE TEMP TABLE IF NOT EXISTS t_count_nodes ( -- store all the nodes from a specific lot
-		feature_type text,
-		"uuid" uuid,
-		tiene_geom bool,
-		the_geom public.geometry(point, 8908) NULL
-	);
-
-	FOR rec in 
-	select concat('PARENT_SCHEMA_', lower(id)) as table_child, id as feature_type from PARENT_SCHEMA.cat_feature_node where concat('PARENT_SCHEMA_', lower(id)) in 
-	(select table_name from information_schema.tables where table_schema = 'cm')
-
-	loop
-
-		execute format(
-			'insert into t_count_nodes
-			select %L, uuid, coalesce(st_isvalid(the_geom), false), the_geom from cm.%I where lot_id IN (%s)',
-			rec.feature_type,
-			rec.table_child,
-			array_to_string(v_lot_id_array, ',')
-		);
-
-	end loop;
-
-	-- 
-	v_sql_result = '
-	with mec as (
-		select node_uuid as uuid, count(*) as n_doc from cm.doc_x_node group by node_uuid
+	-- Query for orphan nodes
+   	v_sql_result := format(
+    'WITH mec AS (
+		SELECT node_id, nodecat_id, the_geom FROM cm.om_campaign_x_node a
+		JOIN cm.om_campaign_lot_x_node b USING (node_id) 
+		WHERE the_geom IS NOT NULL AND lot_id IN (%s)
 	)
-	select a.* from t_count_nodes a
-	left join mec using (uuid) 
-	where n_doc is null and feature_type NOT IN ('||v_exclude_nodecat||')';
+	SELECT a.node_id, a.nodecat_id, string_agg(b.node_id::text, '','') AS node_id_duplicated, a.the_geom
+	FROM mec a LEFT JOIN mec b ON st_dwithin(a.the_geom, b.the_geom, %L) 
+	WHERE a.node_id != b.node_id
+	GROUP BY a.node_id, a.nodecat_id, a.the_geom
+	ORDER BY a.nodecat_id',
+	array_to_string(v_lot_id_array, ','),
+	v_tolerance
+    );
 
-	
    	EXECUTE 'select count(*) from ('||v_sql_result||')' INTO v_count;
    
    	-- Report results
    	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	SELECT 999, 1, concat('There are ', v_count, 'nodes without related documents in the lot ', array_to_string(v_lot_id_array, ', '), '.');
+	SELECT 999, 1, concat('Hay ', v_count, ' nodos duplicados en el lote ', array_to_string(v_lot_id_array, ','), '.');
 
    	-- Return results
 	-- temporal table for nodes
@@ -138,15 +111,13 @@ BEGIN
 
 
 	DROP TABLE IF EXISTS t_audit_check_data;
-	DROP TABLE IF EXISTS t_count_nodes;
-
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||
