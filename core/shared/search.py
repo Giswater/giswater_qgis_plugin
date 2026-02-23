@@ -449,6 +449,10 @@ class GwSearch:
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
             tools_qt.set_completer_object(completer, model, widget, sorted(display_list))
+            # Refresh popup for current text
+            completer.setCompletionPrefix(widget.text())
+            if widget.text():
+                completer.complete()
 
         if len(line_list) == 2:
             line_edit_add = line_list[1]
@@ -472,6 +476,10 @@ class GwSearch:
                 for data in self.result_data['data']:
                     display_list.append(data['display_name'])
                 tools_qt.set_completer_object(completer, model, line_edit_add, sorted(display_list))
+                # Refresh popup for current text
+                completer.setCompletionPrefix(line_edit_add.text())
+                if line_edit_add.text():
+                    completer.complete()
 
     def _clear_line_edit_add(self, line_list):
         """ Clear second line edit if exist """
