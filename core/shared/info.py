@@ -3295,7 +3295,7 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
     # values
     data = complet_list['body']['data']
     fields = data['fields']
-    if not data.get('hidden'):
+    if data.get('hidden'):
         return False
     model = tbl.model()
     if model is None:
