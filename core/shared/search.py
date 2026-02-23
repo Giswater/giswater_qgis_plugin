@@ -297,10 +297,14 @@ class GwSearch:
             # the line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not
             # two ruberbands (the one from self.open_custom_form (...) and this one) we delete these
 
-            try:
-                margin = float(complet_result['body']['feature']['zoomCanvasMargin'])
-            except ValueError:
+            margin = complet_result.get('body', {}).get('feature', {}).get('zoomCanvasMargin')
+            if margin is None:
                 margin = 50
+            else:
+                try:
+                    margin = float(margin)
+                except (ValueError, TypeError):
+                    margin = 50
 
             tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
             self._reset_rubber_band()
