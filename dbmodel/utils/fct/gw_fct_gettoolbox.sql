@@ -37,6 +37,7 @@ ve_fields json;
 v_epa_fields json;
 v_master_fields json;
 v_admin_fields json;
+v_cm_fields json;
 v_isepa boolean = false;
 v_epa_user text;
 rec record;
@@ -109,7 +110,9 @@ BEGIN
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
-			 AND ',v_device,' = ANY(device)) a');
+			 AND ',v_device,' = ANY(device)
+			 AND (COALESCE(source,'''') <> ''cm'' AND alias NOT ILIKE ''%[CM]%'')
+		) a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -174,6 +177,24 @@ BEGIN
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 50);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_admin_fields;
+
+	-- get cm toolbox parameters
+	v_querystring = concat('
+		SELECT array_to_json(array_agg(row_to_json(a))) FROM (
+			 SELECT config_toolbox.id, alias, function_name as functionname
+			 FROM sys_function
+			 JOIN config_toolbox USING (id)
+			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role = ''role_om'' AND config_toolbox.active IS TRUE
+			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
+			 AND ',v_device,' = ANY(device)
+			 AND (COALESCE(source,'''') = ''cm'' OR alias ILIKE ''%[CM]%'')
+		) a');
+
+	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 50);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_cm_fields;
 
 	-- get reports toolbox parameters
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
@@ -242,7 +263,8 @@ BEGIN
 	'edit', ve_fields,
 	'epa', v_epa_fields,
 	'master', v_master_fields,
-	'admin', v_admin_fields)) INTO v_process;
+	'admin', v_admin_fields,
+	'cm', v_cm_fields)) INTO v_process;
 
 	v_process := COALESCE(v_process, '[]');
 	v_reports := COALESCE(v_reports, '[]');
