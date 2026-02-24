@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import Qgis, QgsEditFormConfig
+from qgis.utils import iface
 
 from .task import GwTask
 from ..utils import tools_gw
@@ -54,6 +55,11 @@ class GwProjectLayersConfig(GwTask):
             sql += f"{self.body}"
         sql += ");"
         tools_gw.manage_json_response(self.json_result, sql, None)
+
+        # Select the layer called 've_node'
+        layer = tools_qgis.get_layer_by_tablename('ve_node')
+        if layer:
+            iface.setActiveLayer(layer)
 
         # If user cancel task
         if self.isCanceled():
