@@ -1344,7 +1344,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                 vr_layer = value_relation.get('layer', '')
                 layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
                 if layer_obj is None:
-                    layer_obj = load_layer_in_hidden_group(vr_layer)
+                    layer_obj = load_layer_in_hidden_group(vr_layer, key_column=value_relation.get('keyColumn', ''))
 
                 if layer_obj is None:
                     raise Exception(f"Layer '{vr_layer}' not found")
@@ -1451,7 +1451,7 @@ def load_missing_layers(filter, group="GW Layers", sub_group=None):
                 add_layer_database(tablename, the_geom=the_geom, alias=alias, group=group, sub_group=sub_group)
 
 
-def load_layer_in_hidden_group(layer_name):
+def load_layer_in_hidden_group(layer_name, key_column=""):
     """ Load a layer into the 'Hidden' group """
     # Resolve schema and table name
     if '.' in layer_name:
@@ -1462,7 +1462,7 @@ def load_layer_in_hidden_group(layer_name):
 
     uri, _ = tools_db.get_uri(tablename=table)
     if uri:
-        uri.setDataSource(schema, table, None, "", "")
+        uri.setDataSource(schema, table, None, "", key_column)
         layer = QgsVectorLayer(uri.uri(False), layer_name, "postgres")
         if layer.isValid():
             tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True)
