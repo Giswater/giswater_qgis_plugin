@@ -11,26 +11,35 @@ SET search_path = "SCHEMA_NAME", public;
 
 DROP VIEW IF EXISTS v_cso_drainzone_rainfall_tstep;
 CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep;
-AS SELECT rowid,
-    drainzone_id,
-    node_id AS outfall_id,
-    rf_name AS rainfall,
-    rf_tstep,
-    round(rf_volume::numeric, 3) AS rf_intensity,
-    round(vol_residual::numeric, 3) AS vol_dwf,
-    round(vol_rainfall::numeric, 3) AS vol_rainfall,
-    round(vol_total::numeric, 3) AS vol_total,
-    round(vol_runoff::numeric, 3) AS vol_runoff,
-    round(vol_infiltr::numeric, 3) AS vol_infiltr,
-    round(vol_circ::numeric, 3) AS vol_circ,
-    round(vol_circ_dep::numeric, 3) AS vol_circ_dep,
-    round(vol_circ_red::numeric, 3) AS vol_circ_red,
-    round(vol_non_leaked::numeric, 3) AS vol_non_leaked,
-    round(vol_leaked::numeric, 3) AS vol_leaked,
-    round(vol_wwtp::numeric, 3) AS vol_wwtp,
-    round(vol_treated::numeric, 3) AS vol_treated
-   FROM cso_out_vol
-  ORDER BY drainzone_id, rf_name, (rf_tstep::time without time zone);
+AS SELECT a.rowid,
+    e.name AS macroexploitation,
+    c.name AS exploitation,
+    m.name AS municipality,
+    a.drainzone_id,
+    a.node_id AS outfall_id,
+    a.rf_name AS rainfall,
+    a.rf_tstep,
+    round(a.rf_volume::numeric, 3) AS rf_intensity,
+    round(a.vol_residual::numeric, 3) AS vol_dwf,
+    round(a.vol_rainfall::numeric, 3) AS vol_rainfall,
+    round(a.vol_total::numeric, 3) AS vol_total,
+    round(a.vol_runoff::numeric, 3) AS vol_runoff,
+    round(a.vol_infiltr::numeric, 3) AS vol_infiltr,
+    round(a.vol_circ::numeric, 3) AS vol_circ,
+    round(a.vol_circ_dep::numeric, 3) AS vol_circ_dep,
+    round(a.vol_circ_red::numeric, 3) AS vol_circ_red,
+    round(a.vol_non_leaked::numeric, 3) AS vol_non_leaked,
+    round(a.vol_leaked::numeric, 3) AS vol_leaked,
+    round(a.vol_wwtp::numeric, 3) AS vol_wwtp,
+    round(a.vol_treated::numeric, 3) AS vol_treated
+   FROM cso_out_vol a
+     LEFT JOIN drainzone b USING (drainzone_id)
+     LEFT JOIN exploitation c ON b.expl_id = c.expl_id
+     LEFT JOIN macroexploitation e ON e.macroexpl_id = c.macroexpl_id
+     LEFT JOIN node n USING (node_id)
+     LEFT JOIN ext_municipality m ON n.muni_id = m.muni_id
+  ORDER BY a.drainzone_id, a.rf_name, (a.rf_tstep::time without time zone);
+
 
 
 DROP VIEW IF EXISTS v_cso_drainzone_rainfall;
@@ -158,3 +167,15 @@ AS SELECT rpt_inp_node.id,
   GROUP BY 1,2,3,4,5,12,13;
 
 
+CREATE OR REPLACE VIEW v_cso_weir
+AS SELECT a.node_id,
+    a.qmax,
+    a.vmax,
+    a.weight_factor,
+    a.custom_qmax,
+    a.custom_vmax,
+    b.nodecat_id,
+    b.the_geom,
+    a.weir_type
+   FROM cso_inp_weir a
+     JOIN v_edit_node b USING (node_id);
