@@ -72,13 +72,13 @@ BEGIN
 						"data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
-                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "prefix_id":"3003"}}$$)';
+                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
-                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "prefix_id":"3002"}}$$)';
+                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
-                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "prefix_id":"3001"}}$$)';
+                        "data":{"function":"3134", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001"}}$$)';
 
 	-- process
 	-- inserting on catalog table
