@@ -201,7 +201,7 @@ BEGIN
 		CREATE TEMP TABLE temp_muni_sector_expl AS
 		SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
 		UNION
-		SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0)
+		SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0) sub
 		WHERE expl_id is not null;
 	
 		IF v_expl_x_user is false then
