@@ -41,7 +41,6 @@ AS SELECT a.rowid,
   ORDER BY a.drainzone_id, a.rf_name, (a.rf_tstep::time without time zone);
 
 
-
 DROP VIEW IF EXISTS v_cso_drainzone_rainfall;
 CREATE OR REPLACE VIEW v_cso_drainzone_rainfall AS
 SELECT 
@@ -76,12 +75,7 @@ FROM v_cso_drainzone_rainfall_tstep dr
      WHERE cur_user = current_user
      GROUP BY m.name, ex.name, d.name, e.name, d.drainzone_id, outfall_id, rainfall 
      ORDER BY 1, 2, 4
- 
-     SELECT gw_fct_graphanalytics_mapzones_advanced('{"client":{"device":4, "lang":"", "infoType":1, "epsg":25830}, 
-"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"DRAINZONE", 
-"exploitation":"-999", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", 
-"commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"20"}, "aux_params":null}}')
-     
+
      
 DROP VIEW IF EXISTS v_cso_drainzone;
 CREATE OR REPLACE VIEW v_cso_drainzone AS 
@@ -145,8 +139,7 @@ AS SELECT rpt_inp_arc.id,
  GROUP BY 1,2,3,4,5,6,7,8;
 
  
- 
- CREATE OR REPLACE VIEW v_rpt_multi_nodeflooding_sum
+CREATE OR REPLACE VIEW v_rpt_multi_nodeflooding_sum
 AS SELECT rpt_inp_node.id,
     rpt_nodeflooding_sum.node_id,
     selector_rpt_main.result_id,
@@ -178,4 +171,32 @@ AS SELECT a.node_id,
     b.the_geom,
     a.weir_type
    FROM cso_inp_weir a
+     JOIN v_edit_node b USING (node_id);
+
+
+CREATE OR REPLACE VIEW v_cso_weir
+AS SELECT a.node_id,
+    a.qmax,
+    a.vmax,
+    a.weight_factor,
+    a.custom_qmax,
+    a.custom_vmax,
+    b.nodecat_id,
+    b.the_geom,
+    a.weir_type
+   FROM cso_inp_weir a
+     JOIN v_edit_node b USING (node_id);
+
+     
+CREATE OR REPLACE VIEW v_cso_wwtp
+AS SELECT a.node_id,
+    a.habitants,
+    a.eq_habitants,
+    a.qmed,
+    a.qmax,
+    a.qmin,
+    a.unit_demand,
+    b.nodecat_id,
+    b.the_geom
+   FROM cso_inp_wwtp a
      JOIN v_edit_node b USING (node_id);
