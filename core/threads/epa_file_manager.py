@@ -9,8 +9,11 @@ import json
 import os
 import re
 import subprocess
+import hydraulic_engine as he
 
+from typing import Optional
 from qgis.PyQt.QtCore import pyqtSignal
+from hydraulic_engine.utils import tools_log as he_tools_log
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -81,12 +84,21 @@ class GwEpaFileManager(GwTask):
 
         if status and self.go2epa_execute_epa:
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _execute_epa'")
-            status = self._execute_epa()
+            if global_vars.project_type in 'ud':
+                status = self._execute_epa_ud()
+            elif global_vars.project_type in 'ws':
+                he_tools_log.set_logger("hydraulic_engine", min_log_level=10)  # DEBUG
+                runner = self._execute_epa_ws()
+                if runner is None:
+                    status = False
 
         if status and self.go2epa_import_result:
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _import_rpt'")
-            self.function_name = 'gw_fct_rpt2pg_main'
-            status = self._import_rpt()
+            if global_vars.project_type in 'ud':
+                self.function_name = 'gw_fct_rpt2pg_main'
+                status = self._import_rpt_ud()
+            elif global_vars.project_type in 'ws':
+                status = self._import_rpt_ws(runner)
 
         return status
 
@@ -370,7 +382,7 @@ class GwEpaFileManager(GwTask):
                 os.remove(aditional_path)
 
 
-    def _execute_epa(self):
+    def _execute_epa_ud(self):
 
         if self.isCanceled():
             return False
@@ -392,26 +404,63 @@ class GwEpaFileManager(GwTask):
             return False
 
         # Set file to execute
-        opener = None
-        if global_vars.project_type in 'ws':
-            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
-        elif global_vars.project_type in 'ud':
-            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
-
-        if opener is None:
-            return False
+        opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
 
         if not os.path.exists(opener):
             self.error_msg = f"File not found: {opener}"
             return False
 
         subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
+
+
         self.common_msg += "EPA model finished. "
 
         return True
 
 
-    def _import_rpt(self):
+    def _execute_epa_ws(self)-> Optional[he.epanet.EpanetRunner]:
+
+        if self.isCanceled():
+            return None
+
+        tools_log.log_info(f"Execute EPA software")
+
+        if self.file_rpt == "null":
+            message = "You have to set this parameter"
+            self.error_msg = f"{message}: RPT file"
+            return None
+
+        msg = "INP file not found"
+        if self.file_inp is not None:
+            if not os.path.exists(self.file_inp):
+                self.error_msg = f"{msg}: {self.file_inp}"
+                return None
+        else:
+            self.error_msg = f"{msg}: {self.file_inp}"
+            return None
+
+        try:
+            # Execute EPA with hydraulic engine
+            runner = he.epanet.EpanetRunner(self.file_inp, self.file_rpt)
+            results = runner.run()
+            if results is None:
+                self.error_msg = "Error executing EPA software"
+                self.error_msg_params = (results,)
+                return None
+            if results.status == he.utils.enums.RunStatus.ERROR:
+                self.error_msg = "Error executing EPA software"
+                self.error_msg_params = (results,)
+                return None
+        except Exception as e:
+            self.error_msg = f"Error executing EPA software: {e}"
+            return None
+
+        self.common_msg += "EPA model finished. "
+
+        return runner
+
+
+    def _import_rpt_ud(self):
         """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
@@ -427,6 +476,59 @@ class GwEpaFileManager(GwTask):
                 return False
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_import_function'")
             status = self._exec_import_function()
+        except Exception as e:
+            self.error_msg = str(e)
+        finally:
+            return status
+
+
+    def _import_rpt_ws(self, runner: he.epanet.EpanetRunner):
+        """ Import result file with hydraulic engine """
+
+        tools_log.log_info(f"Import simulation results........: {self.file_rpt}")
+
+        status = False
+        try:
+            # Call import function
+            tools_log.log_info(f"Import simulation results into database")
+            # Create connection
+            dao = he.create_pg_connection(
+                host=global_vars.dao_db_credentials['host'],
+                port=global_vars.dao_db_credentials['port'],
+                dbname=global_vars.dao_db_credentials['db'],
+                user=global_vars.dao_db_credentials['user'],
+                password=global_vars.dao_db_credentials['password'],
+                schema=global_vars.dao_db_credentials['schema'],
+            )
+            # Import results
+            status = runner.export_result(
+                to=he.ExportDataSource.DATABASE,
+                result_id=self.result_name,
+                client=dao,
+                giswater_version=3
+            )
+            tools_log.log_info(f"Import simulation results finished")
+
+            # Build result JSON
+            try:
+                sql = (
+                    "SELECT gw_fct_rpt2pg_log("
+                    f"'{self.result_name}', "
+                    "'{\"status\":\"Accepted\"}'::json"
+                    ");"
+                )
+
+                rows = tools_db.get_rows(sql)
+                if rows and rows[0] and rows[0][0]:
+                    result = rows[0][0]
+                    if isinstance(result, str):
+                        result = json.loads(result)
+                    self.rpt_result = result
+                    self.message = self.rpt_result.get("message", {}).get("text")
+            except Exception as e:
+                self.error_msg = str(e)
+                return False
+            return True
         except Exception as e:
             self.error_msg = str(e)
         finally:
