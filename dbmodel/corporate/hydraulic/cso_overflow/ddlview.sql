@@ -10,6 +10,13 @@ SET search_path = "SCHEMA_NAME", public;
 
 
 DROP VIEW IF EXISTS v_cso_drainzone_rainfall_tstep;
+DROP VIEW IF EXISTS v_cso_drainzone_rainfall;
+DROP VIEW IF EXISTS v_cso_drainzone;
+DROP VIEW IF EXISTS v_rpt_multi_arcflow_sum;
+DROP VIEW IF EXISTS v_rpt_multi_nodeflooding_sum;
+DROP VIEW IF EXISTS v_cso_weir;
+DROP VIEW IF EXISTS v_cso_wwtp;
+
 CREATE OR REPLACE VIEW v_cso_drainzone_rainfall_tstep;
 AS SELECT a.rowid,
     e.name AS macroexploitation,
@@ -41,7 +48,6 @@ AS SELECT a.rowid,
   ORDER BY a.drainzone_id, a.rf_name, (a.rf_tstep::time without time zone);
 
 
-DROP VIEW IF EXISTS v_cso_drainzone_rainfall;
 CREATE OR REPLACE VIEW v_cso_drainzone_rainfall AS
 SELECT 
     m.name AS macroexplotation,
@@ -77,7 +83,6 @@ FROM v_cso_drainzone_rainfall_tstep dr
      ORDER BY 1, 2, 4
 
      
-DROP VIEW IF EXISTS v_cso_drainzone;
 CREATE OR REPLACE VIEW v_cso_drainzone AS 
 SELECT
 	macroexplotation,
@@ -105,6 +110,7 @@ SELECT
    	 LEFT JOIN cso_calibration cc ON cc.drainzone_id = cov.drainzone_id
      LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id = cov.drainzone_id
      LEFT JOIN drainzone d ON d.drainzone_id =cov.drainzone_id 
+     WHERE (d.addparam->>'isCSO')::BOOLEAN IS TRUE
      GROUP BY macroexplotation,	exploitation,	municipality,	drainzone, d.drainzone_id,cov.outfall_id, d.addparam->>'kmLength', cso.eq_inhab, d.the_geom, cso.thyssen_plv_area, cso.imperv_area, cso.mean_coef_runoff, cc.calib_imperv_area, cso.thyssen_plv_area
   ORDER BY 1,2,4;
  
@@ -158,20 +164,6 @@ AS SELECT rpt_inp_node.id,
      JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id::text
   WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT
   GROUP BY 1,2,3,4,5,12,13;
-
-
-CREATE OR REPLACE VIEW v_cso_weir
-AS SELECT a.node_id,
-    a.qmax,
-    a.vmax,
-    a.weight_factor,
-    a.custom_qmax,
-    a.custom_vmax,
-    b.nodecat_id,
-    b.the_geom,
-    a.weir_type
-   FROM cso_inp_weir a
-     JOIN v_edit_node b USING (node_id);
 
 
 CREATE OR REPLACE VIEW v_cso_weir
