@@ -84,7 +84,7 @@ class GwGo2IberTask(GwTask):
         os.makedirs(self.folder_path, exist_ok=True)
         self.go2epa_task.main_process()
 
-        pgully_geojson = tools_gw.execute_procedure('gw_fct_pg2iber_pgully')
+        pgully_geojson = tools_gw.execute_procedure('gw_fct_pg2iber_pgully', aux_conn=self.aux_conn, is_thread=True)
         geojson_str: str = json.dumps(pgully_geojson['body']['data']['result'])
         if geojson_str:
             pgully_layer: QgsVectorLayer = QgsVectorLayer(geojson_str, 'pgully', 'ogr')
