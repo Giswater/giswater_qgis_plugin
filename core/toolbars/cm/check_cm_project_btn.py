@@ -122,6 +122,16 @@ class GwCheckCMProjectButton(GwAction):
     def _start_project_check(self):
         """Re-executes the project check process after Accept is pressed."""
 
+        # Manage if task is already running
+        if hasattr(self, 'project_check_task') and self.project_check_task is not None:
+            try:
+                if self.project_check_task.isActive():
+                    message = "Project check task is already active!"
+                    tools_qgis.show_warning(message)
+                    return
+            except RuntimeError:
+                pass
+
         # Retrieve layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 

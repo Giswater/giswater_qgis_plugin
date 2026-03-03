@@ -67,7 +67,7 @@ class GwProjectCheckCMTask(GwTask):
                 f'}}'
             )
             body = tools_gw.create_body(extras=extras)
-            self.result_data = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, schema_name='cm', aux_conn=self.aux_conn)
+            self.result_data = tools_gw.execute_procedure('gw_fct_cm_setcheckproject', body, schema_name='cm', is_thread=True, aux_conn=self.aux_conn)
             if self.result_data['status'] == 'Accepted':
                 return True
             else:
@@ -76,6 +76,7 @@ class GwProjectCheckCMTask(GwTask):
             msg = "EXCEPTION: {0}, {1}"
             msg_params = (type(e).__name__, str(e),)
             tools_log.log_warning(msg, msg_params=msg_params)
+            return False
 
     def finished(self, result):
         """
@@ -85,6 +86,9 @@ class GwProjectCheckCMTask(GwTask):
         super().finished(result)
 
         self.dialog.progressBar.setVisible(False)
+        if self.isCanceled():
+            self.setProgress(100)
+            return
 
         # Handle exception
         if self.exception is not None:
