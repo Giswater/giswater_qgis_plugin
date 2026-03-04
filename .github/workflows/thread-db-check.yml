@@ -1,4 +1,4 @@
-name: Threaded DB calls check
+name: 🧵 Threaded DB calls check
 
 on:
   push:
