@@ -452,7 +452,7 @@ class GwSelectionWidget(QWidget):
             data_model.index(0, 0),
             data_model.index(data_model.rowCount() - 1, data_model.columnCount() - 1)
         )
-        
+
         # Toggle the selection state using XOR operation
         selection_model.select(all_rows, QItemSelectionModel.SelectionFlag.Toggle | QItemSelectionModel.SelectionFlag.Rows)
 
@@ -550,12 +550,9 @@ class GwSelectionWidget(QWidget):
         id_column_index = -1
         id_col_name = f'{feature_type}_id'
 
-        for i in range(model.columnCount()):
-            if model.headerData(i, Qt.Orientation.Horizontal) == id_col_name:
-                id_column_index = i
-                break
+        id_column_index = tools_qt.get_col_index_by_col_name(widget_table, id_col_name)
 
-        if id_column_index == -1:
+        if id_column_index is None:
             tools_qgis.show_warning(f"Could not find ID column '{id_col_name}'.", dialog=dialog)
             return
 
@@ -605,7 +602,7 @@ class GwSelectionWidget(QWidget):
 
         # Move selection to top using QStandardItemModel
         self.show_selection_on_top(widget_table, class_object, dialog, table_object)
-        
+
         self.highlight_features_method(class_object, dialog, table_object)
 
         if callback_later:
@@ -628,16 +625,16 @@ class GwSelectionWidget(QWidget):
         current_model = widget_table.model()
         if not current_model:
             return
-            
+
         # Initialize default model on first call
         if not hasattr(self, 'default_model') or self.default_model is None:
             # Create a deep copy of the current model as the default
             self.default_model = QStandardItemModel()
             self.default_model.setHorizontalHeaderLabels([
-                current_model.headerData(i, Qt.Orientation.Horizontal) 
+                current_model.headerData(i, Qt.Orientation.Horizontal)
                 for i in range(current_model.columnCount())
             ])
-            
+
             # Copy all rows from current model to default model
             for row in range(current_model.rowCount()):
                 row_items = []
@@ -650,10 +647,10 @@ class GwSelectionWidget(QWidget):
             return
 
         # Validate models
-        if (not isinstance(current_model, QStandardItemModel) or 
+        if (not isinstance(current_model, QStandardItemModel) or
             not isinstance(self.default_model, QStandardItemModel)):
             return
-            
+
         if current_model.columnCount() == 0 or self.default_model.columnCount() == 0:
             return
 
@@ -668,7 +665,7 @@ class GwSelectionWidget(QWidget):
                     if id_column_index == -1:
                         id_column_index = 0
             except Exception:
-                id_column_index = 0 
+                id_column_index = 0
 
         # Create ID mappings for efficient lookup using the correct ID column
         current_id_to_row = {}
@@ -680,7 +677,7 @@ class GwSelectionWidget(QWidget):
         # Create new updated model
         updated_model = QStandardItemModel()
         updated_model.setHorizontalHeaderLabels([
-            current_model.headerData(i, Qt.Orientation.Horizontal) 
+            current_model.headerData(i, Qt.Orientation.Horizontal)
             for i in range(current_model.columnCount())
         ])
 
@@ -690,12 +687,12 @@ class GwSelectionWidget(QWidget):
         # First pass: Update existing rows in default model order
         for default_row in range(self.default_model.rowCount()):
             default_id = str(self.default_model.data(self.default_model.index(default_row, id_column_index)))
-            
+
             if default_id in current_id_to_row:
                 # Row exists in current model - use current data
                 current_row = current_id_to_row[default_id]
                 processed_current_rows.add(current_row)
-                
+
                 row_items = []
                 for col in range(current_model.columnCount()):
                     source_index = current_model.index(current_row, col)
@@ -822,7 +819,7 @@ class GwSelectionWidget(QWidget):
         for col in range(model.columnCount()):
             delegate = widget_table.itemDelegateForColumn(col)
             if delegate:
-                widget_table.setItemDelegateForColumn(col, None) 
+                widget_table.setItemDelegateForColumn(col, None)
                 temp_model.setItemDelegateForColumn(col, delegate)
 
         # First add selected rows

@@ -4824,15 +4824,8 @@ def _select_rows_in_tables(dialog, ft, ids_list):
         qtable = tools_qt.get_widget(dialog, f"tbl_campaign_x_{ft}")
         if qtable and qtable.model() and qtable.selectionModel():
             id_col_name = f"{ft}_id"
-            if hasattr(qtable.model(), 'fieldIndex'):
-                id_col_idx = qtable.model().fieldIndex(id_col_name)
-            else:
-                id_col_idx = -1
-                for c in range(qtable.model().columnCount()):
-                    if qtable.model().headerData(c, Qt.Orientation.Horizontal) == id_col_name:
-                        id_col_idx = c
-                        break
-            if id_col_idx != -1:
+            id_col_idx = tools_qt.get_col_index_by_col_name(qtable, id_col_name)
+            if id_col_idx is not None:
                 sel_model = qtable.selectionModel()
                 sel_model.clearSelection()
                 ids_set = set(map(str, ids_list))
@@ -4903,16 +4896,9 @@ def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
 
 
 def get_model_index(model, row, field_name):
-    if hasattr(model, 'fieldIndex'):
-        column_index = model.fieldIndex(field_name)
-    else:
-        column_index = -1
-        for column in range(model.columnCount()):
-            if model.headerData(column, Qt.Orientation.Horizontal) == field_name:
-                column_index = column
-                break
+    column_index = tools_qt.get_col_index_by_col_name(model, field_name)
 
-    if column_index != -1:
+    if column_index is not None:
         return model.index(row, column_index).data()
     else:
         return None
@@ -5803,17 +5789,8 @@ def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
     model = widget.model()
 
     if selection_mode in (GwSelectionMode.CAMPAIGN, GwSelectionMode.LOT):
-        col_index = -1
-        if isinstance(model, tools_qt.QSqlTableModel):
-            col_index = model.fieldIndex(field_id)
-        else:
-            for c in range(model.columnCount()):
-                header_item = model.horizontalHeaderItem(c)
-                if header_item and header_item.text() == field_id:
-                    col_index = c
-                    break
-
-        if col_index != -1:
+        col_index = tools_qt.get_col_index_by_col_name(widget, field_id)
+        if col_index is not None:
             for item in selected_list:
                 row = item.row()
                 if isinstance(model, tools_qt.QSqlTableModel):
@@ -5828,12 +5805,8 @@ def _get_selected_record_info(widget, field_id, selection_mode, selected_list):
                 id_feature = model.record(row).value(field_id)
             else:
                 # QStandardItemModel - find column by name
-                col_index = -1
-                for c in range(model.columnCount()):
-                    if model.headerData(c, Qt.Orientation.Horizontal) == field_id:
-                        col_index = c
-                        break
-                if col_index != -1:
+                col_index = tools_qt.get_col_index_by_col_name(widget, field_id)
+                if col_index is not None:
                     id_feature = model.data(model.index(row, col_index))
                 else:
                     continue
@@ -5860,7 +5833,7 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
             else:
                 # QStandardItemModel
                 col_index = tools_qt.get_col_index_by_col_name(widget, extra_field)
-                if col_index != -1:
+                if col_index is not None:
                     state = model.data(model.index(selected_list[0].row(), col_index))
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
@@ -5870,16 +5843,8 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
         if extra_field is not None and len(selected_list) == 1:
             # Special handling for Campaign manager's QStandardItemModel
             model = widget.model()
-            col_index = -1
-            if isinstance(model, tools_qt.QSqlTableModel):
-                col_index = model.fieldIndex(extra_field)
-            else:
-                for c in range(model.columnCount()):
-                    header_item = model.horizontalHeaderItem(c)
-                    if header_item and header_item.text() == extra_field:
-                        col_index = c
-                        break
-            if col_index != -1:
+            col_index = tools_qt.get_col_index_by_col_name(widget, extra_field)
+            if col_index is not None:
                 if isinstance(model, tools_qt.QSqlTableModel):
                     state = model.record(selected_list[0].row()).value(col_index)
                 else:
@@ -5892,16 +5857,8 @@ def _perform_delete_and_refresh_view(class_object, dialog, table_object, feature
         if extra_field is not None and len(selected_list) == 1:
             # Special handling for Lot manager's QStandardItemModel
             model = widget.model()
-            col_index = -1
-            if isinstance(model, tools_qt.QSqlTableModel):
-                col_index = model.fieldIndex(extra_field)
-            else:
-                for c in range(model.columnCount()):
-                    header_item = model.horizontalHeaderItem(c)
-                    if header_item and header_item.text() == extra_field:
-                        col_index = c
-                        break
-            if col_index != -1:
+            col_index = tools_qt.get_col_index_by_col_name(widget, extra_field)
+            if col_index is not None:
                 if isinstance(model, tools_qt.QSqlTableModel):
                     state = model.record(selected_list[0].row()).value(col_index)
                 else:
