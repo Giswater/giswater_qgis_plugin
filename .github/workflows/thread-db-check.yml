@@ -6,18 +6,7 @@ on:
 
 jobs:
   check-threaded-db-calls:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - python-version: 3.9
-            os: ubuntu-latest
-          - python-version: "3.10"
-            os: ubuntu-latest
-          - python-version: 3.11
-            os: ubuntu-latest
-          - python-version: 3.12
-            os: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -26,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.9"
 
       - name: Run GwTask DB call checker
         run: |
