@@ -42,12 +42,12 @@ class GwAutoMincutTask(GwTask):
                 self.mincut_class.is_new = False
                 sql = ("INSERT INTO om_mincut (mincut_state)"
                        " VALUES (4) RETURNING id;")
-                new_mincut_id = tools_db.execute_returning(sql)
+                new_mincut_id = tools_db.execute_returning(sql, is_thread=True)
                 if new_mincut_id[0] < 1:
                     real_mincut_id = 1
                     sql = (f"UPDATE om_mincut SET(id) = (1) "
                            f"WHERE id = {new_mincut_id[0]};")
-                    tools_db.execute_sql(sql)
+                    tools_db.execute_sql(sql, is_thread=True)
                 else:
                     real_mincut_id = new_mincut_id[0]
 

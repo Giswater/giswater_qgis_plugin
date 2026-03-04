@@ -81,7 +81,7 @@ class GwAssignation(GwTask):
                 rleak = arc.get("rleak", 0) * 1000 / self.years
                 sql += f"('{arc['id']}', {rleak}),"
             sql = sql[:-1] + " ON CONFLICT(arc_id) DO UPDATE SET rleak=excluded.rleak;"
-            tools_db.execute_sql(sql)
+            tools_db.execute_sql(sql, is_thread=True)
 
             self.setProgress(100)
 
@@ -94,7 +94,7 @@ class GwAssignation(GwTask):
 
     def _assign_leaks(self):
         interval = tools_db.get_row(
-            "select max(date) - min(date) from am.leaks", is_admin=True
+            "select max(date) - min(date) from am.leaks", is_admin=True, is_thread=True
         )[0]
         if self.years:
             self.years = min(self.years, interval / 365)
@@ -133,7 +133,8 @@ class GwAssignation(GwTask):
                 AND ST_LENGTH(
                     ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
                 ) > 0
-            """
+            """,
+            is_thread=True
         )
 
         if self.isCanceled():
@@ -272,7 +273,8 @@ class GwAssignation(GwTask):
                 WHERE cum_length <= COALESCE(
                     (SELECT MIN(cum_length) FROM cum_list WHERE cum_length > {self.cluster_length}),
                     {self.cluster_length})
-                """
+                """,
+                is_thread=True
             )
             if not cluster:
                 continue
@@ -335,6 +337,7 @@ class GwAssignation(GwTask):
             cross join min_rleak
             """,
             is_admin=True,
+            is_thread=True,
         )
 
         final_report = []

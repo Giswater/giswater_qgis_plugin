@@ -115,7 +115,7 @@ class GwValveOperationCheck(GwTask):
             delete from anl_arc
             where fid = 494 and cur_user = current_user;
             """
-        tools_db.execute_sql(sql)
+        tools_db.execute_sql(sql, is_thread=True)
         self._save_result_to_db("base")
 
         # Nodes file
@@ -295,7 +295,7 @@ class GwValveOperationCheck(GwTask):
             sql += template.format(node_id=node_name, x=x, y=y, json=addparam)
 
         sql = sql[:-1]
-        tools_db.execute_sql(sql)
+        tools_db.execute_sql(sql, is_thread=True)
 
         # Arcs
         if scenario_name != "base":
@@ -325,7 +325,7 @@ class GwValveOperationCheck(GwTask):
                 )
                 sql += template.format(arc_id=link_name, the_geom=geom, json=addparam)
             sql = sql[:-1]
-            tools_db.execute_sql(sql)
+            tools_db.execute_sql(sql, is_thread=True)
 
     def _save_scenario_to_infile(self, scenario_name):
         inpath = Path(self.output_folder) / f"{self.file_name}.in"

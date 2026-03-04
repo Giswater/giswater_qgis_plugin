@@ -47,7 +47,7 @@ class GwRenameSchemaTask(GwTask):
         self.new_schema_name = self.params.get('new_schema_name')
 
         sql = f'ALTER SCHEMA {schema} RENAME TO {self.new_schema_name}'
-        status = tools_db.execute_sql(sql, commit=False)        
+        status = tools_db.execute_sql(sql, commit=False, is_thread=True)        
         if status:
             # Reload fcts
             self.admin._reload_fct_ftrg()
@@ -56,7 +56,7 @@ class GwRenameSchemaTask(GwTask):
             # Call fct gw_fct_admin_rename_fixviews
             sql = ('SELECT ' + str(self.new_schema_name) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.new_schema_name + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
-            tools_db.execute_sql(sql, commit=False)
+            tools_db.execute_sql(sql, commit=False, is_thread=True)
             # Execute last_process
             self.admin.execute_last_process(schema_name=self.new_schema_name, locale=True, schema_type=self.admin.project_type)
 

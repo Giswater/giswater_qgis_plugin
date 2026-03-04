@@ -63,7 +63,7 @@ class GwConnectLink(GwTask):
     def _check_user_click_mode(self):
         """ Check if user click mode is active by looking for temp_table entry """
         sql = "SELECT COUNT(*) FROM temp_table WHERE fid = 485 AND cur_user = current_user;"
-        result = tools_db.get_row(sql)
+        result = tools_db.get_row(sql, is_thread=True)
         return result and result[0] > 0
 
     def _link_features_individually(self, feature_type, selected_arcs=None):
@@ -74,7 +74,7 @@ class GwConnectLink(GwTask):
         """
         # Get the user click point from temp_table
         sql = "SELECT ST_AsText(geom_point) FROM temp_table WHERE fid = 485 AND cur_user = current_user;"
-        result = tools_db.get_row(sql)
+        result = tools_db.get_row(sql, is_thread=True)
         user_point_wkt = result[0] if result else None
 
         success_count = 0
@@ -85,9 +85,9 @@ class GwConnectLink(GwTask):
             # Re-insert temp_table entry for each connec
             if user_point_wkt:
                 sql_clear = "DELETE FROM temp_table WHERE fid = 485 AND cur_user = current_user;"
-                tools_db.execute_sql(sql_clear)
+                tools_db.execute_sql(sql_clear, is_thread=True)
                 sql_insert = f"INSERT INTO temp_table (fid, geom_point, cur_user) VALUES (485, ST_GeomFromText('{user_point_wkt}', {lib_vars.data_epsg}), current_user);"
-                tools_db.execute_sql(sql_insert)
+                tools_db.execute_sql(sql_insert, is_thread=True)
 
             # Process single connec
             feature_id = f'"id":[{connec_id}]'

@@ -379,9 +379,10 @@ class GwAddDemandCheck(GwTask):
                 the_geom
             from anl_node
             where fid = 491 and cur_user = current_user;
-            """
+            """,
+            is_thread=True
         )
-        tools_db.execute_sql(self._update_addparam_sql_string())
+        tools_db.execute_sql(self._update_addparam_sql_string(), is_thread=True)
 
     def _update_addparam_sql_string(self):
         template = """

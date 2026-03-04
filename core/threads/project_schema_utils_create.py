@@ -49,25 +49,25 @@ class GwCreateSchemaUtilsTask(GwTask):
             sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_schema_utils_fk();"
             msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
-            tools_db.execute_sql(sql)
+            tools_db.execute_sql(sql, is_thread=True)
             
             sql = f"SELECT {self.params['schema_ud']}.gw_fct_admin_schema_utils_fk();"
             msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
-            tools_db.execute_sql(sql)
+            tools_db.execute_sql(sql, is_thread=True)
 
             # execute gw_fct_admin_role_permissions
             sql = f"SELECT {self.params['schema_ws']}.gw_fct_admin_role_permissions();"
             msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
-            tools_db.execute_sql(sql)
+            tools_db.execute_sql(sql, is_thread=True)
 
             # Insert into config_param_system utils schema version
             sql = f"INSERT INTO utils.config_param_system (id, parameter, value, data_type, descript)" \
                   f" VALUES (10, 'utils_version', '{self.params['main_project_version']}', 'text', 'UTILS')"
             msg_params = ("Create schema", sql,)
             tools_log.log_info(msg, msg_params=msg_params)
-            tools_db.execute_sql(sql)
+            tools_db.execute_sql(sql, is_thread=True)
 
             return True
 

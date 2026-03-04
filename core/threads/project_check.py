@@ -207,7 +207,7 @@ class GwProjectCheckTask(GwTask):
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
-                        style = tools_gw.execute_procedure('gw_fct_getstyle', body)
+                        style = tools_gw.execute_procedure('gw_fct_getstyle', body, is_thread=True)
                         if not style or style['status'] == 'Failed':
                             return
                         if 'styles' in style['body']:

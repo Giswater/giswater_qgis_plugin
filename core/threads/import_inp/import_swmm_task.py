@@ -178,7 +178,7 @@ class GwImportInpTask(GwTask):
             # Enable ALL triggers
             self._enable_triggers(True)
 
-            execute_sql("select 1", commit=True)
+            execute_sql("select 1", commit=True, is_thread=True)
             report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
             self.progress_changed.emit("REPORT", self.PROGRESS_END, report_message, True)
             self.progress_changed.emit("REPORT", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
@@ -197,7 +197,7 @@ class GwImportInpTask(GwTask):
         self._create_new_node_catalogs()
 
         # Get existing catalogs in DB
-        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=self.force_commit)
+        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=self.force_commit, is_thread=True)
         if cat_arc_ids:
             self.arccat_db += [x[0] for x in cat_arc_ids]
 
@@ -297,7 +297,7 @@ class GwImportInpTask(GwTask):
         if geometry_trigger:
             queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
         for sql in queries:
-            result = tools_db.execute_sql(sql, commit=self.force_commit)
+            result = tools_db.execute_sql(sql, commit=self.force_commit, is_thread=True)
             if not result:
                 return
 
@@ -434,7 +434,7 @@ class GwImportInpTask(GwTask):
         title = title.replace('\n', '\\n')
         params = (f'''"{title}"''',)
 
-        execute_sql(sql, params)
+        execute_sql(sql, params, is_thread=True)
 
     def _save_files(self):
         """
@@ -470,10 +470,11 @@ class GwImportInpTask(GwTask):
             sql,
             (self.workcat, description, builtdate),
             commit=self.force_commit,
+            is_thread=True,
         )
 
     def _create_new_node_catalogs(self):
-        cat_node_ids = get_rows("SELECT id FROM cat_node", commit=self.force_commit)
+        cat_node_ids = get_rows("SELECT id FROM cat_node", commit=self.force_commit, is_thread=True)
         nodecat_db: list[str] = []
         if cat_node_ids:
             nodecat_db = [x[0] for x in cat_node_ids]
@@ -497,6 +498,7 @@ class GwImportInpTask(GwTask):
                 sql,
                 (self.catalogs[node_type], nodetype_id),
                 commit=self.force_commit,
+                is_thread=True,
             )
             nodecat_db.append(self.catalogs[node_type])
 
@@ -517,6 +519,7 @@ class GwImportInpTask(GwTask):
             );
             """,
             commit=self.force_commit,
+            is_thread=True,
         )
 
         for varc_type in varc_catalogs:
@@ -535,13 +538,13 @@ class GwImportInpTask(GwTask):
                         've_arc_varc', 'Virtual Arc', NULL, true, true,
                         NULL, NULL
                     ) ON CONFLICT DO NOTHING;
-                """, commit=self.force_commit)
+                """, commit=self.force_commit, is_thread=True)
                 # Just create the 'VARC' catalog to temporarly insert them as varcs
                 execute_sql("""
                     INSERT INTO cat_arc (id, arc_type, shape, geom1)
                     VALUES ('VARC', 'VARC', 'VIRTUAL', 0) ON CONFLICT DO NOTHING;
                 """,
-                commit=self.force_commit
+                commit=self.force_commit, is_thread=True
                 )
                 continue
 
@@ -554,7 +557,7 @@ class GwImportInpTask(GwTask):
             """
             _id = self.catalogs[varc_type]
             arctype_id = self.catalogs["features"][varc_type]
-            execute_sql(sql, (_id, arctype_id), commit=self.force_commit)
+            execute_sql(sql, (_id, arctype_id), commit=self.force_commit, is_thread=True)
             self.arccat_db.append(_id)
 
     def _create_new_conduit_catalogs(self):
@@ -580,7 +583,7 @@ class GwImportInpTask(GwTask):
                     params = (catalog, arctype_id, shape, geom1, geom2)
 
                 execute_sql(
-                    sql, params, commit=self.force_commit
+                    sql, params, commit=self.force_commit, is_thread=True
                 )
                 self.arccat_db.append(catalog)
 
@@ -588,7 +591,7 @@ class GwImportInpTask(GwTask):
         cat_flwreg_ids = get_rows("""SELECT ce.id, ce.element_type
                                         FROM cat_element ce
                                         JOIN cat_feature cf ON (ce.element_type = cf.id)
-                                        WHERE cf.feature_class = 'FRELEM'""", commit=self.force_commit)
+                                        WHERE cf.feature_class = 'FRELEM'""", commit=self.force_commit, is_thread=True)
         flwregcat_db: list[str] = []
         if cat_flwreg_ids:
             flwregcat_db = [x[0] for x in cat_flwreg_ids]
@@ -612,12 +615,13 @@ class GwImportInpTask(GwTask):
             execute_sql(
                 sql,
                 (self.catalogs[flwreg_type], flwregtype_id),
-                commit=self.force_commit
+                commit=self.force_commit,
+                is_thread=True,
             )
             flwregcat_db.append(self.catalogs[flwreg_type])
 
     def _save_patterns(self):
-        pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit)
+        pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit, is_thread=True)
         patterns_db: list[str] = []
         if pattern_rows:
             patterns_db = [x[0] for x in pattern_rows]
@@ -640,6 +644,7 @@ class GwImportInpTask(GwTask):
                 "INSERT INTO inp_pattern (pattern_id, pattern_type) VALUES (%s, %s)",
                 (pattern_name, pattern_type),
                 commit=self.force_commit,
+                is_thread=True,
             )
 
             fields_str = "pattern_id"
@@ -654,11 +659,11 @@ class GwImportInpTask(GwTask):
                 f"INSERT INTO inp_pattern_value ({fields_str}) "
                 f"VALUES ({values_str})"
             )
-            execute_sql(sql, values, commit=self.force_commit)
+            execute_sql(sql, values, commit=self.force_commit, is_thread=True)
             self.results["patterns"] += 1
 
     def _save_curves(self) -> None:
-        curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit)
+        curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit, is_thread=True)
         curves_db: set[str] = set()
         if curve_rows:
             curves_db = {x[0] for x in curve_rows}
@@ -686,6 +691,7 @@ class GwImportInpTask(GwTask):
                 "INSERT INTO inp_curve (id, curve_type) VALUES (%s, %s)",
                 (curve_name, curve_type),
                 commit=self.force_commit,
+                is_thread=True,
             )
 
             for x, y in curve.points:
@@ -693,11 +699,12 @@ class GwImportInpTask(GwTask):
                     "INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES (%s, %s, %s)",
                     (curve_name, x, y),
                     commit=self.force_commit,
+                    is_thread=True,
                 )
             self.results["curves"] += 1
 
     def _save_timeseries(self) -> None:
-        ts_rows = get_rows("SELECT id FROM inp_timeseries", commit=self.force_commit)
+        ts_rows = get_rows("SELECT id FROM inp_timeseries", commit=self.force_commit, is_thread=True)
         ts_db: set[str] = set()
         if ts_rows:
             ts_db = {x[0] for x in ts_rows}
@@ -751,6 +758,7 @@ class GwImportInpTask(GwTask):
                 "INSERT INTO inp_timeseries (id, timser_type, times_type, fname) VALUES (%s, 'Other', %s, %s)",
                 (ts_name, times_type, fname),
                 commit=self.force_commit,
+                is_thread=True,
             )
 
             if times_type == "FILE":  # TODO: import timeseries from file?
@@ -771,11 +779,12 @@ class GwImportInpTask(GwTask):
                     f"INSERT INTO inp_timeseries_value ({fields}) VALUES ({values})",
                     (ts_name,) + ts_data_f,
                     commit=self.force_commit,
+                    is_thread=True,
                 )
             self.results["timeseries"] += 1
 
     def _save_controls(self) -> None:
-        controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit)
+        controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit, is_thread=True)
         controls_db: set[str] = set()
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
@@ -789,11 +798,11 @@ class GwImportInpTask(GwTask):
                 continue
             sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
             params = (self.sector, text)
-            execute_sql(sql, params, commit=self.force_commit)
+            execute_sql(sql, params, commit=self.force_commit, is_thread=True)
             self.results["controls"] += 1
 
     def _save_lids(self) -> None:
-        lid_rows = get_rows("SELECT lidco_id FROM inp_lid", commit=self.force_commit)
+        lid_rows = get_rows("SELECT lidco_id FROM inp_lid", commit=self.force_commit, is_thread=True)
         lids_db: set[str] = set()
         if lid_rows:
             lids_db = {x[0] for x in lid_rows}
@@ -815,7 +824,7 @@ class GwImportInpTask(GwTask):
             lid_type: str = lid.lid_kind
             sql = "INSERT INTO inp_lid (lidco_id, lidco_type) VALUES (%s, %s)"
             params = (lid_name, lid_type)
-            execute_sql(sql, params, commit=self.force_commit)
+            execute_sql(sql, params, commit=self.force_commit, is_thread=True)
 
             # Insert lid_values
             sql = """
@@ -2134,7 +2143,7 @@ class GwImportInpTask(GwTask):
             WHERE workcat_id = '{self.workcat}' AND sector_id = {self.sector}
             AND EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
         """
-        execute_sql(sql, commit=self.force_commit)
+        execute_sql(sql, commit=self.force_commit, is_thread=True)
 
     def _log_message(self, message: str):
         self.log.append(message)

@@ -140,7 +140,7 @@ class GwImportInpTask(GwTask):
             # Enable ALL triggers
             self._enable_triggers(True)
 
-            execute_sql("select 1", commit=True)
+            execute_sql("select 1", commit=True, is_thread=True)
             self.progress_changed.emit("", self.PROGRESS_END, "\n\nALL DONE! INP successfully imported.", True)
             return True
         except Exception:
@@ -159,7 +159,7 @@ class GwImportInpTask(GwTask):
         self._create_new_node_catalogs()
 
         # Get existing catalogs in DB
-        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=self.force_commit)
+        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=self.force_commit, is_thread=True)
         if cat_arc_ids:
             self.arccat_db += [x[0] for x in cat_arc_ids]
 
@@ -172,7 +172,7 @@ class GwImportInpTask(GwTask):
         self.man_tables: dict[str, str] = {}
         for k, v in self.catalogs['features'].items():
             sql = f"SELECT feature_class FROM cat_feature WHERE id = '{v}';"
-            row = get_row(sql, commit=self.force_commit)
+            row = get_row(sql, commit=self.force_commit, is_thread=True)
             if not row:
                 self._log_message(f"Feature class not found: {v}")
                 continue
@@ -229,7 +229,7 @@ class GwImportInpTask(GwTask):
         if geometry_trigger:
             queries.append('ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;')
         for sql in queries:
-            result = tools_db.execute_sql(sql, commit=self.force_commit)
+            result = tools_db.execute_sql(sql, commit=self.force_commit, is_thread=True)
             if not result:
                 return
 
@@ -369,6 +369,7 @@ class GwImportInpTask(GwTask):
             sql,
             (self.workcat, description, builtdate),
             commit=self.force_commit,
+            is_thread=True,
         )
 
     def _create_demand_dscenario(self):
@@ -392,7 +393,7 @@ class GwImportInpTask(GwTask):
             raise ValueError(message)
 
     def _create_new_node_catalogs(self):
-        cat_node_ids = get_rows("SELECT id FROM cat_node", commit=self.force_commit)
+        cat_node_ids = get_rows("SELECT id FROM cat_node", commit=self.force_commit, is_thread=True)
         nodecat_db: list[str] = []
         if cat_node_ids:
             nodecat_db = [x[0] for x in cat_node_ids]
@@ -423,6 +424,7 @@ class GwImportInpTask(GwTask):
                 sql,
                 (self.catalogs[node_type], nodetype_id),
                 commit=self.force_commit,
+                is_thread=True,
             )
             nodecat_db.append(self.catalogs[node_type])
 
@@ -443,6 +445,7 @@ class GwImportInpTask(GwTask):
             );
             """,
             commit=self.force_commit,
+            is_thread=True,
         )
 
         for varc_type in varc_catalogs:
@@ -461,13 +464,13 @@ class GwImportInpTask(GwTask):
                         've_arc_varc', 'Virtual Arc', NULL, true, true,
                         NULL, NULL
                     ) ON CONFLICT DO NOTHING;
-                """, commit=self.force_commit)
+                """, commit=self.force_commit, is_thread=True)
                 # Just create the 'VARC' catalog to temporarly insert them as varcs
                 execute_sql("""
                     INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                     VALUES ('VARC', 'VARC', 'UNKNOWN', 999) ON CONFLICT DO NOTHING;
                 """,
-                commit=self.force_commit)
+                commit=self.force_commit, is_thread=True)
                 continue
 
             if self.catalogs[varc_type] in self.arccat_db:
@@ -487,6 +490,7 @@ class GwImportInpTask(GwTask):
                 );
                 """,
                 commit=self.force_commit,
+                is_thread=True,
             )
 
             sql = """
@@ -495,7 +499,7 @@ class GwImportInpTask(GwTask):
             """
             _id = self.catalogs[varc_type]
             arctype_id = self.catalogs["features"][varc_type]
-            execute_sql(sql, (_id, arctype_id), commit=self.force_commit)
+            execute_sql(sql, (_id, arctype_id), commit=self.force_commit, is_thread=True)
             self.arccat_db.append(_id)
 
     def _create_new_pipe_catalogs(self):
@@ -516,12 +520,12 @@ class GwImportInpTask(GwTask):
                 if self.debug_mode:
                     self._log_message(f"DEBUG: catalog: {catalog}, arctype_id: {arctype_id}, material: {material}, pipe_dint: {pipe_dint}")
                 execute_sql(
-                    sql, (catalog, arctype_id, material, pipe_dint), commit=self.force_commit
+                    sql, (catalog, arctype_id, material, pipe_dint), commit=self.force_commit, is_thread=True
                 )
                 self.arccat_db.append(catalog)
 
     def _save_patterns(self):
-        pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit)
+        pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit, is_thread=True)
         patterns_db: list[str] = []
         if pattern_rows:
             patterns_db = [x[0] for x in pattern_rows]
@@ -542,6 +546,7 @@ class GwImportInpTask(GwTask):
                 "INSERT INTO inp_pattern (pattern_id) VALUES (%s)",
                 (pattern_name,),
                 commit=self.force_commit,
+                is_thread=True,
             )
 
             sql = (
@@ -553,10 +558,10 @@ class GwImportInpTask(GwTask):
                 while len(b) < 12:
                     b: tuple[Any] = b + (None,)
                 values = (pattern_name,) + b
-                execute_sql(sql, values, commit=self.force_commit)
+                execute_sql(sql, values, commit=self.force_commit, is_thread=True)
 
     def _save_curves(self) -> None:
-        curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit)
+        curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit, is_thread=True)
         curves_db: set[str] = set()
         if curve_rows:
             curves_db = {x[0] for x in curve_rows}
@@ -586,6 +591,7 @@ class GwImportInpTask(GwTask):
                 "INSERT INTO inp_curve (id, curve_type) VALUES (%s, %s)",
                 (curve_name, curve_type),
                 commit=self.force_commit,
+                is_thread=True,
             )
 
             for x, y in curve.points:
@@ -595,6 +601,7 @@ class GwImportInpTask(GwTask):
                     "INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES (%s, %s, %s)",
                     (curve_name, x, y),
                     commit=self.force_commit,
+                    is_thread=True,
                 )
 
     def _replace_codes_with_ids(self, text: str, req: tuple) -> str:
@@ -649,12 +656,12 @@ class GwImportInpTask(GwTask):
 
             return setting
 
-        controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit)
+        controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit, is_thread=True)
         controls_db: set[str] = set()
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
 
-        rules_rows = get_rows("SELECT text FROM inp_rules", commit=self.force_commit)
+        rules_rows = get_rows("SELECT text FROM inp_rules", commit=self.force_commit, is_thread=True)
         rules_db: set[str] = set()
         if rules_rows:
             rules_db = {x[0] for x in rules_rows}
@@ -730,7 +737,7 @@ class GwImportInpTask(GwTask):
 
                 sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
-                execute_sql(sql, params, commit=self.force_commit)
+                execute_sql(sql, params, commit=self.force_commit, is_thread=True)
 
             elif type(control) is Rule:
                 condition = str(control.condition)
@@ -750,7 +757,7 @@ class GwImportInpTask(GwTask):
 
                 sql = "INSERT INTO inp_rules (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
-                execute_sql(sql, params, commit=self.force_commit)
+                execute_sql(sql, params, commit=self.force_commit, is_thread=True)
 
     def _save_junctions(self) -> None:
         node_sql = """ 
@@ -1491,7 +1498,7 @@ class GwImportInpTask(GwTask):
                 SELECT node_id, epa_type FROM node WHERE code = %s
             """
             params = (node_name,)
-            row = get_row(sql, params, commit=self.force_commit)
+            row = get_row(sql, params, commit=self.force_commit, is_thread=True)
             if not row:
                 self._log_message(f"Couldn't find node '{node_name}' for source '{s_name}'.")
                 continue
@@ -1504,7 +1511,7 @@ class GwImportInpTask(GwTask):
                 WHERE node_id = %s;
             """
             params = (source_type, source_quality, source_pattern_id, node_id)
-            execute_sql(sql, params, commit=self.force_commit)
+            execute_sql(sql, params, commit=self.force_commit, is_thread=True)
 
     def _manage_nodarcs(self) -> str:
         """ Transform pumps and valves into nodes """
@@ -1550,7 +1557,7 @@ class GwImportInpTask(GwTask):
             WHERE workcat_id = '{self.workcat}' AND sector_id = {self.sector}
             AND EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
         """
-        execute_sql(sql, commit=self.force_commit)
+        execute_sql(sql, commit=self.force_commit, is_thread=True)
 
     def _log_message(self, message: str):
         self.log.append(message)

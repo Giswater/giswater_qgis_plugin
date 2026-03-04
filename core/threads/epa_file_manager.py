@@ -332,7 +332,7 @@ class GwEpaFileManager(GwTask):
             file_binary = file_inp.read()
 
         sql = f"UPDATE rpt_cat_result SET inp_file = {psycopg2.Binary(file_binary)} WHERE result_id = '{self.result_name}';"
-        tools_db.execute_sql(sql, log_sql=True)
+        tools_db.execute_sql(sql, log_sql=True, is_thread=True)
 
         networkmode = self.network_mode
         if global_vars.project_type == 'ud' and networkmode and networkmode == 2:
@@ -415,7 +415,7 @@ class GwEpaFileManager(GwTask):
 
         # Get EPA layers from database
         body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
+        json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body, is_thread=True)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -432,7 +432,7 @@ class GwEpaFileManager(GwTask):
 
                 # Check if this is an EPA RESULTS layer
 
-                context = tools_db.get_row("SELECT idval FROM config_typevalue WHERE id = (SELECT context FROM sys_table WHERE id ilike 'v_rpt_arc%' AND context IS NOT NULL LIMIT 1);")
+                context = tools_db.get_row("SELECT idval FROM config_typevalue WHERE id = (SELECT context FROM sys_table WHERE id ilike 'v_rpt_arc%' AND context IS NOT NULL LIMIT 1);", is_thread=True)
                 if not context or not context[0]:
                     message = tools_qt.tr("Could not load EPA Results layers")
                     tools_qgis.show_message(message)
@@ -530,7 +530,7 @@ class GwEpaFileManager(GwTask):
         # Build a map of tokens -> target table using `config_fprocess.target` for this process (`fid`)
         # The `target` column is stored like a JSON-ish list of strings. We flatten it here into a dict.
         sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid} ORDER BY orderby;"
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, is_thread=True)
         sources = {}
         for row in rows:
             json_elem = row[1].replace('{', '').replace('}', '')

@@ -208,7 +208,7 @@ class GwGo2IberTask(GwTask):
 
         # Get values
         sql = "SELECT value FROM config_param_user WHERE parameter in ('inp_options_start_time', 'inp_options_end_time', 'inp_options_start_date', 'inp_options_end_date') ORDER BY parameter"
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, is_thread=True)
         if rows:
             end_date_str = rows[0]['value']
             end_time_str = rows[1]['value']

@@ -122,10 +122,11 @@ def nan_to_none(x):
 
 def execute_sql(sql, params=None, /, log_sql=False, **kwargs) -> bool:
     sql = tools_db._get_sql(sql, log_sql, params)
+    is_thread = kwargs.pop('is_thread', True)
     result: bool = tools_db.execute_sql(
         sql,
         log_sql=log_sql,
-        is_thread=True,
+        is_thread=is_thread,
         **kwargs,
     )
     if lib_vars.session_vars.get("last_error"):
@@ -134,14 +135,16 @@ def execute_sql(sql, params=None, /, log_sql=False, **kwargs) -> bool:
 
 
 def get_row(sql, params=None, /, **kwargs):
-    result = tools_db.get_row(sql, params=params, is_thread=True, **kwargs)
+    is_thread = kwargs.pop('is_thread', True)
+    result = tools_db.get_row(sql, params=params, is_thread=is_thread, **kwargs)
     if lib_vars.session_vars.get("last_error"):
         raise lib_vars.session_vars["last_error"]
     return result
 
 
 def get_rows(sql, params=None, /, **kwargs):
-    result = tools_db.get_rows(sql, params=params, is_thread=True, **kwargs)
+    is_thread = kwargs.pop('is_thread', True)
+    result = tools_db.get_rows(sql, params=params, is_thread=is_thread, **kwargs)
     if lib_vars.session_vars.get("last_error"):
         raise lib_vars.session_vars["last_error"]
     return result

@@ -1,0 +1,22 @@
+name: Threaded DB calls check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check-threaded-db-calls:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run GwTask DB call checker
+        run: |
+          python scripts/check_thread_db_calls.py

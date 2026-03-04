@@ -144,7 +144,8 @@ class GwCalculatePriority(GwTask):
                     from am.ext_arc_asset a
                     where a.arc_id = o.arc_id)
             where o.result_id = {self.result_id}
-            """
+            """,
+            is_thread=True
         )
 
     def _current_value(self, arcs, year, replacements=False):
@@ -230,7 +231,7 @@ class GwCalculatePriority(GwTask):
                 left join am.arc_input ai using (arc_id)
                 {filters}
             """
-            return tools_db.get_rows(sql)
+            return tools_db.get_rows(sql, is_thread=True)
 
     def _invalid_arccat_id_report(self, obj):
         if not obj["qtd"]:
@@ -332,7 +333,7 @@ class GwCalculatePriority(GwTask):
         break_growth_rate = float(self.config_engine["bratemain0"])
 
         rows = tools_db.get_row(
-            "select max(date_part('year', date)) from am.leaks", is_admin=True
+            "select max(date_part('year', date)) from am.leaks", is_admin=True, is_thread=True
         )
 
         if not rows:
@@ -490,7 +491,8 @@ class GwCalculatePriority(GwTask):
         self.setProgress(72)
 
         tools_db.execute_sql(
-            f"delete from am.arc_engine_sh where result_id = {self.result_id};"
+            f"delete from am.arc_engine_sh where result_id = {self.result_id};",
+            is_thread=True
         )
         index = 0
         loop = 0
@@ -540,7 +542,7 @@ class GwCalculatePriority(GwTask):
                     ended = True
                     break
             save_arcs_sql = save_arcs_sql.strip()[:-1]
-            tools_db.execute_sql(save_arcs_sql)
+            tools_db.execute_sql(save_arcs_sql, is_thread=True)
             loop += 1
             progress = (76 - 72) / len(output_arcs) * 1000 * loop + 72
             self.setProgress(progress)
@@ -588,7 +590,8 @@ class GwCalculatePriority(GwTask):
                 left join am.ext_arc_asset a using (arc_id)
                 where sh.result_id = {self.result_id}
                 order by total;
-            """
+            """,
+            is_thread=True
         )
 
         self._copy_input_to_output()
@@ -623,7 +626,8 @@ class GwCalculatePriority(GwTask):
             select d.dma_id, (d.nrw / d.days / l.length * 1000) as nrw_m3kmd
             from am.dma_nrw as d
             join lengths as l using (dma_id)
-            """
+            """,
+            is_thread=True
         )
 
         if not rows:
@@ -937,7 +941,8 @@ class GwCalculatePriority(GwTask):
             f"""
             delete from am.arc_engine_wm where result_id = {self.result_id};
             delete from am.arc_output where result_id = {self.result_id};
-            """
+            """,
+            is_thread=True
         )
 
         # Saving to am.arc_engine_wm
@@ -982,7 +987,7 @@ class GwCalculatePriority(GwTask):
                     ended = True
                     break
             save_arcs_sql = save_arcs_sql.strip()[:-1]
-            tools_db.execute_sql(save_arcs_sql)
+            tools_db.execute_sql(save_arcs_sql, is_thread=True)
             loop += 1
             progress = (70 - 40) / len(second_iteration) * 1000 * loop + 40
             self.setProgress(progress)
@@ -1064,7 +1069,7 @@ class GwCalculatePriority(GwTask):
             save_arcs_sql = save_arcs_sql.strip()[:-1]
             if save_arcs_sql.endswith("value"):
                 break
-            tools_db.execute_sql(save_arcs_sql)
+            tools_db.execute_sql(save_arcs_sql, is_thread=True)
             loop += 1
             progress = (90 - 70) / len(second_iteration) * 1000 * loop + 70
             self.setProgress(progress)
@@ -1086,7 +1091,7 @@ class GwCalculatePriority(GwTask):
         for k, v in self.config_engine.items():
             save_config_engine_sql += f"({self.result_id}, '{k}', {v}),"
         save_config_engine_sql = save_config_engine_sql.strip()[:-1]
-        tools_db.execute_sql(save_config_engine_sql)
+        tools_db.execute_sql(save_config_engine_sql, is_thread=True)
 
     def _save_result_info(self):
         str_features = (
@@ -1138,11 +1143,12 @@ class GwCalculatePriority(GwTask):
                 report = EXCLUDED.report,
                 cur_user = EXCLUDED.cur_user,
                 tstamp = EXCLUDED.tstamp
-            """
+            """,
+            is_thread=True
         )
 
         sql = f"select result_id from am.cat_result where result_name = '{self.result_name}'"
-        row = tools_db.get_row(sql, is_admin=True)
+        row = tools_db.get_row(sql, is_admin=True, is_thread=True)
         if not row:
             return
         return row[0]

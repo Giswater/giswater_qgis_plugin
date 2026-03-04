@@ -31,7 +31,7 @@ class GwVacuumSchemaTask(GwTask):
         msg_params = ("execute_vacuum",)
         tools_log.log_info(msg, msg_params=msg_params)
         sql = (f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{schema_name}' AND table_type = 'BASE TABLE' ORDER BY table_name")
-        tables = tools_db.get_rows(sql, commit=True)
+        tables = tools_db.get_rows(sql, commit=True, is_thread=True)
         # Create a separate connection for vacuum operations
         aux_conn = tools_db.dao.get_aux_conn()
         if aux_conn is None:
@@ -49,7 +49,7 @@ class GwVacuumSchemaTask(GwTask):
                         aux_conn.autocommit = True
                         if verbose:
                             tools_db.execute_sql(f"VACUUM FULL VERBOSE ANALYZE {schema_name}.{table[0].strip()};", 
-                                                commit=False, aux_conn=aux_conn)
+                                                commit=False, aux_conn=aux_conn, is_thread=True)
                             for notice in aux_conn.notices:
                                 for line in notice.strip().splitlines():
                                     line = line.strip()
@@ -61,7 +61,7 @@ class GwVacuumSchemaTask(GwTask):
                             aux_conn.notices.clear()
                         else:
                             tools_db.execute_sql(f"VACUUM FULL ANALYZE {schema_name}.{table[0].strip()};", 
-                                                commit=False, aux_conn=aux_conn)
+                                                commit=False, aux_conn=aux_conn, is_thread=True)
                             if logs:
                                 msg = "Vacuum executed: {0}.{1}"
                                 msg_params = (schema_name, table[0].strip(),)
