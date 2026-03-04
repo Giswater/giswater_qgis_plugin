@@ -9,11 +9,9 @@ import json
 import os
 import re
 import subprocess
-import hydraulic_engine as he
 
 from typing import Optional
 from qgis.PyQt.QtCore import pyqtSignal
-from hydraulic_engine.utils import tools_log as he_tools_log
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -82,23 +80,38 @@ class GwEpaFileManager(GwTask):
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _export_inp'")
             status = self._export_inp()
 
+        # Try to import hydraulic engine
+        try:
+            import hydraulic_engine as he
+            from hydraulic_engine.utils import tools_log as he_tools_log
+            # Set logger for hydraulic engine
+            he_tools_log.set_logger("hydraulic_engine", min_log_level=10)
+            has_hydraulic_engine = True
+        except ImportError:
+            has_hydraulic_engine = False
+
+        if has_hydraulic_engine and global_vars.project_type == 'ws':
+            tools_log.log_info(f"Hydraulic engine imported successfully")
+        elif global_vars.project_type == 'ud':
+            tools_log.log_info(f"Hydraulic engine not compatible with project type 'ud'. Using default EPA software.")
+        else:
+            tools_log.log_info(f"Hydraulic engine not imported. Using default EPA software.")
+
         if status and self.go2epa_execute_epa:
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _execute_epa'")
-            if global_vars.project_type in 'ud':
-                status = self._execute_epa_ud()
-            elif global_vars.project_type in 'ws':
-                he_tools_log.set_logger("hydraulic_engine", min_log_level=10)  # DEBUG
-                runner = self._execute_epa_ws()
+            if not has_hydraulic_engine or global_vars.project_type == 'ud':
+                status = self._execute_epa()
+            elif has_hydraulic_engine and global_vars.project_type == 'ws':
+                runner = self._execute_epa_with_hydraulic_engine()
                 if runner is None:
                     status = False
 
         if status and self.go2epa_import_result:
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _import_rpt'")
-            if global_vars.project_type in 'ud':
+            if not has_hydraulic_engine or global_vars.project_type == 'ud':
                 self.function_name = 'gw_fct_rpt2pg_main'
-                status = self._import_rpt_ud()
-            elif global_vars.project_type in 'ws':
-                status = self._import_rpt_ws(runner)
+                status = self._import_rpt()
+            elif has_hydraulic_engine and global_vars.project_type == 'ws':
+                status = self._import_rpt_with_hydraulic_engine(runner)
 
         return status
 
@@ -382,7 +395,7 @@ class GwEpaFileManager(GwTask):
                 os.remove(aditional_path)
 
 
-    def _execute_epa_ud(self):
+    def _execute_epa(self):
 
         if self.isCanceled():
             return False
@@ -404,21 +417,28 @@ class GwEpaFileManager(GwTask):
             return False
 
         # Set file to execute
-        opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
+        opener = None
+        if global_vars.project_type in 'ws':
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}epanet.exe"
+        elif global_vars.project_type in 'ud':
+            opener = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}swmm5.exe"
+
+        if opener is None:
+            return False
 
         if not os.path.exists(opener):
             self.error_msg = f"File not found: {opener}"
             return False
 
         subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
-
-
         self.common_msg += "EPA model finished. "
 
         return True
 
 
-    def _execute_epa_ws(self)-> Optional[he.epanet.EpanetRunner]:
+    def _execute_epa_with_hydraulic_engine(self):
+
+        import hydraulic_engine as he
 
         if self.isCanceled():
             return None
@@ -460,7 +480,7 @@ class GwEpaFileManager(GwTask):
         return runner
 
 
-    def _import_rpt_ud(self):
+    def _import_rpt(self):
         """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
@@ -482,8 +502,10 @@ class GwEpaFileManager(GwTask):
             return status
 
 
-    def _import_rpt_ws(self, runner: he.epanet.EpanetRunner):
+    def _import_rpt_with_hydraulic_engine(self, runner):
         """ Import result file with hydraulic engine """
+
+        import hydraulic_engine as he
 
         tools_log.log_info(f"Import simulation results........: {self.file_rpt}")
 
