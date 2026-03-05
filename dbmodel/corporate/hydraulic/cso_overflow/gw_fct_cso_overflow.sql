@@ -515,55 +515,24 @@ BEGIN
 		
 		UPDATE inp_timeseries_value SET value=0 WHERE value IS null;
 	
-	  	-- create an inflows dscenario if the name doesn't exists
-		IF concat (v_inflows_dscenario, '_EP1') NOT IN (SELECT name FROM cat_dscenario) THEN 
-	
-			v_inflows_dscenario = concat(v_inflows_dscenario,'_EP');
 		
-			FOR v_i IN 1..10
-			LOOP
-				v_inflows_dscenario = concat(v_inflows_dscenario, v_i);
-			
-				RAISE NOTICE 'v_inflows_dscenario %', v_inflows_dscenario;
-				
-				INSERT INTO cat_dscenario ("name", dscenario_type, expl_id) 
-				VALUES(v_inflows_dscenario, 'INFLOWS', v_expl_id::integer)
-				RETURNING dscenario_id INTO v_dscenario_id;
-			
-				INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
-				SELECT DISTINCT ON (rf_name, node_id) v_dscenario_id, node_id, v_i, concat(rf_name, '_', node_id) AS lluvia, 1, 0, true
-				FROM cso_out_vol WHERE drainzone_id::text IN (v_drainzone_array) AND RIGHT(rf_name, 2)::integer = v_i 
-				ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING;
-
-				v_inflows_dscenario = REVERSE(SUBSTRING(REVERSE(v_inflows_dscenario::TEXT), 2));
-			END LOOP;
-		ELSE
-
-			v_inflows_dscenario = concat(v_inflows_dscenario,'_EP');		
+		-- create an 10 inflows dscenario for 10 rainfall episodes if not exists
 		
-			FOR v_i IN 1..10
-			LOOP			
-				v_inflows_dscenario = concat(v_inflows_dscenario, v_i);
-				SELECT dscenario_id INTO v_dscenario_id FROM cat_dscenario WHERE "name" = v_inflows_dscenario;
-			
-				RAISE NOTICE 'v_inflows_dscenario %, v_dscenario_id %', v_inflows_dscenario, v_dscenario_id;
-				v_sql ='
-				INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
-				SELECT '||v_dscenario_id||', node_id, '||v_i||', concat(rf_name, ''_'', node_id) AS lluvia, 1, 0, true
-				FROM cso_out_vol WHERE drainzone_id IN ('||v_drainzone_array||') AND RIGHT(rf_name, 2)::integer = '||v_i||' ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING;';
-			
-				RAISE NOTICE 'v_sql %', v_sql;
-			
-				EXECUTE v_sql;
-
-				v_inflows_dscenario = REVERSE(SUBSTRING(REVERSE(v_inflows_dscenario::TEXT), 2));
-
-			END LOOP;			
-		END IF;
+		INSERT INTO cat_dscenario ("name", dscenario_type, expl_id) 
+		SELECT concat(v_inflows_dscenario, '_EP', to_char(n, 'FM00')), 'INFLOWS', v_expl_id::integer
+		FROM generate_series(1, 10) AS n
+		ON CONFLICT DO NOTHING;
+		
 	
-		SELECT dscenario_id INTO v_dscenario_id FROM cat_dscenario WHERE "name" = v_inflows_dscenario;
-		INSERT INTO selector_inp_dscenario VALUES (v_dscenario_id, current_user) ON CONFLICT (dscenario_id, cur_user) DO NOTHING;
-
+		EXECUTE 'INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
+		SELECT DISTINCT b.dscenario_id, a.node_id, substring(split_part(rf_name, ''_'', 2) from ''[0-9]+'')::int AS order_id,
+		concat(rf_name, ''_'', node_id) AS timser_id, 1 AS sfactor, 0 AS base, TRUE
+		FROM cso_out_vol a
+		LEFT JOIN ud.cat_dscenario b ON concat('||quote_literal(v_inflows_dscenario)||', ''_EP'',RIGHT(a.rf_name, 2)) = b.name
+		WHERE drainzone_id IN ('||v_drainzone_array||')
+		ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING
+		';
+	
 	END IF;
 
 	EXECUTE 'UPDATE cso_out_vol SET lastupdate = now() WHERE drainzone_id IN ('||v_drainzone_array||')';
