@@ -150,7 +150,9 @@ BEGIN
     
     -- Update geometry based on which table we're working with
     IF TG_TABLE_NAME = 'om_campaign_x_arc' THEN
-        NEW.the_geom := ST_SetPoint(ST_SetPoint(NEW.the_geom, 0, v_node_start.the_geom), ST_NumPoints(NEW.the_geom) - 1, v_node_end.the_geom);
+		IF v_node_start IS NOT NULL AND v_node_end IS NOT NULL THEN
+			NEW.the_geom := ST_SetPoint(ST_SetPoint(NEW.the_geom, 0, v_node_start.the_geom), ST_NumPoints(NEW.the_geom) - 1, v_node_end.the_geom);
+		END IF;
     ELSIF TG_TABLE_NAME = 'om_campaign_lot_x_arc' THEN
         -- Update the campaign_x_arc table with the corrected geometry and nodes
         UPDATE cm.om_campaign_x_arc 

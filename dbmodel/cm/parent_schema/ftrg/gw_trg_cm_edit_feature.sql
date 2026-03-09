@@ -67,6 +67,7 @@ BEGIN
 
 		NEW.state=1; NEW.state_type=2;
 		NEW.created_by=current_user; NEW.created_at=now();
+		NEW.datasource=1;
 	END IF;
 
 	-- get json data
