@@ -4473,7 +4473,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
     table_ids = []
     if model:
         table_ids = [
-            str(get_model_index(model, row, field_id)) for row in range(model.rowCount())
+            str(get_model_index(table_widget, row, field_id)) for row in range(model.rowCount())
         ]
     table_ids_original = table_ids.copy()
 
@@ -4593,7 +4593,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
             selected_ids_set = set(selected_ids)
 
             for row in range(row_count):
-                model_index = get_model_index(model, row, field_id)
+                model_index = get_model_index(table_widget, row, field_id)
                 row_value = str(model_index)
                 if row_value in selected_ids_set:
                     column_index = model.fieldIndex(field_id)
@@ -4768,7 +4768,7 @@ def _collect_ids_to_insert(class_object, dialog, table_object, selection_mode, e
             widget = tools_qt.get_widget(dialog, f"tbl_{table_object}_x_{ft}")
             model = widget.model() if widget and hasattr(widget, 'model') else None
             if model:
-                table_ids = [str(get_model_index(model, row, field)) for row in range(model.rowCount())]
+                table_ids = [str(get_model_index(widget, row, field)) for row in range(model.rowCount())]
         except Exception:
             table_ids = []
 
@@ -4895,11 +4895,11 @@ def select_ids_in_table(class_object, dialog, table_object, ids_to_select):
     tools_qgis.select_features_by_ids(feature_type, expr_filter, class_object.rel_layers)
 
 
-def get_model_index(model, row, field_name):
-    column_index = tools_qt.get_col_index_by_col_name(model, field_name)
+def get_model_index(widget, row, field_name):
+    column_index = tools_qt.get_col_index_by_col_name(widget, field_name)
 
-    if column_index is not None:
-        return model.index(row, column_index).data()
+    if column_index is not None and widget.model() is not None:
+        return widget.model().index(row, column_index).data()
     else:
         return None
 
