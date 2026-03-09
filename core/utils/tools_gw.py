@@ -1766,6 +1766,8 @@ def set_style_mapzones(schema_name: Union[str, None] = None) -> bool:
         for id in mapzone['values']:
             # initialize the default symbol for this geometry type
             symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+            if symbol is None:
+                continue
             try:
                 symbol.setOpacity(float(mapzone['transparency']))
             except KeyError:  # backwards compatibility for database < 3.5.030
@@ -1801,6 +1803,8 @@ def set_style_mapzones(schema_name: Union[str, None] = None) -> bool:
 
         # Add a category for any other value not categorized
         symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
+        if symbol is None:
+            continue
         try:
             symbol.setOpacity(float(mapzone['transparency']))
         except KeyError:  # backwards compatibility for database < 3.5.030
