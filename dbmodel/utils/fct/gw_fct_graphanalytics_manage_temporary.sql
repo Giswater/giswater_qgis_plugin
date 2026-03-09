@@ -427,7 +427,7 @@ BEGIN
                 FROM link l
                 JOIN connec c ON l.feature_id = c.connec_id
                 LEFT JOIN LATERAL (
-                    SELECT pp1.connec_id, pp1.psector_id
+                    SELECT pp1.psector_id
                     FROM plan_psector_x_connec pp1
                     WHERE pp1.connec_id = l.feature_id
                     AND pp1.psector_id IN (
@@ -496,7 +496,7 @@ BEGIN
                 FROM link l
                 JOIN gully g ON l.feature_id = g.gully_id
                 LEFT JOIN LATERAL (
-                    SELECT pp1.gully_id, pp1.psector_id
+                    SELECT pp1.psector_id
                     FROM plan_psector_x_gully pp1
                     WHERE pp1.gully_id = l.feature_id
                     AND pp1.psector_id IN (
