@@ -159,7 +159,7 @@ INSERT INTO element  (element_id, code, elementcat_id, epa_type, state, state_ty
 ('100021', 'E100021', 'ORIFICE-01','FRORIFICE', 1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)');
 
 INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length) VALUES
-('100020','18828','18968',0.5),
+('100020','18828','18969',0.5),
 ('100021','237','100014',0.5);
 
 INSERT INTO man_genelem (element_id)
