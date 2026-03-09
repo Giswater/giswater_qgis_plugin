@@ -2486,3 +2486,16 @@ def my_form_open(dialog, layer, feature):
   <mapTip></mapTip>
   <layerGeometryType>0</layerGeometryType>
 </qgis>', true);
+
+-- 09/03/2026
+UPDATE config_form_fields SET widgetcontrols='{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": true,
+    "layer": "ve_inp_timeseries",
+    "activated": true,
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "filterExpression": "timser_type = ''Rainfall'' AND active"
+  }
+}'::json WHERE formname='ve_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_data';
