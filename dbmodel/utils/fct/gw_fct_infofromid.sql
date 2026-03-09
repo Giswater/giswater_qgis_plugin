@@ -218,6 +218,10 @@ BEGIN
 		v_editable = true;
 	END IF;
 
+	IF v_tablename IN ('ve_man_frelem', 've_man_genelem') AND v_id IS NOT NULL THEN
+		EXECUTE format('SELECT concat(''ve_element_'', lower(element_type)) FROM %I WHERE element_id = %L', v_tablename, v_id) INTO v_tablename;
+	END IF;
+
 	-- Check if feature exist
 	IF v_id is not null then
 
