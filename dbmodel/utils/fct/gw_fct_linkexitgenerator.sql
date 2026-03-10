@@ -50,7 +50,7 @@ BEGIN
 	IF p_input = 1 THEN -- the whole ve_link
 		v_query_text_aux := '';
 	ELSIF p_input = 2 THEN -- only those links wich are on arcs present on temp_anl_arc and nodes present temp_anl_node
-		v_query_text_aux := ' AND exit_id::varchar(16) IN (SELECT arc_id FROM temp_anl_arc UNION SELECT node_id FROM temp_anl_node)';
+		v_query_text_aux := ' AND exit_id IN (SELECT arc_id FROM temp_anl_arc UNION SELECT node_id FROM temp_anl_node)';
 	END IF;
 
 	-- insert features temp_link

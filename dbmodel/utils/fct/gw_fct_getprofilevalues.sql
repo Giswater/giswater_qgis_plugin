@@ -140,7 +140,7 @@ DECLARE
 	v_nonpriority_statetype text;
 	v_cost_string text;
 	v_last_dist float;
-	v_last_nid text;
+	v_last_nid integer;
 	v_last_systype text;
 
 	v_disconnected integer[];
@@ -201,9 +201,9 @@ BEGIN
 		link_id integer NOT NULL,
 		vnode_id integer,
 		vnode_type text,
-		feature_id character varying(16),
+		feature_id integer,
 		feature_type character varying(16),
-		exit_id character varying(16),
+		exit_id integer,
 		exit_type character varying(16),
 		state smallint,
 		expl_id integer,
@@ -215,6 +215,8 @@ BEGIN
 		flag boolean,
 		CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
 	);
+	CREATE INDEX IF NOT EXISTS temp_link_exit_id_idx ON temp_link USING btree (exit_id);
+	CREATE INDEX IF NOT EXISTS  temp_link_index ON temp_link USING gist (the_geom_endpoint);
 
 	IF v_project_type = 'WS' THEN
 		ALTER TABLE temp_link ADD COLUMN dma_id integer;
@@ -223,11 +225,11 @@ BEGIN
 	CREATE TEMP TABLE temp_link_x_arc(
 		link_id integer NOT NULL,
 		vnode_id integer,
-		arc_id character varying(16),
+		arc_id integer,
 		feature_type character varying(16),
-		feature_id character varying(16),
-		node_1 character varying(16),
-		node_2 character varying(16),
+		feature_id integer,
+		node_1 integer,
+		node_2 integer,
 		vnode_distfromnode1 numeric(12,3),
 		vnode_distfromnode2 numeric(12,3),
 		exit_topelev double precision,
@@ -235,6 +237,7 @@ BEGIN
 		exit_elev numeric(12,3),
 		CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id)
 	);
+	CREATE INDEX IF NOT EXISTS temp_link_x_arc_arc_id_idx ON temp_link_x_arc USING btree (arc_id);
 
 	CREATE TEMP TABLE temp_pgr_dijkstra(
 		seq INTEGER NOT NULL,
@@ -253,7 +256,27 @@ BEGIN
 	CREATE INDEX IF NOT EXISTS temp_pgr_dijkstra_edge_idx ON temp_pgr_dijkstra USING btree (edge);
 
 	CREATE TEMP TABLE temp_anl_arc(LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	ALTER TABLE temp_anl_arc
+	ALTER COLUMN arc_id TYPE int4
+	USING arc_id::int4;
+	ALTER TABLE temp_anl_arc
+	ALTER COLUMN node_1 TYPE int4
+	USING node_1::int4;
+	ALTER TABLE temp_anl_arc
+	ALTER COLUMN node_2 TYPE int4
+	USING node_2::int4;
+	CREATE INDEX IF NOT EXISTS temp_anl_arc_node1_idx ON temp_anl_arc USING btree (node_1);
+	CREATE INDEX IF NOT EXISTS temp_anl_arc_node2_idx ON temp_anl_arc USING btree (node_2);
+
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	ALTER TABLE temp_anl_node
+	ALTER COLUMN node_id TYPE int4
+	USING node_id::int4;
+	ALTER TABLE temp_anl_node
+	ALTER COLUMN arc_id TYPE int4
+	USING arc_id::int4;
+	CREATE INDEX IF NOT EXISTS temp_anl_node_arc_id_idx ON temp_anl_node USING btree (arc_id);
+
 	CREATE TEMP TABLE temp_ve_arc (LIKE SCHEMA_NAME.ve_arc INCLUDING ALL);
 
 	-- set value to v_linksdistance if null
@@ -276,7 +299,7 @@ BEGIN
 	-- Check start-end nodes
 	IF v_project_type = 'UD' THEN
 		IF (SELECT COUNT(*) FROM ve_node JOIN cat_feature_node ON node_type = id
-			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id::integer = v_init::integer) < 1
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init) < 1
 		THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		    "data":{"message":"4466", "function":"2832", "parameters":{}, "fid":'||v_fid||', "criticity":"2",  "is_process":true}}$$)';
@@ -422,7 +445,7 @@ BEGIN
 					END AS exit_elev
 				FROM (
 					SELECT
-						t.link_id, t.exit_id::integer as vnode_id,
+						t.link_id, t.exit_id as vnode_id,
 						t.feature_type, t.feature_id,
 						t.exit_topelev, t.exit_elev,
 						ve_arc.gis_length,
@@ -432,7 +455,7 @@ BEGIN
 						ve_arc.sys_elev1 + ve_arc.sys_y1 AS top_elev1,
 						ve_arc.sys_elev2 + ve_arc.sys_y2 AS top_elev2
 					FROM temp_ve_arc ve_arc
-					JOIN temp_link t ON t.exit_id::integer = ve_arc.arc_id
+					JOIN temp_link t ON t.exit_id = ve_arc.arc_id
 					WHERE t.link_id = t.vnode_id -- remove the links with the same exit_point when exit_type = 'ARC' and the links with exit_type = 'NODE'
 				) a
 				ORDER BY arc_id, node_2 DESC;
@@ -454,7 +477,7 @@ BEGIN
 					END AS exit_elev
 				FROM (
 						SELECT
-							t.link_id, t.exit_id::integer as vnode_id,
+							t.link_id, t.exit_id as vnode_id,
 							t.feature_type, t.feature_id,
 							t.exit_topelev, t.exit_elev,
 							ve_arc.gis_length,
@@ -463,7 +486,7 @@ BEGIN
 							ve_arc.elevation1, ve_arc.elevation2,  ve_arc.depth1,  ve_arc.depth2,
 							ve_arc.elevation1 - ve_arc.depth1 AS elev1,  ve_arc.elevation2 - ve_arc.depth2 AS elev2
 						FROM temp_ve_arc ve_arc
-						JOIN temp_link t ON t.exit_id::integer = ve_arc.arc_id
+						JOIN temp_link t ON t.exit_id = ve_arc.arc_id
 						WHERE t.link_id = t.vnode_id -- remove the links with the same exit_point when exit_type = 'ARC' and the links with exit_type = 'NODE'
 					) a
 				ORDER BY arc_id, node_2 DESC;
@@ -479,15 +502,15 @@ BEGIN
 						la.arc_id, la.vnode_id, la.link_id,''LINK'' as feature_type, la.feature_id, 
 						la.exit_topelev, la.exit_ymax, la.exit_elev, la.vnode_distfromnode1 as dist, a.total_length
 					FROM temp_link_x_arc la
-					JOIN temp_anl_arc a ON la.arc_id::integer = a.arc_id::integer 
-					WHERE a.node_1::integer = la.node_1::integer
+					JOIN temp_anl_arc a ON la.arc_id = a.arc_id
+					WHERE a.node_1 = la.node_1
 					UNION -- connec/gully on reverse sense (pg_routing & arc)
 					SELECT 
 						la.arc_id, la.vnode_id, la.link_id,''LINK'' as feature_type, la.feature_id,
 						la.exit_topelev, la.exit_ymax, la.exit_elev, la.vnode_distfromnode2 as dist, a.total_length
 					FROM temp_link_x_arc la
-					JOIN temp_anl_arc a ON la.arc_id::integer = a.arc_id::integer
-					WHERE a.node_1::integer = la.node_2::integer
+					JOIN temp_anl_arc a ON la.arc_id = a.arc_id
+					WHERE a.node_1 = la.node_2
 				)a 
 			ORDER BY a.arc_id, dist';
 
@@ -529,14 +552,14 @@ BEGIN
 
 		-- update descript and code field
 		EXECUTE 'UPDATE temp_anl_arc SET descript = a.descript, code=a.code 
-		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id::text = temp_anl_arc.arc_id';
+		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id::varchar else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id = temp_anl_arc.arc_id';
 		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
-					(SELECT node_id, top_elev as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::text else code end as code, 
+					(SELECT node_id, top_elev as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::varchar else code end as code, 
 					total_distance FROM temp_anl_node)row)a
-					WHERE a.node_id::integer = temp_anl_node.node_id::integer';
+					WHERE a.node_id = temp_anl_node.node_id';
 
 		EXECUTE 'UPDATE temp_anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
-		FROM (SELECT node_id, case when code is null then node_id::text else code end code FROM ('||v_textnode||')row)a WHERE a.node_id::integer = temp_anl_node.node_id::integer ';
+		FROM (SELECT node_id, case when code is null then node_id::varchar else code end code FROM ('||v_textnode||')row)a WHERE a.node_id = temp_anl_node.node_id';
 
 		-- delete not used keys
 		UPDATE temp_anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id')  ;
@@ -567,22 +590,22 @@ BEGIN
 
 				IF v_telev[i+1] IS NOT NULL AND v_telev[i-1] IS NOT NULL THEN
 					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-1]||'+ (('||v_dist[i]||'-'||v_dist[i-1]||')*('||v_telev[i+1]||'-'||v_telev[i-1]||')/('||v_dist[i+1]||'-'||v_dist[i-1]||')))::numeric(12,3) 
-						       WHERE node_id::integer = '||v_nid[i];
+						       WHERE node_id = '||v_nid[i];
 					EXECUTE v_querytext;
 
 				ELSIF v_telev[i+1] IS NOT NULL AND v_telev[i-2] IS NOT NULL THEN
 					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-2]||'+ (('||v_dist[i]||'-'||v_dist[i-2]||')*('||v_telev[i+1]||'-'||v_telev[i-2]||')/('||v_dist[i+1]||'-'||v_dist[i-2]||')))::numeric(12,3) 
-						       WHERE node_id::integer = '||v_nid[i];
+						       WHERE node_id = '||v_nid[i];
 					EXECUTE v_querytext;
 
 				ELSIF v_telev[i+2] IS NOT NULL AND v_telev[i-1] IS NOT NULL THEN
 					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-1]||'+ (('||v_dist[i]||'-'||v_dist[i-1]||')*('||v_telev[i+2]||'-'||v_telev[i-1]||')/('||v_dist[i+2]||'-'||v_dist[i-1]||')))::numeric(12,3) 
-						       WHERE node_id::integer = '||v_nid[i];
+						       WHERE node_id = '||v_nid[i];
 					EXECUTE v_querytext;
 
 				ELSIF v_telev[i+2] IS NOT NULL AND v_telev[i-2] IS NOT NULL THEN
 					v_querytext = 'UPDATE temp_anl_node SET top_elev = ('||v_telev[i-2]||'+ (('||v_dist[i]||'-'||v_dist[i-2]||')*('||v_telev[i+2]||'-'||v_telev[i-2]||')/('||v_dist[i+2]||'-'||v_dist[i-2]||')))::numeric(12,3) 
-						       WHERE node_id::integer = '||v_nid[i];
+						       WHERE node_id = '||v_nid[i];
 					EXECUTE v_querytext;
 				ELSE
 					v_level  = 2;
@@ -597,13 +620,13 @@ BEGIN
 			--elev values
 			IF v_elev[i] IS NULL THEN
 				IF v_elev[i+1] IS NOT NULL AND v_elev[i-1] IS NOT NULL THEN
-					UPDATE temp_anl_node SET elev = (v_elev[i-1]+ ((v_dist[i]-v_dist[i-1])*(v_elev[i+1]-v_elev[i-1])/(v_dist[i+1]-v_dist[i-1])))::numeric(12,3) WHERE node_id::integer = v_nid[i];
+					UPDATE temp_anl_node SET elev = (v_elev[i-1]+ ((v_dist[i]-v_dist[i-1])*(v_elev[i+1]-v_elev[i-1])/(v_dist[i+1]-v_dist[i-1])))::numeric(12,3) WHERE node_id = v_nid[i];
 				ELSIF v_elev[i+1] IS NOT NULL AND v_elev[i-2] IS NOT NULL THEN
-					UPDATE temp_anl_node SET elev = (v_elev[i-2]+ ((v_dist[i]-v_dist[i-2])*(v_elev[i+1]-v_elev[i-2])/(v_dist[i+1]-v_dist[i-2])))::numeric(12,3) WHERE node_id::integer = v_nid[i];
+					UPDATE temp_anl_node SET elev = (v_elev[i-2]+ ((v_dist[i]-v_dist[i-2])*(v_elev[i+1]-v_elev[i-2])/(v_dist[i+1]-v_dist[i-2])))::numeric(12,3) WHERE node_id = v_nid[i];
 				ELSIF v_elev[i+2] IS NOT NULL AND v_elev[i-1] IS NOT NULL THEN
-					UPDATE temp_anl_node SET elev = (v_elev[i-1]+ ((v_dist[i]-v_dist[i-1])*(v_elev[i+2]-v_elev[i-1])/(v_dist[i+2]-v_dist[i-1])))::numeric(12,3) WHERE node_id::integer = v_nid[i];
+					UPDATE temp_anl_node SET elev = (v_elev[i-1]+ ((v_dist[i]-v_dist[i-1])*(v_elev[i+2]-v_elev[i-1])/(v_dist[i+2]-v_dist[i-1])))::numeric(12,3) WHERE node_id = v_nid[i];
 				ELSIF v_elev[i+2] IS NOT NULL AND v_elev[i-2] IS NOT NULL THEN
-					UPDATE temp_anl_node SET elev = (v_elev[i-2]+ ((v_dist[i]-v_dist[i-2])*(v_elev[i+2]-v_elev[i-2])/(v_dist[i+2]-v_dist[i-2])))::numeric(12,3) WHERE node_id::integer = v_nid[i];
+					UPDATE temp_anl_node SET elev = (v_elev[i-2]+ ((v_dist[i]-v_dist[i-2])*(v_elev[i+2]-v_elev[i-2])/(v_dist[i+2]-v_dist[i-2])))::numeric(12,3) WHERE node_id = v_nid[i];
 				ELSE
 					v_level  = 2;
 					v_message = 'Interpolation tool it is designed to interpolate with data missed maximun at two consecutives nodes. Please check your data!';
@@ -611,10 +634,10 @@ BEGIN
 				END IF;
 
 				UPDATE temp_anl_node SET  result_id = 'interpolated', descript = gw_fct_json_object_set_key(descript::json, 'elev', 'None'::text)
-				WHERE node_id::integer = v_nid[i];
+				WHERE node_id = v_nid[i];
 			END IF;
 
-			UPDATE 	temp_anl_node SET nodecat_id = 'VNODE' WHERE node_id::integer = v_nid[i] AND nodecat_id IS NULL;
+			UPDATE 	temp_anl_node SET nodecat_id = 'VNODE' WHERE node_id = v_nid[i] AND nodecat_id IS NULL;
 		END LOOP;
 
 		-- update node table those ymax nulls
@@ -746,7 +769,7 @@ BEGIN
 				select row_number() over (order by a.total_distance) as rid, a.top_elev as top_n1, b.top_elev as top_n2, (b.top_elev-a.top_elev)::numeric(12,3) as delta_y, 
 				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
 				left join querytext b ON a.rid = b.rid-1 
-				left join (select * from temp_anl_arc) c ON a.arc_id::text = c.arc_id::text) row'
+				left join (select * from temp_anl_arc) c ON a.arc_id = c.arc_id) row'
 				INTO v_terrain;
 				/*
 				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM temp_anl_node ORDER by total_distance)
@@ -771,41 +794,45 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (
-		SELECT arc_id, arccat_id, descript::jsonb,expl_id, ST_Transform(the_geom, 4326) as the_geom, 'ARC' as feature_type
+		SELECT arc_id, arccat_id, descript::jsonb,expl_id, the_geom, 'ARC' as feature_type
 		FROM  temp_anl_arc
-		UNION
-		SELECT l.link_id::text, linkcat_id, descript::jsonb, expl_id, ST_Transform(the_geom, 4326) as the_geom, 'LINK' as feature_type
+		UNION ALL
+		SELECT l.link_id, linkcat_id, descript::jsonb, expl_id, the_geom, 'LINK' as feature_type
 		FROM link l
 		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
 
 
 	v_result_line = v_result;
 
-	SELECT jsonb_build_object(
-		'type', 'FeatureCollection',
-		'layerName', 'Profile point',
-		'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-	) INTO v_result
+	SELECT 
+		jsonb_build_object(
+			'type', 'FeatureCollection',
+			'layerName', 'Profile point',
+			'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+		) INTO v_result
 	FROM (
-	SELECT jsonb_build_object(
-		'type',       'Feature',
-		'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-		'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM (
-		SELECT node_id, nodecat_id, descript::jsonb,expl_id, ST_Transform(the_geom, 4326) as the_geom, 'NODE' as feature_type
-		FROM temp_anl_node
-		WHERE nodecat_id!='VNODE'
-		UNION
-		SELECT c.connec_id::text, conneccat_id, c.descript::jsonb, c.expl_id, ST_Transform(c.the_geom, 4326) as the_geom, 'CONNEC' as feature_type
-		FROM connec c
-		JOIN link l ON c.connec_id = l.feature_id
-		JOIN temp_link_x_arc la ON l.link_id = la.link_id
-		UNION
-		SELECT g.gully_id::text, gullycat_id, g.descript::jsonb, g.expl_id, ST_Transform(g.the_geom, 4326) as the_geom, 'GULLY' as feature_type
-		FROM gully g
-		JOIN link l ON g.gully_id = l.feature_id
-		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
+		SELECT 
+			jsonb_build_object(
+				'type',       'Feature',
+				'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+				'properties', to_jsonb(row) - 'the_geom'
+			) AS feature
+		FROM (
+			SELECT node_id, nodecat_id, descript::jsonb,expl_id, the_geom, 'NODE' as feature_type
+			FROM temp_anl_node
+			WHERE nodecat_id!='VNODE'
+			UNION ALL
+			SELECT c.connec_id, conneccat_id, c.descript::jsonb, c.expl_id, c.the_geom, 'CONNEC' as feature_type
+			FROM connec c
+			JOIN link l ON c.connec_id = l.feature_id
+			JOIN temp_link_x_arc la ON l.link_id = la.link_id
+			UNION ALL
+			SELECT g.gully_id, gullycat_id, g.descript::jsonb, g.expl_id, g.the_geom, 'GULLY' as feature_type
+			FROM gully g
+			JOIN link l ON g.gully_id = l.feature_id
+			JOIN temp_link_x_arc la ON l.link_id = la.link_id
+		) row
+	) features;
 
 	v_result_point = v_result;
 
