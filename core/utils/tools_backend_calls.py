@@ -190,6 +190,10 @@ def delete_object(**kwargs):
     if answer:
         sql = f"DELETE FROM {tablename} WHERE {func_params['columnfind']}::text IN ({list_id})"
         tools_db.execute_sql(sql, log_sql=False)
+        if frelem_ids:
+            frelem_ids_str = str(frelem_ids)[1:-1]
+            sql = f"DELETE FROM v_ui_element WHERE element_id::text IN ({frelem_ids_str})"
+            tools_db.execute_sql(sql, log_sql=False)
         _reload_table(**kwargs)
 
 
