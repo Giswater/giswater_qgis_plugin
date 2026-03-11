@@ -70,7 +70,7 @@ BEGIN
 		WITH aux AS (
 	   		SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
 		), json_vals AS (
-			SELECT key AS col, SELECT key AS col, replace(replace(value::text, '''''''', '''''''''''')::text, ''"'', '''''''') AS val
+			SELECT key AS col, replace(replace(value::text, '''''''', '''''''''''')::text, ''"'', '''''''') AS val
 			FROM aux,
 			jsonb_each(aux.js::jsonb) AS keys_values
 		)
