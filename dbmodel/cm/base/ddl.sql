@@ -717,7 +717,7 @@ CREATE SEQUENCE cm.cm_urn_id_seq
 
 -- CM AUDIT TABLES (in audit schema):
 CREATE SCHEMA IF NOT EXISTS audit;
-CREATE TABLE audit.cm_log (
+CREATE TABLE IF NOT EXISTS audit.cm_log (
 	table_name text NOT NULL,
   mission_type text NOT NULL,
 	mission_id int4 NOT NULL,
@@ -736,7 +736,7 @@ CREATE INDEX IF NOT EXISTS audit_cm_log_insert_at ON audit.cm_log USING btree (i
 CREATE INDEX IF NOT EXISTS audit_cm_log_mission_type ON audit.cm_log USING btree (mission_type);
 CREATE INDEX IF NOT EXISTS audit_cm_log_action_insert_at ON audit.cm_log USING btree ("action", insert_at);
 
-CREATE TABLE audit.cm_log_error (
+CREATE TABLE IF NOT EXISTS audit.cm_log_error (
   id serial4 NOT NULL,
   context text NOT NULL,
   error_code text NOT NULL,

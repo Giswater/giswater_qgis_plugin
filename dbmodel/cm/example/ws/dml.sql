@@ -98,3 +98,7 @@ INSERT INTO om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status
 INSERT INTO om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (2, 'Lot num.2', 1, TRUE, 5, 1);
 INSERT INTO om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (3, 'Lot num.3', 2, TRUE, 6, 1);
 INSERT INTO om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (4, 'Lot num.4', 2, TRUE, 7, 1);
+
+-- Sync sequences after explicit ID inserts
+SELECT setval('om_campaign_campaign_id_seq', (SELECT MAX(campaign_id) FROM om_campaign), true);
+SELECT setval('om_campaign_lot_lot_id_seq', (SELECT MAX(lot_id) FROM om_campaign_lot), true);

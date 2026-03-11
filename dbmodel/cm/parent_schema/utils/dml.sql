@@ -11,7 +11,7 @@ SET search_path = PARENT_SCHEMA, public, pg_catalog;
 INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type, datatype) VALUES
 ('plugin_campaign', '{"campaignManage":"TRUE"}', 'External plugin to use functionality of planified campaign/lots review/visits', FALSE, 'utils', 'json') ON CONFLICT (parameter) DO NOTHING;
 
-INSERT INTO cm.cat_pschema (name) VALUES ('PARENT_SCHEMA');
+INSERT INTO cm.cat_pschema (name) VALUES ('PARENT_SCHEMA') ON CONFLICT DO NOTHING;
 
 UPDATE PARENT_SCHEMA.config_param_system
    SET value = '{"schemaName":"cm"}'
@@ -32,41 +32,41 @@ UPDATE cm.sys_version AS dst
 -- topological trace
 INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4576, 'There is no topology from the selected node.', 'The node is isolated or it does not exist in the selected lot_id.', 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4576, 'There is no topology from the selected node.', 'The node is isolated or it does not exist in the selected lot_id.', 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 -- setarcdivide_massive Set mode audit messages (fid 2114)
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4578, 'Node %node_id% has been moved to arc %arc_id%.', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (4578, 'Node %node_id% has been moved to arc %arc_id%.', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4580, 'Arc %arc_id% has been divided.', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (4580, 'Arc %arc_id% has been divided.', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4582, 'Arcs %arc_id1% and %arc_id2% have been created (replacing arc %arc_id%).', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (4582, 'Arcs %arc_id1% and %arc_id2% have been created (replacing arc %arc_id%).', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES (4584, 'There are %v_count% orphan nodes.', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES (4584, 'There are %v_count% orphan nodes.', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
 VALUES(3542, 'gw_fct_cm_topological_trace', 'ws', 'function', 'json', 'json', 'Function to visualize the topology of the lot from a SELECTED NODE.
 
-The available lots for the analysis are the ones that take part into de SELECTED CAMPAIGN.', 'role_om', NULL, 'cm', NULL);
+The available lots for the analysis are the ones that take part into de SELECTED CAMPAIGN.', 'role_om', NULL, 'cm', NULL) ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3540, 'gw_fct_cm_build_topology', 'ws', 'function', 'json', 'json', 'Function to build or update the topology of a Lot. 
 
 
-Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'cm', NULL);
+Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'cm', NULL) ON CONFLICT DO NOTHING;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3544, 'gw_fct_cm_check_node_orphan', 'ws', 'function', 'json', 'json', 'Function to show orphan nodes of the selected lot. That is: the nodes that are neither node_1 nor node_2 or any arc.', 'role_om', NULL, 'cm', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3544, 'gw_fct_cm_check_node_orphan', 'ws', 'function', 'json', 'json', 'Function to show orphan nodes of the selected lot. That is: the nodes that are neither node_1 nor node_2 or any arc.', 'role_om', NULL, 'cm', NULL) ON CONFLICT DO NOTHING;
 
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3546, 'gw_fct_cm_check_node_duplicated', 'ws', 'function', 'json', 'json', 'Funcion to show duplicated nodes of the selected lot 3.
 
-The tolerance from which nodes are detected is 10 cm.', 'role_om', NULL, 'cm', NULL);
+The tolerance from which nodes are detected is 10 cm.', 'role_om', NULL, 'cm', NULL) ON CONFLICT DO NOTHING;
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3548, 'gw_fct_cm_check_arc_duplicated', 'ws', 'function', 'json', 'json', 'Function to show duplicated arcs in the lot.', 'role_om', NULL, 'cm', NULL);
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3548, 'gw_fct_cm_check_arc_duplicated', 'ws', 'function', 'json', 'json', 'Function to show duplicated arcs in the lot.', 'role_om', NULL, 'cm', NULL) ON CONFLICT DO NOTHING;
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3550, 'gw_fct_cm_check_node_document', 'ws', 'function', 'json', 'json', 'Function to show the nodes that do not have related documents. 
 
-Specific node type can be excluded from the search.', 'role_om', NULL, 'cm', NULL);
+Specific node type can be excluded from the search.', 'role_om', NULL, 'cm', NULL) ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(-3, 'There are ', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(-2, 'There is ', NULL, 0, true, 'utils', 'core', 'UI') ON CONFLICT (id) DO NOTHING;
@@ -77,7 +77,7 @@ INSERT INTO sys_function
 VALUES(3552, 'gw_fct_cm_setarcdivide_massive', 'ws', 'function', 'json', 'json', 'Function to set the arc divide of a node. 
 
 
-Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'cm', 'SETARCDIVIDE_MASSIVE');
+Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'cm', 'SETARCDIVIDE_MASSIVE') ON CONFLICT DO NOTHING;
 
 
 INSERT INTO config_function
@@ -109,7 +109,7 @@ VALUES(3552, 'gw_fct_cm_setarcdivide_massive', '{
       ]
     }
   }
-}'::json, NULL, NULL);
+}'::json, NULL, NULL) ON CONFLICT DO NOTHING;
 
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
@@ -147,7 +147,7 @@ VALUES(3552, '6- [CM] Massive arc divide', '{"featureType":[]}'::json, '[{
     "dvQueryText": "SELECT ''CHECK'' AS id, ''CHECK'' AS idval UNION ALL SELECT ''SET'' AS id, ''SET'' AS idval",
     "selectedId": "1"
   }
-]'::json, NULL, true, '{4}');
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3550, '0- [CM] Verificar nodos sin documento de un lote', '{"featureType":[]}'::json, '[
@@ -184,7 +184,7 @@ VALUES(3550, '0- [CM] Verificar nodos sin documento de un lote', '{"featureType"
     "isMandatory": false,
     "layoutorder": 5
   }
-]'::json, NULL, true, '{4}');
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3548, '[CM] Check duplicated arcs of a lot', '{"featureType":[]}'::json, '[
@@ -211,7 +211,7 @@ VALUES(3548, '[CM] Check duplicated arcs of a lot', '{"featureType":[]}'::json, 
     "dvQueryText": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6)",
     "filterquery": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6) and a.campaign_id = {parent_value}"
   }
-]'::json, NULL, false, '{4}');
+]'::json, NULL, false, '{4}') ON CONFLICT DO NOTHING;
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3546, '1- [CM] Check duplicated nodes of a lot', '{"featureType":[]}'::json, '[
@@ -247,7 +247,7 @@ VALUES(3546, '1- [CM] Check duplicated nodes of a lot', '{"featureType":[]}'::js
     "isMandatory": true,
     "layoutorder": 5
   }
-]'::json, NULL, true, '{4}');
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3544, '5- [CM] Check orphan nodes of a lot', '{"featureType":[]}'::json, '[
@@ -274,7 +274,7 @@ VALUES(3544, '5- [CM] Check orphan nodes of a lot', '{"featureType":[]}'::json, 
     "dvQueryText": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6)",
     "filterquery": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6) and a.campaign_id = {parent_value}"
   }
-]'::json, NULL, true, '{4}');
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3542, '4- [CM] Visualize lot topology', '{"featureType":[]}'::json, '[
@@ -310,7 +310,7 @@ VALUES(3542, '4- [CM] Visualize lot topology', '{"featureType":[]}'::json, '[
     "isMandatory": true,
     "layoutorder": 5
   }
-]'::json, NULL, true, '{4}');
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3540, '3- [CM] Reconnect lot topology', '{"featureType":[]}'::json, '[
@@ -354,4 +354,4 @@ VALUES(3540, '3- [CM] Reconnect lot topology', '{"featureType":[]}'::json, '[
     "isMandatory": true,
     "layoutorder": 5
   }
-]'::json, NULL, true, '{4}');
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
