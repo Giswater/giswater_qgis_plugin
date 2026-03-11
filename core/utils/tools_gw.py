@@ -1692,12 +1692,18 @@ def delete_selected_rows(widget, table_object, field_object_id=None, col_idx=0):
     if field_object_id is None:
         field_object_id = "id"
 
+    model = widget.model()
+    if isinstance(model, QStandardItemModel):
+        idx = tools_qt.get_col_index_by_col_name(widget, field_object_id)
+        if idx is None:
+            idx = col_idx
+
     for i in range(0, len(selected_list)):
         row = selected_list[i].row()
-        if isinstance(widget.model(), QStandardItemModel):
-            id_ = widget.model().item(row, col_idx).text()
+        if isinstance(model, QStandardItemModel):
+            id_ = model.item(row, idx).text()
         else:
-            id_ = widget.model().record(row).value(str(field_object_id))
+            id_ = model.record(row).value(str(field_object_id))
         inf_text += f"{id_}, "
         list_id += f"'{id_}', "
     inf_text = inf_text[:-2]
