@@ -2666,8 +2666,9 @@ class GwInfo(QObject):
             return
         index = selected_list[0]
         row = index.row()
-        first_col_value = index.sibling(row, 0).data()
-        dscenario_manager_btn.selected_dscenario_id = int(first_col_value)
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'dscenario_id')
+        dscenario_id_value = index.sibling(row, col_idx).data()
+        dscenario_manager_btn.selected_dscenario_id = int(dscenario_id_value)
         dscenario_manager_btn.manage_update(
             dlg_cf,
             tableview,
