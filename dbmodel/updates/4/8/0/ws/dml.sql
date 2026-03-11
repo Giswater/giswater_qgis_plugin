@@ -1117,3 +1117,85 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'emitter_coeff', 'lyt_epa_data_1', 22, 'string', 'text', 'Coeficiente emisor:', 'Coeficiente del emisor', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, 17);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'demand_pattern_id', 'lyt_epa_data_1', 21, 'string', 'combo', 'Id del patrón:', 'Id de patrón', NULL, false, false, true, false, false, 'SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL', true, true, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, 17);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'demand', 'lyt_epa_data_1', 20, 'string', 'text', 'Demanda:', 'Deamanda de agua - demand ', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, 17);
+
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3560, 'gw_fct_create_dscenario_losses', 'ws', 'function', 'json', 'json', 'Function to create losses dscenario', 'role_epa', NULL, 'core', NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) 
+VALUES('inp_typevalue_dscenario', 'LOSSES', 'LOSSES', NULL, NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3560, 'gw_fct_create_dscenario_losses', 'ws', 'function', 'json', 'json', 'Function to create losses dscenario.', 'role_epa', NULL, 'core', 'CREATE LOSSES DSCENARIO')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) 
+VALUES(3560, 'Create losses dscenario', '{"featureType":[]}'::json, '[
+  {
+    "label": "Name: (*)",
+    "value": null,
+    "tooltip": "Name of the scenario",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "name",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 1,
+    "placeholder": ""
+  },
+  {
+    "label": "Descript:",
+    "value": null,
+    "tooltip": "Descript",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "descript",
+    "widgettype": "linetext",
+    "isMandatory": false,
+    "layoutorder": 2,
+    "placeholder": ""
+  },
+  {
+    "label": "Sector:",
+    "value": null,
+    "datatype": "int",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "sectorId",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT sector_id as id, name as idval FROM sector s WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.expl_id = ANY(s.expl_id) AND se.cur_user = current_user)",
+    "layoutorder": 3
+  },
+  {
+    "label": "Emitter coefficient",
+    "value": null,
+    "tooltip": "Emitter coefficient",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "emitterCoeff",
+    "widgettype": "linetext",
+    "isMandatory": true,
+    "layoutorder": 4,
+    "placeholder": "0.01"
+  },
+  {
+    "label": "Active:",
+    "value": null,
+    "tooltip": "If true, active",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "active",
+    "widgettype": "check",
+    "layoutorder": 5
+  }
+]'::json, NULL, true, '{4}');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
+VALUES(4586, 'The scenario name already exists. The process was not executed.', NULL, 2, true, 'utils', 'core', 'AUDIT')
+ON CONFLICT DO NOTHING;
