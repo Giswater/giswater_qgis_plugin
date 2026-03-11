@@ -660,6 +660,8 @@ BEGIN
 	FROM cm.sys_fprocess
 	WHERE
 		active AND query_text IS NOT NULL AND (addparam IS NULL) AND function_name ILIKE '%gw_fct_cm_check%'
+		-- Dynamic/template checks must run only in the path that provides replaceParams.
+		AND COALESCE(function_name, '') NOT ILIKE '%gw_fct_cm_check_dynamic%'
 		AND CASE
 			WHEN fid IN (200, 201) THEN v_check_management_configs
 			WHEN fid IN (202, 203) THEN v_check_data_related
