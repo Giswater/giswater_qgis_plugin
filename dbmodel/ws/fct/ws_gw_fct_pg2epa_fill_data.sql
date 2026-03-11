@@ -142,12 +142,6 @@ BEGIN
 	UPDATE temp_t_node SET demand=(inp_connec.demand*COALESCE(peak_factor, 1)), pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id::text;
 
-	-- update child param for inp_valve
-	UPDATE temp_t_node SET addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
-	'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
-	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
-	FROM ve_inp_valve v WHERE temp_t_node.node_id=v.node_id::text;
-
 	-- update addparam for inp_pump
 	UPDATE temp_t_node SET addparam=concat('{"power":"',power,'", "curve_id":"',curve_id,'", "speed":"',speed,'", "pattern":"',p.pattern_id,'", "status":"',status,'", "to_arc":"',to_arc,
 	'", "energy_price":"',energy_price,'", "energy_pattern_id":"',energy_pattern_id,'", "pump_type":"',pump_type,'"}')
@@ -235,6 +229,42 @@ BEGIN
 				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
 
+	-- insert numarcs for nodes
+	INSERT INTO t_numarcs (node_id, numarcs)
+	SELECT n.node_id, count(*) as numarcs
+	FROM temp_t_node n
+	JOIN (
+		SELECT node_1 as node_id
+		FROM temp_t_arc 
+		UNION ALL
+		SELECT node_2
+		FROM temp_t_arc
+	) a ON n.node_id=a.node_id
+	group by n.node_id;
+
+
+	-- update child param for inp_valve
+	UPDATE temp_t_node SET addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
+	'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
+	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
+	FROM ve_inp_valve v WHERE temp_t_node.node_id=v.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=v.node_id::text AND t_numarcs.numarcs > 1);
+
+	-- convert to reservoir the valves with numarcs = 1 and to_arc is not null
+	UPDATE temp_t_node SET
+	epa_type = 'RESERVOIR', top_elev = v.head, elev = v.head, pattern_id=v.pattern_id
+	FROM ve_inp_valve v
+	JOIN man_valve m ON m.node_id=v.node_id
+	WHERE temp_t_node.node_id=v.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=v.node_id::text AND t_numarcs.numarcs = 1) AND m.to_arc IS NOT NULL;
+
+	-- convert to junction the valves with numarcs = 1 and to_arc is null
+	UPDATE temp_t_node SET
+	epa_type = 'JUNCTION',
+	demand=(v.demand*1), pattern_id=v.demand_pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
+	FROM ve_inp_valve v
+	JOIN man_valve m ON m.node_id=v.node_id
+	WHERE temp_t_node.node_id=v.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=v.node_id::text AND t_numarcs.numarcs = 1) AND m.to_arc IS NULL;
+
+
 	-- update child param for inp_pipe
 	UPDATE temp_t_arc SET
 	minorloss = inp_pipe.minorloss,
@@ -259,13 +289,29 @@ BEGIN
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM ve_inp_shortpipe JOIN man_valve USING (node_id)
 	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = ve_inp_shortpipe.node_id::text
-	WHERE temp_t_node.node_id=ve_inp_shortpipe.node_id::text;
+	WHERE temp_t_node.node_id=ve_inp_shortpipe.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=ve_inp_shortpipe.node_id::text AND t_numarcs.numarcs > 1);
 
 	-- update addparam for inp_shortpipe (step 2)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM ve_inp_shortpipe JOIN man_valve USING (node_id)
 	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a ON a.node_id = ve_inp_shortpipe.node_id::text
-	WHERE temp_t_node.node_id=ve_inp_shortpipe.node_id::text;
+	WHERE temp_t_node.node_id=ve_inp_shortpipe.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=ve_inp_shortpipe.node_id::text AND t_numarcs.numarcs > 1);
+
+	-- convert to reservoir the shortpipes with numarcs = 1 and to_arc is not null
+	UPDATE temp_t_node SET
+	epa_type = 'RESERVOIR',
+	top_elev = v.head, elev = v.head, pattern_id=v.pattern_id
+	FROM ve_inp_shortpipe v
+	JOIN man_valve m ON m.node_id=v.node_id
+	WHERE temp_t_node.node_id=v.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=v.node_id::text AND t_numarcs.numarcs = 1);
+
+	-- convert to junction the shortpipes with numarcs = 1 and to_arc is null
+	UPDATE temp_t_node SET
+	epa_type = 'JUNCTION',
+	demand=(v.demand*1), pattern_id=v.demand_pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
+	FROM ve_inp_shortpipe v
+	JOIN man_valve m ON m.node_id=v.node_id
+	WHERE temp_t_node.node_id=v.node_id::text AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=v.node_id::text AND t_numarcs.numarcs = 1);
 
 
 	RETURN 1;

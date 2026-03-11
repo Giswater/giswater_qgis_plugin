@@ -26,3 +26,24 @@ ON v_ui_doc_x_link FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('link');
 
 CREATE TRIGGER gw_trg_ui_doc_x_element INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_ui_doc_x_element FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('element');
+
+
+
+-- 11/03/2026
+create trigger gw_trg_edit_inp_node_valve instead of insert or delete or update on
+ve_inp_valve for each row execute function gw_trg_edit_inp_node('inp_valve');
+
+create trigger gw_trg_edit_ve_epa_valve instead of insert or delete or update on
+ve_epa_valve for each row execute function gw_trg_edit_ve_epa('valve');
+
+create trigger gw_trg_edit_inp_dscenario_valve instead of insert or delete or update on
+ve_inp_dscenario_valve for each row execute function gw_trg_edit_inp_dscenario('VALVE');
+
+create trigger gw_trg_edit_inp_node_shortpipe instead of insert or delete or update on
+ve_inp_shortpipe for each row execute function gw_trg_edit_inp_node('inp_shortpipe');
+
+create trigger gw_trg_edit_inp_dscenario_shortpipe instead of insert or delete or update on
+ve_inp_dscenario_shortpipe for each row execute function gw_trg_edit_inp_dscenario('SHORTPIPE');
+
+create trigger gw_trg_edit_ve_epa_shortpipe instead of insert or delete or update on
+ve_epa_shortpipe for each row execute function gw_trg_edit_ve_epa('shortpipe');

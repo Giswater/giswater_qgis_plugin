@@ -126,14 +126,16 @@ BEGIN
         ELSIF v_node_table = 'inp_valve' THEN
             UPDATE inp_valve SET valve_type=NEW.valve_type, setting=NEW.setting, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss, custom_dint=NEW.custom_dint, add_settings = NEW.add_settings,
-            init_quality=NEW.init_quality
+            init_quality=NEW.init_quality, head = NEW.head, pattern_id = NEW.pattern_id, demand = NEW.demand, demand_pattern_id = NEW.demand_pattern_id, emitter_coeff = NEW.emitter_coeff
             WHERE node_id=OLD.node_id;
 
 			update man_valve set closed = true where new.status = 'CLOSED' AND node_id = OLD.node_id;
 			update man_valve set closed = false where new.status IN ('ACTIVE', 'OPEN') and node_id = OLD.node_id;
 
         ELSIF v_node_table = 'inp_shortpipe' THEN
-             UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff WHERE node_id=OLD.node_id;
+             UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff,
+			 head = NEW.head, pattern_id = NEW.pattern_id, demand = NEW.demand, demand_pattern_id = NEW.demand_pattern_id,
+			 emitter_coeff = NEW.emitter_coeff WHERE node_id=OLD.node_id;
 
 			IF NEW.to_arc IS NOT NULL AND ((NEW.to_arc != OLD.to_arc) OR OLD.to_arc IS NULL) THEN
 				INSERT INTO config_graph_checkvalve VALUES (NEW.node_id, NEW.to_arc)

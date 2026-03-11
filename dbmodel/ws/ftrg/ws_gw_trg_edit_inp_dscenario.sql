@@ -38,9 +38,16 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.add_settings IS NULL THEN NEW.add_settings = (SELECT add_settings FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.head IS NULL THEN NEW.head = (SELECT head FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.demand IS NULL THEN NEW.demand = (SELECT demand FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.demand_pattern_id IS NULL OR NEW.demand_pattern_id='' THEN NEW.demand_pattern_id = (SELECT demand_pattern_id FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.emitter_coeff IS NULL THEN NEW.emitter_coeff = (SELECT emitter_coeff FROM ve_inp_valve WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valve_type, setting, curve_id, minorloss, status, add_settings, init_quality)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valve_type, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings, NEW.init_quality);
+			INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valve_type, setting, curve_id, minorloss, status, add_settings, init_quality,
+			head, pattern_id, demand, demand_pattern_id, emitter_coeff)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valve_type, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings,
+			NEW.init_quality, NEW.head, NEW.pattern_id, NEW.demand, NEW.demand_pattern_id, NEW.emitter_coeff);
 
 		ELSIF v_dscenario_type = 'TANK' THEN
 
@@ -77,9 +84,14 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			IF NEW.to_arc IS NULL THEN NEW.to_arc = (SELECT to_arc FROM man_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.head IS NULL THEN NEW.head = (SELECT head FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.pattern_id IS NULL OR NEW.pattern_id='' THEN NEW.pattern_id = (SELECT pattern_id FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.demand IS NULL THEN NEW.demand = (SELECT demand FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.demand_pattern_id IS NULL OR NEW.demand_pattern_id='' THEN NEW.demand_pattern_id = (SELECT demand_pattern_id FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
+			IF NEW.emitter_coeff IS NULL THEN NEW.emitter_coeff = (SELECT emitter_coeff FROM ve_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_shortpipe(dscenario_id, node_id, minorloss, status, bulk_coeff, wall_coeff, to_arc)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff, NEW.to_arc);
+			INSERT INTO inp_dscenario_shortpipe(dscenario_id, node_id, minorloss, status, bulk_coeff, wall_coeff, to_arc, head, pattern_id, demand, demand_pattern_id, emitter_coeff)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff, NEW.to_arc, NEW.head, NEW.pattern_id, NEW.demand, NEW.demand_pattern_id, NEW.emitter_coeff);
 
 		ELSIF v_dscenario_type = 'RESERVOIR' THEN
 
@@ -271,7 +283,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		IF v_dscenario_type = 'VALVE' THEN
 			UPDATE inp_dscenario_valve SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, valve_type=NEW.valve_type, setting=NEW.setting,
 			curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, add_settings=NEW.add_settings,
-			init_quality=NEW.init_quality
+			init_quality=NEW.init_quality, head = NEW.head, pattern_id = NEW.pattern_id, demand = NEW.demand, demand_pattern_id = NEW.demand_pattern_id, emitter_coeff = NEW.emitter_coeff
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'TANK' THEN
@@ -283,7 +295,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'SHORTPIPE' THEN
 			UPDATE inp_dscenario_shortpipe SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, minorloss=NEW.minorloss, status=NEW.status,
-			bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff, to_arc = NEW.to_arc
+			bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff, to_arc = NEW.to_arc, head = NEW.head, pattern_id = NEW.pattern_id, demand = NEW.demand, demand_pattern_id = NEW.demand_pattern_id, emitter_coeff = NEW.emitter_coeff
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 		ELSIF v_dscenario_type = 'RESERVOIR' THEN

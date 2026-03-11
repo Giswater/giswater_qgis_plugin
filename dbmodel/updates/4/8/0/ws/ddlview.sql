@@ -388,3 +388,206 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_doc
 AS SELECT doc_id,
     visit_id
    FROM doc_x_visit;
+
+
+DROP VIEW IF EXISTS ve_inp_valve;
+CREATE OR REPLACE VIEW ve_inp_valve
+AS SELECT n.node_id,
+    n.top_elev,
+    n.custom_top_elev,
+    n.depth,
+    n.nodecat_id,
+    n.expl_id,
+    n.sector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    concat(n.node_id, '_n2a') AS nodarc_id,
+    inp_valve.valve_type,
+    inp_valve.setting,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    v.to_arc,
+        CASE
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'ACTIVE'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
+        END AS status,
+    n.cat_dint,
+    inp_valve.custom_dint,
+    inp_valve.add_settings,
+    inp_valve.init_quality,
+    inp_valve.head,
+    inp_valve.pattern_id,
+    inp_valve.demand,
+    inp_valve.demand_pattern_id,
+    inp_valve.emitter_coeff,
+    n.the_geom
+   FROM ve_node n
+     JOIN inp_valve USING (node_id)
+     JOIN man_valve v USING (node_id)
+  WHERE n.is_operative IS TRUE;
+
+
+
+DROP VIEW IF EXISTS ve_epa_valve;
+CREATE OR REPLACE VIEW ve_epa_valve
+AS SELECT inp_valve.node_id,
+    inp_valve.valve_type,
+    cat_node.dint,
+    inp_valve.custom_dint,
+    inp_valve.setting,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    v.to_arc,
+        CASE
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'ACTIVE'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
+        END AS status,
+    inp_valve.add_settings,
+    inp_valve.init_quality,
+    inp_valve.head,
+    inp_valve.pattern_id,
+    inp_valve.demand,
+    inp_valve.demand_pattern_id,
+    inp_valve.emitter_coeff,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min
+   FROM node
+     JOIN inp_valve USING (node_id)
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_valve.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_valve.node_id;
+
+
+DROP VIEW IF EXISTS ve_inp_dscenario_valve;
+CREATE OR REPLACE VIEW ve_inp_dscenario_valve
+AS SELECT d.dscenario_id,
+    p.node_id,
+    concat(p.node_id, '_n2a') AS nodarc_id,
+    p.valve_type,
+    p.setting,
+    p.curve_id,
+    p.minorloss,
+    p.status,
+    p.add_settings,
+    p.init_quality,
+    p.to_arc,
+    p.head,
+    p.pattern_id,
+    p.demand,
+    p.demand_pattern_id,
+    p.emitter_coeff,
+    n.the_geom
+   FROM selector_inp_dscenario,
+    ve_node n
+     JOIN inp_dscenario_valve p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = CURRENT_USER AND n.is_operative IS TRUE;
+
+
+DROP VIEW IF EXISTS ve_inp_shortpipe;
+CREATE OR REPLACE VIEW ve_inp_shortpipe
+AS SELECT n.node_id,
+    n.top_elev,
+    n.custom_top_elev,
+    n.depth,
+    n.nodecat_id,
+    n.expl_id,
+    n.sector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    concat(n.node_id, '_n2a') AS nodarc_id,
+    inp_shortpipe.minorloss,
+        CASE
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
+        END AS status,
+    inp_shortpipe.bulk_coeff,
+    inp_shortpipe.wall_coeff,
+    inp_shortpipe.head,
+    inp_shortpipe.pattern_id,
+    inp_shortpipe.demand,
+    inp_shortpipe.demand_pattern_id,
+    inp_shortpipe.emitter_coeff,
+    n.the_geom
+   FROM ve_node n
+     JOIN inp_shortpipe USING (node_id)
+     LEFT JOIN man_valve v ON v.node_id = n.node_id
+  WHERE n.is_operative IS TRUE;
+
+
+DROP VIEW IF EXISTS ve_inp_dscenario_shortpipe;
+CREATE OR REPLACE VIEW ve_inp_dscenario_shortpipe
+AS SELECT d.dscenario_id,
+    p.node_id,
+    p.minorloss,
+    p.status,
+    p.bulk_coeff,
+    p.wall_coeff,
+    p.to_arc,
+    n.the_geom
+   FROM selector_inp_dscenario,
+    ve_node n
+     JOIN inp_dscenario_shortpipe p USING (node_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = CURRENT_USER AND n.is_operative IS TRUE;
+
+
+DROP VIEW IF EXISTS ve_epa_shortpipe;
+CREATE OR REPLACE VIEW ve_epa_shortpipe
+AS SELECT inp_shortpipe.node_id,
+    inp_shortpipe.minorloss,
+    cat_node.dint,
+    inp_shortpipe.custom_dint,
+    v.to_arc,
+        CASE
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
+        END AS status,
+    inp_shortpipe.bulk_coeff,
+    inp_shortpipe.wall_coeff,
+    inp_shortpipe.head,
+    inp_shortpipe.pattern_id,
+    inp_shortpipe.demand,
+    inp_shortpipe.demand_pattern_id,
+    inp_shortpipe.emitter_coeff,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min
+   FROM node
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN inp_shortpipe USING (node_id)
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_shortpipe.node_id;

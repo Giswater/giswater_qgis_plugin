@@ -245,6 +245,11 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
 
                 CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS t_numarcs (
+                    node_id character varying(16),
+                    numarcs integer,
+                    CONSTRAINT t_numarcs_pkey PRIMARY KEY (node_id)
+                );
 
             ELSIF v_project_type = 'UD' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_arc_flowregulator (LIKE temp_arc_flowregulator INCLUDING ALL);
@@ -352,6 +357,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_t_arc_flowregulator;
         DROP TABLE IF EXISTS temp_t_lid_usage;
         DROP TABLE IF EXISTS temp_t_node_other;
+        DROP TABLE IF EXISTS t_numarcs;
 
         DROP TABLE IF EXISTS t_rpt_inp_pattern_value;
         DROP TABLE IF EXISTS t_rpt_inp_raingage;

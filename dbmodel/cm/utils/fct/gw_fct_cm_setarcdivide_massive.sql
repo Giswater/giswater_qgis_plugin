@@ -118,10 +118,6 @@ BEGIN
 	-- Set default values if parameters are not provided
 	v_mode := UPPER(COALESCE(v_mode, 'CHECK'));
 
-	ALTER TABLE cm.om_campaign_x_arc DISABLE TRIGGER trg_cm_topocontrol_arc;
-	ALTER TABLE cm.om_campaign_x_arc DISABLE TRIGGER trg_log_om_campaign_x_arc;
-	ALTER TABLE cm.om_campaign_x_arc DISABLE TRIGGER trg_validate_campaign_x_arc_feature;
-
 	-- Clean up previous audit data for this function (fid=3552)
 	DELETE FROM PARENT_SCHEMA.audit_check_data WHERE cur_user="current_user"() AND fid=3552;
 
@@ -700,10 +696,6 @@ BEGIN
 		v_result_info := '{"values":[]}';
 		v_result_point := '{}';
 	END IF;
-
-	ALTER TABLE cm.om_campaign_x_arc ENABLE TRIGGER trg_cm_topocontrol_arc;
-	ALTER TABLE cm.om_campaign_x_arc ENABLE TRIGGER trg_log_om_campaign_x_arc;
-	ALTER TABLE cm.om_campaign_x_arc ENABLE TRIGGER trg_validate_campaign_x_arc_feature;
 
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_point := COALESCE(v_result_point, '{}');

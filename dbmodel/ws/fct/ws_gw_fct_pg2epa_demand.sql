@@ -53,6 +53,9 @@ BEGIN
 		-- demand on nodes
 		UPDATE temp_t_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id::text;
 
+		-- demand on valves converted to junction
+		UPDATE temp_t_node SET pattern_id = v.demand_pattern_id, demand = v.demand FROM ve_inp_valve v WHERE temp_t_node.node_id = v.node_id::text AND temp_t_node.epa_type = 'JUNCTION';
+
 		-- pattern
 		IF v_patternmethod = 11 THEN -- GLOBAL PATTERN
 			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL AND epa_type ='JUNCTION';

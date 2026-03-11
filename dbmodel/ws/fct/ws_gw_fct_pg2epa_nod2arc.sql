@@ -82,6 +82,7 @@ BEGIN
 				FROM temp_t_node a JOIN man_valve v ON a.node_id=v.node_id::text
 				LEFT JOIN inp_dscenario_shortpipe d ON d.node_id::text = a.node_id
 				LEFT JOIN inp_dscenario_valve d2 ON d2.node_id::text = a.node_id WHERE v.to_arc is not null
+				AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=v.node_id::text AND t_numarcs.numarcs > 1)
 				UNION  
 				SELECT a.*, m.to_arc FROM temp_t_node a JOIN man_pump m ON a.node_id=m.node_id::text WHERE to_arc is not null
 				UNION
@@ -111,6 +112,7 @@ BEGIN
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id
 					   LEFT JOIN inp_dscenario_shortpipe d ON i.node_id = d.node_id
 					   LEFT JOIN man_frelem ON a.node_id=man_frelem.node_id::text WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL
+					   AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=a.node_id AND t_numarcs.numarcs > 1)
 					   UNION
 					   SELECT a.*,
 					   CASE
@@ -120,7 +122,8 @@ BEGIN
 					   FROM temp_t_node a JOIN inp_valve i ON i.node_id::text = a.node_id 
 					   LEFT JOIN man_valve s ON i.node_id = s.node_id
 					   LEFT JOIN inp_dscenario_valve d ON i.node_id = d.node_id
-					   LEFT JOIN man_frelem ON s.node_id=man_frelem.node_id WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL';
+					   LEFT JOIN man_frelem ON s.node_id=man_frelem.node_id WHERE s.to_arc IS NULL and man_frelem.node_id IS NULL
+					   AND EXISTS (SELECT 1 FROM t_numarcs WHERE t_numarcs.node_id=a.node_id AND t_numarcs.numarcs > 1)';
 
 		v_querytext = concat (' INSERT INTO t_anl_node (num_arcs, arc_id, node_id, top_elev, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, 
 				the_geom, fid, cur_user, dma_id, presszone_id, dqa_id, minsector_id, builtdate, family)
