@@ -70,7 +70,7 @@ BEGIN
 		WITH aux AS (
 	   		SELECT 1 AS id, '||QUOTE_LITERAL(v_json_data)||'::json AS js
 		), json_vals AS (
-			SELECT key AS col, replace(value::text, ''"'', '''''''') AS val
+			SELECT key AS col, SELECT key AS col, replace(replace(value::text, '''''''', '''''''''''')::text, ''"'', '''''''') AS val
 			FROM aux,
 			jsonb_each(aux.js::jsonb) AS keys_values
 		)
@@ -103,10 +103,10 @@ BEGIN
 	-- discard non-updatable tables from INSERT/UPDATE statement
 	DELETE FROM temp_new_vals WHERE table_name ILIKE '%selector_%' OR table_name ILIKE 'cat_%';
 	DELETE FROM temp_new_vals WHERE table_name IS NULL;
-	
-	DELETE FROM temp_new_vals 
+
+	DELETE FROM temp_new_vals
 	WHERE table_name in ('om_campaign_x_node', 'om_campaign_x_arc', 'om_campaign_x_connec', 'om_campaign_lot');
-	
+
 	-- discard id, we will use the serial sequences
 	DELETE FROM temp_new_vals
 	WHERE col = 'id';
