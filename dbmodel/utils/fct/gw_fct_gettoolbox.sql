@@ -110,9 +110,7 @@ BEGIN
 			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
-			 AND ',v_device,' = ANY(device)
-			 AND (COALESCE(source,'''') <> ''cm'' AND alias NOT ILIKE ''%[CM]%'')
-		) a');
+			 AND ',v_device,' = ANY(device)) a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -184,11 +182,11 @@ BEGIN
 			 SELECT config_toolbox.id, alias, function_name as functionname
 			 FROM sys_function
 			 JOIN config_toolbox USING (id)
-			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role = ''role_om'' AND config_toolbox.active IS TRUE
+			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_cm'' AND config_toolbox.active IS TRUE
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' or project_type=''utils'')
 			 AND ',v_device,' = ANY(device)
-			 AND (COALESCE(source,'''') = ''cm'' OR alias ILIKE ''%[CM]%'')
+			 AND EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = ''cm'')
 		) a');
 
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
