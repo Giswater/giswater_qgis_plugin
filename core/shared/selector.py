@@ -268,9 +268,13 @@ class GwSelector:
             if 'manageAll' in form_tab and (form_tab['manageAll']).lower() == 'true':
                 # Check check_all if all selectors are checked
                 self.checkall = True
-                for field in form_tab['fields']:
-                    if not tools_os.set_boolean(field.get('value'), default=False):
-                        self.checkall = False
+
+                if form_tab['fields'] == []:
+                    self.checkall = False
+                else:
+                    for field in form_tab['fields']:
+                        if not tools_os.set_boolean(field.get('value'), default=False):
+                            self.checkall = False
 
                 if tools_qt.get_widget(dialog, f"chk_all_{tab_name}") is None:
                     widget = QCheckBox()
