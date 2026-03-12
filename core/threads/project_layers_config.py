@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import Qgis, QgsEditFormConfig
+from qgis.core import Qgis, QgsEditFormConfig, QgsProject
 from qgis.utils import iface
 
 from .task import GwTask
@@ -33,6 +33,7 @@ class GwProjectLayersConfig(GwTask):
         self.json_result = None
         self.vr_errors = None
         self.vr_missing = None
+        self.vr_layers_to_add = None
 
     def run(self):
 
@@ -40,6 +41,7 @@ class GwProjectLayersConfig(GwTask):
         self.setProgress(0)
         self.vr_errors = set()
         self.vr_missing = set()
+        self.vr_layers_to_add = set()
         self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
@@ -55,6 +57,15 @@ class GwProjectLayersConfig(GwTask):
             sql += f"{self.body}"
         sql += ");"
         tools_gw.manage_json_response(self.json_result, sql, None)
+
+        # Add ValueRelation layers to TOC (HIDDEN group)
+        for layer in self.vr_layers_to_add or []:
+            tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True)
+
+        # Hide hidden group
+        root = QgsProject.instance().layerTreeRoot()
+        tools_gw.hide_group_from_toc('HIDDEN')
+        root.findGroup('HIDDEN').setItemVisibilityChecked(False)
 
         # Select the layer called 've_node'
         layer = tools_qgis.get_layer_by_tablename('ve_node')
