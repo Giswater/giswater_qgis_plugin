@@ -544,6 +544,11 @@ AS SELECT d.dscenario_id,
     p.bulk_coeff,
     p.wall_coeff,
     p.to_arc,
+    p.head,
+    p.pattern_id,
+    p.demand,
+    p.demand_pattern_id,
+    p.emitter_coeff,
     n.the_geom
    FROM selector_inp_dscenario,
     ve_node n
