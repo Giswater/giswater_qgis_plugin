@@ -7002,6 +7002,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     if complet_list in (False, None):
         return False, False
     data = complet_list['body']['data']
+    headers = complet_list['body']['form'].get('headers')
     fields = data['fields']
 
     if data.get('hidden'):
@@ -7010,8 +7011,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     widget = dialog.findChild(QTableView, short_name)
     if widget is None:
         return False, False
-
-    widget = add_tableview_header(widget, fields)
+    widget = add_tableview_header(widget, fields, headers)
     widget = fill_tableview_rows(widget, fields)
     widget = set_tablemodel_config(dialog, widget, short_name, Qt.SortOrder.DescendingOrder)
     tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked)

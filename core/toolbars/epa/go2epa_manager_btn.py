@@ -110,6 +110,7 @@ class GwGo2EpaManagerButton(GwAction):
         if complet_list is False:
             return False, False
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False, False
@@ -120,7 +121,7 @@ class GwGo2EpaManagerButton(GwAction):
         model.removeRows(0, model.rowCount())
 
         if fields:
-            self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, fields)
+            self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, fields, headers)
             self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, fields)
 
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')

@@ -223,6 +223,7 @@ class GwAudit:
             return False
 
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False
@@ -233,7 +234,7 @@ class GwAudit:
         model.removeRows(0, model.rowCount())
 
         if fields:
-            self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, fields)
+            self.dlg_audit_manager.tbl_audit = tools_gw.add_tableview_header(self.dlg_audit_manager.tbl_audit, fields, headers)
             self.dlg_audit_manager.tbl_audit = tools_gw.fill_tableview_rows(self.dlg_audit_manager.tbl_audit, fields)
 
         tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, 'audit_results')

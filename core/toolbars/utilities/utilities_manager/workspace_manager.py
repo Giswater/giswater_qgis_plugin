@@ -146,6 +146,7 @@ class GwWorkspaceManagerButton(GwAction):
         if complet_list is False:
             return False, False
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False
@@ -156,7 +157,7 @@ class GwWorkspaceManagerButton(GwAction):
         model.removeRows(0, model.rowCount())
 
         if fields:
-            self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, fields)
+            self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, fields, headers)
             self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, fields)
         # TODO: config_form_tableview
         # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', Qt.SortOrder.DescendingOrder, True)

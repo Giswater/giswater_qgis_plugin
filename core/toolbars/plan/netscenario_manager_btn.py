@@ -260,6 +260,7 @@ class GwNetscenarioManagerButton(GwAction):
         if complet_list is False:
             return False, False
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False, False
@@ -270,7 +271,7 @@ class GwNetscenarioManagerButton(GwAction):
         model.removeRows(0, model.rowCount())
 
         if fields:
-            self.tbl_netscenario = tools_gw.add_tableview_header(self.tbl_netscenario, fields)
+            self.tbl_netscenario = tools_gw.add_tableview_header(self.tbl_netscenario, fields, headers)
             self.tbl_netscenario = tools_gw.fill_tableview_rows(self.tbl_netscenario, fields)
         tools_gw.set_tablemodel_config(self.dlg_netscenario_manager, self.tbl_netscenario, 'v_ui_plan_netscenario', Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(self.tbl_netscenario)

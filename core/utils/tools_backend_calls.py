@@ -325,6 +325,7 @@ def manage_visit_class(**kwargs):
         # non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
 
     # values
+    fields = complet_list['body']['data']['fields']
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']:
             continue
@@ -334,7 +335,7 @@ def manage_visit_class(**kwargs):
             table_view.setModel(model)
         model.removeRows(0, model.rowCount())
 
-        table_view = tools_gw.add_tableview_header(table_view, field)
+        table_view = tools_gw.add_tableview_header(table_view, field, headers)
         table_view = tools_gw.fill_tableview_rows(table_view, field)
         tools_qt.set_tableview_config(table_view)
 
@@ -433,6 +434,7 @@ def filter_table(**kwargs):
         qtable = dialog.findChild(QTableView, func_params.get('targetwidget'))
     if qtable:
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False
@@ -440,7 +442,7 @@ def filter_table(**kwargs):
             model.removeRows(0, model.rowCount())
             return complet_list
         model.clear()
-        tools_gw.add_tableview_header(qtable, fields)
+        tools_gw.add_tableview_header(qtable, fields, headers)
         tools_gw.fill_tableview_rows(qtable, fields)
         tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(qtable)
@@ -469,6 +471,7 @@ def filter_table_mincut(**kwargs):
     if complet_list is False:
         return False
     data = complet_list['body']['data']
+    headers = complet_list['body']['form'].get('headers')
     fields = data['fields']
     if data.get('hidden'):
         return False
@@ -478,7 +481,7 @@ def filter_table_mincut(**kwargs):
             model.removeRows(0, model.rowCount())
             return complet_list
         model.clear()
-        tools_gw.add_tableview_header(qtable, fields)
+        tools_gw.add_tableview_header(qtable, fields, headers)
         tools_gw.fill_tableview_rows(qtable, fields)
         tools_gw.set_tablemodel_config(dialog, qtable, widgetname, Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(qtable)
@@ -838,7 +841,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
         tab_name = 'main'
         no_tabs = True
     complet_list = _get_list(complet_result, filter_fields, linkedobject)
-
+    print(f"complet_list: {complet_list}")
     if complet_list is False:
         return False, False
 

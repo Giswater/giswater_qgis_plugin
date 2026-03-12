@@ -3295,6 +3295,7 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
 
     # values
     data = complet_list['body']['data']
+    headers = complet_list['body']['form'].get('headers')
     fields = data['fields']
     if data.get('hidden'):
         return False
@@ -3305,7 +3306,7 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
     model.removeRows(0, model.rowCount())
 
     if fields:
-        tbl = tools_gw.add_tableview_header(tbl, fields)
+        tbl = tools_gw.add_tableview_header(tbl, fields, headers)
         tbl = tools_gw.fill_tableview_rows(tbl, fields)
     tools_qt.set_tableview_config(tbl)
     model.dataChanged.connect(partial(tbl_data_changed, info, view, tbl, model, addparam))

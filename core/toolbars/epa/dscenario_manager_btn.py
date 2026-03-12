@@ -499,6 +499,7 @@ class GwDscenarioManagerButton(GwAction):
         if complet_list is False:
             return False, False
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False, False
@@ -510,7 +511,7 @@ class GwDscenarioManagerButton(GwAction):
         model.removeRows(0, model.rowCount())
 
         if fields:
-            self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, fields)
+            self.tbl_dscenario = tools_gw.add_tableview_header(self.tbl_dscenario, fields, headers)
             self.tbl_dscenario = tools_gw.fill_tableview_rows(self.tbl_dscenario, fields)
         tools_gw.set_tablemodel_config(dialog, self.tbl_dscenario, 've_cat_dscenario', Qt.SortOrder.DescendingOrder)
         tools_qt.set_tableview_config(self.tbl_dscenario)

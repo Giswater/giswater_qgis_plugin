@@ -508,6 +508,7 @@ class GwDocument(QObject):
         if complet_list is False:
             return False
         data = complet_list['body']['data']
+        headers = complet_list['body']['form'].get('headers')
         fields = data['fields']
         if data.get('hidden'):
             return False
@@ -518,7 +519,7 @@ class GwDocument(QObject):
         model.removeRows(0, model.rowCount())
 
         if fields:
-            self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, fields)
+            self.dlg_man.tbl_document = tools_gw.add_tableview_header(self.dlg_man.tbl_document, fields, headers)
             self.dlg_man.tbl_document = tools_gw.fill_tableview_rows(self.dlg_man.tbl_document, fields)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, 'v_ui_doc', Qt.SortOrder.AscendingOrder)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, section_resize_mode=QHeaderView.ResizeMode.Interactive)
