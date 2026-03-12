@@ -20,7 +20,8 @@ SELECT has_table('inp_valve'::name, 'Table inp_valve should exist');
 SELECT columns_are(
     'inp_valve',
     ARRAY[
-        'node_id', 'valve_type', 'custom_dint', 'setting', 'curve_id', 'minorloss', 'add_settings', 'init_quality'
+        'node_id', 'valve_type', 'custom_dint', 'setting', 'curve_id', 'minorloss', 'add_settings', 'init_quality',
+        'demand', 'demand_pattern_id', 'emitter_coeff', 'head', 'pattern_id'
     ],
     'Table inp_valve should have the correct columns'
 );
@@ -37,6 +38,11 @@ SELECT col_type_is('inp_valve', 'curve_id', 'varchar(16)', 'Column curve_id shou
 SELECT col_type_is('inp_valve', 'minorloss', 'numeric(12,4)', 'Column minorloss should be numeric(12,4)');
 SELECT col_type_is('inp_valve', 'add_settings', 'double precision', 'Column add_settings should be double precision');
 SELECT col_type_is('inp_valve', 'init_quality', 'double precision', 'Column init_quality should be double precision');
+SELECT col_type_is('inp_valve', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
+SELECT col_type_is('inp_valve', 'demand_pattern_id', 'varchar(16)', 'Column demand_pattern_id should be varchar(16)');
+SELECT col_type_is('inp_valve', 'emitter_coeff', 'double precision', 'Column emitter_coeff should be double precision');
+SELECT col_type_is('inp_valve', 'head', 'double precision', 'Column head should be double precision');
+SELECT col_type_is('inp_valve', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 
 -- Check foreign keys
 SELECT has_fk('inp_valve', 'Table inp_valve should have foreign keys');

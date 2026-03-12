@@ -20,7 +20,8 @@ SELECT has_table('inp_dscenario_shortpipe'::name, 'Table inp_dscenario_shortpipe
 SELECT columns_are(
     'inp_dscenario_shortpipe',
     ARRAY[
-        'dscenario_id', 'node_id', 'minorloss', 'status', 'bulk_coeff', 'wall_coeff', 'to_arc'
+        'dscenario_id', 'node_id', 'minorloss', 'status', 'bulk_coeff', 'wall_coeff', 'to_arc', 'demand', 'demand_pattern_id',
+        'emitter_coeff', 'head', 'pattern_id'
     ],
     'Table inp_dscenario_shortpipe should have the correct columns'
 );
@@ -36,6 +37,11 @@ SELECT col_type_is('inp_dscenario_shortpipe', 'status', 'varchar(12)', 'Column s
 SELECT col_type_is('inp_dscenario_shortpipe', 'bulk_coeff', 'double precision', 'Column bulk_coeff should be double precision');
 SELECT col_type_is('inp_dscenario_shortpipe', 'wall_coeff', 'double precision', 'Column wall_coeff should be double precision');
 SELECT col_type_is('inp_dscenario_shortpipe', 'to_arc', 'integer', 'Column to_arc should be integer');
+SELECT col_type_is('inp_dscenario_shortpipe', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
+SELECT col_type_is('inp_dscenario_shortpipe', 'demand_pattern_id', 'varchar(16)', 'Column demand_pattern_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_shortpipe', 'emitter_coeff', 'double precision', 'Column emitter_coeff should be double precision');
+SELECT col_type_is('inp_dscenario_shortpipe', 'head', 'double precision', 'Column head should be double precision');
+SELECT col_type_is('inp_dscenario_shortpipe', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 
 -- Check foreign keys
 SELECT has_fk('inp_dscenario_shortpipe', 'Table inp_dscenario_shortpipe should have foreign keys');
