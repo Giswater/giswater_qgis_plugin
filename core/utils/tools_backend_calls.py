@@ -325,7 +325,6 @@ def manage_visit_class(**kwargs):
         # non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
 
     # values
-    fields = complet_list['body']['data']['fields']
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']:
             continue
