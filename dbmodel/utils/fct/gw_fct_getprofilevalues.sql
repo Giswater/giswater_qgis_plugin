@@ -551,15 +551,62 @@ BEGIN
 		END IF;
 
 		-- update descript and code field
-		EXECUTE 'UPDATE temp_anl_arc SET descript = a.descript, code=a.code 
-		FROM (SELECT arc_id, (row_to_json(row)) AS descript, case when code is null then arc_id::varchar else code end as code FROM ('||v_textarc||')row)a WHERE a.arc_id = temp_anl_arc.arc_id';
-		EXECUTE' UPDATE temp_anl_node SET descript = a.descript FROM (SELECT node_id, (row_to_json(row)) AS descript FROM 
-					(SELECT node_id, top_elev as top_elev, '||v_fymax||' as ymax, elev , case when code is null then node_id::varchar else code end as code, 
-					total_distance FROM temp_anl_node)row)a
-					WHERE a.node_id = temp_anl_node.node_id';
+		EXECUTE format(
+			'
+			UPDATE temp_anl_arc t
+			SET
+				descript = a.descript,
+				code = a.code
+			FROM (
+				SELECT
+					arc_id,
+					row_to_json(r) AS descript,
+					COALESCE(code::varchar, arc_id::varchar) AS code
+				FROM (%s) r
+			) a
+			WHERE a.arc_id = t.arc_id
+			',
+			v_textarc
+		);
+		
+		EXECUTE format(
+			'
+			UPDATE temp_anl_node t
+			SET descript = a.descript
+			FROM (
+				SELECT
+					node_id,
+					row_to_json(r) AS descript
+				FROM (
+					SELECT
+						node_id,
+						top_elev AS top_elev,
+						%s AS ymax,
+						elev,
+						COALESCE(code, node_id::varchar) AS code,
+						total_distance
+					FROM temp_anl_node
+				) r
+			) a
+			WHERE a.node_id = t.node_id
+			',
+			v_fymax
+		);
 
-		EXECUTE 'UPDATE temp_anl_node SET  descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code) 
-		FROM (SELECT node_id, case when code is null then node_id::varchar else code end code FROM ('||v_textnode||')row)a WHERE a.node_id = temp_anl_node.node_id';
+		EXECUTE format(
+			'
+			UPDATE temp_anl_node t
+			SET descript = gw_fct_json_object_set_key(descript::json, ''code'', a.code)
+			FROM (
+				SELECT
+					node_id,
+					COALESCE(code, node_id::varchar) AS code
+				FROM (%s) r
+			) a
+			WHERE a.node_id = t.node_id
+			',
+			v_textnode
+		);
 
 		-- delete not used keys
 		UPDATE temp_anl_arc SET descript = gw_fct_json_object_delete_keys(descript::json, 'arc_id')  ;
