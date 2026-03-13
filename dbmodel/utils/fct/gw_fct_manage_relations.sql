@@ -147,7 +147,7 @@ BEGIN
     END IF;
 
     IF v_data->>'psector' IS NOT NULL THEN
-        v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
+        v_querytext = format('DELETE FROM %I WHERE %I::text = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb)::int)',
             v_relations_table_prefix||'psector', v_table_name||'_id', 'psector_id');
 
         EXECUTE v_querytext USING v_object_id, v_data->>'psector';
