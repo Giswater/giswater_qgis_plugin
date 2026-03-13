@@ -42,7 +42,6 @@ DECLARE
 
     v_fid INTEGER = 134;
     v_query_text TEXT;
-    v_query_text_components TEXT;
 
     v_version TEXT;
     v_srid INTEGER;
