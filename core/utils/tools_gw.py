@@ -757,7 +757,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
 
 def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
-                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=True, force_create_group=False, properties=None):
+                        visibility=None, auth_id=None, extent=None, passwd=None, create_project=False, force_create_group=False, properties=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -830,13 +830,14 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     if isinstance(renderer, QgsCategorizedSymbolRenderer):
                         refresh_categorized_layer_symbology_classes(layer, addparam)
 
-        if tablename and schema != 'am' and schema != 'cm':
-            # Set layer config
-            feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
-            extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'
-            body = create_body(feature=feature, extras=extras)
-            json_result = execute_procedure('gw_fct_getinfofromid', body, schema_name=schema_name)
-            config_layer_attributes(json_result, layer, alias)
+        if not create_project:
+            if tablename and schema != 'am' and schema != 'cm':
+                # Set layer config
+                feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
+                extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'
+                body = create_body(feature=feature, extras=extras)
+                json_result = execute_procedure('gw_fct_getinfofromid', body, schema_name=schema_name)
+                config_layer_attributes(json_result, layer, alias)
 
     if visibility is not None:
         if visibility is False:
