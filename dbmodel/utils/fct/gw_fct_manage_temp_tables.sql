@@ -189,7 +189,7 @@ BEGIN
         END IF;
 
         IF 'EPA' = ANY(v_group_array) THEN
-            v_filter = concat(v_filter, ' AND sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)');
+            v_filter = concat(v_filter, ' AND sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)');
 
             IF v_project_type = 'WS' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_vnode(
