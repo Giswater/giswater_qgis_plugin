@@ -270,3 +270,14 @@ UPDATE config_param_user SET parameter = 'edit_disable_arc_divide' WHERE paramet
 UPDATE sys_param_user SET id = 'edit_disable_typevalue_fk' WHERE id = 'edit_typevalue_fk_disable';
 UPDATE sys_param_user SET id = 'edit_disable_noderotation' WHERE id = 'edit_noderotation_update_dsbl';
 UPDATE sys_param_user SET id = 'edit_disable_arc_divide' WHERE id = 'edit_arc_division_dsbl';
+
+-- 16/03/2026
+UPDATE config_param_system AS cps
+SET
+    isenabled = true,
+    layoutname = 'lyt_admin_om',
+    layoutorder = 27,
+    widgettype = 'check',
+    ismandatory = false,
+    iseditable = true
+WHERE cps.parameter = 'ignoreCheckValvesMincut';
