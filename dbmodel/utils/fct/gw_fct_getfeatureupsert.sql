@@ -862,11 +862,19 @@ BEGIN
 
 				-- dynamic mapzones
 				WHEN 'presszone_id' THEN
-					field_value = v_presszone_id;
+					if v_tablename = 'plan_netscenario_presszone' then
+						field_value = v_id;
+					else
+						field_value = v_presszone_id;
+					end if;
 				WHEN 'sector_id' THEN
 					field_value = v_sector_id;
 				WHEN 'dma_id' THEN
-					field_value = v_dma_id;
+					if v_tablename = 'plan_netscenario_dma' then
+						field_value = v_id;
+					else
+						field_value = v_dma_id;
+					end if;
 				WHEN 'dqa_id' THEN
 					field_value = v_dqa_id;
 				WHEN 'supplyzone_id' THEN

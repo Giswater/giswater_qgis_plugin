@@ -773,6 +773,10 @@ BEGIN
 				v_zone = replace(v_tablename,'ve_','');
 				v_querystring = format('SELECT max(%I_id::integer)+1 FROM %I WHERE %I_id::text ~ ''^[0-9]+$''', v_zone, v_zone, v_zone);
 				EXECUTE v_querystring INTO v_id;
+			ELSIF v_id IS NULL AND v_tablename IN ('plan_netscenario_dma', 'plan_netscenario_presszone') THEN
+				v_zone = replace(v_tablename, 'plan_netscenario_', '');
+				v_querystring = format('SELECT coalesce(max(%I_id::integer)+1, 1) FROM %I WHERE %I_id::text ~ ''^[0-9]+$''', v_zone, v_zone, v_zone);
+				EXECUTE v_querystring INTO v_id;
             ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
                 -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.
                 -- Get node id from initial clicked point

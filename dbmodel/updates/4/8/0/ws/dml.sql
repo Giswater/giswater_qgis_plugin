@@ -1199,3 +1199,6 @@ VALUES(3560, 'Create losses dscenario', '{"featureType":[]}'::json, '[
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) 
 VALUES(4586, 'The scenario name already exists. The process was not executed.', NULL, 2, true, 'utils', 'core', 'AUDIT')
 ON CONFLICT DO NOTHING;
+
+-- 16/03/2026
+UPDATE config_form_fields SET iseditable=false WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_none' AND iseditable=true;
