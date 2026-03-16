@@ -129,19 +129,6 @@ BEGIN
 					END IF;
 				END IF;
 
-				--check isparent/dv_parent_id
-				IF NEW.isparent IS TRUE  AND NEW.widgettype = 'combo' THEN
-
-						--count if dv_parent_id exists before set isparent=TRUE
-						SELECT count(*) FROM config_form_fields WHERE formname=NEW.formname AND dv_parent_id=NEW.columnname INTO v_count;
-
-						IF v_count = 0 THEN
-							v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3168",
-							"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
-							PERFORM gw_fct_getmessage(v_message);
-						END IF;
-				END IF;
-
 				--check for typeahead some additional restrictions
 				IF NEW.widgettype = 'typeahead' THEN
 
