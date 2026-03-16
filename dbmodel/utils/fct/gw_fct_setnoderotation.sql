@@ -40,7 +40,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting current value for user
-	v_curval = (SELECT value FROM config_param_user where parameter = 'edit_noderotation_update_dsbl' and cur_user = current_user);
+	v_curval = (SELECT value FROM config_param_user where parameter = 'edit_disable_noderotation' and cur_user = current_user);
 
 	-- getting cat_node_feature
 	v_nodetype := (((p_data ->>'data')::json->>'parameters')::json->>'nodeType')::text;
@@ -49,7 +49,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 516 and cur_user = current_user;
 
 	-- setting value false
-	update config_param_user set value ='false' where parameter = 'edit_noderotation_update_dsbl' and cur_user = current_user;
+	update config_param_user set value ='false' where parameter = 'edit_disable_noderotation' and cur_user = current_user;
 
 	-- starting function
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -64,7 +64,7 @@ BEGIN
 	-- dissabling triggers
 	-- trigger arc_link_update does not make sense to disable because trigger only is triggered if the_geom changes and this update does not make any change on the_geom!!!
 	update config_param_user set value ='true' where parameter = 'edit_disable_arctopocontrol' and cur_user = current_user; -- topocontrol
-	update config_param_user set value ='true' where parameter = 'edit_typevalue_fk_disable' and cur_user = current_user; -- typevalue
+	update config_param_user set value ='true' where parameter = 'edit_disable_typevalue_fk' and cur_user = current_user; -- typevalue
 	update config_param_user set value ='true' where parameter = 'edit_disable_update_nodevalues' and cur_user = current_user; -- node_values
 
 	IF v_nodetype = '' OR v_nodetype IS NULL THEN	
@@ -84,11 +84,11 @@ BEGIN
 
 	-- enabling triggers
 	update config_param_user set value ='false' where parameter = 'edit_disable_arctopocontrol' and cur_user = current_user; -- topocontrol
-	update config_param_user set value ='false' where parameter = 'edit_typevalue_fk_disable' and cur_user = current_user; -- typevalue
+	update config_param_user set value ='false' where parameter = 'edit_disable_typevalue_fk' and cur_user = current_user; -- typevalue
 	update config_param_user set value ='false' where parameter = 'edit_disable_update_nodevalues' and cur_user = current_user; -- node_values
 
 	-- restoring user value
-	update config_param_user set value = v_curval where parameter = 'edit_noderotation_update_dsbl' and cur_user = current_user;
+	update config_param_user set value = v_curval where parameter = 'edit_disable_noderotation' and cur_user = current_user;
 	
 	-- get results
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result FROM (SELECT id, error_message AS message 

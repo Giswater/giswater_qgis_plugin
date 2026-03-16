@@ -21,10 +21,22 @@ v_data_type text;
 v_querystring text;
 v_value text;
 v_check_null_value boolean;
+v_disable_arc_fkarray boolean := false;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	IF TG_TABLE_NAME = 'arc' THEN
+		SELECT COALESCE(value::boolean, false) INTO v_disable_arc_fkarray
+		FROM config_param_user
+		WHERE parameter = 'edit_disable_arc_fkarray'
+		AND cur_user = current_user;
+
+		IF v_disable_arc_fkarray IS TRUE THEN
+			RETURN NEW;
+		END IF;
+	END IF;
 
     name_array_column := TG_ARGV[0];
     name_id_table := TG_ARGV[1];

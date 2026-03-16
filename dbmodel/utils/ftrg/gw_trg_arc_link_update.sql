@@ -22,6 +22,7 @@ v_link record;
 v_closest_point PUBLIC.geometry;
 v_debugmsg text;
 v_projecttype text;
+v_disable_arc_linkupdate boolean := false;
 
 BEGIN
 
@@ -29,6 +30,14 @@ BEGIN
 
 	-- select config values
 	SELECT upper(project_type)  INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT COALESCE(value::boolean, false) INTO v_disable_arc_linkupdate
+	FROM config_param_user
+	WHERE parameter = 'edit_disable_arc_linkupdate'
+	AND cur_user = current_user;
+
+	IF v_disable_arc_linkupdate IS TRUE THEN
+		RETURN NEW;
+	END IF;
 
     -- only if the geometry has changed (not reversed) because reverse may not affect links....
     IF st_orderingequals(OLD.the_geom, NEW.the_geom) IS FALSE THEN

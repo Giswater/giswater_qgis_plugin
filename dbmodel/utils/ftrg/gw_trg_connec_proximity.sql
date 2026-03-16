@@ -29,10 +29,14 @@ BEGIN
 	SELECT ((value::json)->>'activated') INTO v_connec_proximity_control FROM config_param_system WHERE parameter='edit_connec_proximity';
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol_complete' AND cur_user=current_user) IS TRUE THEN
+		RETURN NEW;
+	END IF;
+
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
-  	v_connec_proximity_control = FALSE;
-  	v_dsbl_error=TRUE;
-  END IF;
+		v_connec_proximity_control = FALSE;
+		v_dsbl_error = TRUE;
+	END IF;
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing connecs  

@@ -227,3 +227,46 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('upsert_catalog_link', 'form_catalog', 'tab_none', 'id', 'lyt_data_1', 4, 'string', 'combo', 'Id:', 'Id', NULL, false, false, true, false, NULL, 'SELECT DISTINCT (id) AS id, id AS idval FROM cat_link WHERE id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
 
 UPDATE config_form_fields SET iseditable=false WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_none' AND iseditable=true;
+
+-- 16/03/2026
+-- Per-user switches to disable heavy edit triggers during batch integrations
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_planpsector_arc', 'dynamic', 'If true, disable gw_trg_plan_psector_after_arc trigger logic', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_planpsector_node', 'dynamic', 'If true, disable gw_trg_plan_psector_after_node trigger logic', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_arc_fkarray', 'dynamic', 'If true, disable gw_trg_fk_array_id_table and gw_trg_fk_array_id_table_update logic on arc', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_editcontrols', 'dynamic', 'If true, disable gw_trg_edit_controls trigger logic', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_noderotation_complete', 'dynamic', 'If true, fully disable gw_trg_node_rotation_update trigger logic', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_planpsector_connec', 'dynamic', 'If true, disable gw_trg_plan_psector_after_connec trigger logic', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_topocontrol_complete', 'dynamic', 'If true, disable gw_trg_connec_proximity_insert and gw_trg_connec_proximity_update trigger logic', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, descript, sys_role, project_type, datatype, ismandatory, vdefault, source)
+VALUES ('edit_disable_connec_uniquefield', 'dynamic', 'If true, disable gw_trg_unique_field trigger logic for connec', 'role_edit',
+'utils', 'boolean', true, 'false', 'core') ON CONFLICT (id) DO NOTHING;
+
+-- Rename legacy disable params to canonical edit_disable_* ids
+UPDATE config_param_user SET parameter = 'edit_disable_typevalue_fk' WHERE parameter = 'edit_typevalue_fk_disable';
+UPDATE config_param_user SET parameter = 'edit_disable_noderotation' WHERE parameter = 'edit_noderotation_update_dsbl';
+UPDATE config_param_user SET parameter = 'edit_disable_arc_divide' WHERE parameter = 'edit_arc_division_dsbl';
+
+UPDATE sys_param_user SET id = 'edit_disable_typevalue_fk' WHERE id = 'edit_typevalue_fk_disable';
+UPDATE sys_param_user SET id = 'edit_disable_noderotation' WHERE id = 'edit_noderotation_update_dsbl';
+UPDATE sys_param_user SET id = 'edit_disable_arc_divide' WHERE id = 'edit_arc_division_dsbl';

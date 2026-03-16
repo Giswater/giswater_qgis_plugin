@@ -41,6 +41,22 @@ v_cat_result json;
 v_cat_log text;
 v_catalogs_created integer := 0;
 v_prev_search_path text;
+v_disable_params text[] := ARRAY[
+	'edit_disable_typevalue_fk',
+	'edit_disable_arctopocontrol',
+	'edit_disable_planpsector_arc',
+	'edit_disable_arc_fkarray',
+	'edit_disable_editcontrols',
+	'edit_disable_noderotation',
+	'edit_disable_noderotation_complete',
+	'edit_disable_topocontrol',
+	'edit_disable_topocontrol_complete',
+	'edit_disable_statetopocontrol',
+	'edit_disable_planpsector_node',
+	'edit_disable_arc_divide',
+	'edit_disable_planpsector_connec'
+];
+v_restore_param record;
 
 
 BEGIN
@@ -56,6 +72,25 @@ BEGIN
 
   	-- getting input data
   	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::integer;
+
+	-- Temporarily disable selected edit triggers for performance (mandatory user params only)
+	CREATE TEMP TABLE tmp_cm_integrate_trigger_params (
+		parameter text PRIMARY KEY,
+		prev_value text,
+		existed boolean
+	) ON COMMIT DROP;
+
+	INSERT INTO tmp_cm_integrate_trigger_params (parameter, prev_value, existed)
+	SELECT p.parameter, cpu.value, (cpu.parameter IS NOT NULL)
+	FROM (SELECT DISTINCT unnest(v_disable_params) AS parameter) p
+JOIN sys_param_user spu ON spu.id = p.parameter AND spu.ismandatory IS TRUE
+	LEFT JOIN config_param_user cpu ON cpu.parameter = p.parameter AND cpu.cur_user = current_user;
+
+	INSERT INTO config_param_user (parameter, value, cur_user)
+	SELECT parameter, 'true', current_user
+	FROM tmp_cm_integrate_trigger_params
+	ON CONFLICT (parameter, cur_user) DO UPDATE
+	SET value = 'true';
 
   	v_querytext=
   	'SELECT object_id, feature_type, 
@@ -166,17 +201,53 @@ BEGIN
     v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Build return and restore search_path
-	v_result := gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	v_result := PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
                ',"body":{"form":{}'||
   		     ',"data":{ "info":'||v_result_info||','||
  				'"point":'||v_result_point||
  			'}}'||
  	    '}')::json, 3426, null, null, null);
 
+	-- Restore trigger params to their previous values
+	FOR v_restore_param IN
+		SELECT parameter, prev_value, existed
+		FROM tmp_cm_integrate_trigger_params
+	LOOP
+		IF v_restore_param.existed IS TRUE THEN
+			UPDATE config_param_user
+			SET value = v_restore_param.prev_value
+			WHERE parameter = v_restore_param.parameter
+			AND cur_user = current_user;
+		ELSE
+			DELETE FROM config_param_user
+			WHERE parameter = v_restore_param.parameter
+			AND cur_user = current_user;
+		END IF;
+	END LOOP;
+
 	PERFORM set_config('search_path', v_prev_search_path, true);
 	RETURN v_result;
 
 EXCEPTION WHEN OTHERS THEN
+	-- Restore trigger params even on error
+	IF to_regclass('pg_temp.tmp_cm_integrate_trigger_params') IS NOT NULL THEN
+		FOR v_restore_param IN
+			SELECT parameter, prev_value, existed
+			FROM tmp_cm_integrate_trigger_params
+		LOOP
+			IF v_restore_param.existed IS TRUE THEN
+				UPDATE config_param_user
+				SET value = v_restore_param.prev_value
+				WHERE parameter = v_restore_param.parameter
+				AND cur_user = current_user;
+			ELSE
+				DELETE FROM config_param_user
+				WHERE parameter = v_restore_param.parameter
+				AND cur_user = current_user;
+			END IF;
+		END LOOP;
+	END IF;
+
 	-- Ensure restoration on error
 	PERFORM set_config('search_path', v_prev_search_path, true);
 	RAISE;

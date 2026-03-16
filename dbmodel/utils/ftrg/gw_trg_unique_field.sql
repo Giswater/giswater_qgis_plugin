@@ -12,12 +12,24 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_unique_field() RETURNS trigger AS
 $BODY$
 DECLARE 
 table_name text;
+v_disable_connec_uniquefield boolean := false;
 
 BEGIN
    -- set search_path
    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
    
    table_name:= TG_ARGV[0];
+
+   IF table_name = 'connec' THEN
+      SELECT COALESCE(value::boolean, false) INTO v_disable_connec_uniquefield
+      FROM config_param_user
+      WHERE parameter = 'edit_disable_connec_uniquefield'
+      AND cur_user = current_user;
+
+      IF v_disable_connec_uniquefield IS TRUE THEN
+         RETURN NULL;
+      END IF;
+   END IF;
   
     IF table_name = 'connec' AND NEW.state = 1 THEN 
    

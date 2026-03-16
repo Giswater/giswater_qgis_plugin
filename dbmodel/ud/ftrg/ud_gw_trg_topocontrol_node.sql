@@ -64,6 +64,10 @@ BEGIN
 	v_node_topelev_autoupdate := COALESCE(v_node_topelev_autoupdate, 0);
 
     --Check if user has migration mode enabled
+    IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol_complete' AND cur_user=current_user) IS TRUE THEN
+        RETURN NEW;
+    END IF;
+
     IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_topocontrol' AND cur_user=current_user) IS TRUE THEN
         v_node_proximity_control = FALSE;
         v_dsbl_error = TRUE;

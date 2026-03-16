@@ -26,7 +26,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	v_table:= TG_ARGV[0];
-	v_disable := (SELECT value::boolean FROM config_param_user WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user);
+	v_disable := (SELECT value::boolean FROM config_param_user WHERE parameter = 'edit_disable_typevalue_fk' AND cur_user = current_user);
 
 	IF v_disable THEN
 		RETURN NULL;

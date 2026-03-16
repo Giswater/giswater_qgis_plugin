@@ -76,7 +76,7 @@ BEGIN
                        "data":{"function":"3284", "fid":"518", "result_id":"'||v_result_id||'", "is_process":true, "is_header":"true"}}$$)';
 
 	-- disable arc divide temporary
-	UPDATE config_param_user SET value = 'TRUE'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+	UPDATE config_param_user SET value = 'TRUE'  WHERE "parameter"='edit_disable_arc_divide' AND cur_user=current_user;
 
 	
     -- insert connec2network variable for user in case it doesn't exist
@@ -337,7 +337,7 @@ BEGIN
 	END IF;
 	
 	-- enable arc divide
-	UPDATE config_param_user SET value = 'false'  WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+	UPDATE config_param_user SET value = 'false'  WHERE "parameter"='edit_disable_arc_divide' AND cur_user=current_user;
 
 
 	--activate the functions an set back the values of parameters

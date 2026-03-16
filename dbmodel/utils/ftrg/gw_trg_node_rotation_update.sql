@@ -22,6 +22,7 @@ DECLARE
 	state_aux 	integer;
 	intersect_loc	 double precision;
 	v_rotation_disable boolean;
+	v_rotation_disable_complete boolean;
 	v_numarcs integer;
 
 
@@ -59,7 +60,12 @@ BEGIN
 		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
 		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
 	END IF;
-	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user;
+	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_disable_noderotation' AND cur_user=current_user;
+	SELECT value::boolean INTO v_rotation_disable_complete FROM config_param_user WHERE parameter='edit_disable_noderotation_complete' AND cur_user=current_user;
+
+	IF v_rotation_disable_complete IS TRUE THEN
+		RETURN NEW;
+	END IF;
 
 	-- for disconnected nodes
 	IF v_numarcs = 0 THEN
@@ -160,7 +166,7 @@ BEGIN
 	new.rotation = coalesce(new.rotation, 0);
 
 	if v_dist_ylab is not null and v_dist_xlab is not null and 
-	(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE 
+	(SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_noderotation' AND cur_user=current_user) IS FALSE
 	then -- only start the process with not-null values
 
 		-- prev calc: intermediate rotations according to dist_x and dist_y from cat_feature

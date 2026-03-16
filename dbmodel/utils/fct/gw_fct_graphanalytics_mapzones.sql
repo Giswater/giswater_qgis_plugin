@@ -1404,7 +1404,7 @@ BEGIN
 	ELSIF v_commitchanges IS TRUE and v_netscenario is null THEN
 
 		-- setting variables in order to enhace performance
-		UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
+		UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_disable_typevalue_fk' AND cur_user = current_user;
 		UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'edit_node2arc_update_disable' AND cur_user = current_user;
 		UPDATE config_param_system SET value = 'TRUE' WHERE parameter = 'admin_skip_audit';
 
@@ -1494,7 +1494,7 @@ BEGIN
 		END IF;
 
 		-- restore values for temporal variables
-		UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_typevalue_fk_disable' AND cur_user = current_user;
+		UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_disable_typevalue_fk' AND cur_user = current_user;
 		UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_node2arc_update_disable' AND cur_user = current_user;
 		UPDATE config_param_system SET value = 'FALSE' WHERE parameter = 'admin_skip_audit';
 

@@ -36,7 +36,7 @@ BEGIN
 		WHERE NEW.nodecat_id=cat_node.id;
 	END IF;
 
-	SELECT value::boolean INTO v_arcdivision_disable FROM config_param_user WHERE "parameter"='edit_arc_division_dsbl' AND cur_user=current_user;
+	SELECT value::boolean INTO v_arcdivision_disable FROM config_param_user WHERE "parameter"='edit_disable_arc_divide' AND cur_user=current_user;
 
 	IF v_isarcdivide IS TRUE AND v_arcdivision_disable is not true THEN
 		v_arcdivision_disable = FALSE;

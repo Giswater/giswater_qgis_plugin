@@ -1141,7 +1141,7 @@ BEGIN
 		new.rotation = coalesce(new.rotation, 0);
 
 		if v_dist_ylab is not null and v_dist_xlab is not null and
-		(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE
+		(SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_noderotation' AND cur_user=current_user) IS FALSE
 		then -- only start the process with not-null values
 
 

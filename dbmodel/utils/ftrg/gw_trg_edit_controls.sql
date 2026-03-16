@@ -23,12 +23,26 @@ v_count integer;
 
 v_disable_locklevel json;
 v_automatic_disable_locklevel json;
+v_disable_editcontrols boolean := false;
 
 BEGIN
 
   EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
   v_featurefield:= TG_ARGV[0];
+
+  SELECT COALESCE(value::boolean, false) INTO v_disable_editcontrols
+  FROM config_param_user
+  WHERE parameter = 'edit_disable_editcontrols'
+  AND cur_user = current_user;
+
+  IF v_disable_editcontrols IS TRUE THEN
+	IF TG_OP = 'DELETE' THEN
+		RETURN OLD;
+	ELSE
+		RETURN NEW;
+	END IF;
+  END IF;
 
   -- Get user variable for disabling lock level
   SELECT value::json INTO v_disable_locklevel FROM config_param_user

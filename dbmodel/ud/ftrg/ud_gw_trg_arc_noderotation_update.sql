@@ -35,8 +35,16 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_noderotation_complete' AND cur_user=current_user) IS TRUE THEN
+		IF TG_OP='DELETE' THEN
+			RETURN OLD;
+		ELSE
+			RETURN NEW;
+		END IF;
+	END IF;
 	
-	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS NOT TRUE THEN 
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_noderotation' AND cur_user=current_user) IS NOT TRUE THEN 
     
 		IF TG_OP='INSERT' THEN
 	
@@ -165,7 +173,7 @@ BEGIN
 				' INTO v_dist_ylab;
 				
 				if v_dist_ylab is not null and v_dist_xlab is not null and 
-				(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE 
+				(SELECT value::boolean FROM config_param_user WHERE parameter='edit_disable_noderotation' AND cur_user=current_user) IS FALSE
 				then -- only start the process with not-null values
 	
 					-- prev calc: current label position

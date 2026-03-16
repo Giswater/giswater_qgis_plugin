@@ -30,7 +30,29 @@ DECLARE
   tgt_tab  text := format('plan_psector_x_%s', prefix);
   key_col  text := prefix || '_id';
   new_id    int;
+  v_disable_planpsector boolean := false;
 BEGIN
+  IF prefix = 'arc' THEN
+    SELECT COALESCE(value::boolean, false) INTO v_disable_planpsector
+    FROM config_param_user
+    WHERE parameter = 'edit_disable_planpsector_arc'
+    AND cur_user = current_user;
+  ELSIF prefix = 'node' THEN
+    SELECT COALESCE(value::boolean, false) INTO v_disable_planpsector
+    FROM config_param_user
+    WHERE parameter = 'edit_disable_planpsector_node'
+    AND cur_user = current_user;
+  ELSIF prefix = 'connec' THEN
+    SELECT COALESCE(value::boolean, false) INTO v_disable_planpsector
+    FROM config_param_user
+    WHERE parameter = 'edit_disable_planpsector_connec'
+    AND cur_user = current_user;
+  END IF;
+
+  IF v_disable_planpsector IS TRUE THEN
+    RETURN NEW;
+  END IF;
+
   -- extract NEW.<prefix>_id into new_id
   EXECUTE format('SELECT ($1).%I', key_col)
     INTO new_id
