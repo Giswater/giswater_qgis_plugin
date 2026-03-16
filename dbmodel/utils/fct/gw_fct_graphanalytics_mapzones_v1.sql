@@ -196,23 +196,6 @@ BEGIN
 		       	"data":{"message":"4478", "function":"2706","parameters":null}}$$);';
     END IF;
 
-	IF v_from_zero THEN
-		EXECUTE format($sql$
-		SELECT count(*)
-		FROM %I
-		WHERE active
-			AND %I NOT IN (0, -1) -- 0 and -1 are conflict and undefined
-			AND ($1 IS NULL OR expl_id && $1)
-		$sql$, v_mapzone_table, v_mapzone_field)
-		INTO v_mapzone_count
-		USING v_expl_id_array;
-		
-		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_class ||'"}, "is_process":true}}$$)';
-		END IF;
-	END IF;
-
 	-- Delete temporary tables
 	-- =======================
 	v_data :=
@@ -332,6 +315,26 @@ BEGIN
 		v_mapzone_field,
 		v_mapzone_field
 	);
+
+	IF v_from_zero THEN
+		EXECUTE format($sql$
+		SELECT count(*)
+		FROM %I
+		WHERE active
+			AND %I NOT IN (0, -1) -- 0 and -1 are conflict and undefined
+			AND EXISTS (
+				SELECT 1
+				FROM temp_pgr_old_mapzone t2
+				WHERE t2.mapzone_id = t.%I
+			)
+		$sql$, v_mapzone_table, v_mapzone_field, v_mapzone_field)
+		INTO v_mapzone_count;
+		
+		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_class ||'"}, "is_process":true}}$$)';
+		END IF;
+	END IF;
 	
 	-- CREATE MAPZONES
 	-- =======================
@@ -427,7 +430,11 @@ BEGIN
 					LEFT JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND (expl_id && $1 OR cardinality($1) = 0)
+					AND EXISTS (
+						SELECT 1
+						FROM temp_pgr_old_mapzone t2
+						WHERE t2.mapzone_id = t.%I
+					)
 					%s
 				)
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
@@ -439,8 +446,7 @@ BEGIN
 				FROM graphconfig
 				WHERE mapzone_id > 0
 				AND (node_parent IS DISTINCT FROM 0 OR to_arc IS DISTINCT FROM 0);
-			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux)
-			USING v_expl_id_array;
+			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field, v_query_text_aux);
 
 			-- forceClosed
 			EXECUTE format($sql$
@@ -453,10 +459,13 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'forceClosed') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND (expl_id && $1 OR cardinality($1) = 0)
+					AND EXISTS (
+						SELECT 1
+						FROM temp_pgr_old_mapzone t2
+						WHERE t2.mapzone_id = t.%I
+					)
 					%s;
-			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux)
-			USING v_expl_id_array;
+			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field, v_query_text_aux);
 
 			-- forceOpen
 			EXECUTE format($sql$
@@ -469,10 +478,13 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND (expl_id && $1 OR cardinality($1) = 0)
+					AND EXISTS (
+						SELECT 1
+						FROM temp_pgr_old_mapzone t2
+						WHERE t2.mapzone_id = t.%I
+					)
 					%s;
-			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux)
-			USING v_expl_id_array;
+			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field, v_query_text_aux);
 
 			-- update temp_pgr_node (nodeParent)
 			UPDATE temp_pgr_node n
@@ -565,7 +577,11 @@ BEGIN
 					JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND (expl_id && $1 OR cardinality($1) = 0)
+					AND EXISTS (
+						SELECT 1
+						FROM temp_pgr_old_mapzone t2
+						WHERE t2.mapzone_id = t.%I
+					)
 				)
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
 				SELECT
@@ -575,8 +591,7 @@ BEGIN
 				FROM graphconfig
 				WHERE mapzone_id > 0
 				AND node_parent IS DISTINCT FROM 0
-			$sql$, v_mapzone_field, v_mapzone_table)
-			USING v_expl_id_array;
+			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field);
 
 			-- forceClosed
 			EXECUTE format($sql$
@@ -589,9 +604,12 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'forceClosed') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND (expl_id && $1 OR cardinality($1) = 0)
-			$sql$, v_mapzone_field, v_mapzone_table)
-			USING v_expl_id_array;
+					AND EXISTS (
+						SELECT 1
+						FROM temp_pgr_old_mapzone t2
+						WHERE t2.mapzone_id = t.%I
+					)
+			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field);
 
 			-- ignore
 			EXECUTE format($sql$
@@ -604,9 +622,12 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND (expl_id && $1 OR cardinality($1) = 0)
-			$sql$, v_mapzone_field, v_mapzone_table)
-			USING v_expl_id_array;
+					AND EXISTS (
+						SELECT 1
+						FROM temp_pgr_old_mapzone t2
+						WHERE t2.mapzone_id = t.%I
+					)
+			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field);
 
 			-- update temp_pgr_node (nodeParent)
 			UPDATE temp_pgr_node n
