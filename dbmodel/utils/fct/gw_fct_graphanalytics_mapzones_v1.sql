@@ -430,11 +430,6 @@ BEGIN
 					LEFT JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND EXISTS (
-						SELECT 1
-						FROM temp_pgr_old_mapzone t2
-						WHERE t2.mapzone_id = t.%I
-					)
 					%s
 				)
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
@@ -446,7 +441,7 @@ BEGIN
 				FROM graphconfig
 				WHERE mapzone_id > 0
 				AND (node_parent IS DISTINCT FROM 0 OR to_arc IS DISTINCT FROM 0);
-			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field, v_query_text_aux);
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
 
 			-- forceClosed
 			EXECUTE format($sql$
@@ -459,13 +454,8 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'forceClosed') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND EXISTS (
-						SELECT 1
-						FROM temp_pgr_old_mapzone t2
-						WHERE t2.mapzone_id = t.%I
-					)
 					%s;
-			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field, v_query_text_aux);
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
 
 			-- forceOpen
 			EXECUTE format($sql$
@@ -478,13 +468,8 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND EXISTS (
-						SELECT 1
-						FROM temp_pgr_old_mapzone t2
-						WHERE t2.mapzone_id = t.%I
-					)
 					%s;
-			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field, v_query_text_aux);
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
 
 			-- update temp_pgr_node (nodeParent)
 			UPDATE temp_pgr_node n
@@ -577,11 +562,6 @@ BEGIN
 					JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND EXISTS (
-						SELECT 1
-						FROM temp_pgr_old_mapzone t2
-						WHERE t2.mapzone_id = t.%I
-					)
 				)
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
 				SELECT
@@ -591,7 +571,7 @@ BEGIN
 				FROM graphconfig
 				WHERE mapzone_id > 0
 				AND node_parent IS DISTINCT FROM 0
-			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field);
+			$sql$, v_mapzone_field, v_mapzone_table);
 
 			-- forceClosed
 			EXECUTE format($sql$
@@ -604,12 +584,7 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'forceClosed') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND EXISTS (
-						SELECT 1
-						FROM temp_pgr_old_mapzone t2
-						WHERE t2.mapzone_id = t.%I
-					)
-			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field);
+			$sql$, v_mapzone_field, v_mapzone_table);
 
 			-- ignore
 			EXECUTE format($sql$
@@ -622,12 +597,7 @@ BEGIN
 				JOIN LATERAL json_array_elements_text(t.graphconfig->'ignore') AS elem(value) ON TRUE
 				WHERE t.graphconfig IS NOT NULL
 					AND t.active
-					AND EXISTS (
-						SELECT 1
-						FROM temp_pgr_old_mapzone t2
-						WHERE t2.mapzone_id = t.%I
-					)
-			$sql$, v_mapzone_field, v_mapzone_table, v_mapzone_field);
+			$sql$, v_mapzone_field, v_mapzone_table);
 
 			-- update temp_pgr_node (nodeParent)
 			UPDATE temp_pgr_node n
@@ -729,8 +699,8 @@ BEGIN
 					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
 					AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				LEFT JOIN temp_pgr_node n USING (pgr_node_id)
-				WHERE n.pgr_node_id IS NULL
+				LEFT JOIN v_temp_node n ON g.pgr_node_id = n.node_id
+				WHERE n.node_id IS NULL
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -749,8 +719,8 @@ BEGIN
 					g.mapzone_id,
 					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
-				WHERE g.graph_type = 'use' AND a.pgr_arc_id IS NULL
+				LEFT JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
+				WHERE g.graph_type = 'use' AND a.arc_id IS NULL
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -769,7 +739,7 @@ BEGIN
 					g.pgr_node_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				JOIN temp_pgr_node n USING (pgr_node_id)
+				JOIN v_temp_node n ON g.pgr_node_id = n.node_id
 				GROUP BY g.pgr_node_id
 				HAVING  count(DISTINCT (g.mapzone_id, g.graph_type)) > 1
 				ORDER BY g.pgr_node_id
@@ -782,14 +752,14 @@ BEGIN
 			END IF;
 
 			-- Check if there are any arcs set in more than one nodeParent
-			SELECT string_agg(concat('arc_id: ', arc_id, ' - ', pair_block, '\n'), '')
+			SELECT string_agg(concat('arc_id: ', sub.arc_id, ' - ', sub.pair_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
 					g.pgr_arc_id AS arc_id,
 					string_agg(concat('[mapzone_id: ', g.mapzone_id, ', node_id: ', g.pgr_node_id, ']'), ' ' ORDER BY g.mapzone_id) AS pair_block
 				FROM temp_pgr_graphconfig g
-				JOIN temp_pgr_arc a USING (pgr_arc_id)
+				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
 				WHERE g.graph_type = 'use'
 				GROUP BY g.pgr_arc_id
 				HAVING COUNT(*) > 1
@@ -802,14 +772,14 @@ BEGIN
 			END IF;
 
 			-- Check if there are any to_arcs not connected to its nodeParent
-			SELECT string_agg(mapzone_arcs, '')
+			SELECT string_agg(sub.mapzone_arcs, '')
 			INTO message
 			FROM (
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ',g.pgr_node_id,', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
-				JOIN temp_pgr_arc a USING (pgr_arc_id)
+				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
 				WHERE g.graph_type = 'use' 
-				AND g.pgr_node_id NOT IN (a.pgr_node_1, a.pgr_node_2) 
+				AND g.pgr_node_id NOT IN (a.node_1, a.node_2) 
 				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
 
@@ -820,7 +790,7 @@ BEGIN
 			END IF;
 
 			-- Check if nodeParent or toArc is null
-			SELECT string_agg(mapzone_arcs, '')
+			SELECT string_agg(sub.mapzone_arcs, '')
 			INTO message
 			FROM (
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
@@ -838,7 +808,7 @@ BEGIN
 
 			IF v_use_plan_psector = FALSE THEN 
 				-- Check if there are pump/meter/valve nodeParent where its to_arc is not the same as in its man_table
-				SELECT string_agg(mapzone_arcs, '')
+				SELECT string_agg(sub.mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH 
@@ -867,7 +837,7 @@ BEGIN
 				END IF;
 
 				-- Check if there are tank/source/waterwell/wtp nodeParent where its to_arc is inlet in its man_table
-				SELECT string_agg(mapzone_arcs, '')
+				SELECT string_agg(sub.mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH
@@ -895,7 +865,7 @@ BEGIN
 				END IF;
 				
 				-- check if there are arcs for nodeParents that are not toArc, neither inlet_arc 
-				SELECT string_agg(mapzone_arcs, '')
+				SELECT string_agg(sub.mapzone_arcs, '')
 				INTO message
 				FROM (
 					WITH inlet AS (
@@ -905,28 +875,28 @@ BEGIN
 						UNION ALL SELECT node_id, inlet_arc FROM man_wtp
 						)
 					SELECT
-						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.pgr_arc_id, ')\n') AS mapzone_arcs
-					FROM temp_pgr_node n 
-					JOIN temp_pgr_graphconfig g ON g.pgr_node_id = n.pgr_node_id
-					JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.arc_id, ')\n') AS mapzone_arcs
+					FROM v_temp_node n 
+					JOIN temp_pgr_graphconfig g ON g.pgr_node_id = n.node_id
+					JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
 					WHERE g.graph_type = 'use' -- nodeParent
 					AND EXISTS (
 						SELECT 1 
 						FROM inlet i
-						WHERE i.node_id = n.pgr_node_id
+						WHERE i.node_id = n.node_id
 					)
 					AND NOT EXISTS (
 						SELECT 1
 						FROM inlet i
-						WHERE i.node_id = n.pgr_node_id
-							AND a.pgr_arc_id = ANY (i.inlet_arc)
+						WHERE i.node_id = n.node_id
+							AND a.arc_id = ANY (i.inlet_arc)
 					)
 					AND NOT EXISTS (
 						SELECT 1
 						FROM temp_pgr_graphconfig ga
 						WHERE ga.graph_type = 'use'
-							AND ga.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-							AND ga.pgr_arc_id  = a.pgr_arc_id
+							AND ga.pgr_node_id IN (a.node_1, a.node_2)
+							AND ga.pgr_arc_id  = a.arc_id
 					)
 					ORDER BY g.mapzone_id,  g.pgr_node_id
 				) sub;
@@ -942,7 +912,7 @@ BEGIN
 		ELSIF v_project_type = 'UD' THEN
 
 			-- Check if there are any nodeParents in the graphconfig that are not in the operative network
-			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block, '\n'), '')
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', sub.mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
@@ -950,9 +920,9 @@ BEGIN
 					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
 					AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				LEFT JOIN temp_pgr_node n USING (pgr_node_id)
+				LEFT JOIN v_temp_node n ON g.pgr_node_id = n.node_id
 				WHERE g.graph_type = 'use' 
-				AND n.pgr_node_id IS NULL
+				AND n.node_id IS NULL
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -964,16 +934,16 @@ BEGIN
 			END IF;
 
 			-- Check if there are any forceClose/forceOpen in the graphconfig that are not in the operative network
-			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block, '\n'), '')
+			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', sub.mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
 					g.mapzone_id,
 					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				LEFT JOIN temp_pgr_arc a USING (pgr_arc_id)
+				LEFT JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
 				WHERE g.graph_type IN ('forceClosed', 'forceOpen')
-				AND a.pgr_arc_id IS NULL
+				AND a.arc_id IS NULL
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -985,14 +955,14 @@ BEGIN
 			END IF;
 
 			-- Check if there are any nodeParents set in more than one mapzone
-			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
+			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', sub.mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
 					g.pgr_node_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				JOIN temp_pgr_node n USING (pgr_node_id)
+				JOIN v_temp_node n ON g.pgr_node_id = n.node_id
 				GROUP BY g.pgr_node_id
 				HAVING  count(*) > 1
 				ORDER BY g.pgr_node_id
@@ -1005,14 +975,14 @@ BEGIN
 			END IF;
 
 			-- Check if there are any forceClosed/forceOpen set in more than one mapzone
-			SELECT string_agg(concat('arc_id: ', sub.pgr_arc_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
+			SELECT string_agg(concat('arc_id: ', sub.pgr_arc_id, ' - mapzone_ids: ', sub.mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
 					g.pgr_arc_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				JOIN temp_pgr_arc a USING (pgr_arc_id)
+				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
 				GROUP BY g.pgr_arc_id
 				HAVING  count(*) > 1
 				ORDER BY g.pgr_arc_id
