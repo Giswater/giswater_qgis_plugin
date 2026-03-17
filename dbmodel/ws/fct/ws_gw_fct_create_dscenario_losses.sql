@@ -33,7 +33,7 @@ v_sql TEXT;
 
 -- Return
 v_function_id INT = 3560;
-v_project_type TEXT = 'SCHEMA_NAME';
+v_project_type TEXT;
 v_fid INT = 403;
 v_version TEXT;
 v_result JSON;
@@ -45,7 +45,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- NOTE: Get input params AND set init vars
-	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
+
 
 	v_dscenario_type :=  p_data -> 'data' -> 'parameters'->>'dscenarioType';
 	v_name :=  p_data -> 'data' -> 'parameters'->>'name';
