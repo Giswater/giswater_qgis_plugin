@@ -174,7 +174,7 @@ BEGIN
 				USING v_layer, schemas_array[1];
 
 			--  Indentify geometry type
-			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';'
+			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||' LIMIT 1;'
 			INTO v_geometrytype;
 
 		-- get icon
