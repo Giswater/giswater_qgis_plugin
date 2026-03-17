@@ -105,6 +105,7 @@ class GwProjectCheckCMTask(GwTask):
 
         self.setProgress(100)
 
+    # TODO: Remove this function
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
 
@@ -144,6 +145,7 @@ class GwProjectCheckCMTask(GwTask):
 
     # region private functions
 
+    # TODO: Remove this function
     def _execute_check_project_function(self, init_project, fields_to_insert):
         """ Execute function 'gw_fct_cm_setcheckproject' with checkbox selections passed from project_check_btn.py """
         # Retrieve checkbox values from params
@@ -205,6 +207,8 @@ class GwProjectCheckCMTask(GwTask):
         if result.get('status') == 'Failed':
             tools_gw.manage_json_exception(result)
             return False
+
+        tools_gw.manage_json_response(result, None, None)
 
         # Call `fill_tab_log()` directly, no need to store variables
         tools_gw.fill_tab_log(self.dialog, result['body']['data'], reset_text=False)
