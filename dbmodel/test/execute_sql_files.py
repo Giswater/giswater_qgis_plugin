@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import argparse
+from datetime import datetime
 from utils import connect_to_db, execute_sql_file
 from custom_logger import logger
 
@@ -36,6 +37,7 @@ def main(project_type: str) -> None:
     # Define the base updates directory
     updates_dir = "updates"
     order = ['utils', f"{project_type}"]
+    v_major, v_minor, v_patch = 4, 0, 0
 
     if os.path.isdir(updates_dir):
         # Only process 3-level deep version folders: updates/3/6/1, updates/4/2/0, etc.
@@ -58,16 +60,18 @@ def main(project_type: str) -> None:
                             file_path = os.path.join(sub_path, file)
                             logger.info(f"Executing SQL file: {file_path}")
                             execute_sql_file(conn, file_path)
+                            v_major, v_minor, v_patch = major, minor, patch
     else:
         logger.warning(f"Directory {updates_dir} does not exist")
 
 
     logger.info(f"PERFORM lastprocess:")
+    current_date = datetime.now().strftime("%d-%m-%Y")
     # Execute last process command
     with conn.cursor() as cursor:
         lastprocess_command = f"""
             SELECT {project_type}_40.gw_fct_admin_schema_lastprocess(
-                '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"3.6.012", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_36", "name":"{project_type}_36", "author":"postgres", "date":"29-07-2024"}}}}'
+                '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"{v_major}.{v_minor}.{v_patch}", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_40", "name":"{project_type}_40", "author":"postgres", "date":"{current_date}"}}}}'
             );
         """
         cursor.execute(lastprocess_command)
