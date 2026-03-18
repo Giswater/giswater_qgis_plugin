@@ -135,7 +135,8 @@ class GwMapzoneManager:
 
     def _txt_name_changed(self, text):
         show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
-        expr = f"name ilike '%{text}%'"
+        mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+        expr = f"(name ilike '%{text}%' or code ilike '%{text}%' or {mapzone_type}_id::text ilike '%{text}%')"
         if not show_inactive:
             expr += " and active is true"
         self._fill_mapzone_table(expr=expr)
