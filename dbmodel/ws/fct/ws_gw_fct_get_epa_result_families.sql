@@ -16,6 +16,7 @@ v_version text;
 v_features json;
 v_families json;
 v_mapzones json;
+v_patterns json;
 
 
 rec TEXT;
@@ -174,14 +175,34 @@ BEGIN
     END LOOP;
 
 	v_mapzones := result;
-	
+
+	-- JSON with patterns (flattened factor_1..factor_18 per pattern_id, ordered by idrow, id)
+	SELECT COALESCE(json_agg(json_build_object('id', pattern_id, 'values', values_arr)), '[]'::json) INTO v_patterns
+	FROM (
+		SELECT pattern_id,
+			array_agg(factor_val ORDER BY COALESCE(idrow, 0), id, factor_idx) AS values_arr
+		FROM (
+			SELECT p.id, p.pattern_id, p.idrow,
+				unnest(ARRAY[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]) AS factor_idx,
+				unnest(ARRAY[
+					p.factor_1, p.factor_2, p.factor_3, p.factor_4, p.factor_5, p.factor_6,
+					p.factor_7, p.factor_8, p.factor_9, p.factor_10, p.factor_11, p.factor_12,
+					p.factor_13, p.factor_14, p.factor_15, p.factor_16, p.factor_17, p.factor_18
+				]) AS factor_val
+			FROM rpt_inp_pattern_value p
+			WHERE result_id = v_result_id
+		) unnested
+		WHERE factor_val IS NOT NULL
+		GROUP BY pattern_id
+	) sub;
+
 	-- Drop temp table
 	DROP TABLE IF EXISTS temp_features;
 	
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}'||
-			',"data":{"result_id": "'||v_result_id||'", "features":'||v_features||', "families":'||v_families||', "mapzones":'||v_mapzones||
+			',"data":{"result_id": "'||v_result_id||'", "features":'||v_features||', "families":'||v_families||', "mapzones":'||v_mapzones||', "patterns":'||COALESCE(v_patterns::text, '[]')||
 		'}}'||
 	'}')::json, 2302, null, null, null);
 
