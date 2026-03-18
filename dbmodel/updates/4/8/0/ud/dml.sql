@@ -2499,3 +2499,76 @@ UPDATE config_form_fields SET widgetcontrols='{
     "filterExpression": "timser_type = ''Rainfall'' AND active"
   }
 }'::json WHERE formname='ve_raingage' AND formtype='form_feature' AND columnname='timser_id' AND tabname='tab_data';
+
+-- 18/03/2026
+-- ve_arc
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1'),
+'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+-- ve_arc_conduit
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_conduit', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_conduit' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1'),
+'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_conduit', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_conduit' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+-- ve_arc_pump_pipe
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_pump_pipe', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_pump_pipe' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1'),
+'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_pump_pipe', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_pump_pipe' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+-- ve_arc_siphon
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_siphon', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_siphon' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1'),
+'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_siphon', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_siphon' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+-- ve_arc_varc
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_varc', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_varc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1'),
+'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_varc', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_varc' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+-- ve_arc_waccel
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_waccel', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_waccel' AND tabname = 'tab_data' AND layoutname = 'lyt_data_1'),
+'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_waccel', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
+(SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_waccel' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
+'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);

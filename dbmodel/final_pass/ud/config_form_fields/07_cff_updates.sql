@@ -1321,3 +1321,1320 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('upsert_catalog_link', 'form_catalog', 'tab_none', 'id', 'lyt_data_1', 4, 'string', 'combo', 'Id:', 'Id', NULL, false, false, true, false, NULL, 'SELECT DISTINCT (id) AS id, id AS idval FROM cat_link WHERE id IS NOT NULL', true, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
 
 UPDATE config_form_fields SET iseditable=false WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_none' AND iseditable=true;
+
+-- 18/03/2026
+-- ve_arc
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='node_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='node_custom_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='sys_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='sys_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='z1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='r1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='cat_shape' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='cat_geom1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='cat_geom2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='gis_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='inverted_slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='workcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='builtdate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='ownercat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='workcat_id_end' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='num_value' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='adate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='adescript' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='label_quadrant' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='macrominsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=35
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=36
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='serial_number' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=37
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='negative_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=38
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='cat_dr' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=39
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=40
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='node_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='node_custom_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='sys_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='z2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='r2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='category_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='soilcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='comment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='label' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='label_x' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='label_y' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='label_rotation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='publish' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='inventory' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='uncertain' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='verified' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='workcat_id_plan' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='asset_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='visitability' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='placement_type' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1', 2, 'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2', 2, 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+
+-- ve_arc_conduit
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='node_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='node_custom_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='sys_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='sys_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='z1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='r1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='cat_shape' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='cat_geom1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='cat_geom2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='gis_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='inverted_slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='workcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='builtdate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='ownercat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='num_value' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='inlet_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='adate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='adescript' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='bottom_mat' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='visitability' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='label_quadrant' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=35
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='macrominsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=36
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='serial_number' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=37
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='negative_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=38
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='conduit_code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=39
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=40
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='node_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='node_custom_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='sys_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='z2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='r2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='category_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='soilcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='comment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='label' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='label_x' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='label_y' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='label_rotation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='publish' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='inventory' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='uncertain' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='verified' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='workcat_id_end' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='workcat_id_plan' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='asset_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='placement_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_conduit' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_conduit', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1', 2, 'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_conduit', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2', 2, 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+
+-- ve_arc_pump_pipe
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='node_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='node_custom_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='sys_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='sys_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='z1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='r1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='cat_shape' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='cat_geom1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='cat_geom2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='gis_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='inverted_slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='workcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='builtdate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='ownercat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='num_value' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='inlet_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='adate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='adescript' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='bottom_mat' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='visitability' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='label_quadrant' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=35
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='macrominsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=36
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='serial_number' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=37
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='negative_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=38
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='conduit_code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=39
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='pumpipe_param_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=40
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='pumpipe_param_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=41
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=42
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='node_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='node_custom_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='sys_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='z2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='r2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='category_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='soilcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='comment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='label' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='label_x' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='label_y' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='label_rotation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='publish' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='inventory' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='uncertain' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='verified' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='workcat_id_end' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='workcat_id_plan' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='asset_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='placement_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_pump_pipe' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_pump_pipe', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1', 2, 'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_pump_pipe', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2', 2, 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+
+-- ve_arc_siphon
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='node_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='node_custom_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='sys_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='sys_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='z1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='r1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='cat_shape' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='cat_geom1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='cat_geom2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='gis_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='inverted_slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='workcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='builtdate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='ownercat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='num_value' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='name' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='adate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='adescript' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='visitability' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='label_quadrant' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='macrominsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=35
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='serial_number' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=36
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='negative_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=37
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='siphon_code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=38
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=39
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='node_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='node_custom_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='sys_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='z2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='r2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='category_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='soilcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='comment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='label' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='label_x' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='label_y' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='label_rotation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='publish' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='inventory' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='uncertain' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='verified' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='workcat_id_end' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='workcat_id_plan' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='asset_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='placement_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_siphon' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_siphon', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1', 2, 'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_siphon', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2', 2, 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+
+-- ve_arc_varc
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='node_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='node_custom_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='sys_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='sys_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='z1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='r1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='cat_shape' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='cat_geom1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='cat_geom2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='gis_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='inverted_slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='workcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='builtdate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='ownercat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='num_value' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='adate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='adescript' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='visitability' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='label_quadrant' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='macrominsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='serial_number' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=35
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='negative_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=36
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=37
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='node_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='node_custom_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='sys_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='z2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='r2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='category_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='soilcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='comment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='label' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='label_x' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='label_y' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='label_rotation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='publish' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='inventory' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='uncertain' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='verified' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='workcat_id_end' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='workcat_id_plan' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='asset_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='placement_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_varc' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_varc', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1', 2, 'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_varc', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2', 2, 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+
+-- ve_arc_waccel
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='node_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='node_custom_top_elev_1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='sys_y1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='custom_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='sys_elev1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='z1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='r1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='cat_shape' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='cat_geom1' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='cat_geom2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='gis_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='inverted_slope' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='workcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='builtdate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='ownercat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='num_value' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='accessibility' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='name' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='prot_surface' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='sander_depth' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='sander_length' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='adate' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='adescript' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=35
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='visitability' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=36
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='label_quadrant' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=37
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='minsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=38
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='macrominsector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=39
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='serial_number' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=40
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='negative_offset' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=41
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='waccel_code' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=42
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='macrosector_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=45
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='parent_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='node_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=4
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='node_custom_top_elev_2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=5
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=6
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='sys_y2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=7
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=8
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='custom_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=9
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='sys_elev2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=10
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='z2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=11
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='r2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=12
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=13
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='category_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=14
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=15
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='soilcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=16
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='location_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=17
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='comment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=18
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='label' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=19
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='label_y' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=20
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='label_x' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=21
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='label_rotation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=22
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='publish' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=23
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='inventory' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=24
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='uncertain' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=25
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=26
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='verified' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=27
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=28
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='workcat_id_end' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=29
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='workcat_id_plan' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=30
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='asset_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=31
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=32
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='placement_type' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=33
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='brand_id' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET layoutorder=34
+	WHERE formname='ve_arc_waccel' AND formtype='form_feature' AND columnname='model_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_waccel', 'form_feature', 'tab_data', 'nodetype_1', 'lyt_data_1', 2, 'string', 'text', 'Node type 1:', 'Nodetype_1 - Type of node 1', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_arc_waccel', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2', 2, 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
