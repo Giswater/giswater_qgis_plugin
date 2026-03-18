@@ -79,7 +79,6 @@ DECLARE
 	v_geom_param_update_divide float;
 	v_concave_hull float = 0.9;
 
-	-- TODO: finish v_from_zero
 	v_from_zero boolean = FALSE;
 
     v_parameters json;
@@ -152,7 +151,11 @@ BEGIN
 	v_commit_changes := p_data->'data'->'parameters'->>'commitChanges';
 	v_netscenario := p_data->'data'->'parameters'->>'netscenario';
 
-	v_from_zero := p_data->'data'->'parameters'->>'fromZero';
+	-- fromZero: sent as text "true"/"false" by client; default FALSE when absent (keeps v1 behavior)
+	v_from_zero := COALESCE(
+		NULLIF(p_data->'data'->'parameters'->>'fromZero','')::boolean,
+		false
+	);
 
 	-- extra parameters
 	v_parameters := p_data->'data'->'parameters';
@@ -233,24 +236,73 @@ BEGIN
         RETURN v_response;
     END IF;
 
+	-- Create temp tables for log (needed by gw_fct_getmessage with tempTable='t_')
+	-- ========================================================================
+	v_data :=
+	jsonb_build_object(
+		'data',
+		jsonb_build_object(
+			'parameters',
+			jsonb_build_object(
+				'fid', v_fid,
+				'project_type', v_project_type,
+				'action', 'CREATE',
+				'group', 'LOG'
+			)
+		)
+	);
+
+	SELECT gw_fct_manage_temp_tables(v_data) INTO v_response;
+
+	IF v_response->>'status' <> 'Accepted' THEN
+		RETURN v_response;
+	END IF;
+
+	-- Reset log tables content for this run
+	DELETE FROM t_audit_check_data WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM t_audit_check_project WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM t_audit_log_data WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM temp_audit_check_data WHERE fid = v_fid AND cur_user = current_user;
+
 	-- Start Building Log Message
 	-- =======================
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_use_plan_psector::text)));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_update_map_zone::text)));
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_commit_changes::text)));
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4588","function":"3508","parameters":{"graphClass":"'
+		|| upper(v_class) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
 
-	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
+	-- separator line (sys_message)
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4590","function":"3508","parameters":null, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+
+	-- Use psectors (already exists on sys_message id 4018)
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4018","function":"3508","parameters":{"v_usepsector":"'
+		|| upper(v_use_plan_psector::text) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4592","function":"3508","parameters":{"updateMapZone":"'
+		|| upper(v_update_map_zone::text) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4594","function":"3508","parameters":{"commitChanges":"'
+		|| upper(v_commit_changes::text) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4596","function":"3508","parameters":{"fromZero":"'
+		|| upper(v_from_zero::text) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+
+	-- spacer line (sys_message) inside the title/params block
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+
+	-- section headers
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4598","function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4600","function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4602","function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4604","function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4606","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4608","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4610","function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4612","function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||'}}$$);';
 
 	-- Initialize process
 	-- =======================
@@ -319,7 +371,7 @@ BEGIN
 	IF v_from_zero THEN
 		EXECUTE format($sql$
 		SELECT count(*)
-		FROM %I
+		FROM %I t
 		WHERE active
 			AND %I NOT IN (0, -1) -- 0 and -1 are conflict and undefined
 			AND EXISTS (
@@ -644,48 +696,6 @@ BEGIN
 
 	-- SECTION CHECK GRAPHCONFIG
 	--==============================
-	-- drop temp tables
-	v_data :=
-    jsonb_build_object(
-        'data',
-        jsonb_build_object(
-            'parameters',
-			jsonb_build_object(
-				'fid', v_fid,
-				'project_type', v_project_type,
-				'action', 'DROP',
-				'group', 'LOG'
-			)
-        )
-    );
-
-	SELECT gw_fct_manage_temp_tables(v_data) INTO v_response;
-	
-	IF v_response->>'status' <> 'Accepted' THEN
-		RETURN v_response;
-	END IF;
-
-	-- create temp tables
-	v_data :=
-    jsonb_build_object(
-        'data',
-        jsonb_build_object(
-            'parameters',
-			jsonb_build_object(
-				'fid', v_fid,
-				'project_type', v_project_type,
-				'action', 'CREATE',
-				'group', 'LOG'
-			)
-        )
-    );
-	
-	SELECT gw_fct_manage_temp_tables(v_data) INTO v_response;
-
-	IF v_response->>'status' <> 'Accepted' THEN
-		RETURN v_response;
-	END IF;
-
 
 	IF v_from_zero = FALSE THEN
 
@@ -1013,7 +1023,16 @@ BEGIN
 	END IF; --v_from_zero
 
 	-- check if there are any errors in grapfconfig, when v_from_zero FALSE
-	IF (SELECT count(*) FROM t_audit_check_data WHERE fid = v_fid AND criticity > 2) > 0 THEN
+	-- Detect real errors in graphconfig, ignoring UI scaffolding rows
+	-- (we insert section headers/spacers into t_audit_check_data as well).
+	IF (
+		SELECT count(*)
+		FROM t_audit_check_data
+		WHERE fid = v_fid
+		  AND criticity = 3
+		  AND COALESCE(error_message, '') <> ''
+		  AND error_message NOT IN ('ERRORS', '-----------')
+	) > 0 THEN
 
 		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, expl_id, name)
 		VALUES (0,0, array[0]::int[], array[0]::int[], 'Disconnected');
@@ -1767,8 +1786,10 @@ BEGIN
 		) sub;
 
 		IF v_arcs_count > 0 OR v_connecs_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
-			VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',v_class,'''s (',v_mapzones_ids,') with ',v_arcs_count,' arc(s) and ',v_connecs_count,' connec(s) affected.'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4616","function":"3508","parameters":{"graphClass":"'
+				|| upper(v_class) || '","mapzones_ids":"' || COALESCE(v_mapzones_ids, '') || '","arcs_count":"'
+				|| COALESCE(v_arcs_count::text, '0') || '","connecs_count":"' || COALESCE(v_connecs_count::text, '0')
+				|| '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
 		END IF;
 
 		IF v_project_type = 'WS' THEN
@@ -1829,11 +1850,11 @@ BEGIN
 		WHERE t.mapzone_id = 0;
 
 		IF v_arcs_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_arcs_count ,' arc''s have been disconnected'));
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4618","function":"3508","parameters":{"arcs_count":"'
+			|| COALESCE(v_arcs_count::text, '0')
+			|| '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 1, concat('INFO: 0 arc''s have been disconnected'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4620","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 		END IF;
 
 		RAISE NOTICE 'Disconnected connecs';
@@ -1843,15 +1864,14 @@ BEGIN
 			WHERE t.mapzone_id = 0;
 
 			IF v_connecs_count > 0 THEN
-				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-				VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_connecs_count ,' connec''s have been disconnected'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4622","function":"3508","parameters":{"connecs_count":"'
+					|| COALESCE(v_connecs_count::text, '0')
+					|| '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
 			ELSE
-				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-				VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4624","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 1, concat('INFO: 0 connec''s have been disconnected'));
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4624","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 		END IF;
 
 		IF v_audit_result is null THEN
@@ -2006,9 +2026,8 @@ BEGIN
 			-- SECTION: Creating geometry of mapzones
 
 			IF v_update_map_zone > 0 THEN
-				-- message
-				INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-				VALUES (v_fid, 1, concat('INFO: ',v_class,' values for features and geometry of the mapzone has been modified by this process'));
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4626","function":"3508","parameters":{"graphClass":"'
+					|| upper(v_class) || '"}, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
 			IF v_update_map_zone = 0 THEN
@@ -2794,11 +2813,11 @@ BEGIN
 	FROM t_audit_check_data
 	where fid = v_fid;
 
-	-- insert spacer for warning and info
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  3, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  2, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  1, '');
-	INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  0, '');
+	-- insert spacer lines (sys_message)
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"3", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"2", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"1", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"0", "fid": '||v_fid||'}}$$);';
 
 	-- Get Info for the audit
 	SELECT json_agg(row_to_json(t)) INTO v_result
