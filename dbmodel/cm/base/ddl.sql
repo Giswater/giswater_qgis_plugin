@@ -357,6 +357,7 @@ CREATE TABLE om_campaign (
   qindex1 numeric(12, 3) NULL,
   qindex2 numeric(12, 3) NULL,
   rating int2 NULL,
+  workcat_id text NULL,
   the_geom geometry(MultiPolygon,SRID_VALUE),
   CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
   CONSTRAINT om_campaign_check_type check (campaign_type in (1,2,3)),
