@@ -79,19 +79,10 @@ BEGIN
 		v_expl_id_array := string_to_array(v_expl_id, ',');
 	END IF;
 
-	-- Delete temporary tables
-	-- =======================
-	v_data := '{"data":{"action":"DROP", "fct_name":"'|| v_class ||'"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
 
-	-- Create temporary tables
-	-- =======================
-	v_data := '{"data":{"action":"CREATE", "fct_name":"'|| v_class ||'"}}';
-	SELECT gw_fct_graphanalytics_manage_temporary(v_data) INTO v_response;
+	DROP TABLE IF EXISTS temp_audit_check_data;
+	CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
-    IF v_response->>'status' <> 'Accepted' THEN
-        RETURN v_response;
-    END IF;
 
 	-- Log
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MACROMAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
@@ -108,13 +99,21 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
 
-	-- prepare query
-	v_query_geom = '
-	SELECT '||v_macro_id_field||' AS mapzone_id, '||v_child_table||'_id, name as '||v_child_table||'_name , 
-	'||v_child_table||'_type, descript, st_union(the_geom) as the_geom, UNNEST(expl_id) as expl_id,
-	UNNEST(muni_id) as muni_id FROM '|| v_child_table ||' 
-	WHERE '||v_macro_id_field||' IS NOT NULL AND '||quote_literal(v_expl_id_array)||'::integer[] && ARRAY[expl_id]
-	GROUP BY '||v_macro_id_field||', '||v_child_table||'_id,  name, '||v_child_table||'_type, descript';
+	IF v_child_table = 'sector' THEN
+		v_query_geom = '
+		SELECT '||v_macro_id_field||' AS mapzone_id, '||v_child_table||'_id, name as '||v_child_table||'_name , 
+		'||v_child_table||'_type, descript, st_union(the_geom) as the_geom, UNNEST(expl_id) as expl_id,
+		UNNEST(muni_id) as muni_id FROM '|| v_child_table ||' 
+		WHERE '||v_macro_id_field||' IS NOT NULL AND '||quote_literal(v_expl_id_array)||'::integer[] && ARRAY[expl_id]
+		GROUP BY '||v_macro_id_field||', '||v_child_table||'_id,  name, '||v_child_table||'_type, descript';
+	ELSE 
+		v_query_geom = '
+		SELECT '||v_macro_id_field||' AS mapzone_id, '||v_child_table||'_id, name as '||v_child_table||'_name , 
+		'||v_child_table||'_type, descript, st_union(the_geom) as the_geom, UNNEST(expl_id) as expl_id,
+		UNNEST(muni_id) as muni_id, UNNEST(sector_id) as sector_id FROM '|| v_child_table ||' 
+		WHERE '||v_macro_id_field||' IS NOT NULL AND '||quote_literal(v_expl_id_array)||'::integer[] && ARRAY[expl_id]
+		GROUP BY '||v_macro_id_field||', '||v_child_table||'_id,  name, '||v_child_table||'_type, descript';
+	END IF;
 
 	IF v_commitchanges THEN -- update macromapzone table
 
