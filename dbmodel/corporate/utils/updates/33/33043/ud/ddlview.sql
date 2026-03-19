@@ -33,7 +33,7 @@ r.rast,
 r.rastercat_id,
 r.envelope
 FROM 
-v_edit_exploitation a, ext_raster_dem r
+ve_exploitation a, ext_raster_dem r
 JOIN utils.cat_raster c ON c.id=rastercat_id
 WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
 

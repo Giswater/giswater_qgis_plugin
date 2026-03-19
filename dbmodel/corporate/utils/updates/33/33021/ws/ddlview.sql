@@ -11,7 +11,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- 2019/12/21
 CREATE OR REPLACE VIEW ext_raster_dem AS 
 SELECT raster_dem.id,
-code,
+cat_raster.code,
 alias,
 raster_type, 
 cat_raster.descript,

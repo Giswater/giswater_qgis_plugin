@@ -12,7 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE OR REPLACE VIEW ext_municipality AS 
 SELECT * FROM utils.municipality;
 
-
+DROP VIEW IF EXISTS v_ext_streetaxis;
 CREATE OR REPLACE VIEW v_ext_streetaxis AS 
  SELECT ext_streetaxis.id,
     ext_streetaxis.code,
