@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `gw_fct_graphanalytics_macromapzones` streamline temporary table management.
 - `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
 - `gw_fct_graphanalytics_mapzones_v1` function.
+- Performance of dscenario views for ws and ud 
 
 ## [4.8.0] - 2026-03-17
 
