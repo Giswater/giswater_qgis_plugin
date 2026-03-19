@@ -1157,11 +1157,9 @@ class AddNewLot:
         except Exception:
             return None
 
-    def resources_management(self, initial_tab: Optional[str] = None):
+    def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
         (such as teams and vehicles) within the application's UI.
-
-        :param initial_tab: Optional tab to select on open: 'campaign' for campaign selector tab.
         """
 
         # Get user information
@@ -1204,6 +1202,7 @@ class AddNewLot:
         self.team_id = None
         self.user_id = None
         self.tab_organizations = 0
+        self.tab_campaign = 3
 
         # Populate combos
         # Create sql query to get all teams
@@ -1219,12 +1218,18 @@ class AddNewLot:
             for table in tables:
                 self._populate_resource_tableview(table)
 
+            # Setup campaign selector tab (cm.selector_campaign)
+            self._setup_campaign_selector_tab()
+
             # Set signals for manage organizations
             self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
         else:
 
             # Remove tab organizations
             self.dlg_resources_man.tab_main.removeTab(self.tab_organizations)
+
+            # Remove tab campaign
+            self.dlg_resources_man.tab_main.removeTab(self.tab_campaign)
 
             # Filter teams table by the user organization selected
             self.filter_teams_by_name()
@@ -1266,14 +1271,6 @@ class AddNewLot:
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
 
-        # Setup campaign selector tab (cm.selector_campaign)
-        self._setup_campaign_selector_tab()
-
-        if initial_tab == 'campaign' and hasattr(self.dlg_resources_man, 'tab_main'):
-            # Campaign tab: index 3 for admin (org, teams, users, campaign), 2 when org tab removed
-            idx = 3 if self.user_data.get("role") == "role_cm_admin" else 2
-            self.dlg_resources_man.tab_main.setCurrentIndex(idx)
-
         # Open form
         tools_gw.open_dialog(self.dlg_resources_man, "resources_management")
 
@@ -1282,7 +1279,7 @@ class AddNewLot:
         dlg = self.dlg_resources_man
         if not hasattr(dlg, 'tbl_campaign'):
             return
-        organization_id = self.user_data.get('org_id', 3) if self.user_data.get('role') != 'role_cm_admin' else 3
+        organization_id = 3
 
         sql_users = (
             "SELECT user_id as id, username as idval "
