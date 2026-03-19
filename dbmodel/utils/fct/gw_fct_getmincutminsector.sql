@@ -17,66 +17,115 @@ AS $function$
 EXAMPLE:
 
 SELECT gw_fct_getmincutminsector($${"client":{"device":4, "lang":"es_ES", "version":"4.0.001", "infoType":1, "epsg":25831},
-"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters": {"mincutId":"10"}}}$$);
+"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters": {"arcId":"10"}}}$$);
 
 */
 
 DECLARE
-v_mincut_id INTEGER;
-v_minsector_affected INTEGER;
-v_minsector_dependent_arcs JSON;
-v_proposed_valves JSON;
-v_arc_id INTEGER;
-v_version TEXT;
 
-v_status TEXT;
-v_message JSON;
-v_data JSON;
-v_error_context TEXT;
+-- Init params
+v_arc_id INTEGER;
+v_minsector_id INTEGER;
+
+-- Vars
+v_minsector_affected INTEGER = 0;
+v_minsector_dependent_arcs JSON = '{}';
+v_proposed_valves JSON = '{}';
+
+
+-- aux/std vars
+v_sql TEXT;
+
+
+-- Return and sys vars
+v_version TEXT = '';
+v_status TEXT = 'Accepted';
+v_message JSON = '{}';
+v_error_context TEXT = '';
+v_result_point JSON = '{}';
+v_result_connecs JSON = '{}';
+v_result_valves JSON = '{}';
+v_result_line JSON = '{}';
+v_result_info JSON = '{}';
+v_project_type TEXT;
+v_fid integer = 999;
+
 
 BEGIN
 
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws_0319_01", public;
 
-	-- Get input parameters
-    v_mincut_id := (p_data->'data'->'parameters'->>'mincutId')::INTEGER;
+	-- NOTE: Input parameters and init vars
+    v_arc_id := (p_data->'data'->'parameters'->>'arcId')::INTEGER;
 
-	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	SELECT anl_feature_id INTO v_arc_id FROM om_mincut WHERE id = v_mincut_id;
+	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 3700;
 
-    -- Minsector affected
-	SELECT minsector_id INTO v_minsector_affected FROM arc WHERE arc_id = v_arc_id;
+	SELECT minsector_id INTO v_minsector_id FROM arc WHERE arc_id = v_arc_id;
 
-    -- Dependent arcs from the minsector
-	SELECT json_agg(arc_id) INTO v_minsector_dependent_arcs FROM arc WHERE minsector_id IN (
-		SELECT mincut_minsector_id FROM minsector_mincut WHERE minsector_id = v_minsector_affected
-	);
+	SELECT json_build_object('arcId', v_arc_id, 'minsectorId', v_minsector_id) INTO v_result_info;
 
-    -- Proposed valves
-	SELECT json_agg(js) FROM (
-		SELECT json_build_object('toOpen', proposed, 'node_id', json_agg(node_id)) AS js 
-		FROM om_mincut_valve WHERE result_id = v_mincut_id GROUP BY proposed
-	) INTO v_proposed_valves;
+	-- pipes
+	v_sql := FORMAT('SELECT 
+    va.arc_id,
+    va.minsector_id,
+    the_geom
+	FROM ve_arc va
+	WHERE EXISTS (
+	    SELECT 1 FROM minsector_mincut mm 
+	    WHERE mm.minsector_id = %s
+	    AND mm.mincut_minsector_id = va.minsector_id
+	)', v_minsector_id);
+
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Arcs", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
+	INTO v_result_line;
+	
+	
+	-- connecs
+	v_sql := FORMAT('SELECT
+	    vc.connec_id,
+	    vc.customer_code,
+	    vc.minsector_id,
+	    the_geom
+	FROM ve_connec vc
+	WHERE EXISTS (
+	    SELECT 1 FROM minsector_mincut mm 
+	    WHERE mm.minsector_id = %s
+	    AND mm.mincut_minsector_id = vc.minsector_id
+	)', v_minsector_id);
+	
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Connecs","queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
+	INTO v_result_connecs;
+	
+	-- valves
+	v_sql := FORMAT('SELECT 
+	    mv.node_id,
+	    mv.closed,
+	    mv.broken,
+	    mv.to_arc,
+	    mv.proposed,
+	    mv.unaccess,
+	    mv.changestatus,
+	    the_geom,
+	    vn.minsector_id
+	FROM minsector_mincut_valve mv
+	JOIN ve_node vn USING (node_id) 
+	WHERE mv.minsector_id = %s',
+	v_minsector_id);
 
 
-	-- Control NULLs
-	v_minsector_affected := COALESCE(v_minsector_affected, 0);
-	v_minsector_dependent_arcs := COALESCE(v_minsector_dependent_arcs, '{}');
-	v_proposed_valves := COALESCE(v_proposed_valves, '{}');
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Valves", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
+	INTO v_result_valves;
 
-   	v_status := COALESCE(v_status, '');
-   	v_message := COALESCE(v_message, '{}');
-	v_version := COALESCE(v_version, '');
-    v_data := COALESCE(v_data, '{}');
+	v_result_point := jsonb_build_array(
+		v_result_connecs,
+		v_result_valves
+	)::json;
 
-    SELECT JSONB_BUILD_OBJECT(
-        'minsectorAffected', v_minsector_affected,
-        'minsectorDependentArcs', v_minsector_dependent_arcs,
-        'proposedValves', v_proposed_valves
-    ) INTO v_data;
 
    	--  Return
-	RETURN ('{"status":"'||v_status||'", "message":'||v_message||', "version":"'||v_version||'","body":{"form":{},"data":'||v_data||'}}')::json;
+	RETURN ('{"status":"'||v_status||'","message":'||v_message||',"version":"'||v_version||'","body":{"form":{},
+	"data":{"info":'||v_result_info||',"point":'||v_result_point||',"line":'||v_result_line||'}}}');
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
