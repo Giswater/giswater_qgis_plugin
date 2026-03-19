@@ -25,6 +25,7 @@ v_returntype text;
 v_querytext text;
 v_rec record;
 v_project_type text;
+v_custom_layer_name TEXT;
 
 BEGIN
 
@@ -38,6 +39,7 @@ BEGIN
 	-- get input parameters
 	v_returntype := ((p_data->>'data')::json->>'parameters')::json->>'type';
 	v_querytext := ((p_data->>'data')::json->>'parameters')::json->>'queryText';
+	v_custom_layer_name := COALESCE((p_data->'data'->'parameters'->>'layerName')::TEXT, 'custom_temp');
 
 	v_result = NULL;
 	IF v_returntype = 'fillExcepTables' THEN -- delete and insert on anl tables
@@ -166,6 +168,7 @@ BEGIN
 	execute format(
 	'SELECT jsonb_build_object(
 	    ''type'', ''FeatureCollection'',
+		''layerName'', %L,
 	    ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
 	) 
 	FROM (
@@ -175,7 +178,8 @@ BEGIN
 	''properties'', to_jsonb(row) - ''the_geom''
 	) AS feature
 	FROM (%s) row) features',
-	v_querytext	
+	v_custom_layer_name,
+	v_querytext
 	) INTO v_result;
 
 
