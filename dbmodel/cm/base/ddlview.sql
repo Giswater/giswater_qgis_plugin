@@ -27,6 +27,7 @@ WITH campaign_reviewvisit AS (SELECT ocr.campaign_id, omr.idval FROM om_campaign
 	c.descript,
 	c.active,
 	c.organization_id,
+	c.workcat_id,
 	c.status,
 	c.the_geom
 	FROM om_campaign c
