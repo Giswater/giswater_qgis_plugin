@@ -886,8 +886,6 @@ class GwAdminButton:
         # Create dialog object
         self.dlg_readsql = GwAdminUi(self)
         tools_gw.load_settings(self.dlg_readsql)
-        for widget in self.dlg_readsql.findChildren(QWidget):
-            print(widget.objectName())
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
@@ -1069,6 +1067,11 @@ class GwAdminButton:
 
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
 
+        # Block signals to prevent cascading DB queries during bulk combo setup
+        self.cmb_connection.blockSignals(True)
+        self.cmb_project_type.blockSignals(True)
+        self.dlg_readsql.project_schema_name.blockSignals(True)
+
         # Populate again combo because user could have created one after initialization
         self._populate_combo_connections()
 
@@ -1095,6 +1098,9 @@ class GwAdminButton:
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
             self.dlg_readsql.btn_gis_create.setEnabled(False)
+            self.cmb_connection.blockSignals(False)
+            self.cmb_project_type.blockSignals(False)
+            self.dlg_readsql.project_schema_name.blockSignals(False)
             self._manage_docker()
             return
 
@@ -1106,6 +1112,9 @@ class GwAdminButton:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            self.cmb_connection.blockSignals(False)
+            self.cmb_project_type.blockSignals(False)
+            self.dlg_readsql.project_schema_name.blockSignals(False)
             self._manage_docker()
             return
 
@@ -1120,6 +1129,9 @@ class GwAdminButton:
         if not tools_db.check_role(self.username, is_admin=True) and not show_dialog:
             msg = "User not found"
             tools_log.log_warning(msg, parameter=self.username)
+            self.cmb_connection.blockSignals(False)
+            self.cmb_project_type.blockSignals(False)
+            self.dlg_readsql.project_schema_name.blockSignals(False)
             return
 
         # Check PostgreSQL Version
@@ -1185,13 +1197,24 @@ class GwAdminButton:
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
 
-        # Load last schema name selected and project type
+        # Load last schema name selected and project type (signals still blocked)
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
                                  tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session", False,
                                                             force_reload=True))
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
                                  tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False,
                                                             force_reload=True))
+
+        # Unblock signals now that all combos are set
+        self.cmb_connection.blockSignals(False)
+        self.cmb_project_type.blockSignals(False)
+        self.dlg_readsql.project_schema_name.blockSignals(False)
+
+        # Run dependent functions once with the final combo values
+        self._change_project_type(self.cmb_project_type)
+        self._populate_data_schema_name(self.cmb_project_type)
+        self._set_info_project()
+        self._update_manage_ui()
 
         # Set custom sql path
         folder_path = tools_gw.get_config_parser("btn_admin", "custom_sql_path", "user", "session", force_reload=True)
@@ -1545,6 +1568,9 @@ class GwAdminButton:
     def _event_change_connection(self):
         """"""
 
+        # Invalidate cached PG versions since we're switching connections
+        self._cached_pg_versions = None
+
         connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
         credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
@@ -1780,10 +1806,9 @@ class GwAdminButton:
         result_list = []
         for (schema_name,) in rows:
             sql = f"SELECT project_type FROM {schema_name}.sys_version"
-            (project_type,) = tools_db.get_row(sql)
-            if project_type is not None and project_type == filter_.upper():
-                elem = [schema_name, schema_name]
-                result_list.append(elem)
+            row = tools_db.get_row(sql)
+            if row is not None and row[0] == filter_.upper():
+                result_list.append([schema_name, schema_name])
         if not result_list:
             self.dlg_readsql.project_schema_name.clear()
             self._set_buttons_enabled()
@@ -1838,14 +1863,19 @@ class GwAdminButton:
         # set variables from table version
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
-        self.postgresql_version = tools_db.get_pg_version()
-        self.postgis_version = tools_db.get_postgis_version()
-        self.pgrouting_version = tools_db.get_pgrouting_version()
-        tools_db.check_pg_extension('postgis_raster')
-        tools_db.check_pg_extension('tablefunc')
-        tools_db.check_pg_extension('unaccent')
-        tools_db.check_pg_extension('fuzzystrmatch')
-        tools_db.check_pg_extension('intarray')
+        # Cache PG versions and extensions: they don't change within a connection
+        if not hasattr(self, '_cached_pg_versions') or self._cached_pg_versions is None:
+            self._cached_pg_versions = {
+                'pg': tools_db.get_pg_version(),
+                'postgis': tools_db.get_postgis_version(),
+                'pgrouting': tools_db.get_pgrouting_version(),
+            }
+            for ext in ('postgis_raster', 'tablefunc', 'unaccent', 'fuzzystrmatch', 'intarray'):
+                tools_db.check_pg_extension(ext)
+
+        self.postgresql_version = self._cached_pg_versions['pg']
+        self.postgis_version = self._cached_pg_versions['postgis']
+        self.pgrouting_version = self._cached_pg_versions['pgrouting']
 
         if schema_name == 'null':
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
@@ -3503,7 +3533,12 @@ class GwAdminButton:
 
     def _manage_utils(self):
 
-        sql = "SELECT schema_name FROM information_schema.schemata"
+        # Get only schemas that have a sys_version table (single query instead of N+1)
+        sql = (
+            "SELECT DISTINCT table_schema "
+            "FROM information_schema.tables "
+            "WHERE table_name = 'sys_version'"
+        )
         rows = tools_db.get_rows(sql)
         if rows is None:
             return
@@ -3511,20 +3546,14 @@ class GwAdminButton:
         ws_result_list = []
         ud_result_list = []
 
-        for row in rows:
-            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
-                   f"WHERE table_schema = '{row[0]}' "
-                   f"AND table_name = 'sys_version')")
-            exists = tools_db.get_row(sql)
-            if exists and str(exists[0]) == 'True':
-                sql = f"SELECT project_type FROM {row[0]}.sys_version"
-                result = tools_db.get_row(sql)
-                if result is not None and result[0] == 'WS':
-                    elem = [row[0], row[0]]
-                    ws_result_list.append(elem)
-                elif result is not None and result[0] == 'UD':
-                    elem = [row[0], row[0]]
-                    ud_result_list.append(elem)
+        for (schema_name,) in rows:
+            sql = f"SELECT project_type FROM {schema_name}.sys_version LIMIT 1"
+            result = tools_db.get_row(sql)
+            project_type = result[0] if result is not None else None
+            if project_type == 'WS':
+                ws_result_list.append([schema_name, schema_name])
+            elif project_type == 'UD':
+                ud_result_list.append([schema_name, schema_name])
 
         if not ws_result_list:
             self.dlg_readsql.cmb_utils_ws.clear()
