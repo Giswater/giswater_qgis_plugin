@@ -229,10 +229,22 @@ class Campaign:
                 (cur_user, campaign_id)
             )
             tools_db.execute_sql(sql)
+            sql = tools_db.dao.mogrify(
+                "DELETE FROM cm.selector_lot WHERE cur_user = %s AND lot_id IN "
+                "(SELECT lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
 
         for cur_user, campaign_id in to_insert:
             sql = tools_db.dao.mogrify(
                 "INSERT INTO cm.selector_campaign (cur_user, campaign_id) VALUES (%s, %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+            sql = tools_db.dao.mogrify(
+                "INSERT INTO cm.selector_lot (cur_user, lot_id) "
+                "SELECT %s, lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s",
                 (cur_user, campaign_id)
             )
             tools_db.execute_sql(sql)
