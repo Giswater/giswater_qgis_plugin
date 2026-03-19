@@ -1157,9 +1157,12 @@ class AddNewLot:
         except Exception:
             return None
 
-    def resources_management(self):
+    def resources_management(self, initial_tab: Optional[str] = None):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
-        (such as teams and vehicles) within the application's UI."""
+        (such as teams and vehicles) within the application's UI.
+
+        :param initial_tab: Optional tab to select on open: 'campaign' for campaign selector tab.
+        """
 
         # Get user information
         user_data = self.get_current_user()
@@ -1263,8 +1266,178 @@ class AddNewLot:
 
         self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
 
+        # Setup campaign selector tab (cm.selector_campaign)
+        self._setup_campaign_selector_tab()
+
+        if initial_tab == 'campaign' and hasattr(self.dlg_resources_man, 'tab_main'):
+            # Campaign tab: index 3 for admin (org, teams, users, campaign), 2 when org tab removed
+            idx = 3 if self.user_data.get("role") == "role_cm_admin" else 2
+            self.dlg_resources_man.tab_main.setCurrentIndex(idx)
+
         # Open form
         tools_gw.open_dialog(self.dlg_resources_man, "resources_management")
+
+    def _setup_campaign_selector_tab(self):
+        """Setup campaign selector tab: tbl_campaign, cmb_user, cmb_campaign, btn_campaign_add/remove/accept."""
+        dlg = self.dlg_resources_man
+        if not hasattr(dlg, 'tbl_campaign'):
+            return
+        organization_id = self.user_data.get('org_id', 3) if self.user_data.get('role') != 'role_cm_admin' else 3
+
+        sql_users = (
+            "SELECT user_id as id, username as idval "
+            "FROM cm.cat_user "
+            "LEFT JOIN cm.cat_team ON cat_user.team_id = cat_team.team_id "
+            f"WHERE cat_team.organization_id = {organization_id} "
+            "ORDER BY username"
+        )
+        user_rows = tools_db.get_rows(sql_users)
+        tools_qt.fill_combo_values(dlg.cmb_user, user_rows, index_to_show=1, add_empty=True)
+
+        sql_campaigns = (
+            "SELECT campaign_id as id, name as idval "
+            "FROM cm.om_campaign "
+            "WHERE status IN (3, 4, 6, 8, 9) "
+            "ORDER BY name"
+        )
+        campaign_rows = tools_db.get_rows(sql_campaigns)
+        tools_qt.fill_combo_values(dlg.cmb_campaign, campaign_rows, index_to_show=1, add_empty=True)
+
+        self._populate_campaign_selector_table(dlg, user_rows, campaign_rows)
+        self._filter_campaign_selector_table(dlg)
+        dlg.btn_campaign_add.clicked.connect(
+            partial(self._add_campaign_selector_row, dlg, user_rows, campaign_rows)
+        )
+        dlg.btn_campaign_remove.clicked.connect(partial(self._delete_campaign_selector_rows, dlg))
+        dlg.cmb_user.currentIndexChanged.connect(partial(self._filter_campaign_selector_table, dlg))
+        dlg.cmb_campaign.currentIndexChanged.connect(partial(self._filter_campaign_selector_table, dlg))
+        if hasattr(dlg, 'btn_campaign_accept'):
+            dlg.btn_campaign_accept.clicked.connect(partial(self._save_campaign_selector_table, dlg))
+        tools_gw.add_icon(dlg.btn_campaign_add, "111")
+        tools_gw.add_icon(dlg.btn_campaign_remove, "112")
+
+    def _populate_campaign_selector_table(self, dlg, user_rows, campaign_rows):
+        """Populate tbl_campaign with cm.selector_campaign rows; user & campaign cols use QComboBox."""
+        tbl = dlg.tbl_campaign
+        tbl.setSortingEnabled(False)
+        tbl.setColumnCount(2)
+        tbl.setHorizontalHeaderLabels([tools_qt.tr("User", context_name="cm"), tools_qt.tr("Campaign", context_name="cm")])
+
+        usernames = [r[1] if not isinstance(r, dict) else r.get('idval') for r in (user_rows or [])]
+        campaign_ids = [r[0] if not isinstance(r, dict) else r.get('id') for r in (campaign_rows or [])]
+        if not usernames or not campaign_ids:
+            selector_rows = []
+        else:
+            sql = (
+                "SELECT cur_user, campaign_id FROM cm.selector_campaign "
+                "WHERE cur_user = ANY(%s) AND campaign_id = ANY(%s) "
+                "ORDER BY cur_user, campaign_id"
+            )
+            selector_rows = tools_db.get_rows(sql, params=(usernames, campaign_ids)) or []
+        tbl.setRowCount(len(selector_rows))
+
+        for row_idx, row in enumerate(selector_rows):
+            cur_user = row['cur_user'] if isinstance(row, dict) else row[0]
+            campaign_id = row['campaign_id'] if isinstance(row, dict) else row[1]
+            combo_user = QComboBox()
+            tools_qt.fill_combo_values(combo_user, user_rows, index_to_show=1, add_empty=True)
+            tools_qt.set_combo_value(combo_user, cur_user, 1)
+            tbl.setCellWidget(row_idx, 0, combo_user)
+            combo_campaign = QComboBox()
+            tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
+            tools_qt.set_combo_value(combo_campaign, campaign_id, 0)
+            tbl.setCellWidget(row_idx, 1, combo_campaign)
+
+        dlg._selector_original_rows = {
+            (str(row['cur_user'] if isinstance(row, dict) else row[0]),
+             int(row['campaign_id'] if isinstance(row, dict) else row[1]))
+            for row in selector_rows
+        }
+
+    def _filter_campaign_selector_table(self, dlg):
+        """Show/hide rows based on cmb_user and cmb_campaign filter."""
+        tbl = dlg.tbl_campaign
+        filter_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
+        filter_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
+        for row_idx in range(tbl.rowCount()):
+            combo_u = tbl.cellWidget(row_idx, 0)
+            combo_c = tbl.cellWidget(row_idx, 1)
+            row_user = tools_qt.get_combo_value(dlg, combo_u, 1) if combo_u else None
+            row_campaign = tools_qt.get_combo_value(dlg, combo_c, 0) if combo_c else None
+            match_user = not filter_user or str(row_user or "") == str(filter_user or "")
+            match_campaign = filter_campaign in (None, "", -1, "-1") or str(row_campaign or "") == str(filter_campaign or "")
+            tbl.setRowHidden(row_idx, not (match_user and match_campaign))
+
+    def _add_campaign_selector_row(self, dlg, user_rows, campaign_rows):
+        """Append a new row; prefills from cmb_user/cmb_campaign if set."""
+        tbl = dlg.tbl_campaign
+        row_idx = tbl.rowCount()
+        tbl.insertRow(row_idx)
+        combo_user = QComboBox()
+        tools_qt.fill_combo_values(combo_user, user_rows, index_to_show=1, add_empty=True)
+        sel_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
+        if sel_user:
+            tools_qt.set_combo_value(combo_user, sel_user, 1)
+        tbl.setCellWidget(row_idx, 0, combo_user)
+        combo_campaign = QComboBox()
+        tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
+        sel_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
+        if sel_campaign not in (None, "", -1, "-1"):
+            tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
+        tbl.setCellWidget(row_idx, 1, combo_campaign)
+        self._filter_campaign_selector_table(dlg)
+
+    def _delete_campaign_selector_rows(self, dlg):
+        """Remove selected rows from tbl_campaign."""
+        tbl = dlg.tbl_campaign
+        for idx in sorted(tbl.selectionModel().selectedRows(), key=lambda i: i.row(), reverse=True):
+            tbl.removeRow(idx.row())
+
+    def _save_campaign_selector_table(self, dlg):
+        """Persist tbl_campaign changes to cm.selector_campaign and cm.selector_lot."""
+        tbl = dlg.tbl_campaign
+        current = set()
+        for row_idx in range(tbl.rowCount()):
+            combo_u = tbl.cellWidget(row_idx, 0)
+            combo_c = tbl.cellWidget(row_idx, 1)
+            cur_user = tools_qt.get_combo_value(dlg, combo_u, 1) if combo_u else None
+            campaign_id = tools_qt.get_combo_value(dlg, combo_c, 0) if combo_c else None
+            if cur_user and campaign_id not in (None, "", -1, "-1"):
+                current.add((str(cur_user), int(campaign_id)))
+
+        original = getattr(dlg, '_selector_original_rows', set())
+        to_insert = current - original
+        to_delete = original - current
+
+        for cur_user, campaign_id in to_delete:
+            sql = tools_db.dao.mogrify(
+                "DELETE FROM cm.selector_campaign WHERE cur_user = %s AND campaign_id = %s",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+            sql = tools_db.dao.mogrify(
+                "DELETE FROM cm.selector_lot WHERE cur_user = %s AND lot_id IN "
+                "(SELECT lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+
+        for cur_user, campaign_id in to_insert:
+            sql = tools_db.dao.mogrify(
+                "INSERT INTO cm.selector_campaign (cur_user, campaign_id) VALUES (%s, %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+            sql = tools_db.dao.mogrify(
+                "INSERT INTO cm.selector_lot (cur_user, lot_id) "
+                "SELECT %s, lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+
+        dlg._selector_original_rows = current
+        msg = tools_qt.tr("Changes saved.", context_name="cm")
+        tools_qgis.show_info(msg)
 
     def txt_org_name_changed(self):
         """ Filter table by organization id """

@@ -80,5 +80,4 @@ from .cm.add_lot_btn import GwAddLotButton  # noqa: F401
 from .cm.resources_lot_btn import GwLotResourceManagementButton  # noqa: F401
 from .cm.selector_campaign_btn import GwSelectorCampaignButton  # noqa: F401
 from .cm.check_cm_project_btn import GwCheckCMProjectButton  # noqa: F401
-from .cm.admin_campaign_selector_btn import GwAdminCampaignSelectorButton  # noqa: F401
 
