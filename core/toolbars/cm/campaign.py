@@ -127,14 +127,24 @@ class Campaign:
         selector.open_selector(selector_type, show_lot_tab=show_lot)
 
     def _setup_selector_table(self, admin_selector, user_rows, campaign_rows):
-        """Populate tbl_selector with cm.selector_campaign rows; user & campaign cols use QComboBox."""
+        """Populate tbl_selector with cm.selector_campaign rows; user & campaign cols use QComboBox.
+        Only includes rows where cur_user and campaign_id exist in user_rows/campaign_rows."""
         tbl = admin_selector.tbl_selector
         tbl.setSortingEnabled(False)  # Required when using setCellWidget
         tbl.setColumnCount(2)
         tbl.setHorizontalHeaderLabels([tools_qt.tr("User", context_name="cm"), tools_qt.tr("Campaign", context_name="cm")])
 
-        sql = "SELECT cur_user, campaign_id FROM cm.selector_campaign ORDER BY cur_user, campaign_id"
-        selector_rows = tools_db.get_rows(sql) or []
+        usernames = [r[1] if not isinstance(r, dict) else r.get('idval') for r in (user_rows or [])]
+        campaign_ids = [r[0] if not isinstance(r, dict) else r.get('id') for r in (campaign_rows or [])]
+        if not usernames or not campaign_ids:
+            selector_rows = []
+        else:
+            sql = (
+                "SELECT cur_user, campaign_id FROM cm.selector_campaign "
+                "WHERE cur_user = ANY(%s) AND campaign_id = ANY(%s) "
+                "ORDER BY cur_user, campaign_id"
+            )
+            selector_rows = tools_db.get_rows(sql, params=(usernames, campaign_ids)) or []
         tbl.setRowCount(len(selector_rows))
 
         for row_idx, row in enumerate(selector_rows):
@@ -149,6 +159,26 @@ class Campaign:
             tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
             tools_qt.set_combo_value(combo_campaign, campaign_id, 0)
             tbl.setCellWidget(row_idx, 1, combo_campaign)
+
+        admin_selector._selector_original_rows = {
+            (str(row['cur_user'] if isinstance(row, dict) else row[0]),
+             int(row['campaign_id'] if isinstance(row, dict) else row[1]))
+            for row in selector_rows
+        }
+
+    def _filter_selector_table(self, admin_selector):
+        """Show/hide rows based on cmb_user and cmb_campaign filter."""
+        tbl = admin_selector.tbl_selector
+        filter_user = tools_qt.get_combo_value(admin_selector, admin_selector.cmb_user, 1)
+        filter_campaign = tools_qt.get_combo_value(admin_selector, admin_selector.cmb_campaign, 0)
+        for row_idx in range(tbl.rowCount()):
+            combo_u = tbl.cellWidget(row_idx, 0)
+            combo_c = tbl.cellWidget(row_idx, 1)
+            row_user = tools_qt.get_combo_value(admin_selector, combo_u, 1) if combo_u else None
+            row_campaign = tools_qt.get_combo_value(admin_selector, combo_c, 0) if combo_c else None
+            match_user = not filter_user or str(row_user or "") == str(filter_user or "")
+            match_campaign = filter_campaign in (None, "", -1, "-1") or str(row_campaign or "") == str(filter_campaign or "")
+            tbl.setRowHidden(row_idx, not (match_user and match_campaign))
 
     def _add_selector_row(self, admin_selector, user_rows, campaign_rows):
         """Append a new row; prefills from cmb_user/cmb_campaign if set."""
@@ -169,12 +199,48 @@ class Campaign:
         if sel_campaign not in (None, "", -1, "-1"):
             tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
         tbl.setCellWidget(row_idx, 1, combo_campaign)
+        self._filter_selector_table(admin_selector)
 
     def _delete_selector_rows(self, admin_selector):
         """Remove selected rows from tbl_selector."""
         tbl = admin_selector.tbl_selector
         for idx in sorted(tbl.selectionModel().selectedRows(), key=lambda i: i.row(), reverse=True):
             tbl.removeRow(idx.row())
+
+    def _save_selector_table(self, admin_selector):
+        """Persist tbl_selector changes to cm.selector_campaign (INSERT new, DELETE removed)."""
+        tbl = admin_selector.tbl_selector
+        current = set()
+        for row_idx in range(tbl.rowCount()):
+            combo_u = tbl.cellWidget(row_idx, 0)
+            combo_c = tbl.cellWidget(row_idx, 1)
+            cur_user = tools_qt.get_combo_value(admin_selector, combo_u, 1) if combo_u else None
+            campaign_id = tools_qt.get_combo_value(admin_selector, combo_c, 0) if combo_c else None
+            if cur_user and campaign_id not in (None, "", -1, "-1"):
+                current.add((str(cur_user), int(campaign_id)))
+
+        original = getattr(admin_selector, '_selector_original_rows', set())
+        to_insert = current - original
+        to_delete = original - current
+
+        for cur_user, campaign_id in to_delete:
+            sql = tools_db.dao.mogrify(
+                "DELETE FROM cm.selector_campaign WHERE cur_user = %s AND campaign_id = %s",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+
+        for cur_user, campaign_id in to_insert:
+            sql = tools_db.dao.mogrify(
+                "INSERT INTO cm.selector_campaign (cur_user, campaign_id) VALUES (%s, %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+
+        admin_selector._selector_original_rows = current
+        msg = tools_qt.tr("Changes saved.", context_name="cm")
+        tools_qgis.show_info(msg)
+        admin_selector.accept()
 
     def open_admin_campaign_selector(self):
         """ Open the campaign selector for admins when the button is clicked """
@@ -204,11 +270,21 @@ class Campaign:
 
         # Setup selector table (cm.selector_campaign: cur_user, campaign_id)
         self._setup_selector_table(admin_selector, user_rows, campaign_rows)
+        self._filter_selector_table(admin_selector)
         admin_selector.btn_add.clicked.connect(
             lambda: self._add_selector_row(admin_selector, user_rows, campaign_rows)
         )
         admin_selector.btn_delete.clicked.connect(
             lambda: self._delete_selector_rows(admin_selector)
+        )
+        admin_selector.cmb_user.currentIndexChanged.connect(
+            lambda: self._filter_selector_table(admin_selector)
+        )
+        admin_selector.cmb_campaign.currentIndexChanged.connect(
+            lambda: self._filter_selector_table(admin_selector)
+        )
+        admin_selector.btn_accept.clicked.connect(
+            lambda: self._save_selector_table(admin_selector)
         )
         tools_gw.add_icon(admin_selector.btn_add, "111")
         tools_gw.add_icon(admin_selector.btn_delete, "112")
