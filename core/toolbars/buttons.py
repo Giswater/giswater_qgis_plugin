@@ -73,11 +73,12 @@ from .am.priority_btn import GwAmPriorityButton  # noqa: F401
 from .am.result_manager_btn import GwResultManagerButton  # noqa: F401
 from .am.result_selector_btn import GwResultSelectorButton  # noqa: F401
 
-# cm 84, 85, 86, 87, 88, 89
+# cm 84, 85, 86, 87, 88, 89, 90
 from .cm.add_campaign_btn import GwAddCampaignButton  # noqa: F401
 from .cm.manager_campaign_lot_btn import GwManageCampaignLotButton  # noqa: F401
 from .cm.add_lot_btn import GwAddLotButton  # noqa: F401
 from .cm.resources_lot_btn import GwLotResourceManagementButton  # noqa: F401
 from .cm.selector_campaign_btn import GwSelectorCampaignButton  # noqa: F401
 from .cm.check_cm_project_btn import GwCheckCMProjectButton  # noqa: F401
+from .cm.admin_campaign_selector_btn import GwAdminCampaignSelectorButton  # noqa: F401
 

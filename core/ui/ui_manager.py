@@ -834,6 +834,15 @@ class CampaignManagementUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
+UINAME = "admin_campaign_selector"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class AdminCampaignSelectorUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "workorder_management"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 

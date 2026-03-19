@@ -16,7 +16,8 @@ from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...utils.selection_mode import GwSelectionMode
-from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, AddCampaignInventoryUi
+from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi, AddCampaignInventoryUi, \
+    AdminCampaignSelectorUi
 from ...shared.selector import GwSelector
 from ...utils.selection_widget import GwSelectionWidget
 
@@ -124,6 +125,95 @@ class Campaign:
         tools_gw.init_docker('qgis_form_docker')
         selector = GwSelector()
         selector.open_selector(selector_type, show_lot_tab=show_lot)
+
+    def _setup_selector_table(self, admin_selector, user_rows, campaign_rows):
+        """Populate tbl_selector with cm.selector_campaign rows; user & campaign cols use QComboBox."""
+        tbl = admin_selector.tbl_selector
+        tbl.setSortingEnabled(False)  # Required when using setCellWidget
+        tbl.setColumnCount(2)
+        tbl.setHorizontalHeaderLabels([tools_qt.tr("User", context_name="cm"), tools_qt.tr("Campaign", context_name="cm")])
+
+        sql = "SELECT cur_user, campaign_id FROM cm.selector_campaign ORDER BY cur_user, campaign_id"
+        selector_rows = tools_db.get_rows(sql) or []
+        tbl.setRowCount(len(selector_rows))
+
+        for row_idx, row in enumerate(selector_rows):
+            cur_user = row['cur_user'] if isinstance(row, dict) else row[0]
+            campaign_id = row['campaign_id'] if isinstance(row, dict) else row[1]
+            combo_user = QComboBox()
+            tools_qt.fill_combo_values(combo_user, user_rows, index_to_show=1, add_empty=True)
+            tools_qt.set_combo_value(combo_user, cur_user, 1)
+            tbl.setCellWidget(row_idx, 0, combo_user)
+
+            combo_campaign = QComboBox()
+            tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
+            tools_qt.set_combo_value(combo_campaign, campaign_id, 0)
+            tbl.setCellWidget(row_idx, 1, combo_campaign)
+
+    def _add_selector_row(self, admin_selector, user_rows, campaign_rows):
+        """Append a new row; prefills from cmb_user/cmb_campaign if set."""
+        tbl = admin_selector.tbl_selector
+        row_idx = tbl.rowCount()
+        tbl.insertRow(row_idx)
+
+        combo_user = QComboBox()
+        tools_qt.fill_combo_values(combo_user, user_rows, index_to_show=1, add_empty=True)
+        sel_user = tools_qt.get_combo_value(admin_selector, admin_selector.cmb_user, 1)
+        if sel_user:
+            tools_qt.set_combo_value(combo_user, sel_user, 1)
+        tbl.setCellWidget(row_idx, 0, combo_user)
+
+        combo_campaign = QComboBox()
+        tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
+        sel_campaign = tools_qt.get_combo_value(admin_selector, admin_selector.cmb_campaign, 0)
+        if sel_campaign not in (None, "", -1, "-1"):
+            tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
+        tbl.setCellWidget(row_idx, 1, combo_campaign)
+
+    def _delete_selector_rows(self, admin_selector):
+        """Remove selected rows from tbl_selector."""
+        tbl = admin_selector.tbl_selector
+        for idx in sorted(tbl.selectionModel().selectedRows(), key=lambda i: i.row(), reverse=True):
+            tbl.removeRow(idx.row())
+
+    def open_admin_campaign_selector(self):
+        """ Open the campaign selector for admins when the button is clicked """
+        admin_selector = AdminCampaignSelectorUi(self)
+        tools_gw.load_settings(admin_selector)
+        organization_id = 3  # AYA
+
+        # Load combo values for user & campaign dropdowns
+        sql_users = (
+            "SELECT user_id as id, username as idval "
+            "FROM cm.cat_user "
+            "LEFT JOIN cm.cat_team ON cat_user.team_id = cat_team.team_id "
+            f"WHERE cat_team.organization_id = {organization_id} "
+            "ORDER BY username"
+        )
+        user_rows = tools_db.get_rows(sql_users)
+        tools_qt.fill_combo_values(admin_selector.cmb_user, user_rows, index_to_show=1, add_empty=True)
+
+        sql_campaigns = (
+            "SELECT campaign_id as id, name as idval "
+            "FROM cm.om_campaign "
+            "WHERE status IN (3, 4, 6, 8, 9) "
+            "ORDER BY name"
+        )
+        campaign_rows = tools_db.get_rows(sql_campaigns)
+        tools_qt.fill_combo_values(admin_selector.cmb_campaign, campaign_rows, index_to_show=1, add_empty=True)
+
+        # Setup selector table (cm.selector_campaign: cur_user, campaign_id)
+        self._setup_selector_table(admin_selector, user_rows, campaign_rows)
+        admin_selector.btn_add.clicked.connect(
+            lambda: self._add_selector_row(admin_selector, user_rows, campaign_rows)
+        )
+        admin_selector.btn_delete.clicked.connect(
+            lambda: self._delete_selector_rows(admin_selector)
+        )
+        tools_gw.add_icon(admin_selector.btn_add, "111")
+        tools_gw.add_icon(admin_selector.btn_delete, "112")
+
+        tools_gw.open_dialog(admin_selector, dlg_name="admin_campaign_selector")
 
     def load_campaign_dialog(self, campaign_id: Optional[int] = None, mode: str = "review", parent: Optional[QWidget] = None):
         """
