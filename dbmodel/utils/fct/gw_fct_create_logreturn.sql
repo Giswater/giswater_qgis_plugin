@@ -174,7 +174,7 @@ BEGIN
 	FROM (
 	SELECT jsonb_build_object(
 	''type'',       ''Feature'',
-	''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+	''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 	''properties'', to_jsonb(row) - ''the_geom''
 	) AS feature
 	FROM (%s) row) features',
