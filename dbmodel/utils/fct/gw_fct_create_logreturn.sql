@@ -160,6 +160,25 @@ BEGIN
 	FROM (SELECT pol_id, descript, ST_Transform(the_geom, 4326) as the_geom
 	FROM  t_anl_polygon WHERE cur_user="current_user"() AND fid=216) row) features;
 
+
+	ELSIF v_returntype = 'custom' THEN
+	
+	execute format(
+	'SELECT jsonb_build_object(
+	    ''type'', ''FeatureCollection'',
+	    ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
+	) 
+	FROM (
+	SELECT jsonb_build_object(
+	''type'',       ''Feature'',
+	''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+	''properties'', to_jsonb(row) - ''the_geom''
+	) AS feature
+	FROM (%s) row) features',
+	v_querytext	
+	) INTO v_result;
+
+
 	END IF;
 
 	v_result := COALESCE(v_result, '{}');
