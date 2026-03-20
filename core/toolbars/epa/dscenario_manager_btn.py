@@ -34,7 +34,7 @@ class GwDscenarioManagerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.feature_type = 'node'
-        self.feature_types = ['element_id', 'node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id']
+        self.feature_types = ['element_id', 'node_id', 'arc_id', 'feature_id', 'connec_id', 'nodarc_id', 'rg_id', 'poll_id', 'sector_id', 'lidco_id', 'pattern_id']
         self.filter_dict = {"inp_dscenario_controls": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_rules": {"filter_table": "ve_sector", "feature_type": "sector"},
                             "inp_dscenario_demand": {"filter_table": ["ve_inp_junction", "ve_inp_connec"], "feature_type": ["node", "connec"]},
@@ -699,7 +699,7 @@ class GwDscenarioManagerButton(GwAction):
         default_tab_idx = 0
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
-              f"AND table_name LIKE 'inp_dscenario%'" \
+              f"AND table_name LIKE 'inp_dscenario%' AND table_name <> 'inp_dscenario_pattern_value'" \
               f"ORDER BY table_name;"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -936,6 +936,9 @@ class GwDscenarioManagerButton(GwAction):
             tools_qt.set_widget_enabled(self.dlg_dscenario, 'txt_feature_id', False)
             tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', False)
             tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_expr_select', False)
+        if tableview.objectName() == "inp_dscenario_pattern":
+            tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', False)
+            tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_expr_select', False)
 
     def _manage_feature_type(self):
         """ Manages current tableview feature type (node, arc, nodarc, etc.) """
@@ -994,7 +997,7 @@ class GwDscenarioManagerButton(GwAction):
         col_name = 'feature_id'
         col_idx = None
 
-        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules', 'inp_dscenario_demand'):
+        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
             col_name = 'id'
             col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
         else:
@@ -1019,6 +1022,8 @@ class GwDscenarioManagerButton(GwAction):
             return self._manage_upsert_controls(feature_id)
         elif tablename == "inp_dscenario_rules":
             return self._manage_upsert_rules(feature_id)
+        elif tablename == "inp_dscenario_pattern":
+            return self._manage_upsert_pattern(feature_id)
 
         # Execute getinfofromid
         _id = f"{feature_id}"
@@ -1252,18 +1257,7 @@ class GwDscenarioManagerButton(GwAction):
         if not rows:
             return
 
-        if rows[0][0] == 'id':
-            # FIELDS
-            sql = f"INSERT INTO ve_{view} ({rows[1][0]}, {rows[2][0]}"
-            if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
-                sql += f", {rows[3][0]}"
-            # VALUES
-            sql += f")VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}'"
-            if view in ("inp_dscenario_controls", "inp_dscenario_rules"):
-                sql += ", ''"
-            sql += ");"
-        else:
-            sql = f"INSERT INTO ve_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+        sql = f"INSERT INTO ve_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
@@ -1289,6 +1283,12 @@ class GwDscenarioManagerButton(GwAction):
 
         nonvisual = GwNonVisual()
         nonvisual.get_rules(rule_id=rule_id, dscenario_id=self.selected_dscenario_id)
+        nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
+    
+    def _manage_upsert_pattern(self, pattern_id=None):
+
+        nonvisual = GwNonVisual()
+        nonvisual.get_patterns(pattern_id=pattern_id, dscenario_id=self.selected_dscenario_id)
         nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
 
     def _manage_delete(self):

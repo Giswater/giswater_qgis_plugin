@@ -1264,7 +1264,7 @@ class GwNonVisual:
     # endregion
 
     # region patterns
-    def get_patterns(self, pattern_id=None, duplicate=False):
+    def get_patterns(self, pattern_id=None, duplicate=False, dscenario_id=None):
         """ Opens dialog for patterns """
 
         # Get dialog
@@ -1283,7 +1283,7 @@ class GwNonVisual:
         #    calls -> def _manage_ws_patterns_dlg(self):
         #             def _manage_ud_patterns_dlg(self):
         self.previous_pattern_values = []
-        getattr(self, f'_manage_{global_vars.project_type}_patterns_dlg')(pattern_id, duplicate=duplicate)
+        getattr(self, f'_manage_{global_vars.project_type}_patterns_dlg')(pattern_id, duplicate=duplicate, dscenario_id=dscenario_id)
 
         # Connect dialog signals
         self._connect_dialog_signals()
@@ -1291,7 +1291,7 @@ class GwNonVisual:
         # Open dialog
         tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_pattern_{global_vars.project_type}')
 
-    def _manage_ws_patterns_dlg(self, pattern_id, duplicate=False):
+    def _manage_ws_patterns_dlg(self, pattern_id, duplicate=False, dscenario_id=None):
         # Get dialog
         self.dialog = GwNonVisualPatternWSUi(self)
         tools_gw.load_settings(self.dialog)
@@ -1328,7 +1328,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(cmb_expl_id, rows, add_empty=True)
 
         if pattern_id:
-            self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate)
+            self._populate_ws_patterns_widgets(pattern_id, duplicate=duplicate, dscenario_id=dscenario_id)
             self._manage_ws_patterns_plot(tbl_pattern_value, self.plot_widget, None, None)
         else:
             self._load_ws_pattern_widgets(self.dialog)
@@ -1339,7 +1339,7 @@ class GwNonVisual:
 
         # Connect OK button to insert all inp_pattern and inp_pattern_value data to database
         is_new = (pattern_id is None) or duplicate
-        self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new))
+        self.dialog.btn_accept.clicked.connect(partial(self._accept_pattern_ws, self.dialog, is_new, dscenario_id))
 
     def _paste_patterns_custom_menu(self, tbl):
         menu = QMenu(tbl)
@@ -1414,7 +1414,7 @@ class GwNonVisual:
         self.previous_pattern_values = None
         self.undo_enabled = False
 
-    def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False):
+    def _populate_ws_patterns_widgets(self, pattern_id, duplicate=False, dscenario_id=None):
         """ Fills in all the values for ws pattern dialog """
 
         # Variables
@@ -1423,7 +1423,13 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         tbl_pattern_value = self.dialog.tbl_pattern_value
 
-        sql = f"SELECT * FROM ve_inp_pattern WHERE pattern_id = '{pattern_id}'"
+        if dscenario_id is not None:
+            tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+            tools_qt.set_widget_enabled(self.dialog, txt_observ, False)
+            tools_qt.set_widget_enabled(self.dialog, cmb_expl_id, False)
+            sql = f"SELECT * FROM inp_dscenario_pattern WHERE dscenario_id = '{dscenario_id}' AND pattern_id = '{pattern_id}'"
+        else:
+            sql = f"SELECT * FROM ve_inp_pattern WHERE pattern_id = '{pattern_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1436,9 +1442,14 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
 
         # Populate table pattern_values
-        sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, " \
-              f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 " \
-              f"FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
+        if dscenario_id is not None:
+            sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, " \
+                  f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 " \
+                  f"FROM inp_dscenario_pattern_value WHERE dscenario_id = '{dscenario_id}' AND pattern_id = '{pattern_id}'"
+        else:
+            sql = f"SELECT factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, " \
+                  f"factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 " \
+                  f"FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             return
@@ -1478,7 +1489,7 @@ class GwNonVisual:
         # Populate widgets
         tools_gw.set_config_parser('nonvisual_patterns', 'cmb_expl_id', expl_id)
 
-    def _accept_pattern_ws(self, dialog, is_new):
+    def _accept_pattern_ws(self, dialog, is_new, dscenario_id=None):
         """ Manage accept button (insert & update) """
 
         # Variables
@@ -1502,8 +1513,12 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_pattern
-            sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id)" \
-                  f"VALUES({pattern_id}, {observ}, {expl_id})"
+            if dscenario_id is not None:
+                sql = f"INSERT INTO inp_dscenario_pattern (dscenario_id, pattern_id, observ, expl_id)" \
+                      f"VALUES({dscenario_id}, {pattern_id}, {observ}, {expl_id})"
+            else:
+                sql = f"INSERT INTO inp_pattern (pattern_id, observ, expl_id)" \
+                    f"VALUES({pattern_id}, {observ}, {expl_id})"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting pattern."
@@ -1512,7 +1527,7 @@ class GwNonVisual:
                 return
 
             # Insert inp_pattern_value
-            result = self._insert_ws_pattern_values(dialog, tbl_pattern_value, pattern_id)
+            result = self._insert_ws_pattern_values(dialog, tbl_pattern_value, pattern_id, dscenario_id)
             if not result:
                 return
 
@@ -1522,24 +1537,32 @@ class GwNonVisual:
             self._reload_manager_table()
         elif pattern_id is not None:
             # Update inp_pattern
-            table_name = 've_inp_pattern'
+            if dscenario_id is not None:
+                table_name = 'inp_dscenario_pattern'
+                id_pattern = dscenario_id.strip("'") + ", " + pattern_id.strip("'")
+            else:
+                table_name = 've_inp_pattern'
+                id_pattern = pattern_id.strip("'")
 
             observ = observ.strip("'")
             fields = f"""{{"expl_id": {expl_id}, "observ": "{observ}"}}"""
 
-            result = self._setfields(pattern_id.strip("'"), table_name, fields)
+            result = self._setfields(id_pattern, table_name, fields)
             if not result:
                 return
 
             # Update inp_pattern_value
-            sql = f"DELETE FROM ve_inp_pattern_value WHERE pattern_id = {pattern_id}"
+            if dscenario_id is not None:
+                sql = f"DELETE FROM inp_dscenario_pattern_value WHERE dscenario_id = '{dscenario_id}' AND pattern_id = {pattern_id}"
+            else:
+                sql = f"DELETE FROM ve_inp_pattern_value WHERE pattern_id = {pattern_id}"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
-                msg = "There was an error deleting old curve values."
+                msg = "There was an error deleting old pattern values."
                 tools_qgis.show_warning(msg, dialog=dialog)
                 tools_db.dao.rollback()
                 return
-            result = self._insert_ws_pattern_values(dialog, tbl_pattern_value, pattern_id)
+            result = self._insert_ws_pattern_values(dialog, tbl_pattern_value, pattern_id, dscenario_id)
             if not result:
                 return
 
@@ -1554,7 +1577,7 @@ class GwNonVisual:
         self._save_ws_pattern_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
-    def _insert_ws_pattern_values(self, dialog, tbl_pattern_value, pattern_id):
+    def _insert_ws_pattern_values(self, dialog, tbl_pattern_value, pattern_id, dscenario_id=None):
         """ Insert table values into ve_inp_pattern_values """
 
         # Insert inp_pattern_value
@@ -1581,8 +1604,12 @@ class GwNonVisual:
             for i, x in enumerate(row):
                 sql_columns.append(f"factor_{i + 1}")
                 sql_values.append(x)
-            sql = f"""INSERT INTO ve_inp_pattern_value (pattern_id, {','.join(sql_columns)}) 
-                        VALUES ({pattern_id}, {','.join(map(str, sql_values))});"""
+            if dscenario_id is not None:
+                sql = f"""INSERT INTO inp_dscenario_pattern_value (dscenario_id, pattern_id, {','.join(sql_columns)}) 
+                            VALUES ({dscenario_id}, {pattern_id}, {','.join(map(str, sql_values))});"""
+            else:
+                sql = f"""INSERT INTO ve_inp_pattern_value (pattern_id, {','.join(sql_columns)}) 
+                            VALUES ({pattern_id}, {','.join(map(str, sql_values))});"""
             print(sql)
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
@@ -1620,7 +1647,7 @@ class GwNonVisual:
         # Draw plot
         plot_widget.draw()
 
-    def _manage_ud_patterns_dlg(self, pattern_id, duplicate=False):
+    def _manage_ud_patterns_dlg(self, pattern_id, duplicate=False, dscenario_id=None):
         """ Opens dialog for ud pattern """
         # Get dialog
         self.dialog = GwNonVisualPatternUDUi(self)
@@ -1652,7 +1679,7 @@ class GwNonVisual:
             tools_qt.fill_combo_values(cmb_pattern_type, rows)
 
         if pattern_id:
-            self._populate_ud_patterns_widgets(pattern_id, duplicate=duplicate)
+            self._populate_ud_patterns_widgets(pattern_id, duplicate=duplicate, dscenario_id=dscenario_id)
         else:
             self._load_ud_pattern_widgets(self.dialog)
 
@@ -1671,7 +1698,7 @@ class GwNonVisual:
             table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             table.horizontalHeader().setMinimumSectionSize(50)
 
-    def _populate_ud_patterns_widgets(self, pattern_id, duplicate=False):
+    def _populate_ud_patterns_widgets(self, pattern_id, duplicate=False, dscenario_id=None):
         """ Fills in all the values for ud pattern dialog """
 
         # Variables
@@ -1680,7 +1707,14 @@ class GwNonVisual:
         cmb_expl_id = self.dialog.cmb_expl_id
         cmb_pattern_type = self.dialog.cmb_pattern_type
 
-        sql = f"SELECT * FROM ve_inp_pattern WHERE pattern_id = '{pattern_id}'"
+        if dscenario_id is not None:
+            tools_qt.set_widget_enabled(self.dialog, txt_id, False)
+            tools_qt.set_widget_enabled(self.dialog, txt_observ, False)
+            tools_qt.set_widget_enabled(self.dialog, cmb_expl_id, False)
+            tools_qt.set_widget_enabled(self.dialog, cmb_pattern_type, False)
+            sql = f"SELECT * FROM inp_dscenario_pattern WHERE dscenario_id = '{dscenario_id}' AND pattern_id = '{pattern_id}'"
+        else:
+            sql = f"SELECT * FROM ve_inp_pattern WHERE pattern_id = '{pattern_id}'"
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -1694,7 +1728,10 @@ class GwNonVisual:
         tools_qt.set_widget_text(self.dialog, cmb_pattern_type, row['pattern_type'])
 
         # Populate table pattern_values
-        sql = f"SELECT * FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
+        if dscenario_id is not None:
+            sql = f"SELECT * FROM inp_dscenario_pattern_value WHERE dscenario_id = '{dscenario_id}' AND pattern_id = '{pattern_id}'"
+        else:
+            sql = f"SELECT * FROM ve_inp_pattern_value WHERE pattern_id = '{pattern_id}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             return
