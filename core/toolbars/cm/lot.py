@@ -1505,14 +1505,21 @@ class AddNewLot:
             tbl.setRowHidden(row_idx, not (match_user and match_campaign))
 
     def _add_campaign_selector_row(self, dlg, user_rows, campaign_rows):
-        """Append a new row; user from cmb_user (text), campaign from cmb_campaign if set."""
+        """Append a new row; user from cmb_user (text), campaign from cmb_campaign if set.
+        If no cmb_user or cmb_campaign is set, show a warning and do not add a row."""
+        sel_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
+        sel_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
+        if sel_user in (None, "", -1, "-1") or sel_campaign in (None, "", -1, "-1"):
+            msg = tools_qt.tr(
+                "Please select both a user and a campaign before adding a row.",
+                context_name="cm",
+            )
+            tools_qgis.show_warning(msg, dialog=dlg)
+            return
         tbl = dlg.tbl_campaign
         row_idx = tbl.rowCount()
         tbl.insertRow(row_idx)
-        sel_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
-        user_disp = ""
-        if sel_user not in (None, "", -1, "-1"):
-            user_disp = str(sel_user).strip()
+        user_disp = str(sel_user).strip()
         item_user = QTableWidgetItem(user_disp)
         item_user.setData(Qt.ItemDataRole.UserRole, user_disp or None)
         item_user.setFlags(
@@ -1521,9 +1528,7 @@ class AddNewLot:
         tbl.setItem(row_idx, 0, item_user)
         combo_campaign = QComboBox()
         tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
-        sel_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
-        if sel_campaign not in (None, "", -1, "-1"):
-            tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
+        tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
         combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
         tbl.setCellWidget(row_idx, 1, combo_campaign)
         dlg._selector_row_originals.append((None, None))
@@ -1556,7 +1561,7 @@ class AddNewLot:
                 "Duplicate user and campaign pairs are not allowed. Remove duplicates before saving.",
                 context_name="cm",
             )
-            tools_qgis.show_warning(msg)
+            tools_qgis.show_warning(msg, dialog=dlg)
             return
         current = set(complete_list)
 
@@ -1566,7 +1571,7 @@ class AddNewLot:
 
         if not to_insert and not to_delete:
             msg = tools_qt.tr("No changes to save.", context_name="cm")
-            tools_qgis.show_info(msg)
+            tools_qgis.show_info(msg, dialog=dlg)
             return
 
         campaign_names = {}
@@ -1635,7 +1640,7 @@ class AddNewLot:
                 font.setBold(False)
                 combo_c.setFont(font)
         msg = tools_qt.tr("Changes saved.", context_name="cm")
-        tools_qgis.show_info(msg)
+        tools_qgis.show_info(msg, dialog=dlg)
 
     def txt_org_name_changed(self):
         """ Filter table by organization id """
