@@ -872,15 +872,13 @@ BEGIN
             INSERT INTO temp_pgr_minsector_mincut (minsector_id, mincut_minsector_id)
             SELECT v_record_minsector.pgr_node_id, n.pgr_node_id
             FROM temp_pgr_node_minsector n
-            WHERE n.graph_delimiter = 'MINSECTOR'
-            AND n.mapzone_id <> 0;
+            WHERE n.mapzone_id <> 0;
 
             INSERT INTO temp_pgr_minsector_mincut_valve
                 (minsector_id, node_id, proposed, closed, broken, unaccess, to_arc, changestatus)
             SELECT v_record_minsector.pgr_node_id, a.pgr_node_id, a.proposed, a.closed, a.broken, a.unaccess, a.to_arc, changestatus
             FROM temp_pgr_arc_linegraph a
-            WHERE a.graph_delimiter = 'MINSECTOR'
-            AND a.mapzone_id <> 0;
+            WHERE a.mapzone_id <> 0;
 
         END LOOP;
 
