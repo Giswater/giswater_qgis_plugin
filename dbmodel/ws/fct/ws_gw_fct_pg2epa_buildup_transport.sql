@@ -42,7 +42,7 @@ BEGIN
 				SELECT sector_id FROM temp_t_arc WHERE node_2 = rec_node.node_id) a WHERE sector_id <> v_inletsector;
 
 		IF v_count_diff = 0 THEN -- reservoir
-			UPDATE temp_t_node SET epa_type  = 'RESERVOIR' WHERE node_id =  rec_node.node_id;
+			UPDATE temp_t_node SET epa_type  = 'RESERVOIR', pattern_id = addparam::json->>'pattern_id' WHERE node_id =  rec_node.node_id;
 
 		ELSIF v_count = v_count_diff THEN -- junction
 
