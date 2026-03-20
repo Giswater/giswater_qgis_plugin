@@ -1,0 +1,4 @@
+4.9.0
+*************
+- Add inp_dscenario_pattern and inp_dscenario_pattern_value tables
+- Fix inp_dscenario_demand

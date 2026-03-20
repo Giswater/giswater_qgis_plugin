@@ -274,6 +274,13 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
 			INSERT INTO inp_dscenario_controls(dscenario_id, sector_id, text, active)
 			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
+		
+		ELSIF v_dscenario_type = 'PATTERN' THEN
+			INSERT INTO inp_dscenario_pattern(dscenario_id, pattern_id, pattern_type, observ, tscode, tsparameters, expl_id, log, active)
+			SELECT NEW.dscenario_id, NEW.pattern_id, pattern_type, observ, tscode, tsparameters::json, expl_id, log, active FROM ve_inp_pattern WHERE pattern_id = NEW.pattern_id;
+
+			INSERT INTO inp_dscenario_pattern_value(dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+			SELECT NEW.dscenario_id, NEW.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM ve_inp_pattern_value WHERE pattern_id = NEW.pattern_id;
 		END IF;
 
 		RETURN NEW;
@@ -424,6 +431,9 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'MAPZONE' THEN
 			DELETE FROM inp_dscenario_mapzone WHERE dscenario_id=OLD.dscenario_id AND mapzone_id=OLD.mapzone_id AND mapzone_type=OLD.mapzone_type;
+
+		ELSIF v_dscenario_type = 'PATTERN' THEN
+			DELETE FROM inp_dscenario_pattern WHERE dscenario_id=OLD.dscenario_id AND pattern_id=OLD.pattern_id;
 
 		END IF;
 

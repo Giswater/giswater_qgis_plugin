@@ -248,6 +248,12 @@ BEGIN
 			INSERT INTO inp_dscenario_inlet (dscenario_id, elev, ymax, node_id, y0, ysur, apond, inlet_type, outlet_type, gully_method, custom_top_elev, custom_depth, inlet_length, inlet_width, cd1, cd2, efficiency)
 	 		VALUES (NEW.dscenario_id, NEW.elev, NEW.ymax, NEW.node_id, NEW.y0, NEW.ysur, NEW.apond, NEW.inlet_type, NEW.outlet_type, NEW.gully_method, NEW.custom_top_elev, NEW.custom_depth, NEW.inlet_length, NEW.inlet_width, NEW.cd1, NEW.cd2, NEW.efficiency);
 
+		ELSIF v_dscenario_type = 'PATTERN' THEN
+			INSERT INTO inp_dscenario_pattern(dscenario_id, pattern_id, pattern_type, observ, tsparameters, expl_id, log, active)
+			SELECT NEW.dscenario_id, NEW.pattern_id, pattern_type, observ, tsparameters::json, expl_id, log, active FROM ve_inp_pattern WHERE pattern_id = NEW.pattern_id;
+
+			INSERT INTO inp_dscenario_pattern_value(dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24)
+			SELECT NEW.dscenario_id, NEW.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18, factor_19, factor_20, factor_21, factor_22, factor_23, factor_24 FROM ve_inp_pattern_value WHERE pattern_id = NEW.pattern_id;
 		END IF;
 
 		RETURN NEW;
@@ -372,6 +378,9 @@ BEGIN
 
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
 			DELETE FROM inp_dscenario_controls WHERE id=OLD.id;
+
+		ELSIF v_dscenario_type = 'PATTERN' THEN
+			DELETE FROM inp_dscenario_pattern WHERE dscenario_id=OLD.dscenario_id AND pattern_id=OLD.pattern_id;
 
 		END IF;
 
