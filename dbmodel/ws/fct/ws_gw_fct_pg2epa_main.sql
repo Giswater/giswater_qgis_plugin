@@ -68,6 +68,7 @@ v_epa_maxresults integer;
 v_dma_id integer[];
 v_flow_units text;
 v_quality_units text;
+v_userscenario integer[];
 
 BEGIN
 
@@ -296,16 +297,32 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dscenario(v_result);
 
 		-- move patterns used
-		INSERT INTO t_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
-			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
-		SELECT  v_result, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
-			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-			from inp_pattern_value p
-			WHERE
-			pattern_id IN (SELECT distinct (pattern_id) FROM temp_t_demand WHERE pattern_id IS NOT NULL
-						   UNION
-						   SELECT distinct (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL)
-			order by pattern_id, id;
+		INSERT INTO t_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
+		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+		SELECT v_result, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
+		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
+		FROM inp_pattern_value p
+		WHERE pattern_id IN (
+			SELECT DISTINCT (pattern_id) FROM temp_t_demand WHERE pattern_id IS NOT NULL
+			UNION
+			SELECT DISTINCT (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL
+		)
+		ORDER BY pattern_id, id;
+
+		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
+		DELETE FROM t_rpt_inp_pattern_value WHERE result_id = v_result AND dscenario_id IN (SELECT unnest(v_userscenario));
+		INSERT INTO t_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
+		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+		SELECT v_result, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
+		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
+		FROM inp_dscenario_pattern_value p
+		WHERE p.pattern_id IN (
+			SELECT DISTINCT (pattern_id) FROM temp_t_demand WHERE pattern_id IS NOT NULL
+			UNION
+			SELECT DISTINCT (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL
+		)
+		AND p.dscenario_id IN (SELECT unnest(v_userscenario))
+		ORDER BY pattern_id, id;
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
 		RETURN v_return;
