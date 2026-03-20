@@ -10,6 +10,37 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 19/03/2026
 
+
+CREATE OR REPLACE VIEW ve_inp_dscenario_connec
+AS SELECT d.dscenario_id,
+    connec.connec_id,
+    connec.pjoint_type,
+    connec.pjoint_id,
+    c.demand,
+    c.pattern_id,
+    c.peak_factor,
+    c.status,
+    c.minorloss,
+    c.custom_roughness,
+    c.custom_length,
+    c.custom_dint,
+    c.emitter_coeff,
+    c.init_quality,
+    c.source_type,
+    c.source_quality,
+    c.source_pattern_id,
+    connec.the_geom
+FROM ve_inp_connec connec
+JOIN inp_dscenario_connec c USING (connec_id)
+JOIN cat_dscenario d USING (dscenario_id)
+WHERE EXISTS (
+	SELECT 1
+	FROM selector_inp_dscenario s
+	WHERE s.dscenario_id = c.dscenario_id 
+	AND s.cur_user = CURRENT_USER
+);
+
+
 CREATE OR REPLACE VIEW ve_inp_dscenario_inlet
 AS SELECT p.dscenario_id,
     n.node_id,

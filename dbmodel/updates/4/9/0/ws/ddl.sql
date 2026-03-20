@@ -55,6 +55,8 @@ CREATE TABLE IF NOT EXISTS inp_dscenario_pattern_value (
 ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_value_dscenario_id_pattern_id_fkey 
 FOREIGN KEY (dscenario_id, pattern_id) REFERENCES inp_dscenario_pattern(dscenario_id, pattern_id) 
 ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_value_unique UNIQUE (id,dscenario_id);
+
 
 DROP VIEW IF EXISTS ve_inp_dscenario_demand;
 ALTER TABLE inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pkey;

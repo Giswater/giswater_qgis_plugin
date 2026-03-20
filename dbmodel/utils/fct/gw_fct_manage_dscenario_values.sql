@@ -237,6 +237,14 @@ BEGIN
 						INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
 						SELECT v_target, feature_id, feature_type, demand, pattern_id, demand_type, source
 						FROM inp_dscenario_demand WHERE dscenario_id = v_copyfrom;
+					ELSIF object_rec.table = 'pattern' THEN
+						INSERT INTO inp_dscenario_pattern (dscenario_id, pattern_id, pattern_type, observ, tscode, tsparameters, expl_id, log, active)
+						SELECT v_target, pattern_id, pattern_type, observ, tscode, tsparameters, expl_id, log, active
+						FROM inp_dscenario_pattern WHERE dscenario_id = v_copyfrom;
+					ELSIF object_rec.table = 'pattern_value' THEN
+						INSERT INTO inp_dscenario_pattern_value (dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+						SELECT v_target, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
+						FROM inp_dscenario_pattern_value WHERE dscenario_id = v_copyfrom;
 					ELSIF object_rec.table IN ('controls', 'pump_additional', 'rules') THEN
 						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
 						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||

@@ -135,6 +135,7 @@ BEGIN
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	RAISE NOTICE 'v_querystring: %', v_querystring;
 	EXECUTE v_querystring INTO v_fields;
 
 	-- refactor dvquerytext
@@ -162,11 +163,13 @@ BEGIN
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 			EXECUTE v_querytext INTO v_arrayresult;
-
+			RAISE NOTICE 'v_arrayresult: %', v_arrayresult;
+			RAISE NOTICE 'inputparams: %', rec.inputparams;
 			IF (rec.inputparams::json->>'isNullValue')::boolean IS TRUE THEN
+				RAISE NOTICE 'isNullValue: %', rec.inputparams::json->>'isNullValue';
 				v_arrayresult = array_prepend('',v_arrayresult);
 			END IF;
-
+			RAISE NOTICE 'v_arrayresult: %', v_arrayresult;
 			IF v_selectedid ~ '^[0-9]+$'THEN
 
 				v_selectedid = concat('{"selectedId":"',v_arrayresult[v_selectedid::integer],'"}');

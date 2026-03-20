@@ -9,6 +9,7 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 19/03/2026
+CREATE INDEX IF NOT EXISTS inp_dscenario_connec_connec_id_idx ON inp_dscenario_connec (connec_id);
 CREATE INDEX IF NOT EXISTS inp_dscenario_inlet_node_id_idx ON inp_dscenario_inlet (node_id);
 CREATE INDEX IF NOT EXISTS inp_dscenario_junction_node_id_idx ON inp_dscenario_junction (node_id);
 CREATE INDEX IF NOT EXISTS inp_dscenario_pipe_arc_id_idx ON inp_dscenario_pipe (arc_id);

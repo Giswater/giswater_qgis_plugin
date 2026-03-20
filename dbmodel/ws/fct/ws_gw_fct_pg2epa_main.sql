@@ -310,7 +310,11 @@ BEGIN
 		ORDER BY pattern_id, id;
 
 		v_userscenario = (SELECT array_agg(dscenario_id) FROM selector_inp_dscenario where cur_user=current_user);
-		DELETE FROM t_rpt_inp_pattern_value WHERE result_id = v_result AND dscenario_id IN (SELECT unnest(v_userscenario));
+		DELETE FROM t_rpt_inp_pattern_value WHERE result_id = v_result AND pattern_id IN (
+			SELECT DISTINCT (pattern_id)
+			FROM inp_dscenario_pattern p
+			WHERE p.dscenario_id IN (SELECT unnest(v_userscenario))
+		);
 		INSERT INTO t_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
 		factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 		SELECT v_result, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
