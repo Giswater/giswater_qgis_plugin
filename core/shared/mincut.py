@@ -14,7 +14,8 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, \
+    QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer, Qgis
@@ -67,6 +68,7 @@ class GwMincut:
         self.emit_point = None
         self.vertex_marker = None
         self.snapper_manager = None
+        self.mincut_mode = 'network'
 
         # Other variables
         self.col1 = "customer_code"
@@ -518,6 +520,26 @@ class GwMincut:
 
         # Show form in docker?
         self.manage_docker()
+
+    def start_offline_mincut(self):
+        """Start offline mincut snapping directly on arc layer."""
+
+        self.mincut_mode = 'offline'
+        self.user_current_layer = self.iface.activeLayer()
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        self._init_mincut_canvas()
+
+        tools_qgis.show_info("Select the arc to perform a visual execution")
+
+        tools_gw.connect_signal(self.canvas.xyCoordinates, self._mouse_move_node_arc, 'mincut_offline',
+                                'offline_mincut_xyCoordinates_mouse_move_node_arc')
+        tools_gw.connect_signal(self.emit_point.canvasClicked, self._offline_mincut_snapping, 'mincut_offline',
+                                'offline_mincut_ep_canvasClicked_offline_mincut_snapping')
 
     def manage_docker(self):
 
@@ -2095,27 +2117,98 @@ class GwMincut:
             element_id = snapped_feat.attribute(f'{elem_type}_id')
             layer.select([feature_id])
 
-            # Ensure that Mincut layers are loaded
+            # Network mincut mode: ensure that Mincut layers are loaded
             tools_gw.load_missing_layers('v_om_mincut%', "OM", "Mincut")
+            self._start_network_mincut_task(snapped_point, elem_type, element_id)
 
-            # Create task to manage Mincut execution
-            self.dlg_mincut.btn_cancel_task.show()
-            self.dlg_mincut.btn_cancel.hide()
+    def _offline_mincut_snapping(self, point, btn):
+        """Offline mincut snapping on arc layer without opening the mincut dialog."""
 
-            # Create timer
-            self.t0 = time()
-            if self.timer:
-                self.timer.stop()
-                del self.timer
-            self.timer = QTimer()
-            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
-            self.timer.start(1000)
+        if btn == Qt.MouseButton.RightButton:
+            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            tools_gw.disconnect_signal('mincut_offline')
+            self._remove_selection()
+            if self.user_current_layer is not None:
+                self.iface.setActiveLayer(self.user_current_layer)
+            self.iface.actionPan().trigger()
+            return
 
-            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, timer=self.timer)
-            QgsApplication.taskManager().addTask(self.mincut_task)
-            QgsApplication.taskManager().triggerTask(self.mincut_task)
-            self.mincut_task.task_finished.connect(
-                partial(self._mincut_task_finished, snapped_point, elem_type, element_id))
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
+        self.iface.setActiveLayer(self.layer_arc)
+        self.current_layer = self.layer_arc
+
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result.isValid():
+            return
+
+        layer = self.snapper_manager.get_snapped_layer(result)
+        if layer != self.layer_arc:
+            return
+
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        feature_id = self.snapper_manager.get_snapped_feature_id(result)
+        element_id = snapped_feat.attribute('arc_id')
+        layer.select([feature_id])
+
+        self._offline_mincut_execute(element_id)
+
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut_offline')
+        self._remove_selection()
+        if self.user_current_layer is not None:
+            self.iface.setActiveLayer(self.user_current_layer)
+        self.iface.actionPan().trigger()
+
+    def _start_network_mincut_task(self, snapped_point, elem_type, element_id):
+        """Start the regular asynchronous mincut task."""
+
+        self.dlg_mincut.btn_cancel_task.show()
+        self.dlg_mincut.btn_cancel.hide()
+
+        self.t0 = time()
+        if self.timer:
+            self.timer.stop()
+            del self.timer
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_mincut))
+        self.timer.start(1000)
+
+        self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, timer=self.timer)
+        QgsApplication.taskManager().addTask(self.mincut_task)
+        QgsApplication.taskManager().triggerTask(self.mincut_task)
+        self.mincut_task.task_finished.connect(partial(self._mincut_task_finished, snapped_point, elem_type, element_id))
+
+    def _offline_mincut_execute(self, arc_id):
+        """Offline mincut: arc snap -> gw_fct_getmincutminsector(arcId)."""
+
+        extras = f'"parameters":{{"arcId":"{arc_id}"}}'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_getmincutminsector', body)
+
+        if not result or result.get('status') == 'Failed':
+            tools_qgis.show_warning("Offline mincut failed (gw_fct_getmincutminsector)")
+            return None
+
+        # Optional UX: show returned message text (if any).
+        message = result.get('message')
+        if isinstance(message, dict) and message.get('text'):
+            tools_qgis.show_message(message.get('text'), Qgis.MessageLevel(message.get('level', 1)))
+
+        return result
+
+    def _enable_post_mincut_actions(self):
+        """Enable action set after mincut execution."""
+
+        self.dlg_mincut.btn_start.setDisabled(False)
+        self.action_mincut.setDisabled(False)
+        self.action_refresh_mincut.setDisabled(False)
+        self.action_custom_mincut.setDisabled(False)
+        self.action_change_valve_status.setDisabled(False)
+        self.action_add_connec.setDisabled(True)
+        self.action_add_hydrometer.setDisabled(True)
+        self.action_mincut_composer.setDisabled(False)
 
     def _cancel_task(self):
         """ Cancel GwAutoMincutTask """
@@ -2228,14 +2321,7 @@ class GwMincut:
                 return
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
-            self.dlg_mincut.btn_start.setDisabled(False)
-            self.action_mincut.setDisabled(False)
-            self.action_refresh_mincut.setDisabled(False)
-            self.action_custom_mincut.setDisabled(False)
-            self.action_change_valve_status.setDisabled(False)
-            self.action_add_connec.setDisabled(True)
-            self.action_add_hydrometer.setDisabled(True)
-            self.action_mincut_composer.setDisabled(False)
+            self._enable_post_mincut_actions()
 
             # Update table 'selector_mincut_result'
             self._update_result_selector(real_mincut_id)
