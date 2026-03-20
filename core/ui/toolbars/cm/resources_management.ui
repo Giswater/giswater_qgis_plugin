@@ -281,13 +281,6 @@
             </widget>
            </item>
            <item row="0" column="6">
-            <widget class="QPushButton" name="btn_campaign_accept">
-             <property name="text">
-              <string>Save</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="7">
             <spacer name="horizontalSpacer_5">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>

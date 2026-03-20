@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QStringListModel
 from qgis.core import QgsExpression
-from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QFont, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                  QComboBox, QCompleter, QDateEdit, QDialog,
                                  QDialogButtonBox, QHBoxLayout, QLabel,
@@ -1300,6 +1300,8 @@ class AddNewLot:
         campaign_rows = tools_db.get_rows(sql_campaigns)
         tools_qt.fill_combo_values(dlg.cmb_campaign, campaign_rows, index_to_show=1, add_empty=True)
 
+        dlg._campaign_selector_user_rows = user_rows
+        dlg._campaign_selector_campaign_rows = campaign_rows
         self._populate_campaign_selector_table(dlg, user_rows, campaign_rows)
         self._filter_campaign_selector_table(dlg)
         dlg.btn_campaign_add.clicked.connect(
@@ -1333,23 +1335,54 @@ class AddNewLot:
             selector_rows = tools_db.get_rows(sql, params=(usernames, campaign_ids)) or []
         tbl.setRowCount(len(selector_rows))
 
+        dlg._selector_row_originals = []
         for row_idx, row in enumerate(selector_rows):
             cur_user = row['cur_user'] if isinstance(row, dict) else row[0]
             campaign_id = row['campaign_id'] if isinstance(row, dict) else row[1]
             combo_user = QComboBox()
             tools_qt.fill_combo_values(combo_user, user_rows, index_to_show=1, add_empty=True)
             tools_qt.set_combo_value(combo_user, cur_user, 1)
+            combo_user.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
             tbl.setCellWidget(row_idx, 0, combo_user)
             combo_campaign = QComboBox()
             tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
             tools_qt.set_combo_value(combo_campaign, campaign_id, 0)
+            combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
             tbl.setCellWidget(row_idx, 1, combo_campaign)
+            dlg._selector_row_originals.append((str(cur_user), int(campaign_id) if campaign_id is not None else None))
 
         dlg._selector_original_rows = {
             (str(row['cur_user'] if isinstance(row, dict) else row[0]),
              int(row['campaign_id'] if isinstance(row, dict) else row[1]))
             for row in selector_rows
         }
+
+    def _update_campaign_selector_row_bold(self, dlg, row_idx):
+        """Set combos bold if row values differ from original."""
+        originals = getattr(dlg, '_selector_row_originals', [])
+        if row_idx >= len(originals):
+            return
+        tbl = dlg.tbl_campaign
+        combo_u = tbl.cellWidget(row_idx, 0)
+        combo_c = tbl.cellWidget(row_idx, 1)
+        if not combo_u or not combo_c:
+            return
+        orig_user, orig_campaign = originals[row_idx]
+        cur_user = tools_qt.get_combo_value(dlg, combo_u, 1)
+        cur_campaign = tools_qt.get_combo_value(dlg, combo_c, 0)
+        try:
+            cur_campaign_int = int(cur_campaign) if cur_campaign not in (None, "", -1, "-1") else None
+        except (TypeError, ValueError):
+            cur_campaign_int = None
+        try:
+            orig_campaign_int = int(orig_campaign) if orig_campaign not in (None, "", -1, "-1") else None
+        except (TypeError, ValueError):
+            orig_campaign_int = None
+        changed = (str(cur_user or "") != str(orig_user or "")) or (cur_campaign_int != orig_campaign_int)
+        font = QFont()
+        font.setBold(changed)
+        combo_u.setFont(font)
+        combo_c.setFont(font)
 
     def _filter_campaign_selector_table(self, dlg):
         """Show/hide rows based on cmb_user and cmb_campaign filter."""
@@ -1375,20 +1408,28 @@ class AddNewLot:
         sel_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
         if sel_user:
             tools_qt.set_combo_value(combo_user, sel_user, 1)
+        combo_user.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
         tbl.setCellWidget(row_idx, 0, combo_user)
         combo_campaign = QComboBox()
         tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
         sel_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
         if sel_campaign not in (None, "", -1, "-1"):
             tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
+        combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
         tbl.setCellWidget(row_idx, 1, combo_campaign)
+        dlg._selector_row_originals.append((None, None))
+        self._update_campaign_selector_row_bold(dlg, row_idx)
         self._filter_campaign_selector_table(dlg)
 
     def _delete_campaign_selector_rows(self, dlg):
         """Remove selected rows from tbl_campaign."""
         tbl = dlg.tbl_campaign
+        originals = getattr(dlg, '_selector_row_originals', [])
         for idx in sorted(tbl.selectionModel().selectedRows(), key=lambda i: i.row(), reverse=True):
-            tbl.removeRow(idx.row())
+            row = idx.row()
+            if row < len(originals):
+                dlg._selector_row_originals.pop(row)
+            tbl.removeRow(row)
 
     def _save_campaign_selector_table(self, dlg):
         """Persist tbl_campaign changes to cm.selector_campaign and cm.selector_lot."""
@@ -1405,6 +1446,32 @@ class AddNewLot:
         original = getattr(dlg, '_selector_original_rows', set())
         to_insert = current - original
         to_delete = original - current
+
+        if not to_insert and not to_delete:
+            msg = tools_qt.tr("No changes to save.", context_name="cm")
+            tools_qgis.show_info(msg)
+            return
+
+        campaign_names = {}
+        for r in getattr(dlg, '_campaign_selector_campaign_rows', []) or []:
+            cid = r[0] if not isinstance(r, dict) else r.get('id')
+            cname = r[1] if not isinstance(r, dict) else r.get('idval')
+            campaign_names[cid] = cname or str(cid)
+        lines = []
+        if to_delete:
+            lines.append(tools_qt.tr("To remove:", context_name="cm"))
+            for cur_user, campaign_id in sorted(to_delete, key=lambda x: (x[0], x[1])):
+                cname = campaign_names.get(campaign_id, str(campaign_id))
+                lines.append(f"  - {cur_user} / {cname}")
+        if to_insert:
+            lines.append(tools_qt.tr("To add:", context_name="cm"))
+            for cur_user, campaign_id in sorted(to_insert, key=lambda x: (x[0], x[1])):
+                cname = campaign_names.get(campaign_id, str(campaign_id))
+                lines.append(f"  - {cur_user} / {cname}")
+        inf_text = "\n".join(lines)
+        msg = tools_qt.tr("Save these changes to campaign selector?", context_name="cm")
+        if not tools_qt.show_question(msg, tools_qt.tr("Confirm", context_name="cm"), inf_text=inf_text, force_action=True, buttons=["Save", "Cancel"]):
+            return
 
         for cur_user, campaign_id in to_delete:
             sql = tools_db.dao.mogrify(
@@ -1433,6 +1500,22 @@ class AddNewLot:
             tools_db.execute_sql(sql)
 
         dlg._selector_original_rows = current
+        # Sync row originals and reset bold
+        dlg._selector_row_originals = []
+        for row_idx in range(tbl.rowCount()):
+            combo_u = tbl.cellWidget(row_idx, 0)
+            combo_c = tbl.cellWidget(row_idx, 1)
+            cur_user = tools_qt.get_combo_value(dlg, combo_u, 1) if combo_u else None
+            campaign_id = tools_qt.get_combo_value(dlg, combo_c, 0) if combo_c else None
+            dlg._selector_row_originals.append((str(cur_user or ""), int(campaign_id) if campaign_id not in (None, "", -1, "-1") else None))
+            if combo_u:
+                font = combo_u.font()
+                font.setBold(False)
+                combo_u.setFont(font)
+            if combo_c:
+                font = combo_c.font()
+                font.setBold(False)
+                combo_c.setFont(font)
         msg = tools_qt.tr("Changes saved.", context_name="cm")
         tools_qgis.show_info(msg)
 
