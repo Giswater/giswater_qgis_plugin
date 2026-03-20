@@ -53,7 +53,7 @@ v_fid integer = 999;
 
 BEGIN
 
-	SET search_path = "ws_0319_01", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- NOTE: Input parameters and init vars
     v_arc_id := (p_data->'data'->'parameters'->>'arcId')::INTEGER;
@@ -63,13 +63,27 @@ BEGIN
 
 	SELECT minsector_id INTO v_minsector_id FROM arc WHERE arc_id = v_arc_id;
 
+	IF v_arc_id IS NULL THEN
+		RETURN json_build_object(
+			'status', 'Failed',
+			'message', json_build_object('level', 1, 'text', 'Parameter arcId is required')
+		)::json;
+	END IF;
+
+	IF v_minsector_id IS NULL THEN
+		RETURN json_build_object(
+			'status', 'Failed',
+			'message', json_build_object('level', 1, 'text', format('No minsector found for arcId %s', v_arc_id))
+		)::json;
+	END IF;
+
 	SELECT json_build_object('arcId', v_arc_id, 'minsectorId', v_minsector_id) INTO v_result_info;
 
 	-- pipes
 	v_sql := FORMAT('SELECT 
     va.arc_id,
     va.minsector_id,
-    the_geom
+    va.the_geom
 	FROM ve_arc va
 	WHERE EXISTS (
 	    SELECT 1 FROM minsector_mincut mm 
@@ -86,7 +100,7 @@ BEGIN
 	    vc.connec_id,
 	    vc.customer_code,
 	    vc.minsector_id,
-	    the_geom
+	    vc.the_geom
 	FROM ve_connec vc
 	WHERE EXISTS (
 	    SELECT 1 FROM minsector_mincut mm 
@@ -106,7 +120,7 @@ BEGIN
 	    mv.proposed,
 	    mv.unaccess,
 	    mv.changestatus,
-	    the_geom,
+	    vn.the_geom,
 	    vn.minsector_id
 	FROM minsector_mincut_valve mv
 	JOIN ve_node vn USING (node_id) 
