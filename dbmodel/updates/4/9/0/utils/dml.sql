@@ -13,7 +13,7 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam)
 VALUES('inp_typevalue_dscenario', 'PATTERN', 'PATTERN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
-VALUES(3536, 'gw_fct_getmincutminsector', '{
+VALUES(3536, 'ws_gw_fct_getmincutminsector', '{
   "style": {
     "Valves": {
       "style": "categorized",
