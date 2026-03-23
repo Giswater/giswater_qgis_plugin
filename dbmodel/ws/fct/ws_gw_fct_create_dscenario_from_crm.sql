@@ -496,8 +496,8 @@ BEGIN
 				WHERE d.source = h.hydrometer_id
 				AND dscenario_id = v_scenarioid;
 
-
 			END IF;
+			
 		END IF;
 
 		IF v_pattern > 1 THEN
@@ -545,8 +545,22 @@ BEGIN
 
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING;
-
-		UPDATE inp_dscenario_demand SET source = concat('HYD ', source) WHERE dscenario_id = v_scenarioid;
+		
+		-- update wjoins (connec)
+		UPDATE inp_dscenario_demand d SET source = concat('HYDROMETER:',source, ' (CONNEC:',i.connec_id,')')
+		FROM inp_connec i
+		JOIN connec c USING (connec_id)
+		JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
+		WHERE d.source = h.hydrometer_id
+		AND dscenario_id = v_scenarioid;
+				
+		-- update netwjoins (node)
+		UPDATE inp_dscenario_demand d SET source = concat('HYDROMETER:',source, ' (NODE:',i.node_id,')')
+		FROM inp_junction i
+		JOIN node n USING (node_id)
+		JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
+		WHERE d.source = h.hydrometer_id
+		AND dscenario_id = v_scenarioid;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat(''));
