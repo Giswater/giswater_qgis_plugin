@@ -141,29 +141,55 @@ BEGIN
 	-- JSON with all mapzones that are in features
 	FOR rec IN SELECT unnest(ARRAY['presszone', 'dma'])
     LOOP
-        -- Build dynamic SQL to get JSON for this table
-        sql := format($f$
-            SELECT json_build_object(
-                concat('%s', 's'),
-                json_agg(json_build_object(
-                    'id', %I,
-					'code', code,
-                    'name', name,
-                    'descript', descript,
-                    'geometry', ST_AsGeoJSON(the_geom, 4326)::json
-                ))
-            )
-            FROM %I t
-            WHERE EXISTS (
-                SELECT 1 FROM temp_features r WHERE r.%I = t.%I
-            )
-        $f$,
-        rec,                 -- key: "presszone" or "dma"
-        rec || '_id',        -- id column
-        rec,                 -- table
-        rec || '_id',        -- column in temp_features
-        rec || '_id'         -- column in mapzone table
-        );
+        -- Build dynamic SQL to get JSON for this table (dma includes pattern_id)
+        IF rec = 'dma' THEN
+            sql := format($f$
+                SELECT json_build_object(
+                    concat('%s', 's'),
+                    json_agg(json_build_object(
+                        'id', %I,
+                        'code', code,
+                        'name', name,
+                        'descript', descript,
+                        'pattern_id', pattern_id,
+                        'geometry', ST_AsGeoJSON(the_geom, 4326)::json
+                    ))
+                )
+                FROM %I t
+                WHERE EXISTS (
+                    SELECT 1 FROM temp_features r WHERE r.%I = t.%I
+                )
+            $f$,
+            rec,
+            rec || '_id',
+            rec,
+            rec || '_id',
+            rec || '_id'
+            );
+        ELSE
+            sql := format($f$
+                SELECT json_build_object(
+                    concat('%s', 's'),
+                    json_agg(json_build_object(
+                        'id', %I,
+                        'code', code,
+                        'name', name,
+                        'descript', descript,
+                        'geometry', ST_AsGeoJSON(the_geom, 4326)::json
+                    ))
+                )
+                FROM %I t
+                WHERE EXISTS (
+                    SELECT 1 FROM temp_features r WHERE r.%I = t.%I
+                )
+            $f$,
+            rec,
+            rec || '_id',
+            rec,
+            rec || '_id',
+            rec || '_id'
+            );
+        END IF;
 
         -- Execute SQL and store JSON for this table
         EXECUTE sql INTO zone_json;
