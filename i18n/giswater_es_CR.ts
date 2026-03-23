@@ -5302,11 +5302,15 @@
 			<translation>El campo 'Ruta' es obligatorio para importar datos INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
-Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
+
+Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+
 Por otro lado, debe saber que la tabla de trazabilidad almacenará información precedente.</translation>
 		</message>
 		<message>
@@ -26681,7 +26685,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_new_workspace_chk</source>
-			<translation>Nombre:</translation>
+			<translation>Espacio de trabajo privado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_workspace_chk</source>
