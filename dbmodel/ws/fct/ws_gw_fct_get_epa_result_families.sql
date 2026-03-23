@@ -21,7 +21,7 @@ v_patterns json;
 
 rec TEXT;
 sql TEXT;
-result jsonb := '[]'::jsonb;
+result jsonb := '{}'::jsonb;
 zone_json jsonb;
 
 BEGIN
@@ -94,10 +94,10 @@ BEGIN
 		presszone_id
 	FROM nodes;
 
-	-- JSON with features
-	SELECT json_agg(
+	-- JSON with features: id = first digit run (e.g. 3924522P0 -> 3924522, VN3925355 -> 3925355)
+	SELECT COALESCE(json_agg(
 		json_build_object(
-			'id', split_part(feature_id, '_', 1),
+			'id', NULLIF(substring(feature_id from '[0-9]+'), '')::bigint,
 			'epaId', feature_id,
 			'epaType', feature_epa_type,
 			'catalog', feature_catalog,
@@ -107,7 +107,7 @@ BEGIN
 				'presszone', presszone_id
 			)
 		)
-	) INTO v_features
+	), '[]'::json) INTO v_features
 	FROM temp_features;
 
 	-- JSON with all families that are in features
@@ -130,30 +130,29 @@ BEGIN
 		LEFT JOIN inp_family if_new ON ef.cal_family = concat(if_new.family_id, '_NEW') AND if_new.age IS NOT NULL
 		LEFT JOIN inp_family if_old ON ef.cal_family = concat(if_old.family_id, '_OLD') AND if_old.age IS NOT NULL
 	)
-	SELECT json_agg(
+	SELECT COALESCE(json_agg(
 		json_build_object(
 			'name', family_id,
-			'descript', descript
+			'description', descript,
+			'active', true
 		)
-	) INTO v_families
+	), '[]'::json) INTO v_families
 	FROM families;
 
 	-- JSON with all mapzones that are in features
-	FOR rec IN SELECT unnest(ARRAY['presszone', 'dma'])
+	FOR rec IN SELECT unnest(ARRAY['dma', 'presszone'])
     LOOP
         -- Build dynamic SQL to get JSON for this table (dma includes pattern_id)
         IF rec = 'dma' THEN
             sql := format($f$
                 SELECT json_build_object(
                     concat('%s', 's'),
-                    json_agg(json_build_object(
-                        'id', %I,
-                        'code', code,
+                    COALESCE(json_agg(json_build_object(
+                        'mapzone_id', %I,
                         'name', name,
-                        'descript', descript,
                         'pattern_id', pattern_id,
                         'geometry', ST_AsGeoJSON(the_geom, 4326)::json
-                    ))
+                    )), '[]'::json)
                 )
                 FROM %I t
                 WHERE EXISTS (
@@ -170,13 +169,11 @@ BEGIN
             sql := format($f$
                 SELECT json_build_object(
                     concat('%s', 's'),
-                    json_agg(json_build_object(
-                        'id', %I,
-                        'code', code,
+                    COALESCE(json_agg(json_build_object(
+                        'mapzone_id', %I,
                         'name', name,
-                        'descript', descript,
                         'geometry', ST_AsGeoJSON(the_geom, 4326)::json
-                    ))
+                    )), '[]'::json)
                 )
                 FROM %I t
                 WHERE EXISTS (
@@ -200,7 +197,7 @@ BEGIN
         END IF;
     END LOOP;
 
-	v_mapzones := result;
+	v_mapzones := COALESCE(result, '{}'::jsonb);
 
 	-- JSON with patterns (flattened factor_1..factor_18 per pattern_id, ordered by idrow, id)
 	SELECT COALESCE(json_agg(json_build_object('id', pattern_id, 'values', values_arr)), '[]'::json) INTO v_patterns
@@ -228,7 +225,7 @@ BEGIN
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}'||
-			',"data":{"result_id": "'||v_result_id||'", "features":'||v_features||', "families":'||v_families||', "mapzones":'||v_mapzones||', "patterns":'||COALESCE(v_patterns::text, '[]')||
+			',"data":{"result_id": "'||v_result_id||'", "patterns":'||COALESCE(v_patterns::text, '[]')||', "families":'||COALESCE(v_families::text, '[]')||', "mapzones":'||COALESCE(v_mapzones::text, '{}')||', "features":'||COALESCE(v_features::text, '[]')||
 		'}}'||
 	'}')::json, 2302, null, null, null);
 
