@@ -541,6 +541,17 @@ class GwMincut:
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._offline_mincut_snapping, 'mincut_offline',
                                 'offline_mincut_ep_canvasClicked_offline_mincut_snapping')
 
+    def _restore_active_layer_after_offline_mincut(self):
+        """Restore the previously active layer if it still exists."""
+
+        if self.user_current_layer is None or isdeleted(self.user_current_layer):
+            return
+
+        try:
+            self.iface.setActiveLayer(self.user_current_layer)
+        except RuntimeError:
+            pass
+
     def manage_docker(self):
 
         tools_gw.init_docker('qgis_form_docker')
@@ -2128,8 +2139,7 @@ class GwMincut:
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             tools_gw.disconnect_signal('mincut_offline')
             self._remove_selection()
-            if self.user_current_layer is not None:
-                self.iface.setActiveLayer(self.user_current_layer)
+            self._restore_active_layer_after_offline_mincut()
             self.iface.actionPan().trigger()
             return
 
@@ -2157,8 +2167,7 @@ class GwMincut:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut_offline')
         self._remove_selection()
-        if self.user_current_layer is not None:
-            self.iface.setActiveLayer(self.user_current_layer)
+        self._restore_active_layer_after_offline_mincut()
         self.iface.actionPan().trigger()
 
     def _start_network_mincut_task(self, snapped_point, elem_type, element_id):

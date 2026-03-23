@@ -29,6 +29,7 @@ class GwMincutButton(GwAction):
 
             self.mincut = GwMincut()
             self.actions = [tools_qt.tr('Mincut'), tools_qt.tr('Offline Mincut')]
+            self.last_selection = tools_qt.tr('Mincut')
             self.menu = QMenu()
             self.menu.setObjectName("GW_mincut")
             self._fill_action_menu()
@@ -60,6 +61,11 @@ class GwMincutButton(GwAction):
 
         if global_vars.project_type != 'ws':
             return
+
+        if selected_action is None or isinstance(selected_action, bool):
+            selected_action = self.last_selection
+        else:
+            self.last_selection = selected_action
 
         if selected_action == tools_qt.tr('Offline Mincut'):
             self.mincut.start_offline_mincut()
