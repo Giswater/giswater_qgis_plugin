@@ -136,10 +136,22 @@ BEGIN
 		v_result_valves
 	)::json;
 
+	-- Return JSON
+	RETURN gw_fct_json_create_return(('{
+		"status":"'||v_status||'", 
+		"message":'||v_message||', 
+		"version":"'||v_version||'",
+		"body":{
+			"form":{}, 
+			"data":{
+				"info":'||v_result_info||',
+				"point":'||v_result_point||',
+				"line":'||v_result_line||'
+			}
+		}
+	}')::json, 3508, null, null, null)::json;
 
-   	--  Return
-	RETURN ('{"status":"'||v_status||'","message":'||v_message||',"version":"'||v_version||'","body":{"form":{},
-	"data":{"info":'||v_result_info||',"point":'||v_result_point||',"line":'||v_result_line||'}}}');
+
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
