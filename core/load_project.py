@@ -703,6 +703,7 @@ class GwLoadProject(QObject):
         if not is_cm_admin:
             # Hide buttons not wanted for non-admin CM roles (DB role check)
             self._hide_button('84', True)  # GwAddCampaignButton
+            # Button 87 (GwManageCampaignLotButton) menu option "Manage Campaign"
 
         # Let the standard project role logic run for everyone
         project_role = lib_vars.project_vars.get('project_role')
