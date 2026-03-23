@@ -51,6 +51,7 @@ v_debug boolean;
 v_debugval text;
 v_advanced boolean;
 v_advancedval text;
+v_result_id text;
 
 
 BEGIN
@@ -87,6 +88,8 @@ BEGIN
         INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, '');
 
 	ELSIF v_fid = 227 THEN -- go2epa
+		
+		v_result_id := (((p_data ->>'data')::json->>'parameters')::json->>'resultId');
 
 		-- get user parameters
 		SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
@@ -149,7 +152,7 @@ BEGIN
 		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-4, current_user, v_fid, 1, '-------');
 		INSERT INTO t_audit_check_data (id, cur_user, fid, criticity, error_message) VALUES (-5, current_user, v_fid, 1, '');
 
-		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Result id: '));
+		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Result id: ', v_result_id));
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Network export mode: ', v_networkmodeval));
 		INSERT INTO t_audit_check_data (fid, cur_user, criticity, error_message) VALUES (v_fid, current_user, 4, concat('Pattern method: ', v_patternmethodval));

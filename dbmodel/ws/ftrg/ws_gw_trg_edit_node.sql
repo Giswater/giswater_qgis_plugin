@@ -748,7 +748,7 @@ BEGIN
 		RETURN NEW;
 
     -- UPDATE
-    ELSIF TG_OP = 'UPDATE' THEN
+	ELSIF TG_OP = 'UPDATE' THEN
 
 	-- static pressure
 		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
