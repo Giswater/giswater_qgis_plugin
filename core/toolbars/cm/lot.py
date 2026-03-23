@@ -11,12 +11,12 @@ from typing import Any, Dict, List, Optional
 
 from qgis.PyQt.QtCore import QDate, Qt, QModelIndex, QStringListModel
 from qgis.core import QgsExpression
-from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QFont, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (QAbstractItemView, QActionGroup, QCheckBox,
                                  QComboBox, QCompleter, QDateEdit, QDialog,
                                  QDialogButtonBox, QHBoxLayout, QLabel,
-                                 QLineEdit, QTableView, QTextEdit, QToolBar,
-                                 QVBoxLayout, QWidget)
+                                 QLineEdit, QTableView, QTableWidgetItem,
+                                 QTextEdit, QToolBar, QVBoxLayout, QWidget)
 
 from ...ui.ui_manager import AddLotUi, LotManagementUi, ResourcesManagementUi, TeamCreateUi
 
@@ -1159,7 +1159,8 @@ class AddNewLot:
 
     def resources_management(self):
         """Manages resources by coordinating the loading, display, and updates of resource-related information
-        (such as teams and vehicles) within the application's UI."""
+        (such as teams and vehicles) within the application's UI.
+        """
 
         # Get user information
         user_data = self.get_current_user()
@@ -1201,6 +1202,7 @@ class AddNewLot:
         self.team_id = None
         self.user_id = None
         self.tab_organizations = 0
+        self.tab_campaign = 3
 
         # Populate combos
         # Create sql query to get all teams
@@ -1216,9 +1218,15 @@ class AddNewLot:
             for table in tables:
                 self._populate_resource_tableview(table)
 
+            # Setup campaign selector tab (cm.selector_campaign)
+            self._setup_campaign_selector_tab()
+
             # Set signals for manage organizations
             self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
         else:
+
+            # Remove tab campaign
+            self.dlg_resources_man.tab_main.removeTab(self.tab_campaign)
 
             # Remove tab organizations
             self.dlg_resources_man.tab_main.removeTab(self.tab_organizations)
@@ -1261,10 +1269,378 @@ class AddNewLot:
         if hasattr(self.dlg_resources_man, 'btn_user_toggle_active'):
             self.dlg_resources_man.btn_user_toggle_active.clicked.connect(partial(self.toggle_active_records, "cat_user"))
 
-        self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
+        self.dlg_resources_man.btn_close.clicked.connect(self._close_resources_management)
+
+        dlg_rm = self.dlg_resources_man
+        dlg_rm.closeEvent = lambda ev, d=dlg_rm: self._resources_management_close_event(d, ev)
 
         # Open form
         tools_gw.open_dialog(self.dlg_resources_man, "resources_management")
+
+    def _close_resources_management(self):
+        dlg = self.dlg_resources_man
+        if not self._confirm_discard_campaign_selector_if_dirty(dlg):
+            return
+        dlg._campaign_selector_force_close = True
+        tools_gw.close_dialog(dlg)
+
+    def _resources_management_close_event(self, dlg, event):
+        if getattr(dlg, "_campaign_selector_force_close", False):
+            dlg._campaign_selector_force_close = False
+            QDialog.closeEvent(dlg, event)
+            return
+        if not self._confirm_discard_campaign_selector_if_dirty(dlg):
+            event.ignore()
+            return
+        QDialog.closeEvent(dlg, event)
+
+    def _confirm_discard_campaign_selector_if_dirty(self, dlg) -> bool:
+        if not hasattr(dlg, "_selector_original_rows"):
+            return True
+        if not self._campaign_selector_is_dirty(dlg):
+            return True
+        msg = tools_qt.tr(
+            "You have unsaved changes in the campaign selector. Close without saving?",
+            context_name="cm",
+        )
+        return tools_qt.show_question(
+            msg, tools_qt.tr("Confirm", context_name="cm"), buttons=["Yes", "No"]
+        )
+
+    def _get_campaign_selector_row_values(self, dlg, row_idx):
+        """Return (cur_user_username, campaign_id_int_or_None) for tbl_campaign row."""
+        tbl = dlg.tbl_campaign
+        item = tbl.item(row_idx, 0)
+        cur_user = None
+        if item:
+            data = item.data(Qt.ItemDataRole.UserRole)
+            cur_user = data if data not in (None, "") else None
+            if cur_user is None and item.text():
+                cur_user = item.text()
+        combo_c = tbl.cellWidget(row_idx, 1)
+        campaign_raw = tools_qt.get_combo_value(dlg, combo_c, 0) if combo_c else None
+        try:
+            campaign_id = (
+                int(campaign_raw) if campaign_raw not in (None, "", -1, "-1") else None
+            )
+        except (TypeError, ValueError):
+            campaign_id = None
+        return cur_user, campaign_id
+
+    @staticmethod
+    def _norm_campaign_selector_user(u):
+        if u is None or str(u).strip() == "":
+            return None
+        return str(u).strip()
+
+    @staticmethod
+    def _norm_campaign_selector_campaign(c):
+        if c in (None, "", -1, "-1"):
+            return None
+        try:
+            return int(c)
+        except (TypeError, ValueError):
+            return None
+
+    def _campaign_selector_is_dirty(self, dlg) -> bool:
+        if not hasattr(dlg, "tbl_campaign"):
+            return False
+        if not hasattr(dlg, "_selector_original_rows"):
+            return False
+        tbl = dlg.tbl_campaign
+        originals = getattr(dlg, "_selector_row_originals", [])
+        original_set = getattr(dlg, "_selector_original_rows", set())
+        if tbl.rowCount() != len(originals):
+            return True
+        complete_pairs = []
+        for row_idx in range(tbl.rowCount()):
+            cur_user, campaign_id = self._get_campaign_selector_row_values(dlg, row_idx)
+            nu = self._norm_campaign_selector_user(cur_user)
+            nc = self._norm_campaign_selector_campaign(campaign_id)
+            has_u = nu is not None
+            has_c = nc is not None
+            if has_u ^ has_c:
+                return True
+            ou, oc = originals[row_idx]
+            nou = self._norm_campaign_selector_user(ou)
+            noc = self._norm_campaign_selector_campaign(oc)
+            if (nu, nc) != (nou, noc):
+                return True
+            if has_u and has_c:
+                complete_pairs.append((nu, nc))
+        if len(complete_pairs) != len(set(complete_pairs)):
+            return True
+        return set(complete_pairs) != original_set
+
+    def _setup_campaign_selector_tab(self):
+        """Setup campaign selector tab: tbl_campaign, cmb_user, cmb_campaign, btn_campaign_add/remove/accept."""
+        dlg = self.dlg_resources_man
+        if not hasattr(dlg, 'tbl_campaign'):
+            return
+        organization_id = 3
+
+        sql_users = (
+            "SELECT user_id as id, username as idval "
+            "FROM cm.cat_user "
+            "LEFT JOIN cm.cat_team ON cat_user.team_id = cat_team.team_id "
+            f"WHERE cat_team.organization_id = {organization_id} "
+            "ORDER BY username"
+        )
+        user_rows = tools_db.get_rows(sql_users)
+        tools_qt.fill_combo_values(dlg.cmb_user, user_rows, index_to_show=1, add_empty=True)
+
+        sql_campaigns = (
+            "SELECT campaign_id as id, name as idval "
+            "FROM cm.om_campaign "
+            "WHERE status IN (3, 4, 6, 8, 9) "
+            "ORDER BY name"
+        )
+        campaign_rows = tools_db.get_rows(sql_campaigns)
+        tools_qt.fill_combo_values(dlg.cmb_campaign, campaign_rows, index_to_show=1, add_empty=True)
+
+        dlg._campaign_selector_user_rows = user_rows
+        dlg._campaign_selector_campaign_rows = campaign_rows
+        self._populate_campaign_selector_table(dlg, user_rows, campaign_rows)
+        self._filter_campaign_selector_table(dlg)
+        dlg.btn_campaign_add.clicked.connect(
+            partial(self._add_campaign_selector_row, dlg, user_rows, campaign_rows)
+        )
+        dlg.btn_campaign_remove.clicked.connect(partial(self._delete_campaign_selector_rows, dlg))
+        dlg.cmb_user.currentIndexChanged.connect(partial(self._filter_campaign_selector_table, dlg))
+        dlg.cmb_campaign.currentIndexChanged.connect(partial(self._filter_campaign_selector_table, dlg))
+        dlg.btn_campaign_save.clicked.connect(partial(self._save_campaign_selector_table, dlg))
+        tools_gw.add_icon(dlg.btn_campaign_add, "111")
+        tools_gw.add_icon(dlg.btn_campaign_remove, "112")
+
+    def _populate_campaign_selector_table(self, dlg, user_rows, campaign_rows):
+        """Populate tbl_campaign with cm.selector_campaign rows; user col text, campaign col QComboBox."""
+        tbl = dlg.tbl_campaign
+        tbl.setSortingEnabled(False)
+        tbl.setColumnCount(2)
+        tbl.setHorizontalHeaderLabels([tools_qt.tr("User", context_name="cm"), tools_qt.tr("Campaign", context_name="cm")])
+
+        usernames = [r[1] if not isinstance(r, dict) else r.get('idval') for r in (user_rows or [])]
+        campaign_ids = [r[0] if not isinstance(r, dict) else r.get('id') for r in (campaign_rows or [])]
+        if not usernames or not campaign_ids:
+            selector_rows = []
+        else:
+            sql = (
+                "SELECT cur_user, campaign_id FROM cm.selector_campaign "
+                "WHERE cur_user = ANY(%s) AND campaign_id = ANY(%s) "
+                "ORDER BY cur_user, campaign_id"
+            )
+            selector_rows = tools_db.get_rows(sql, params=(usernames, campaign_ids)) or []
+        tbl.setRowCount(len(selector_rows))
+
+        dlg._selector_row_originals = []
+        for row_idx, row in enumerate(selector_rows):
+            cur_user = row['cur_user'] if isinstance(row, dict) else row[0]
+            campaign_id = row['campaign_id'] if isinstance(row, dict) else row[1]
+            nu = self._norm_campaign_selector_user(cur_user)
+            nc = self._norm_campaign_selector_campaign(campaign_id)
+            item_user = QTableWidgetItem(nu or "")
+            item_user.setData(Qt.ItemDataRole.UserRole, nu)
+            item_user.setFlags(
+                Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
+            )
+            tbl.setItem(row_idx, 0, item_user)
+            combo_campaign = QComboBox()
+            tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
+            tools_qt.set_combo_value(combo_campaign, campaign_id, 0)
+            combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
+            tbl.setCellWidget(row_idx, 1, combo_campaign)
+            dlg._selector_row_originals.append((nu, nc))
+
+        dlg._selector_original_rows = {
+            (
+                self._norm_campaign_selector_user(
+                    row['cur_user'] if isinstance(row, dict) else row[0]
+                ),
+                self._norm_campaign_selector_campaign(
+                    row['campaign_id'] if isinstance(row, dict) else row[1]
+                ),
+            )
+            for row in selector_rows
+        }
+
+    def _update_campaign_selector_row_bold(self, dlg, row_idx):
+        """Bold user cell and campaign combo if row differs from original."""
+        originals = getattr(dlg, '_selector_row_originals', [])
+        if row_idx >= len(originals):
+            return
+        tbl = dlg.tbl_campaign
+        item_u = tbl.item(row_idx, 0)
+        combo_c = tbl.cellWidget(row_idx, 1)
+        if not item_u or not combo_c:
+            return
+        orig_user, orig_campaign = originals[row_idx]
+        cur_user, cur_campaign_int = self._get_campaign_selector_row_values(dlg, row_idx)
+        nu = self._norm_campaign_selector_user(cur_user)
+        nou = self._norm_campaign_selector_user(orig_user)
+        nc = self._norm_campaign_selector_campaign(cur_campaign_int)
+        noc = self._norm_campaign_selector_campaign(orig_campaign)
+        changed = (nu, nc) != (nou, noc)
+        font = QFont()
+        font.setBold(changed)
+        item_u.setFont(font)
+        combo_c.setFont(font)
+
+    def _filter_campaign_selector_table(self, dlg):
+        """Show/hide rows based on cmb_user and cmb_campaign filter."""
+        tbl = dlg.tbl_campaign
+        filter_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
+        if filter_user in (None, "", -1, "-1"):
+            nf = None
+        else:
+            nf = self._norm_campaign_selector_user(filter_user)
+        filter_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
+        for row_idx in range(tbl.rowCount()):
+            row_user, row_campaign = self._get_campaign_selector_row_values(dlg, row_idx)
+            nu = self._norm_campaign_selector_user(row_user)
+            match_user = nf is None or nu == nf
+            match_campaign = filter_campaign in (None, "", -1, "-1") or (
+                row_campaign is not None
+                and str(row_campaign) == str(filter_campaign)
+            )
+            tbl.setRowHidden(row_idx, not (match_user and match_campaign))
+
+    def _add_campaign_selector_row(self, dlg, user_rows, campaign_rows):
+        """Append a new row; user from cmb_user (text), campaign from cmb_campaign if set.
+        If no cmb_user or cmb_campaign is set, show a warning and do not add a row."""
+        sel_user = tools_qt.get_combo_value(dlg, dlg.cmb_user, 1)
+        sel_campaign = tools_qt.get_combo_value(dlg, dlg.cmb_campaign, 0)
+        if sel_user in (None, "", -1, "-1") or sel_campaign in (None, "", -1, "-1"):
+            msg = tools_qt.tr(
+                "Please select both a user and a campaign before adding a row.",
+                context_name="cm",
+            )
+            tools_qgis.show_warning(msg, dialog=dlg)
+            return
+        tbl = dlg.tbl_campaign
+        row_idx = tbl.rowCount()
+        tbl.insertRow(row_idx)
+        user_disp = str(sel_user).strip()
+        item_user = QTableWidgetItem(user_disp)
+        item_user.setData(Qt.ItemDataRole.UserRole, user_disp or None)
+        item_user.setFlags(
+            Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
+        )
+        tbl.setItem(row_idx, 0, item_user)
+        combo_campaign = QComboBox()
+        tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
+        tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
+        combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
+        tbl.setCellWidget(row_idx, 1, combo_campaign)
+        dlg._selector_row_originals.append((None, None))
+        self._update_campaign_selector_row_bold(dlg, row_idx)
+        self._filter_campaign_selector_table(dlg)
+
+    def _delete_campaign_selector_rows(self, dlg):
+        """Remove selected rows from tbl_campaign."""
+        tbl = dlg.tbl_campaign
+        originals = getattr(dlg, '_selector_row_originals', [])
+        for idx in sorted(tbl.selectionModel().selectedRows(), key=lambda i: i.row(), reverse=True):
+            row = idx.row()
+            if row < len(originals):
+                dlg._selector_row_originals.pop(row)
+            tbl.removeRow(row)
+
+    def _save_campaign_selector_table(self, dlg):
+        """Persist tbl_campaign changes to cm.selector_campaign and cm.selector_lot."""
+        tbl = dlg.tbl_campaign
+        complete_list = []
+        for row_idx in range(tbl.rowCount()):
+            cur_user, campaign_id = self._get_campaign_selector_row_values(dlg, row_idx)
+            nu = self._norm_campaign_selector_user(cur_user)
+            nc = self._norm_campaign_selector_campaign(campaign_id)
+            if nu is None or nc is None:
+                continue
+            complete_list.append((nu, nc))
+        if len(complete_list) != len(set(complete_list)):
+            msg = tools_qt.tr(
+                "Duplicate user and campaign pairs are not allowed. Remove duplicates before saving.",
+                context_name="cm",
+            )
+            tools_qgis.show_warning(msg, dialog=dlg)
+            return
+        current = set(complete_list)
+
+        original = getattr(dlg, '_selector_original_rows', set())
+        to_insert = current - original
+        to_delete = original - current
+
+        if not to_insert and not to_delete:
+            msg = tools_qt.tr("No changes to save.", context_name="cm")
+            tools_qgis.show_info(msg, dialog=dlg)
+            return
+
+        campaign_names = {}
+        for r in getattr(dlg, '_campaign_selector_campaign_rows', []) or []:
+            cid = r[0] if not isinstance(r, dict) else r.get('id')
+            cname = r[1] if not isinstance(r, dict) else r.get('idval')
+            campaign_names[cid] = cname or str(cid)
+        lines = []
+        if to_delete:
+            lines.append(tools_qt.tr("To remove:", context_name="cm"))
+            for cur_user, campaign_id in sorted(to_delete, key=lambda x: (x[0], x[1])):
+                cname = campaign_names.get(campaign_id, str(campaign_id))
+                lines.append(f"  - {cur_user} / {cname}")
+        if to_insert:
+            lines.append(tools_qt.tr("To add:", context_name="cm"))
+            for cur_user, campaign_id in sorted(to_insert, key=lambda x: (x[0], x[1])):
+                cname = campaign_names.get(campaign_id, str(campaign_id))
+                lines.append(f"  - {cur_user} / {cname}")
+        inf_text = "\n".join(lines)
+        msg = tools_qt.tr("Save these changes to campaign selector?", context_name="cm")
+        if not tools_qt.show_question(msg, tools_qt.tr("Confirm", context_name="cm"), inf_text=inf_text, force_action=True, buttons=["Save", "Cancel"]):
+            return
+
+        for cur_user, campaign_id in to_delete:
+            sql = tools_db.dao.mogrify(
+                "DELETE FROM cm.selector_campaign WHERE cur_user = %s AND campaign_id = %s",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+            sql = tools_db.dao.mogrify(
+                "DELETE FROM cm.selector_lot WHERE cur_user = %s AND lot_id IN "
+                "(SELECT lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+
+        for cur_user, campaign_id in to_insert:
+            sql = tools_db.dao.mogrify(
+                "INSERT INTO cm.selector_campaign (cur_user, campaign_id) VALUES (%s, %s)",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+            sql = tools_db.dao.mogrify(
+                "INSERT INTO cm.selector_lot (cur_user, lot_id) "
+                "SELECT %s, lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s",
+                (cur_user, campaign_id)
+            )
+            tools_db.execute_sql(sql)
+
+        dlg._selector_original_rows = current
+        # Sync row originals and reset bold
+        dlg._selector_row_originals = []
+        for row_idx in range(tbl.rowCount()):
+            item_u = tbl.item(row_idx, 0)
+            combo_c = tbl.cellWidget(row_idx, 1)
+            cur_user, campaign_id = self._get_campaign_selector_row_values(dlg, row_idx)
+            nu = self._norm_campaign_selector_user(cur_user)
+            nc = self._norm_campaign_selector_campaign(campaign_id)
+            dlg._selector_row_originals.append((nu, nc))
+            if item_u:
+                font = item_u.font()
+                font.setBold(False)
+                item_u.setFont(font)
+            if combo_c:
+                font = combo_c.font()
+                font.setBold(False)
+                combo_c.setFont(font)
+        msg = tools_qt.tr("Changes saved.", context_name="cm")
+        tools_qgis.show_info(msg, dialog=dlg)
 
     def txt_org_name_changed(self):
         """ Filter table by organization id """
