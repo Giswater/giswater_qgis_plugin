@@ -1225,11 +1225,11 @@ class AddNewLot:
             self.dlg_resources_man.txt_orgname.textChanged.connect(partial(self.txt_org_name_changed))
         else:
 
-            # Remove tab organizations
-            self.dlg_resources_man.tab_main.removeTab(self.tab_organizations)
-
             # Remove tab campaign
             self.dlg_resources_man.tab_main.removeTab(self.tab_campaign)
+
+            # Remove tab organizations
+            self.dlg_resources_man.tab_main.removeTab(self.tab_organizations)
 
             # Filter teams table by the user organization selected
             self.filter_teams_by_name()
