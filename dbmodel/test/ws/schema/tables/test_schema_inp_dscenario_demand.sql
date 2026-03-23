@@ -20,17 +20,16 @@ SELECT has_table('inp_dscenario_demand'::name, 'Table inp_dscenario_demand shoul
 SELECT columns_are(
     'inp_dscenario_demand',
     ARRAY[
-        'dscenario_id', 'id', 'feature_id', 'feature_type', 'demand', 'pattern_id', 'demand_type', 'source'
+        'dscenario_id', 'feature_id', 'feature_type', 'demand', 'pattern_id', 'demand_type', 'source'
     ],
     'Table inp_dscenario_demand should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('inp_dscenario_demand', ARRAY['id'], 'Column id should be primary key');
+SELECT col_is_pk('inp_dscenario_demand', ARRAY['dscenario_id', 'feature_id'], 'Column dscenario_id and feature_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('inp_dscenario_demand', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_demand', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('inp_dscenario_demand', 'feature_id', 'integer', 'Column feature_id should be integer');
 SELECT col_type_is('inp_dscenario_demand', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('inp_dscenario_demand', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
@@ -58,7 +57,6 @@ SELECT has_index('inp_dscenario_demand', 'idx_inp_dscenario_demand_source', ARRA
 
 -- Check constraints
 SELECT col_not_null('inp_dscenario_demand', 'dscenario_id', 'Column dscenario_id should be NOT NULL');
-SELECT col_not_null('inp_dscenario_demand', 'id', 'Column id should be NOT NULL');
 SELECT col_not_null('inp_dscenario_demand', 'feature_id', 'Column feature_id should be NOT NULL');
 
 SELECT * FROM finish();

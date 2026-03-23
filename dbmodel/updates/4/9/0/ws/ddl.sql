@@ -61,4 +61,4 @@ ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_val
 DROP VIEW IF EXISTS ve_inp_dscenario_demand;
 ALTER TABLE inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pkey;
 ALTER TABLE inp_dscenario_demand DROP COLUMN id;
-
+ALTER TABLE inp_dscenario_demand ADD CONSTRAINT inp_dscenario_demand_pkey PRIMARY KEY (dscenario_id, feature_id);
