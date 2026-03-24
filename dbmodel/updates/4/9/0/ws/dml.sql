@@ -172,6 +172,11 @@ UPDATE config_toolbox
 ]'::json
 	WHERE id=3134;
 
+INSERT INTO inp_dscenario_demand (id, dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
+SELECT id, dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source
+FROM _inp_dscenario_demand_;
+
+
 UPDATE config_toolbox
 	SET inputparams='[
   {

@@ -71,6 +71,7 @@ WHERE EXISTS (
 
 CREATE OR REPLACE VIEW ve_inp_dscenario_demand
 AS SELECT
+    idd.id,
     idd.dscenario_id,
     idd.feature_id,
     idd.feature_type,
@@ -98,6 +99,7 @@ WHERE EXISTS (
 )
 UNION
 SELECT
+    idd.id,
     idd.dscenario_id,
     idd.feature_id,
     idd.feature_type,

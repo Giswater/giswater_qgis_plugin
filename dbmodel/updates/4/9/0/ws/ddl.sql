@@ -59,6 +59,23 @@ ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_val
 
 
 DROP VIEW IF EXISTS ve_inp_dscenario_demand;
-ALTER TABLE inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pkey;
-ALTER TABLE inp_dscenario_demand DROP COLUMN id;
-ALTER TABLE inp_dscenario_demand ADD CONSTRAINT inp_dscenario_demand_pkey PRIMARY KEY (dscenario_id, feature_id);
+alter table inp_dscenario_demand rename to _inp_dscenario_demand_;
+DROP INDEX IF EXISTS idx_inp_dscenario_demand_dscenario_id;
+DROP INDEX IF EXISTS idx_inp_dscenario_demand_source;
+
+CREATE TABLE inp_dscenario_demand (
+	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('inp_dscenario_demand_id_seq'),
+	dscenario_id int4 NOT NULL,
+	feature_id int4 NOT NULL,
+	feature_type varchar(16) NULL,
+	demand numeric(12, 6) NULL,
+	pattern_id varchar(16) NULL,
+	demand_type varchar(18) NULL,
+	"source" text NULL,
+	CONSTRAINT inp_demand_dscenario_id_fkey FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT inp_demand_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT inp_dscenario_demand_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT inp_dscenario_demand_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX idx_inp_dscenario_demand_dscenario_id ON inp_dscenario_demand USING btree (dscenario_id);
+CREATE INDEX idx_inp_dscenario_demand_source ON inp_dscenario_demand USING btree (source);
