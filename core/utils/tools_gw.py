@@ -16,7 +16,7 @@ import sqlite3
 import webbrowser
 import xml.etree.ElementTree as ET
 
-from typing import Literal, Dict, Optional, Union, Any, List
+from typing import Literal, Dict, Optional, Union, Any, List, Tuple
 from qgis.PyQt.sip import isdeleted
 from osgeo import gdal
 
@@ -100,6 +100,65 @@ def normalize_label(label: str, add_colon: bool = False) -> str:
     else:
         normalized = normalized.rstrip(':').rstrip()
     return normalized
+
+
+def parse_context_levels(context_value: Any) -> List[str]:
+    """
+    Parse a layer context and return ordered menu levels.
+    """
+
+    if not context_value:
+        return []
+
+    context = context_value
+    if isinstance(context, str):
+        try:
+            context = json.loads(context)
+        except Exception:
+            return []
+
+    if not isinstance(context, dict):
+        return []
+
+    # Legacy payload where layer_menu contains the real context
+    layer_menu = context.get("layer_menu")
+    if layer_menu:
+        if isinstance(layer_menu, str):
+            try:
+                context = json.loads(layer_menu)
+            except Exception:
+                return []
+        elif isinstance(layer_menu, dict):
+            context = layer_menu
+
+    levels = context.get(tools_qt.tr('levels')) or context.get('levels') or []
+    if not levels:
+        level_1 = context.get('level_1')
+        level_2 = context.get('level_2')
+        level_3 = context.get('level_3')
+        levels = [level_1, level_2]
+        if level_3:
+            levels.append(level_3)
+
+    return [level for level in levels if level]
+
+
+def get_context_menu_levels(context_value: Any) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Return safe context menu levels (level_1, level_2, level_3).
+
+    level_1 and level_2 are mandatory for menu construction.
+    level_3 is optional and can be None.
+    """
+
+    levels = parse_context_levels(context_value)
+    if len(levels) < 2:
+        return None, None, None
+
+    level_1 = levels[0]
+    level_2 = levels[1]
+    level_3 = levels[2] if len(levels) > 2 else None
+    return level_1, level_2, level_3
 
 
 def load_settings(dialog, plugin='core'):

@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-
 from functools import partial
 
 from qgis.core import QgsProject
@@ -57,30 +55,31 @@ class GwAddChildLayerButton(GwAction):
 
         for field in json_result['body']['data']['fields']:
             if field['context'] is not None:
-                context = json.loads(field['context'])
-                levels = context.get(tools_qt.tr('levels')) or context.get('levels')
+                level_1, level_2, level_3 = tools_gw.get_context_menu_levels(field['context'])
+                if not level_1 or not level_2:
+                    continue
 
                 # Check if schema exists for am and cm
-                if levels[0] == "AM" or levels[0] == "CM":
-                    if tools_db.get_row(f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{levels[0].lower()}'") is None:
+                if level_1 == "AM" or level_1 == "CM":
+                    if tools_db.get_row(f"SELECT 1 FROM information_schema.schemata WHERE schema_name = '{level_1.lower()}'") is None:
                         # Skip group if schema does not exist
                         continue
 
-                if len(levels) > 0 and levels[0] and levels[0] not in dict_menu:
-                    menu_level_1 = main_menu.addMenu(f"{levels[0]}")
-                    dict_menu[levels[0]] = menu_level_1
-                if len(levels) > 1 and levels[1] and f"{levels[0]}_{levels[1]}" not in dict_menu:
-                    menu_level_2 = dict_menu[levels[0]].addMenu(f"{levels[1]}")
-                    dict_menu[f"{levels[0]}_{levels[1]}"] = menu_level_2
-                if len(levels) > 2 and levels[2] and f"{levels[0]}_{levels[1]}_{levels[2]}" not in dict_menu:
-                    menu_level_3 = dict_menu[f"{levels[0]}_{levels[1]}"].addMenu(f"{levels[2]}")
-                    dict_menu[f"{levels[0]}_{levels[1]}_{levels[2]}"] = menu_level_3
+                if level_1 not in dict_menu:
+                    menu_level_1 = main_menu.addMenu(f"{level_1}")
+                    dict_menu[level_1] = menu_level_1
+                if f"{level_1}_{level_2}" not in dict_menu:
+                    menu_level_2 = dict_menu[level_1].addMenu(f"{level_2}")
+                    dict_menu[f"{level_1}_{level_2}"] = menu_level_2
+                if level_3 and f"{level_1}_{level_2}_{level_3}" not in dict_menu:
+                    menu_level_3 = dict_menu[f"{level_1}_{level_2}"].addMenu(f"{level_3}")
+                    dict_menu[f"{level_1}_{level_2}_{level_3}"] = menu_level_3
 
                 alias = field['layerName'] if field['layerName'] is not None else field['tableName']
                 alias = f"{alias}     "
-                if len(levels) > 2 and levels[2] is not None:
-                    menu = dict_menu[f"{levels[0]}_{levels[1]}_{levels[2]}"]
-                    if f"{levels[0]}_{levels[1]}_{levels[2]}_load_all" not in dict_menu:
+                if level_3 is not None:
+                    menu = dict_menu[f"{level_1}_{level_2}_{level_3}"]
+                    if f"{level_1}_{level_2}_{level_3}_load_all" not in dict_menu:
                         # LEVEL 3 - LOAD ALL
                         widget = QCheckBox()
                         widget.setText(load_all_text)
@@ -89,7 +88,7 @@ class GwAddChildLayerButton(GwAction):
                         widgetAction.setDefaultWidget(widget)
                         widgetAction.defaultWidget().stateChanged.connect(partial(self._manage_load_all, menu))
                         menu.addAction(widgetAction)
-                        dict_menu[f"{levels[0]}_{levels[1]}_{levels[2]}_load_all"] = True
+                        dict_menu[f"{level_1}_{level_2}_{level_3}_load_all"] = True
                     # LEVEL 3 - LAYER
                     widget = QCheckBox()
                     widget.setText(alias)
@@ -97,8 +96,8 @@ class GwAddChildLayerButton(GwAction):
                     widgetAction.setDefaultWidget(widget)
                     menu.addAction(widgetAction)
                 else:
-                    menu = dict_menu[f"{levels[0]}_{levels[1]}"]
-                    if f"{levels[0]}_{levels[1]}_load_all" not in dict_menu:
+                    menu = dict_menu[f"{level_1}_{level_2}"]
+                    if f"{level_1}_{level_2}_load_all" not in dict_menu:
                         # LEVEL 2 - LOAD ALL
                         widget = QCheckBox()
                         widget.setText(load_all_text)
@@ -107,7 +106,7 @@ class GwAddChildLayerButton(GwAction):
                         widgetAction.setDefaultWidget(widget)
                         widgetAction.defaultWidget().stateChanged.connect(partial(self._manage_load_all, menu))
                         menu.addAction(widgetAction)
-                        dict_menu[f"{levels[0]}_{levels[1]}_load_all"] = True
+                        dict_menu[f"{level_1}_{level_2}_load_all"] = True
                     # LEVEL 2 - LAYER
                     widget = QCheckBox()
                     widget.setText(alias)
@@ -129,9 +128,9 @@ class GwAddChildLayerButton(GwAction):
                 if not geom_field:
                     continue
                 geom_field = geom_field.replace(" ", "")
-                group = levels[0]
-                sub_group = levels[1]
-                sub_sub_group = levels[2] if len(levels) > 2 else None
+                group = level_1
+                sub_group = level_2
+                sub_sub_group = level_3
                 widgetAction.defaultWidget().stateChanged.connect(
                     partial(self._check_action_ischecked, layer_name, the_geom, geom_field, group, sub_group,
                             sub_sub_group, alias.strip()))
