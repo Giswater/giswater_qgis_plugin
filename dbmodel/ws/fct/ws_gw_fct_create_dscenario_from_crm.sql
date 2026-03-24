@@ -262,11 +262,13 @@ BEGIN
 					COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY dma_id) AS demand_weight,
 					sum,
 					custom_sum,
-					concat(''pattern_dma'', dma_id) AS pattern_id,
+					d.pattern_id AS pattern_id,
 					hydrometer_id,
-					expl_id,
+					data.expl_id,
 					dma_id
-				FROM data';
+				FROM data
+				JOIN dma d ON d.dma_id = data.dma_id
+				WHERE data.dma_id > 0';
 
 		ELSE
 			v_querytext = '
@@ -333,15 +335,16 @@ BEGIN
 			SELECT
 				feature_type,
 				feature_id,
-				COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY dma_id) AS demand_weight,
+				COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY data.dma_id) AS demand_weight,
 				sum,
 				custom_sum,
-				concat(''pattern_dma'', dma_id) AS pattern_id,
+				d.pattern_id AS pattern_id,
 				hydrometer_id,
-				expl_id,
-				dma_id
+				data.expl_id,
+				data.dma_id
 			FROM data
-			WHERE feature_id IS NOT NULL
+			JOIN dma d ON d.dma_id = data.dma_id
+			WHERE feature_id IS NOT NULL AND data.dma_id > 0
 			AND expl_id IN ('||v_expl||')';
 
 		ELSE
@@ -399,12 +402,6 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 
 		IF v_dma_weight_factor is true then
-			EXECUTE 'INSERT INTO inp_pattern (pattern_id, active)
-			SELECT concat(''pattern_dma'', dma_id), true
-			FROM dma
-			WHERE EXISTS (SELECT 1 FROM ('||v_querytext||') v WHERE v.dma_id = dma.dma_id)
-			ON CONFLICT DO NOTHING;';
-
 			EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source, pattern_id)
 			WITH aux as ('||v_querytext||')
 			SELECT  feature_type, '||v_scenarioid||', feature_id,
@@ -440,7 +437,7 @@ BEGIN
 				FROM sector s
 				JOIN connec USING (sector_id)
 				JOIN rtc_hydrometer_x_connec h USING (connec_id)
-				WHERE d.source = h.hydrometer_id
+				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
 			ELSIF v_pattern = 3 THEN -- dma default
@@ -449,7 +446,7 @@ BEGIN
 				FROM dma s
 				JOIN connec c ON c.dma_id = s.dma_id::integer
 				JOIN rtc_hydrometer_x_connec h USING (connec_id)
-				WHERE d.source = h.hydrometer_id
+				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
 			ELSIF v_pattern = 4 THEN -- dma period
@@ -459,7 +456,7 @@ BEGIN
 				FROM ext_rtc_dma_period s
 				JOIN connec c ON c.dma_id = s.dma_id::integer
 				JOIN rtc_hydrometer_x_connec h USING (connec_id)
-				WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
+				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
 				AND dscenario_id = '||v_scenarioid||'';
 
 			ELSIF v_pattern = 5 THEN -- hydrometer period
@@ -467,7 +464,7 @@ BEGIN
 				EXECUTE '
 				UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id
 				FROM ext_rtc_hydrometer_x_data h
-				WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
+				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
 				AND dscenario_id = '||v_scenarioid||'';
 
 			ELSIF v_pattern = 6 THEN -- hydrometer category
@@ -485,7 +482,7 @@ BEGIN
 				FROM inp_connec i
 				JOIN connec c USING (connec_id)
 				JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
-				WHERE d.source = h.hydrometer_id
+				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 				
 				-- update netwjoins (node)
@@ -493,7 +490,7 @@ BEGIN
 				FROM inp_junction i
 				JOIN node n USING (node_id)
 				JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
-				WHERE d.source = h.hydrometer_id
+				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
 			END IF;
@@ -546,21 +543,7 @@ BEGIN
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING;
 		
-		-- update wjoins (connec)
-		UPDATE inp_dscenario_demand d SET source = concat('HYDROMETER:',source, ' (CONNEC:',i.connec_id,')')
-		FROM inp_connec i
-		JOIN connec c USING (connec_id)
-		JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
-		WHERE d.source = h.hydrometer_id
-		AND dscenario_id = v_scenarioid;
-				
-		-- update netwjoins (node)
-		UPDATE inp_dscenario_demand d SET source = concat('HYDROMETER:',source, ' (NODE:',i.node_id,')')
-		FROM inp_junction i
-		JOIN node n USING (node_id)
-		JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
-		WHERE d.source = h.hydrometer_id
-		AND dscenario_id = v_scenarioid;
+		UPDATE inp_dscenario_demand SET source = concat('HYD ', source) WHERE dscenario_id = v_scenarioid;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat(''));
