@@ -163,8 +163,7 @@ class GwWorkspaceManagerButton(GwAction):
         if fields:
             self.tbl_wrkspcm = tools_gw.add_tableview_header(self.tbl_wrkspcm, fields, headers)
             self.tbl_wrkspcm = tools_gw.fill_tableview_rows(self.tbl_wrkspcm, fields)
-        # TODO: config_form_tableview
-        # widget = tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_wrkspcm', Qt.SortOrder.DescendingOrder, True)
+        tools_gw.set_tablemodel_config(self.dlg_workspace_manager, self.tbl_wrkspcm, 'tbl_workspace_manager')
         tools_qt.set_tableview_config(self.tbl_wrkspcm, selection_mode=QAbstractItemView.SelectionMode.SingleSelection)
 
         return complet_list
