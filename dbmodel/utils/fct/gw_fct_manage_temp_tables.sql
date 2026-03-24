@@ -307,10 +307,15 @@ BEGIN
         END IF;
 
         IF 'OMCHECK' = ANY(v_group_array) THEN
+			EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_element AS SELECT * FROM element'||v_filter;
+			IF v_verifiedExceptions THEN
+                v_filter = ' WHERE (verified IS NULL OR verified IN (0,1)) AND sector_id > 0';
+            ELSE
+                v_filter = ' WHERE state IS NOT NULL AND sector_id > 0';
+            END IF;
             EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_arc AS SELECT * FROM ve_arc'||v_filter;
             EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_node AS SELECT * FROM ve_node'||v_filter;
             EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_connec AS SELECT * FROM ve_connec'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_element AS SELECT * FROM element'||v_filter;
             EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_link AS SELECT * FROM ve_link'; -- TODO: add filter
 
             IF v_project_type = 'UD' THEN
