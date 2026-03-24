@@ -45,11 +45,8 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
-        self.mapzone_status = {
-            "enabled": ["sector", "dma", "dqa", "presszone", "dwfzone", "supplyzone"],
-            "enabledMacromapzone": ["macrosector", "macrodma", "macrodqa", "macroomzone"],
-            "disabled": ["omzone", "drainzone"]
-        }
+        self.flood_enabled_mapzones = ["sector", "dma", "dqa", "presszone", "dwfzone", "supplyzone"]
+        self.macromapzone_types = ["macrosector", "macrodma", "macrodqa", "macroomzone"]
 
         # The -901 is transformed to user selected exploitation in the mapzones analysis
         self.user_selected_exploitation = '-901'
@@ -170,23 +167,35 @@ class GwMapzoneManager:
             self.mapzone_mng_dlg.btn_config.setEnabled(True)
 
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+        is_enabled_from_config = self._get_mapzone_enabled_status_from_config(mapzone_type)
+        self.mapzone_mng_dlg.btn_execute.setEnabled(is_enabled_from_config)
+        can_enable_flood = is_enabled_from_config and mapzone_type in self.flood_enabled_mapzones
+        self.mapzone_mng_dlg.btn_flood.setEnabled(can_enable_flood and self._flood_enabled_by_tab.get(mapzone_type, False))
 
-        if mapzone_type in self.mapzone_status["enabled"]:
-            # enabled
-            self.mapzone_mng_dlg.btn_execute.setEnabled(True)
-            self.mapzone_mng_dlg.btn_flood.setEnabled(self._flood_enabled_by_tab.get(mapzone_type, False))
-        elif mapzone_type in self.mapzone_status["enabledMacromapzone"]:
-            # enabledMacromapzone
-            self.mapzone_mng_dlg.btn_execute.setEnabled(True)
-            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
-        elif mapzone_type in self.mapzone_status["disabled"]:
-            # disabled
-            self.mapzone_mng_dlg.btn_execute.setEnabled(False)
-            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
-        else:
-            # fallback
-            self.mapzone_mng_dlg.btn_execute.setEnabled(False)
-            self.mapzone_mng_dlg.btn_flood.setEnabled(False)
+    def _get_mapzone_enabled_status_from_config(self, mapzone_type):
+        """
+        Returns execution status for a mapzone type from utils_graphanalytics_status.
+        Missing/malformed values are treated as disabled.
+        """
+        row = tools_gw.get_config_value(
+            parameter='utils_graphanalytics_status',
+            columns='value::text',
+            table='config_param_system',
+            log_info=False
+        )
+        if not row or row[0] is None:
+            return False
+
+        try:
+            data = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+        except (TypeError, ValueError):
+            return False
+
+        if not isinstance(data, dict):
+            return False
+
+        key = mapzone_type.upper()
+        return bool(data.get(key, False))
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.EditTrigger.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
@@ -270,7 +279,7 @@ class GwMapzoneManager:
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
         macromapzone_function_id: int = 3482
         mapzone_function_id: int = 2768
-        function_id: int = macromapzone_function_id if mapzone_name in self.mapzone_status["enabledMacromapzone"] else mapzone_function_id
+        function_id: int = macromapzone_function_id if mapzone_name in self.macromapzone_types else mapzone_function_id
 
         # Connect signals - refresh table when dialog is closed
         connect = [self._refresh_mapzone_table_on_close]
@@ -284,13 +293,13 @@ class GwMapzoneManager:
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
-        enable_flood = mapzone_name in self.mapzone_status["enabled"]
+        enable_flood = mapzone_name in self.flood_enabled_mapzones
         if run_button and self.mapzone_mng_dlg.btn_flood and enable_flood:
             run_button.clicked.connect(partial(self._enable_flood_for_tab, mapzone_name))
 
     def _enable_flood_for_tab(self, mapzone_name):
         """Enable flood button only for the current mapzone tab."""
-        if mapzone_name not in self.mapzone_status["enabled"]:
+        if mapzone_name not in self.flood_enabled_mapzones:
             return
         self._flood_enabled_by_tab[mapzone_name] = True
         self.mapzone_mng_dlg.btn_flood.setEnabled(True)
