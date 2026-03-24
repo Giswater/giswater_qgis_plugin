@@ -462,7 +462,8 @@ class GwMapzoneManager:
             layer_name = (layer_data or {}).get('layerName')
             if not layer_name:
                 continue
-            vlayer = tools_qgis.get_layer_by_layername(layer_name)
+            table_name = layer_name.split(".")[-1]
+            vlayer = tools_qgis.get_layer_by_tablename(table_name)
             if not vlayer or not vlayer.isValid():
                 continue
             # Apply styling only to valid mapzones
