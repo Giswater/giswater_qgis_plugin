@@ -90,13 +90,19 @@ BEGIN
 		IF v_networkmode IN(1,2,5) THEN
 
 			-- demands for connec related to arcs
-		INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
-			SELECT dscenario_id, node_1 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source FROM temp_t_arc JOIN ve_inp_connec ON temp_t_arc.arc_id = ve_inp_connec.arc_id::text
-			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario)) AND pjoint_type in ('ARC', 'CONNEC')
-			UNION ALL
-			SELECT dscenario_id, node_2 AS node_id, d.demand/2 as demand, d.pattern_id, demand_type, source  FROM temp_t_arc JOIN ve_inp_connec ON temp_t_arc.arc_id = ve_inp_connec.arc_id::text
-			JOIN inp_dscenario_demand d ON feature_id = connec_id WHERE dscenario_id IN (SELECT unnest(v_userscenario)) AND pjoint_type in ('ARC', 'CONNEC');
-
+			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
+			SELECT d.dscenario_id, n.node_id, d.demand * 0.5 AS demand, d.pattern_id, d.demand_type, d.source
+			FROM temp_t_arc a
+				JOIN ve_inp_connec v ON a.arc_id = v.arc_id::text
+				JOIN inp_dscenario_demand d ON d.feature_id = v.connec_id
+				JOIN LATERAL (
+				    SELECT a.node_1 AS node_id
+				    UNION ALL
+				    SELECT a.node_2
+				) n ON TRUE
+			WHERE d.dscenario_id = ANY (v_userscenario)
+		  	AND v.pjoint_type = ANY (ARRAY['ARC','CONNEC'])
+			AND n.node_id is not null;
 
 			-- demands for connec related to nodes
 			INSERT INTO temp_t_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, source)
