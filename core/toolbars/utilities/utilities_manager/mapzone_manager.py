@@ -295,9 +295,36 @@ class GwMapzoneManager:
 
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
+        if run_button:
+            run_button.pressed.connect(partial(self._prepare_layer_on_execute, mapzone_name, run_button))
         enable_flood = mapzone_name in self.flood_enabled_mapzones
         if run_button and self.mapzone_mng_dlg.btn_flood and enable_flood:
             run_button.clicked.connect(partial(self._enable_flood_for_tab, mapzone_name))
+
+    def _prepare_layer_on_execute(self, mapzone_name, run_button):
+        """Ensure layer is ready exactly when execute is pressed."""
+        self._ensure_mapzone_layer_ready(mapzone_name)
+
+    def _ensure_mapzone_layer_ready(self, mapzone_name):
+        """Ensure mapzone layer is loaded, visible and active."""
+        layer_name = f"ve_{mapzone_name}"
+        field_id = f"{mapzone_name}_id"
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+
+        if not layer:
+            tools_gw.add_layer_database(tablename=layer_name, field_id=field_id)
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+
+        if not layer:
+            tools_qgis.show_warning(
+                f"Layer {layer_name} is not loaded and could not be created.",
+                dialog=self.mapzone_mng_dlg
+            )
+            return False
+
+        tools_qgis.set_layer_visible(layer)
+        self.iface.setActiveLayer(layer)
+        return True
 
     def _enable_flood_for_tab(self, mapzone_name):
         """Enable flood button only for the current mapzone tab."""
