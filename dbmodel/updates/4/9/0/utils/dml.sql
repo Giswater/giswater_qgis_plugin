@@ -34,3 +34,6 @@ INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
     }
   }
 }'::json, NULL, NULL);
+
+-- 24/03/2026
+UPDATE sys_function SET function_alias = 'MACROMAPZONES DYNAMIC SECTORITZATION' WHERE id = 3482;

@@ -171,3 +171,82 @@ UPDATE config_toolbox
   }
 ]'::json
 	WHERE id=3134;
+
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "label": "Graph class:",
+    "tooltip": "Graphanalytics method used",
+    "comboIds": [
+      "MACROSECTOR",
+      "MACROOMZONE"
+    ],
+    "datatype": "text",
+    "comboNames": [
+      "MACROSECTOR",
+      "MACROOMZONE"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "graphClass",
+    "widgettype": "combo",
+    "layoutorder": 1
+  },
+  {
+    "label": "Exploitation:",
+    "tooltip": "Choose exploitation to work with",
+    "datatype": "text",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "exploitation",
+    "widgettype": "combo",
+    "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC",
+    "layoutorder": 2
+  },
+  {
+    "label": "Commit changes:",
+    "value": null,
+    "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be showed in a temporal layer",
+    "datatype": "boolean",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "commitChanges",
+    "widgettype": "check",
+    "layoutorder": 8
+  },
+  {
+    "label": "Mapzone constructor method:",
+    "comboIds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "datatype": "integer",
+    "comboNames": [
+      "NONE",
+      "CONCAVE POLYGON",
+      "PIPE BUFFER",
+      "PLOT & PIPE BUFFER",
+      "LINK & PIPE BUFFER"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "updateMapZone",
+    "widgettype": "combo",
+    "layoutorder": 10
+  },
+  {
+    "label": "Pipe buffer",
+    "value": null,
+    "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.",
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "geomParamUpdate",
+    "widgettype": "text",
+    "isMandatory": false,
+    "layoutorder": 11,
+    "placeholder": "5-30"
+  }
+]'::json
+	WHERE id=3482;
