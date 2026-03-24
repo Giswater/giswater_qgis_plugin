@@ -997,7 +997,7 @@ class GwDscenarioManagerButton(GwAction):
         col_name = 'feature_id'
         col_idx = None
 
-        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
+        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules', 'inp_dscenario_demand'):
             col_name = 'id'
             col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
         else:
@@ -1239,6 +1239,8 @@ class GwDscenarioManagerButton(GwAction):
             return self._manage_upsert_controls()
         elif view == "inp_dscenario_rules":
             return self._manage_upsert_rules()
+        elif view == "inp_dscenario_demand":
+            return self._manage_insert_demand(view)
 
         if self.dlg_dscenario.txt_feature_id.text() == '':
             msg = "Feature_id is mandatory."
@@ -1268,6 +1270,13 @@ class GwDscenarioManagerButton(GwAction):
         split_text = full_text.replace('(', '').replace(')', '').split(' order_id ')
         node_id, order_id = split_text
         sql = f"INSERT INTO ve_{view} VALUES ({self.selected_dscenario_id}, '{node_id}', '{order_id}');"
+        tools_db.execute_sql(sql)
+
+        # Refresh tableview
+        self._fill_dscenario_table()
+    
+    def _manage_insert_demand(self, view):
+        sql = f"INSERT INTO ve_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
