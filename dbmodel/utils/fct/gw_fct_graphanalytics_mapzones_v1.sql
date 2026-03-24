@@ -266,11 +266,8 @@ BEGIN
 
 	-- Start Building Log Message
 	-- =======================
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4588","function":"3508","parameters":{"graphClass":"'
-		|| upper(v_class) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
-
-	-- separator line (sys_message)
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4590","function":"3508","parameters":null, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":{"graphClass":"'
+		|| upper(v_class) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||', "is_process":true, "is_header":true, "separator_id":"2049"}}$$);';
 
 	-- Use psectors (already exists on sys_message id 4018)
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4018","function":"3508","parameters":{"v_usepsector":"'
@@ -285,24 +282,20 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4596","function":"3508","parameters":{"fromZero":"'
 		|| upper(v_from_zero::text) || '"}, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
 
-	-- spacer line (sys_message) inside the title/params block
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||'}}$$);';
+	-- spacer line from sys_label separator
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"4", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
 
-	-- section headers
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4598","function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4600","function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4602","function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4604","function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
+	-- section headers from sys_label
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||', "is_process":true, "is_header":true, "label_id":"3003", "separator_id":"2011"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||', "is_process":true, "is_header":true, "label_id":"3002", "separator_id":"2014"}}$$);';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4606","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4608","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||', "is_process":true, "is_header":true, "label_id":"3001", "separator_id":"2007"}}$$);';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4610","function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4612","function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||'}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"t_", "criticity":"0", "fid": '||v_fid||', "is_process":true, "is_header":true, "label_id":"3012", "separator_id":"2010"}}$$);';
 
 	-- Initialize process
 	-- =======================
@@ -1786,7 +1779,7 @@ BEGIN
 		) sub;
 
 		IF v_arcs_count > 0 OR v_connecs_count > 0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4616","function":"3508","parameters":{"graphClass":"'
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4598","function":"3508","parameters":{"graphClass":"'
 				|| upper(v_class) || '","mapzones_ids":"' || COALESCE(v_mapzones_ids, '') || '","arcs_count":"'
 				|| COALESCE(v_arcs_count::text, '0') || '","connecs_count":"' || COALESCE(v_connecs_count::text, '0')
 				|| '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
@@ -1850,11 +1843,11 @@ BEGIN
 		WHERE t.mapzone_id = 0;
 
 		IF v_arcs_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4618","function":"3508","parameters":{"arcs_count":"'
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4600","function":"3508","parameters":{"arcs_count":"'
 			|| COALESCE(v_arcs_count::text, '0')
 			|| '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4620","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4602","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 		END IF;
 
 		RAISE NOTICE 'Disconnected connecs';
@@ -1864,14 +1857,14 @@ BEGIN
 			WHERE t.mapzone_id = 0;
 
 			IF v_connecs_count > 0 THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4622","function":"3508","parameters":{"connecs_count":"'
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4604","function":"3508","parameters":{"connecs_count":"'
 					|| COALESCE(v_connecs_count::text, '0')
 					|| '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4624","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4606","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4624","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4606","function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 		END IF;
 
 		IF v_audit_result is null THEN
@@ -2026,7 +2019,7 @@ BEGIN
 			-- SECTION: Creating geometry of mapzones
 
 			IF v_update_map_zone > 0 THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4626","function":"3508","parameters":{"graphClass":"'
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4608","function":"3508","parameters":{"graphClass":"'
 					|| upper(v_class) || '"}, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 
@@ -2813,11 +2806,11 @@ BEGIN
 	FROM t_audit_check_data
 	where fid = v_fid;
 
-	-- insert spacer lines (sys_message)
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"3", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"2", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"1", "fid": '||v_fid||'}}$$);';
-	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4614","function":"3508","parameters":null, "tempTable":"", "criticity":"0", "fid": '||v_fid||'}}$$);';
+	-- insert spacer lines from sys_label separator
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"", "criticity":"3", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"", "criticity":"2", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"", "criticity":"1", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"", "criticity":"0", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
 
 	-- Get Info for the audit
 	SELECT json_agg(row_to_json(t)) INTO v_result
