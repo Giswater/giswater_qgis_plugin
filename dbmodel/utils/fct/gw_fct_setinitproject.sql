@@ -207,6 +207,12 @@ BEGIN
 	ON CONFLICT("parameter", cur_user) DO NOTHING;
 	UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
 
+	-- Set state_type vdefault
+	INSERT INTO config_param_user ("parameter", value, cur_user) 
+	SELECT 'edit_statetype_1_vdefault', id , current_user 
+	FROM value_state_type WHERE state = 1 AND is_operative IS TRUE LIMIT 1
+	ON CONFLICT DO NOTHING;
+
     -- Control null
 	v_message := COALESCE(v_message, '{}');
 	v_return := COALESCE(v_return,'{}');
