@@ -59,12 +59,21 @@ ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_val
 
 
 DROP VIEW IF EXISTS ve_inp_dscenario_demand;
-alter table inp_dscenario_demand rename to _inp_dscenario_demand_;
+ALTER TABLE inp_dscenario_demand RENAME TO _inp_dscenario_demand_;
+ALTER TABLE _inp_dscenario_demand_ DROP CONSTRAINT inp_dscenario_demand_pkey;
+ALTER TABLE _inp_dscenario_demand_ DROP CONSTRAINT inp_demand_dscenario_id_fkey;
+ALTER TABLE _inp_dscenario_demand_ DROP CONSTRAINT inp_dscenario_demand_feature_type_fkey;
+ALTER TABLE _inp_dscenario_demand_ DROP CONSTRAINT inp_dscenario_demand_pattern_id_fkey;
+
 DROP INDEX IF EXISTS idx_inp_dscenario_demand_dscenario_id;
 DROP INDEX IF EXISTS idx_inp_dscenario_demand_source;
 
+ALTER TABLE _inp_dscenario_demand_ ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS SCHEMA_NAME.inp_dscenario_demand_id_seq1;
+ALTER SEQUENCE SCHEMA_NAME.inp_dscenario_demand_id_seq RENAME TO inp_dscenario_demand_id_seq1;
+
 CREATE TABLE inp_dscenario_demand (
-	id int4 NOT NULL PRIMARY KEY DEFAULT nextval('inp_dscenario_demand_id_seq'),
+	id serial4 NOT NULL PRIMARY KEY,
 	dscenario_id int4 NOT NULL,
 	feature_id int4 NOT NULL,
 	feature_type varchar(16) NULL,
@@ -79,3 +88,5 @@ CREATE TABLE inp_dscenario_demand (
 );
 CREATE INDEX idx_inp_dscenario_demand_dscenario_id ON inp_dscenario_demand USING btree (dscenario_id);
 CREATE INDEX idx_inp_dscenario_demand_source ON inp_dscenario_demand USING btree (source);
+
+SELECT setval('SCHEMA_NAME.inp_dscenario_demand_id_seq', (SELECT last_value FROM inp_dscenario_demand_id_seq1));

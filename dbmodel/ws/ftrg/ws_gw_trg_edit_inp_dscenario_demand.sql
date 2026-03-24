@@ -17,7 +17,7 @@ BEGIN
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
 		-- overwrite id values (in case of user fill something)
-		PERFORM setval('SCHEMA_NAME.inp_dscenario_demand_id_seq1',(SELECT max(id) FROM inp_dscenario_demand), true);
+		PERFORM setval('SCHEMA_NAME.inp_dscenario_demand_id_seq',(SELECT max(id) FROM inp_dscenario_demand), true);
 
 		IF NEW.feature_type IS NULL THEN
 			IF (SELECT count(node_id) FROM node WHERE node_id=NEW.feature_id) > 0 THEN
@@ -26,8 +26,8 @@ BEGIN
 				NEW.feature_type = 'CONNEC';
 			END IF;
 		END IF;
-		INSERT INTO inp_dscenario_demand (id, dscenario_id, feature_id, demand, pattern_id, demand_type, feature_type, source)
-		VALUES (nextval('SCHEMA_NAME.inp_dscenario_demand_id_seq1'), NEW.dscenario_id, NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type, NEW.feature_type, NEW.source);
+		INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, demand, pattern_id, demand_type, feature_type, source)
+		VALUES (NEW.dscenario_id, NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type, NEW.feature_type, NEW.source);
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
