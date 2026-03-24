@@ -12,21 +12,25 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) 
 VALUES('inp_typevalue_dscenario', 'PATTERN', 'PATTERN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
-VALUES(3536, 'ws_gw_fct_getmincutminsector', '{
+INSERT INTO config_function (id, function_name, "style", layermanager, actions) VALUES(3536, 'gw_fct_getmincutminsector', '{
   "style": {
     "Valves": {
       "style": "categorized",
-      "field": "closed"
+      "field": "closed",
+      "width": 2,
+      "transparency": 0.5
     },
     "Arcs": {
       "style": "categorized",
-      "field": "minsector_id"
+      "field": "minsector_id",
+      "width": 2,
+      "transparency": 0.5
     },
     "Connecs": {
       "style": "categorized",
-      "field": "minsector_id"
+      "field": "minsector_id",
+      "width": 2,
+      "transparency": 0.5
     }
   }
-}'::json, NULL, NULL)
-ON CONFLICT DO NOTHING;
+}'::json, NULL, NULL);
