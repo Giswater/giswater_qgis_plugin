@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import json
+import os
 from functools import partial
 
-from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel
+from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QPixmap
 from qgis.PyQt.QtCore import QRegularExpression, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
 from qgis.core import Qgis
@@ -17,7 +18,7 @@ from ...dialog import GwAction
 from ....ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi
 from ....utils import tools_gw
 from ..... import global_vars
-from .....libs import tools_qgis, tools_qt, tools_db
+from .....libs import lib_vars, tools_qgis, tools_qt, tools_db
 
 
 class GwWorkspaceManagerButton(GwAction):
@@ -26,6 +27,9 @@ class GwWorkspaceManagerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+        self.icon_folder = None
+        self.workspace_with_current = None
+        self.workspace_without_current = None
 
     def clicked_event(self):
 
@@ -235,6 +239,19 @@ class GwWorkspaceManagerButton(GwAction):
         try:
             name_value = result["body"]["data"]["name"]
             tools_qt.set_widget_text(dialog, 'lbl_vdefault_workspace', name_value)
+
+            cur_workspace = tools_gw.get_config_value('utils_workspace_current')
+            enabled = bool(cur_workspace and cur_workspace[0] is not None)
+
+            if self.workspace_with_current is None and lib_vars.plugin_dir:
+                self.icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}"
+                self.workspace_with_current = QPixmap(f"{self.icon_folder}140.png")
+                self.workspace_without_current = QPixmap(f"{self.icon_folder}138.png")
+            if self.workspace_with_current:
+                if enabled:
+                    dialog.lbl_status_current.setPixmap(self.workspace_with_current)
+                else:
+                    dialog.lbl_status_current.setPixmap(self.workspace_without_current)
         except KeyError:
             print("Error: 'name' field is missing in the result")
 

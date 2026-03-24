@@ -45,6 +45,8 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg = None
         self.netscenario_id = None
 
+        # to enable btn_execute and btn_flood, the mapzone type must be enabled in config_param_system table -> utils_graphanalytics_status
+
         self.flood_enabled_mapzones = ["sector", "dma", "dqa", "presszone", "dwfzone", "supplyzone"]
         self.macromapzone_types = ["macrosector", "macrodma", "macrodqa", "macroomzone"]
 
