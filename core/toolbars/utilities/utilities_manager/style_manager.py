@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
-import json
 import tempfile
 
 from ....ui.ui_manager import GwStyleManagerUi, GwStyleUi, GwUpdateStyleGroupUi
@@ -464,37 +463,37 @@ class GwStyleManager:
                 if layer['geomField'] == "None" or not layer['geomField']:
                     continue  # Skip layers without a geometry field
 
-                context = json.loads(layer['context']['layer_menu'])
+                level_1, level_2, level_3 = tools_gw.get_context_menu_levels(layer.get('context'))
+                if not level_1 or not level_2:
+                    continue
 
                 # Level 1 of the context
-                if 'level_1' in context and context['level_1'] not in dict_menu:
-                    menu_level_1 = menu.addMenu(f"{context['level_1']}")
-                    dict_menu[context['level_1']] = menu_level_1
+                if level_1 not in dict_menu:
+                    menu_level_1 = menu.addMenu(f"{level_1}")
+                    dict_menu[level_1] = menu_level_1
 
                 # Level 2 of the context
-                if 'level_2' in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
-                    menu_level_2 = dict_menu[context['level_1']].addMenu(f"{context['level_2']}")
-                    dict_menu[f"{context['level_1']}_{context['level_2']}"] = menu_level_2
+                if f"{level_1}_{level_2}" not in dict_menu:
+                    menu_level_2 = dict_menu[level_1].addMenu(f"{level_2}")
+                    dict_menu[f"{level_1}_{level_2}"] = menu_level_2
 
                 # Level 3 of the context
-                if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
-                    menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(
-                        f"{context['level_3']}")
-                    dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
+                if level_3 and f"{level_1}_{level_2}_{level_3}" not in dict_menu:
+                    menu_level_3 = dict_menu[f"{level_1}_{level_2}"].addMenu(f"{level_3}")
+                    dict_menu[f"{level_1}_{level_2}_{level_3}"] = menu_level_3
 
                 alias = layer['layerName'] if layer['layerName'] is not None else layer['tableName']
                 alias = f"{alias}     "
 
                 # Add actions and submenus at the appropriate context level
-                if 'level_3' in context:
-                    sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
+                if level_3:
+                    sub_menu = dict_menu[f"{level_1}_{level_2}_{level_3}"]
                 else:
-                    sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}"]
+                    sub_menu = dict_menu[f"{level_1}_{level_2}"]
 
                 action = QAction(alias, self.style_mng_dlg.btn_add_style)
                 action.triggered.connect(partial(self._add_layer_style, layer['tableName'], layer['geomField']))
                 sub_menu.addAction(action)
-
             # Assign the menu to the button
             self.style_mng_dlg.btn_add_style.setMenu(menu)
 
