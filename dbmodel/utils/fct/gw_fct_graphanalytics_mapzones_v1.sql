@@ -2146,7 +2146,7 @@ BEGIN
 						c.mapzone_id,
 						ST_Buffer(ST_Collect(l.the_geom), '||v_geom_param_update_divide||', ''endcap=flat join=round'') AS geom
 						FROM temp_pgr_connec c
-						JOIN link l ON l.feature_id = c.connec_id
+						JOIN link l ON l.feature_id = c.pgr_connec_id
 						WHERE c.mapzone_id > 0
 						GROUP BY c.mapzone_id
 						'||v_query_text_aux||'
