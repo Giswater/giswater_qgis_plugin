@@ -2,3 +2,4 @@
 *************
 - Add inp_dscenario_pattern and inp_dscenario_pattern_value tables
 - Fix inp_dscenario_demand
+- Create new views (v_*) for utils tables. v_ext_* views won't depend from the main table so they can be changed from ws/ud to utils easily in case of utils schema

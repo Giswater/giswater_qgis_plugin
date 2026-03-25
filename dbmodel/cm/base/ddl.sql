@@ -760,6 +760,9 @@ CREATE TABLE cm.doc (
 	user_name varchar(50) DEFAULT USER NULL,
 	tstamp timestamp DEFAULT now() NULL,
 	the_geom public.geometry(point, 8908) NULL,
+	hash text NULL,
+	lat numeric NULL,
+	long numeric NULL,
 	CONSTRAINT doc_pkey PRIMARY KEY (id),
 	CONSTRAINT name_chk UNIQUE (name)
 );
