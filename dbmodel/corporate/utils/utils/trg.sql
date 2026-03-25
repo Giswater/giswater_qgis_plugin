@@ -8,5 +8,8 @@ or (at your option) any later version.
 
 SET search_path = "utils", public, pg_catalog;
 
+create trigger gw_trg_manage_raster_dem_delete after delete on utils.raster_dem 
+for each row execute function utils.gw_trg_manage_raster_dem();
 
-ALTER TABLE municipality ALTER COLUMN active SET DEFAULT TRUE;
+create trigger gw_trg_manage_raster_dem_insert before insert on utils.raster_dem
+for each row execute function utils.gw_trg_manage_raster_dem();

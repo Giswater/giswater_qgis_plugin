@@ -8,8 +8,35 @@ or (at your option) any later version.
 
 SET search_path = "utils", public, pg_catalog;
 
-INSERT INTO config_param_system(id, parameter, value, data_type, context, descript)
-VALUES (1, 'ws_current_schema', NULL , 'text', 'NULL','WS');
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('municipality', 'Table of town cities and villages', 'role_edit', 'core');
 
-INSERT INTO config_param_system(id, parameter, value, data_type, context, descript)
-VALUES (2, 'ud_current_schema', NULL , 'text', NULL,'UD');
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('streetaxis', 'Table of streetaxis', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('address', 'Table of entrance numbers', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('plot', 'Table of urban properties', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('raster_dem', 'Table to store raster DEM', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('cat_raster', 'Catalog for raster layers', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('district', 'Table of districts', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('region_x_province', 'Table with the relations between regions and provinces', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('province', 'Table of provinces', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('region', 'Table of regions', 'role_edit', 'core');
+
+INSERT INTO utils.sys_table (id, descript, sys_role, "source")
+VALUES('type_street', 'Table with the values of different streetaxis types', 'role_edit', 'core');

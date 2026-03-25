@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 --FUNCTION CODE: 2864
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_manage_raster_dem()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION utils.gw_trg_manage_raster_dem()  RETURNS trigger AS
 $BODY$
 
 DECLARE 

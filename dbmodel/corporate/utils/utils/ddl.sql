@@ -5,105 +5,72 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
 
---
--- TOC entry 10 (class 2615 OID 151924)
--- Name: SCHEMA_NAME; Type: SCHEMA; Schema: -; Owner: -
---
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE SCHEMA utils;
+SET ROLE role_admin;
 
-SET search_path = "utils", public, pg_catalog;
+CREATE SCHEMA utils AUTHORIZATION role_admin;
 
--- ----------------------------
--- TABLES
--- ----------------------------
+GRANT ALL ON SCHEMA utils TO role_admin;
+GRANT ALL ON SCHEMA utils TO role_basic;
+ALTER DEFAULT PRIVILEGES IN SCHEMA utils GRANT SELECT ON TABLES TO role_basic;
 
-CREATE TABLE address
-(
-  id character varying(16) NOT NULL,
-  muni_id integer ,
-  postcode character varying(16),
-  streetaxis_id character varying(16),
-  postnumber character varying(16),
-  plot_id character varying(16),
-  the_geom geometry(Point,SRID_VALUE),
-  ud_expl_id integer,
-  ws_expl_id integer,
-  CONSTRAINT address_pkey PRIMARY KEY (id))
-;
-
-
-CREATE TABLE streetaxis
-(
-  id character varying(16) NOT NULL,
-  code text,
-  type character varying(18),
-  name character varying(100),
-  text text,
-  the_geom geometry(MultiLineString,SRID_VALUE),
-  ud_expl_id integer,
-  ws_expl_id integer,
-  muni_id integer,
-  CONSTRAINT streetaxis_pkey PRIMARY KEY (id))
-;
-
-
-
-CREATE TABLE municipality
-(
-  muni_id integer NOT NULL,
-  name text,
-  observ text,
-  the_geom geometry(MultiPolygon,SRID_VALUE),
-  CONSTRAINT municipality_pkey PRIMARY KEY (muni_id)
+CREATE TABLE utils.config_param_system (
+	"parameter" varchar(50) NOT NULL,
+	value text NULL,
+	descript text NULL,
+	CONSTRAINT config_param_system_pkey PRIMARY KEY (parameter)
 );
 
-
-
-CREATE TABLE plot
-(
-  id character varying(16) NOT NULL,
-  plot_code character varying(30),
-  muni_id integer ,
-  postcode integer,
-  streetaxis_id character varying(16) ,
-  postnumber character varying(16),
-  complement character varying(16),
-  placement character varying(16),
-  square character varying(16),
-  observ text,
-  text text,
-  the_geom geometry(MultiPolygon,SRID_VALUE),
-  ws_expl_id integer,
-  ud_expl_id integer,
-  CONSTRAINT plot_pkey PRIMARY KEY (id)
+CREATE TABLE utils.sys_table (
+    LIKE sys_table INCLUDING ALL
 );
 
-
-
-
-CREATE TABLE type_street
-(
-  id character varying(20) NOT NULL,
-  observ character varying(50),
-  CONSTRAINT type_street_pkey PRIMARY KEY (id)
+CREATE TABLE utils.municipality (
+    LIKE ext_municipality INCLUDING ALL
 );
 
+CREATE TABLE utils.streetaxis (
+    LIKE ext_streetaxis INCLUDING ALL
+);
 
+CREATE TABLE utils.address (
+    LIKE ext_address INCLUDING ALL
+);
 
-CREATE TABLE config_param_system
-(
-  id serial NOT NULL,
-  parameter character varying(50) NOT NULL,
-  value text,
-  data_type character varying(20),
-  context character varying(50),
-  descript text,
-  CONSTRAINT config_param_system_pkey PRIMARY KEY (id)
+CREATE TABLE utils.plot (
+    LIKE ext_plot INCLUDING ALL
+);
+
+CREATE TABLE utils.raster_dem (
+    id serial NOT NULL,
+	rast public.raster NULL,
+	rastercat_id text NULL,
+	envelope public.geometry(polygon, 25831) NULL,
+	CONSTRAINT raster_dem_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE utils.cat_raster (
+    LIKE ext_cat_raster INCLUDING ALL
+);
+
+CREATE TABLE utils.district (
+    LIKE ext_district INCLUDING ALL
+);
+
+CREATE TABLE utils.region_x_province (
+    LIKE ext_region_x_province INCLUDING ALL
+);
+
+CREATE TABLE utils.province (
+    LIKE ext_province INCLUDING ALL
+);
+
+CREATE TABLE utils.region (
+    LIKE ext_region INCLUDING ALL
+);
+
+CREATE TABLE utils.type_street (
+    LIKE ext_type_street INCLUDING ALL
 );
