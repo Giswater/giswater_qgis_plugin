@@ -296,14 +296,10 @@ class GwMapzoneManager:
         # Connect btn 'Run' to enable btn_flood when pressed
         run_button = dlg_functions.findChild(QPushButton, 'btn_run')
         if run_button:
-            run_button.pressed.connect(partial(self._prepare_layer_on_execute, mapzone_name, run_button))
+            run_button.pressed.connect(partial(self._ensure_mapzone_layer_ready, mapzone_name))
         enable_flood = mapzone_name in self.flood_enabled_mapzones
         if run_button and self.mapzone_mng_dlg.btn_flood and enable_flood:
             run_button.clicked.connect(partial(self._enable_flood_for_tab, mapzone_name))
-
-    def _prepare_layer_on_execute(self, mapzone_name, run_button):
-        """Ensure layer is ready exactly when execute is pressed."""
-        self._ensure_mapzone_layer_ready(mapzone_name)
 
     def _ensure_mapzone_layer_ready(self, mapzone_name):
         """Ensure mapzone layer is loaded, visible and active."""
@@ -462,8 +458,7 @@ class GwMapzoneManager:
             layer_name = (layer_data or {}).get('layerName')
             if not layer_name:
                 continue
-            table_name = layer_name.split(".")[-1]
-            vlayer = tools_qgis.get_layer_by_tablename(table_name)
+            vlayer = tools_qgis.get_layer_by_layername(layer_name)
             if not vlayer or not vlayer.isValid():
                 continue
             # Apply styling only to valid mapzones
