@@ -37,3 +37,28 @@ INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
 
 -- 24/03/2026
 UPDATE sys_function SET function_alias = 'MACROMAPZONES DYNAMIC SECTORITZATION' WHERE id = 3482;
+
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_municipality', 'View of town cities and villages', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_streetaxis', 'View of streetaxis', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_address', 'View of entrance numbers', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_plot', 'View of urban properties', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_raster_dem', 'View to store raster DEM', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_district', 'View of districts', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_region', 'View of regions', 'role_edit', 'core');
+
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_province', 'View of provinces', 'role_edit', 'core');

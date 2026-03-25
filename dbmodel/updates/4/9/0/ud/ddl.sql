@@ -59,3 +59,7 @@ CREATE TABLE IF NOT EXISTS inp_dscenario_pattern_value (
 ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_value_dscenario_id_pattern_id_fkey 
 FOREIGN KEY (dscenario_id, pattern_id) REFERENCES inp_dscenario_pattern(dscenario_id, pattern_id) 
 ON DELETE CASCADE ON UPDATE CASCADE;
+
+DROP VIEW IF EXISTS v_ext_plot;
+DROP VIEW IF EXISTS v_plot;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_plot", "column":"plot_code", "dataType":"varchar(100)", "isUtils":"True"}}$$);
