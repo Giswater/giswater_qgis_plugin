@@ -15,3 +15,30 @@ DROP VIEW IF EXISTS v_edit_connec;
 DROP VIEW IF EXISTS v_edit_link;
 
 SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
+
+DO $$
+    DECLARE
+    rec_mapzone TEXT;
+
+    BEGIN
+
+    FOREACH rec_mapzone IN ARRAY ARRAY['omzone', 'dma', 'sector', 'presszone',  'dqa']
+    LOOP
+        RAISE NOTICE '%', rec_mapzone;
+
+        EXECUTE format('
+        ALTER TABLE %I ALTER COLUMN %s SET DEFAULT nextval(''urn_id_seq''::regclass)
+        ', 
+        rec_mapzone,
+        rec_mapzone || '_id',
+        'mapzone_id_seq'
+        );
+
+    END LOOP;
+
+    EXECUTE 'ALTER TABLE plan_netscenario_dma ALTER COLUMN dma_id SET DEFAULT nextval(''urn_id_seq''::regclass)';
+    EXECUTE 'ALTER TABLE plan_netscenario_presszone ALTER COLUMN presszone_id SET DEFAULT nextval(''urn_id_seq''::regclass)';
+    EXECUTE 'ALTER TABLE crmzone ALTER COLUMN id SET DEFAULT nextval(''urn_id_seq''::regclass)';
+
+    END; 
+$$;

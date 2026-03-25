@@ -16,3 +16,27 @@ DROP VIEW IF EXISTS v_edit_link;
 DROP VIEW IF EXISTS v_edit_gully;
 
 SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
+
+DO $$
+    DECLARE
+    rec_mapzone TEXT;
+
+    BEGIN
+
+    FOREACH rec_mapzone IN ARRAY ARRAY['omzone', 'dma', 'sector', 'dwfzone']
+    LOOP
+        RAISE NOTICE '%', rec_mapzone;
+
+        EXECUTE format('
+        ALTER TABLE %I ALTER COLUMN %s SET DEFAULT nextval(''urn_id_seq''::regclass)
+        ', 
+        rec_mapzone,
+        rec_mapzone || '_id',
+        'mapzone_id_seq'
+        );
+
+    END LOOP;
+
+    END;
+
+$$;
