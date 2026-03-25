@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SET ROLE role_admin;
 
@@ -24,23 +24,23 @@ CREATE TABLE utils.config_param_system (
 );
 
 CREATE TABLE utils.sys_table (
-    LIKE sys_table INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".sys_table INCLUDING ALL
 );
 
 CREATE TABLE utils.municipality (
-    LIKE ext_municipality INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_municipality INCLUDING ALL
 );
 
 CREATE TABLE utils.streetaxis (
-    LIKE ext_streetaxis INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_streetaxis INCLUDING ALL
 );
 
 CREATE TABLE utils.address (
-    LIKE ext_address INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_address INCLUDING ALL
 );
 
 CREATE TABLE utils.plot (
-    LIKE ext_plot INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_plot INCLUDING ALL
 );
 
 CREATE TABLE utils.raster_dem (
@@ -52,25 +52,25 @@ CREATE TABLE utils.raster_dem (
 );
 
 CREATE TABLE utils.cat_raster (
-    LIKE ext_cat_raster INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_cat_raster INCLUDING ALL
 );
 
 CREATE TABLE utils.district (
-    LIKE ext_district INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_district INCLUDING ALL
 );
 
 CREATE TABLE utils.region_x_province (
-    LIKE ext_region_x_province INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_region_x_province INCLUDING ALL
 );
 
 CREATE TABLE utils.province (
-    LIKE ext_province INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_province INCLUDING ALL
 );
 
 CREATE TABLE utils.region (
-    LIKE ext_region INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_region INCLUDING ALL
 );
 
 CREATE TABLE utils.type_street (
-    LIKE ext_type_street INCLUDING ALL
+    LIKE "AUX_SCHEMA_NAME".ext_type_street INCLUDING ALL
 );
