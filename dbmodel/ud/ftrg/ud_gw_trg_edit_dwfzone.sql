@@ -40,13 +40,16 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 
-		SELECT max(dwfzone_id::integer)+1 INTO v_dwfzone_id FROM dwfzone WHERE dwfzone_id::text ~ '^[0-9]+$';
+		IF NEW.dwfzone_id != (SELECT last_value FROM urn_id_seq) OR NEW.dwfzone_id IS NULL THEN
+			NEW.dwfzone_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
 		IF NEW.code IS NULL THEN
-			NEW.code := v_dwfzone_id::text;
+			NEW.code := NEW.dwfzone_id::text;
 		END IF;
 
 		INSERT INTO dwfzone (dwfzone_id, code, name, descript, active, dwfzone_type, drainzone_id, expl_id, sector_id, muni_id, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
-		VALUES (v_dwfzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.dwfzone_type, NEW.drainzone_id, NEW.expl_id, NEW.sector_id, NEW.muni_id,
+		VALUES (NEW.dwfzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.dwfzone_type, NEW.drainzone_id, NEW.expl_id, NEW.sector_id, NEW.muni_id,
 		NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
 
 		IF v_view_name = 'EDIT' THEN

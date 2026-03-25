@@ -61,6 +61,9 @@ v_definition text;
 rec_viewname text;
 rec_feature record;
 
+rec_mapzone text;
+v_mapzone_arr text[];
+
 BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -455,6 +458,8 @@ BEGIN
 				END LOOP;
 			END IF;
 
+			PERFORM setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true); --into v_next_val;
+
 		END IF;
 
         -- delete all functions not related to project type
@@ -478,6 +483,37 @@ BEGIN
 		WHERE cur_user="current_user"() AND fid=v_fid ORDER BY criticity desc, id asc) row;
 
 	END IF;
+
+
+	-- set urn_id_seq to mapzones
+	IF v_projecttype = 'WS' THEN
+		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'presszone',  'dqa']; 
+	ELSIF v_projecttype = 'UD' THEN
+		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'dwfzone'];
+	END IF;
+
+	FOREACH rec_mapzone IN ARRAY v_mapzone_arr
+	LOOP
+		RAISE NOTICE '%', rec_mapzone;
+	
+		EXECUTE format('
+		ALTER TABLE %I ALTER COLUMN %s SET DEFAULT nextval(''urn_id_seq''::regclass)
+		', 
+		rec_mapzone,
+		rec_mapzone || '_id',
+		'mapzone_id_seq'
+		);
+
+	END LOOP;
+
+	IF v_projecttype = 'WS' THEN
+	
+		EXECUTE 'ALTER TABLE plan_netscenario_dma ALTER COLUMN dma_id SET DEFAULT nextval(''urn_id_seq''::regclass)';
+		EXECUTE 'ALTER TABLE plan_netscenario_presszone ALTER COLUMN presszone_id SET DEFAULT nextval(''urn_id_seq''::regclass)';
+		EXECUTE 'ALTER TABLE crmzone ALTER COLUMN id SET DEFAULT nextval(''urn_id_seq''::regclass)';
+
+	END IF;
+
 
     -- recreate views
     PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},

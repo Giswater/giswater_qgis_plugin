@@ -27,9 +27,13 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
-		SELECT max(dma_id::integer)+1 INTO v_dma_id FROM dma WHERE dma_id::text ~ '^[0-9]+$';
+
+		IF NEW.dma_id != (SELECT last_value FROM urn_id_seq) OR NEW.dma_id IS NULL THEN
+			NEW.dma_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+		
 		IF NEW.code IS NULL THEN
-			NEW.code := v_dma_id::text;
+			NEW.code := NEW.dma_id::text;
 		END IF;
 
 		-- active
