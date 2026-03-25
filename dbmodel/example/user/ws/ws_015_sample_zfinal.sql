@@ -181,3 +181,22 @@ UPDATE om_visit_x_connec SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FRO
 UPDATE om_visit_x_link SET is_last = FALSE WHERE id NOT IN (SELECT max(id) FROM om_visit_x_link GROUP BY link_id);
 
 UPDATE cat_feature_node SET graph_delimiter='{PRESSZONE}' WHERE id='PRESSURE_METER';
+
+-- 25/03/2026
+UPDATE plan_psector_x_connec p
+SET arc_id = c.arc_id,
+    link_id = l.link_id
+FROM connec c
+LEFT JOIN LATERAL (
+    SELECT link_id
+    FROM link
+    WHERE feature_id = c.connec_id
+      AND feature_type = 'CONNEC'
+      AND state = 2
+    ORDER BY link_id DESC
+    LIMIT 1
+) l ON true
+WHERE p.connec_id = c.connec_id
+  AND p.psector_id = 1
+  AND p.state = 1
+  AND p.connec_id IN (114461, 114462);
