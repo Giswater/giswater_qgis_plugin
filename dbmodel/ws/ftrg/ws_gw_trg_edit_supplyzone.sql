@@ -44,9 +44,13 @@ BEGIN
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
-		SELECT max(supplyzone_id::integer)+1 INTO v_supplyzone_id FROM supplyzone WHERE supplyzone_id::text ~ '^[0-9]+$';
+
+		IF NEW.supplyzone_id != (SELECT last_value FROM urn_id_seq) OR NEW.supplyzone_id IS NULL THEN
+			NEW.supplyzone_id:= (SELECT nextval('urn_id_seq'));
+		END IF;
+
 		IF NEW.code IS NULL THEN
-			NEW.code := v_supplyzone_id::text;
+			NEW.code := NEW.supplyzone_id::text;
 		END IF;
 
 		IF NEW.active IS NULL THEN
@@ -54,7 +58,7 @@ BEGIN
 		END IF;
 
 		INSERT INTO supplyzone (supplyzone_id, code, name, descript, active, supplyzone_type, expl_id, sector_id, muni_id, avg_press, pattern_id, graphconfig, stylesheet, link, lock_level, addparam, created_at, created_by, updated_at, updated_by)
-		VALUES (v_supplyzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.supplyzone_type, NEW.expl_id, NEW.sector_id, NEW.muni_id, NEW.avg_press, 
+		VALUES (NEW.supplyzone_id, NEW.code, NEW.name, NEW.descript, NEW.active, NEW.supplyzone_type, NEW.expl_id, NEW.sector_id, NEW.muni_id, NEW.avg_press, 
 		NEW.pattern_id, NEW.graphconfig::json, NEW.stylesheet::json, NEW.link, NEW.lock_level, NEW.addparam::json, now(), current_user, now(), current_user);
 
 		IF v_view_name = 'EDIT' THEN

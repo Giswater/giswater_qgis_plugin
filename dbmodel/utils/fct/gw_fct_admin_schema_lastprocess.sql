@@ -487,7 +487,7 @@ BEGIN
 
 	-- set urn_id_seq to mapzones
 	IF v_projecttype = 'WS' THEN
-		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'presszone',  'dqa']; 
+		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'presszone',  'dqa', 'supplyzone']; 
 	ELSIF v_projecttype = 'UD' THEN
 		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'dwfzone'];
 	END IF;
