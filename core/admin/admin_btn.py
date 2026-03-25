@@ -2195,7 +2195,7 @@ class GwAdminButton:
         self.dlg_readsql_rename.schema_rename_copy.setText(schema)
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
-    def _execute_files(self, filedir, no_ct=False, utils_schema_name=None, set_progress_bar=False):
+    def _execute_files(self, filedir, no_ct=False, utils_schema_name=None, set_progress_bar=False, aux_schema_name=None):
         """"""
 
         if not os.path.exists(filedir):
@@ -2228,13 +2228,13 @@ class GwAdminButton:
                 if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                     tools_log.log_info(os.path.join(filedir, file))
                     self.current_sql_file += 1
-                    status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
+                    status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar, aux_schema_name)
                     if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
                         return False
 
         return status
 
-    def _read_execute_file(self, filedir, file, schema_name, project_epsg, set_progress_bar=False):
+    def _read_execute_file(self, filedir, file, schema_name, project_epsg, set_progress_bar=False, aux_schema_name=None):
         """"""
 
         status = False
@@ -2254,7 +2254,11 @@ class GwAdminButton:
             filepath = os.path.join(filedir, file)
             f = open(filepath, 'r', encoding="utf8")
             if f:
-                f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
+                f_to_read = str(f.read())
+                if aux_schema_name:
+                    f_to_read = f_to_read.replace("AUX_SCHEMA_NAME", aux_schema_name)
+                f_to_read = f_to_read.replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg)
+                
                 status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
                 if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
@@ -3632,7 +3636,7 @@ class GwAdminButton:
     def _load_base_utils(self):
 
         folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils')
-        status = self._execute_files(folder, utils_schema_name='utils')
+        status = self._execute_files(folder, utils_schema_name='utils', aux_schema_name=self.ws_project_name)
         if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
         folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils', 'fct')

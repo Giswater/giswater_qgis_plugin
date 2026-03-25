@@ -691,7 +691,6 @@ class GwLoadProject(QObject):
         # Check cm role and adjust CM toolbar if necessary
         cm_role = tools_gw.get_cm_user_role()
         is_cm_admin = tools_db.check_role_user('role_cm_admin')
-        print(f"is_cm_admin: {is_cm_admin}")
         if cm_role:
             cm_role_list = list(cm_role)
             if 'role_cm_edit' in cm_role_list:
