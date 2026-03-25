@@ -61,11 +61,6 @@ WHERE EXISTS (
 	FROM selector_inp_dscenario s
 	WHERE s.dscenario_id = p.dscenario_id
 	AND s.cur_user = CURRENT_USER
-) AND EXISTS ( 
-	SELECT 1
-	FROM selector_expl s
-	WHERE s.expl_id = p.expl_id
-	AND s.cur_user = CURRENT_USER
 ) ORDER BY pv.id;
 
 

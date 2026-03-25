@@ -281,6 +281,10 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			INSERT INTO inp_dscenario_pattern_value(dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 			SELECT NEW.dscenario_id, NEW.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM ve_inp_pattern_value WHERE pattern_id = NEW.pattern_id;
+		
+		ELSIF v_dscenario_type = 'PATTERN_VALUE' THEN
+			INSERT INTO inp_dscenario_pattern_value(dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+			VALUES (NEW.dscenario_id, NEW.pattern_id, NEW.factor_1, NEW.factor_2, NEW.factor_3, NEW.factor_4, NEW.factor_5, NEW.factor_6, NEW.factor_7, NEW.factor_8, NEW.factor_9, NEW.factor_10, NEW.factor_11, NEW.factor_12, NEW.factor_13, NEW.factor_14, NEW.factor_15, NEW.factor_16, NEW.factor_17, NEW.factor_18);
 		END IF;
 
 		RETURN NEW;
@@ -435,6 +439,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'PATTERN' THEN
 			DELETE FROM inp_dscenario_pattern WHERE dscenario_id=OLD.dscenario_id AND pattern_id=OLD.pattern_id;
 
+		ELSIF v_dscenario_type = 'PATTERN_VALUE' THEN
+			DELETE FROM inp_dscenario_pattern_value WHERE dscenario_id=OLD.dscenario_id AND pattern_id=OLD.pattern_id;
 		END IF;
 
 		RETURN OLD;
