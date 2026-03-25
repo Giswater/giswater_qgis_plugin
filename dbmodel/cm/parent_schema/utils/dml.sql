@@ -355,3 +355,27 @@ VALUES(3540, '3- [CM] Reconnect lot topology', '{"featureType":[]}'::json, '[
     "layoutorder": 5
   }
 ]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
+
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3554, 'gw_fct_cm_check_progress', 'ws', 'function', 'json', 'json', 'Función que muestra el porcentaje de progreso de una campaña.
+Se muestra en longitud de red.
+Para calcular las tuberías hechas se toman aquellas que hayan sido insertadas, modificadas o elimnadas de la campaña.
+Para calcular las tuberías iniciales se toman aquellas que existían en el momento de generar la campaña.', 'role_admin', NULL, 'cm', 'PROGRESO DE CAMPAÑA');
+
+INSERT INTO config_toolbox
+(id, alias, functionparams, inputparams, observ, active, device)
+VALUES(3554, '[CM] Progreso de campañas', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "campaignId",
+    "label": "Id Campaña:",
+    "widgettype": "combo",
+    "isparent": "true",
+    "datatype": "text",
+    "tooltip": "Escoja la campaña",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "dvQueryText": "SELECT c.campaign_id as id, name as idval FROM cm.om_campaign c JOIN (SELECT t.organization_id, bool_or(o.orgname = ''Org AyA'') AS is_aya FROM cm.cat_user u JOIN cm.cat_team t ON t.team_id = u.team_id JOIN cm.cat_organization o ON o.organization_id = t.organization_id WHERE u.username = current_user GROUP BY t.organization_id) ctx ON (c.organization_id = ctx.organization_id OR ctx.is_aya) where exists (select 1 from cm.om_campaign_lot l where status in (3,4,6,7,8,9) and l.campaign_id = c.campaign_id)"
+  }
+]'::json, NULL, true, '{4}');
