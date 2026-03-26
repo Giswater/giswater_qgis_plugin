@@ -66,3 +66,7 @@ VALUES('v_province', 'View of provinces', 'role_edit', 'core');
 -- 26/03/2026
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) 
 VALUES('inp_typevalue_dscenario', 'CALIBRATION', 'CALIBRATION', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM cat_element WHERE active IS true'
+WHERE formname = 've_element' AND columnname = 'elementcat_id';

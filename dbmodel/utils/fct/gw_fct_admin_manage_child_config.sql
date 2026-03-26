@@ -112,7 +112,13 @@ BEGIN
 		AND dv_querytext NOT ILIKE ''% OR%'';';
 	END IF;
 
-	-- Update brand_id and model_id
+	
+	UPDATE config_form_fields SET dv_querytext = (
+	SELECT concat(dv_querytext, ' AND ', v_feature_type, '_type = ', quote_literal(v_cat_feature))
+	FROM config_form_fields WHERE formname = v_view_name AND columnname = concat(v_feature_type, 'cat_id')
+	) WHERE formname = v_view_name AND columnname = concat(v_feature_type, 'cat_id');
+
+	-- Update brand_id and model_id and dvquerytext for catalog
 	EXECUTE 'UPDATE config_form_fields SET dv_querytext = ''SELECT id, id as idval FROM cat_brand WHERE '''||quote_literal(upper(v_cat_feature))||''' = ANY(featurecat_id::text[])''
 	WHERE formname = '''||v_view_name||''' AND columnname =''brand_id'';';
 
