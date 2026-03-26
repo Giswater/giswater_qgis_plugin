@@ -379,3 +379,47 @@ VALUES(3554, '[CM] Progreso de campañas', '{"featureType":[]}'::json, '[
     "dvQueryText": "SELECT c.campaign_id as id, name as idval FROM cm.om_campaign c JOIN (SELECT t.organization_id, bool_or(o.orgname = ''Org AyA'') AS is_aya FROM cm.cat_user u JOIN cm.cat_team t ON t.team_id = u.team_id JOIN cm.cat_organization o ON o.organization_id = t.organization_id WHERE u.username = current_user GROUP BY t.organization_id) ctx ON (c.organization_id = ctx.organization_id OR ctx.is_aya) where exists (select 1 from cm.om_campaign_lot l where status in (3,4,6,7,8,9) and l.campaign_id = c.campaign_id)"
   }
 ]'::json, NULL, true, '{4}');
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3564, 'gw_fct_cm_hydraulic_trace', 'ws', 'function', 'json', 'json', 'Function to visualize the hydraulic topology of the SELECTED LOT based on a selected node_id.
+
+The available lots for the analysis are the ones that take part into de SELECTED CAMPAIGN.', 'role_om', NULL, 'cm', 'VISUALIZE HYDRAULIC TOPOLOGY');
+
+INSERT INTO config_toolbox
+(id, alias, functionparams, inputparams, observ, active, device)
+VALUES(3564, '4.2- [CM] Visualize hydraulic topology of a lot', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "campaignId",
+    "label": "Campaign Id:",
+    "widgettype": "combo",
+    "isparent": "true",
+    "datatype": "text",
+    "tooltip": "Choose a campaign",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "dvQueryText": "SELECT c.campaign_id as id, name as idval FROM cm.om_campaign c JOIN (SELECT t.organization_id, bool_or(o.orgname = ''Org AyA'') AS is_aya FROM cm.cat_user u JOIN cm.cat_team t ON t.team_id = u.team_id JOIN cm.cat_organization o ON o.organization_id = t.organization_id WHERE u.username = current_user GROUP BY t.organization_id) ctx ON (c.organization_id = ctx.organization_id OR ctx.is_aya) where exists (select 1 from cm.om_campaign_lot l where status in (3,4,6) and l.campaign_id = c.campaign_id)"
+  },
+  {
+    "widgetname": "lotId",
+    "label": "Lot Id:",
+    "widgettype": "combo",
+    "parentname": "campaignId",
+    "datatype": "text",
+    "tooltip": "Choose a lot",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "isNullValue": true,
+    "dvQueryText": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6)",
+    "filterquery": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6) and a.campaign_id = {parent_value}"
+  },
+  {
+    "widgetname": "nodeId",
+    "widgettype": "text",
+    "datatype": "integer",
+    "label": "Node Id:",
+    "layoutname": "grl_option_parameters",
+    "isMandatory": true,
+    "layoutorder": 5
+  }
+]'::json, NULL, true, '{4}');

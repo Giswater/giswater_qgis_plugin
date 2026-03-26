@@ -26,9 +26,12 @@ v_srid integer;
 -- Inputs
 v_header bigint;
 v_stoppers bigint[];
+v_table_stoppers text[];
 
 -- SQL
 v_sql text;
+v_agg bigint[];
+tblname text;
 
 -- Control
 v_exists boolean;
@@ -47,11 +50,54 @@ BEGIN
     FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Params from JSON
-    v_header := (p_data -> 'data' -> 'parameters' ->> 'header')::bigint;
+    v_header := (p_data -> 'data' -> 'parameters' ->> 'nodeId')::bigint;
 
     SELECT array_agg(value::bigint)
     INTO v_stoppers
     FROM json_array_elements_text(p_data -> 'data' -> 'parameters' -> 'stoppers');
+
+    IF v_stoppers IS NULL THEN
+        SELECT array_agg(concat('PARENT_SCHEMA_', lower(cat_feature.id))) INTO v_table_stoppers
+        FROM PARENT_SCHEMA.cat_feature_node
+			JOIN PARENT_SCHEMA.cat_feature ON cat_feature.id = cat_feature_node.id
+        WHERE 'MINSECTOR' = ANY(graph_delimiter) AND cat_feature.feature_class = 'VALVE';
+    END IF;
+
+    IF v_table_stoppers IS NOT NULL THEN
+        v_table_stoppers := ARRAY(
+            SELECT tbl
+            FROM unnest(v_table_stoppers) AS tbl
+            WHERE EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name = tbl
+                  AND column_name = 'closed'
+                  AND table_schema = 'SCHEMA_NAME'
+            )
+			AND EXISTS (
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name = tbl
+                  AND column_name = 'node_id'
+                  AND table_schema = 'SCHEMA_NAME'
+            )
+        );
+    END IF;
+
+    -- Closed node ids from MINSECTOR feature tables -> v_stoppers
+    IF v_table_stoppers IS NOT NULL THEN
+        v_stoppers := ARRAY[]::bigint[];
+        FOR tblname IN SELECT unnest(v_table_stoppers)
+        LOOP
+            EXECUTE format(
+                'SELECT array_agg(node_id) FROM "SCHEMA_NAME".%I WHERE closed IS TRUE',
+                tblname
+            ) INTO v_agg;
+            IF v_agg IS NOT NULL THEN
+                v_stoppers := v_stoppers || v_agg;
+            END IF;
+        END LOOP;
+    END IF;
 
     IF v_stoppers IS NULL THEN
         v_stoppers := ARRAY[]::bigint[];
@@ -78,9 +124,10 @@ BEGIN
                         node_2 AS target,
                         1.0::float8 AS cost,
                         1.0::float8 AS reverse_cost
-                    FROM arc
-                    WHERE node_1 <> ALL(%L::bigint[])
-                      AND node_2 <> ALL(%L::bigint[])
+                    FROM om_campaign_x_arc
+                    WHERE node_1 <> ALL(%%L::bigint[])
+                      AND node_2 <> ALL(%%L::bigint[])
+						AND node_1 IS NOT NULL AND node_2 IS NOT NULL
                     $inner$,
                     %L,
                     %L
@@ -104,7 +151,7 @@ BEGIN
             a.node_1,
             a.node_2,
             a.the_geom
-        FROM arc a
+        FROM om_campaign_x_arc a
         WHERE
               (
                 a.node_1 IN (SELECT node FROM reachable_nodes)
@@ -144,7 +191,7 @@ BEGIN
         FROM (
             SELECT jsonb_build_object(
                 ''type'', ''Feature'',
-                ''geometry'', ST_AsGeoJSON(the_geom)::jsonb,
+                ''geometry'', ST_Transform(the_geom, 4326),
                 ''properties'', to_jsonb(row) - ''the_geom''
             ) AS feature
             FROM (%s) row
