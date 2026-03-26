@@ -38,10 +38,9 @@ class GwCreateSchemaUtilsTask(GwTask):
             status = self.admin._update_utils_schema(schema_version)
             if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
-            # TODO: Uncomment this when the final_pass is ready
-            #status = self.admin.load_final_pass('utils', utils=True)
-            #if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            #    return False
+            status = self.admin.load_final_pass('utils', utils=True)
+            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
+                return False
 
             # After create schema utils:
             # execute gw_fct_admin_schema_utils_fk for mains schema
