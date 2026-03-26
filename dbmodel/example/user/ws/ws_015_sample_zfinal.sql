@@ -200,3 +200,22 @@ WHERE p.connec_id = c.connec_id
   AND p.psector_id = 1
   AND p.state = 1
   AND p.connec_id IN (114461, 114462);
+
+
+UPDATE arc SET presszone_id = 4 WHERE arc_id = 2089;
+UPDATE arc SET presszone_id = 4 WHERE arc_id = 2095;
+UPDATE arc SET presszone_id = 4 WHERE arc_id = 2208;
+
+UPDATE arc SET presszone_id = 2 WHERE arc_id = 2205;
+UPDATE arc SET presszone_id = 2 WHERE arc_id = 113884;
+
+UPDATE arc SET presszone_id = 1 WHERE arc_id = 2207;
+UPDATE arc SET presszone_id = 1 WHERE arc_id = 113881;
+
+UPDATE arc SET presszone_id = 3 WHERE presszone_id = 0 AND expl_id = 1;
+
+UPDATE arc SET presszone_id = 5 WHERE arc_id = 114025;
+UPDATE arc SET presszone_id = 5 WHERE arc_id = 114026;
+UPDATE arc SET presszone_id = 5 WHERE arc_id = 114145;
+
+UPDATE arc SET presszone_id = 6 WHERE presszone_id = 0 AND expl_id = 2;
