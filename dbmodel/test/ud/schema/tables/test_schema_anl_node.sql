@@ -24,7 +24,7 @@ SELECT columns_are(
     ARRAY[
         'id', 'node_id', 'nodecat_id','state','num_arcs','node_id_aux', 'nodecat_id_aux', 'state_aux',
          'expl_id', 'fid','cur_user', 'the_geom', 'arc_distance','arc_id','descript','result_id', 'total_distance', 
-         'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwfzone_id'
+         'sys_type','code', 'cat_geom1', 'top_elev','elev', 'ymax','state_type','sector_id', 'addparam', 'drainzone_id', 'dwfzone_id', 'dma_id'
     ],
     'Table anl_node should have the correct columns'
 );
@@ -57,6 +57,7 @@ SELECT col_type_is('anl_node', 'sector_id', 'integer', 'Column sector_id should 
 SELECT col_type_is('anl_node', 'addparam', 'text', 'Column addparam should be text');
 SELECT col_type_is('anl_node', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
 SELECT col_type_is('anl_node', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
+SELECT col_type_is('anl_node', 'dma_id', 'integer', 'Column dma_id should be integer');
 
 --check defealt values
 SELECT col_has_default('anl_node', 'cur_user', 'Column cur_user should have default value');
