@@ -303,7 +303,24 @@ BEGIN
 	END IF;
 
 	IF v_arc_id IS NULL THEN
-		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Arc not found."}}')::json;
+	
+		SELECT json_build_object('level', log_level,'text', error_message)
+		INTO v_message FROM sys_message WHERE id = 2008;
+	
+		v_message := COALESCE(v_message, '{}');
+
+		v_response := json_build_object(
+			'status', 'Failed',
+			'message', v_message,
+			'version', v_version,
+			'body', jsonb_build_object(
+				'form', jsonb_build_object(),
+				'feature', jsonb_build_object(),
+				'data', jsonb_build_object()
+			)
+		);
+		RETURN v_response;
+	
 	ELSE
 		UPDATE om_mincut SET
 			anl_feature_id = v_arc_id,
@@ -319,20 +336,48 @@ BEGIN
 		JOIN v_temp_arc a ON n.node_id = a.node_1 OR n.node_id = a.node_2
 		WHERE a.arc_id = v_arc_id
 	) THEN
-		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not operative, not found."}}')::json;
+	
+		SELECT json_build_object('level', log_level,'text', error_message)
+		INTO v_message FROM sys_message WHERE id = 4618;
+	
+		v_message := COALESCE(v_message, '{}');
+
+		v_response := json_build_object(
+			'status', 'Failed',
+			'message', v_message,
+			'version', v_version,
+			'body', jsonb_build_object(
+				'form', jsonb_build_object(),
+				'feature', jsonb_build_object(),
+				'data', jsonb_build_object()
+			)
+		);
+		RETURN v_response;
 	END IF;
 
 	IF v_mode = 'MINSECTOR' THEN
 		v_minsector_id := (SELECT minsector_id FROM v_temp_arc WHERE arc_id = v_arc_id);
 
 		IF v_minsector_id IS NULL OR v_minsector_id = 0 THEN
-			RETURN jsonb_build_object(
+		
+			SELECT json_build_object('level', log_level,'text', error_message)
+			INTO v_message FROM sys_message WHERE id = 4620;
+		
+			v_message := COALESCE(v_message, '{}');
+	
+			v_response := json_build_object(
 				'status', 'Failed',
-				'message', jsonb_build_object(
-					'level', 3,
-					'text', 'You MUST execute the minsector analysis before executing the mincut analysis with 6.1 version.'
+				'message', v_message,
+				'version', v_version,
+				'body', jsonb_build_object(
+					'form', jsonb_build_object(),
+					'feature', jsonb_build_object(),
+					'data', jsonb_build_object()
 				)
 			);
+		
+			RETURN v_response;
+	
 		END IF;
 	ELSE
 		-- pick one of the nodes of the arc v_temp_arc that is not water source (SECTOR); 0 if the arc is in between 2 nodes SECTOR
@@ -351,8 +396,25 @@ BEGIN
 		);
 	END IF;
 
-	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN
-		RETURN ('{"status":"Failed", "message":{"level":2, "text":"Node not found."}}')::json;
+	IF v_action IN ('mincutValveUnaccess', 'mincutChangeValveStatus') AND v_valve_node_id IS NULL THEN 
+		SELECT json_build_object('level', log_level,'text', error_message)
+		INTO v_message FROM sys_message WHERE id = 2002;
+	
+		v_message := COALESCE(v_message, '{}');
+
+		v_response := json_build_object(
+			'status', 'Failed',
+			'message', v_message,
+			'version', v_version,
+			'body', jsonb_build_object(
+				'form', jsonb_build_object(),
+				'feature', jsonb_build_object(),
+				'data', jsonb_build_object()
+			)
+		);
+	
+		RETURN v_response;	
+		
 	END IF;
 
 	-- check if the minsector_id of the arc exists in the cluster:
@@ -695,15 +757,11 @@ BEGIN
 
 		-- Set message based on overlap status
 		IF v_has_overlap THEN
-			v_message := json_build_object(
-				'level', 1,
-				'text', 'Mincut has overlapping conflicts'
-			);
+			SELECT json_build_object('level', log_level,'text', error_message) -- conflicts
+			INTO v_message FROM sys_message WHERE id = 4610;
 		ELSE
-			v_message := json_build_object(
-				'level', 3,
-				'text', 'Analysis done successfully'
-			);
+			SELECT json_build_object('level', log_level,'text', error_message) -- successful
+			INTO v_message FROM sys_message WHERE id = 3700;
 		END IF;
 
 		-- return
@@ -726,10 +784,10 @@ BEGIN
 		);
 
 	ELSIF v_action = 'mincutCancel' THEN
-		v_message := json_build_object(
-			'text', 'Mincut to cancel not found.',
-			'level', 1
-		);
+	
+		SELECT json_build_object('level', log_level,'text', error_message) -- successful
+		INTO v_message FROM sys_message WHERE id = 3700;
+		
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			WITH groups_conflict AS (
 				SELECT DISTINCT id FROM om_mincut_conflict WHERE mincut_id = v_mincut_id
@@ -788,16 +846,16 @@ BEGIN
 		);
 		RETURN v_response;
 	ELSIF v_action = 'mincutDelete' THEN
-		v_message := json_build_object(
-			'text', 'Mincut to delete not found.',
-			'level', 1
-		);
+	
+		SELECT json_build_object('level', log_level,'text', error_message)
+		INTO v_message FROM sys_message WHERE id = 4614;
+	
 		IF (SELECT id FROM om_mincut WHERE id = v_mincut_id) IS NOT NULL THEN
 			DELETE FROM om_mincut WHERE id = v_mincut_id;
-			v_message := json_build_object(
-				'text', 'Mincut deleted.',
-				'level', 0
-			);
+		
+			SELECT json_build_object('level', log_level,'text', error_message)
+			INTO v_message FROM sys_message WHERE id = 4616;
+		
 		END IF;
 
 		-- manage null values
@@ -2167,10 +2225,8 @@ BEGIN
 
 	-- Set message based on overlap status
 	IF v_has_overlap THEN
-		v_message := json_build_object(
-			'level', 1,
-			'text', 'Mincut has overlapping conflicts'
-		);
+		SELECT json_build_object('level', log_level,'text', error_message) -- conflicts
+		INTO v_message FROM sys_message WHERE id = 4610;
 	ELSE
 		v_message := COALESCE(v_message, '{}');
 	END IF;

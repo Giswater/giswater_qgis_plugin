@@ -72,3 +72,10 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM cat_el
 WHERE formname = 've_element' AND columnname = 'elementcat_id';
 
 UPDATE config_form_tabs SET tooltip='State' WHERE formname='selector_basic' AND tabname='tab_network_state';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4610, 'Mincut has overlapping conflicts', NULL, 1, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4612, 'Mincut to cancel not found', NULL, 1, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4614, 'Mincut to delete not found', NULL, 1, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4616, 'Mincut deleted', NULL, 0, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4618, 'Node not operative not found', NULL, 2, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4620, 'You MUST execute the minsector analysis before executing the mincut analysis with 6.1 version.', NULL, 3, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
