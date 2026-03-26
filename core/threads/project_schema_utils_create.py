@@ -35,13 +35,10 @@ class GwCreateSchemaUtilsTask(GwTask):
             status = self.admin._load_base_utils()
             if not status and self.admin.dev_commit is False:
                 return False
-            status = self.admin._update_utils_schema(schema_version)
-            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False:
-                return False
-            status = self.admin.load_final_pass('utils', utils=True)
-            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False:
-                return False
+            self.admin._update_utils_schema(schema_version, is_thread=True)
 
+            self.admin.load_final_pass('utils', utils=True)
+        
             # After create schema utils:
             # execute gw_fct_admin_schema_utils_fk for mains schema
             msg = "Task '{0}' execute sql: '{1}'"

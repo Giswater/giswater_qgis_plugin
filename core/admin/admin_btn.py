@@ -881,7 +881,10 @@ class GwAdminButton:
         self.folder_cm_example = os.path.join(self.sql_cm_dir, 'example')
 
         # Variable to commit changes even if schema creation fails
-        self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
+        self.dev_commit = tools_os.set_boolean(
+            tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True),
+            False
+        )
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi(self)
@@ -3654,20 +3657,18 @@ class GwAdminButton:
 
         return True
 
-    def _update_utils_schema(self, schema_version=None, schema_name=None):
+    def _update_utils_schema(self, schema_version=None, schema_name=None, is_thread=False):
 
         folder_utils_updates = os.path.join(self.sql_dir, 'corporate', 'utils', 'updates')
-
         if not os.path.exists(folder_utils_updates):
             msg = "The update folder was not found in sql folder"
-            tools_qgis.show_message(msg)
-            self.error_count = self.error_count + 1
+            if not is_thread:
+                tools_qgis.show_message(msg)
+                self.error_count = self.error_count + 1
             return False
-
         folders = sorted(os.listdir(folder_utils_updates))
         for folder in folders:
             sub_folders = sorted(os.listdir(os.path.join(folder_utils_updates, folder)))
-
             for sub_folder in sub_folders:
                 aux = str(self.ws_project_result[0]).replace('.', '')
                 if (schema_version is None and sub_folder <= aux) or schema_version is not None and (schema_version < sub_folder < aux):
@@ -3697,7 +3698,6 @@ class GwAdminButton:
                         status = self._execute_files(folder_update, True)
                         if tools_os.set_boolean(status, False) is False:
                             return False
-
         return True
 
     def _calculate_elapsed_time(self, dialog):
