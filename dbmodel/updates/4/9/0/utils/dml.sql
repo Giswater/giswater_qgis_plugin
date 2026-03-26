@@ -62,3 +62,7 @@ VALUES('v_region', 'View of regions', 'role_edit', 'core');
 
 INSERT INTO sys_table (id, descript, sys_role, "source")
 VALUES('v_province', 'View of provinces', 'role_edit', 'core');
+
+-- 26/03/2026
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) 
+VALUES('inp_typevalue_dscenario', 'CALIBRATION', 'CALIBRATION', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
