@@ -255,3 +255,12 @@ UPDATE config_toolbox
   }
 ]'::json
 	WHERE id=3482;
+
+
+-- 26/03/2026
+UPDATE sys_fprocess
+SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_valve mv JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = mv.to_arc WHERE node_id NOT IN (node_1, node_2)'
+WHERE fid=170;
+UPDATE sys_fprocess
+SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_pump mp JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = mp.to_arc WHERE node_id NOT IN (node_1, node_2)'
+WHERE fid=171;
