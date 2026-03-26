@@ -259,13 +259,13 @@ BEGIN
 				SELECT
 					feature_type,
 					feature_id,
-					COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY dma_id) AS demand_weight,
+					COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY data.dma_id) AS demand_weight,
 					sum,
 					custom_sum,
 					d.pattern_id AS pattern_id,
 					hydrometer_id,
 					data.expl_id,
-					dma_id
+					data.dma_id
 				FROM data
 				JOIN dma d ON d.dma_id = data.dma_id
 				WHERE data.dma_id > 0';
