@@ -70,3 +70,5 @@ VALUES('inp_typevalue_dscenario', 'CALIBRATION', 'CALIBRATION', NULL, NULL) ON C
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM cat_element WHERE active IS true'
 WHERE formname = 've_element' AND columnname = 'elementcat_id';
+
+UPDATE config_form_tabs SET tooltip='State' WHERE formname='selector_basic' AND tabname='tab_network_state';
