@@ -79,3 +79,5 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4616, 'Mincut deleted', NULL, 0, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4618, 'Node not operative not found', NULL, 2, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4620, 'You MUST execute the minsector analysis before executing the mincut analysis with 6.1 version.', NULL, 3, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+UPDATE config_form_fields SET dv_querytext='SELECT function_type as id, function_type as idval FROM man_type_function WHERE ((featurecat_id is null AND ''ELEMENT''=ANY(feature_type))) AND active IS TRUE' WHERE formname='ve_element' AND formtype='form_feature' AND columnname='function_type' AND tabname='tab_data';
