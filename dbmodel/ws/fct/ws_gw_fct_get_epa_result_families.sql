@@ -200,6 +200,16 @@ BEGIN
 	v_mapzones := COALESCE(result, '{}'::jsonb);
 
 	-- JSON with patterns (flattened factor_1..factor_18 per pattern_id, ordered by idrow, id)
+	WITH pattern_ids AS (
+		SELECT DISTINCT d.pattern_id
+		FROM rpt_inp_arc ria
+		JOIN dma d ON d.dma_id = ria.dma_id
+		WHERE ria.result_id = v_result_id
+		UNION
+		SELECT DISTINCT pattern_id
+		FROM rpt_inp_pattern_value
+		WHERE result_id = v_result_id
+	)
 	SELECT COALESCE(json_agg(json_build_object('id', pattern_id, 'values', values_arr)), '[]'::json) INTO v_patterns
 	FROM (
 		SELECT pattern_id,
@@ -214,6 +224,22 @@ BEGIN
 				]) AS factor_val
 			FROM rpt_inp_pattern_value p
 			WHERE result_id = v_result_id
+			AND p.pattern_id IN (SELECT pattern_id FROM pattern_ids)
+			UNION ALL
+			SELECT p.id, p.pattern_id, NULL::integer AS idrow,
+				unnest(ARRAY[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]) AS factor_idx,
+				unnest(ARRAY[
+					p.factor_1, p.factor_2, p.factor_3, p.factor_4, p.factor_5, p.factor_6,
+					p.factor_7, p.factor_8, p.factor_9, p.factor_10, p.factor_11, p.factor_12,
+					p.factor_13, p.factor_14, p.factor_15, p.factor_16, p.factor_17, p.factor_18
+				]) AS factor_val
+			FROM inp_pattern_value p
+			WHERE p.pattern_id IN (SELECT pattern_id FROM pattern_ids)
+			AND p.pattern_id NOT IN (
+				SELECT DISTINCT pattern_id
+				FROM rpt_inp_pattern_value
+				WHERE result_id = v_result_id
+			)
 		) unnested
 		WHERE factor_val IS NOT NULL
 		GROUP BY pattern_id
