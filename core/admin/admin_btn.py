@@ -621,9 +621,9 @@ class GwAdminButton:
         if self._process_folder(folder_cff) is False:
             msg = '{0} folder not found'
             msg_params = ("Final_pass/config_form_fields",)
-            tools_log.log_info(msg, msg_params)
+            tools_log.log_info(msg, msg_params=msg_params)
             return False
-        
+
         status = self._execute_files(folder_cff, set_progress_bar=True)
         if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
@@ -631,12 +631,12 @@ class GwAdminButton:
         if self._process_folder(folder_i18n) is False:
             msg = '{0} folder not found, executing en_US folder'
             msg_params = ("Final_pass/i18n/" + lang,)
-            tools_log.log_info(msg, msg_params)
+            tools_log.log_info(msg, msg_params=msg_params)
             folder_i18n = os.path.join(folder_final_pass, 'i18n', 'en_US')
             if self._process_folder(folder_i18n) is False:
                 msg = '{0} folder not found'
                 msg_params = ("Final_pass/i18n/en_US",)
-                tools_log.log_info(msg, msg_params)
+                tools_log.log_info(msg, msg_params=msg_params)
                 return False
 
         status = self._execute_files(folder_i18n, set_progress_bar=True)
@@ -2261,7 +2261,7 @@ class GwAdminButton:
                 if aux_schema_name:
                     f_to_read = f_to_read.replace("AUX_SCHEMA_NAME", aux_schema_name)
                 f_to_read = f_to_read.replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg)
-                
+
                 status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
                 if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
@@ -2357,7 +2357,7 @@ class GwAdminButton:
                 file_content = f.read()
                 f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
                     "PARENT_SCHEMA", PARENT_SCHEMA).replace("PARENT_TYPE", self.project_type_selected)
-                
+
                 # Case-insensitive BD_NAME replacement
                 if re.search(r'bd_name', f_to_read, re.IGNORECASE):
                     BD_NAME = self._get_current_db_name()
@@ -2411,7 +2411,7 @@ class GwAdminButton:
 
         settings = QSettings()
         settings.beginGroup(f"PostgreSQL/connections/{connection_name}")
-        
+
         # Check if using pg_service
         service_name = settings.value("service", "")
         if service_name:
@@ -2421,7 +2421,7 @@ class GwAdminButton:
         else:
             # Get database name from connection settings
             db_name = settings.value("database", "")
-        
+
         settings.endGroup()
         return db_name if db_name else None
 
