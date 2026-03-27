@@ -359,8 +359,7 @@ class GwConnectLinkButton(GwMaptool):
         if result and result['status'] != 'Failed':
             tools_gw.fill_tab_log(self.dlg_connect_link, result['body']['data'])
         else:
-            msg = "gw_fct_setlinktonetwork (Check log messages)"
-            tools_qgis.show_warning(msg, title='Function error')
+            tools_gw.manage_json_exception(result)
 
         # Recover dialog values
         self._save_dlg_values()
