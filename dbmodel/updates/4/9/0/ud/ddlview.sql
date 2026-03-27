@@ -1125,6 +1125,8 @@ AS WITH sel_expl AS (
            FROM sel_expl
           WHERE sel_expl.expl_id = connec.expl_id));
 
+DROP VIEW IF EXISTS ve_link;
+
 CREATE OR REPLACE VIEW ve_link
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
