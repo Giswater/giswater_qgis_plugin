@@ -1285,3 +1285,182 @@ AS SELECT om_mincut.id,
      LEFT JOIN v_streetaxis ON v_streetaxis.id::text = om_mincut.streetaxis_id::text
      LEFT JOIN cat_users ON cat_users.id::text = om_mincut.assigned_to::text
   WHERE om_mincut.id > 0;
+
+
+CREATE OR REPLACE VIEW ve_link AS
+WITH typevalue AS (
+         SELECT edit_typevalue.typevalue,
+            edit_typevalue.id,
+            edit_typevalue.idval
+           FROM edit_typevalue
+          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
+        ), sector_table AS (
+         SELECT sector.sector_id,
+            sector.macrosector_id,
+            sector.stylesheet,
+            t.id::character varying(16) AS sector_type
+           FROM sector
+             LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
+        ), dma_table AS (
+         SELECT dma.dma_id,
+            dma.macrodma_id,
+            dma.stylesheet,
+            t.id::character varying(16) AS dma_type
+           FROM dma
+             LEFT JOIN typevalue t ON t.id::text = dma.dma_type::text AND t.typevalue::text = 'dma_type'::text
+        ), presszone_table AS (
+         SELECT presszone.presszone_id,
+            presszone.head AS presszone_head,
+            presszone.stylesheet,
+            t.id::character varying(16) AS presszone_type
+           FROM presszone
+             LEFT JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
+        ), dqa_table AS (
+         SELECT dqa.dqa_id,
+            dqa.stylesheet,
+            t.id::character varying(16) AS dqa_type,
+            dqa.macrodqa_id
+           FROM dqa
+             LEFT JOIN typevalue t ON t.id::text = dqa.dqa_type::text AND t.typevalue::text = 'dqa_type'::text
+        ), supplyzone_table AS (
+         SELECT supplyzone.supplyzone_id,
+            supplyzone.stylesheet,
+            t.id::character varying(16) AS supplyzone_type
+           FROM supplyzone
+             LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type::text AND t.typevalue::text = 'supplyzone_type'::text
+        ), omzone_table AS (
+         SELECT omzone.omzone_id,
+            t.id::character varying(16) AS omzone_type,
+            omzone.macroomzone_id,
+            omzone.stylesheet
+           FROM omzone
+             LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
+        ), inp_network_mode AS (
+         SELECT config_param_user.value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+        )
+ SELECT l.link_id,
+    l.code,
+    l.sys_code,
+    l.top_elev1,
+    l.depth1,
+        CASE
+            WHEN l.top_elev1 IS NULL OR l.depth1 IS NULL THEN NULL::double precision
+            ELSE l.top_elev1 - l.depth1::double precision
+        END AS elevation1,
+    l.exit_id,
+    l.exit_type,
+    l.top_elev2,
+    l.depth2,
+        CASE
+            WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL::double precision
+            ELSE l.top_elev2 - l.depth2::double precision
+        END AS elevation2,
+    l.feature_type,
+    l.feature_id,
+    cat_link.link_type,
+    cat_feature.feature_class AS sys_type,
+    l.linkcat_id,
+    cat_link.matcat_id,
+    cat_link.dnom AS cat_dnom,
+    cat_link.dint AS cat_dint,
+    cat_link.pnom AS cat_pnom,
+    l.state,
+    l.state_type,
+    l.expl_id,
+    exploitation.macroexpl_id,
+    l.muni_id,
+    l.sector_id,
+    sector_table.macrosector_id,
+    sector_table.sector_type,
+    l.supplyzone_id,
+    supplyzone_table.supplyzone_type,
+    l.presszone_id,
+    presszone_table.presszone_type,
+    presszone_table.presszone_head,
+    l.dma_id,
+    dma_table.macrodma_id,
+    dma_table.dma_type,
+    l.dqa_id,
+    dqa_table.macrodqa_id,
+    dqa_table.dqa_type,
+    l.omzone_id,
+    omzone_table.macroomzone_id,
+    omzone_table.omzone_type,
+    l.minsector_id,
+    l.location_type,
+    l.fluid_type,
+    l.custom_length,
+    st_length(l.the_geom)::numeric(12,3) AS gis_length,
+    l.staticpressure1,
+    l.staticpressure2,
+    l.annotation,
+    l.observ,
+    l.comment,
+    l.descript,
+    l.link,
+    l.num_value,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    l.brand_id,
+    l.model_id,
+    l.verified,
+    l.uncertain,
+    l.userdefined_geom,
+    l.datasource,
+    l.is_operative,
+    sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+    omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
+    dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
+    dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
+    supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
+        CASE
+            WHEN l.sector_id > 0 AND l.is_operative = true AND c.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text THEN c.epa_type
+            ELSE NULL::text
+        END AS inp_type,
+    l.lock_level,
+    l.expl_visibility,
+    l.created_at,
+    l.created_by,
+    l.updated_at,
+    l.updated_by,
+    l.the_geom,
+    COALESCE(pp.state, l.state) AS p_state,
+    l.uuid
+   FROM link l
+     LEFT JOIN connec c ON c.connec_id = l.feature_id
+     LEFT JOIN LATERAL ( SELECT pp1.connec_id,
+            pp1.psector_id
+           FROM plan_psector_x_connec pp1
+          WHERE (pp1.psector_id IN ( SELECT sp.psector_id
+                   FROM selector_psector sp
+                  WHERE sp.cur_user = CURRENT_USER)) AND pp1.connec_id = l.feature_id
+          ORDER BY pp1.psector_id DESC
+         LIMIT 1) last_ps ON true
+     LEFT JOIN LATERAL ( SELECT pp2.state
+           FROM plan_psector_x_connec pp2
+          WHERE pp2.link_id = l.link_id AND pp2.psector_id = last_ps.psector_id
+         LIMIT 1) pp ON true
+     JOIN sector_table ON sector_table.sector_id = l.sector_id
+     JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text
+     JOIN exploitation ON l.expl_id = exploitation.expl_id
+     LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
+     LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
+     LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
+     LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l.supplyzone_id
+     LEFT JOIN omzone_table ON omzone_table.omzone_id = l.omzone_id
+     LEFT JOIN inp_network_mode ON true
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = COALESCE(pp.state, l.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = l.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = l.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(l.expl_visibility::integer[], l.expl_id))) AND se.cur_user = CURRENT_USER));

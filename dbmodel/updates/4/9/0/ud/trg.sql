@@ -11,3 +11,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE TRIGGER gw_trg_edit_inp_dscenario_pattern INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_dscenario_pattern 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('PATTERN');
 
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');

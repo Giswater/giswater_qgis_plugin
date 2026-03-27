@@ -21,3 +21,8 @@ CREATE TRIGGER gw_trg_dscenario_demand_feature AFTER INSERT ON inp_dscenario_dem
 FOR EACH ROW EXECUTE FUNCTION gw_trg_dscenario_demand_feature();
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON inp_dscenario_demand
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_dscenario_demand');
+
+-- View Triggers
+
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');

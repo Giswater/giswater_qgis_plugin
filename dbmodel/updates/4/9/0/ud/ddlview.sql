@@ -1124,3 +1124,170 @@ AS WITH sel_expl AS (
   WHERE (EXISTS ( SELECT 1
            FROM sel_expl
           WHERE sel_expl.expl_id = connec.expl_id));
+
+CREATE OR REPLACE VIEW ve_link
+AS WITH typevalue AS (
+         SELECT edit_typevalue.typevalue,
+            edit_typevalue.id,
+            edit_typevalue.idval
+           FROM edit_typevalue
+          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
+        ), sector_table AS (
+         SELECT sector.sector_id,
+            sector.macrosector_id,
+            sector.stylesheet,
+            t.id::character varying(16) AS sector_type
+           FROM sector
+             LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
+        ), omzone_table AS (
+         SELECT omzone.omzone_id,
+            omzone.macroomzone_id,
+            omzone.stylesheet,
+            t.id::character varying(16) AS omzone_type
+           FROM omzone
+             LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
+        ), drainzone_table AS (
+         SELECT drainzone.drainzone_id,
+            drainzone.stylesheet,
+            t.id::character varying(16) AS drainzone_type
+           FROM drainzone
+             LEFT JOIN typevalue t ON t.id::text = drainzone.drainzone_type::text AND t.typevalue::text = 'drainzone_type'::text
+        ), dwfzone_table AS (
+         SELECT dwfzone.dwfzone_id,
+            dwfzone.stylesheet,
+            t.id::character varying(16) AS dwfzone_type,
+            dwfzone.drainzone_id
+           FROM dwfzone
+             LEFT JOIN typevalue t ON t.id::text = dwfzone.dwfzone_type::text AND t.typevalue::text = 'dwfzone_type'::text
+        ), inp_network_mode AS (
+         SELECT config_param_user.value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+        )
+ SELECT l.link_id,
+    l.code,
+    l.sys_code,
+    l.top_elev1,
+    l.y1,
+        CASE
+            WHEN l.top_elev1 IS NULL OR l.y1 IS NULL THEN NULL::double precision
+            ELSE l.top_elev1 - l.y1::double precision
+        END AS elevation1,
+    l.exit_id,
+    l.exit_type,
+    l.top_elev2,
+    l.y2,
+        CASE
+            WHEN l.top_elev2 IS NULL OR l.y2 IS NULL THEN NULL::double precision
+            ELSE l.top_elev2 - l.y2::double precision
+        END AS elevation2,
+    l.feature_type,
+    l.feature_id,
+    l.link_type,
+    cat_feature.feature_class AS sys_type,
+    l.linkcat_id,
+    cat_link.matcat_id,
+    cat_link.dnom AS cat_dnom,
+    cat_link.dint AS cat_dint,
+    cat_link.pnom AS cat_pnom,
+    l.state,
+    l.state_type,
+    l.expl_id,
+    exploitation.macroexpl_id,
+    l.muni_id,
+    l.sector_id,
+    sector_table.macrosector_id,
+    sector_table.sector_type,
+    dwfzone_table.drainzone_id,
+    drainzone_table.drainzone_type,
+    l.drainzone_outfall,
+    l.dwfzone_id,
+    dwfzone_table.dwfzone_type,
+    l.dwfzone_outfall,
+    l.omzone_id,
+    omzone_table.macroomzone_id,
+    l.dma_id,
+    l.location_type,
+    l.fluid_type,
+    l.custom_length,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.sys_slope,
+    l.annotation,
+    l.observ,
+    l.comment,
+    l.descript,
+    l.link,
+    l.num_value,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    l.brand_id,
+    l.model_id,
+    l.private_linkcat_id,
+    l.verified,
+    l.uncertain,
+    l.userdefined_geom,
+    l.datasource,
+    l.is_operative,
+    sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+    omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
+    drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
+    dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
+    l.lock_level,
+    l.expl_visibility,
+    l.created_at,
+    l.created_by,
+    date_trunc('second'::text, l.updated_at) AS updated_at,
+    l.updated_by,
+    l.the_geom,
+    COALESCE(pp.state, l.state) AS p_state,
+    l.uuid,
+    l.omunit_id,
+    l.treatment_type
+   FROM link l
+     LEFT JOIN LATERAL ( SELECT p.psector_id
+           FROM ( SELECT pp1.connec_id AS feature_id,
+                    pp1.psector_id
+                   FROM plan_psector_x_connec pp1
+                  WHERE (pp1.psector_id IN ( SELECT sp.psector_id
+                           FROM selector_psector sp
+                          WHERE sp.cur_user = CURRENT_USER)) AND pp1.connec_id = l.feature_id
+                UNION ALL
+                 SELECT pg1.gully_id AS feature_id,
+                    pg1.psector_id
+                   FROM plan_psector_x_gully pg1
+                  WHERE (pg1.psector_id IN ( SELECT sp.psector_id
+                           FROM selector_psector sp
+                          WHERE sp.cur_user = CURRENT_USER)) AND pg1.gully_id = l.feature_id) p
+          ORDER BY p.psector_id DESC
+         LIMIT 1) last_ps ON true
+     LEFT JOIN LATERAL ( SELECT p.state
+           FROM ( SELECT pp2.state
+                   FROM plan_psector_x_connec pp2
+                  WHERE pp2.link_id = l.link_id AND pp2.psector_id = last_ps.psector_id
+                UNION ALL
+                 SELECT pg2.state
+                   FROM plan_psector_x_gully pg2
+                  WHERE pg2.link_id = l.link_id AND pg2.psector_id = last_ps.psector_id) p
+         LIMIT 1) pp ON true
+     JOIN exploitation ON l.expl_id = exploitation.expl_id
+     JOIN ext_municipality mu ON l.muni_id = mu.muni_id
+     JOIN sector_table ON l.sector_id = sector_table.sector_id
+     JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
+     JOIN cat_feature ON cat_feature.id::text = l.link_type::text
+     LEFT JOIN omzone_table ON l.omzone_id = omzone_table.omzone_id
+     LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
+     LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
+     LEFT JOIN inp_network_mode ON true
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = COALESCE(pp.state, l.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = l.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = l.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(l.expl_visibility::integer[], l.expl_id))) AND se.cur_user = CURRENT_USER));
+
+-- View Triggers
