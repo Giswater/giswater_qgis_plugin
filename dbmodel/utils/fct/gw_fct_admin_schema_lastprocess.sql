@@ -327,9 +327,9 @@ BEGIN
 
 			-- force all cat feature not active in order to increase step-by-step
 			IF v_projecttype = 'WS' THEN
-				UPDATE cat_feature SET active = false WHERE feature_class NOT IN ('VALVE', 'WJOIN', 'JUNCTION', 'TANK', 'PIPE', 'FRELEM'); -- ws projects
+				UPDATE cat_feature SET active = false WHERE feature_class NOT IN ('VALVE', 'WJOIN', 'JUNCTION', 'TANK', 'PIPE', 'FRELEM', 'VLINK', 'PIPELINK'); -- ws projects
 			ELSE
-				UPDATE cat_feature SET active = false WHERE feature_class NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL', 'FRELEM'); -- ud projects
+				UPDATE cat_feature SET active = false WHERE feature_class NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL', 'FRELEM', 'VLINK', 'CONDUITLINK'); -- ud projects
 			END IF;
 
 			-- hidden lastupdate and lastupdate_user columns
