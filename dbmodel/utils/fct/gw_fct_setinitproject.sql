@@ -141,14 +141,20 @@ BEGIN
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN
 
 			IF (v_expl_x_user) IS NOT TRUE THEN
-				SELECT expl_id INTO v_expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 LIMIT 1;
+				SELECT expl_id INTO v_expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 ORDER BY expl_id LIMIT 1;
 			ELSE
-				SELECT expl_id INTO v_expl_id FROM config_user_x_expl WHERE username = current_user AND expl_id > 0 LIMIT 1;
+				SELECT c.expl_id INTO v_expl_id 
+				FROM config_user_x_expl c
+				JOIN exploitation e USING (expl_id)
+				WHERE c.username = current_user AND c.expl_id > 0
+				AND e.active IS NOT FALSE
+				ORDER BY c.expl_id LIMIT 1;
 			END IF;
 
 			IF v_expl_id IS NOT NULL THEN
 				EXECUTE format(
 					$$SELECT gw_fct_setselectors('{
+						"client":{},
 						"data":{
 							"selectorType":"selector_basic",
 							"tabName":"tab_exploitation",
