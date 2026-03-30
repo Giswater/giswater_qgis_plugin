@@ -580,7 +580,7 @@ BEGIN
 
 		-- psector
 		DELETE FROM selector_psector WHERE psector_id NOT IN
-		(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+		(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 	
 		EXECUTE 'SET search_path = '||v_schemaname||', public';
 	END IF;
@@ -703,7 +703,7 @@ BEGIN
 	
 			-- psector
 			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN 
+			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN 
 		    (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 		END IF;
 	END IF;
