@@ -66,6 +66,14 @@ BEGIN
 	v_currentpsector  = (SELECT value FROM config_param_user WHERE parameter = 'plan_psector_current' AND cur_user=current_user);
 	v_statetypeplan  = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user=current_user);
 
+	-- checks
+	IF v_currentpsector IS NULL THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4622", "function":"3072"}}$$);';
+	END IF;
+	IF v_statetypeplan IS NULL THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4432", "function":"3072"}}$$);';
+	END IF;
+
 
 	-- manage log (fid: 143)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
@@ -106,7 +114,7 @@ BEGIN
 				UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 				-- setting values of new arc
-				rec.state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user=current_user);
+				rec.state_type = v_statetypeplan;
 				rec.workcat_id_plan = (SELECT workcat_id FROM plan_psector WHERE psector_id = v_currentpsector);
 
 				-- profilactic controls
