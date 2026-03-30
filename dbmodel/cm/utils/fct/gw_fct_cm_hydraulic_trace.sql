@@ -153,7 +153,8 @@ BEGIN
             a.the_geom
         FROM om_campaign_x_arc a
         WHERE
-              (
+			  (larc.action IS NULL OR larc.action <> 3)
+		  AND ((
                 a.node_1 IN (SELECT node FROM reachable_nodes)
                 AND a.node_2 IN (SELECT node FROM reachable_nodes)
               )
@@ -164,7 +165,7 @@ BEGIN
            OR (
                 a.node_2 IN (SELECT node FROM reachable_nodes)
                 AND a.node_1 = ANY(%L)
-              )
+              ))
         ORDER BY a.arc_id
 
     $sql$,
