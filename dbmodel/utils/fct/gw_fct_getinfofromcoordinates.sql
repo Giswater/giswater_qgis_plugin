@@ -269,7 +269,7 @@ BEGIN
 
 					', near AS (',
 						'SELECT lp.', quote_ident(v_idname), ', lp.state, lp.', quote_ident(v_the_geom),
-						' FROM ', quote_ident(v_parent), ' lp, params p',
+						' FROM ', quote_ident(v_layer.layer_id), ' lp, params p',
 						' ORDER BY lp.', quote_ident(v_the_geom), ' <-> p.pt',
 						' LIMIT 200)',
 					
