@@ -97,3 +97,7 @@ UPDATE config_form_fields SET dv_querytext='SELECT location_type as id, location
 
 -- 30/03/2026
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(4622, 'You MUST select “current_psector” to perform this action', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_message
+(id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4624, 'There are values not allowed in the field ''%alias%'' (%column%) of the table ''%table%''', NULL, 0, true, 'utils', 'core', 'AUDIT');

@@ -79,7 +79,6 @@ VALUES(3552, 'gw_fct_cm_setarcdivide_massive', 'ws', 'function', 'json', 'json',
 
 Only available for those Lots that have state ASSIGNED, IN PROGRESS or EXECUTED.', 'role_om', NULL, 'cm', 'SETARCDIVIDE_MASSIVE') ON CONFLICT DO NOTHING;
 
-
 INSERT INTO config_function
 (id, function_name, "style", layermanager, actions)
 VALUES(3552, 'gw_fct_cm_setarcdivide_massive', '{
@@ -423,3 +422,37 @@ VALUES(3564, '4.2- [CM] Visualize hydraulic topology of a lot', '{"featureType":
     "layoutorder": 5
   }
 ]'::json, NULL, true, '{4}');
+
+-- 30/03/2026
+
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3562, 'gw_fct_cm_verify_catalogs', 'ws', 'function', NULL, NULL, 'Function to check values outside of catalog.', 'role_om', NULL, 'cm', 'CHECK_CATALOG') ON CONFLICT DO NOTHING;
+
+INSERT INTO config_toolbox
+(id, alias, functionparams, inputparams, observ, active, device)
+VALUES(3562, 'Check catalogs values', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "campaignId",
+    "label": "Campaign Id:",
+    "widgettype": "combo",
+    "isparent": "true",
+    "datatype": "text",
+    "tooltip": "Choose a campaign",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "dvQueryText": "SELECT c.campaign_id as id, name as idval FROM cm.om_campaign c JOIN (SELECT t.organization_id, bool_or(o.orgname = ''Org AyA'') AS is_aya FROM cm.cat_user u JOIN cm.cat_team t ON t.team_id = u.team_id JOIN cm.cat_organization o ON o.organization_id = t.organization_id WHERE u.username = current_user GROUP BY t.organization_id) ctx ON (c.organization_id = ctx.organization_id OR ctx.is_aya) where exists (select 1 from cm.om_campaign_lot l where status in (3,4,6) and l.campaign_id = c.campaign_id)"
+  },
+  {
+    "widgetname": "lotId",
+    "label": "Lot Id:",
+    "widgettype": "combo",
+    "parentname": "campaignId",
+    "datatype": "text",
+    "tooltip": "Choose a lot",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "dvQueryText": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6)",
+    "filterquery": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6) and a.campaign_id = ''{parent_value}''"
+  }
+]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
