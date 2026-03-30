@@ -77,7 +77,7 @@ BEGIN
 			AND columnname = rec_check.columnname;
 	
 			IF v_exists IS TRUE THEN
-				EXECUTE format('SELECT gw_fct_getmessage($msg${"data":{"message":"4622", "function":"3552", "parameters":{"alias":"%s", "column":"%s", "table": "%s"}, "fid":"3562", "is_process":true, "tempTable":"t_"}}$msg$)', 
+				EXECUTE format('SELECT gw_fct_getmessage($msg${"data":{"message":"4624", "function":"3552", "parameters":{"alias":"%s", "column":"%s", "table": "%s"}, "fid":"3562", "is_process":true, "tempTable":"t_"}}$msg$)', 
 							v_alias, rec_check.columnname, v_cm_tablename);
 			END IF;
 		END IF;
