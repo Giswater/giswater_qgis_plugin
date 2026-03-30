@@ -30,6 +30,11 @@ v_num_pkeys integer;
 v_json_data JSON;
 v_feature TEXT := TG_ARGV[0];
 v_prev_search_path text;
+v_lot_id int;
+v_campaign_id int;
+v_current_table text := TG_TABLE_NAME;
+v_feature_type text;
+v_epavdef json;
 
 BEGIN
 
@@ -51,6 +56,17 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 		IF v_feature = 'node' THEN
 		    NEW.node_id := nextval('cm_urn_id_seq');
+			IF (lower(replace(v_current_table, 've_PARENT_SCHEMA_lot_', '')) IN (SELECT lower(id) FROM PARENT_SCHEMA.cat_feature WHERE feature_class = 'VALVE')) THEN
+
+				SELECT vdef INTO v_epavdef FROM (
+					SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef
+					FROM PARENT_SCHEMA.config_param_system
+					WHERE parameter like 'epa_valve_vdefault_%'
+				)a
+				WHERE lower(id) = lower(replace(v_current_table, 've_PARENT_SCHEMA_lot_', ''));
+				SELECT v_epavdef->>'valve_type'
+				INTO NEW.valve_type;
+			END IF;
 		ELSIF v_feature = 'arc' THEN
 		    NEW.arc_id := nextval('cm_urn_id_seq');
 		ELSIF v_feature = 'connec' THEN
@@ -78,6 +94,25 @@ BEGIN
 
   		SELECT COALESCE(row_to_json(NEW), '{}') INTO v_json_data;
 
+		v_lot_id := NEW.lot_id;
+
+		SELECT campaign_id INTO v_campaign_id
+	    FROM cm.om_campaign_lot
+	    WHERE lot_id = v_lot_id;
+	
+		IF v_campaign_id IS NULL THEN
+	        RAISE EXCEPTION 'Lot % does not have an assigned campaign.', v_lot_id;
+	    END IF;
+		v_feature_type := UPPER(replace(v_current_table, 've_PARENT_SCHEMA_lot_', ''));
+		IF v_feature IN ('arc','node') THEN
+			EXECUTE format('INSERT INTO cm.om_campaign_x_%I (%s_id, campaign_id, %scat_id, %s_type, status)
+							VALUES ($1.%I_id, $2, $1.%Icat_id, COALESCE($1.%I_type, $3), $1.status) ON CONFLICT (%s_id, campaign_id)
+							DO UPDATE SET status = EXCLUDED.status, %s_type = EXCLUDED.%s_type, %scat_id = EXCLUDED.%scat_id
+							WHERE cm.om_campaign_x_%I.%s_id = EXCLUDED.%s_id',
+					v_feature, v_feature, v_feature, v_feature, v_feature, v_feature, v_feature, v_feature, v_feature, v_feature,
+					v_feature, v_feature, v_feature, v_feature, v_feature)
+					USING NEW, v_campaign_id, v_feature_type;
+		END IF;
    	ELSE
 
   		SELECT COALESCE(row_to_json(OLD), '{}') INTO v_json_data;
