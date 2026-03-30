@@ -82,37 +82,48 @@ FROM v_cso_drainzone_rainfall_tstep dr
      GROUP BY m.name, ex.name, d.name, e.name, d.drainzone_id, outfall_id, rainfall 
      ORDER BY 1, 2, 4
 
-     
-CREATE OR REPLACE VIEW v_cso_drainzone AS 
-SELECT
-	macroexplotation,
-	exploitation,
-	municipality,
-	drainzone, 
-	d.expl_id,
-	d.drainzone_id,
-	outfall_id,
+   
+	
+CREATE OR REPLACE VIEW v_cso_drainzone
+AS SELECT cov.macroexplotation,
+    cov.exploitation,
+    cov.municipality,
+    cov.drainzone,
+    d.expl_id,
+    d.drainzone_id,
+    cov.outfall_id,
     cso.thyssen_plv_area::numeric(12,3) AS total_area,
     cso.imperv_area::numeric(12,3) AS imperv_area,
-    (cso.imperv_area/cso.thyssen_plv_area)::numeric(12,3) AS runoffc,
-    CASE WHEN cc.calib_imperv_area IS NULL THEN cso.imperv_area::numeric(12,3) ELSE cc.calib_imperv_area::numeric(12,3) END AS calib_imperv_area,
-    CASE WHEN cc.calib_imperv_area IS NOT NULL THEN (cc.calib_imperv_area/cso.thyssen_plv_area)::numeric(12,3) ELSE mean_coef_runoff::numeric(12,3) END AS calib_runoffc,
-    (d.addparam->>'kmLength')::numeric(12,3) AS kmlength,
-    sum(vol_dwf) AS vol_dwf,
-    sum(vol_wwtp) AS vol_wwtp,
-    ((sum(vol_leaked))/(10*24*3600))::numeric(12,3) AS q_leaked_p80,
-    ((sum(vol_non_leaked))/(10*24*3600))::numeric(12,3) AS q_nonleaked_p80,
+    (cso.imperv_area / cso.thyssen_plv_area)::numeric(12,3) AS runoffc,
+        CASE
+            WHEN cc.calib_imperv_area IS NULL THEN cso.imperv_area::numeric(12,3)
+            ELSE cc.calib_imperv_area::numeric(12,3)
+        END AS calib_imperv_area,
+        CASE
+            WHEN cc.calib_imperv_area IS NOT NULL THEN (cc.calib_imperv_area / cso.thyssen_plv_area)::numeric(12,3)
+            ELSE cso.mean_coef_runoff::numeric(12,3)
+        END AS calib_runoffc,
+    ((d.addparam ->> 'kmLength'::text))::numeric(12,3) AS kmlength,
+    sum(cov.vol_dwf) AS vol_dwf,
+    sum(cov.vol_wwtp) AS vol_wwtp,
+    (sum(cov.vol_leaked) / (10 * 24 * 3600)::numeric)::numeric(12,3) AS q_leaked_p80,
+    (sum(cov.vol_non_leaked) / (10 * 24 * 3600)::numeric)::numeric(12,3) AS q_nonleaked_p80,
     cso.eq_inhab::integer AS eq_inhab,
-    ((sum(vol_dwf)/sum(vol_runoff))*100)::numeric(12,3) AS dwf_p80_percent,
+        CASE
+            WHEN sum(cov.vol_dwf) > sum(cov.vol_runoff) THEN 100::numeric
+            ELSE (sum(cov.vol_dwf) / sum(cov.vol_runoff) * 100::numeric)::numeric(12,3)
+        END AS dwf_p80_percent,
     avg(cov.efficiency)::numeric(12,3) AS efficiency,
-    d.the_geom
-   FROM v_cso_drainzone_rainfall cov 
-   	 LEFT JOIN cso_calibration cc ON cc.drainzone_id = cov.drainzone_id
+    d.the_geom,
+    drainzone_type,
+    link
+   FROM v_cso_drainzone_rainfall cov
+     LEFT JOIN cso_calibration cc ON cc.drainzone_id = cov.drainzone_id
      LEFT JOIN cso_inp_system_subc cso ON cso.drainzone_id = cov.drainzone_id
-     LEFT JOIN drainzone d ON d.drainzone_id =cov.drainzone_id 
-     WHERE (d.addparam->>'isCSO')::BOOLEAN IS TRUE
-     GROUP BY macroexplotation,	exploitation,	municipality,	drainzone, d.drainzone_id,cov.outfall_id, d.addparam->>'kmLength', cso.eq_inhab, d.the_geom, cso.thyssen_plv_area, cso.imperv_area, cso.mean_coef_runoff, cc.calib_imperv_area, cso.thyssen_plv_area
-  ORDER BY 1,2,4;
+     LEFT JOIN drainzone d ON d.drainzone_id = cov.drainzone_id
+  WHERE ((d.addparam ->> 'isCSO'::text)::boolean) IS TRUE
+  GROUP BY cov.macroexplotation, cov.exploitation, cov.municipality, cov.drainzone, d.drainzone_id, cov.outfall_id, (d.addparam ->> 'kmLength'::text), cso.eq_inhab, d.the_geom, cso.thyssen_plv_area, cso.imperv_area, cso.mean_coef_runoff, cc.calib_imperv_area
+  ORDER BY cov.macroexplotation, cov.exploitation, cov.drainzone;
  
 
 CREATE OR REPLACE VIEW v_rpt_multi_arcflow_sum
