@@ -121,7 +121,7 @@ BEGIN
 					muni_id, postcode, district_id, postnumber, postcomplement, postnumber2, postcomplement2,
 					label_x,label_y,label_rotation,inventory)
 					VALUES
-					(v_catalog, rec.epa_type, rec.expl_id, rec.sector_id, 2, rec.state_type, rec.minsector_id, rec.dma_id, rec.presszone_id, rec.dqa_id, rec.soilcat_id,
+					(v_catalog, rec.epa_type, rec.expl_id, 0, 2, rec.state_type, 0, 0, 0, 0, rec.soilcat_id,
 					rec.function_type, rec.category_type, rec.fluid_type, rec.location_type, rec.workcat_id_plan, rec.ownercat_id, rec.the_geom,
 					rec.muni_id, rec.postcode, rec.district_id, rec.postnumber, rec.postcomplement, rec.postnumber2, rec.postcomplement2,
 					rec.label_x, rec.label_y, rec.label_rotation, false)
@@ -142,7 +142,7 @@ BEGIN
 					label_x,label_y,label_rotation, inventory, y1, y2, elev1, elev2, custom_elev1, custom_elev2,
 					matcat_id, inverted_slope)
 					VALUES
-					(v_catalog, v_arc_type, rec.epa_type, rec.expl_id, rec.sector_id, 2, rec.state_type, rec.dma_id, rec.soilcat_id,
+					(v_catalog, v_arc_type, rec.epa_type, rec.expl_id, 0, 2, rec.state_type, 0, rec.soilcat_id,
 					rec.function_type, rec.category_type, rec.fluid_type, rec.location_type, rec.workcat_id_plan, rec.ownercat_id, rec.the_geom,
 					rec.muni_id, rec.postcode, rec.district_id, rec.postnumber, rec.postcomplement, rec.postnumber2, rec.postcomplement2,
 					rec.label_x, rec.label_y, rec.label_rotation, false, rec.y1, rec.y2,
@@ -182,14 +182,14 @@ BEGIN
 
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, presszone_id,
 						linkcat_id, state_type, dma_id, dqa_id, minsector_id, fluid_type)
-						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id,	presszone_id,
-						linkcat_id, v_statetypeplan, dma_id, dqa_id, minsector_id, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, 0,	0,
+						linkcat_id, v_statetypeplan, 0, 0, 0, fluid_type FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					
 						INSERT INTO man_pipelink VALUES (v_link_id);
 
 					ELSE
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, state_type, link_type)
-						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, linkcat_id, fluid_type, v_statetypeplan, link_type
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, 0, 0, linkcat_id, fluid_type, v_statetypeplan, link_type
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					
 						INSERT INTO man_pipelink VALUES (v_link_id);
@@ -232,7 +232,7 @@ BEGIN
 						ON CONFLICT (gully_id, psector_id, state) DO NOTHING;
 
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, state, expl_id, the_geom, sector_id, dma_id, fluid_type, link_type, linkcat_id, state_type)
-						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, sector_id, dma_id, fluid_type, link_type, linkcat_id, v_statetypeplan
+						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, 0, 0, fluid_type, link_type, linkcat_id, v_statetypeplan
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 
 						INSERT INTO man_conduitlink VALUES (v_link_id);
