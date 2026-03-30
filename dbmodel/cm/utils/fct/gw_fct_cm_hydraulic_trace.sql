@@ -152,6 +152,7 @@ BEGIN
             a.node_2,
             a.the_geom
         FROM om_campaign_x_arc a
+		JOIN om_campaign_lot_x_arc larc ON a.arc_id = larc.arc_id
         WHERE
 			  (larc.action IS NULL OR larc.action <> 3)
 		  AND ((
