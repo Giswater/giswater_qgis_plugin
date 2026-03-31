@@ -162,7 +162,7 @@ BEGIN
 						}
 					}')$$
 				);
-				v_errortext=concat('Set visible exploitation for user ',(v_expl_id));
+				v_errortext = 'Set all active exploitations as visible exploitations for user';
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 			ELSE
 				v_errortext=concat('No exploitation found for user ', current_user);
