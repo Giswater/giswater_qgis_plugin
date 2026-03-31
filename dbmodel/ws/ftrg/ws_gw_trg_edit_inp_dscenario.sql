@@ -163,8 +163,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM ve_inp_junction WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_junction(dscenario_id, node_id, demand, pattern_id, init_quality, source_type, source_quality, source_pattern_id)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.demand, NEW.pattern_id, NEW.init_quality, NEW.source_type, NEW.source_quality, NEW.source_pattern_id);
+			INSERT INTO inp_dscenario_junction(dscenario_id, node_id, demand, pattern_id, init_quality, source_type, source_quality, source_pattern_id, emitter_coeff)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.demand, NEW.pattern_id, NEW.init_quality, NEW.source_type, NEW.source_quality, NEW.source_pattern_id, NEW.emitter_coeff);
 
 		ELSIF v_dscenario_type = 'CONNEC' THEN
 
@@ -254,7 +254,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			INSERT INTO inp_dscenario_frvalve (dscenario_id, element_id, valve_type, custom_dint, setting, curve_id, minorloss, add_settings, init_quality)
 			VALUES (NEW.dscenario_id, NEW.element_id, NEW.valve_type, NEW.custom_dint, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.add_settings, NEW.init_quality);
-		
+
 		ELSIF v_dscenario_type = 'FLWREG-SHORTPIPE' THEN
 
 			-- default values
@@ -274,14 +274,14 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 		ELSIF v_dscenario_type = 'CONTROLS' THEN
 			INSERT INTO inp_dscenario_controls(dscenario_id, sector_id, text, active)
 			VALUES (NEW.dscenario_id, NEW.sector_id, NEW.text, NEW.active);
-		
+
 		ELSIF v_dscenario_type = 'PATTERN' THEN
 			INSERT INTO inp_dscenario_pattern(dscenario_id, pattern_id, pattern_type, observ, tscode, tsparameters, expl_id, log, active)
 			SELECT NEW.dscenario_id, NEW.pattern_id, pattern_type, observ, tscode, tsparameters::json, expl_id, log, active FROM ve_inp_pattern WHERE pattern_id = NEW.pattern_id;
 
 			INSERT INTO inp_dscenario_pattern_value(dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 			SELECT NEW.dscenario_id, NEW.pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 FROM ve_inp_pattern_value WHERE pattern_id = NEW.pattern_id;
-		
+
 		ELSIF v_dscenario_type = 'PATTERN_VALUE' THEN
 			INSERT INTO inp_dscenario_pattern_value(dscenario_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 			VALUES (NEW.dscenario_id, NEW.pattern_id, NEW.factor_1, NEW.factor_2, NEW.factor_3, NEW.factor_4, NEW.factor_5, NEW.factor_6, NEW.factor_7, NEW.factor_8, NEW.factor_9, NEW.factor_10, NEW.factor_11, NEW.factor_12, NEW.factor_13, NEW.factor_14, NEW.factor_15, NEW.factor_16, NEW.factor_17, NEW.factor_18);
@@ -366,7 +366,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			UPDATE inp_dscenario_frvalve SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id, valve_type=NEW.valve_type, custom_dint=NEW.custom_dint,
 			setting=NEW.setting, curve_id=NEW.curve_id, minorloss=NEW.minorloss, add_settings=NEW.add_settings, init_quality=NEW.init_quality
 			WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
-		
+
 		ELSIF v_dscenario_type = 'FLWREG-SHORTPIPE' THEN
 			UPDATE inp_dscenario_frshortpipe SET dscenario_id=NEW.dscenario_id, element_id=NEW.element_id, minorloss=NEW.minorloss,
 			bulk_coeff=NEW.bulk_coeff, wall_coeff=NEW.wall_coeff, custom_dint=NEW.custom_dint, status=NEW.status
@@ -423,7 +423,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF v_dscenario_type = 'FLWREG-VALVE' THEN
 			DELETE FROM inp_dscenario_frvalve WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
-		
+
 		ELSIF v_dscenario_type = 'FLWREG-SHORTPIPE' THEN
 			DELETE FROM inp_dscenario_frshortpipe WHERE dscenario_id=OLD.dscenario_id AND element_id=OLD.element_id;
 
