@@ -101,3 +101,14 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4624, 'There are values not allowed in the field ''%alias%'' (%column%) of the table ''%table%''', NULL, 0, true, 'utils', 'core', 'AUDIT');
+
+-- 31/03/2026
+DELETE FROM config_typevalue WHERE typevalue='tabname_typevalue' AND id='tab_hydro_state';
+DELETE FROM config_form_tabs WHERE formname='selector_basic' AND tabname='tab_hydro_state';
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('connec', 'form_feature', 'tab_hydrometer', 'cmb_hydrometer_state', 'lyt_hydrometer_1', 2, 'string', 'combo', 'State:', 'State:', NULL, false, false, true, false, true, 'SELECT name as id, name as idval FROM ext_rtc_hydrometer_state WHERE id IS NOT NULL', NULL, true, NULL, NULL, NULL, '{"saveValue": false, "filterSign":"="}'::json, '{
+  "functionName": "filter_table",
+  "parameters": {
+    "columnfind": "state",
+    "field_id": "feature_id"
+  }
+}'::json, 'v_ui_hydrometer', false, 2);

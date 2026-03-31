@@ -289,7 +289,7 @@ BEGIN
 		ELSIF v_tabname = 'tab_dscenario' THEN -- to manage only those dscenarios related to selected exploitations
 			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
 			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
-		ELSIF v_tabname in ('tab_hydro_state', 'tab_mincut') THEN
+		ELSIF v_tabname in ('tab_mincut') THEN
 			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
 			',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,') ') end),' 
 			ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
@@ -739,7 +739,7 @@ BEGIN
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM plan_psector WHERE psector_id IN (select psector_id FROM selector_psector WHERE cur_user = current_user))b) a;
 	
-	ELSIF v_tabname IN ('tab_hydro_state', 'tab_network_state', 'tab_dscenario') THEN
+	ELSIF v_tabname IN ('tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
 
 	ELSIF (v_count > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
