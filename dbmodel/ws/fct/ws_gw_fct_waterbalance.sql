@@ -600,49 +600,20 @@ v_queryhydro =
 
 		select date_part('day', now() - v_current_date::timestamp) into v_days_past;
 
-
 		IF v_days_past is null then
-
-
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3142", "fid":"'||v_fid||'","criticity":"3", "is_process":true, "is_header":"true", "label_id":"1003"}}$$)';
-
 		ELSIF v_days_past >= v_days_limiter then
-
-
-
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4338", "function":"3142", "fid":"'||v_fid||'","criticity":"3", "is_process":true, "prefix_id":"1003"}}$$)';
-		else
-
-
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4040", "function":"3142", "parameters":{"v_period":"'||v_period||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
-
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4042", "function":"3142", "parameters":{" v_count":"'|| v_count||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
-
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4030", "function":"3142", "parameters":{" v_hydrometer":"'||v_hydrometer||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
-
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4032", "function":"3142", "parameters":{"v_tsi":"'||coalesce(round(rec_nrw.tsi::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4034", "function":"3142", "parameters":{"v_bmc":"'||coalesce(round(rec_nrw.bmc::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
-
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4036", "function":"3142", "parameters":{"v_nrw":"'||coalesce(round(rec_nrw.nrw::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
-
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"4038", "function":"3142", "parameters":{"v_day":"'||date_part('day', now() - v_current_date::timestamp)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
-
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4040", "function":"3142", "parameters":{"v_period":"'||v_period||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4042", "function":"3142", "parameters":{"v_count":"'||v_count||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4030", "function":"3142", "parameters":{"v_hydrometer":"'||v_hydrometer||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4032", "function":"3142", "parameters":{"v_tsi":"'||coalesce(round(rec_nrw.tsi::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4034", "function":"3142", "parameters":{"v_bmc":"'||coalesce(round(rec_nrw.bmc::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4036", "function":"3142", "parameters":{"v_nrw":"'||coalesce(round(rec_nrw.nrw::numeric,2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4038", "function":"3142", "parameters":{"v_day":"'||date_part('day', now() - v_current_date::timestamp)||'"}, "fid":"'||v_fid||'", "criticity":"4",  "is_process":true}}$$)';
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
-
-		end if;
+		END IF;
 
 		IF v_executegraphdma THEN
 
