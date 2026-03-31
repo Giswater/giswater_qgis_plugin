@@ -40,6 +40,7 @@ BEGIN
 			WHEN epa_type = 'PUMP' OR epa_type = 'VIRTUALPUMP' THEN 'PUMP'
 			ELSE 'PIPE'
 		END AS epa_type,
+		epa_type as giswater_epa_type,
 		arccat_id,
 		CASE
 			WHEN epa_type = 'VALVE' OR epa_type = 'VIRTUALVALVE' THEN addparam::json->>'valve_type'
@@ -57,24 +58,36 @@ BEGIN
 		WHERE result_id = v_result_id
 	),
 	nodes AS (
-		SELECT node_id,
+		SELECT n.node_id,
 		CASE
-			WHEN epa_type = 'TANK' OR epa_type = 'RESERVOIR' THEN epa_type
+			WHEN n.epa_type = 'TANK' OR n.epa_type = 'RESERVOIR' THEN n.epa_type
 			ELSE 'JUNCTION'
 		END AS epa_type,
-		nodecat_id,
+		n.epa_type as giswater_epa_type,
+		n.nodecat_id,
 		CASE
-			WHEN epa_type = 'TANK' OR epa_type = 'RESERVOIR' THEN epa_type
+			WHEN n.epa_type = 'TANK' OR n.epa_type = 'RESERVOIR' THEN n.epa_type
 			ELSE 'JUNCTION'
 		END AS "family",
-		dma_id,
-		presszone_id
-		FROM rpt_inp_node
-		WHERE result_id = v_result_id
+		n.dma_id,
+		n.presszone_id,
+		lw.losses_weight
+		FROM rpt_inp_node n
+		LEFT JOIN (
+			SELECT node_id, SUM(arc_len) AS losses_weight
+			FROM (
+				SELECT node_1::text AS node_id, ST_Length(the_geom) AS arc_len FROM arc WHERE state = 1
+				UNION ALL
+				SELECT node_2::text AS node_id, ST_Length(the_geom) AS arc_len FROM arc WHERE state = 1
+			) s
+			GROUP BY node_id
+		) lw ON lw.node_id::text = n.node_id
+		WHERE n.result_id = v_result_id
 	)
-	SELECT 
-		arc_id AS feature_id, 
-		epa_type AS feature_epa_type, 
+	SELECT
+		arc_id AS feature_id,
+		epa_type AS feature_epa_type,
+		giswater_epa_type AS feature_giswater_epa_type,
 		arccat_id AS feature_catalog,
 		CASE
 			WHEN "family" IS NULL THEN NULL
@@ -82,31 +95,52 @@ BEGIN
 			ELSE concat("family", '_', cal_age)
 		END AS cal_family,
 		dma_id,
-		presszone_id
+		presszone_id,
+		NULL::numeric AS losses_weight
 	FROM arcs
 	UNION ALL
-	SELECT 
-		node_id AS feature_id, 
-		epa_type AS feature_epa_type, 
-		nodecat_id AS feature_catalog, 
-		epa_type AS cal_family, 
-		dma_id, 
-		presszone_id
+	SELECT
+		node_id AS feature_id,
+		epa_type AS feature_epa_type,
+		giswater_epa_type AS feature_giswater_epa_type,
+		nodecat_id AS feature_catalog,
+		epa_type AS cal_family,
+		dma_id,
+		presszone_id,
+		losses_weight
 	FROM nodes;
 
 	-- JSON with features: id = first digit run (e.g. 3924522P0 -> 3924522, VN3925355 -> 3925355)
 	SELECT COALESCE(json_agg(
-		json_build_object(
-			'id', NULLIF(substring(feature_id from '[0-9]+'), '')::bigint,
-			'epaId', feature_id,
-			'epaType', feature_epa_type,
-			'catalog', feature_catalog,
-			'family', cal_family,
-			'zones', json_build_object(
-				'dma', dma_id,
-				'presszone', presszone_id
-			)
-		)
+		CASE
+			WHEN feature_epa_type = 'JUNCTION' THEN
+				json_build_object(
+					'id', NULLIF(substring(feature_id from '[0-9]+'), '')::bigint,
+					'epaId', feature_id,
+					'epaType', feature_epa_type,
+					'gwEpaType', feature_giswater_epa_type,
+					'catalog', feature_catalog,
+					'family', cal_family,
+					'zones', json_build_object(
+						'dma', dma_id,
+						'presszone', presszone_id
+					),
+					'lossesWeight', losses_weight
+				)
+			ELSE
+				json_build_object(
+					'id', NULLIF(substring(feature_id from '[0-9]+'), '')::bigint,
+					'epaId', feature_id,
+					'epaType', feature_epa_type,
+					'gwEpaType', feature_giswater_epa_type,
+					'catalog', feature_catalog,
+					'family', cal_family,
+					'zones', json_build_object(
+						'dma', dma_id,
+						'presszone', presszone_id
+					)
+				)
+		END
 	), '[]'::json) INTO v_features
 	FROM temp_features;
 
@@ -247,7 +281,7 @@ BEGIN
 
 	-- Drop temp table
 	DROP TABLE IF EXISTS temp_features;
-	
+
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
 			',"body":{"form":{}'||
