@@ -72,29 +72,29 @@ BEGIN
 	v_prev_search_path := current_setting('search_path');
 	PERFORM set_config('search_path', 'PARENT_SCHEMA,public', true);
 	v_cmschema = 'cm';
-   	v_parentschema = 'PARENT_SCHEMA';
+	v_parentschema = 'PARENT_SCHEMA';
 
-  	-- select version and project type
-  	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+	-- select version and project type
+	SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-  	-- getting input data
-  	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::integer;
+	-- getting input data
+	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::integer;
 
 	v_data :=
-    jsonb_build_object(
-        'data',
-        jsonb_build_object(
-            'parameters',
+	jsonb_build_object(
+		'data',
+		jsonb_build_object(
+			'parameters',
 			jsonb_build_object(
 				'campaignId', v_campaign::text,
 				'lotId', null
 			)
-        )
-    );
+		)
+	);
 	SELECT cm.gw_fct_cm_verify_catalogs(v_data) INTO v_cat_result;
 
 	IF v_cat_result->>'status' = 'Accepted' THEN
-		IF (v_cat_result->'body'->'data'->'info' IS NOT NULL AND (v_cat_result->'body'->'data'->'info')::jsonb != '{}'::jsonb) THEN
+		IF (v_cat_result->'body'->'data'->'info'->'values' IS NOT NULL AND (v_cat_result->'body'->'data'->'info'->'values')::jsonb != '{}'::jsonb) THEN
 			RETURN v_cat_result;
 		END IF;
 	ELSE
@@ -125,12 +125,12 @@ BEGIN
 	INSERT INTO PARENT_SCHEMA.cat_work (id, descript, active)
 	VALUES (v_workcat_id, concat('Generado al integrar la campaña ', v_workcat_id), true) ON CONFLICT (id) DO NOTHING;
 
-	SELECT lower(concat('PARENT_SCHEMA_', lower(id))) INTO v_arc_childs
+	SELECT array_agg(lower(concat('PARENT_SCHEMA_', lower(id)))) INTO v_arc_childs
 	FROM PARENT_SCHEMA.cat_feature
 	WHERE lower(feature_type) = 'arc';
 	
 
-  	v_querytext_review=
+	v_querytext_review :=
 		format('SELECT * FROM (SELECT object_id, feature_type, 
 		child_layer as target_layer, 
 		lower(concat('''||v_parentschema||'_'',object_id)) as source_layer,
@@ -160,23 +160,23 @@ BEGIN
 		-- insert (action = 1);
 		-- get columns excluding those are not used
 		SELECT string_agg(quote_ident(column_name), ', ')
-	    INTO v_column_list_values
-	    FROM information_schema.columns
-	    WHERE table_name = v_catfeature.source_layer
-	      AND table_schema = v_cmschema
-	      AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
+		INTO v_column_list_values
+		FROM information_schema.columns
+		WHERE table_name = v_catfeature.source_layer
+		AND table_schema = v_cmschema
+		AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
 
 		SELECT string_agg('s.' || quote_ident(column_name), ', ')
-	    INTO v_column_list
-	    FROM information_schema.columns
-	    WHERE table_name = v_catfeature.source_layer
-	      AND table_schema = v_cmschema
-	      AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
+		INTO v_column_list
+		FROM information_schema.columns
+		WHERE table_name = v_catfeature.source_layer
+		AND table_schema = v_cmschema
+		AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
 
 		
 
-     -- set querytext
-	     v_querytext :=
+	-- set querytext
+		v_querytext :=
 		'INSERT INTO ' || v_catfeature.target_layer || ' ' ||
 			' ( '|| v_column_list_values || ', code, workcat_id) ' || 
 		'SELECT ' || v_column_list || ', '||v_catfeature.column_id||', '||quote_literal(v_workcat_id)||' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
@@ -184,9 +184,9 @@ BEGIN
 		'USING (' || v_catfeature.column_id || ') ' ||
 				'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
 
-       execute v_querytext;
-       GET DIAGNOSTICS v_ins = ROW_COUNT;
-       v_tot_ins := v_tot_ins + v_ins;
+	execute v_querytext;
+	GET DIAGNOSTICS v_ins = ROW_COUNT;
+	v_tot_ins := v_tot_ins + v_ins;
 
 	END LOOP;
 
@@ -199,14 +199,14 @@ BEGIN
 		-- update (action = 2)
 		-- get columns excluding those are not used
 		SELECT string_agg(format('%I = s.%I', column_name, column_name), ', ')
-	    INTO v_update_list
-	    FROM information_schema.columns
-	    WHERE table_name = v_catfeature.source_layer
-	      AND table_schema = v_cmschema
-	      AND column_name not IN ('id','lot_id','code', 'workcat_id');
+		INTO v_update_list
+		FROM information_schema.columns
+		WHERE table_name = v_catfeature.source_layer
+		AND table_schema = v_cmschema
+		AND column_name not IN ('id','lot_id','code', 'workcat_id');
 
 
-	    v_querytext :=
+		v_querytext :=
 		'UPDATE ' || v_catfeature.target_layer || ' t SET ' || v_update_list ||', workcat_id = '||quote_literal(v_workcat_id)||
 		' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
 		'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
@@ -216,9 +216,9 @@ BEGIN
 			'SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign ||
 					');';
 
-       EXECUTE v_querytext;
-       GET DIAGNOSTICS v_upd = ROW_COUNT;
-       v_tot_upd := v_tot_upd + v_upd;
+	EXECUTE v_querytext;
+	GET DIAGNOSTICS v_upd = ROW_COUNT;
+	v_tot_upd := v_tot_upd + v_upd;
 
 	END LOOP;
 
@@ -233,32 +233,32 @@ BEGIN
 		-- insert (action = 1);
 		-- get columns excluding those are not used
 		SELECT string_agg(quote_ident(column_name), ', ')
-	    INTO v_column_list_values
-	    FROM information_schema.columns
-	    WHERE table_name = v_catfeature.source_layer
-	      AND table_schema = v_cmschema
-	      AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
+		INTO v_column_list_values
+		FROM information_schema.columns
+		WHERE table_name = v_catfeature.source_layer
+		AND table_schema = v_cmschema
+		AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
 
 		SELECT string_agg('s.' || quote_ident(column_name), ', ')
-	    INTO v_column_list
-	    FROM information_schema.columns
-	    WHERE table_name = v_catfeature.source_layer
-	      AND table_schema = v_cmschema
-	      AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
+		INTO v_column_list
+		FROM information_schema.columns
+		WHERE table_name = v_catfeature.source_layer
+		AND table_schema = v_cmschema
+		AND column_name not IN ('id','lot_id', 'node_1', 'node_2', 'code', 'workcat_id');
 
 
-     -- set querytext
-	     v_querytext :=
-       'INSERT INTO ' || v_catfeature.target_layer || ' ' ||
+	-- set querytext
+		v_querytext :=
+	'INSERT INTO ' || v_catfeature.target_layer || ' ' ||
 		' ( '|| v_column_list_values || ', code, node_1, node_2, workcat_id) ' || 
-       'SELECT ' || v_column_list || ', '||v_catfeature.column_id||', (select node_id from node where code = s.node_1::text), (select node_id from node where code = s.node_2::text), '||quote_literal(v_workcat_id)||' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
-       'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
-       'USING (' || v_catfeature.column_id || ') ' ||
-      		'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
+	'SELECT ' || v_column_list || ', '||v_catfeature.column_id||', (select node_id from node where code = s.node_1::text), (select node_id from node where code = s.node_2::text), '||quote_literal(v_workcat_id)||' FROM ' || v_cmschema ||'.'|| v_catfeature.source_layer || ' s ' ||
+	'JOIN ' || v_cmschema || '.' || v_catfeature.campaign_layer || ' l ' ||
+	'USING (' || v_catfeature.column_id || ') ' ||
+			'WHERE action = 1 AND l.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ');';
 
-       EXECUTE v_querytext;
-       GET DIAGNOSTICS v_ins = ROW_COUNT;
-       v_tot_ins := v_tot_ins + v_ins;
+	EXECUTE v_querytext;
+	GET DIAGNOSTICS v_ins = ROW_COUNT;
+	v_tot_ins := v_tot_ins + v_ins;
 
 	END LOOP;
 
@@ -268,23 +268,95 @@ BEGIN
 
 		EXECUTE'UPDATE connec SET arc_id=NULL
 		WHERE connec_id IN (SELECT connec_id FROM connec WHERE arc_id IN (SELECT arc_id FROM cm.om_campaign_lot_x_arc s ' ||
-      	' WHERE action = 3 AND s.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ')))';
+		' WHERE action = 3 AND s.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || ')))';
 
 		
 		v_querytext =
 		'UPDATE ' || v_catfeature.target_layer || 
 		' SET state = 0 WHERE ' || v_catfeature.column_id || ' IN (SELECT ' || v_catfeature.column_id ||
 		' FROM ' || v_cmschema || '.' || v_catfeature.campaign_layer ||' s ' ||
-      		 ' WHERE action = 3 AND s.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
+			' WHERE action = 3 AND s.lot_id IN (SELECT lot_id FROM ' || v_cmschema || '.om_campaign_lot WHERE campaign_id = ' || v_campaign || '));';
 
-       EXECUTE v_querytext;
-       GET DIAGNOSTICS v_del = ROW_COUNT;
-       v_tot_del := v_tot_del + v_del;
+		EXECUTE v_querytext;
+		GET DIAGNOSTICS v_del = ROW_COUNT;
+		v_tot_del := v_tot_del + v_del;
 
+		
+	END LOOP;
+
+
+
+	-- INSERT DOCS
+	FOR v_catfeature IN execute concat(v_querytext_review, ' desc')
+	LOOP
+		IF to_regclass(format('%I.%I', v_cmschema, 'doc_x_' || lower(v_catfeature.feature_type::text))) IS NULL
+			OR to_regclass(format('%I.%I', v_parentschema, 'doc_x_' || lower(v_catfeature.feature_type::text))) IS NULL THEN
+			CONTINUE;
+		END IF;
+
+		-- doc rows (cm doc.id serial -> production doc.id varchar)
+		v_querytext:= format(
+			$q$
+				INSERT INTO %I.doc (code, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom)
+				SELECT concat('CM', s.id::text), s.name, s.doc_type, s.path, s.observ, s.date, s.user_name, s.tstamp, s.the_geom
+				FROM (
+					SELECT DISTINCT d.id, d.name, d.doc_type, d.path, d.observ, d.date, d.user_name, d.tstamp, d.the_geom
+					FROM cm.%I d
+					JOIN cm.%I dx ON dx.doc_id = d.id
+					JOIN cm.%I ch ON ch.uuid = dx.%I
+					JOIN cm.%I ocl ON ocl.%I = ch.%I AND ocl.lot_id = ch.lot_id
+					WHERE (ocl.action IS NULL OR ocl.action <> 3)
+					AND ocl.lot_id IN (SELECT lot_id FROM cm.om_campaign_lot WHERE campaign_id = $1)
+				) s
+			$q$,
+			v_parentschema,
+			'doc',
+			'doc_x_' || lower(v_catfeature.feature_type::text),
+			v_catfeature.source_layer,
+			concat(lower(v_catfeature.feature_type), '_uuid'),
+			v_catfeature.campaign_layer,
+			v_catfeature.column_id,
+			v_catfeature.column_id
+		);
+		EXECUTE v_querytext USING v_campaign;
+
+		-- INSERT doc relations
+		v_querytext:= format(
+			$q$
+				INSERT INTO %I.%I (doc_id, %I)
+				SELECT DISTINCT (SELECT id FROM %I.doc WHERE code = concat('CM', d.id::text)), (SELECT %I FROM %I.%I WHERE code = ch.%I)
+				FROM %I.%I d
+				JOIN %I.%I dx ON dx.doc_id = d.id
+				JOIN %I.%I ch ON ch.uuid = dx.%I
+				JOIN %I.%I ocl ON ocl.%I = ch.%I AND ocl.lot_id = ch.lot_id
+				WHERE (ocl.action IS NULL OR ocl.action <> 3)
+				AND ocl.lot_id IN (SELECT lot_id FROM %I.om_campaign_lot WHERE campaign_id = $1)
+			$q$,
+			v_parentschema, 'doc_x_' || lower(v_catfeature.feature_type::text),	v_catfeature.column_id,
+			v_parentschema, v_catfeature.column_id, v_parentschema, lower(v_catfeature.feature_type), v_catfeature.column_id,
+			v_cmschema, 'doc',
+			v_cmschema, 'doc_x_' || lower(v_catfeature.feature_type::text),
+			v_cmschema, v_catfeature.source_layer, concat(lower(v_catfeature.feature_type), '_uuid'),
+			v_cmschema, v_catfeature.campaign_layer, v_catfeature.column_id, v_catfeature.column_id,
+			v_cmschema
+		);
+		EXECUTE v_querytext USING v_campaign;
 	END LOOP;
 
 	-- UPDATE campaign workcat
 	UPDATE cm.om_campaign SET workcat_id = v_workcat_id WHERE campaign_id = v_campaign;
+
+	-- Set lock_level to NULL for all integrated nodes
+	UPDATE PARENT_SCHEMA.node SET lock_level = NULL WHERE code IN (SELECT node_id::text FROM SCHEMA_NAME.om_campaign_x_node WHERE campaign_id = v_campaign);
+
+	-- Set lock_level to NULL for all integrated arcs
+	UPDATE PARENT_SCHEMA.arc SET lock_level = NULL WHERE code IN (SELECT arc_id::text FROM SCHEMA_NAME.om_campaign_x_arc WHERE campaign_id = v_campaign);
+
+	-- Set lock_level to NULL for all integrated connecs
+	UPDATE PARENT_SCHEMA.connec SET lock_level = NULL WHERE code IN (SELECT connec_id::text FROM SCHEMA_NAME.om_campaign_x_connec WHERE campaign_id = v_campaign);
+
+	-- Set lock_level to NULL for all integrated links
+	UPDATE PARENT_SCHEMA.link SET lock_level = NULL WHERE code IN (SELECT link_id::text FROM SCHEMA_NAME.om_campaign_x_link WHERE campaign_id = v_campaign);
 
 	-- Check and create missing catalog entries
 	SELECT cm.gw_fct_cm_check_catalogs(json_build_object('data', json_build_object(
@@ -307,26 +379,26 @@ BEGIN
 	DELETE FROM cm.selector_campaign where campaign_id = v_campaign;
 
 	-- managing results
-  	v_result := COALESCE(v_result, '{}');
+	v_result := COALESCE(v_result, '{}');
 
-    -- Build info messages with operation totals and catalog summary
-    v_result_info := json_build_object(
-        'values', json_build_array(
-            json_build_object('message', format('Inserted: %s', v_tot_ins)),
-            json_build_object('message', format('Updated: %s', v_tot_upd)),
-            json_build_object('message', format('Deleted: %s', v_tot_del)),
-            json_build_object('message', format('Catalogs created: %s', COALESCE(v_catalogs_created, 0)))
-        )
-    );
-    v_result_point := COALESCE(v_result_point, '{}');
+	-- Build info messages with operation totals and catalog summary
+	v_result_info := json_build_object(
+		'values', json_build_array(
+			json_build_object('message', format('Inserted: %s', v_tot_ins)),
+			json_build_object('message', format('Updated: %s', v_tot_upd)),
+			json_build_object('message', format('Deleted: %s', v_tot_del)),
+			json_build_object('message', format('Catalogs created: %s', COALESCE(v_catalogs_created, 0)))
+		)
+	);
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	--  Build return and restore search_path
 	v_result := PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-               ',"body":{"form":{}'||
-  		     ',"data":{ "info":'||v_result_info||','||
- 				'"point":'||v_result_point||
- 			'}}'||
- 	    '}')::json, 3426, null, null, null);
+			',"body":{"form":{}'||
+			',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||
+			'}}'||
+		'}')::json, 3426, null, null, null);
 
 	-- Restore trigger params to their previous values
 	FOR v_restore_param IN

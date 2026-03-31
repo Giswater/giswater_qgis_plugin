@@ -67,6 +67,12 @@ BEGIN
     )
     INTO v_allowed;
 
+    -- Set lock_level to 3 if positive id
+    IF v_object_id::int > 0 THEN
+        EXECUTE format('UPDATE PARENT_SCHEMA.%I SET lock_level = 3 WHERE %I_id = $1::integer', v_feature, v_feature)
+        USING v_object_id;
+    END IF;
+
 
     -- If not allowed, skip insert
     IF NOT v_allowed THEN
