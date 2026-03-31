@@ -158,13 +158,9 @@ BEGIN
 						"data":{
 							"selectorType":"selector_basic",
 							"tabName":"tab_exploitation",
-							"id": %s,
-							"isAlone":"True",
-							"disableParent":"False",
-							"value":"True"
+							"checkAll":"True"
 						}
-					}')$$,
-					v_expl_id
+					}')$$
 				);
 				v_errortext=concat('Set visible exploitation for user ',(v_expl_id));
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
