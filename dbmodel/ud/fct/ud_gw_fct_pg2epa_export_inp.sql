@@ -520,7 +520,7 @@ BEGIN
 	    temp_t_node.apond,
 	    concat(';', temp_t_node.sector_id, ' ', temp_t_node.node_type) AS other
 	   FROM temp_t_node
-	  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text, 'INLET'::text]);
+	  WHERE temp_t_node.epa_type::text = ANY (ARRAY['JUNCTION'::text, 'NETGULLY'::text, 'INLET'::text, 'UNDEFINED'::text]);
 
 	CREATE OR REPLACE TEMP VIEW vi_t_labels AS
 	 SELECT inp_label.xcoord,
