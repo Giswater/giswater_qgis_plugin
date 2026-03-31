@@ -640,7 +640,7 @@ AS WITH typevalue AS (
             l.exit_id,
             l.exit_type
            FROM plan_psector_x_connec pp_1
-             JOIN link l ON l.link_id = pp_1.link_id
+             LEFT JOIN link l ON l.link_id = pp_1.link_id AND l.state = 2
           WHERE pp_1.connec_id = c.connec_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
                    FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER))
@@ -830,7 +830,7 @@ AS WITH typevalue AS (
             l.exit_id,
             l.exit_type
            FROM plan_psector_x_gully pp_1
-             JOIN link l ON l.link_id = pp_1.link_id
+             LEFT JOIN link l ON l.link_id = pp_1.link_id AND l.state = 2
           WHERE pp_1.gully_id = gully.gully_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
                    FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER))
