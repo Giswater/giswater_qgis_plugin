@@ -397,7 +397,7 @@ BEGIN
 		v_return_level = 3;
 	END IF;
 
-	IF v_deleted_psector IS NOT NULL OR v_deleted_dscenario IS NOT NULL OR v_deleted_sector IS NOT NULL OR v_deleted_result IS NOT NULL THEN
+	IF v_deleted_psector IS NOT NULL OR v_deleted_muni IS NOT NULL OR v_deleted_dscenario IS NOT NULL OR v_deleted_sector IS NOT NULL OR v_deleted_result IS NOT NULL THEN
 
 		p_data = replace(p_data::text, 'CURRENT', 'UPDATE');
 		PERFORM gw_fct_workspacemanager(p_data);
@@ -405,7 +405,7 @@ BEGIN
 		IF v_deleted_psector IS NOT NULL THEN
 			v_return_msg = concat(v_return_msg,'. Workspace recreated without psectors:',v_deleted_psector);
 		END IF;
-		IF v_deleted_psector IS NOT NULL THEN
+		IF v_deleted_muni IS NOT NULL THEN
 			v_return_msg = concat(v_return_msg,'. Workspace recreated without muni:',v_deleted_muni);
 		END IF;
 		IF v_deleted_dscenario IS NOT NULL THEN
