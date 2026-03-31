@@ -82,7 +82,7 @@ UPDATE config_toolbox
     "selectedId": null,
     "widgetname": "expl",
     "widgettype": "combo",
-    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation",
+    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation WHERE expl_id > 0",
     "isNullValue": "true",
     "isMandatory": true,
     "layoutorder": 7
@@ -165,7 +165,8 @@ UPDATE config_toolbox
     "selectedId": null,
     "widgetname": "expl",
     "widgettype": "combo",
-    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation",
+    "dvQueryText": "SELECT expl_id AS id, name as idval FROM ve_exploitation WHERE expl_id > 0",
+    "isNullValue": "true",
     "isMandatory": true,
     "layoutorder": 6
   }
@@ -264,3 +265,8 @@ WHERE fid=170;
 UPDATE sys_fprocess
 SET query_text='SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM man_pump mp JOIN t_node n USING (node_id) JOIN t_arc v ON v.arc_id = mp.to_arc WHERE node_id NOT IN (node_1, node_2)'
 WHERE fid=171;
+
+-- 31/03/2026
+UPDATE config_form_fields
+SET dv_querytext='SELECT expl_id as id, name as idval FROM ve_exploitation WHERE expl_id > 0'
+WHERE formname='ve_cat_dscenario' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
