@@ -1405,7 +1405,8 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                 vr_layer = value_relation.get('layer', '')
                 layer_obj = tools_qgis.get_layer_by_tablename(vr_layer)
                 if layer_obj is None:
-                    layer_obj = load_layer_in_hidden_group(vr_layer, value_relation.get('keyColumn', ''), add_to_toc=False)
+                    add_to_toc = thread is None
+                    layer_obj = load_layer_in_hidden_group(vr_layer, value_relation.get('keyColumn', ''), add_to_toc=add_to_toc)
                     if thread:
                         if layer_obj.name() not in [layer.name() for layer in thread.vr_layers_to_add]:
                             thread.vr_layers_to_add.add(layer_obj)
