@@ -38,7 +38,7 @@ BEGIN
 		"data":{"message":"3276", "function":"3378","parameters":null, "is_process":true}}$$);';
 	END IF;
 
-	IF NOT (SELECT array_agg(muni_id ORDER BY muni_id) @> NEW.muni_id FROM ext_municipality) THEN
+	IF NOT (SELECT array_agg(muni_id ORDER BY muni_id) @> NEW.muni_id FROM v_municipality) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3278", "function":"3378","parameters":null, "is_process":true}}$$);';
 	END IF;

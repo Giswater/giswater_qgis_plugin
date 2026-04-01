@@ -6,4 +6,7 @@ or (at your option) any later version.
 */
 
 
-CREATE INDEX connec_plot_code ON connec USING btree (plot_code);
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+CREATE INDEX connec_plot_code ON connec USING btree (code);

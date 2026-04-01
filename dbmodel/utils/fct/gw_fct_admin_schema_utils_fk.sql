@@ -60,20 +60,13 @@ BEGIN
 		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey"; 
 		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_district_id_fkey"; 
 		
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_ws_exploitation_id_fkey;';
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_ud_exploitation_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_muni_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_type_street_fkey;';
 		
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_ws_exploitation_id_fkey;';
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_ud_exploitation_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_muni_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_streetaxis_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_plot_id_fkey;';
 		
-
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_ws_exploitation_id_fkey;';
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_ud_exploitation_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_muni_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_streetaxis_id_fkey;';
 
@@ -108,40 +101,6 @@ BEGIN
 
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ADD CONSTRAINT "district_muni_id_fkey" FOREIGN KEY ("muni_id") 
 		REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-
-		--DOUBLE EXPLOITATION FK
-
-		EXECUTE 'SELECT value FROM '|| ext_utils_schema_aux ||'.config_param_system WHERE parameter=''ws_current_schema'';'
-		INTO ws_current_schema_aux;
-
-		IF ws_current_schema_aux is not null  THEN
-			
-			EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ADD CONSTRAINT "streetaxis_ws_exploitation_id_fkey" 
-			FOREIGN KEY ("ws_expl_id") REFERENCES '|| ws_current_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-
-			EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT "address_ws_exploitation_id_fkey" 
-			FOREIGN KEY ("ws_expl_id") REFERENCES '|| ws_current_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-
-			EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT "plot_ws_exploitation_id_fkey" 
-			FOREIGN KEY ("ws_expl_id") REFERENCES '|| ws_current_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-
-		END IF;
-
-		EXECUTE 'SELECT value FROM '|| ext_utils_schema_aux ||'.config_param_system WHERE parameter=''ud_current_schema'';'
-		INTO ud_current_schema_aux;
-
-		IF ud_current_schema_aux is not null THEN
-			
-			EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ADD CONSTRAINT "streetaxis_ud_exploitation_id_fkey" 
-			FOREIGN KEY ("ud_expl_id") REFERENCES '|| ud_current_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-
-			EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT "address_ud_exploitation_id_fkey" 
-			FOREIGN KEY ("ud_expl_id") REFERENCES '|| ud_current_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-
-			EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT "plot_ud_exploitation_id_fkey" 
-			FOREIGN KEY ("ud_expl_id") REFERENCES '|| ud_current_schema_aux||'."exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-			
-		END IF;
 
 		--FOREIGN KEY
 		
@@ -252,26 +211,6 @@ BEGIN
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ALTER COLUMN streetaxis_id SET NOT NULL;';
 
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.district ALTER COLUMN muni_id SET NOT NULL;';
-		
-		--DROP CHECK EXPL
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_expl_id_check;';
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address DROP CONSTRAINT IF EXISTS address_expl_id_check;';
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot DROP CONSTRAINT IF EXISTS plot_expl_id_check;';
-
-
-		--CREATE CHECK EXPL
-
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis ADD CONSTRAINT streetaxis_expl_id_check CHECK 
-		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
-		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL );';
-
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.address ADD CONSTRAINT address_expl_id_check CHECK 
-		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
-		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
-
-		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.plot ADD CONSTRAINT plot_expl_id_check CHECK 
-		(ws_expl_id IS NOT NULL AND ud_expl_id IS NULL OR ws_expl_id IS NULL AND ud_expl_id IS NOT NULL OR 
-		ws_expl_id IS NOT NULL AND ud_expl_id IS NOT NULL  );';
 
 		--RECREATE TRIGGER
 		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_manage_raster_dem_insert ON '|| ext_utils_schema_aux||'.raster_dem;';
@@ -309,17 +248,13 @@ BEGIN
 		END IF;
 
 		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_unique";
-		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_exploitation_id_fkey";
 		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_muni_id_fkey";
 		ALTER TABLE "ext_streetaxis" DROP CONSTRAINT IF EXISTS "ext_streetaxis_type_street_fkey";
 
-		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_exploitation_id_fkey";
 		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_muni_id_fkey";
 		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_streetaxis_id_fkey";
 		ALTER TABLE "ext_address" DROP CONSTRAINT IF EXISTS "ext_address_plot_id_fkey";
 
-
-		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_exploitation_id_fkey";
 		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_muni_id_fkey";
 		ALTER TABLE "ext_plot" DROP CONSTRAINT IF EXISTS "ext_plot_streetaxis_id_fkey";
 
@@ -327,16 +262,13 @@ BEGIN
 
 		--ADD FK
 		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_unique" UNIQUE("muni_id", "id");
-		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_streetaxis" ADD CONSTRAINT "ext_streetaxis_type_street_fkey" FOREIGN KEY ("type") REFERENCES "ext_type_street" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_address" ADD CONSTRAINT "ext_address_plot_id_fkey" FOREIGN KEY ("plot_id") REFERENCES "ext_plot" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_exploitation_id_fkey" FOREIGN KEY ("expl_id") REFERENCES "exploitation" ("expl_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_muni_id_fkey" FOREIGN KEY ("muni_id") REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "ext_plot" ADD CONSTRAINT "ext_plot_streetaxis_id_fkey" FOREIGN KEY ("streetaxis_id") REFERENCES "ext_streetaxis" ("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -396,17 +328,14 @@ BEGIN
 		--NOT NULL DROP
 		ALTER TABLE ext_municipality ALTER COLUMN name DROP NOT NULL;
 
-		ALTER TABLE ext_streetaxis ALTER COLUMN expl_id DROP NOT NULL;
 		ALTER TABLE ext_streetaxis ALTER COLUMN muni_id DROP NOT NULL;
 		ALTER TABLE ext_streetaxis ALTER COLUMN name DROP NOT NULL;
 
 		ALTER TABLE ext_address ALTER COLUMN muni_id DROP NOT NULL;
-		ALTER TABLE ext_address ALTER COLUMN expl_id DROP NOT NULL;
 		ALTER TABLE ext_address ALTER COLUMN streetaxis_id DROP NOT NULL;
 		ALTER TABLE ext_address ALTER COLUMN postnumber DROP NOT NULL;
 
 		ALTER TABLE ext_plot ALTER COLUMN muni_id DROP NOT NULL;
-		ALTER TABLE ext_plot ALTER COLUMN expl_id DROP NOT NULL;
 		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL;
 
 		ALTER TABLE ext_district ALTER COLUMN muni_id DROP NOT NULL;
@@ -414,17 +343,14 @@ BEGIN
 		--NOT NULL ADD
 		ALTER TABLE ext_municipality ALTER COLUMN name SET NOT NULL;
 
-		ALTER TABLE ext_streetaxis ALTER COLUMN expl_id SET NOT NULL;
 		ALTER TABLE ext_streetaxis ALTER COLUMN muni_id SET NOT NULL;
 		ALTER TABLE ext_streetaxis ALTER COLUMN name SET NOT NULL;
 
 		ALTER TABLE ext_address ALTER COLUMN muni_id SET NOT NULL;
-		ALTER TABLE ext_address ALTER COLUMN expl_id SET NOT NULL;
 		ALTER TABLE ext_address ALTER COLUMN streetaxis_id SET NOT NULL;
 		ALTER TABLE ext_address ALTER COLUMN postnumber SET NOT NULL;
 
 		ALTER TABLE ext_plot ALTER COLUMN muni_id SET NOT NULL;
-		ALTER TABLE ext_plot ALTER COLUMN expl_id SET NOT NULL;
 		ALTER TABLE ext_plot ALTER COLUMN streetaxis_id SET NOT NULL;
 
 		ALTER TABLE ext_district ALTER COLUMN muni_id SET NOT NULL;

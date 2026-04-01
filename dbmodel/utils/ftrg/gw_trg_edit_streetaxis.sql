@@ -16,8 +16,6 @@ DECLARE
 v_isutils boolean;
 v_schema_utils text;
 v_project_type text;
-v_ud_expl_id integer;
-v_ws_expl_id integer;
 v_ws_schema text;
 v_ud_schema text;
 
@@ -48,23 +46,19 @@ BEGIN
         		NEW.id = (SELECT nextval('ext_streetaxis_id_seq'));
         	END IF;
        	
-	       	--get muni and expl_id value if its null    
-	        IF NEW.expl_id IS NULL THEN
-	          NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-	        END IF;
-
+	       	--get muni value if its null    
 	        IF NEW.muni_id IS NULL THEN
 	          NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
 	          	AND active IS TRUE LIMIT 1);
 	        END IF;
 
-			INSERT INTO ext_streetaxis(id, code, type, name, text, the_geom, expl_id, muni_id)
-    		VALUES (NEW.id,NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.expl_id, NEW.muni_id);
+			INSERT INTO ext_streetaxis(id, code, type, name, text, the_geom, muni_id)
+    		VALUES (NEW.id,NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.muni_id);
     	ELSE
 
         	-- set id if null
         	IF NEW.id IS NULL THEN
-        		NEW.id = (SELECT nextval('ext_streetaxis_id_seq'));
+        		NEW.id = (SELECT nextval('utils.streetaxis_id_seq'));
         	END IF;
             
 	    	--get muni value if its null
@@ -75,48 +69,9 @@ BEGIN
 	          INTO NEW.muni_id;
 	        END IF; 
 
-    		IF v_project_type = 'WS' THEN
-
-				 --get expl_id value if its null
-		    	IF NEW.expl_id IS NULL THEN
-		        	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-		        	USING NEW.the_geom
-		        	INTO v_ws_expl_id;
-                ELSE
-                    v_ws_expl_id=NEW.expl_id;
-		      	END IF;
-	    		
-			    --get expl_id value of the oposite schema
-		        IF v_ud_schema IS NOT NULL THEN
-		            EXECUTE 'SELECT expl_id FROM '||v_ud_schema||'.exploitation 
-		            WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-		            USING NEW.the_geom
-		            INTO v_ud_expl_id;
-		        END IF;
-
-	    	ELSIF v_project_type = 'UD' THEN
-			    --get expl_id value if its null
-		        IF NEW.expl_id IS NULL THEN
-		            EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-		            USING NEW.the_geom
-		            INTO v_ud_expl_id;
-		        ELSE
-                    v_ud_expl_id=NEW.expl_id;
-		        END IF;
-
-		           --get expl_id value of the oposite schema
-		        IF v_ws_schema IS NOT NULL THEN
-		            EXECUTE 'SELECT expl_id FROM '||v_ws_schema||'.exploitation 
-		            WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-		            USING NEW.the_geom
-		            INTO v_ws_expl_id;
-		        END IF;	    		
-	     	END IF;
-
-	    	EXECUTE 'INSERT INTO '||v_schema_utils||'.streetaxis(id, code, type, name, text, the_geom, muni_id, 
-	    	ws_expl_id, ud_expl_id)
-	    	VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)'
-	    	USING NEW.id,NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.muni_id, v_ws_expl_id, v_ud_expl_id;
+	    	EXECUTE 'INSERT INTO '||v_schema_utils||'.streetaxis(id, code, type, name, text, the_geom, muni_id)
+	    	VALUES($1, $2, $3, $4, $5, $6, $7)'
+	    	USING NEW.id,NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.muni_id;
     	END IF;
 
 	RETURN NEW;
@@ -125,20 +80,19 @@ BEGIN
 
 		IF v_isutils IS FALSE OR v_isutils IS NULL THEN				
 			UPDATE ext_streetaxis 
-			SET id=NEW.id, code=NEW.code, type=NEW.type, name=NEW.name, text=NEW.text, the_geom=NEW.the_geom, expl_id=NEW.expl_id,
-			muni_id=NEW.muni_id
+			SET id=NEW.id, code=NEW.code, type=NEW.type, name=NEW.name, text=NEW.text, the_geom=NEW.the_geom, muni_id=NEW.muni_id
 			WHERE id=NEW.id;
 		ELSE
 			IF v_project_type = 'WS' THEN
 				EXECUTE 'UPDATE '||v_schema_utils||'.streetaxis 
-				SET id=$1, code=$2, type=$3, name=$4, text=$5, the_geom=$6, ws_expl_id=$7,muni_id=$7
+				SET id=$1, code=$2, type=$3, name=$4, text=$5, the_geom=$6
 				WHERE id=$1'
-				USING NEW.id, NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.expl_id, NEW.muni_id;
+				USING NEW.id, NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.muni_id;
 			ELSIF v_project_type = 'UD' THEN
 				EXECUTE 'UPDATE '||v_schema_utils||'.streetaxis 
-				SET id=$1, code=$2, type=$3, name=$4, text=$5, the_geom=$6, ud_expl_id=$7,muni_id=$7
+				SET id=$1, code=$2, type=$3, name=$4, text=$5, the_geom=$6, muni_id=$7
 				WHERE id=$1'
-				USING NEW.id, NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.expl_id, NEW.muni_id;
+				USING NEW.id, NEW.code, NEW.type, NEW.name, NEW.text, NEW.the_geom, NEW.muni_id;
 			END IF;
 		END IF;
 

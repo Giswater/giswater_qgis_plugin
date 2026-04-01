@@ -60,7 +60,7 @@ BEGIN
 	IF v_clip IS NOT NULL then
 
 		IF v_clip = 'muni' THEN
-			v_clip_table = 'v_ext_municipality';
+			v_clip_table = 've_municipality';
 		ELSE
 			v_clip_table = 've_' || lower(v_clip);
 		END IF;
@@ -68,7 +68,7 @@ BEGIN
 	ELSE
 	
 		v_clip = 'muni';
-		v_clip_table = 'v_ext_municipality';
+		v_clip_table = 've_municipality';
 		
 	END IF;
 

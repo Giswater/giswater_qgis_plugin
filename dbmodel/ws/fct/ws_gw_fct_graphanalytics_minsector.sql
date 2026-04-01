@@ -468,10 +468,10 @@ BEGIN
                     JOIN arc v ON v.arc_id = t.pgr_arc_id
                     GROUP BY t.mapzone_id 
                     UNION
-                    SELECT t.mapzone_id AS minsector_id, ST_Collect(ext_plot.the_geom) AS geom 
+                    SELECT t.mapzone_id AS minsector_id, ST_Collect(v_plot.the_geom) AS geom 
                     FROM temp_pgr_connec t 
                     JOIN connec vc ON vc.connec_id = t.pgr_connec_id
-                    LEFT JOIN ext_plot ON vc.plot_code = ext_plot.plot_code AND ST_DWithin(vc.the_geom, ext_plot.the_geom, 0.001)
+                    LEFT JOIN v_plot ON vc.plot_code = v_plot.plot_code AND ST_DWithin(vc.the_geom, v_plot.the_geom, 0.001)
                     GROUP BY t.mapzone_id
                 ) c 
                 GROUP BY minsector_id

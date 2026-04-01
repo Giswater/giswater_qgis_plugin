@@ -291,9 +291,9 @@ BEGIN
 
 			-- getting value from geometry of mapzone
 			IF (NEW.muni_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) AND active IS TRUE ;
+				SELECT count(*) INTO v_count FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001) AND active IS TRUE ;
 				IF v_count = 1 THEN
-					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001)
+					NEW.muni_id = (SELECT muni_id FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001)
 					AND active IS TRUE LIMIT 1);
 				ELSE
 					NEW.muni_id =(SELECT muni_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
@@ -307,9 +307,9 @@ BEGIN
 
 			-- getting value from geometry of mapzone
 			IF (NEW.district_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001);
+				SELECT count(*) INTO v_count FROM v_district WHERE ST_DWithin(NEW.the_geom, v_district.the_geom,0.001);
 				IF v_count = 1 THEN
-					NEW.district_id = (SELECT district_id FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001) LIMIT 1);
+					NEW.district_id = (SELECT district_id FROM v_district WHERE ST_DWithin(NEW.the_geom, v_district.the_geom,0.001) LIMIT 1);
 				ELSIF v_count > 1 THEN
 					NEW.district_id =(SELECT district_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
 					order by ST_Distance (NEW.the_geom, ve_arc.the_geom) LIMIT 1);
@@ -380,9 +380,9 @@ BEGIN
 		--Address
 		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				NEW.streetaxis_id := (select v_ext_streetaxis.id from v_ext_streetaxis
-								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
-								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
+				NEW.streetaxis_id := (select v_v_streetaxis.id from v_v_streetaxis
+								join node on ST_DWithin(NEW.the_geom, v_v_streetaxis.the_geom, v_auto_streetvalues_buffer)
+								order by ST_Distance(NEW.the_geom, v_v_streetaxis.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -390,15 +390,15 @@ BEGIN
 		IF (v_auto_streetvalues_status) IS TRUE THEN
 			IF (v_auto_streetvalues_field = 'postcomplement') THEN
 				IF (NEW.postcomplement IS NULL) THEN
-					NEW.postcomplement = (select ext_address.postnumber from ext_address
-						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					NEW.postcomplement = (select v_address.postnumber from v_address
+						join node on ST_DWithin(NEW.the_geom, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, v_address.the_geom) LIMIT 1);
 				END IF;
 			ELSIF (v_auto_streetvalues_field = 'postnumber') THEN
 				IF (NEW.postnumber IS NULL) THEN
-					NEW.postnumber= (select ext_address.postnumber from ext_address
-						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					NEW.postnumber= (select v_address.postnumber from v_address
+						join node on ST_DWithin(NEW.the_geom, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, v_address.the_geom) LIMIT 1);
 				END IF;
 			END IF;
 		END IF;
@@ -508,9 +508,9 @@ BEGIN
 				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1) LIMIT 1);
 		END IF;
 
-		-- plot_code from plot layer
+		-- plot_id from plot layer
 		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
-			NEW.plot_code = (SELECT plot_code FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
+			NEW.plot_id = (SELECT id FROM v_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
 		END IF;
 
 		IF NEW.epa_type IS NULL THEN
@@ -528,14 +528,14 @@ BEGIN
 		muni_id, streetaxis2_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, updated_at, updated_by, asset_id, epa_type, om_state, conserv_state, priority,
-		access_type, placement_type, crmzone_id, expl_visibility, plot_code, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_code, n_hydrometer, uuid)
+		access_type, placement_type, crmzone_id, expl_visibility, plot_id, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_code, n_hydrometer, uuid)
 		VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.datasource, NEW.top_elev, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.muni_id, NEW.streetaxis2_id, NEW.postcode, NEW.district_id, NEW.postcomplement,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
 		NEW.num_value, NEW.connec_length, NEW.arc_id, COALESCE(NEW.minsector_id, 0), COALESCE(NEW.dqa_id, 0), NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
-		NEW.access_type, NEW.placement_type, COALESCE(NEW.crmzone_id, 0), NEW.expl_visibility, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
+		NEW.access_type, NEW.placement_type, COALESCE(NEW.crmzone_id, 0), NEW.expl_visibility, NEW.plot_id, NEW.brand_id, NEW.model_id, NEW.serial_number,
 		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_code, NEW.n_hydrometer, NEW.uuid);
 
 		-- insert into connec_add table
@@ -696,9 +696,9 @@ BEGIN
 				NEW.pjoint_type = NULL;
 			END IF;
 
-			-- plot_code from plot layer
+			-- plot_id from plot layer
 			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
-				NEW.plot_code = (SELECT plot_code FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
+				NEW.plot_id = (SELECT id FROM v_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
 			END IF;
 
 		ELSIF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='MULTIPOLYGON'  THEN
@@ -883,7 +883,7 @@ BEGIN
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
 			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority, access_type = NEW.access_type, placement_type = NEW.placement_type,
-			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
+			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_id=NEW.plot_id, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_code=NEW.block_code, n_hydrometer=NEW.n_hydrometer
 			WHERE connec_id=OLD.connec_id;
 

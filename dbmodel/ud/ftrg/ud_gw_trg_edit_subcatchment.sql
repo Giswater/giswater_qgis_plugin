@@ -24,7 +24,7 @@ BEGIN
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
-				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin((the_geom), NEW.the_geom, 0) LIMIT 1);
+				NEW.muni_id := (SELECT muni_id FROM v_municipality WHERE ST_DWithin((the_geom), NEW.the_geom, 0) LIMIT 1);
 			END IF;
 		END IF;
 	END IF;

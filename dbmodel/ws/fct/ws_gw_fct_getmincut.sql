@@ -100,37 +100,37 @@ BEGIN
 
         --Get location combos searching the address
         v_point_geom = (SELECT anl_the_geom FROM om_mincut WHERE id::text = v_mincutid::text);
-        EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM ext_address WHERE ST_DWithin(the_geom, $1, 200) ORDER BY ST_distance (the_geom,$1) ASC LIMIT 10) row'
+        EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM v_address WHERE ST_DWithin(the_geom, $1, 200) ORDER BY ST_distance (the_geom,$1) ASC LIMIT 10) row'
             INTO address_array
             USING v_point_geom;
 
         IF address_array IS NULL THEN
-            EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM ext_address) row'
+            EXECUTE 'SELECT array_agg(row.id) FROM (SELECT id FROM v_address) row'
                 INTO address_array
                 USING v_point_geom;
         END IF;
 
         -- Get municipality
-        EXECUTE 'SELECT array_agg(row.muni_id) FROM (SELECT DISTINCT ext_municipality.muni_id FROM ext_address JOIN ext_municipality USING (muni_id) WHERE id = ANY($1)) row'
+        EXECUTE 'SELECT array_agg(row.muni_id) FROM (SELECT DISTINCT v_municipality.muni_id FROM v_address JOIN v_municipality USING (muni_id) WHERE id = ANY($1)) row'
             INTO aux_muni_id
             USING address_array;
-        EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT ext_municipality.name FROM ext_address JOIN ext_municipality USING (muni_id) WHERE id = ANY($1)) row'
+        EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT v_municipality.name FROM v_address JOIN v_municipality USING (muni_id) WHERE id = ANY($1)) row'
             INTO aux_muni_name
             USING address_array;
 
         -- Get postcode
-        EXECUTE 'SELECT array_agg(row.postcode) FROM (SELECT DISTINCT postcode FROM ext_address WHERE id = ANY($1)) row'
+        EXECUTE 'SELECT array_agg(row.postcode) FROM (SELECT DISTINCT postcode FROM v_address WHERE id = ANY($1)) row'
             INTO aux_cp
             USING address_array;
 
         -- Get street
-        EXECUTE 'SELECT array_agg(row.streetaxis_id) FROM (SELECT DISTINCT streetaxis_id, ext_streetaxis.name 
-            FROM ext_address JOIN ext_streetaxis ON (streetaxis_id = ext_streetaxis.id) WHERE ext_address.id = ANY($1) order by name) row'
+        EXECUTE 'SELECT array_agg(row.streetaxis_id) FROM (SELECT DISTINCT streetaxis_id, v_streetaxis.name 
+            FROM v_address JOIN v_streetaxis ON (streetaxis_id = v_streetaxis.id) WHERE v_address.id = ANY($1) order by name) row'
             INTO aux_street_id
             USING address_array;
 
-        EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT streetaxis_id, ext_streetaxis.name 
-            FROM ext_address JOIN ext_streetaxis ON (streetaxis_id = ext_streetaxis.id) WHERE ext_address.id = ANY($1) order by name) row'
+        EXECUTE 'SELECT array_agg(row.name) FROM (SELECT DISTINCT streetaxis_id, v_streetaxis.name 
+            FROM v_address JOIN v_streetaxis ON (streetaxis_id = v_streetaxis.id) WHERE v_address.id = ANY($1) order by name) row'
             INTO aux_street_name
             USING address_array;
 

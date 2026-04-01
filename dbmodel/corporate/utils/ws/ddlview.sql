@@ -35,7 +35,7 @@ AS SELECT DISTINCT ON (r.id) r.id,
     r.rast,
     r.rastercat_id,
     r.envelope
-   FROM v_ext_municipality a,
+   FROM ve_municipality a,
     v_raster_dem r
      JOIN utils.cat_raster c ON c.id = r.rastercat_id
   WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);

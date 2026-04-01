@@ -13,3 +13,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('PATTERN');
 
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
+
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');

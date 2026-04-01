@@ -1014,7 +1014,7 @@ INSERT INTO connec (connec_id, code, sys_code, top_elev, "depth", conneccat_id, 
 
 INSERT INTO connec_add (connec_id) SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;
 
-UPDATE connec SET plot_code = ext_plot.plot_code
+UPDATE connec SET plot_id = ext_plot.id
 FROM ext_plot
 WHERE ST_Contains(ext_plot.the_geom, connec.the_geom);
 

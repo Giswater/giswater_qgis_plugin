@@ -47,7 +47,7 @@ CREATE TABLE utils.raster_dem (
     id serial NOT NULL,
 	rast public.raster NULL,
 	rastercat_id text NULL,
-	envelope public.geometry(polygon, 25831) NULL,
+	envelope public.geometry(polygon, SRID_VALUE) NULL,
 	CONSTRAINT raster_dem_pkey PRIMARY KEY (id)
 );
 
@@ -74,3 +74,32 @@ CREATE TABLE utils.region (
 CREATE TABLE utils.type_street (
     LIKE "AUX_SCHEMA_NAME".ext_type_street INCLUDING ALL
 );
+
+
+CREATE SEQUENCE plot_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+	
+CREATE SEQUENCE address_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+	
+CREATE SEQUENCE streetaxis_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+ALTER TABLE plot ALTER COLUMN id SET DEFAULT nextval('plot_id_seq');
+ALTER TABLE streetaxis ALTER COLUMN id SET DEFAULT nextval('streetaxis_id_seq');
+ALTER TABLE address ALTER COLUMN id SET DEFAULT nextval('address_id_seq');

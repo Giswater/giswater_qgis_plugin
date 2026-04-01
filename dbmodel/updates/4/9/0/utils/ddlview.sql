@@ -12,11 +12,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE OR REPLACE VIEW v_municipality AS
 SELECT * FROM ext_municipality;
 
-CREATE OR REPLACE VIEW v_ext_municipality
+CREATE OR REPLACE VIEW ve_municipality
 AS SELECT DISTINCT s.muni_id,
     m.name,
-    m.expl_id,
-    m.sector_id,
     m.active,
     m.the_geom
    FROM v_municipality m,
@@ -27,14 +25,13 @@ AS SELECT DISTINCT s.muni_id,
 CREATE OR REPLACE VIEW v_streetaxis AS
 SELECT * FROM ext_streetaxis;
 
-CREATE OR REPLACE VIEW v_ext_streetaxis
+CREATE OR REPLACE VIEW ve_streetaxis
 AS SELECT v_streetaxis.id,
     v_streetaxis.code,
     v_streetaxis.type,
     v_streetaxis.name,
     v_streetaxis.text,
     v_streetaxis.the_geom,
-    v_streetaxis.expl_id,
     v_streetaxis.muni_id,
         CASE
             WHEN v_streetaxis.type IS NULL THEN v_streetaxis.name::text
@@ -51,18 +48,17 @@ AS SELECT v_streetaxis.id,
 CREATE OR REPLACE VIEW v_address AS
 SELECT * FROM ext_address;
 
-CREATE OR REPLACE VIEW v_ext_address
+CREATE OR REPLACE VIEW ve_address
 AS SELECT v_address.id,
     v_address.muni_id,
     v_address.postcode,
     v_address.streetaxis_id,
     v_address.postnumber,
     v_address.plot_id,
-    v_address.expl_id,
     v_streetaxis.name,
     v_address.the_geom,
     v_address.postcomplement,
-    v_address.ext_code,
+    v_address.code,
     v_address.source
    FROM selector_municipality s,
     v_address
@@ -73,9 +69,9 @@ AS SELECT v_address.id,
 CREATE OR REPLACE VIEW v_plot AS
 SELECT * FROM ext_plot;
 
-CREATE OR REPLACE VIEW v_ext_plot
+CREATE OR REPLACE VIEW ve_plot
 AS SELECT v_plot.id,
-    v_plot.plot_code,
+    v_plot.code,
     v_plot.muni_id,
     v_plot.postcode,
     v_plot.streetaxis_id,
@@ -85,8 +81,7 @@ AS SELECT v_plot.id,
     v_plot.square,
     v_plot.observ,
     v_plot.text,
-    v_plot.the_geom,
-    v_plot.expl_id
+    v_plot.the_geom
    FROM selector_municipality s,
     v_plot
   WHERE v_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
@@ -95,7 +90,7 @@ AS SELECT v_plot.id,
 CREATE OR REPLACE VIEW v_raster_dem AS
 SELECT * FROM ext_raster_dem;
 
-CREATE OR REPLACE VIEW v_ext_raster_dem
+CREATE OR REPLACE VIEW ve_raster_dem
 AS SELECT DISTINCT ON (r.id) r.id,
     c.code,
     c.alias,
@@ -107,7 +102,7 @@ AS SELECT DISTINCT ON (r.id) r.id,
     r.rast,
     r.rastercat_id,
     r.envelope
-   FROM v_ext_municipality a,
+   FROM ve_municipality a,
     v_raster_dem r
      JOIN ext_cat_raster c ON c.id = r.rastercat_id
   WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);

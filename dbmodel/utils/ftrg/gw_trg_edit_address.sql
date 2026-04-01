@@ -16,8 +16,6 @@ DECLARE
 v_isutils boolean;
 v_schema_utils text;
 v_project_type text;
-v_ud_expl_id integer;
-v_ws_expl_id integer;
 v_ws_schema text;
 v_ud_schema text;
 
@@ -48,24 +46,20 @@ BEGIN
         		NEW.id = (SELECT nextval('ext_address_id_seq'));
         	END IF;
             
-       		--get muni and expl_id value if its null
+       		--get muni value if its null
             IF NEW.muni_id IS NULL THEN
 				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
 				AND active IS TRUE LIMIT 1);
 			END IF;
-			
-			IF NEW.expl_id IS NULL THEN
-					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-			END IF;
 
-			INSERT INTO ext_address( id, muni_id, postcode, streetaxis_id, postnumber, plot_id, the_geom, expl_id)
-    		VALUES (NEW.id,NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.plot_id, NEW.the_geom, NEW.expl_id);
+			INSERT INTO ext_address( id, muni_id, postcode, streetaxis_id, postnumber, plot_id, the_geom)
+    		VALUES (NEW.id,NEW.muni_id, NEW.postcode, NEW.streetaxis_id, NEW.postnumber, NEW.plot_id, NEW.the_geom);
     	
     	ELSE
         
             -- set id if null
         	IF NEW.id IS NULL THEN
-        		NEW.id = (SELECT nextval('ext_address_id_seq'));
+        		NEW.id = (SELECT nextval('utils.address_id_seq'));
         	END IF;
             
     		--get muni value if its null
@@ -75,50 +69,12 @@ BEGIN
 				 USING NEW.the_geom
 				 INTO NEW.muni_id;
 			END IF;
-
-
-    		IF v_project_type = 'WS' THEN
-    			--get expl_id value if its null
-    			IF NEW.expl_id IS NULL THEN
-				 	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-				 	USING NEW.the_geom
-					INTO v_ws_expl_id;
-				ELSE 
-					v_ws_expl_id=NEW.expl_id;
-				END IF;
-
-				--get expl_id value of the oposite schema
-	    		IF v_ud_schema IS NOT NULL THEN
-					EXECUTE 'SELECT expl_id FROM '||v_ud_schema||'.exploitation 
-					WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-					USING NEW.the_geom
-					INTO v_ud_expl_id;
-				END IF;
-
-	    	ELSIF  v_project_type = 'UD' THEN
-	    		--get expl_id value if its null
-	    		IF NEW.expl_id IS NULL THEN
-				 	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-				 	USING NEW.the_geom
-					INTO v_ud_expl_id;
-				ELSE 
-					v_ud_expl_id=NEW.expl_id;
-				END IF;
-
-				--get expl_id value of the oposite schema
-	    		IF v_ws_schema IS NOT NULL THEN
-					EXECUTE 'SELECT expl_id FROM '||v_ws_schema||'.exploitation 
-					WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
-					USING NEW.the_geom
-					INTO v_ws_expl_id;
-				END IF;
-			END IF;
 		 	
 		 	EXECUTE 'INSERT INTO '||v_schema_utils||'.address ( id, muni_id, postcode, streetaxis_id, postnumber, 
-	    	plot_id, the_geom, ud_expl_id,ws_expl_id)
-	    	VALUES($1, $2, $3, $4, $5, $6, $7, $8,$9)'
+	    	plot_id, the_geom)
+	    	VALUES($1, $2, $3, $4, $5, $6, $7)'
 			USING NEW.id,NEW.muni_id,NEW.postcode,NEW.streetaxis_id,NEW.postnumber,NEW.plot_id, 
-			NEW.the_geom,v_ud_expl_id,v_ws_expl_id;
+			NEW.the_geom;
 
 	    	
     	END IF;
@@ -130,19 +86,19 @@ BEGIN
 		IF v_isutils IS FALSE OR v_isutils IS NULL THEN				
 			UPDATE ext_address 
 			SET id=NEW.id, muni_id=NEW.muni_id, postcode=NEW.postcode, streetaxis_id=NEW.streetaxis_id, 
-			postnumber=NEW.postnumber, plot_id=NEW.plot_id, the_geom=NEW.the_geom, expl_id=NEW.expl_id
+			postnumber=NEW.postnumber, plot_id=NEW.plot_id, the_geom=NEW.the_geom
 			WHERE id=NEW.id;
 		ELSE
 			IF  v_project_type = 'WS' THEN
 			
 				EXECUTE 'UPDATE '||v_schema_utils||'.address SET id=$1, muni_id=$2, postcode=$3, streetaxis_id=$4,
-				postnumber=$5,plot_id=$6,the_geom=$7, ws_expl_id=$8 WHERE id=$1'
-				USING NEW.id,NEW.muni_id,NEW.postcode,NEW.streetaxis_id,NEW.postnumber,NEW.plot_id, NEW.the_geom,NEW.expl_id;
+				postnumber=$5,plot_id=$6,the_geom=$7 WHERE id=$1'
+				USING NEW.id,NEW.muni_id,NEW.postcode,NEW.streetaxis_id,NEW.postnumber,NEW.plot_id, NEW.the_geom;
 				
 			ELSIF v_project_type = 'UD' THEN
 				EXECUTE 'UPDATE '||v_schema_utils||'.address SET id=$1, muni_id=$2, postcode=$3, streetaxis_id=$4,
-				postnumber=$5,plot_id=$6,the_geom=$7, ud_expl_id=$8 WHERE id=$1'
-				USING NEW.id,NEW.muni_id,NEW.postcode,NEW.streetaxis_id,NEW.postnumber,NEW.plot_id, NEW.the_geom,NEW.expl_id;
+				postnumber=$5,plot_id=$6,the_geom=$7 WHERE id=$1'
+				USING NEW.id,NEW.muni_id,NEW.postcode,NEW.streetaxis_id,NEW.postnumber,NEW.plot_id, NEW.the_geom;
 			END IF;
 		END IF;
 

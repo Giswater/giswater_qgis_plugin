@@ -35,7 +35,7 @@ BEGIN
 
 		-- getting value from geometry of mapzone
 		IF (NEW.muni_id IS NULL) THEN
-			NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_intersects(NEW.the_geom, ext_municipality.the_geom) AND active IS TRUE limit 1);
+			NEW.muni_id := (SELECT muni_id FROM v_municipality WHERE ST_intersects(NEW.the_geom, v_municipality.the_geom) AND active IS TRUE limit 1);
 		END IF;
 
 

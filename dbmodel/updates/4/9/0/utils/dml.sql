@@ -112,3 +112,39 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
     "field_id": "feature_id"
   }
 }'::json, 'v_ui_hydrometer', false, 2);
+
+
+UPDATE sys_table SET id='ve_municipality' WHERE id='v_ext_municipality';
+UPDATE sys_table SET id='ve_streetaxis' WHERE id='v_ext_streetaxis';
+UPDATE sys_table SET id='ve_address' WHERE id='v_ext_address';
+UPDATE sys_table SET id='ve_plot' WHERE id='v_ext_plot';
+UPDATE sys_table SET id='ve_raster_dem' WHERE id='v_ext_raster_dem';
+
+UPDATE sys_style SET layername='ve_municipality' WHERE layername='v_ext_municipality';
+UPDATE sys_style SET layername='ve_streetaxis' WHERE layername='v_ext_streetaxis';
+UPDATE sys_style SET layername='ve_address' WHERE layername='v_ext_address';
+UPDATE sys_style SET layername='ve_plot' WHERE layername='v_ext_plot';
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+update config_form_fields set dv_querytext = replace(dv_querytext, 'v_ext_municipality', 've_municipality') where dv_querytext like '%v_ext_municipality%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_municipality', 'v_municipality') where dv_querytext like '%ext_municipality%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'v_ext_streetaxis', 've_streetaxis') where dv_querytext like '%v_ext_streetaxis%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_streetaxis', 'v_streetaxis') where dv_querytext like '%ext_streetaxis%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_address', 'v_address') where dv_querytext like '%ext_address%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_region', 'v_region') where dv_querytext like '%ext_region%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') where dv_querytext like '%ext_province%';
+update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') where dv_querytext like '%ext_district%';
+
+update config_form_fields set formname='ve_streetaxis' where formname = 'v_ext_streetaxis';
+delete from config_form_fields where formname='ve_streetaxis' and columnname='expl_id';
+
+update config_form_fields set formname='ve_municipality' where formname in ('v_ext_municipality', 'ext_municipality');
+delete from config_form_fields where formname='ve_municipality' and columnname in ('expl_id', 'sector_id');
+
+update config_form_fields set formname='ve_address' where formname = 'v_ext_address';
+delete from config_form_fields where formname='ve_address' and columnname = 'expl_id';
+
+update config_form_fields set formname='ve_plot' where formname = 'v_ext_plot';
+delete from config_form_fields where formname='ve_plot' and columnname = 'expl_id';
+update config_form_fields set columnname='code', label='Code:', tooltip='Code' where formname = 've_plot' and columnname = 'plot_code';
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

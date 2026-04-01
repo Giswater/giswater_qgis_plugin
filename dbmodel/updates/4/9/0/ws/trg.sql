@@ -22,7 +22,14 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_dscenario_demand_feature();
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON inp_dscenario_demand
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_dscenario_demand');
 
--- View Triggers
-
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_link 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
+
+CREATE TRIGGER gw_trg_edit_inp_dscenario_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_dscenario_connec 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('CONNEC');
+
+CREATE TRIGGER gw_trg_edit_inp_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_inp_connec 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_connec();
+
+CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');

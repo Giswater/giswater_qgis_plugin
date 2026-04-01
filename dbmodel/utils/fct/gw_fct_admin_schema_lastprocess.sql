@@ -98,6 +98,9 @@ BEGIN
                 AND s.sequence_name != 'urn_id_seq'
                 AND s.sequence_name != 'doc_seq'
                 AND s.sequence_name != 'raingage_rg_id_seq'
+				AND s.sequence_name != 'ext_plot_id_seq'
+				AND s.sequence_name != 'ext_streetaxis_id_seq'
+				AND s.sequence_name != 'ext_address_id_seq'
             ORDER BY
                 s.sequence_name
         )

@@ -13,14 +13,14 @@ VALUES ('ws_current_schema', 'SCHEMA_NAME', 'Indicate the name for the WS schema
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_utils_schema';
 
-insert into utils.province select * from ext_province_old;
-insert into utils.region select * from ext_region_old;
-insert into utils.region_x_province select * from ext_region_x_province_old;
-insert into utils.municipality select * from ext_municipality_old;
-insert into utils.district select * from ext_district_old;
-insert into utils.cat_raster select * from ext_cat_raster_old;
-insert into utils.raster_dem select * from ext_raster_dem_old;
-insert into utils.type_street select * from ext_type_street_old;
-insert into utils.streetaxis select * from ext_streetaxis_old;
-insert into utils.plot select * from ext_plot_old;
-insert into utils.address select * from ext_address_old;
+insert into utils.province select * from SCHEMA_NAME.ext_province_old;
+insert into utils.region select * from SCHEMA_NAME.ext_region_old;
+insert into utils.region_x_province select * from SCHEMA_NAME.ext_region_x_province_old;
+insert into utils.municipality select * from SCHEMA_NAME.ext_municipality_old;
+insert into utils.district select * from SCHEMA_NAME.ext_district_old;
+insert into utils.cat_raster select * from SCHEMA_NAME.ext_cat_raster_old;
+insert into utils.raster_dem select * from SCHEMA_NAME.ext_raster_dem_old;
+insert into utils.type_street select * from SCHEMA_NAME.ext_type_street_old;
+insert into utils.streetaxis select * from SCHEMA_NAME.ext_streetaxis_old;
+insert into utils.plot select * from SCHEMA_NAME.ext_plot_old;
+insert into utils.address select * from SCHEMA_NAME.ext_address_old;

@@ -311,9 +311,9 @@ BEGIN
 
 			-- getting value from geometry of mapzone
 			IF (NEW.muni_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) AND active IS TRUE;
+				SELECT count(*) INTO v_count FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001) AND active IS TRUE;
 				IF v_count = 1 THEN
-					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001)
+					NEW.muni_id = (SELECT muni_id FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001)
 					AND active IS TRUE LIMIT 1);
 				ELSE
 					NEW.muni_id =(SELECT muni_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
@@ -327,9 +327,9 @@ BEGIN
 
 			-- getting value from geometry of mapzone
 			IF (NEW.district_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001);
+				SELECT count(*) INTO v_count FROM v_district WHERE ST_DWithin(NEW.the_geom, v_district.the_geom,0.001);
 				IF v_count = 1 THEN
-					NEW.district_id = (SELECT district_id FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001) LIMIT 1);
+					NEW.district_id = (SELECT district_id FROM v_district WHERE ST_DWithin(NEW.the_geom, v_district.the_geom,0.001) LIMIT 1);
 				ELSIF v_count > 1 THEN
 					NEW.district_id =(SELECT district_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
 					order by ST_Distance (NEW.the_geom, ve_arc.the_geom) LIMIT 1);
@@ -423,9 +423,9 @@ BEGIN
 		--Address
 		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				NEW.streetaxis_id := (select v_ext_streetaxis.id from v_ext_streetaxis
-								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
-								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
+				NEW.streetaxis_id := (select ve_streetaxis.id from ve_streetaxis
+								join node on ST_DWithin(NEW.the_geom, ve_streetaxis.the_geom, v_auto_streetvalues_buffer)
+								order by ST_Distance(NEW.the_geom, ve_streetaxis.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -433,15 +433,15 @@ BEGIN
 		IF (v_auto_streetvalues_status) IS TRUE THEN
 			IF (v_auto_streetvalues_field = 'postcomplement') THEN
 				IF (NEW.postcomplement IS NULL) THEN
-					NEW.postcomplement = (select ext_address.postnumber from ext_address
-						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					NEW.postcomplement = (select v_address.postnumber from v_address
+						join node on ST_DWithin(NEW.the_geom, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, v_address.the_geom) LIMIT 1);
 				END IF;
 			ELSIF (v_auto_streetvalues_field = 'postnumber') THEN
 				IF (NEW.postnumber IS NULL) THEN
-					NEW.postnumber= (select ext_address.postnumber from ext_address
-						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					NEW.postnumber= (select v_address.postnumber from v_address
+						join node on ST_DWithin(NEW.the_geom, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, v_address.the_geom) LIMIT 1);
 				END IF;
 			END IF;
 		END IF;

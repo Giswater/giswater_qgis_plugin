@@ -1480,7 +1480,7 @@ BEGIN
 						SELECT ST_Collect(ep.the_geom) AS the_geom 
 						FROM om_mincut_connec co
 						JOIN connec c ON c.connec_id = co.connec_id
-						LEFT JOIN ext_plot ep ON c.plot_code = ep.plot_code 
+						LEFT JOIN v_plot ep ON c.plot_id = ep.id
 							AND ST_DWithin(c.the_geom, ep.the_geom, 0.001)
 						WHERE a.result_id = '||v_mincut_id||'
 					) a

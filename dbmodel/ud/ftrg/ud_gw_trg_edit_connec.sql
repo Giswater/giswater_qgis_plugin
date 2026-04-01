@@ -246,9 +246,9 @@ BEGIN
 
 			-- getting value from geometry of mapzone
 			IF (NEW.muni_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) AND active IS TRUE ;
+				SELECT count(*) INTO v_count FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001) AND active IS TRUE ;
 				IF v_count = 1 THEN
-					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001)
+					NEW.muni_id = (SELECT muni_id FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001)
 					AND active IS TRUE  LIMIT 1);
 				ELSE
 					NEW.muni_id =(SELECT muni_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
@@ -262,9 +262,9 @@ BEGIN
 
 			-- getting value from geometry of mapzone
 			IF (NEW.district_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001);
+				SELECT count(*) INTO v_count FROM v_district WHERE ST_DWithin(NEW.the_geom, v_district.the_geom,0.001);
 				IF v_count = 1 THEN
-					NEW.district_id = (SELECT district_id FROM ext_district WHERE ST_DWithin(NEW.the_geom, ext_district.the_geom,0.001) LIMIT 1);
+					NEW.district_id = (SELECT district_id FROM v_district WHERE ST_DWithin(NEW.the_geom, v_district.the_geom,0.001) LIMIT 1);
 				ELSIF v_count > 1 THEN
 					NEW.district_id =(SELECT district_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
 					order by ST_Distance (NEW.the_geom, ve_arc.the_geom) LIMIT 1);
@@ -336,9 +336,9 @@ BEGIN
 		--Address
 		IF (NEW.streetaxis_id IS NULL) THEN
 			IF (v_auto_streetvalues_status is true) THEN
-				NEW.streetaxis_id := (select v_ext_streetaxis.id from v_ext_streetaxis
-								join node on ST_DWithin(NEW.the_geom, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
-								order by ST_Distance(NEW.the_geom, v_ext_streetaxis.the_geom) LIMIT 1);
+				NEW.streetaxis_id := (select ve_streetaxis.id from ve_streetaxis
+								join node on ST_DWithin(NEW.the_geom, ve_streetaxis.the_geom, v_auto_streetvalues_buffer)
+								order by ST_Distance(NEW.the_geom, ve_streetaxis.the_geom) LIMIT 1);
 			END IF;
 		END IF;
 
@@ -346,15 +346,15 @@ BEGIN
 		IF (v_auto_streetvalues_status) IS TRUE THEN
 			IF (v_auto_streetvalues_field = 'postcomplement') THEN
 				IF (NEW.postcomplement IS NULL) THEN
-					NEW.postcomplement = (select ext_address.postnumber from ext_address
-						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					NEW.postcomplement = (select v_address.postnumber from v_address
+						join node on ST_DWithin(NEW.the_geom, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, v_address.the_geom) LIMIT 1);
 				END IF;
 			ELSIF (v_auto_streetvalues_field = 'postnumber') THEN
 				IF (NEW.postnumber IS NULL) THEN
-					NEW.postnumber= (select ext_address.postnumber from ext_address
-						join node on ST_DWithin(NEW.the_geom, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(NEW.the_geom, ext_address.the_geom) LIMIT 1);
+					NEW.postnumber= (select v_address.postnumber from v_address
+						join node on ST_DWithin(NEW.the_geom, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(NEW.the_geom, v_address.the_geom) LIMIT 1);
 				END IF;
 			END IF;
 		END IF;
@@ -462,9 +462,9 @@ BEGIN
 				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1) LIMIT 1);
 		END IF;
 
-		-- plot_code from plot layer
+		-- plot_id from plot layer
 		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
-			NEW.plot_code = (SELECT plot_code FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
+			NEW.plot_id = (SELECT plot_id FROM ve_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
 		END IF;
 		
 		-- uuid random
@@ -479,7 +479,7 @@ BEGIN
 			builtdate, enddate, ownercat_id, muni_id, postcode, district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, brand_id, model_id,
-			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid,
+			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_id, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid,
 			treatment_type)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, COALESCE(NEW.sector_id, 0), NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
@@ -487,7 +487,7 @@ BEGIN
 			NEW.streetaxis2_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id,
-			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
+			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_id, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, COALESCE(NEW.omunit_id, 0), NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), NEW.uuid, COALESCE(NEW.treatment_type, 0));
 		ELSE
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
@@ -495,7 +495,7 @@ BEGIN
 			builtdate, enddate, ownercat_id, muni_id,postcode,district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, matcat_id, brand_id, model_id,
-			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_code, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid,
+			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_id, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid,
 			treatment_type)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, COALESCE(NEW.sector_id, 0), NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
@@ -503,7 +503,7 @@ BEGIN
 			NEW.streetaxis2_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.brand_id, NEW.model_id,
-			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
+			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_id, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, COALESCE(NEW.omunit_id, 0), NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), NEW.uuid, COALESCE(NEW.treatment_type, 0));
 		END IF;
 
@@ -609,9 +609,9 @@ BEGIN
 				AND element_id IN (SELECT element_id FROM element_x_connec WHERE connec_id=NEW.connec_id);
 			END IF;
 
-			-- plot_code from plot layer
+			-- plot_id from plot layer
 			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
-				NEW.plot_code = (SELECT plot_code FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
+				NEW.plot_id = (SELECT plot_id FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
 			END IF;
 
 		END IF;
@@ -780,7 +780,7 @@ BEGIN
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, brand_id=NEW.brand_id, model_id=NEW.model_id,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(), updated_by=current_user, asset_id=NEW.asset_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id
+			plot_id=NEW.plot_id, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id
 			WHERE connec_id = OLD.connec_id;
 		ELSE
 			UPDATE connec
@@ -793,7 +793,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(),
 			updated_by=current_user, matcat_id = NEW.matcat_id, asset_id=NEW.asset_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id
+			plot_id=NEW.plot_id, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id
 			WHERE connec_id = OLD.connec_id;
 		END IF;
 

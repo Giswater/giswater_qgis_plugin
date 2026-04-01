@@ -671,21 +671,21 @@ BEGIN
 
 		-- Municipality
 		IF v_muni_id IS NULL THEN
-			v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(v_reduced_geometry, ext_municipality.the_geom,0.001) AND active IS TRUE LIMIT 1);
+			v_muni_id := (SELECT muni_id FROM v_municipality WHERE ST_DWithin(v_reduced_geometry, v_municipality.the_geom,0.001) AND active IS TRUE LIMIT 1);
 		END IF;
 
 		-- District
-		v_district_id := (SELECT district_id FROM ext_district WHERE ST_DWithin(v_reduced_geometry, ext_district.the_geom,0.001) LIMIT 1);
+		v_district_id := (SELECT district_id FROM v_district WHERE ST_DWithin(v_reduced_geometry, v_district.the_geom,0.001) LIMIT 1);
 
 		--Address
-		v_streetname :=(select v_ext_streetaxis.descript from v_ext_streetaxis
-				where ST_DWithin(v_reduced_geometry, v_ext_streetaxis.the_geom, v_auto_streetvalues_buffer)
-				order by ST_Distance(v_reduced_geometry, v_ext_streetaxis.the_geom) LIMIT 1);
+		v_streetname :=(select ve_streetaxis.descript from ve_streetaxis
+				where ST_DWithin(v_reduced_geometry, ve_streetaxis.the_geom, v_auto_streetvalues_buffer)
+				order by ST_Distance(v_reduced_geometry, ve_streetaxis.the_geom) LIMIT 1);
 
 		--Postnumber/postcomplement
-		v_postnumber := (select ext_address.postnumber from ext_address
-						where ST_DWithin(v_reduced_geometry, ext_address.the_geom, v_auto_streetvalues_buffer)
-						order by ST_Distance(v_reduced_geometry, ext_address.the_geom) LIMIT 1);
+		v_postnumber := (select v_address.postnumber from v_address
+						where ST_DWithin(v_reduced_geometry, v_address.the_geom, v_auto_streetvalues_buffer)
+						order by ST_Distance(v_reduced_geometry, v_address.the_geom) LIMIT 1);
 
 		-- Dem elevation
 		IF v_sys_raster_dem AND ve_insert_elevation_from_dem AND v_idname IN ('node_id', 'connec_id', 'gully_id') THEN
@@ -1079,7 +1079,7 @@ BEGIN
 
 				CASE (aux_json->>'columnname')
 				WHEN 'streetaxis_id' THEN
-					SELECT descript INTO field_value FROM v_ext_streetaxis WHERE id = (v_values_array->>(aux_json->>'columnname'));
+					SELECT descript INTO field_value FROM ve_streetaxis WHERE id = (v_values_array->>(aux_json->>'columnname'));
 				ELSE
 					field_value := (v_values_array->>(aux_json->>'columnname'));
 				END CASE;
