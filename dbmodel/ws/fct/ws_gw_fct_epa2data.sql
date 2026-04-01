@@ -35,13 +35,11 @@ v_iscorporate boolean;
 v_affected_result text;
 v_mapzone text;
 v_addparam jsonb;
-v_network_type integer;
 v_sectors text;
 v_sql text;
 v_results record;
 v_message_text text;
 v_action_update boolean = false;
-v_network_name text;
 
 BEGIN
 
@@ -65,22 +63,19 @@ BEGIN
 		true
 	);
 
-	-- Get network_type
-	SELECT network_type, idval INTO v_network_type, v_network_name FROM rpt_cat_result join inp_typevalue on network_type = id WHERE result_id = v_result_id and typevalue = 'inp_options_networkmode';
-
 	-- Get sector_id
 	SELECT sector_id INTO v_sectors FROM rpt_cat_result WHERE result_id = v_result_id;
 
 	IF v_iscorporate then
 
-		if (SELECT count(*)  FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE) > 0 then
-			-- The result includes the same network type and sectors. Proceed with updating the corporate entity.
+		if (SELECT count(*)  FROM rpt_cat_result r WHERE v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE) > 0 then
+			-- The result includes the same sectors. Proceed with updating the corporate entity.
 			if v_action_update is true then
-				UPDATE rpt_cat_result SET iscorporate = FALSE WHERE result_id in (SELECT result_id FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE AND result_id != v_result_id);
+				UPDATE rpt_cat_result SET iscorporate = FALSE WHERE result_id in (SELECT result_id FROM rpt_cat_result r WHERE v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE AND result_id != v_result_id);
 				v_message_text = 'Epa corporate updated';
 			else
 				SELECT CONCAT(
-				        'To set this result as corporate, the following results will no longer be marked as corporate: (Network Type - ',v_network_name,') \n\n',
+				        'To set this result as corporate, the following results will no longer be marked as corporate:\n\n',
 				        STRING_AGG(
 				            CONCAT(
 			                '- ', result_id, ' with sectors: ''', sector_id, ''''
@@ -91,11 +86,9 @@ BEGIN
 				FROM (
 				    SELECT
 				        result_id,
-				        network_type,
 				        sector_id::text
 				    FROM rpt_cat_result r
-				    WHERE r.network_type = v_network_type::text
-				      AND v_sectors::integer[] @> r.sector_id
+				    WHERE v_sectors::integer[] @> r.sector_id
 				      AND iscorporate IS TRUE
 				) subq;
 				RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
@@ -106,8 +99,8 @@ BEGIN
 			end if;
 
 
-		elsif (SELECT count(*)  FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND r.sector_id && v_sectors::integer[] and iscorporate is true) > 0 then
-			-- The result contains the same network type with one or more sectors already associated with another corporate entity. It is not possible to create a new corporate entity under these circumstances.
+		elsif (SELECT count(*)  FROM rpt_cat_result r WHERE r.sector_id && v_sectors::integer[] and iscorporate is true) > 0 then
+			-- The result contains one or more sectors already associated with another corporate entity. It is not possible to create a new corporate entity under these circumstances.
 			RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":2, "text":"It is impossible to proceed. You need to fix the current corporate result for the following sectors: '||(v_sectors)||'"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{}}'||
