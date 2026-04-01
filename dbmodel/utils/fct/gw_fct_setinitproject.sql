@@ -142,7 +142,7 @@ BEGIN
 	ELSE
 		-- Force exploitation selector in case of null values
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN
-			IF (SELECT 1 FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 ORDER BY expl_id LIMIT 1) IS NOT NULL THEN
+			IF EXISTS (SELECT 1 FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0) THEN
 				EXECUTE format(
 					$$SELECT gw_fct_setselectors('{
 						"client":{
@@ -156,6 +156,8 @@ BEGIN
 						}
 					}')$$
 				);
+			END IF;
+			IF EXISTS (SELECT 1 FROM selector_expl WHERE cur_user=current_user) THEN
 				v_errortext = 'Set all active exploitations as visible exploitations for user';
 				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 			ELSE
