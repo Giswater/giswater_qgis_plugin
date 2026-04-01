@@ -11,8 +11,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 4 test
-SELECT plan(4);
+-- Plan for 1 test
+SELECT plan(1);
 
 -- Create roles for testing
 CREATE USER plan_user;
@@ -32,33 +32,10 @@ GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_setsearch($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"tabName":"network"},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"arc", "net_type":{"id":"ve_arc", "name":"Arcs"},
-    "net_code":{"text":"100011 : CC040"}, "addSchema":"NULL"}}$$)::JSON)->>'status',
+    (gw_fct_setsearch($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"section":"basic_search_v2_tab_coordinates", "value":"431000,4582000", "filterKey":"", "filterValue":"431000,4582000", "execFunc":"", "tableName":"", "searchAdd":"false"}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_setsearch --> tabName":"network" returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setsearch($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"tabName":"workcat"},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"work1"}, "addSchema":"NULL"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setsearch --> tabName":"workcat" returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setsearch($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"tabName":"psector"},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "psector_expl":{"id":"1", "name":"expl_01"},
-    "psector_search":{"text":"ACT_01_F0"}, "addSchema":"NULL"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setsearch --> tabName":"psector" returns status "Accepted"'
-);
-
-SELECT is (
-    (gw_fct_setsearch($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{"tabName":"visit"},
-    "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "visit_search":{"text":"1"}, "addSchema":"NULL"}}$$)::JSON)->>'status',
-    'Accepted',
-    'Check if gw_fct_setsearch --> tabName":"visit" returns status "Accepted"'
+    'Check if gw_fct_setsearch returns status "Accepted" with v2 payload'
 );
 
 -- Finish the test
