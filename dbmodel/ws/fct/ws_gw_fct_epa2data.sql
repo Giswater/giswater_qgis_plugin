@@ -257,13 +257,13 @@ BEGIN
 
 				EXECUTE '
 				UPDATE exploitation set avg_press = null where '||v_mapzone||'_id in 
-				(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+				(select distinct '||v_mapzone||'_id from node where node_id::text in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
 			ELSE
 
 				EXECUTE '
 				UPDATE '||v_mapzone||' set avg_press = null where '||v_mapzone||'_id in 
-				(select distinct '||v_mapzone||'_id from node where node_id in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
+				(select distinct '||v_mapzone||'_id from node where node_id::text in (select distinct node_id from rpt_node where result_id = '||quote_literal(v_result_id)||'))';
 
 			END IF;
 
