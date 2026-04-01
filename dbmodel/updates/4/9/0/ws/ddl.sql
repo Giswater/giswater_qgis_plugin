@@ -90,3 +90,18 @@ CREATE INDEX idx_inp_dscenario_demand_dscenario_id ON inp_dscenario_demand USING
 CREATE INDEX idx_inp_dscenario_demand_source ON inp_dscenario_demand USING btree (source);
 
 SELECT setval('SCHEMA_NAME.inp_dscenario_demand_id_seq', (SELECT last_value FROM inp_dscenario_demand_id_seq1));
+
+-- 01/04/2026
+DROP INDEX IF EXISTS arc_dma;
+DROP INDEX IF EXISTS connec_dma;
+DROP INDEX IF EXISTS node_dma;
+DROP INDEX IF EXISTS anl_node_fid;
+DROP INDEX IF EXISTS anl_node_fprocesscat_id_index;
+CREATE INDEX IF NOT EXISTS anl_node_fid_idx ON anl_node USING btree (fid);
+DROP INDEX IF EXISTS archived_psector_link_exit_id;
+DROP INDEX IF EXISTS link_exit_id;
+CREATE INDEX IF NOT EXISTS link_exit_id_idx ON link USING btree (exit_id);
+DROP INDEX IF EXISTS idx_plan_psector_expl_id;
+DROP INDEX IF EXISTS plan_psector_expl_id;
+CREATE INDEX IF NOT EXISTS plan_psector_expl_id_idx ON plan_psector USING btree (expl_id);
+ALTER TABLE selector_rpt_main_tstep DROP CONSTRAINT IF EXISTS time_cur_user_unique;
