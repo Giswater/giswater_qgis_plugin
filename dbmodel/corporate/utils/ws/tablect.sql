@@ -14,6 +14,8 @@ ALTER TABLE arc DROP CONSTRAINT arc_district_id_fkey;
 ALTER TABLE arc ADD CONSTRAINT arc_district_id_fkey FOREIGN KEY (district_id) REFERENCES utils.district(district_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE connec DROP CONSTRAINT connec_district_id_fkey;
 ALTER TABLE connec ADD CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES utils.district(district_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE connec DROP CONSTRAINT connec_plot_id_fkey;
+ALTER TABLE connec ADD CONSTRAINT connec_plot_id_fkey FOREIGN KEY (plot_id) REFERENCES utils.plot(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_district_id_fkey;
 ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_district_id_fkey FOREIGN KEY (district_id) REFERENCES utils.district(district_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE link DROP CONSTRAINT link_muni_id_fkey;
