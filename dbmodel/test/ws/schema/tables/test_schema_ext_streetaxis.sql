@@ -20,7 +20,7 @@ SELECT has_table('ext_streetaxis'::name, 'Table ext_streetaxis should exist');
 SELECT columns_are(
     'ext_streetaxis',
     ARRAY[
-        'id', 'code', 'type', 'name', 'text', 'the_geom', 'expl_id', 'muni_id', 'source'
+        'id', 'code', 'type', 'name', 'text', 'the_geom', 'muni_id', 'source'
     ],
     'Table ext_streetaxis should have the correct columns'
 );
@@ -35,7 +35,6 @@ SELECT col_type_is('ext_streetaxis', 'type', 'varchar(18)', 'Column type should 
 SELECT col_type_is('ext_streetaxis', 'name', 'varchar(100)', 'Column name should be varchar(100)');
 SELECT col_type_is('ext_streetaxis', 'text', 'text', 'Column text should be text');
 SELECT col_type_is('ext_streetaxis', 'the_geom', 'geometry(MultiLineString,25831)', 'Column the_geom should be geometry(MultiLineString,25831)');
-SELECT col_type_is('ext_streetaxis', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('ext_streetaxis', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('ext_streetaxis', 'source', 'text', 'Column source should be text');
 
@@ -50,7 +49,6 @@ SELECT has_index('ext_streetaxis', 'idx_ext_streetaxis_the_geom', 'Table should 
 
 -- Check foreign keys
 SELECT has_fk('ext_streetaxis', 'Table ext_streetaxis should have foreign keys');
-SELECT fk_ok('ext_streetaxis', 'expl_id', 'exploitation', 'expl_id', 'FK ext_streetaxis_exploitation_id_fkey should exist');
 SELECT fk_ok('ext_streetaxis', 'muni_id', 'ext_municipality', 'muni_id', 'FK ext_streetaxis_muni_id_fkey should exist');
 SELECT fk_ok('ext_streetaxis', 'type', 'ext_type_street', 'id', 'FK ext_streetaxis_type_street_fkey should exist');
 
@@ -63,7 +61,6 @@ SELECT fk_ok('ext_streetaxis', 'type', 'ext_type_street', 'id', 'FK ext_streetax
 -- Check constraints
 SELECT col_not_null('ext_streetaxis', 'id', 'Column id should be NOT NULL');
 SELECT col_not_null('ext_streetaxis', 'name', 'Column name should be NOT NULL');
-SELECT col_not_null('ext_streetaxis', 'expl_id', 'Column expl_id should be NOT NULL');
 SELECT col_not_null('ext_streetaxis', 'muni_id', 'Column muni_id should be NOT NULL');
 
 SELECT * FROM finish();

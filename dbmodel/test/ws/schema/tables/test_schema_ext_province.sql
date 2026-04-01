@@ -20,7 +20,7 @@ SELECT has_table('ext_province'::name, 'Table ext_province should exist');
 SELECT columns_are(
     'ext_province',
     ARRAY[
-        'province_id', 'name', 'descript', 'the_geom', 'active', 'ext_code'
+        'province_id', 'name', 'descript', 'the_geom', 'active', 'code'
     ],
     'Table ext_province should have the correct columns'
 );
@@ -34,7 +34,7 @@ SELECT col_type_is('ext_province', 'name', 'text', 'Column name should be text')
 SELECT col_type_is('ext_province', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('ext_province', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('ext_province', 'active', 'boolean', 'Column active should be boolean');
-SELECT col_type_is('ext_province', 'ext_code', 'varchar(50)', 'Column ext_code should be varchar(50)');
+SELECT col_type_is('ext_province', 'code', 'varchar(50)', 'Column code should be varchar(50)');
 
 -- Check indexes
 

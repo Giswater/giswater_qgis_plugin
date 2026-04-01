@@ -20,7 +20,7 @@ SELECT has_table('ext_plot'::name, 'Table ext_plot should exist');
 SELECT columns_are(
     'ext_plot',
     ARRAY[
-        'id', 'plot_code', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'complement', 'placement', 'square', 'observ', 'text', 'the_geom', 'expl_id'
+        'id', 'code', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'complement', 'placement', 'square', 'observ', 'text', 'the_geom'
     ],
     'Table ext_plot should have the correct columns'
 );
@@ -30,7 +30,7 @@ SELECT col_is_pk('ext_plot', ARRAY['id'], 'Column id should be primary key');
 
 -- Check column types
 SELECT col_type_is('ext_plot', 'id', 'varchar(16)', 'Column id should be varchar(16)');
-SELECT col_type_is('ext_plot', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
+SELECT col_type_is('ext_plot', 'code', 'varchar(100)', 'Column code should be varchar(100)');
 SELECT col_type_is('ext_plot', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('ext_plot', 'postcode', 'varchar(16)', 'Column postcode should be varchar(16)');
 SELECT col_type_is('ext_plot', 'streetaxis_id', 'varchar(16)', 'Column streetaxis_id should be varchar(16)');
@@ -41,7 +41,6 @@ SELECT col_type_is('ext_plot', 'square', 'varchar(16)', 'Column square should be
 SELECT col_type_is('ext_plot', 'observ', 'text', 'Column observ should be text');
 SELECT col_type_is('ext_plot', 'text', 'text', 'Column text should be text');
 SELECT col_type_is('ext_plot', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
-SELECT col_type_is('ext_plot', 'expl_id', 'integer', 'Column expl_id should be integer');
 
 -- Check indexes
 SELECT has_index('ext_plot', 'idx_ext_plot_muni_id', 'Should have index on muni_id');

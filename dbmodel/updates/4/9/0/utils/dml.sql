@@ -126,25 +126,25 @@ UPDATE sys_style SET layername='ve_address' WHERE layername='v_ext_address';
 UPDATE sys_style SET layername='ve_plot' WHERE layername='v_ext_plot';
 
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
-update config_form_fields set dv_querytext = replace(dv_querytext, 'v_ext_municipality', 've_municipality') where dv_querytext like '%v_ext_municipality%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_municipality', 'v_municipality') where dv_querytext like '%ext_municipality%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'v_ext_streetaxis', 've_streetaxis') where dv_querytext like '%v_ext_streetaxis%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_streetaxis', 'v_streetaxis') where dv_querytext like '%ext_streetaxis%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_address', 'v_address') where dv_querytext like '%ext_address%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_region', 'v_region') where dv_querytext like '%ext_region%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') where dv_querytext like '%ext_province%';
-update config_form_fields set dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') where dv_querytext like '%ext_district%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'v_ext_municipality', 've_municipality') WHERE dv_querytext LIKE '%v_ext_municipality%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'v_ext_streetaxis', 've_streetaxis') WHERE dv_querytext LIKE '%v_ext_streetaxis%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_municipality', 'v_municipality') WHERE dv_querytext LIKE '%ext_municipality%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_streetaxis', 'v_streetaxis') WHERE dv_querytext LIKE '%ext_streetaxis%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_address', 'v_address') WHERE dv_querytext LIKE '%ext_address%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_region', 'v_region') WHERE dv_querytext LIKE '%ext_region%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') WHERE dv_querytext LIKE '%ext_province%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') WHERE dv_querytext LIKE '%ext_district%';
 
-update config_form_fields set formname='ve_streetaxis' where formname = 'v_ext_streetaxis';
-delete from config_form_fields where formname='ve_streetaxis' and columnname='expl_id';
+UPDATE config_form_fields SET formname='ve_streetaxis' WHERE formname = 'v_ext_streetaxis';
+DELETE FROM config_form_fields WHERE formname='ve_streetaxis' AND columnname='expl_id';
 
-update config_form_fields set formname='ve_municipality' where formname in ('v_ext_municipality', 'ext_municipality');
-delete from config_form_fields where formname='ve_municipality' and columnname in ('expl_id', 'sector_id');
+UPDATE config_form_fields SET formname='ve_municipality' WHERE formname in ('v_ext_municipality', 'ext_municipality');
+DELETE FROM config_form_fields WHERE formname='ve_municipality' AND columnname in ('expl_id', 'sector_id');
 
-update config_form_fields set formname='ve_address' where formname = 'v_ext_address';
-delete from config_form_fields where formname='ve_address' and columnname = 'expl_id';
+UPDATE config_form_fields SET formname='ve_address' WHERE formname = 'v_ext_address';
+DELETE FROM config_form_fields WHERE formname='ve_address' AND columnname = 'expl_id';
 
-update config_form_fields set formname='ve_plot' where formname = 'v_ext_plot';
-delete from config_form_fields where formname='ve_plot' and columnname = 'expl_id';
-update config_form_fields set columnname='code', label='Code:', tooltip='Code' where formname = 've_plot' and columnname = 'plot_code';
+UPDATE config_form_fields SET formname='ve_plot' WHERE formname = 'v_ext_plot';
+DELETE FROM config_form_fields WHERE formname='ve_plot' AND columnname = 'expl_id';
+UPDATE config_form_fields SET columnname='code', label='Code:', tooltip='Code' WHERE formname = 've_plot' AND columnname = 'plot_code';
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

@@ -20,7 +20,7 @@ SELECT has_table('ext_address'::name, 'Table ext_address should exist');
 SELECT columns_are(
     'ext_address',
     ARRAY[
-        'id', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'plot_id', 'the_geom', 'expl_id', 'postcomplement', 'ext_code',
+        'id', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'plot_id', 'the_geom', 'postcomplement', 'code',
         'source'
     ],
     'Table ext_address should have the correct columns'
@@ -37,15 +37,12 @@ SELECT col_type_is('ext_address', 'streetaxis_id', 'varchar(16)', 'Column street
 SELECT col_type_is('ext_address', 'postnumber', 'varchar(16)', 'Column postnumber should be varchar(16)');
 SELECT col_type_is('ext_address', 'plot_id', 'varchar(16)', 'Column plot_id should be varchar(16)');
 SELECT col_type_is('ext_address', 'the_geom', 'geometry(point, 25831)', 'Column the_geom should be geometry(point, 25831)');
-SELECT col_type_is('ext_address', 'expl_id', 'int4', 'Column expl_id should be int4');
 SELECT col_type_is('ext_address', 'postcomplement', 'text', 'Column postcomplement should be text');
-SELECT col_type_is('ext_address', 'ext_code', 'text', 'Column ext_code should be text');
+SELECT col_type_is('ext_address', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('ext_address', 'source', 'text', 'Column source should be text');
 
 -- Check foreign keys
 SELECT has_fk('ext_address', 'Table ext_address should have foreign keys');
-
-SELECT fk_ok('ext_address', 'expl_id', 'exploitation', 'expl_id', 'Table should have foreign key from expl_id to exploitation.expl_id');
 SELECT fk_ok('ext_address', 'muni_id', 'ext_municipality', 'muni_id', 'Table should have foreign key from muni_id to ext_municipality.muni_id');
 SELECT fk_ok('ext_address', 'plot_id', 'ext_plot', 'id', 'Table should have foreign key from plot_id to ext_plot.id');
 SELECT fk_ok('ext_address', 'streetaxis_id', 'ext_streetaxis', 'id', 'Table should have foreign key from streetaxis_id to ext_streetaxis.id');
