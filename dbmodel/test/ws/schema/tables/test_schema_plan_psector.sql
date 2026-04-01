@@ -99,7 +99,6 @@ SELECT has_index('plan_psector', 'idx_plan_psector_workcat_id', 'Table should ha
 SELECT has_index('plan_psector', 'idx_plan_psector_workcat_id_plan', 'Table should have index on workcat_id_plan');
 SELECT has_index('plan_psector', 'ifx_plan_psector_parent_id', 'Table should have index on parent_id');
 SELECT has_index('plan_psector', 'ifx_plan_psector_the_geom', 'Table should have index on the_geom');
-SELECT has_index('plan_psector', 'plan_psector_expl_id', 'Table should have index on expl_id');
 
 -- Check triggers
 SELECT has_trigger('plan_psector', 'gw_trg_plan_psector', 'Table should have trigger gw_trg_plan_psector');

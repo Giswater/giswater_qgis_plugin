@@ -32,7 +32,7 @@ SELECT columns_are(
 SELECT col_is_pk('anl_node', 'id', 'Column id should be primary key');
 
 -- Check indexes
-SELECT has_index('anl_node', 'anl_node_fprocesscat_id_index', 'Table should have index on fid');
+SELECT has_index('anl_node', 'anl_node_fid_idx', 'Table should have index on fid');
 SELECT has_index('anl_node', 'anl_node_index', 'Table should have spatial index');
 SELECT has_index('anl_node', 'anl_node_node_id_index', 'Table should have index on node_id');
 

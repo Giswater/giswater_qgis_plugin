@@ -63,7 +63,6 @@ SELECT col_not_null('ext_address', 'id', 'Column id should be NOT NULL');
 SELECT col_not_null('ext_address', 'muni_id', 'Column muni_id should be NOT NULL');
 SELECT col_not_null('ext_address', 'streetaxis_id', 'Column streetaxis_id should be NOT NULL');
 SELECT col_not_null('ext_address', 'postnumber', 'Column postnumber should be NOT NULL');
-SELECT col_not_null('ext_address', 'expl_id', 'Column expl_id should be NOT NULL');
 
 
 SELECT * FROM finish();

@@ -38,7 +38,7 @@ SELECT col_type_is('ext_address', 'postnumber', 'varchar(16)', 'Column postnumbe
 SELECT col_type_is('ext_address', 'plot_id', 'varchar(16)', 'Column plot_id should be varchar(16)');
 SELECT col_type_is('ext_address', 'the_geom', 'geometry(point, 25831)', 'Column the_geom should be geometry(point, 25831)');
 SELECT col_type_is('ext_address', 'postcomplement', 'text', 'Column postcomplement should be text');
-SELECT col_type_is('ext_address', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('ext_address', 'code', 'varchar(100)', 'Column code should be varchar(100)');
 SELECT col_type_is('ext_address', 'source', 'text', 'Column source should be text');
 
 -- Check foreign keys

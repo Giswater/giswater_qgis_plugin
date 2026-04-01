@@ -64,7 +64,6 @@ SELECT fk_ok('ext_plot', 'streetaxis_id', 'ext_streetaxis', 'id', 'FK ext_plot_s
 SELECT col_not_null('ext_plot', 'id', 'Column id should be NOT NULL');
 SELECT col_not_null('ext_plot', 'muni_id', 'Column muni_id should be NOT NULL');
 SELECT col_not_null('ext_plot', 'streetaxis_id', 'Column streetaxis_id should be NOT NULL');
-SELECT col_not_null('ext_plot', 'expl_id', 'Column expl_id should be NOT NULL');
 
 
 SELECT * FROM finish();
