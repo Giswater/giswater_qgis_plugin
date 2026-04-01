@@ -324,7 +324,7 @@ BEGIN
 		v_querytext:= format(
 			$q$
 				INSERT INTO %I.%I (doc_id, %I)
-				SELECT DISTINCT (SELECT id FROM %I.doc WHERE code = concat('CM', d.id::text)), (SELECT %I FROM %I.%I WHERE code = ch.%I)
+				SELECT DISTINCT (SELECT id FROM %I.doc WHERE code = concat('CM', d.id::text)), (SELECT %I FROM %I.%I WHERE code = ch.%I::text)
 				FROM %I.%I d
 				JOIN %I.%I dx ON dx.doc_id = d.id
 				JOIN %I.%I ch ON ch.uuid = dx.%I

@@ -66,7 +66,7 @@ BEGIN
 		AND column_name = rec_check.columnname) INTO v_column_exists;
 		
 		IF v_column_exists IS TRUE THEN
-			querytext := format('SELECT EXISTS (SELECT 1 FROM cm.%I WHERE lot_id IN (%s) AND (%I IS NOT NULL OR %L IS TRUE) AND %I::text NOT IN (SELECT id::text FROM (%s))) LIMIT 1',
+			querytext := format('SELECT EXISTS (SELECT 1 FROM cm.%I WHERE lot_id IN (%s) AND ((%I IS NULL AND %L IS FALSE) OR (%I IS NOT NULL AND %I::text NOT IN (SELECT id::text FROM (%s))))) LIMIT 1',
 					v_cm_tablename, array_to_string(v_lot_id_array, ','), rec_check.columnname, rec_check.dv_isnullvalue, rec_check.columnname, rec_check.dv_querytext);
 
 			EXECUTE querytext INTO v_exists;
