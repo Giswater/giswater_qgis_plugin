@@ -186,12 +186,12 @@ BEGIN
 			INTO v_geometry;
 		elsif v_section = 'basic_search_v2_tab_address' and v_search_add = 'true' then
 
-			EXECUTE 'SELECT row_to_json(row) FROM (SELECT st_x (a.the_geom) as xcoord, st_y (a.the_geom) as  ycoord, St_AsText(a.the_geom) FROM v_ext_streetaxis s join ext_municipality m using(muni_id) join v_ext_address a on s.id = a.streetaxis_id
+			EXECUTE 'SELECT row_to_json(row) FROM (SELECT st_x (a.the_geom) as xcoord, st_y (a.the_geom) as  ycoord, St_AsText(a.the_geom) FROM ve_streetaxis s join ext_municipality m using(muni_id) join ve_address a on s.id = a.streetaxis_id
 			 WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
 
 		elsif v_section = 'basic_search_v2_tab_address' then
-			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM v_ext_streetaxis '||
+			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM ve_streetaxis '||
 			' s WHERE '||v_filter_key||' = ('||quote_nullable(v_filter_value)||'))row'
 			INTO v_geometry;
 		elsif v_section = 'basic_search_v2_tab_psector' then
@@ -379,6 +379,11 @@ BEGIN
 			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_municipality_vdefault',v_idarg, current_user);
 
 			-- Get street
+			raise notice 'v_combo: %', v_combo;
+			raise notice 'v_idarg: %', v_idarg;
+			raise notice 'v_name: %', v_name;
+			raise notice 'v_edittext: %', v_edittext;
+			raise notice 'v_textarg: %', v_textarg;
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) 
 				FROM (SELECT '||quote_ident(v_street_layer)||'.'||quote_ident(v_street_id_field)||' as id,'||quote_ident(v_street_layer)||'.'||quote_ident(v_street_display_field)||' as display_name, 
 				st_astext(st_envelope('||quote_ident(v_street_layer)||'.'||quote_ident(v_street_geom_field)||'))
