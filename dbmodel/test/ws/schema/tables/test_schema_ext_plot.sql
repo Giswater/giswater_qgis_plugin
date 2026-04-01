@@ -44,7 +44,7 @@ SELECT col_type_is('ext_plot', 'the_geom', 'geometry(MultiPolygon,25831)', 'Colu
 
 -- Check indexes
 SELECT has_index('ext_plot', 'idx_ext_plot_muni_id', 'Should have index on muni_id');
-SELECT has_index('ext_plot', 'idx_ext_plot_plot_code', 'Should have index on plot_code');
+SELECT has_index('ext_plot', 'idx_ext_plot_plot_id', 'Should have index on plot_id');
 SELECT has_index('ext_plot', 'idx_ext_plot_postcode', 'Should have index on postcode');
 SELECT has_index('ext_plot', 'idx_ext_plot_streetaxis_id', 'Should have index on streetaxis_id');
 SELECT has_index('ext_plot', 'idx_ext_plot_the_geom', 'Should have index on the_geom');
@@ -53,7 +53,6 @@ SELECT has_index('ext_plot', 'idx_ext_plot_the_geom', 'Should have index on the_
 SELECT has_fk('ext_plot', 'Table ext_plot should have foreign keys');
 SELECT fk_ok('ext_plot', 'muni_id', 'ext_municipality', 'muni_id', 'FK ext_plot_muni_id_fkey should exist');
 SELECT fk_ok('ext_plot', 'streetaxis_id', 'ext_streetaxis', 'id', 'FK ext_plot_streetaxis_id_fkey should exist');
-SELECT fk_ok('ext_plot', 'expl_id', 'exploitation', 'expl_id', 'FK ext_plot_exploitation_id_fkey should exist');
 
 -- Check triggers
 

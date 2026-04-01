@@ -34,7 +34,7 @@ SELECT col_type_is('ext_region', 'name', 'text', 'Column name should be text');
 SELECT col_type_is('ext_region', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('ext_region', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('ext_region', 'active', 'boolean', 'Column active should be boolean');
-SELECT col_type_is('ext_region', 'code', 'varchar(50)', 'Column code should be varchar(50)');
+SELECT col_type_is('ext_region', 'code', 'varchar(100)', 'Column code should be varchar(100)');
 
 -- Check indexes
 

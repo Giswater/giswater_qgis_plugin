@@ -36,7 +36,7 @@ SELECT col_type_is('ext_municipality', 'the_geom', 'geometry(MultiPolygon,25831)
 SELECT col_type_is('ext_municipality', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('ext_municipality', 'region_id', 'integer', 'Column region_id should be integer');
 SELECT col_type_is('ext_municipality', 'province_id', 'integer', 'Column province_id should be integer');
-SELECT col_type_is('ext_municipality', 'code', 'varchar(50)', 'Column code should be varchar(50)');
+SELECT col_type_is('ext_municipality', 'code', 'varchar(100)', 'Column code should be varchar(100)');
 
 -- Check foreign keys
 SELECT has_fk('ext_municipality', 'Table ext_municipality should have foreign keys');

@@ -92,7 +92,7 @@ SELECT col_not_null('plan_psector', 'status', 'Column status should be NOT NULL'
 SELECT col_is_unique('plan_psector', ARRAY['name', 'expl_id'], 'Columns name and expl_id should be unique together');
 
 -- Check indexes
-SELECT has_index('plan_psector', 'idx_plan_psector_expl_id', 'Table should have index on expl_id');
+SELECT has_index('plan_psector', 'plan_psector_expl_id_idx', 'Table should have index on expl_id');
 SELECT has_index('plan_psector', 'idx_plan_psector_name', 'Table should have index on name');
 SELECT has_index('plan_psector', 'idx_plan_psector_status', 'Table should have index on status');
 SELECT has_index('plan_psector', 'idx_plan_psector_workcat_id', 'Table should have index on workcat_id');

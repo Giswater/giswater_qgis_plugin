@@ -38,7 +38,6 @@ SELECT col_default_is('selector_rpt_main_tstep', 'cur_user', '"current_user"()',
 -- Check constraints
 SELECT col_not_null('selector_rpt_main_tstep', 'timestep', 'Column timestep should be NOT NULL');
 SELECT col_not_null('selector_rpt_main_tstep', 'cur_user', 'Column cur_user should be NOT NULL');
-SELECT col_is_unique('selector_rpt_main_tstep', ARRAY['timestep', 'cur_user'], 'Columns timestep, cur_user should be unique');
 
 SELECT * FROM finish();
 

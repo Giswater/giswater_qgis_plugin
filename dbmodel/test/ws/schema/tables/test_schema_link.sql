@@ -81,7 +81,7 @@ SELECT col_default_is('link', 'created_at', 'now()', 'Column created_at should d
 SELECT col_default_is('link', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 
 -- Check indexes
-SELECT has_index('link', 'link_exit_id', 'Should have index on exit_id');
+SELECT has_index('link', 'link_exit_id_idx', 'Should have index on exit_id');
 SELECT has_index('link', 'link_expl_visibility_gin', 'Should have index on expl_visibility');
 SELECT has_index('link', 'link_feature_id', 'Should have index on feature_id');
 SELECT has_index('link', 'link_index', 'Should have index on the_geom');

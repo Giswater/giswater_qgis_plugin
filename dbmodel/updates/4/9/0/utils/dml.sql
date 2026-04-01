@@ -135,6 +135,15 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_region',
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') WHERE dv_querytext LIKE '%ext_province%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') WHERE dv_querytext LIKE '%ext_district%';
 
+UPDATE config_param_system SET value = replace(value, 'v_ext_municipality', 've_municipality') WHERE value LIKE '%v_ext_municipality%';
+UPDATE config_param_system SET value = replace(value, 'v_ext_streetaxis', 've_streetaxis') WHERE value LIKE '%v_ext_streetaxis%';
+UPDATE config_param_system SET value = replace(value, 'ext_municipality', 'v_municipality') WHERE value LIKE '%ext_municipality%';
+UPDATE config_param_system SET value = replace(value, 'ext_streetaxis', 'v_streetaxis') WHERE value LIKE '%ext_streetaxis%';
+UPDATE config_param_system SET value = replace(value, 'ext_address', 'v_address') WHERE value LIKE '%ext_address%';
+UPDATE config_param_system SET value = replace(value, 'ext_region', 'v_region') WHERE value LIKE '%ext_region%';
+UPDATE config_param_system SET value = replace(value, 'ext_province', 'v_province') WHERE value LIKE '%ext_province%';
+UPDATE config_param_system SET value = replace(value, 'ext_district', 'v_district') WHERE value LIKE '%ext_district%';
+
 UPDATE config_form_fields SET formname='ve_streetaxis' WHERE formname = 'v_ext_streetaxis';
 DELETE FROM config_form_fields WHERE formname='ve_streetaxis' AND columnname='expl_id';
 

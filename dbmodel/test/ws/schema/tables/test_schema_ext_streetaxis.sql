@@ -30,7 +30,7 @@ SELECT col_is_pk('ext_streetaxis', ARRAY['id'], 'Column id should be primary key
 
 -- Check column types
 SELECT col_type_is('ext_streetaxis', 'id', 'varchar(16)', 'Column id should be varchar(16)');
-SELECT col_type_is('ext_streetaxis', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('ext_streetaxis', 'code', 'varchar(100)', 'Column code should be varchar(100)');
 SELECT col_type_is('ext_streetaxis', 'type', 'varchar(18)', 'Column type should be varchar(18)');
 SELECT col_type_is('ext_streetaxis', 'name', 'varchar(100)', 'Column name should be varchar(100)');
 SELECT col_type_is('ext_streetaxis', 'text', 'text', 'Column text should be text');

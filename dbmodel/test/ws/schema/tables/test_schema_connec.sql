@@ -29,7 +29,7 @@ SELECT columns_are(
         'feature_type', 'pjoint_type', 'pjoint_id',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
-        'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_code',
+        'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_id',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'n_hydrometer',
         'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_code',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by', 'uuid', 'uncertain', 'xyz_date'
@@ -107,7 +107,7 @@ SELECT col_type_is('connec', 'access_type', 'text', 'Column access_type should b
 SELECT col_type_is('connec', 'placement_type', 'text', 'Column placement_type should be text');
 SELECT col_type_is('connec', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
 SELECT col_type_is('connec', 'expl_visibility', 'smallint[]', 'Column expl_visibility should be integer[]');
-SELECT col_type_is('connec', 'plot_code', 'text', 'Column plot_code should be varchar');
+SELECT col_type_is('connec', 'plot_id', 'varchar(100)', 'Column plot_id should be varchar(100)');
 SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('connec', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');

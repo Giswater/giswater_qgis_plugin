@@ -27,7 +27,7 @@ SELECT columns_are(
         'category_type', 'location_type', '_fluid_type', 'fluid_type', 'treatment_type', 'has_treatment',
         'n_hydrometer', 'n_inhabitants', 'demand', 'descript', 'annotation', 'observ', 'comment', 'link',
         'num_value', 'district_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement',
-        'streetaxis2_id', 'postnumber2', 'postcomplement2', 'block_code', 'plot_code', 'workcat_id',
+        'streetaxis2_id', 'postnumber2', 'postcomplement2', 'block_code', 'plot_id', 'workcat_id',
         'workcat_id_end', 'workcat_id_plan', 'builtdate', 'enddate', 'ownercat_id', 'pjoint_id',
         'pjoint_type', 'access_type', 'placement_type', 'accessibility', 'asset_id', 'adate', 'adescript',
         'verified', 'uncertain', 'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation',
@@ -95,7 +95,7 @@ SELECT col_type_is('connec', 'streetaxis2_id', 'varchar(16)', 'Column streetaxis
 SELECT col_type_is('connec', 'postnumber2', 'int4', 'Column postnumber2 should be int4');
 SELECT col_type_is('connec', 'postcomplement2', 'varchar(100)', 'Column postcomplement2 should be varchar(100)');
 SELECT col_type_is('connec', 'block_code', 'text', 'Column block_code should be text');
-SELECT col_type_is('connec', 'plot_code', 'text', 'Column plot_code should be text');
+SELECT col_type_is('connec', 'plot_id', 'varchar(100)', 'Column plot_id should be varchar(100)');
 SELECT col_type_is('connec', 'workcat_id', 'varchar(255)', 'Column workcat_id should be varchar(255)');
 SELECT col_type_is('connec', 'workcat_id_end', 'varchar(255)', 'Column workcat_id_end should be varchar(255)');
 SELECT col_type_is('connec', 'workcat_id_plan', 'varchar(255)', 'Column workcat_id_plan should be varchar(255)');

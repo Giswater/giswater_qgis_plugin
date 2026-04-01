@@ -35,7 +35,7 @@ SELECT col_type_is('ext_district', 'muni_id', 'integer', 'Column muni_id should 
 SELECT col_type_is('ext_district', 'observ', 'text', 'Column observ should be text');
 SELECT col_type_is('ext_district', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('ext_district', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
-SELECT col_type_is('ext_district', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('ext_district', 'code', 'varchar(100)', 'Column code should be varchar(100)');
 
 -- Check foreign keys
 SELECT has_fk('ext_district', 'Table ext_district should have foreign keys');
