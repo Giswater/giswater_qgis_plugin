@@ -83,7 +83,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		--get obsolete_planified state_type
-		v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
+		v_state_obsolete_planified:= (SELECT value::json ->> 'plan_statetype_obsolete_planned' FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
 		-- get state_type default values
 		IF (OLD.status != NEW.status) THEN

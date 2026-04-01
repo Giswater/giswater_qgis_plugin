@@ -47,7 +47,7 @@ BEGIN
 
 
 	v_psector := json_extract_path_text (p_data,'data','psectorId')::integer;
-	v_state_obsolete_planified:= (SELECT value::json ->> 'obsolete_planified' FROM config_param_system WHERE parameter='plan_psector_status_action');
+	v_state_obsolete_planified:= (SELECT value::json ->> 'plan_statetype_obsolete_planned' FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
 	-- delete previous logs
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 354;
