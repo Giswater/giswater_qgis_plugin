@@ -533,26 +533,22 @@ BEGIN
 			ON CONFLICT DO NOTHING
 			';
 		
-			
 			-- insert values of inflows into inp_timeseries_values (vol_non_leaked is in m3/10 min and we pass it to m3/s)
 			EXECUTE '
 			INSERT INTO inp_timeseries_value (timser_id, time, value)
 			SELECT concat(rf_name, ''_'', node_id) AS lluvia, rf_tstep, (vol_non_leaked/(60*'||v_tstep||'))
-			FROM cso_out_vol WHERE drainzone_id in ('||v_drainzone_array||')
+			FROM cso_out_vol JOIN drainzone d USING (drainzone_id) WHERE d.drainzone_id in ('||v_drainzone_array||') AND drainzone_type !=''DESCONECTADA''
 			order by concat(rf_name, ''_'', node_id), to_timestamp(rf_tstep, ''HH24:MI'')
 			';
 			
 			UPDATE inp_timeseries_value SET value=0 WHERE value IS null;
-		
-			
+
 			-- create an 10 inflows dscenario for 10 rainfall episodes if not exists
-			
 			INSERT INTO cat_dscenario ("name", dscenario_type, expl_id) 
 			SELECT concat(v_inflows_dscenario, '_EP', to_char(n, 'FM00')), 'INFLOWS', v_expl_id::integer
 			FROM generate_series(1, 10) AS n
 			ON CONFLICT DO NOTHING;
-			
-		
+					
 			execute 'INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
 			SELECT DISTINCT b.dscenario_id, a.node_id, substring(split_part(rf_name, ''_'', 2) from ''[0-9]+'')::int AS order_id,
 			concat(rf_name, ''_'', node_id) AS timser_id, 1 AS sfactor, 0 AS base, TRUE
