@@ -40,7 +40,7 @@ SELECT col_is_pk('arc', 'arc_id', 'Column arc_id should be primary key');
 
 -- Check indexes
 SELECT has_index('arc', 'arc_arccat', 'Table should have index on arccat_id');
-SELECT has_index('arc', 'arc_dma_idx', 'Table should have index on dma_id');
+SELECT has_index('arc', 'arc_dma_id_idx', 'Table should have index on dma_id');
 SELECT has_index('arc', 'arc_dqa', 'Table should have index on dqa_id');
 SELECT has_index('arc', 'arc_exploitation', 'Table should have index on expl_id');
 SELECT has_index('arc', 'arc_expl_visibility_gin', 'Table should have index on expl_visibility');

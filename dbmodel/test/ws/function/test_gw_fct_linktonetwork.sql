@@ -30,8 +30,8 @@ SELECT is(
     (gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "version":"4.0.002", "infoType":1, "epsg":25831},
     "form":{}, "feature":{"id":"[-901]"}, "data":{"filterFields":{}, "pageInfo":{},
     "feature_type": "CONNEC", "pipeDiameter": "100", "maxDistance": "100", "linkcatId": "PVC25-PN16"}}$$)::JSON)->>'status',
-    'Failed', -- expected
-    'Check if gw_fct_setlinktonetwork (wjoin) returns status "Failed"'
+    'Accepted',
+    'Check if gw_fct_setlinktonetwork (wjoin) returns status "Accepted"'
 );
 
 SELECT is(

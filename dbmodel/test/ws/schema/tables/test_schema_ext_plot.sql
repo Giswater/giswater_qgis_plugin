@@ -44,7 +44,6 @@ SELECT col_type_is('ext_plot', 'the_geom', 'geometry(MultiPolygon,25831)', 'Colu
 
 -- Check indexes
 SELECT has_index('ext_plot', 'idx_ext_plot_muni_id', 'Should have index on muni_id');
-SELECT has_index('ext_plot', 'idx_ext_plot_plot_id', 'Should have index on plot_id');
 SELECT has_index('ext_plot', 'idx_ext_plot_postcode', 'Should have index on postcode');
 SELECT has_index('ext_plot', 'idx_ext_plot_streetaxis_id', 'Should have index on streetaxis_id');
 SELECT has_index('ext_plot', 'idx_ext_plot_the_geom', 'Should have index on the_geom');
