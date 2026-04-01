@@ -7,10 +7,9 @@ or (at your option) any later version.
 # flake8: noqa: F401
 # -*- coding: utf-8 -*-
 
-# Basic: 01, 02, 03
+# Basic: 01, 02
 from .basic.info_btn import GwInfoButton  # noqa: F401
 from .basic.selector_btn import GwSelectorButton  # noqa: F401
-from .basic.search_btn import GwSearchButton  # noqa: F401
 
 # Om: 11, 12, 13, 14, 15, 16, 17, 18
 from .om.mincut_btn import GwMincutButton  # noqa: F401

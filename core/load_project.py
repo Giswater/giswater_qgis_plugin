@@ -19,6 +19,7 @@ from .utils import tools_gw
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
 from .shared.psector import GwPsector
+from .shared.search import GwSearchLocatorFilter
 from .. import global_vars
 from ..libs import lib_vars, tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
@@ -36,6 +37,7 @@ class GwLoadProject(QObject):
         self.is_role_cm_edit = False
         self.manage_new_psector = None
         self.selected_psector_id: int | None = None
+        self.gw_locator_filter = None
 
     def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
@@ -109,13 +111,6 @@ class GwLoadProject(QObject):
         if status is False:
             return
 
-        # Open automatically 'search docker' depending its value in user settings
-        # open_search = tools_gw.get_config_parser('dialogs_actions', 'search_open_loadproject', "user", "init")
-        # if tools_os.set_boolean(open_search):
-        #     self.dlg_search = GwSearchUi()
-        #     self.gw_search = GwSearch()
-        #     self.gw_search.open_search(self.dlg_search, load_project=True)
-
         # Connect project save / new project
         try:
             tools_gw.connect_signal(self.iface.newProjectCreated, main._project_new,
@@ -127,6 +122,7 @@ class GwLoadProject(QObject):
 
         # Create menu
         tools_gw.create_giswater_menu(True)
+        self._register_locator_filter()
 
         # Manage actions of the different plugin_toolbars
         self._manage_toolbars()
@@ -218,6 +214,30 @@ class GwLoadProject(QObject):
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
+
+    def _register_locator_filter(self):
+        if self.gw_locator_filter is not None:
+            return
+        if not hasattr(self.iface, 'registerLocatorFilter'):
+            return
+        try:
+            self.gw_locator_filter = GwSearchLocatorFilter()
+            self.iface.registerLocatorFilter(self.gw_locator_filter)
+        except Exception as e:
+            self.gw_locator_filter = None
+            tools_log.log_warning(str(e))
+
+    def unregister_locator_filter(self):
+        if self.gw_locator_filter is None:
+            return
+        if not hasattr(self.iface, 'deregisterLocatorFilter'):
+            self.gw_locator_filter = None
+            return
+        try:
+            self.iface.deregisterLocatorFilter(self.gw_locator_filter)
+        except Exception as e:
+            tools_log.log_warning(str(e))
+        self.gw_locator_filter = None
 
     def _check_version_compatibility(self):
 
@@ -496,6 +516,8 @@ class GwLoadProject(QObject):
         list_actions = list_actions.replace(' ', '').split(',')
         if not isinstance(list_actions, list):
             list_actions = [list_actions]
+        if toolbar_id == "basic":
+            list_actions = [action for action in list_actions if action != "03"]
 
         # Prepare toolbar object
         toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')

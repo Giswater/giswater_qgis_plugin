@@ -22,7 +22,6 @@ from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProj
 from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools
-from .search import GwSearch
 from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
@@ -79,6 +78,7 @@ class GwMincut:
         # Cursor management for setmincut function
         self.mincut_aux_conn = None
         self.mincut_cursor = None
+        self.search_rubber_band = tools_gw.create_rubberband(self.canvas)
 
     def manage_mincuts(self, dialog):
         """ Button 12: Mincut management """
@@ -120,11 +120,6 @@ class GwMincut:
         result = tools_gw.execute_procedure('gw_fct_getmincut', body)
         if result and result['status'] == 'Accepted':
             tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, call_set_tabs_enabled=False, close=False)
-
-        # Manage location
-        tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['street_name']))
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 
         # Manage dates
         self._open_mincut_manage_dates(row)
@@ -169,10 +164,6 @@ class GwMincut:
         # Current_state == '0': Planified
         if self.current_state == '0':
             self.dlg_mincut.work_order.setDisabled(False)
-            # Group Location
-            self.dlg_mincut.address_add_muni.setDisabled(False)
-            self.dlg_mincut.address_add_street.setDisabled(False)
-            self.dlg_mincut.address_add_postnumber.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
@@ -238,10 +229,6 @@ class GwMincut:
         elif self.current_state == '1':
 
             self.dlg_mincut.work_order.setDisabled(True)
-            # Group Location
-            self.dlg_mincut.address_add_muni.setDisabled(True)
-            self.dlg_mincut.address_add_street.setDisabled(True)
-            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -284,10 +271,6 @@ class GwMincut:
         # Current_state == '2': Finished, '3':Canceled
         elif self.current_state in ('2', '3'):
             self.dlg_mincut.work_order.setDisabled(True)
-            # Group Location
-            self.dlg_mincut.address_add_muni.setDisabled(True)
-            self.dlg_mincut.address_add_street.setDisabled(True)
-            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -372,16 +355,6 @@ class GwMincut:
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_mincut)
-
-        self.search = GwSearch()
-        self.search.open_search(None, self.dlg_mincut)
-
-        # These widgets are put from the database, mysteriously if we do something like:
-        # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
-        # it doesn't count them, and that's why we have to force them
-        self.dlg_mincut.address_add_muni = tools_qt.get_widget(self.dlg_mincut, 'address_add_muni')
-        self.dlg_mincut.address_add_street = tools_qt.get_widget(self.dlg_mincut, 'address_add_street')
-        self.dlg_mincut.address_add_postnumber = tools_qt.get_widget(self.dlg_mincut, 'address_add_postnumber')
 
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
@@ -728,7 +701,7 @@ class GwMincut:
         self._remove_selection()
 
         # Reset rubber band
-        tools_qgis.reset_rubber_band(self.search.rubber_band)
+        tools_qgis.reset_rubber_band(self.search_rubber_band)
 
         # Disconnect snapping
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
@@ -777,7 +750,7 @@ class GwMincut:
         else:
             tools_qgis.restore_user_layer('ve_node', self.user_current_layer)
             self._remove_selection()
-            tools_qgis.reset_rubber_band(self.search.rubber_band)
+            tools_qgis.reset_rubber_band(self.search_rubber_band)
 
             # If client don't touch nothing just rejected dialog or press cancel
             if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
@@ -849,29 +822,11 @@ class GwMincut:
         self.dlg_fin = GwMincutEndUi(self)
         tools_gw.load_settings(self.dlg_fin)
 
-        search = GwSearch()
-        search.open_search(None, self.dlg_fin)
-
-        # These widgets are put from the database, mysteriously if we do something like:
-        # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
-        # it doesn't count them, and that's why we have to force them
-        self.dlg_fin.address_add_muni = tools_qt.get_widget(self.dlg_fin, 'address_add_muni')
-        self.dlg_fin.address_add_street = tools_qt.get_widget(self.dlg_fin, 'address_add_street')
-        self.dlg_fin.address_add_postnumber = tools_qt.get_widget(self.dlg_fin, 'address_add_postnumber')
-
         mincut = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.mincut, mincut)
         work_order = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.work_order)
         if str(work_order) != 'null':
             tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.work_order, work_order)
-
-        # Manage address
-        municipality_current = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
-        tools_qt.set_combo_value(self.dlg_fin.address_add_muni, municipality_current, 1)
-        address_street_current = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
-        tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
-        address_number_current = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
-        tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
         sql = ("SELECT name as id, name as idval "
@@ -902,7 +857,6 @@ class GwMincut:
         self.dlg_fin.btn_accept.clicked.connect(self._real_end_accept)
         self.dlg_fin.btn_accept.clicked.connect(self._accept_save_data)
         self.dlg_fin.btn_cancel.clicked.connect(self._real_end_cancel)
-        self.dlg_fin.btn_set_real_location.clicked.connect(self._set_real_location)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_fin, dlg_name='mincut_end')
@@ -927,11 +881,6 @@ class GwMincut:
 
         tools_gw.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
-
-        # Manage 'address'
-        address_exploitation_id = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni)
-        address_street = self.dlg_mincut.address_add_street.property('id_')
-        address_number = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
         mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
         anl_cause = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.cause, 0)
@@ -1038,14 +987,6 @@ class GwMincut:
             sql += f", equipment_code = $${equipment_code}$$"
         if reagent_lot != "":
             sql += f", reagent_lot = $${reagent_lot}$$"
-
-        # Manage address
-        if address_exploitation_id != -1:
-            sql += f", muni_id = '{address_exploitation_id}'"
-        if address_street:
-            sql += f", streetaxis_id = '{address_street}'"
-        if address_number:
-            sql += f", postnumber = '{address_number}'"
 
         # If state 'In Progress' or 'Finished'
         if mincut_result_state == 1 or mincut_result_state == 2:
@@ -1262,7 +1203,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 've_node', self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self._remove_selection))
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.reset_rubber_band, self.search.rubber_band))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.reset_rubber_band, self.search_rubber_band))
         self._refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)
@@ -1326,14 +1267,6 @@ class GwMincut:
         self.dlg_mincut.cbx_date_end.setDate(exec_end_day)
         self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
-        municipality = self.dlg_fin.address_add_muni.currentText()
-        tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, municipality, 1)
-        street = tools_qt.get_text(self.dlg_fin, self.dlg_fin.address_add_street, return_string_null=False)
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
-        street_id = self.dlg_fin.address_add_street.property('id_')
-        self.dlg_mincut.address_add_street.setProperty('id_', street_id)
-        number = tools_qt.get_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, return_string_null=False)
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
         exec_user = tools_qt.get_text(self.dlg_fin, self.dlg_fin.exec_user)
         tools_qt.set_combo_value(self.dlg_mincut.assigned_to, exec_user, 1)
 
@@ -2740,10 +2673,6 @@ class GwMincut:
         if state == '0':
 
             self.dlg_mincut.work_order.setDisabled(False)
-            # Group Location
-            self.dlg_mincut.address_add_muni.setDisabled(False)
-            self.dlg_mincut.address_add_street.setDisabled(False)
-            self.dlg_mincut.address_add_postnumber.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
@@ -2783,10 +2712,6 @@ class GwMincut:
         elif state == '1':
 
             self.dlg_mincut.work_order.setDisabled(True)
-            # Group Location
-            self.dlg_mincut.address_add_muni.setDisabled(True)
-            self.dlg_mincut.address_add_street.setDisabled(True)
-            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -2826,10 +2751,6 @@ class GwMincut:
         elif state == '2':
 
             self.dlg_mincut.work_order.setDisabled(True)
-            # Group Location
-            self.dlg_mincut.address_add_muni.setDisabled(True)
-            self.dlg_mincut.address_add_street.setDisabled(True)
-            self.dlg_mincut.address_add_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)

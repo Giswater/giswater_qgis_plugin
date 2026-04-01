@@ -73,15 +73,6 @@ class GwInfoEpaUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "search"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwSearchUi(GwDocker, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "search_workcat"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 

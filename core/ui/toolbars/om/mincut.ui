@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>598</width>
+    <width>592</width>
     <height>768</height>
    </rect>
   </property>
@@ -37,8 +37,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>578</width>
-         <height>667</height>
+         <width>547</width>
+         <height>683</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
@@ -192,35 +192,6 @@
               </property>
               <property name="text">
                <string>Use planified network</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTabWidget" name="main_tab">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>110</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="currentIndex">
-               <number>-1</number>
-              </property>
-              <property name="elideMode">
-               <enum>Qt::ElideLeft</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lbl_msg">
-              <property name="text">
-               <string>No results found</string>
               </property>
              </widget>
             </item>
@@ -1157,7 +1128,6 @@
   <tabstop>work_order</tabstop>
   <tabstop>mainTab</tabstop>
   <tabstop>chk_use_planified</tabstop>
-  <tabstop>main_tab</tabstop>
   <tabstop>type</tabstop>
   <tabstop>cause</tabstop>
   <tabstop>cbx_recieved_day</tabstop>
