@@ -33,99 +33,94 @@ select * from SCHEMA_NAME.anl_arc
 
 DECLARE
 
-v_version text;
-v_tabname text;
-v_tablename text;
-v_columnname text;
+-- input variables
+v_tab_name text;
+v_selector_type text;
 v_id text;
 v_ids text;
 v_value text;
-v_muni integer;
-v_isalone boolean;
+v_is_alone boolean;
+v_check_all boolean;
+v_add_schema text;
+v_use_atlas boolean;
+v_disable_parent boolean;
+v_cur_user text;
+v_tiled boolean;
+
+
+-- aux variables
+v_prev_cur_user text;
+
 v_parameter_selector json;
-v_data json;
-v_expl integer;
-v_addschema text;
-v_error_context text;
-v_selectortype text;
-v_schemaname text;
-v_return json;
+v_tablename text;
+v_columnname text;
 v_table text;
-v_tableid text;
-v_checkall boolean;
-v_geometry text;
-v_useatlas boolean;
-v_querytext text;
-v_message text = '{"level":1, "text":"Process done successfully"}';
-v_count integer = 0;
-v_count_aux integer = 0;
+v_table_id text;
+v_sector_is_expl_is_muni boolean;
+
 v_name text;
-v_disableparent boolean;
-v_fid integer = 397;
-v_uservalues json;
+v_user_values json;
 v_action text = null;
 v_sector integer;
-v_zonetable text;
-v_cur_user text;
-v_prev_cur_user text;
-v_device integer;
 v_expand float=50;
-v_tiled boolean;
-v_result json;
-v_result_init json;
-v_result_valve json;
-v_result_node json;
-v_result_connec json;
-v_result_arc json;
 v_expl_x_user boolean;
 v_project_type text;
-v_psector_current_value integer;
-v_sectorisexplismuni boolean;
 v_cur_psector integer;
+
+v_expl integer;
+
+-- message variables
+v_error_context text;
+v_message json = json_build_object('level', 1, 'text', 'Process done successfully');
+v_count integer = 0;
+v_count_aux integer = 0;
+-- v_fid integer = 397;
+v_result json;
+v_schema_name text;
+v_return json;
+v_geometry text;
+v_querytext text;
+
+
 
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
-
-	--  get api version
-	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+	v_schema_name = 'SCHEMA_NAME';
 
 	-- get system variables
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- Get input parameters:
-	v_tabname := p_data->'data'->>'tabName';
-	v_selectortype := p_data->'data'->>'selectorType';
+	v_tab_name := p_data->'data'->>'tabName';
+	v_selector_type := p_data->'data'->>'selectorType';
 	v_id := p_data->'data'->>'id';
 	v_ids := p_data->'data'->>'ids';
 	v_value := p_data->'data'->>'value';
-	v_isalone := p_data->'data'->>'isAlone';
-	v_checkall := p_data->'data'->>'checkAll';
-	v_addschema := p_data->'data'->>'addSchema';
-	v_useatlas := p_data->'data'->>'useAtlas';
-	v_disableparent := p_data->'data'->>'disableParent';
-	v_data = p_data->>'data';
+	v_is_alone := p_data->'data'->>'isAlone';
+	v_check_all := p_data->'data'->>'checkAll';
+	v_add_schema := p_data->'data'->>'addSchema';
+	v_use_atlas := p_data->'data'->>'useAtlas';
+	v_disable_parent := p_data->'data'->>'disableParent';
 	v_cur_user := p_data->'client'->>'cur_user';
-	v_device := p_data->'client'->>'device';
-
 	v_tiled := (p_data->'client'->>'tiled')::boolean;
+
 	v_prev_cur_user = current_user;
 	IF v_cur_user IS NOT NULL THEN
 		EXECUTE 'SET ROLE "'||v_cur_user||'"';
 	END IF;
 
 	-- profilactic control
-	IF lower(v_selectortype) = 'none' OR v_selectortype = '' OR lower(v_selectortype) ='null' THEN v_selectortype = 'selector_basic'; END IF;
-	IF v_useatlas IS null then v_useatlas = false; END IF;
+	IF lower(v_selector_type) = 'none' OR v_selector_type = '' OR lower(v_selector_type) ='null' THEN v_selector_type = 'selector_basic'; END IF;
+	IF v_use_atlas IS null then v_use_atlas = false; END IF;
 
 	-- profilactic control of schema name
-	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL'
-		THEN v_addschema = null;
+	IF lower(v_add_schema) = 'none' OR v_add_schema = '' OR lower(v_add_schema) ='null' OR v_add_schema is null OR v_add_schema='NULL'
+		THEN v_add_schema = null;
 	ELSE
-		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
+		IF (select schemaname from pg_tables WHERE schemaname = v_add_schema LIMIT 1) IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	            "data":{"message":"3132", "function":"2870","parameters":null, "is_process":true}}$$)';
 		-- todo: send message to response
@@ -133,35 +128,28 @@ BEGIN
 	END IF;
 
 	-- control null tabname when layout of municipalities appear
-	IF v_tabname IS NULL AND v_selectortype = 'explfrommuni' THEN
-		v_tabname = 'tab_municipality';
+	IF v_tab_name IS NULL AND v_selector_type = 'explfrommuni' THEN
+		v_tab_name = 'tab_municipality';
 	END IF;
 
 	-- Get system parameters
-	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tabname));
+	v_parameter_selector = (SELECT value::json FROM config_param_system WHERE parameter = concat('basic_selector_', v_tab_name));
 	v_tablename = v_parameter_selector->>'selector';
 	v_columnname = v_parameter_selector->>'selector_id';
 	v_table = v_parameter_selector->>'table';
-	v_tableid = v_parameter_selector->>'table_id';
-	v_sectorisexplismuni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
+	v_table_id = v_parameter_selector->>'table_id';
+	v_sector_is_expl_is_muni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
 
-	IF v_sectorisexplismuni IS NULL THEN v_sectorisexplismuni = FALSE; END IF;
+	IF v_sector_is_expl_is_muni IS NULL THEN v_sector_is_expl_is_muni = FALSE; END IF;
 	
 	-- setting schema add
-	IF v_tabname like '%add%' AND v_addschema IS NOT NULL THEN
-		v_tablename = concat(v_addschema,'.',v_tablename);
-		v_table = concat(v_addschema,'.',v_table);
+	IF v_tab_name like '%add%' AND v_add_schema IS NOT NULL THEN
+		v_tablename = concat(v_add_schema,'.',v_tablename);
+		v_table = concat(v_add_schema,'.',v_table);
 	END IF;
 
-	-- create temp tables related to expl x user variable
-	DROP TABLE IF EXISTS temp_muni_sector_expl;
-	DROP TABLE IF EXISTS temp_exploitation;
-	DROP TABLE IF EXISTS temp_macroexploitation;
-	DROP TABLE IF EXISTS temp_sector;
-	DROP TABLE IF EXISTS temp_macrosector;
-	DROP TABLE IF EXISTS temp_municipality;
-	DROP TABLE IF EXISTS temp_t_mincut;
-	DROP TABLE IF EXISTS temp_network;
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"CREATE", "group":"SELECTOR"}}}$$)';
 
 	-- create auxiliar table temp_aux_sector_muni
 	CREATE TEMP TABLE temp_muni_sector_expl AS
@@ -171,75 +159,131 @@ BEGIN
 	WHERE expl_id is not null;
 	
 	IF v_expl_x_user is false THEN
-		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
-		CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
-		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
-		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
-		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
-		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
-		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
+		SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active 
+		FROM exploitation 
+		WHERE active 
+		AND expl_id > 0 
+		ORDER BY expl_id;
+
+		INSERT INTO temp_macroexploitation (macroexpl_id, code, name, descript, active)
+		SELECT macroexpl_id, code, name, descript, active 
+		FROM macroexploitation 
+		WHERE active 
+		AND macroexpl_id > 0 
+		ORDER BY macroexpl_id;
+
+		INSERT INTO temp_sector (sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active)
+		SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active 
+		FROM sector 
+		WHERE active 
+		AND sector_id > 0 
+		ORDER BY sector_id;
+
+		INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
+		SELECT macrosector_id, code, name, descript, expl_id, muni_id, active 
+		FROM macrosector 
+		WHERE active 
+		AND macrosector_id > 0 
+		ORDER BY macrosector_id;
+
+		INSERT INTO temp_municipality (muni_id, name, observ, active)
+		SELECT muni_id, name, observ, active 
+		FROM v_municipality 
+		WHERE active 
+		AND muni_id > 0 
+		ORDER BY muni_id;
+
+		INSERT INTO temp_network (network_id, name, active)
+		SELECT id::integer AS network_id, idval AS name, true AS active 
+		FROM om_typevalue 
+		WHERE typevalue = 'network_type' 
+		ORDER BY id;
 
 		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
+			INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
+			SELECT id, expl_id, macroexpl_id, muni_id, minsector_id 
+			FROM om_mincut 
+			WHERE id > 0 
+			ORDER BY id;
 		END IF;
 	ELSE	
-		-- create temp_exploitation with the cat_manager configuration
-		CREATE TEMP TABLE temp_exploitation as SELECT e.* FROM exploitation e WHERE e.active AND e.expl_id > 0
+		-- populate temp_exploitation with the cat_manager configuration
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
+		SELECT e.expl_id, e.code, e.name, e.descript, e.sector_id, e.muni_id, e.macroexpl_id, e.active
+		FROM exploitation e WHERE e.active AND e.expl_id > 0
 		AND EXISTS (SELECT 1 FROM cat_manager cm
 		WHERE e.expl_id = ANY (cm.expl_id)
 		AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
 		WHERE pg_has_role(current_user, r.role, 'member'))) ORDER BY 1;
 
-		-- create table for network
-		CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
-		FROM om_typevalue WHERE typevalue = 'network_type' order by id;
+		-- populate temp_network
+		INSERT INTO temp_network (network_id, name, active)
+		SELECT id::integer AS network_id, idval AS name, true AS active
+		FROM om_typevalue WHERE typevalue = 'network_type' ORDER BY id;
 
-		-- create table for macroexplotation
-		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
+		-- populate temp_macroexploitation
+		INSERT INTO temp_macroexploitation (macroexpl_id, code, name, descript, active)
+		SELECT DISTINCT ON (m.macroexpl_id) m.macroexpl_id, m.code, m.name, m.descript, m.active
+		FROM macroexploitation m
 		JOIN temp_exploitation e USING (macroexpl_id)
-		WHERE m.active and m.macroexpl_id > 0 order by 1;
+		WHERE m.active AND m.macroexpl_id > 0
+		ORDER BY 1
+		ON CONFLICT (macroexpl_id) DO NOTHING;
 
-		-- create table for macroexplotation
-		CREATE TEMP TABLE temp_sector as
-		SELECT s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active 
+		-- populate temp_sector
+		INSERT INTO temp_sector (sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active)
+		SELECT DISTINCT ON (s.sector_id) s.sector_id, s.code, s.name, s.descript, s.expl_id, s.muni_id, s.macrosector_id, s.parent_id, s.active
 		FROM temp_muni_sector_expl t
 		JOIN temp_exploitation e USING (expl_id)
 		JOIN sector s ON s.sector_id = t.sector_id
-		WHERE s.active AND s.sector_id > 0;
+		WHERE s.active AND s.sector_id > 0
+		ORDER BY s.sector_id
+		ON CONFLICT (sector_id) DO NOTHING;
 
-		-- create table for temp_macrosector
-		CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
+		-- populate temp_macrosector
+		INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
+		SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id, m.code, m.name, m.descript, m.expl_id, m.muni_id, m.active
+		FROM macrosector m
 		JOIN temp_sector e USING (macrosector_id)
-		WHERE m.active and m.macrosector_id > 0;
+		WHERE m.active AND m.macrosector_id > 0
+		ORDER BY m.macrosector_id
+		ON CONFLICT (macrosector_id) DO NOTHING;
 
-		-- create table for temp_municipality
-		CREATE TEMP TABLE temp_municipality as
-		SELECT em.muni_id, em.name, em.observ, em.active 
+		-- populate temp_municipality
+		INSERT INTO temp_municipality (muni_id, name, observ, active)
+		SELECT DISTINCT ON (em.muni_id) em.muni_id, em.name, em.observ, em.active
 		FROM temp_muni_sector_expl t
 		JOIN temp_exploitation e USING (expl_id)
-		JOIN ext_municipality em ON em.muni_id = t.muni_id
-		WHERE em.active;
+		JOIN v_municipality em ON em.muni_id = t.muni_id
+		WHERE em.active
+		ORDER BY em.muni_id
+		ON CONFLICT (muni_id) DO NOTHING;
 
 		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_t_mincut AS SELECT DISTINCT ON (m.id) m.* FROM om_mincut m
+			INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
+			SELECT DISTINCT ON (m.id) m.id, m.expl_id, m.macroexpl_id, m.muni_id, m.minsector_id
+			FROM om_mincut m
 			WHERE m.id > 0 AND EXISTS (SELECT 1 FROM cat_manager cm
 	        WHERE m.expl_id = ANY (cm.expl_id)
 	        AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
 	        WHERE pg_has_role(current_user, r.role, 'member')
-	        ))ORDER BY m.id;
+	        ))
+			ORDER BY m.id
+			ON CONFLICT (id) DO NOTHING;
 		END IF;
 	END IF;
 
 	-- manage selector psector in psector-mode
 	SELECT value::INT INTO v_cur_psector FROM config_param_user WHERE PARAMETER = 'plan_psector_current' AND cur_user = current_user;
 	
-	IF v_cur_psector IS NOT NULL AND v_tabname IN ('tab_psector', 'tab_exploitation', 'tab_sector') THEN  -- mode psector ON
+	IF v_cur_psector IS NOT NULL AND v_tab_name IN ('tab_psector', 'tab_exploitation', 'tab_sector') THEN  -- mode psector ON
 		--unselect psector in different ways
 		v_geometry := COALESCE(v_geometry, '{}');
-		v_uservalues := COALESCE(v_uservalues, '{}');
+		v_user_values := COALESCE(v_user_values, '{}');
 		v_action := COALESCE(v_action, 'null');
 
-		IF v_tabname = 'tab_psector' AND v_checkall IS FALSE THEN
+		IF v_tab_name = 'tab_psector' AND v_check_all IS FALSE THEN
 		
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user AND ' || v_columnname || ' != ' || v_cur_psector;
 
@@ -247,23 +291,23 @@ BEGIN
 		
 			v_message := COALESCE(v_message, '{}');
 
-			v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
-			"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
+			v_return = concat('{"client":',gw_fct_json_object_set_key((p_data ->> 'client')::json, 'isReturnSetSelectors', true::boolean),', "message":', v_message, ', "form":{"currentTab":"', v_tab_name,'"}, 
+			"feature":{}, "data":{"isReturnSetSelectors":true, "userValues":',v_user_values,', "geometry":', v_geometry,', "useAtlas":"',v_use_atlas,'", "action":',v_action,', "selectorType":"',v_selector_type,'", "addSchema":"', v_add_schema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
 			
 			RETURN gw_fct_getselectors(v_return);
 		
 		ELSIF (v_cur_psector = v_id::integer AND v_value = 'False')
-			OR v_checkall IS FALSE
-			OR (v_cur_psector != v_id::integer AND v_isalone)
-			OR (v_tabname = 'tab_exploitation' AND v_id::int IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
+			OR v_check_all IS FALSE
+			OR (v_cur_psector != v_id::integer AND v_is_alone)
+			OR (v_tab_name = 'tab_exploitation' AND v_id::int IN (SELECT expl_id FROM plan_psector WHERE psector_id = v_cur_psector))
 			OR (
-				v_tabname = 'tab_sector' AND 
+				v_tab_name = 'tab_sector' AND 
 				v_id::int IN (SELECT s.sector_id FROM plan_psector pp JOIN sector s ON pp.expl_id = ANY (s.expl_id) WHERE psector_id = v_cur_psector)
 				)
 		THEN
-			IF v_tabname = 'tab_exploitation' THEN
+			IF v_tab_name = 'tab_exploitation' THEN
 				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4444;
-			ELSIF v_tabname = 'tab_sector' THEN
+			ELSIF v_tab_name = 'tab_sector' THEN
 				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4446;
 			ELSE
 				SELECT json_build_object('level', log_level, 'text', error_message) INTO v_message FROM sys_message WHERE id = 4358;
@@ -271,8 +315,8 @@ BEGIN
 		
 			v_message := COALESCE(v_message, '{}');
 
-			v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, 
-			"feature":{}, "data":{"userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', "selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
+			v_return = concat('{"client":',gw_fct_json_object_set_key((p_data ->> 'client')::json, 'isReturnSetSelectors', true::boolean),', "message":', v_message, ', "form":{"currentTab":"', v_tab_name,'"}, 
+			"feature":{}, "data":{"isReturnSetSelectors":true, "userValues":',v_user_values,', "geometry":', v_geometry,', "useAtlas":"',v_use_atlas,'", "action":',v_action,', "selectorType":"',v_selector_type,'", "addSchema":"', v_add_schema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'","layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}')::json;
 			
 			RETURN gw_fct_getselectors(v_return);
 	
@@ -281,36 +325,66 @@ BEGIN
 	END IF;
 
 	-- manage check all
-	IF v_checkall THEN
-		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations and not archived
-
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE status NOT IN (5,6,7) AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
-		ELSIF v_tabname = 'tab_dscenario' THEN -- to manage only those dscenarios related to selected exploitations
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) ON CONFLICT DO NOTHING';
-		ELSIF v_tabname in ('tab_mincut') THEN
-			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+	IF v_check_all THEN
+		IF v_tab_name = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations and not archived
+			EXECUTE format(
+				'INSERT INTO %I (%I, cur_user) 
+				SELECT %I, CURRENT_USER 
+				FROM %I t
+				WHERE status NOT IN (5,6,7) 
+				AND EXISTS (
+					SELECT 1 
+					FROM selector_expl se 
+					WHERE se.expl_id = t.expl_id
+					AND se.cur_user = CURRENT_USER
+				) ON CONFLICT DO NOTHING',
+				v_tablename, v_columnname, 
+				v_table_id, 
+				v_table
+			);
+		ELSIF v_tab_name = 'tab_dscenario' THEN -- to manage only those dscenarios related to selected exploitations
+			EXECUTE format(
+				'INSERT INTO %I (%I, cur_user) 
+				SELECT %I, CURRENT_USER 
+				FROM %I t
+				WHERE EXISTS (
+					SELECT 1 
+					FROM selector_expl se 
+					WHERE se.expl_id = t.expl_id
+					AND se.cur_user = CURRENT_USER
+				) OR expl_id IS NULL
+				ON CONFLICT DO NOTHING',
+				v_tablename, v_columnname, 
+				v_table_id, 
+				v_table
+			);
+		ELSIF v_tab_name in ('tab_mincut') THEN
+			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_table_id,', current_user FROM ',v_table,'
 			',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,') ') end),' 
 			ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
-
 		ELSE
-			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_table_id,', current_user FROM ',v_table,'
 			',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
 			ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
 		END IF;
 
-	ELSIF v_checkall is false THEN
-		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+	ELSIF v_check_all is false THEN
+		EXECUTE format(
+			'DELETE FROM %I WHERE cur_user = CURRENT_USER',
+			v_tablename
+		);
 
 	ELSE
-		IF v_isalone THEN
-			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
+		IF v_is_alone THEN
+			EXECUTE format(
+				'DELETE FROM %I WHERE cur_user = CURRENT_USER',
+				v_tablename
+			);
 		END IF;
 
 		-- manage value
 		IF v_value then
-			IF v_tabname='tab_period' THEN
+			IF v_tab_name='tab_period' THEN
 				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('''|| v_id ||''', '''|| current_user ||''')ON CONFLICT DO NOTHING';
 			ELSE
 				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
@@ -323,15 +397,15 @@ BEGIN
 	END IF;
 
 	-- manage parents
-	IF v_tabname IN ('tab_psector', 'tab_dscenario', 'tab_sector') AND v_checkall is null AND v_disableparent IS NOT TRUE THEN
+	IF v_tab_name IN ('tab_psector', 'tab_dscenario', 'tab_sector') AND v_check_all IS NULL AND v_disable_parent IS NOT TRUE THEN
 
 		-- getting name
-		v_name = substring (v_tabname,5,99);
+		v_name = substring (v_tab_name,5,99);
 
 		IF v_value THEN
 
 			-- getting parent_id for selected row
-			EXECUTE 'SELECT parent_id FROM '||v_table||' WHERE active IS TRUE AND parent_id IS NOT NULL AND '||v_tableid||' = '||v_id
+			EXECUTE 'SELECT parent_id FROM '||v_table||' WHERE active IS TRUE AND parent_id IS NOT NULL AND '||v_table_id||' = '||v_id
 			INTO v_id;
 
 			IF v_id IS NOT NULL THEN
@@ -346,7 +420,7 @@ BEGIN
 			END IF;
 		ELSE
 			-- getting childs for parent_id for selected row
-			v_querytext = 'SELECT '||v_tableid||' FROM '||v_table||' WHERE active IS TRUE AND parent_id = '|| v_id;
+			v_querytext = 'SELECT '||v_table_id||' FROM '||v_table||' WHERE active IS TRUE AND parent_id = '|| v_id;
 
 			FOR v_id IN EXECUTE v_querytext
 			LOOP
@@ -390,19 +464,19 @@ BEGIN
 	END IF;
 
 	-- trigger getmapzones
-	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation') THEN
+	IF v_tab_name IN('tab_exploitation', 'tab_macroexploitation') THEN
 		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
 	END IF;
 
 	-- manage cross-reference tables
-	select count(*) into v_count from node;
+	SELECT 1 INTO v_count FROM node LIMIT 1;
 	IF v_count > 0 THEN
-		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
+		IF v_tab_name IN ('tab_exploitation', 'tab_macroexploitation') THEN
 
-			IF v_tabname = 'tab_exploitation' THEN
+			IF v_tab_name = 'tab_exploitation' THEN
 				DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 
-			ELSIF v_tabname = 'tab_macroexploitation' THEN
+			ELSIF v_tab_name = 'tab_macroexploitation' THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
 				INSERT INTO selector_expl
 				SELECT DISTINCT expl_id, current_user FROM exploitation WHERE active is true and macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user AND macroexpl_id > 0)
@@ -435,9 +509,9 @@ BEGIN
 			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
 
-		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
+		ELSIF v_tab_name IN ('tab_sector', 'tab_macrosector') THEN
 
-			IF  v_tabname = 'tab_macrosector' THEN
+			IF  v_tab_name = 'tab_macrosector' THEN
 				DELETE FROM selector_sector WHERE cur_user = current_user;
 				INSERT INTO selector_sector
 				SELECT DISTINCT sector_id, current_user FROM sector WHERE macrosector_id IN (SELECT macrosector_id FROM selector_macrosector WHERE cur_user = current_user)
@@ -470,7 +544,7 @@ BEGIN
 
 
 		-- inserting muni_id from selected muni
-		ELSIF v_tabname IN ('tab_municipality') THEN
+		ELSIF v_tab_name IN ('tab_municipality') THEN
 
 			-- macroexpl
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
@@ -508,30 +582,30 @@ BEGIN
 			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
 			-- manage add schema for muni
-			IF v_addschema IS NOT NULL THEN
-				EXECUTE 'SET search_path = '||v_addschema||', public';
+			IF v_add_schema IS NOT NULL THEN
+				EXECUTE 'SET search_path = '||v_add_schema||', public';
 
 				EXECUTE' DELETE FROM selector_municipality WHERE cur_user = current_user';
 				EXECUTE' INSERT INTO selector_municipality 
-				SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
+				SELECT muni_id, current_user FROM '||v_schema_name||'.selector_municipality WHERE cur_user = current_user';
 
-				EXECUTE 'SET search_path = '||v_schemaname||', public';
+				EXECUTE 'SET search_path = '||v_schema_name||', public';
 			END IF;
 		END IF;
 	END IF;
 
 	-- manage addschema
-	IF v_addschema IS NOT NULL AND v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
+	IF v_add_schema IS NOT NULL AND v_tab_name IN ('tab_exploitation', 'tab_macroexploitation') THEN
 
-		EXECUTE 'SET search_path = '||v_addschema||', public';
+		EXECUTE 'SET search_path = '||v_add_schema||', public';
 
 		EXECUTE' DELETE FROM selector_municipality WHERE cur_user = current_user';
 		EXECUTE' INSERT INTO selector_municipality 
-		SELECT muni_id, current_user FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
+		SELECT muni_id, current_user FROM '||v_schema_name||'.selector_municipality WHERE cur_user = current_user';
 
 		-- expl
 		DELETE FROM selector_expl WHERE cur_user = current_user;
-		IF v_sectorisexplismuni THEN			
+		IF v_sector_is_expl_is_muni THEN			
 			INSERT INTO selector_expl SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
 			IN (SELECT expl_id FROM exploitation WHERE active);
 		ELSE	
@@ -542,7 +616,7 @@ BEGIN
 	
 		-- macroexpl
 		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-		IF v_sectorisexplismuni THEN			
+		IF v_sector_is_expl_is_muni THEN			
 			INSERT INTO selector_macroexpl SELECT macroexpl_id, current_user FROM SCHEMA_NAME.selector_macroexpl sm WHERE cur_user = current_user AND macroexpl_id 
 			IN (SELECT macroexpl_id FROM macroexploitation m WHERE active);
 		
@@ -556,7 +630,7 @@ BEGIN
 
 		-- sector
 		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-		IF v_sectorisexplismuni THEN			
+		IF v_sector_is_expl_is_muni THEN			
 			INSERT INTO selector_sector SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
 			IN (SELECT sector_id FROM sector WHERE active);
 		ELSE 
@@ -582,28 +656,28 @@ BEGIN
 		DELETE FROM selector_psector WHERE psector_id NOT IN
 		(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 	
-		EXECUTE 'SET search_path = '||v_schemaname||', public';
+		EXECUTE 'SET search_path = '||v_schema_name||', public';
 	END IF;
 
-	IF v_addschema IS NOT NULL AND v_tabname IN ('tab_exploitation_add', 'tab_macroexploitation_add') THEN
+	IF v_add_schema IS NOT NULL AND v_tab_name IN ('tab_exploitation_add', 'tab_macroexploitation_add') THEN
 
-		EXECUTE 'SET search_path = '||v_addschema||', public';
+		EXECUTE 'SET search_path = '||v_add_schema||', public';
 
 		-- manage cross-reference tables
-		select count(*) into v_count from node;
+		SELECT 1 INTO v_count FROM node LIMIT 1;
 		IF v_count > 0 THEN
 
-			IF v_checkall THEN
+			IF v_check_all THEN
 
-				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_table_id,', current_user FROM ',v_table,'
 				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
 				ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
 
-			ELSIF v_checkall is false THEN
+			ELSIF v_check_all is false THEN
 				EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 			ELSE
 
-				IF v_isalone THEN
+				IF v_is_alone THEN
 					EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 				END IF;
 
@@ -616,7 +690,7 @@ BEGIN
 
 			END IF;
 		
-			IF  v_tabname = 'tab_macroexploitation_add' THEN
+			IF  v_tab_name = 'tab_macroexploitation_add' THEN
 				DELETE FROM selector_expl WHERE cur_user = current_user;
 				INSERT INTO selector_expl
 				SELECT DISTINCT expl_id, current_user FROM exploitation WHERE active is true and macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user)
@@ -659,9 +733,9 @@ BEGIN
 			SELECT DISTINCT muni_id, current_user FROM link WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(link.expl_visibility))
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
-			IF v_sectorisexplismuni IS FALSE THEN
-				EXECUTE' DELETE FROM '||v_schemaname||'.selector_municipality WHERE cur_user = current_user';
-				EXECUTE' INSERT INTO '||v_schemaname||'.selector_municipality 
+			IF v_sector_is_expl_is_muni IS FALSE THEN
+				EXECUTE' DELETE FROM '||v_schema_name||'.selector_municipality WHERE cur_user = current_user';
+				EXECUTE' INSERT INTO '||v_schema_name||'.selector_municipality 
 				SELECT muni_id, current_user FROM selector_municipality WHERE cur_user = current_user';
 			END IF;
 			
@@ -669,13 +743,16 @@ BEGIN
 			INTO v_geometry
 			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, 
 			st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-			FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
+			FROM (
+				SELECT st_expand(st_extent(the_geom)::geometry, v_expand) as the_geom
+				FROM temp_ve_arc_geom_selector
+			) b) a;
 
 		END IF;
 
-		EXECUTE 'SET search_path = '||v_schemaname||', public';
+		EXECUTE 'SET search_path = '||v_schema_name||', public';
 								
-		IF v_sectorisexplismuni IS NOT TRUE THEN
+		IF v_sector_is_expl_is_muni IS NOT TRUE THEN
 
 			-- macroexpl
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
@@ -718,35 +795,41 @@ BEGIN
 	END IF;
 
 	-- cross reference schema for state 
-    IF v_addschema IS NOT NULL THEN 
-        EXECUTE 'DELETE FROM '||v_addschema||'.selector_state WHERE cur_user = current_user';
-        EXECUTE 'INSERT INTO '||v_addschema||'.selector_state SELECT state_id, current_user FROM selector_state WHERE cur_user = current_user';
+    IF v_add_schema IS NOT NULL THEN 
+        EXECUTE 'DELETE FROM '||v_add_schema||'.selector_state WHERE cur_user = current_user';
+        EXECUTE 'INSERT INTO '||v_add_schema||'.selector_state SELECT state_id, current_user FROM selector_state WHERE cur_user = current_user';
     END IF;
 
 	-- get envelope
-	SELECT count(the_geom) INTO v_count FROM ve_node LIMIT 1;
+	v_count = (SELECT 1 FROM ve_node LIMIT 1);
 
-	IF v_tabname IN ('tab_sector', 'tab_macrosector','tab_exploitation', 'tab_macroexploitation', 'tab_municipality') THEN
+	IF v_tab_name IN ('tab_sector', 'tab_macrosector','tab_exploitation', 'tab_macroexploitation', 'tab_municipality') THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
+		FROM (
+			SELECT st_expand(st_extent(the_geom)::geometry, v_expand) as the_geom
+			FROM temp_ve_arc_geom_selector
+		) b) a;
 				
-	ELSIF v_tabname IN ('tab_psector') THEN
+	ELSIF v_tab_name IN ('tab_psector') THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM plan_psector WHERE psector_id IN (select psector_id FROM selector_psector WHERE cur_user = current_user))b) a;
+		FROM (SELECT st_expand(st_extent(the_geom)::geometry, v_expand) as the_geom FROM plan_psector WHERE psector_id IN (select psector_id FROM selector_psector WHERE cur_user = current_user))b) a;
 	
-	ELSIF v_tabname IN ('tab_network_state', 'tab_dscenario') THEN
+	ELSIF v_tab_name IN ('tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
 
-	ELSIF (v_count > 0 or (v_checkall IS False and v_id is null)) AND v_tabname NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
+	ELSIF (v_count > 0 or (v_check_all IS False and v_id is null)) AND v_tab_name NOT IN ('tab_exploitation_add', 'tab_macroexploitation_add')  THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM ve_arc) b) a;
+		FROM (
+			SELECT st_expand(st_extent(the_geom)::geometry, v_expand) as the_geom
+			FROM temp_ve_arc_geom_selector
+		) b) a;
 
 	END IF;
 
@@ -793,13 +876,13 @@ BEGIN
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_current')
+	v_user_values = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_current')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');
-	v_uservalues := COALESCE(v_uservalues, '{}');
+	v_user_values := COALESCE(v_user_values, '{}');
 	v_action := COALESCE(v_action, 'null');
 	v_message := COALESCE(v_message, '{}');
 
@@ -807,22 +890,16 @@ BEGIN
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
 	-- Return
-	v_return = concat('{"client":',(p_data ->> 'client'),', "message":', v_message, ', "form":{"currentTab":"', v_tabname,'"}, "feature":{}, 
-	"data":{"isReturnSetselectors":true, "userValues":',v_uservalues,', "geometry":', v_geometry,', "useAtlas":"',v_useatlas,'", "action":',v_action,', 
-	"selectorType":"',v_selectortype,'", "addSchema":"', v_addschema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'",
+	v_return = concat('{"client":',gw_fct_json_object_set_key((p_data ->> 'client')::json, 'isReturnSetSelectors', true::boolean),', "message":', v_message, ', "form":{"currentTab":"', v_tab_name,'"}, "feature":{}, 
+	"data":{"isReturnSetSelectors":true, "isReturnSetselectors":true, "userValues":',v_user_values,', "geometry":', v_geometry,', "useAtlas":"',v_use_atlas,'", "action":',v_action,', 
+	"selectorType":"',v_selector_type,'", "addSchema":"', v_add_schema,'", "tiled":"', v_tiled,'", "id":"', v_id,'", "ids":"', v_ids,'",
 	"layers":',COALESCE(((p_data ->> 'data')::json->> 'layers'), '{}'),'}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	--Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	DROP TABLE IF EXISTS temp_exploitation;
-	DROP TABLE IF EXISTS temp_macroexploitation;
-	DROP TABLE IF EXISTS temp_sector;
-	DROP TABLE IF EXISTS temp_macrosector;
-	DROP TABLE IF EXISTS temp_municipality;
-	DROP TABLE IF EXISTS temp_t_mincut;
-	DROP TABLE IF EXISTS temp_network;
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;

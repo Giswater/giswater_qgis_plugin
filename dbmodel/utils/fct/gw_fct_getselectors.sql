@@ -26,87 +26,76 @@ SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"en_US", 
 */
 
 DECLARE
-rec_tab record;
 
-v_formTabsAux  json;
-v_formTabs text;
-v_version text;
-v_active boolean=false;
-v_firsttab boolean=false;
-v_selector_list text;
+-- input variables
 v_selector_type text;
-v_result_list text[];
-v_filter_name text;
+v_current_tab text;
+v_filter_from_input text;
+v_geometry text;
+v_use_atlas boolean;
+v_load_project boolean=false;
+v_message text;
+v_cur_user text;
+v_device integer;
+v_add_schema text;
+v_tiled boolean;
+v_is_return_set_selectors boolean;
+
+-- aux variables
+v_form_tabs_aux  json;
+v_version text;
+v_first_tab boolean=false;
+v_selector_list text;
 v_label text;
 v_table text;
 v_selector text;
 v_table_id text;
 v_selector_id text;
-v_filterfromconfig text;
-v_manageall boolean;
+v_filter_from_config text;
 v_typeahead text;
 v_expl_x_user boolean;
-v_filter text;
-v_selectionMode text;
-v_typeaheadForced boolean=false;
-v_stylesheet json;
-v_errcontext text;
-v_currenttab text;
+v_typeahead_forced boolean=false;
+v_error_context text;
 v_tab record;
-v_ids text;
-v_filterfrominput text;
-v_filterfromids text;
-v_fullfilter text;
-v_finalquery text;
-v_querytab text;
+v_filter_from_ids text;
+v_full_filter text;
+v_final_query text;
+v_query_tab text;
 v_orderby text;
-v_geometry text;
 v_query text;
 v_name text;
-v_pkeyfield text;
-v_querystring text;
+v_pkey_field text;
+v_query_string text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
-v_count_zone integer;
-rec_macro integer;
-v_count_selector integer;
-v_useatlas boolean;
-v_message text;
-v_uservalues json;
 v_action text;
-v_zonetable text;
-v_zoneid text;
-v_macroid text;
-v_macrotable text;
-v_macroselector text;
-v_cur_user text;
 v_prev_cur_user text;
-v_device integer;
-v_layers text;
-v_layer text;
 v_rec record;
-v_columns json;
-v_layerColumns json;
-v_loadProject boolean=false;
-v_addschema text;
-v_tiled boolean;
 v_result json;
+
+v_exclude_tab text='';
+v_orderby_query text;
+v_order_by_check boolean;
+v_project_type text;
+v_tab_network_signal integer = 0;
+v_custom_order_by_column text;
+v_selector_macro_tabs boolean;
+
+-- return variables
+v_formTabs text;
+v_manage_all boolean;
+v_has_custom_order_by boolean;
+v_selection_mode text;
+v_stylesheet json;
 v_mincut_init json;
 v_mincut_valve_proposed json;
 v_mincut_valve_not_proposed json;
 v_mincut_node json;
 v_mincut_connec json;
 v_mincut_arc json;
-v_exclude_tab text='';
-v_orderby_query text;
-v_order_by_check boolean;
-v_has_custom_order_by boolean;
-v_project_type text;
-v_tabnetworksignal integer = 0;
-v_custom_order_by_column text;
-v_isreturnsetselectors boolean;
-v_selector_macro_tabs boolean;
+v_user_values json;
+
 
 BEGIN
 
@@ -120,19 +109,25 @@ BEGIN
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
-	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
-	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
+	v_current_tab := (p_data ->> 'form')::json->> 'currentTab';
+	v_filter_from_input := (p_data ->> 'data')::json->> 'filterText';
 	v_geometry := ((p_data ->> 'data')::json->>'geometry');
-	v_useatlas := (p_data ->> 'data')::json->> 'useAtlas';
-	v_loadProject := (p_data ->> 'data')::json->> 'loadProject';
+	v_use_atlas := (p_data ->> 'data')::json->> 'useAtlas';
+	v_load_project := (p_data ->> 'data')::json->> 'loadProject';
 	v_message := (p_data ->> 'message')::json;
 	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
 	v_device := (p_data ->> 'client')::json->> 'device';
-	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
+	v_add_schema := (p_data ->> 'data')::json->> 'addSchema';
 	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
-	v_isreturnsetselectors := ((p_data ->>'client')::json->>'isReturnSetSelectors')::boolean;
+	-- Backward compatible flag parsing: accepted in client/data and with both key casings.
+	v_is_return_set_selectors := COALESCE(
+		((p_data ->>'client')::json->>'isReturnSetSelectors')::boolean,
+		((p_data ->>'client')::json->>'isReturnSetselectors')::boolean,
+		((p_data ->>'data')::json->>'isReturnSetSelectors')::boolean,
+		((p_data ->>'data')::json->>'isReturnSetselectors')::boolean
+	);
 
-	IF v_addschema IS NOT NULL THEN v_tabnetworksignal = -1; END IF;
+	IF v_add_schema IS NOT NULL THEN v_tab_network_signal = -1; END IF;
 
 	IF v_device is null then v_device = 4; END IF;
 
@@ -142,8 +137,8 @@ BEGIN
 	END IF;
 
 	-- profilactic control of schema name
-	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL' THEN
-		v_addschema = null;
+	IF lower(v_add_schema) = 'none' OR v_add_schema = '' OR lower(v_add_schema) ='null' OR v_add_schema is null OR v_add_schema='NULL' THEN
+		v_add_schema = null;
 		v_exclude_tab = ' AND tabname != ''tab_exploitation_add''';
 	END IF;
 	-- profilactic control of message
@@ -157,10 +152,10 @@ BEGIN
 	v_stylesheet = (SELECT value FROM config_param_system WHERE parameter = 'qgis_form_selector_stylesheet');
 
 	-- when typeahead only one tab is executed
-	IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
-		v_querytab = '';
+	IF v_filter_from_input IS NULL OR v_filter_from_input = '' OR lower(v_filter_from_input) ='None' or lower(v_filter_from_input) = 'null' THEN
+		v_query_tab = '';
 	ELSE
-		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
+		v_query_tab = concat(' AND tabname = ', quote_literal(v_current_tab));
 	END IF;
 	
 	-- get if user has a role to show macroexploitation and macrosector tabs or not
@@ -176,26 +171,19 @@ BEGIN
 	v_query = concat(
 	'SELECT formname, tabname, label, tooltip, tabfunction, tabactions, value
 	 FROM (SELECT formname, tabname, f.label, f.tooltip, tabfunction, tabactions, unnest(device) AS device, value, orderby FROM config_form_tabs f, config_param_system
-	 WHERE formname=',quote_literal(v_selector_type),' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_querytab),
-	'AND orderby >=',v_tabnetworksignal,' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a 
+	 WHERE formname=',quote_literal(v_selector_type),' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_query_tab),
+	'AND orderby >=',v_tab_network_signal,' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a 
 	WHERE device = ',v_device, v_exclude_tab,' ORDER BY orderby');
-	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_querytab', v_querytab);
+	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_query_tab', v_query_tab);
 	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
+	raise notice 'v_query: %', v_query;
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
-	raise notice '10';
-
-	IF v_isreturnsetselectors IS FALSE OR v_isreturnsetselectors IS NULL THEN
+	IF v_is_return_set_selectors IS FALSE OR v_is_return_set_selectors IS NULL THEN
 
 		-- create temp tables related to expl x user variable
-		DROP TABLE IF EXISTS temp_muni_sector_expl;
-		DROP TABLE IF EXISTS temp_exploitation;
-		DROP TABLE IF EXISTS temp_macroexploitation;
-		DROP TABLE IF EXISTS temp_sector;
-		DROP TABLE IF EXISTS temp_macrosector;
-		DROP TABLE IF EXISTS temp_municipality;
-		DROP TABLE IF EXISTS temp_t_mincut;
-		DROP TABLE IF EXISTS temp_network;
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"CREATE", "group":"SELECTOR"}}}$$)';
 	
 		-- create auxiliar table temp_aux_sector_muni
 		CREATE TEMP TABLE temp_muni_sector_expl AS
@@ -205,62 +193,117 @@ BEGIN
 		WHERE expl_id is not null;
 	
 		IF v_expl_x_user is false then
-			CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
-			CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
-			CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
-			CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
-			CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
-			CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
-			FROM om_typevalue WHERE typevalue = 'network_type' order by id;
-	
+			INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
+			SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active 
+			FROM exploitation 
+			WHERE active 
+			AND expl_id > 0 
+			ORDER BY expl_id;
+
+			INSERT INTO temp_macroexploitation (macroexpl_id, code, name, descript, active)
+			SELECT macroexpl_id, code, name, descript, active 
+			FROM macroexploitation 
+			WHERE active 
+			AND macroexpl_id > 0 
+			ORDER BY macroexpl_id;
+
+			INSERT INTO temp_sector (sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active)
+			SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active 
+			FROM sector 
+			WHERE active 
+			AND sector_id > 0 
+			ORDER BY sector_id;
+
+			INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
+			SELECT macrosector_id, code, name, descript, expl_id, muni_id, active 
+			FROM macrosector 
+			WHERE active 
+			AND macrosector_id > 0 
+			ORDER BY macrosector_id;
+
+			INSERT INTO temp_municipality (muni_id, name, observ, active)
+			SELECT muni_id, name, observ, active 
+			FROM v_municipality 
+			WHERE active 
+			AND muni_id > 0 
+			ORDER BY muni_id;
+
+			INSERT INTO temp_network (network_id, name, active)
+			SELECT id::integer AS network_id, idval AS name, true AS active 
+			FROM om_typevalue 
+			WHERE typevalue = 'network_type' 
+			ORDER BY id;
+
 			IF v_project_type = 'WS' THEN
-				CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
+				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
+				SELECT id, expl_id, macroexpl_id, muni_id, minsector_id 
+				FROM om_mincut 
+				WHERE id > 0 
+				ORDER BY id;
 			END IF;
 		ELSE
-			-- create temp_exploitation with the cat_manager configuration
-			CREATE TEMP TABLE temp_exploitation as SELECT e.* FROM exploitation e WHERE e.active AND e.expl_id > 0
+			INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
+			SELECT e.expl_id, e.code, e.name, e.descript, e.sector_id, e.muni_id, e.macroexpl_id, e.active
+			FROM exploitation e WHERE e.active AND e.expl_id > 0
 			AND EXISTS (SELECT 1 FROM cat_manager cm
 			WHERE e.expl_id = ANY (cm.expl_id)
 			AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
 			WHERE pg_has_role(current_user, r.role, 'member'))) ORDER BY 1;
-	
-			-- create table for temp_network
-			CREATE TEMP TABLE temp_network AS SELECT id::integer as network_id, idval as name, true as active
-			FROM om_typevalue WHERE typevalue = 'network_type' order by id;
-	
-			-- create table for temp_macroexploitation
-			CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
+
+			-- populate temp_network
+			INSERT INTO temp_network (network_id, name, active)
+			SELECT id::integer AS network_id, idval AS name, true AS active
+			FROM om_typevalue WHERE typevalue = 'network_type' ORDER BY id;
+
+			-- populate temp_macroexploitation
+			INSERT INTO temp_macroexploitation (macroexpl_id, code, name, descript, active)
+			SELECT DISTINCT ON (m.macroexpl_id) m.macroexpl_id, m.code, m.name, m.descript, m.active
+			FROM macroexploitation m
 			JOIN temp_exploitation e USING (macroexpl_id)
-			WHERE m.active and m.macroexpl_id > 0 order by 1;
-	
-			-- create table for temp_sector
-			CREATE TEMP TABLE temp_sector as
-			SELECT distinct s.sector_id, s.name, s.macrosector_id, s.descript, s.parent_id, s.active 
+			WHERE m.active AND m.macroexpl_id > 0
+			ORDER BY 1
+			ON CONFLICT (macroexpl_id) DO NOTHING;
+
+			-- populate temp_sector
+			INSERT INTO temp_sector (sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active)
+			SELECT DISTINCT ON (s.sector_id) s.sector_id, s.code, s.name, s.descript, s.expl_id, s.muni_id, s.macrosector_id, s.parent_id, s.active
 			FROM temp_muni_sector_expl t
 			JOIN temp_exploitation e USING (expl_id)
 			JOIN sector s ON s.sector_id = t.sector_id
-			WHERE s.active AND s.sector_id > 0;
-	
-			-- create table for temp_macrosector
-			CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
+			WHERE s.active AND s.sector_id > 0
+			ORDER BY s.sector_id
+			ON CONFLICT (sector_id) DO NOTHING;
+
+			-- populate temp_macrosector
+			INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
+			SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id, m.code, m.name, m.descript, m.expl_id, m.muni_id, m.active
+			FROM macrosector m
 			JOIN temp_sector e USING (macrosector_id)
-			WHERE m.active and m.macrosector_id > 0;
-	
-			-- create table for temp_municipality
-			CREATE TEMP TABLE temp_municipality as
-			SELECT em.muni_id, em.name, em.observ, em.active 
+			WHERE m.active AND m.macrosector_id > 0
+			ORDER BY m.macrosector_id
+			ON CONFLICT (macrosector_id) DO NOTHING;
+
+			-- populate temp_municipality
+			INSERT INTO temp_municipality (muni_id, name, observ, active)
+			SELECT DISTINCT ON (em.muni_id) em.muni_id, em.name, em.observ, em.active
 			FROM temp_muni_sector_expl t
 			JOIN temp_exploitation e USING (expl_id)
-			JOIN ext_municipality em ON em.muni_id = t.muni_id
-			WHERE em.active;
-	
+			JOIN v_municipality em ON em.muni_id = t.muni_id
+			WHERE em.active
+			ORDER BY em.muni_id
+			ON CONFLICT (muni_id) DO NOTHING;
+
 			IF v_project_type = 'WS' THEN
-				CREATE TEMP TABLE temp_t_mincut AS SELECT DISTINCT ON (m.id) m.* FROM om_mincut m
+				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
+				SELECT DISTINCT ON (m.id) m.id, m.expl_id, m.macroexpl_id, m.muni_id, m.minsector_id
+				FROM om_mincut m
 				WHERE m.id > 0 AND EXISTS (SELECT 1 FROM cat_manager cm
-		        WHERE m.expl_id = ANY (cm.expl_id)
-		        AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
-		        WHERE pg_has_role(current_user, r.role, 'member')
-		        ))ORDER BY m.id;
+				WHERE m.expl_id = ANY (cm.expl_id)
+				AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
+				WHERE pg_has_role(current_user, r.role, 'member')
+				))
+				ORDER BY m.id
+				ON CONFLICT (id) DO NOTHING;
 			END IF;
 		END IF;
 	END IF;
@@ -275,7 +318,7 @@ BEGIN
 		
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
-		v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
+		v_filter_from_input := (p_data ->> 'data')::json->> 'filterText';
 
 		-- get variables from tab
 		v_label = v_tab.value::json->>'label';
@@ -283,28 +326,28 @@ BEGIN
 		v_table_id = v_tab.value::json->>'table_id';
 		v_selector = v_tab.value::json->>'selector';
 		v_selector_id = v_tab.value::json->>'selector_id';
-		v_filterfromconfig = v_tab.value::json->>'query_filter';
-		v_manageall = v_tab.value::json->>'manageAll';
+		v_filter_from_config = v_tab.value::json->>'query_filter';
+		v_manage_all = v_tab.value::json->>'manageAll';
 		v_typeahead = v_tab.value::json->>'typeaheadFilter';
-		v_selectionMode = v_tab.value::json->>'selectionMode';
+		v_selection_mode = v_tab.value::json->>'selectionMode';
 		v_orderby = v_tab.value::json->>'orderBy';
 		v_name = v_tab.value::json->>'name';
-		v_typeaheadForced = v_tab.value::json->>'typeaheadForced';
+		v_typeahead_forced = v_tab.value::json->>'typeaheadForced';
 		v_order_by_check = v_tab.value::json->>'orderbyCheck';
 		v_has_custom_order_by = v_tab.value::json->>'hasCustomOrderBy';
 
 		-- profilactic control of v_orderby
-		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
+		v_query_string = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
 		v_debug_vars := json_build_object('v_table', v_table);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 20);
+		v_debug := json_build_object('querystring', v_query_string, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 20);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_pkeyfield;
-		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
+		EXECUTE v_query_string INTO v_pkey_field;
+		IF v_orderby IS NULL THEN v_orderby = v_pkey_field; end if;
 		IF v_name IS NULL THEN v_name = v_orderby; end if;
 
 		-- profilactic control of selection mode
-		IF v_selectionMode = '' OR v_selectionMode is null then
-			v_selectionMode = 'keepPrevious';
+		IF v_selection_mode = '' OR v_selection_mode is null then
+			v_selection_mode = 'keepPrevious';
 		END IF;
 
 		IF v_has_custom_order_by THEN
@@ -326,10 +369,10 @@ BEGIN
 		END IF;
 
 		-- built filter from input
-		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
-			v_filterfrominput := NULL;
+		IF v_filter_from_input IS NULL OR v_filter_from_input = '' OR lower(v_filter_from_input) ='None' or lower(v_filter_from_input) = 'null' THEN
+			v_filter_from_input := NULL;
 		ELSE
-			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+			v_filter_from_input = concat (v_typeahead,' LIKE ''%', lower(v_filter_from_input), '%''');
 		END IF;
 
 
@@ -337,98 +380,89 @@ BEGIN
 		IF v_selector = 'selector_mincut_result' THEN
 			v_selector_list = replace(replace(v_selector_list, '[', '('), ']', ')');
 			IF v_selector_list != '' THEN
-				v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
+				v_filter_from_ids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
 			END IF;
 			-- always order descending for mincut
 			v_orderby_query = 'ORDER BY orderby DESC';
 		END IF;
 
 		-- built full filter
-		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
+		v_full_filter = concat(v_filter_from_ids, v_filter_from_config, v_filter_from_input);
 
 		-- use atlas on psector selector
-		IF v_useatlas AND v_tab.tabname ='tab_psector' THEN
+		IF v_use_atlas AND v_tab.tabname ='tab_psector' THEN
 			v_orderby = 'atlas_id::integer';
 			v_name = 'concat(row_number() over(order by atlas_id::integer), ''-'',name)';
 		END IF;
 
 		-- filter out archived psectors (status 5, 6, 7 = archived)
 		IF v_tab.tabname = 'tab_psector' THEN
-			v_fullfilter = concat(v_fullfilter, ' AND (status NOT IN (''5'', ''6'', ''7'') OR status IS NULL)');
+			v_full_filter = concat(v_full_filter, ' AND (status NOT IN (''5'', ''6'', ''7'') OR status IS NULL)');
 		END IF;
 
 		-- profilactic null control
-		v_fullfilter := COALESCE(v_fullfilter, '');
+		v_full_filter := COALESCE(v_full_filter, '');
 
 		-- setting schema add
-		IF v_tab.tabname like '%add%' AND v_addschema IS NOT  NULL THEN
-			v_table = concat(v_addschema,'.',v_table);
-			v_selector = concat(v_addschema,'.',v_selector);
+		IF v_tab.tabname like '%add%' AND v_add_schema IS NOT  NULL THEN
+			v_table = concat(v_add_schema,'.',v_table);
+			v_selector = concat(v_add_schema,'.',v_selector);
 		END IF;
 
 		-- final query
 		-- Add conditional active filter (not applicable for mincut selector)
 		IF v_selector = 'selector_mincut_result' THEN
-			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
+			v_final_query = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 					select *, row_number() OVER (',v_orderby_query,') as orderby from (
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
 					v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType",
 					EXISTS (SELECT ', v_selector_id, ' FROM ', v_selector, ' e WHERE e.', v_selector_id, ' = s.', v_table_id, ' and cur_user=current_user) as "value", null as active,
 					null as stylesheet
-					FROM ', v_table ,' s WHERE TRUE ', v_fullfilter, ' ) a)b');
+					FROM ', v_table ,' s WHERE TRUE ', v_full_filter, ' ) a)b');
 		ELSE
-			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
+			v_final_query = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 					select *, row_number() OVER (',v_orderby_query,') as orderby from (
 					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
 					v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType",
 					EXISTS (SELECT ', v_selector_id, ' FROM ', v_selector, ' e WHERE e.', v_selector_id, ' = s.', v_table_id, ' and cur_user=current_user) as "value", active,
 					case when EXISTS(SELECT ', v_table_id, ' FROM ', v_table, ' e WHERE active and e.', v_table_id, ' = s.', v_table_id, ') is not true then ''color: lightgray; font-style: italic;'' end as stylesheet
-					FROM ', v_table ,' s WHERE TRUE ', v_fullfilter, ' ) a)b');
+					FROM ', v_table ,' s WHERE TRUE ', v_full_filter, ' ) a)b');
 		END IF;
 
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
-						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
-		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
+						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_full_filter', v_full_filter);
+		v_debug := json_build_object('querystring', v_final_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 
-		EXECUTE  v_finalquery INTO v_formTabsAux;
-		--reset v_ids
-		v_ids= null;
+		EXECUTE  v_final_query INTO v_form_tabs_aux;
 
 		-- Add tab name to json
-		IF v_formTabsAux IS NULL THEN
-			v_formTabsAux := ('{"fields":[]}')::json;
+		IF v_form_tabs_aux IS NULL THEN
+			v_form_tabs_aux := ('{"fields":[]}')::json;
 		ELSE
-			v_formTabsAux := ('{"fields":' || v_formTabsAux || '}')::json;
-		END IF;
-
-		-- setting active tab
-		IF v_currenttab = v_tab.tabname THEN
-			v_active = true;
-		ELSIF v_currenttab IS NULL OR v_currenttab = '' OR v_currenttab ='None' OR v_firsttab is false THEN
-			v_active = false;
+			v_form_tabs_aux := ('{"fields":' || v_form_tabs_aux || '}')::json;
 		END IF;
 
 		-- setting other variables of tab
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabName', v_tab.tabname::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tableName', v_selector);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tabLabel', v_tab.label::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'tooltip', v_tab.tooltip::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectorType', v_tab.formname::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'manageAll', v_manageall::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadForced', v_typeaheadForced::TEXT);
-		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'hasCustomOrderBy', v_has_custom_order_by::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'tabName', v_tab.tabname::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'tableName', v_selector);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'tabLabel', v_tab.label::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'tooltip', v_tab.tooltip::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'selectorType', v_tab.formname::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'manageAll', v_manage_all::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'typeaheadFilter', v_typeahead::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'selectionMode', v_selection_mode::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'typeaheadForced', v_typeahead_forced::TEXT);
+		v_form_tabs_aux := gw_fct_json_object_set_key(v_form_tabs_aux, 'hasCustomOrderBy', v_has_custom_order_by::TEXT);
 
 		-- Create tabs array
-		IF v_firsttab THEN
-			v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
+		IF v_first_tab THEN
+			v_formTabs := v_formTabs || ',' || v_form_tabs_aux::text;
 		ELSE
-			v_formTabs := v_formTabs || v_formTabsAux::text;
+			v_formTabs := v_formTabs || v_form_tabs_aux::text;
 		END IF;
-		v_firsttab := TRUE;
+		v_first_tab := TRUE;
 
 	END LOOP;
 
@@ -436,11 +470,11 @@ BEGIN
 	IF v_device = 5 THEN
 
 		-- Get active exploitations geometry (to zoom on them)
-		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
+		IF v_load_project IS TRUE AND v_geometry IS NULL THEN
 			SELECT row_to_json (a)
 			INTO v_geometry
 			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
+			FROM (SELECT st_expand(st_extent(the_geom)::geometry, 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
 		END IF;
 
 		if v_selector_type='selector_mincut' then
@@ -547,55 +581,45 @@ BEGIN
 
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
-	v_manageall := COALESCE(v_manageall, FALSE);
+	v_manage_all := COALESCE(v_manage_all, FALSE);
 	v_has_custom_order_by := COALESCE(v_has_custom_order_by, FALSE);
-	v_selectionMode = COALESCE(v_selectionMode, '');
-	v_currenttab = COALESCE(v_currenttab, '');
+	v_selection_mode = COALESCE(v_selection_mode, '');
+	v_current_tab = COALESCE(v_current_tab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
 	v_stylesheet := COALESCE(v_stylesheet, '{}');
-	v_layerColumns = COALESCE(v_layerColumns, '{}');
 	v_mincut_init = COALESCE(v_mincut_init, '[]');
 	v_mincut_valve_proposed = COALESCE(v_mincut_valve_proposed, '[]');
 	v_mincut_valve_not_proposed = COALESCE(v_mincut_valve_not_proposed, '[]');
 	v_mincut_node = COALESCE(v_mincut_node, '[]');
 	v_mincut_connec = COALESCE(v_mincut_connec, '[]');
 	v_mincut_arc = COALESCE(v_mincut_arc, '[]');
-	v_uservalues = COALESCE(v_uservalues, '{}');
+	v_user_values = COALESCE(v_user_values, '{}');
 	v_tiled = COALESCE(v_tiled, FALSE);
 
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
 	-- Return
-	IF v_firsttab IS FALSE THEN
+	IF v_first_tab IS FALSE THEN
 		-- Return not implemented
 		RETURN ('{"status":"Accepted"' ||
 		', "version":"'|| v_version ||'"'||
 		', "message":"Not implemented"'||
 		'}')::json;
 	ELSE
-		v_uservalues := COALESCE(json_extract_path_text(p_data,'data','userValues'),
+		v_user_values := COALESCE(json_extract_path_text(p_data,'data','userValues'),
 			(SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_current') AND cur_user = current_user ORDER BY parameter)a)::text,
 			'{}');
 		v_action := json_extract_path_text(p_data,'data','action');
 		IF v_action = '' THEN v_action = NULL; END IF;
 
-		DROP TABLE IF EXISTS temp_muni_sector_expl;
-		DROP TABLE IF EXISTS temp_exploitation;
-		DROP TABLE IF EXISTS temp_macroexploitation;
-		DROP TABLE IF EXISTS temp_sector;
-		DROP TABLE IF EXISTS temp_macrosector;
-		DROP TABLE IF EXISTS temp_municipality;
-		DROP TABLE IF EXISTS temp_t_mincut;
-		DROP TABLE IF EXISTS temp_network;
 		-- Return formtabs
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":"'||v_version||'"'||
 			',"body":{"message":'||v_message||
-			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
+			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_current_tab||'", "formText":"", "formTabs":'||v_formTabs||', "style": '||v_stylesheet||'}'||
 			',"feature":{}'||
 			',"data":{
-				"userValues":'||v_uservalues||',
-				"geometry":'||v_geometry||',
-				"layerColumns":'||v_layerColumns||
+				"userValues":'||v_user_values||',
+				"geometry":'||v_geometry||
 				(case when v_selector_type = 'selector_mincut' then ',
 					"tiled":'||v_tiled||',
 					"mincutInit":'||v_mincut_init||',
@@ -611,14 +635,8 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	DROP TABLE IF EXISTS temp_exploitation;
-	DROP TABLE IF EXISTS temp_macroexploitation;
-	DROP TABLE IF EXISTS temp_sector;
-	DROP TABLE IF EXISTS temp_macrosector;
-	DROP TABLE IF EXISTS temp_municipality;
-	DROP TABLE IF EXISTS temp_t_mincut;
-	DROP TABLE IF EXISTS temp_network;
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
 	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;

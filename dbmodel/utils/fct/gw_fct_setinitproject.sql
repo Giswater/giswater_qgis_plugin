@@ -33,9 +33,7 @@ v_version text;
 v_epsg integer;
 v_message text;
 v_return json;
-v_addschema text;
-v_expl_x_user boolean;
-v_expl_id integer;
+v_add_schema text;
 v_sectorisexplismuni boolean;
 v_has_usage boolean;
 
@@ -47,7 +45,6 @@ BEGIN
 
 	-- get system parameters
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
-	v_expl_x_user = (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	v_sectorisexplismuni = (SELECT value::boolean FROM config_param_system WHERE parameter = 'basic_selector_sectorisexplismuni');
 
 
@@ -124,41 +121,38 @@ BEGIN
 		DELETE FROM selector_municipality WHERE cur_user = current_user;
 		DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 		DELETE FROM selector_macrosector WHERE cur_user = current_user;
+		DELETE FROM selector_network WHERE cur_user = current_user;
+		DELETE FROM selector_psector WHERE cur_user = current_user;
+		DELETE FROM selector_dscenario WHERE cur_user = current_user;
 
 		-- looking for additional schema
-		IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
-			EXECUTE 'SET search_path = '||v_addschema||', public';
+		IF v_add_schema IS NOT NULL AND v_add_schema != v_schemaname THEN
+			EXECUTE 'SET search_path = '||v_add_schema||', public';
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			DELETE FROM selector_sector WHERE cur_user = current_user;
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
+			DELETE FROM selector_network WHERE cur_user = current_user;
+			DELETE FROM selector_psector WHERE cur_user = current_user;
+			DELETE FROM selector_dscenario WHERE cur_user = current_user;
 
 			SET search_path = 'SCHEMA_NAME', public;
 		END IF;
 	ELSE
 		-- Force exploitation selector in case of null values
 		IF (SELECT count(*) FROM selector_expl WHERE cur_user=current_user) < 1 THEN
-
-			IF (v_expl_x_user) IS NOT TRUE THEN
-				SELECT expl_id INTO v_expl_id FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 ORDER BY expl_id LIMIT 1;
-			ELSE
-				SELECT c.expl_id INTO v_expl_id 
-				FROM config_user_x_expl c
-				JOIN exploitation e USING (expl_id)
-				WHERE c.username = current_user AND c.expl_id > 0
-				AND e.active IS NOT FALSE
-				ORDER BY c.expl_id LIMIT 1;
-			END IF;
-
-			IF v_expl_id IS NOT NULL THEN
+			IF (SELECT 1 FROM exploitation WHERE active IS NOT FALSE AND expl_id > 0 ORDER BY expl_id LIMIT 1) IS NOT NULL THEN
 				EXECUTE format(
 					$$SELECT gw_fct_setselectors('{
-						"client":{},
+						"client":{
+							"cur_user":"', v_user, '"
+						},
 						"data":{
 							"selectorType":"selector_basic",
 							"tabName":"tab_exploitation",
-							"checkAll":"True"
+							"checkAll":"True",
+							"addSchema":"', v_add_schema, '"
 						}
 					}')$$
 				);

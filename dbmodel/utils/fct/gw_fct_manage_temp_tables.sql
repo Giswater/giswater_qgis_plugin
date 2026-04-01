@@ -19,7 +19,7 @@ $BODY$
  * * project_type: string -> 'WS' | 'UD' (mandatory)
  * * action: string -> 'CREATE' | 'DROP' (mandatory)
  * * verifiedExceptions: boolean (optional)
- * * group: string -> 'LOG' | 'ANL' | 'MAPZONES' | 'EPA' | 'OMCHECK' | 'ADMIN' | 'PLANCHECK' | 'EPAMAIN' | 'CHECKPROJECT' | 'GRAPHANALYTICSCHECK', 'USERCHECK' (mandatory)
+ * * group: string -> 'LOG' | 'SELECTOR' | 'ANL' | 'MAPZONES' | 'EPA' | 'OMCHECK' | 'ADMIN' | 'PLANCHECK' | 'EPAMAIN' | 'CHECKPROJECT' | 'GRAPHANALYTICSCHECK', 'USERCHECK' (mandatory)
  * * subGroup: string[] -> ['ALL' | 'DMA' | 'DQA' | 'PRESSZONE' | 'SECTOR' | 'DRAINZONE'] (optional)
 
  * EXAMPLE CALLS:
@@ -38,7 +38,6 @@ $BODY$
 
 DECLARE
 
-    v_fid integer;
     v_project_type text;
 
     v_filter text;
@@ -62,7 +61,6 @@ BEGIN
 
 	-- get input parameters
 	v_parameters := (((p_data ->>'data')::json->>'parameters')::json);
-    v_fid := v_parameters->>'fid';
     v_project_type = UPPER(v_parameters->>'project_type');
     v_action = UPPER(v_parameters->>'action');
     v_verifiedExceptions = v_parameters->>'verifiedExceptions';
@@ -70,10 +68,6 @@ BEGIN
     v_subGroup = UPPER(v_parameters->>'subGroup');
 
     -- validate parameters
-    IF v_fid IS NULL THEN
-        RETURN ('{"status":"Failed","message":{"level":1, "text":"fid is required"}}')::json;
-    END IF;
-
     IF v_project_type IS NULL THEN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"project_type is required"}}')::json;
     END IF;
@@ -97,7 +91,7 @@ BEGIN
     END IF;
 
     -- validate group
-    IF v_group NOT IN ('LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'PLANCHECK', 'EPAMAIN', 'CHECKPROJECT', 'GRAPHANALYTICSCHECK', 'USERCHECK') THEN
+    IF v_group NOT IN ('LOG', 'SELECTOR', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'PLANCHECK', 'EPAMAIN', 'CHECKPROJECT', 'GRAPHANALYTICSCHECK', 'USERCHECK') THEN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"group is invalid"}}')::json;
     END IF;
 
@@ -108,7 +102,7 @@ BEGIN
 
     -- test
     IF v_group = 'EPAMAIN' THEN
-        v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN'];
+        v_group_array = ARRAY['LOG', 'SELECTOR', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN'];
         IF v_project_type = 'WS' THEN
             v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR', 'SUPPLYZONE', 'OMZONE'];
         ELSIF v_project_type = 'UD' THEN
@@ -141,6 +135,110 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS t_audit_check_data (LIKE audit_check_data INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS t_audit_check_project (LIKE audit_check_project INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS t_audit_log_data (LIKE audit_log_data INCLUDING ALL);
+        END IF;
+
+        IF 'SELECTOR' = ANY(v_group_array) THEN
+            EXECUTE 'CREATE OR REPLACE TEMPORARY VIEW temp_ve_arc_geom_selector AS
+                SELECT a.the_geom
+                FROM arc a
+                WHERE EXISTS (
+                        SELECT 1
+                        FROM selector_state ss
+                        WHERE ss.cur_user = current_user
+                          AND ss.state_id = a.state
+                    )
+                  AND EXISTS (
+                        SELECT 1
+                        FROM selector_sector ssec
+                        WHERE ssec.cur_user = current_user
+                          AND ssec.sector_id = a.sector_id
+                    )
+                  AND EXISTS (
+                        SELECT 1
+                        FROM selector_municipality sm
+                        WHERE sm.cur_user = current_user
+                          AND sm.muni_id = a.muni_id
+                    )
+                  AND EXISTS (
+                        SELECT 1
+                        FROM selector_expl se
+                        WHERE se.cur_user = current_user
+                          AND se.expl_id = ANY(array_append(a.expl_visibility::integer[], a.expl_id))
+                    )';
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_exploitation (
+                expl_id int4 NULL,
+                code varchar(100) NULL,
+                name varchar(100) NULL,
+                descript varchar(255) NULL,
+                sector_id int4[] NULL,
+                muni_id int4[] NULL,
+                macroexpl_id int4 NULL,
+                active bool NULL,
+                CONSTRAINT temp_exploitation_pkey PRIMARY KEY (expl_id)
+            );
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_macroexploitation (
+                macroexpl_id int4 NOT NULL,
+                code varchar(100) NULL,
+                name varchar(100) NULL,
+                descript varchar(255) NULL,
+                active bool NULL,
+                CONSTRAINT temp_macroexploitation_pkey PRIMARY KEY (macroexpl_id)
+            );
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_sector (
+                sector_id int4 NOT NULL,
+                code varchar(100) NULL,
+                name varchar(100) NULL,
+                descript varchar(255) NULL,
+                expl_id int4[] NULL,
+                muni_id int4[] NULL,
+                macrosector_id int4 NULL,
+                parent_id int4 NULL,
+                active bool NULL,
+                CONSTRAINT temp_sector_pkey PRIMARY KEY (sector_id)
+            );
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_macrosector (
+                macrosector_id int4 NOT NULL,
+                code varchar(100) NULL,
+                name varchar(100) NULL,
+                descript varchar(255) NULL,
+                expl_id int4[] NULL,
+                muni_id int4[] NULL,
+                active bool NULL,
+                CONSTRAINT temp_macrosector_pkey PRIMARY KEY (macrosector_id)
+            );
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_municipality (
+                muni_id int4 NOT NULL,
+                name varchar(100) NOT NULL,
+                observ varchar(255) NULL,
+                expl_id int4[] NULL,
+                sector_id int4[] NULL,
+                active bool NULL,
+                CONSTRAINT temp_municipality_pkey PRIMARY KEY (muni_id)
+            );
+
+            CREATE TEMP TABLE IF NOT EXISTS temp_network (
+                network_id int4 NOT NULL,
+                name varchar(100) NULL,
+                active bool DEFAULT true NOT NULL,
+                CONSTRAINT temp_network_pkey PRIMARY KEY (network_id)
+            );
+
+            IF v_project_type = 'WS' THEN
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_mincut (
+                    id int4 NOT NULL,
+                    expl_id int4 NULL,
+                    macroexpl_id int4 NULL,
+                    muni_id int4 NULL,
+                    minsector_id int4 NULL,
+                    CONSTRAINT temp_t_mincut_pkey PRIMARY KEY (id)
+                );
+            END IF;
+
         END IF;
 
         IF 'ANL' = ANY(v_group_array) THEN
@@ -329,6 +427,16 @@ BEGIN
         DROP TABLE IF EXISTS t_audit_check_data;
         DROP TABLE IF EXISTS t_audit_check_project;
         DROP TABLE IF EXISTS t_audit_log_data;
+
+        DROP VIEW IF EXISTS temp_ve_arc_geom_selector;
+        DROP TABLE IF EXISTS temp_muni_sector_expl;
+        DROP TABLE IF EXISTS temp_exploitation;
+        DROP TABLE IF EXISTS temp_macroexploitation;
+        DROP TABLE IF EXISTS temp_sector;
+        DROP TABLE IF EXISTS temp_macrosector;
+        DROP TABLE IF EXISTS temp_municipality;
+        DROP TABLE IF EXISTS temp_t_mincut;
+        DROP TABLE IF EXISTS temp_network;
 
         DROP TABLE IF EXISTS t_anl_node;
         DROP TABLE IF EXISTS t_anl_arc;
