@@ -306,7 +306,7 @@ BEGIN
 			SELECT * INTO v_arc FROM ve_arc WHERE ST_DWithin(v_connect.the_geom, ve_arc.the_geom, 0.001);
 
 			-- Use connect.arc_id as forced arcs in case of exists
-			IF v_connect.arc_id IS NOT NULL AND v_isforcedarcs is False THEN
+			IF v_connect.arc_id IS NOT NULL AND v_connect.arc_id <> v_old_arc_id AND v_isforcedarcs is False THEN
 				v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 
 				-- check if forced arc diameter is smaller than configured
