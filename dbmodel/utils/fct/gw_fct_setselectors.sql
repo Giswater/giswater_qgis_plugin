@@ -177,7 +177,7 @@ BEGIN
 		SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active 
 		FROM sector 
 		WHERE active 
-		AND sector_id > 0 
+		AND sector_id >= 0 
 		ORDER BY sector_id;
 
 		INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
@@ -384,11 +384,7 @@ BEGIN
 
 		-- manage value
 		IF v_value then
-			IF v_tab_name='tab_period' THEN
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('''|| v_id ||''', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-			ELSE
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-			END IF;
+			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
 		ELSE
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || '::text = '''|| v_id ||''' AND cur_user = current_user';
 		END IF;
@@ -629,7 +625,7 @@ BEGIN
 		DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
 		-- sector
-		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id >= 0;
 		IF v_sector_is_expl_is_muni THEN			
 			INSERT INTO selector_sector SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
 			IN (SELECT sector_id FROM sector WHERE active);
@@ -639,11 +635,11 @@ BEGIN
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 		END IF;
 		
-		-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+		-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
 		INSERT INTO selector_sector
-		SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+		SELECT DISTINCT sector_id,current_user FROM arc WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(arc.expl_visibility))
 		UNION
-		SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+		SELECT DISTINCT sector_id,current_user FROM node WHERE EXISTS (SELECT 1 FROM selector_expl se WHERE se.cur_user = current_user AND se.expl_id = ANY(node.expl_visibility))
 		ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 		-- scenarios
@@ -701,7 +697,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id >= 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
@@ -767,7 +763,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 	
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id >= 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
@@ -834,7 +830,6 @@ BEGIN
 	END IF;
 
 	-- force 0 
-	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
 	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
 
 	-- warn the user that in the selected psectors, there is a connec connected to different arcs

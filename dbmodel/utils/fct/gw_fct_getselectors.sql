@@ -108,23 +108,23 @@ BEGIN
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- Get input parameters:
-	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
-	v_current_tab := (p_data ->> 'form')::json->> 'currentTab';
-	v_filter_from_input := (p_data ->> 'data')::json->> 'filterText';
-	v_geometry := ((p_data ->> 'data')::json->>'geometry');
-	v_use_atlas := (p_data ->> 'data')::json->> 'useAtlas';
-	v_load_project := (p_data ->> 'data')::json->> 'loadProject';
-	v_message := (p_data ->> 'message')::json;
-	v_cur_user := (p_data ->> 'client')::json->> 'cur_user';
-	v_device := (p_data ->> 'client')::json->> 'device';
-	v_add_schema := (p_data ->> 'data')::json->> 'addSchema';
-	v_tiled := ((p_data ->>'client')::json->>'tiled')::boolean;
+	v_selector_type := p_data->'data'->> 'selectorType';
+	v_current_tab := p_data->'form'->> 'currentTab';
+	v_filter_from_input := p_data->'data'->>'filterText';
+	v_geometry := p_data->'data'->>'geometry';
+	v_use_atlas := p_data->'data'->>'useAtlas';
+	v_load_project := p_data->'data'->>'loadProject';
+	v_message := p_data->'message';
+	v_cur_user := p_data->'client'->>'cur_user';
+	v_device := p_data->'client'->>'device';
+	v_add_schema := p_data->'data'->>'addSchema';
+	v_tiled := (p_data->'client'->>'tiled')::boolean;
 	-- Backward compatible flag parsing: accepted in client/data and with both key casings.
 	v_is_return_set_selectors := COALESCE(
-		((p_data ->>'client')::json->>'isReturnSetSelectors')::boolean,
-		((p_data ->>'client')::json->>'isReturnSetselectors')::boolean,
-		((p_data ->>'data')::json->>'isReturnSetSelectors')::boolean,
-		((p_data ->>'data')::json->>'isReturnSetselectors')::boolean
+		(p_data->'client'->>'isReturnSetSelectors')::boolean,
+		(p_data->'client'->>'isReturnSetselectors')::boolean,
+		(p_data->'data'->>'isReturnSetSelectors')::boolean,
+		(p_data->'data'->>'isReturnSetselectors')::boolean
 	);
 
 	IF v_add_schema IS NOT NULL THEN v_tab_network_signal = -1; END IF;
@@ -211,7 +211,7 @@ BEGIN
 			SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active 
 			FROM sector 
 			WHERE active 
-			AND sector_id > 0 
+			AND sector_id >= 0 
 			ORDER BY sector_id;
 
 			INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
@@ -270,7 +270,7 @@ BEGIN
 			FROM temp_muni_sector_expl t
 			JOIN temp_exploitation e USING (expl_id)
 			JOIN sector s ON s.sector_id = t.sector_id
-			WHERE s.active AND s.sector_id > 0
+			WHERE s.active AND s.sector_id >= 0 
 			ORDER BY s.sector_id
 			ON CONFLICT (sector_id) DO NOTHING;
 
