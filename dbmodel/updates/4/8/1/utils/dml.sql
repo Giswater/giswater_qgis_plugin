@@ -58,7 +58,7 @@ WHERE parameter = 'utils_graphanalytics_status';
 UPDATE config_param_system SET value = value::jsonb || '{"plan_statetype_obsolete_planned": 24}' WHERE parameter = 'plan_statetype_vdefault';
 UPDATE config_param_system SET value = value::jsonb - ARRAY['plan_statetype_planned', 'plan_statetype_reconstruct'] WHERE parameter = 'plan_statetype_vdefault';
 
-DELETE FROM config_param_system WHERE parameter = ‘plan_psector_status_action’;
-DELETE FROM config_param_system WHERE parameter = ‘plan_statetype_planned’;
-DELETE FROM config_param_system WHERE parameter = ‘plan_statetype_ficticius’;
-DELETE FROM config_param_system WHERE parameter = ‘plan_statetype_reconstruct’;
+DELETE FROM config_param_system WHERE parameter = 'plan_psector_status_action';
+DELETE FROM config_param_system WHERE parameter = 'plan_statetype_planned';
+DELETE FROM config_param_system WHERE parameter = 'plan_statetype_ficticius';
+DELETE FROM config_param_system WHERE parameter = 'plan_statetype_reconstruct';
