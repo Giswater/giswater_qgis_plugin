@@ -52,7 +52,9 @@ BEGIN
 			ELSE 'OLD'
 		END AS cal_age,
 		dma_id,
-		presszone_id
+		presszone_id,
+		node_1,
+		node_2
 		FROM rpt_inp_arc
 		LEFT JOIN inp_family f ON "family" = family_id AND f.age IS NOT NULL
 		WHERE result_id = v_result_id
@@ -96,7 +98,9 @@ BEGIN
 		END AS cal_family,
 		dma_id,
 		presszone_id,
-		NULL::numeric AS losses_weight
+		NULL::numeric AS losses_weight,
+		node_1,
+		node_2
 	FROM arcs
 	UNION ALL
 	SELECT
@@ -107,7 +111,9 @@ BEGIN
 		epa_type AS cal_family,
 		dma_id,
 		presszone_id,
-		losses_weight
+		losses_weight,
+		NULL::text AS node_1,
+		NULL::text AS node_2
 	FROM nodes;
 
 	-- JSON with features: id = first digit run (e.g. 3924522P0 -> 3924522, VN3925355 -> 3925355)
@@ -126,6 +132,21 @@ BEGIN
 						'presszone', presszone_id
 					),
 					'lossesWeight', losses_weight
+				)
+			WHEN feature_epa_type in ('PIPE', 'PUMP', 'VALVE') THEN
+				json_build_object(
+					'id', NULLIF(substring(feature_id from '[0-9]+'), '')::bigint,
+					'epaId', feature_id,
+					'epaType', feature_epa_type,
+					'gwEpaType', feature_giswater_epa_type,
+					'catalog', feature_catalog,
+					'family', cal_family,
+					'zones', json_build_object(
+						'dma', dma_id,
+						'presszone', presszone_id
+					),
+					'node1', node_1,
+					'node2', node_2
 				)
 			ELSE
 				json_build_object(
