@@ -1415,55 +1415,28 @@ BEGIN
 		-- update mapzone_ids, mapzone_id, name for temp_pgr_mapzone 
 		IF v_from_zero = TRUE THEN
 
-			IF v_project_type = 'WS' THEN
-
-				IF v_class IN ('DMA', 'PRESSZONE') THEN
-					EXECUTE format(
-						'SELECT GREATEST(
-							(SELECT max(%I) FROM %I),
-							(SELECT max(%I) FROM %I)
-						)',
-						v_mapzone_field,
-						v_mapzone_table,
-						v_mapzone_field,
-						'plan_netscenario_' || lower(v_class)
-					) 
-					INTO v_mapzone_id;
-				ELSE
-					EXECUTE format(
-						'SELECT max(%I) FROM %I',
-						v_mapzone_field,
-						v_mapzone_table
-					)
-					INTO v_mapzone_id;
-				END IF;
-			
-			ELSE -- v_project_type (UD)
-				EXECUTE format(
-						'SELECT max(%I) FROM %I',
-						v_mapzone_field,
-						v_mapzone_table
-					)
-					INTO v_mapzone_id;
-			END IF; -- v_project_type
-
-			IF v_mapzone_id IS NULL THEN
-				v_mapzone_id := 0;
-			END IF;
-
 			WITH idx AS (
 				SELECT
 					component,
 					row_number() OVER () AS id
 				FROM temp_pgr_mapzone
 				WHERE component > 0
+			),
+			ids AS (
+				SELECT
+					i.component,
+					CASE 
+						WHEN v_commit_changes THEN nextval('urn_id_seq')
+						ELSE i.id
+					END AS new_id
+				FROM idx i
 			)
 			UPDATE temp_pgr_mapzone m
-			SET mapzone_ids = ARRAY[v_mapzone_id + i.id],
-				mapzone_id = v_mapzone_id + i.id,
-				name = concat(v_mapzone_table, (v_mapzone_id + i.id))
-			FROM idx i
-			WHERE m.component = i.component;
+			SET mapzone_ids = ARRAY[ids.new_id],
+				mapzone_id = ids.new_id,
+				name = concat(v_mapzone_table, ids.new_id)
+			FROM ids
+			WHERE m.component = ids.component;
 
 		ELSE -- v_from_zero
 			-- mapzone_id
