@@ -543,7 +543,7 @@ BEGIN
 		("value"::json->>'buffer')::numeric as v_buffer
 		INTO rec_param_link
 		FROM config_param_user
-		WHERE "parameter" ilike 'edit_arc_automatic_link2netowrk'
+		WHERE "parameter" ilike 'edit_arc_automatic_link2network'
 		AND cur_user = current_user;
 
 		IF rec_param_link.v_active is true THEN

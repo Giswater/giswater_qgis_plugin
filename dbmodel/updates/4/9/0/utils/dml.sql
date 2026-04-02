@@ -158,3 +158,8 @@ UPDATE config_form_fields SET formname='ve_plot' WHERE formname = 'v_ext_plot';
 DELETE FROM config_form_fields WHERE formname='ve_plot' AND columnname = 'expl_id';
 UPDATE config_form_fields SET columnname='code', label='Code:', tooltip='Code' WHERE formname = 've_plot' AND columnname = 'plot_code';
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+DELETE FROM config_param_user WHERE "parameter"='edit_arc_automatic_link2netowrk';
+
+INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,vdefault,layoutname,iseditable,"source")
+VALUES ('edit_arc_automatic_link2network','config','Automatic connection of closest connecs to the arc','role_edit','Automatic connection of closest connecs to the arc:',true,9,'utils',false,false,'json','text',true,'{"active":"false", "buffer":"10"}','lyt_other',true,'core');
