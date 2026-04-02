@@ -74,6 +74,8 @@ v_macroomzone_id integer;
 v_supplyzone_id integer;
 v_dwfzone_id integer;
 v_drainzone_id integer;
+v_omunit_id integer;
+v_minsector_id integer;
 v_muni_id integer;
 v_district_id integer;
 v_project_type varchar;
@@ -436,6 +438,17 @@ BEGIN
 							v_drainzone_id = 0;
 						END IF;
 
+						-- getting omunit_id by heritage from nodes:
+						IF v_noderecord1.omunit_id = v_noderecord2.omunit_id THEN
+							v_omunit_id = v_noderecord1.omunit_id;
+						ELSIF v_noderecord1.omunit_id = 0 THEN
+							v_omunit_id = v_noderecord2.omunit_id;
+						ELSIF v_noderecord2.omunit_id = 0 THEN
+							v_omunit_id = v_noderecord1.omunit_id;
+						ELSIF v_noderecord1.omunit_id::text != v_noderecord2.omunit_id::text THEN
+							v_omunit_id = 0;
+						END IF;
+
 
 					END IF;
 
@@ -451,16 +464,14 @@ BEGIN
 					END IF;
 
 					-- getting dma_id by heritage from nodes
-					IF v_project_type = 'WS' THEN
-						IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
-							v_dma_id = v_noderecord1.dma_id;
-						ELSIF v_noderecord1.dma_id = 0 THEN
-							v_dma_id = v_noderecord2.dma_id;
-						ELSIF v_noderecord2.dma_id = 0 THEN
-							v_dma_id = v_noderecord1.dma_id;
-						ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
-							v_dma_id = 0;
-						END IF;
+					IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
+						v_dma_id = v_noderecord1.dma_id;
+					ELSIF v_noderecord1.dma_id = 0 THEN
+						v_dma_id = v_noderecord2.dma_id;
+					ELSIF v_noderecord2.dma_id = 0 THEN
+						v_dma_id = v_noderecord1.dma_id;
+					ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
+						v_dma_id = 0;
 					END IF;
 
 					-- getting omzone_id by heritage from nodes
@@ -483,6 +494,16 @@ BEGIN
 						v_expl_id = v_noderecord1.expl_id;
 					ELSIF v_noderecord1.expl_id::text != v_noderecord2.expl_id::text THEN
 						v_expl_id = 0;
+					END IF;
+
+					IF v_noderecord1.minsector_id = v_noderecord2.minsector_id THEN
+						v_minsector_id = v_noderecord1.minsector_id;
+					ELSIF v_noderecord1.minsector_id = 0 THEN
+						v_minsector_id = v_noderecord2.minsector_id;
+					ELSIF v_noderecord2.minsector_id = 0 THEN
+						v_minsector_id = v_noderecord1.minsector_id;
+					ELSIF v_noderecord1.minsector_id::text != v_noderecord2.minsector_id::text THEN
+						v_minsector_id = 0;
 					END IF;
 
 					-- getting muni_id by heritage from nodes
@@ -590,7 +611,7 @@ BEGIN
 		END IF;
 
 		-- Dma ID
-		IF v_project_type = 'WS' AND v_dma_id IS NULL THEN
+		IF v_dma_id IS NULL THEN
 			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(v_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE ;
 			IF count_aux = 1 THEN
 				v_dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(v_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE LIMIT 1);
@@ -621,7 +642,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- supplyzone: TODO
 		IF v_project_type = 'WS' AND v_supplyzone_id IS NULL THEN
 			SELECT count(*) into count_aux FROM supplyzone WHERE ST_DWithin(v_reduced_geometry, supplyzone.the_geom,0.001) AND active IS TRUE ;
 			IF count_aux = 1 THEN
@@ -632,7 +652,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- dwfzone: TODO
 		IF v_project_type = 'UD' AND v_dwfzone_id IS NULL THEN
 			SELECT count(*) into count_aux FROM dwfzone WHERE ST_DWithin(v_reduced_geometry, dwfzone.the_geom,0.001) AND active IS TRUE ;
 			IF count_aux = 1 THEN
@@ -643,13 +662,22 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- drainzone: TODO
 		IF v_project_type = 'UD' AND v_drainzone_id IS NULL THEN
 			SELECT count(*) into count_aux FROM drainzone WHERE ST_DWithin(v_reduced_geometry, drainzone.the_geom,0.001) AND active IS TRUE ;
 			IF count_aux = 1 THEN
 				v_drainzone_id = (SELECT drainzone_id FROM drainzone WHERE ST_DWithin(v_reduced_geometry, drainzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
 				v_drainzone_id =(SELECT drainzone_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
+			END IF;
+		END IF;
+
+		IF v_project_type = 'UD' AND v_omunit_id IS NULL THEN
+			SELECT count(*) into count_aux FROM omunit WHERE ST_DWithin(v_reduced_geometry, omunit.the_geom, 0.001) AND active IS TRUE ;
+			IF count_aux = 1 THEN
+				v_omunit_id = (SELECT omunit_id FROM omunit WHERE ST_DWithin(v_reduced_geometry, omunit.the_geom, 0.001) AND active IS TRUE LIMIT 1);
+			ELSE
+				v_omunit_id =(SELECT omunit_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
 				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
@@ -879,7 +907,8 @@ BEGIN
 					field_value = v_dqa_id;
 				WHEN 'supplyzone_id' THEN
 					field_value = v_supplyzone_id;
-
+				WHEN 'minsector_id' THEN
+					field_value = v_minsector_id;
 				-- static mapzones
 				WHEN 'macrosector_id' THEN
 					field_value = v_macrosector_id;
@@ -1070,6 +1099,8 @@ BEGIN
 						field_value = v_dwfzone_id;
 					WHEN 'drainzone_id' THEN
 						field_value = v_drainzone_id;
+					WHEN 'omunit_id' THEN
+						field_value = v_omunit_id;
                     ELSE
                     END CASE;
                 END IF;
