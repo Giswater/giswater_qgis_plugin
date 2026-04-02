@@ -307,3 +307,8 @@ UPDATE config_form_fields SET layoutorder=8 WHERE formname='plan_netscenario_dma
 UPDATE config_form_fields SET layoutorder=9 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=10 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=11 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''ARC''=ANY(feature_type))' WHERE formname='ve_arc' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''CONNEC''=ANY(feature_type))' WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''ELEMENT''=ANY(feature_type))' WHERE formname='ve_element' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''NODE''=ANY(feature_type))' WHERE formname='ve_node' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
