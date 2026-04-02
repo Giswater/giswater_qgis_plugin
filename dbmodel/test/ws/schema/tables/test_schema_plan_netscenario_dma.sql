@@ -20,7 +20,7 @@ SELECT has_table('plan_netscenario_dma'::name, 'Table plan_netscenario_dma shoul
 SELECT columns_are(
     'plan_netscenario_dma',
     ARRAY[
-        'netscenario_id', 'dma_id', 'dma_name', 'pattern_id', 'graphconfig', 'the_geom',
+        'netscenario_id', 'dma_id', 'name', 'code', 'descript', 'pattern_id', 'graphconfig', 'the_geom',
         'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id', 'muni_id', 'sector_id'
     ],
     'Table plan_netscenario_dma should have the correct columns'
@@ -32,7 +32,9 @@ SELECT col_is_pk('plan_netscenario_dma', ARRAY['netscenario_id', 'dma_id'], 'Col
 -- Check column types
 SELECT col_type_is('plan_netscenario_dma', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
 SELECT col_type_is('plan_netscenario_dma', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('plan_netscenario_dma', 'dma_name', 'character varying(30)', 'Column dma_name should be character varying(30)');
+SELECT col_type_is('plan_netscenario_dma', 'name', 'character varying(100)', 'Column name should be character varying(100)');
+SELECT col_type_is('plan_netscenario_dma', 'code', 'character varying(100)', 'Column code should be character varying(100)');
+SELECT col_type_is('plan_netscenario_dma', 'descript', 'character varying(255)', 'Column descript should be character varying(255)');
 SELECT col_type_is('plan_netscenario_dma', 'pattern_id', 'character varying(16)', 'Column pattern_id should be character varying(16)');
 SELECT col_type_is('plan_netscenario_dma', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('plan_netscenario_dma', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');

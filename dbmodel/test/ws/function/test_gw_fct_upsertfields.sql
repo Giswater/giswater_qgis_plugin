@@ -35,7 +35,7 @@ INSERT INTO plan_netscenario (netscenario_id, "name", descript, parent_id, netsc
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1, 2", "tableName":"plan_netscenario_dma"},
-    "data":{"filterFields":{}, "pageInfo":{}, "fields":{"netscenario_id": "1", "dma_id": "2", "dma_name": "dma1-2d", "pattern_id": "PTN-DMA-02-DEF",
+    "data":{"filterFields":{}, "pageInfo":{}, "fields":{"netscenario_id": "1", "dma_id": "2", "name": "dma1-2d", "code": "dma1-2d", "descript": "dma1-2d", "pattern_id": "PTN-DMA-02-DEF",
     "graphconfig": "{\"use\": [{\"nodeParent\": \"1080\", \"toArc\": [2092]}], \"ignore\": [], \"forceClosed\": []}", "active": "true"}, "force_action":"UPDATE"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_upsertfields --> "tableName":"plan_netscenario_dma" returns status "Accepted"'
