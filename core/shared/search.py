@@ -29,6 +29,7 @@ class GwSearchLocatorFilter(QgsLocatorFilter):
         self.max_results = int(tools_gw.get_config_parser("search_location", "max_results", "user", "init", False) or 80)
         self.use_without_prefix = tools_os.set_boolean(
             tools_gw.get_config_parser("search_location", "use_without_prefix", "user", "init", False))
+    
     def clone(self):
         return GwSearchLocatorFilter()
 
