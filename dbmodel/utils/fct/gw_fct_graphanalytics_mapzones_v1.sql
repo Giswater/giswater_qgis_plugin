@@ -257,6 +257,12 @@ BEGIN
 		RETURN v_response;
 	END IF;
 
+	-- Reset log tables content for this run
+	DELETE FROM t_audit_check_data WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM t_audit_check_project WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM t_audit_log_data WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM temp_audit_check_data WHERE fid = v_fid AND cur_user = current_user;
+
 	-- Start Building Log Message
 	-- =======================
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":{"graphClass":"'
