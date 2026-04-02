@@ -33,3 +33,10 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_connec();
 
 CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+-- 02/04/2026
+CREATE TRIGGER gw_trg_edit_plan_netscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_plan_netscenario_dma 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('DMA');
+
+CREATE TRIGGER gw_trg_edit_plan_netscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_plan_netscenario_presszone 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('PRESSZONE');

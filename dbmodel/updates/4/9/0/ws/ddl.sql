@@ -105,3 +105,17 @@ DROP INDEX IF EXISTS idx_plan_psector_expl_id;
 DROP INDEX IF EXISTS plan_psector_expl_id;
 CREATE INDEX IF NOT EXISTS plan_psector_expl_id_idx ON plan_psector USING btree (expl_id);
 ALTER TABLE selector_rpt_main_tstep DROP CONSTRAINT IF EXISTS time_cur_user_unique;
+
+-- 02/04/2026
+DROP VIEW IF EXISTS ve_plan_netscenario_dma;
+DROP VIEW IF EXISTS ve_plan_netscenario_presszone;
+
+ALTER TABLE plan_netscenario_presszone RENAME COLUMN presszone_name TO "name";
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN "name" TYPE varchar(100) USING "name"::varchar(100);
+ALTER TABLE plan_netscenario_presszone ADD code varchar(100) NULL;
+ALTER TABLE plan_netscenario_presszone ADD descript varchar(255) NULL;
+
+ALTER TABLE plan_netscenario_dma RENAME COLUMN dma_name TO "name";
+ALTER TABLE plan_netscenario_dma ALTER COLUMN "name" TYPE varchar(100) USING "name"::varchar(100);
+ALTER TABLE plan_netscenario_dma ADD code varchar(100) NULL;
+ALTER TABLE plan_netscenario_dma ADD descript varchar(255) NULL;

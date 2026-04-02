@@ -26,10 +26,7 @@ object_rec record;
 v_version text;
 v_result json;
 v_result_info json;
-v_copyfrom integer;
-v_target integer;
 v_error_context text;
-v_projecttype text;
 v_fid integer = 508;
 
 v_name text;
@@ -45,7 +42,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select version
-	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data
 	v_name :=  p_data->'data'->'parameters'->>'name';
@@ -60,34 +57,25 @@ BEGIN
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3662", "function":"3260", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3662", "function":"3260", "parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3664", "function":"3260", "parameters":{"v_descript":"'||quote_nullable(v_descript)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3664", "function":"3260", "parameters":{"v_descript":"'||quote_nullable(v_descript)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3666", "function":"3260", "parameters":{"v_parent_id":"'||quote_nullable(v_parent_id)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3666", "function":"3260", "parameters":{"v_parent_id":"'||quote_nullable(v_parent_id)||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3762", "function":"3260", "parameters":{"v_netscenario_type":"'||v_netscenario_type||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3762", "function":"3260", "parameters":{"v_netscenario_type":"'||v_netscenario_type||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3670", "function":"3260", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3670", "function":"3260", "parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"3", "is_process":true, "is_header":"true", "label_id":"3003", "separator_id":"2008"}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002", "separator_id":"2009"}}$$)';
 
-	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
+	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3260", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001", "separator_id":"2009"}}$$)';
 
 
 	-- process
@@ -101,24 +89,22 @@ BEGIN
 
 	IF v_scenarioid IS NULL THEN
 		SELECT netscenario_id INTO v_scenarioid FROM plan_netscenario where name = v_name;
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3764", "function":"3260", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3764", "function":"3260", "parameters":{"v_scenarioid":"'||v_scenarioid||'", "v_name":"'||v_name||'"}, "fid":"'||v_fid||'", "criticity":"3", "prefix_id":"1003", "is_process":true}}$$)';
 
 	ELSE
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3766", "function":"3260", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3766", "function":"3260", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 	END IF;
 
 	IF v_netscenario_type = 'DMA' THEN
-			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id,dma_name, pattern_id, graphconfig, the_geom, active)
-			SELECT v_scenarioid, dma_id, name, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE dma_id = 0 OR dma_id = -1
-			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
-		ELSIF v_netscenario_type = 'PRESSZONE' THEN
-			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,presszone_name, head, graphconfig, the_geom, active)
-			SELECT v_scenarioid, presszone_id, name, head, graphconfig, the_geom, TRUE FROM presszone WHERE presszone_id= 0 OR presszone_id= -1
-			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
-		END IF;
+		INSERT INTO plan_netscenario_dma (netscenario_id, dma_id,name, code, descript, pattern_id, graphconfig, the_geom, active)
+		SELECT v_scenarioid, dma_id, name, code, descript, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE dma_id = 0 OR dma_id = -1
+		ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
+	ELSIF v_netscenario_type = 'PRESSZONE' THEN
+		INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,name, code, descript, head, graphconfig, the_geom, active)
+		SELECT v_scenarioid, presszone_id, name, code, descript, head, graphconfig, the_geom, TRUE FROM presszone WHERE presszone_id= 0 OR presszone_id= -1
+		ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
+	END IF;
 
 
 	-- insert spacers
@@ -141,6 +127,11 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
 	    '}')::json, 3260, null, null, null);
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$

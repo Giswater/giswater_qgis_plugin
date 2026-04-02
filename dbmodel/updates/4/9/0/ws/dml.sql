@@ -270,3 +270,40 @@ WHERE fid=171;
 UPDATE config_form_fields
 SET dv_querytext='SELECT expl_id as id, name as idval FROM ve_exploitation WHERE expl_id > 0'
 WHERE formname='ve_cat_dscenario' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+
+-- 02/04/2026
+UPDATE config_form_fields SET columnname='name' WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='presszone_name' AND tabname='tab_none';
+
+DELETE FROM config_form_fields WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='lastupdate' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='lastupdate_user' AND tabname='tab_none';
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,isparent,iseditable,isautoupdate,isfilter,hidden)
+VALUES ('plan_netscenario_presszone','form_feature','tab_none','code','lyt_data_1',3,'string','text','Code:','Code:',false,true,false,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,isparent,iseditable,isautoupdate,isfilter,hidden)
+VALUES ('plan_netscenario_presszone','form_feature','tab_none','descript','lyt_data_1',5,'string','text','Descript','Descript',false,true,false,false,false);
+
+UPDATE config_form_fields SET layoutorder=2,ismandatory=true WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='head' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=9 WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=10 WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET columnname='name' WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='dma_name' AND tabname='tab_none';
+
+DELETE FROM config_form_fields WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='lastupdate' AND tabname='tab_none';
+DELETE FROM config_form_fields WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='lastupdate_user' AND tabname='tab_none';
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,isparent,iseditable,isautoupdate,isfilter,hidden)
+VALUES ('plan_netscenario_dma','form_feature','tab_none','code','lyt_data_1',3,'string','text','Code:','Code:',false,true,false,false,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,isparent,iseditable,isautoupdate,isfilter,hidden)
+VALUES ('plan_netscenario_dma','form_feature','tab_none','descript','lyt_data_1',5,'string','text','Descript','Descript',false,true,false,false,false);
+
+UPDATE config_form_fields SET layoutorder=2,ismandatory=true WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='pattern_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=9 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=10 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
