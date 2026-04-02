@@ -490,7 +490,7 @@ BEGIN
 
 	-- set urn_id_seq to mapzones
 	IF v_projecttype = 'WS' THEN
-		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'presszone',  'dqa', 'supplyzone']; 
+		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'presszone',  'dqa', 'supplyzone', 'crmzone']; 
 	ELSIF v_projecttype = 'UD' THEN
 		v_mapzone_arr := ARRAY['omzone', 'dma', 'sector', 'dwfzone'];
 	END IF;
@@ -513,7 +513,6 @@ BEGIN
 	
 		EXECUTE 'ALTER TABLE plan_netscenario_dma ALTER COLUMN dma_id SET DEFAULT nextval(''urn_id_seq''::regclass)';
 		EXECUTE 'ALTER TABLE plan_netscenario_presszone ALTER COLUMN presszone_id SET DEFAULT nextval(''urn_id_seq''::regclass)';
-		EXECUTE 'ALTER TABLE crmzone ALTER COLUMN id SET DEFAULT nextval(''urn_id_seq''::regclass)';
 
 	END IF;
 

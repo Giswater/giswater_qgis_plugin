@@ -845,7 +845,7 @@ AS WITH typevalue AS (
      LEFT JOIN dqa_table ON dqa_table.dqa_id = c.dqa_id
      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = c.supplyzone_id
      LEFT JOIN omzone_table ON omzone_table.omzone_id = c.omzone_id
-     LEFT JOIN crmzone ON crmzone.id::text = c.crmzone_id::text
+     LEFT JOIN crmzone ON crmzone.crmzone_id = c.crmzone_id
      LEFT JOIN connec_add ON connec_add.connec_id = c.connec_id
      LEFT JOIN value_state_type vst ON vst.id = c.state_type
      LEFT JOIN inp_network_mode ON true
@@ -3269,7 +3269,7 @@ AS WITH sel_state AS (
 		LEFT JOIN dqa_table ON dqa_table.dqa_id = connec.dqa_id
 		LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = connec.supplyzone_id
 		LEFT JOIN omzone_table ON omzone_table.omzone_id = connec.omzone_id
-		LEFT JOIN crmzone ON crmzone.id::text = connec.crmzone_id::text
+		LEFT JOIN crmzone ON crmzone.crmzone_id = connec.crmzone_id
 		LEFT JOIN link_planned USING (link_id)
 		LEFT JOIN connec_add ON connec_add.connec_id = connec.connec_id
 		LEFT JOIN value_state_type vst ON vst.id = connec.state_type

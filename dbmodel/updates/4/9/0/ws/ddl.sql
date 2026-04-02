@@ -119,3 +119,11 @@ ALTER TABLE plan_netscenario_dma RENAME COLUMN dma_name TO "name";
 ALTER TABLE plan_netscenario_dma ALTER COLUMN "name" TYPE varchar(100) USING "name"::varchar(100);
 ALTER TABLE plan_netscenario_dma ADD code varchar(100) NULL;
 ALTER TABLE plan_netscenario_dma ADD descript varchar(255) NULL;
+
+ALTER TABLE crmzone RENAME COLUMN id TO crmzone_id;
+ALTER TABLE crmzone ADD code varchar(100) NULL;
+ALTER TABLE crmzone ALTER COLUMN "name" TYPE varchar(100) USING "name"::varchar(100);
+ALTER TABLE crmzone ALTER COLUMN "descript" TYPE varchar(255) USING "descript"::varchar(255);
+ALTER TABLE crmzone ADD expl_id int4[] NULL;
+ALTER TABLE crmzone ADD sector_id int4[] NULL;
+ALTER TABLE crmzone ADD muni_id int4[] NULL;

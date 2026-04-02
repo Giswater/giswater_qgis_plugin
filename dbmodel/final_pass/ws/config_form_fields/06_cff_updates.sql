@@ -45,3 +45,7 @@ UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type 
 UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''CONNEC''=ANY(feature_type))' WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''ELEMENT''=ANY(feature_type))' WHERE formname='ve_element' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields SET dv_querytext='SELECT fluid_type AS id, fluid_type AS idval FROM man_type_fluid WHERE active AND (featurecat_id IS NULL AND ''NODE''=ANY(feature_type))' WHERE formname='ve_node' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+
+UPDATE config_form_fields
+SET dv_querytext='SELECT crmzone_id AS id, name AS idval FROM crmzone WHERE crmzone_id IS NOT NULL AND active'
+WHERE formname ILIKE 've_connec%' AND formtype='form_feature' AND columnname='crmzone_id' AND tabname='tab_data';

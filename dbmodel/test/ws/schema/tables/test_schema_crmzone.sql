@@ -20,18 +20,23 @@ SELECT has_table('crmzone'::name, 'Table crmzone should exist');
 SELECT columns_are(
     'crmzone',
     ARRAY[
-        'id', 'name', 'descript', 'the_geom', 'active', 'macrocrmzone_id', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'crmzone_id', 'name', 'descript', 'the_geom', 'active', 'macrocrmzone_id', 
+        'created_at', 'created_by', 'updated_at', 'updated_by', 'code', 'expl_id', 'sector_id', 'muni_id'
     ],
     'Table crmzone should have the correct columns'
 );
 
 -- Check primary key
-SELECT col_is_pk('crmzone', ARRAY['id'], 'Column id should be primary key');
+SELECT col_is_pk('crmzone', ARRAY['crmzone_id'], 'Column crmzone_id should be primary key');
 
 -- Check column types
-SELECT col_type_is('crmzone', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('crmzone', 'name', 'text', 'Column name should be text');
-SELECT col_type_is('crmzone', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('crmzone', 'crmzone_id', 'integer', 'Column crmzone_id should be integer');
+SELECT col_type_is('crmzone', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('crmzone', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('crmzone', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
+SELECT col_type_is('crmzone', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
+SELECT col_type_is('crmzone', 'sector_id', 'int4[]', 'Column sector_id should be int4[]');
+SELECT col_type_is('crmzone', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');
 SELECT col_type_is('crmzone', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('crmzone', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('crmzone', 'macrocrmzone_id', 'integer', 'Column macrocrmzone_id should be integer');
@@ -51,7 +56,7 @@ SELECT fk_ok('crmzone', 'macrocrmzone_id', 'macrocrmzone', 'macrocrmzone_id', 'F
 -- Check sequences
 
 -- Check constraints
-SELECT col_not_null('crmzone', 'id', 'Column id should be NOT NULL');
+SELECT col_not_null('crmzone', 'crmzone_id', 'Column crmzone_id should be NOT NULL');
 SELECT col_default_is('crmzone', 'active', 'true', 'Column active should default to true');
 
 SELECT * FROM finish();

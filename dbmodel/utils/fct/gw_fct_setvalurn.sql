@@ -33,12 +33,11 @@ BEGIN
 		(SELECT max(element_id::int8) FROM element),
 		(SELECT max(pol_id::int8) FROM polygon),
 		(SELECT max(omzone_id::int8) FROM omzone),
-		(SELECT max(id::int8) FROM crmzone),
+		(SELECT max(crmzone_id::int8) FROM crmzone),
 		(SELECT max(dma_id::int8) FROM dma),
 		(SELECT max(presszone_id::int8) FROM presszone),
 		(SELECT max(sector_id::int8) FROM sector),
 		(SELECT max(dqa_id::int8) FROM dqa),
-		--(SELECT max(dwfzone_id::int8) FROM dwfzone),
 		(SELECT max(dma_id::int8) FROM plan_netscenario_dma),
 		(SELECT max(presszone_id::int8) FROM plan_netscenario_presszone)
 		) INTO v_max;
@@ -52,11 +51,8 @@ BEGIN
 		(SELECT max(element_id::int8) FROM element),
 		(SELECT max(pol_id::int8) FROM polygon),
 		(SELECT max(omzone_id::int8) FROM omzone),
-		--(SELECT max(id::int8) FROM crmzone),
 		(SELECT max(dma_id::int8) FROM dma),
-		--(SELECT max(presszone_id::int8) FROM presszone),
 		(SELECT max(sector_id::int8) FROM sector),
-		--(SELECT max(dqa_id::int8) FROM dqa),
 		(SELECT max(dwfzone_id::int8) FROM dwfzone)
 		) INTO v_max;
 	END IF;

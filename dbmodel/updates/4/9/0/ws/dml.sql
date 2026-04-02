@@ -320,3 +320,7 @@ DELETE FROM sys_param_user WHERE id = 'inp_options_demand_weight_factor';
 
 INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,vdefault,layoutname,iseditable,"source")
 	VALUES ('epa_dscenario_percent_hydro_threshold','epaoptions','Dscenario percent hydro threshold','role_epa','Percent hydro threshold:',true,9,'ws',false,false,'integer','text',true,'10','lyt_general_2',true,'core');
+
+UPDATE config_form_fields
+SET dv_querytext='SELECT crmzone_id AS id, name AS idval FROM crmzone WHERE crmzone_id IS NOT NULL AND active'
+WHERE formname ILIKE 've_connec%' AND formtype='form_feature' AND columnname='crmzone_id' AND tabname='tab_data';
