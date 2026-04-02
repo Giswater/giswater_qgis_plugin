@@ -163,3 +163,16 @@ DELETE FROM config_param_user WHERE "parameter"='edit_arc_automatic_link2netowrk
 
 INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,vdefault,layoutname,iseditable,"source")
 VALUES ('edit_arc_automatic_link2network','config','Automatic connection of closest connecs to the arc','role_edit','Automatic connection of closest connecs to the arc:',true,9,'utils',false,false,'json','text',true,'{"active":"false", "buffer":"10"}','lyt_other',true,'core');
+
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('inp_family','Defines inp families contained in the network','role_edit','core');
+
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('dma_graph','Table to manage graph for dma','role_edit','core');
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('sector_graph','Table to manage graph for sector','role_edit','core');
+
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('inp_dscenario_pattern','Table to manage dscenario for pattern','role_epa','core');
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('inp_dscenario_pattern_value','Table to manage dscenario for pattern value','role_epa','core');

@@ -19,3 +19,6 @@ UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue W
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''' WHERE formname='ve_gully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 
 DELETE FROM config_param_user WHERE "parameter"='edit_insert_show_elevation_from_dem' AND cur_user='postgres';
+
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('dwfzone_graph','Table to manage graph for dwfzone','role_edit','core');

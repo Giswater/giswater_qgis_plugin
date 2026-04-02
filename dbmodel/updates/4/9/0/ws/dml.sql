@@ -324,3 +324,10 @@ INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layo
 UPDATE config_form_fields
 SET dv_querytext='SELECT crmzone_id AS id, name AS idval FROM crmzone WHERE crmzone_id IS NOT NULL AND active'
 WHERE formname ILIKE 've_connec%' AND formtype='form_feature' AND columnname='crmzone_id' AND tabname='tab_data';
+
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('dma_graph_meter','Table to manage graph for dma','role_edit','core');
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('dma_graph_object','Table to manage graph for dma','role_edit','core');
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('presszone_graph','Table to manage graph for presszone','role_edit','core');
