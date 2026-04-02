@@ -119,6 +119,7 @@ UPDATE sys_table SET id='ve_streetaxis' WHERE id='v_ext_streetaxis';
 UPDATE sys_table SET id='ve_address' WHERE id='v_ext_address';
 UPDATE sys_table SET id='ve_plot' WHERE id='v_ext_plot';
 UPDATE sys_table SET id='ve_raster_dem' WHERE id='v_ext_raster_dem';
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES('ve_district', 'Filtered view of districts', 'role_edit', 'core');
 
 UPDATE sys_style SET layername='ve_municipality' WHERE layername='v_ext_municipality';
 UPDATE sys_style SET layername='ve_streetaxis' WHERE layername='v_ext_streetaxis';

@@ -110,6 +110,12 @@ AS SELECT DISTINCT ON (r.id) r.id,
 CREATE OR REPLACE VIEW v_district AS
 SELECT * FROM ext_district;
 
+CREATE OR REPLACE VIEW ve_district
+AS SELECT v_district.*
+   FROM selector_municipality s,
+    v_district
+  WHERE v_district.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
 CREATE OR REPLACE VIEW v_region AS
 SELECT * FROM ext_region;
 
