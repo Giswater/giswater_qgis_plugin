@@ -29,7 +29,6 @@ DECLARE
     v_fct_type TEXT;
     v_action TEXT;
     v_use_psector TEXT;
-    v_netscenario TEXT;
 
     -- extra variables
     v_return_message TEXT;
@@ -51,7 +50,6 @@ BEGIN
     v_fct_type = (SELECT (p_data::json->>'data')::json->>'fct_type');
     v_action = (SELECT (p_data::json->>'data')::json->>'action');
     v_use_psector = (SELECT (p_data::json->>'data')::json->>'use_psector');
-    v_netscenario = (SELECT (p_data::json->>'data')::json->>'netscenario');
 
     IF v_action = 'CREATE' THEN
         -- Create temporary tables

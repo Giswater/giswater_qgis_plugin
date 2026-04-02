@@ -224,8 +224,7 @@ BEGIN
 				'action', 'CREATE',
 				'fct_name', v_class,
 				'fct_type', 'MAPZONE',
-				'use_psector', v_use_plan_psector,
-				'netscenario', v_netscenario
+				'use_psector', v_use_plan_psector
 			)
 		);
 
@@ -1015,7 +1014,7 @@ BEGIN
 		END IF;
 	END IF; --v_from_zero
 
-	-- check if there are any errors in grapfconfig, when v_from_zero FALSE
+	-- check if there are any errors in graphconfig, when v_from_zero FALSE
 	-- Detect real errors in graphconfig, ignoring UI scaffolding rows
 	-- (we insert section headers/spacers into t_audit_check_data as well).
 	IF (
@@ -1484,45 +1483,31 @@ BEGIN
 			) c
 			WHERE m.component = c.component;
 
-			-- mapzone_name, pattern
-			IF v_netscenario IS NOT NULL THEN
+			-- mapzone_pattern
+			IF v_netscenario IS NOT NULL AND v_class = 'DMA' THEN
 				EXECUTE format($sql$
 					UPDATE temp_pgr_mapzone t
-					SET name = COALESCE(m.%I, ''),
-						graphconfig = m.graphconfig
-					FROM %I m
-					WHERE t.mapzone_id = m.%I
-					AND t.mapzone_id > 0
-					$sql$,
-					lower(v_class) || '_name',
-					v_mapzone_table,
-					v_mapzone_field
-					);
-				IF v_class = 'DMA' THEN
-					EXECUTE format($sql$
-						UPDATE temp_pgr_mapzone t
-						SET pattern_id = m.pattern_id
-						FROM %I m
-						WHERE t.mapzone_id = m.%I
-						AND t.mapzone_id > 0
-						$sql$,
-						v_mapzone_table,
-						v_mapzone_field
-					);				
-				END IF;
-			ELSE
-				EXECUTE format($sql$
-					UPDATE temp_pgr_mapzone t
-					SET name = COALESCE(m.name, ''),
-					graphconfig = m.graphconfig
+					SET pattern_id = m.pattern_id
 					FROM %I m
 					WHERE t.mapzone_id = m.%I
 					AND t.mapzone_id > 0
 					$sql$,
 					v_mapzone_table,
 					v_mapzone_field
-				);
+				);				
 			END IF;
+
+			EXECUTE format($sql$
+				UPDATE temp_pgr_mapzone t
+				SET name = COALESCE(m.name, ''),
+				graphconfig = m.graphconfig
+				FROM %I m
+				WHERE t.mapzone_id = m.%I
+				AND t.mapzone_id > 0
+				$sql$,
+				v_mapzone_table,
+				v_mapzone_field
+			);
 
 			UPDATE temp_pgr_mapzone t
 			SET name = 'Conflict'
@@ -2232,59 +2217,32 @@ BEGIN
 			-- mapzone
 			IF v_from_zero = TRUE THEN
 				-- insert the new mapzones
-				IF v_netscenario IS NOT NULL THEN
-					EXECUTE format($sql$
-					INSERT INTO %I (%I, %I, expl_id, muni_id, the_geom, graphconfig)
-					SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.graphconfig
-					FROM temp_pgr_mapzone t
-					WHERE t.mapzone_id > 0
-					$sql$, v_mapzone_table, v_mapzone_field, CONCAT(LOWER(v_class), '_name'));
-				ELSE
-					EXECUTE format($sql$
-					INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
-					SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
-					FROM temp_pgr_mapzone t
-					WHERE t.mapzone_id > 0
-					$sql$, v_mapzone_table, v_mapzone_field);
-				END IF;
+				EXECUTE format($sql$
+				INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
+				SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
+				FROM temp_pgr_mapzone t
+				WHERE t.mapzone_id > 0
+				$sql$, v_mapzone_table, v_mapzone_field);
 
 			ELSE
-				IF v_netscenario IS NOT NULL THEN
-					EXECUTE format($sql$
-						UPDATE %I m
-						SET
-							%I = t.name,
-							expl_id = t.expl_id,
-							muni_id = t.muni_id,
-							the_geom = t.the_geom,
-							graphconfig = t.graphconfig,
-							updated_at = t.created_at,
-							updated_by = t.created_by
-						FROM temp_pgr_mapzone t
-						WHERE m.%I = t.mapzone_id
-							AND t.mapzone_id > 0
-						$sql$
-					, v_mapzone_table, CONCAT(LOWER(v_class), '_name'), v_mapzone_field);
-				ELSE
-					EXECUTE format($sql$
-						UPDATE %I m
-						SET
-							name = t.name,
-							expl_id = t.expl_id,
-							muni_id = t.muni_id,
-							the_geom = t.the_geom,
-							addparam = t.addparam,
-							graphconfig = t.graphconfig,
-							created_at = t.created_at,
-							created_by = t.created_by,
-							updated_at = t.created_at,
-							updated_by = t.created_by
-						FROM temp_pgr_mapzone t
-						WHERE m.%I = t.mapzone_id
-							AND t.mapzone_id > 0
-						$sql$
-					, v_mapzone_table, v_mapzone_field);
-				END IF;
+				EXECUTE format($sql$
+					UPDATE %I m
+					SET
+						name = t.name,
+						expl_id = t.expl_id,
+						muni_id = t.muni_id,
+						the_geom = t.the_geom,
+						addparam = t.addparam,
+						graphconfig = t.graphconfig,
+						created_at = t.created_at,
+						created_by = t.created_by,
+						updated_at = t.created_at,
+						updated_by = t.created_by
+					FROM temp_pgr_mapzone t
+					WHERE m.%I = t.mapzone_id
+						AND t.mapzone_id > 0
+					$sql$
+				, v_mapzone_table, v_mapzone_field);
 			END IF;
 
 			IF v_class <> 'SECTOR' THEN
@@ -2355,14 +2313,6 @@ BEGIN
 			-- ==============
 
 			IF v_netscenario IS NOT NULL THEN
-				EXECUTE format($sql$
-					UPDATE %I m
-					SET the_geom = tm.the_geom
-					FROM temp_pgr_mapzone tm
-					WHERE m.%I = tm.mapzone_id
-						AND tm.mapzone_id <> -1
-					$sql$
-				, v_mapzone_table, v_mapzone_field);
 
 				DELETE FROM plan_netscenario_arc WHERE netscenario_id = v_netscenario::integer;
 				DELETE FROM plan_netscenario_node WHERE netscenario_id = v_netscenario::integer;
