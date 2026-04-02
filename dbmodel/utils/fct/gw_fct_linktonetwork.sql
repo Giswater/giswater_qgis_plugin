@@ -330,23 +330,29 @@ BEGIN
 				END IF;
 
 				IF v_link.the_geom IS NULL THEN -- looking for closest arc from connect
-					EXECUTE 'WITH index_query AS(
-					SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id 
-					FROM ve_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
-					SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
+					EXECUTE format(
+					'WITH index_query AS(
+					SELECT ST_Distance(the_geom, %L) as distance, arc_id
+					FROM ve_arc WHERE state > 0 %s%s)
+					SELECT arc_id FROM index_query WHERE distance < %s ORDER BY distance limit 1',
+					v_connect.the_geom::text, v_checkeddiam, v_forcedarcs, v_check_maxdistance)
 					INTO v_connect.arc_id;
 
 				ELSIF v_link.the_geom IS NOT NULL THEN -- looking for closest arc from link's endpoint
-					EXECUTE 'WITH index_query AS(
-					SELECT ST_Distance(the_geom, st_endpoint('||quote_literal(v_link.the_geom::text)||')) as distance, arc_id 
-					FROM ve_arc WHERE state > 0 '||v_checkeddiam||''||v_forcedarcs||')
-					SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
+					EXECUTE format(
+					'WITH index_query AS(
+					SELECT ST_Distance(the_geom, st_endpoint(%L)) as distance, arc_id
+					FROM ve_arc WHERE state > 0 %s%s)
+					SELECT arc_id FROM index_query WHERE distance < %s ORDER BY distance limit 1',
+					v_link.the_geom::text, v_checkeddiam, v_forcedarcs, v_check_maxdistance)
 					INTO v_connect.arc_id;
 
 					IF v_connect.arc_id IS NULL and v_forcedarcs is not null THEN -- looking for closest arc from connect
-						EXECUTE 'WITH index_query AS(
-						SELECT ST_Distance(the_geom, '||quote_literal(v_connect.the_geom::text)||') as distance, arc_id FROM arc WHERE state > 0 '||v_forcedarcs||')
-						SELECT arc_id FROM index_query WHERE distance < '||v_check_maxdistance||'  ORDER BY distance limit 1'
+						EXECUTE format(
+						'WITH index_query AS(
+						SELECT ST_Distance(the_geom, %L) as distance, arc_id FROM arc WHERE state > 0 %s)
+						SELECT arc_id FROM index_query WHERE distance < %s ORDER BY distance limit 1',
+						v_connect.the_geom::text, v_forcedarcs, v_check_maxdistance)
 						INTO v_connect.arc_id;
 					END IF;
 
