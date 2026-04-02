@@ -607,8 +607,9 @@ BEGIN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code, automated, closed, to_arc, nominal_flowrate)
-			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code, NEW.automated, NEW.closed, NEW.to_arc, NEW.nominal_flowrate);
+			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code, automated, closed, to_arc, meter_type, name, nominal_flowrate)
+			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code, NEW.automated, NEW.closed, NEW.to_arc, NEW.meter_type, NEW.name, NEW.nominal_flowrate);
+
 
 		ELSIF v_man_table='man_source' THEN
 				INSERT INTO man_source (node_id, name, source_type, source_code, aquifer_type, aquifer_name, wtp_id, registered_flow, auth_code, basin_id, subbasin_id, inlet_arc)
@@ -999,8 +1000,9 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_meter' THEN
-			UPDATE man_meter SET
-			real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code, automated=NEW.automated, to_arc=NEW.to_arc
+			UPDATE man_meter
+			SET real_press_max=NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code, 
+			automated=NEW.automated, closed=NEW.closed, to_arc=NEW.to_arc, meter_type=NEW.meter_type, name=NEW.name, nominal_flowrate=NEW.nominal_flowrate
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_waterwell' THEN
