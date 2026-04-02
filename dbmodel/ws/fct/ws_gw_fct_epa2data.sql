@@ -36,6 +36,7 @@ v_affected_result text;
 v_mapzone text;
 v_addparam jsonb;
 v_sectors text;
+v_network_type text;
 v_sql text;
 v_results record;
 v_message_text text;
@@ -64,8 +65,10 @@ BEGIN
 	);
 
 	-- Get sector_id
-	SELECT sector_id INTO v_sectors FROM rpt_cat_result WHERE result_id = v_result_id;
-
+	SELECT sector_id, network_type INTO v_sectors, v_network_type FROM rpt_cat_result WHERE result_id = v_result_id;
+	-- Get network type
+	SELECT idval INTO v_network_type FROM inp_typevalue WHERE typevalue = 'inp_options_networkmode' AND id = v_network_type;
+	
 	IF v_iscorporate then
 
 		if (SELECT count(*)  FROM rpt_cat_result r WHERE v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE) > 0 then
@@ -78,7 +81,7 @@ BEGIN
 				        'To set this result as corporate, the following results will no longer be marked as corporate:\n\n',
 				        STRING_AGG(
 				            CONCAT(
-			                '- ', result_id, ' with sectors: ''', sector_id, ''''
+			                '- ', result_id, ' with sectors: ''', sector_id, ''' (', v_network_type, ')'
 			            	), '\n'
 				        )
 				    )
