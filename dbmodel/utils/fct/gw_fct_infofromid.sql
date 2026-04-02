@@ -767,6 +767,7 @@ BEGIN
 		ELSIF v_editable THEN
 
 			-- getting id from URN
+			-- TODO: revise this code
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
 			ELSIF v_id IS NULL AND v_tablename in  ('ve_dma', 've_dqa', 've_sector', 've_drainzone', 've_supplyzone', 've_macrodma', 've_macrodqa', 've_macrosector', 've_dwfzone', 've_omzone', 've_macroomzone', 've_presszone') THEN
@@ -775,7 +776,7 @@ BEGIN
 				EXECUTE v_querystring INTO v_id;
 			ELSIF v_id IS NULL AND v_tablename IN ('plan_netscenario_dma', 'plan_netscenario_presszone') THEN
 				v_zone = replace(v_tablename, 'plan_netscenario_', '');
-				v_querystring = format('SELECT coalesce(max(%I_id::integer)+1, 1) FROM %I WHERE %I_id::text ~ ''^[0-9]+$''', v_zone, v_zone, v_zone);
+				v_querystring = format('SELECT coalesce(max(%I_id::integer)+1, 1) FROM %I WHERE %I_id::text ~ ''^[0-9]+$''', v_zone, v_tablename, v_zone);
 				EXECUTE v_querystring INTO v_id;
             ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
                 -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.
