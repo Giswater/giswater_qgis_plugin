@@ -673,9 +673,9 @@ BEGIN
 		END IF;
 
 		IF v_project_type = 'UD' AND v_omunit_id IS NULL THEN
-			SELECT count(*) into count_aux FROM omunit WHERE ST_DWithin(v_reduced_geometry, omunit.the_geom, 0.001) AND active IS TRUE ;
+			SELECT count(*) into count_aux FROM omunit WHERE ST_DWithin(v_reduced_geometry, omunit.the_geom, 0.001);
 			IF count_aux = 1 THEN
-				v_omunit_id = (SELECT omunit_id FROM omunit WHERE ST_DWithin(v_reduced_geometry, omunit.the_geom, 0.001) AND active IS TRUE LIMIT 1);
+				v_omunit_id = (SELECT omunit_id FROM omunit WHERE ST_DWithin(v_reduced_geometry, omunit.the_geom, 0.001) LIMIT 1);
 			ELSE
 				v_omunit_id =(SELECT omunit_id FROM ve_arc WHERE ST_DWithin(v_reduced_geometry, ve_arc.the_geom, v_proximity_buffer)
 				order by ST_Distance (v_reduced_geometry, ve_arc.the_geom) LIMIT 1);
