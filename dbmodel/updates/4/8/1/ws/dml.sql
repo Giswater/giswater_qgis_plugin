@@ -16,8 +16,7 @@ INSERT INTO inp_family (family_id,descript,age) VALUES
 	 ('FCV','Flow Control Valve',10),
 	 ('TCV','Throttle Control Valve',10),
 	 ('PSV','Pressure Sustaining Valve',10),
-	 ('HEADPUMP','Head pump (buster)',10),
-	 ('POWERPUMP','Power pump (flow)',10),
+	 ('PUMP','Head pump (buster)',10),
 	 ('RESERVOIR','Reservoir',10),
 	 ('TANK','Tank',10),
 	 ('JUNCTION','Junction',10);
