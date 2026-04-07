@@ -52,9 +52,9 @@ BEGIN
     USING TG_TABLE_SCHEMA, TG_TABLE_NAME, name_array_column
     INTO v_data_type;
     
-    -- Check for null values
+    -- Check for null values based on data type
     IF v_data_type = 'ARRAY' THEN
-        EXECUTE format('SELECT array_length(($1).%I, 1) IS NULL', 
+        EXECUTE format('SELECT ($1).%I IS NULL OR ($1).%I = ARRAY[NULL]::integer[] OR array_length(($1).%I, 1) IS NULL', 
                       name_array_column, name_array_column, name_array_column) 
         USING NEW INTO v_check_null_value;
     ELSE
