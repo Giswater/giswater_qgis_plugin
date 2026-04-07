@@ -30,6 +30,7 @@ DECLARE
     v_target_srid integer;
     v_sql text;
     v_prev_search_path text;
+	v_buffer numeric;
 
 BEGIN 
     -- Get params
@@ -48,7 +49,10 @@ BEGIN
         -- Dynamically get the SRID of the target geometry column
         SELECT Find_SRID('cm', 'om_campaign_lot', 'the_geom') INTO v_target_srid;
 
-		v_sql := 'WITH polygon AS (SELECT st_collect(f.the_geom) g FROM (' ||
+		-- Get sys param
+		SELECT (value::json ->> concat('buffer_', lower(p_type)))::numeric INTO v_buffer FROM config_param_system WHERE "parameter" = 'edit_campaign_lot_geom';
+
+		v_sql := 
             'SELECT c.the_geom FROM cm.om_campaign_x_arc c JOIN cm.om_campaign_lot_x_arc l ON c.arc_id = l.arc_id 
 			WHERE l.lot_id=' ||p_campaign_lot_id||
             ' UNION ' ||
@@ -66,7 +70,16 @@ BEGIN
                 'SELECT c.the_geom FROM cm.om_campaign_x_gully c JOIN cm.om_campaign_lot_x_gully l ON c.gully_id = l.gully_id
 				WHERE l.lot_id=' ||p_campaign_lot_id||'';
         END IF;
+	
+		EXECUTE format(
+		'SELECT ST_SetSRID(ST_Union(ST_Buffer(the_geom, %s)), %s) from (%s)',
+		v_buffer,
+		v_target_srid,
+		v_sql
+		) into collect_aux;
+		
 
+	/*
         v_sql := v_sql || ') f) ' ||
             'SELECT CASE ' ||
             'WHEN st_geometrytype(st_concavehull(g, 0.85)) = ''ST_Polygon''::text ' ||
@@ -76,6 +89,7 @@ BEGIN
 
         EXECUTE 'SELECT st_multi(the_geom) FROM (' || v_sql || ') a' INTO collect_aux;
 	
+	*/
 			-- Update geometry field
 			UPDATE cm.om_campaign_lot SET the_geom=collect_aux WHERE lot_id=p_campaign_lot_id;
 
@@ -84,7 +98,10 @@ BEGIN
         -- Dynamically get the SRID of the target geometry column
         SELECT Find_SRID('cm', 'om_campaign', 'the_geom') INTO v_target_srid;
 
-		v_sql := 'WITH polygon AS (SELECT st_collect(f.the_geom) g FROM (' ||
+		-- Get sys param
+		SELECT (value::json ->> concat('buffer_', lower(p_type)))::numeric INTO v_buffer FROM config_param_system WHERE "parameter" = 'edit_campaign_lot_geom';
+
+		v_sql := 
             'select the_geom from om_campaign_x_arc where campaign_id = ' || p_campaign_lot_id ||
             ' UNION ' ||
             'select the_geom from om_campaign_x_node where campaign_id = ' || p_campaign_lot_id ||
@@ -98,6 +115,14 @@ BEGIN
                 'select the_geom from om_campaign_x_gully where campaign_id = ' || p_campaign_lot_id;
         END IF;
 
+		EXECUTE format(
+		'SELECT ST_SetSRID(ST_Union(ST_Buffer(the_geom, %s)), %s) from (%s)',
+		v_buffer,
+		v_target_srid,
+		v_sql
+		) into collect_aux;
+
+	/*
         v_sql := v_sql || ') f) ' ||
             'SELECT CASE ' ||
             'WHEN st_geometrytype(st_concavehull(g, 0.85)) = ''ST_Polygon''::text ' ||
@@ -107,6 +132,7 @@ BEGIN
         
         EXECUTE 'SELECT st_multi(the_geom) FROM (' || v_sql || ') a' INTO collect_aux;
 	
+	*/
 			-- Update geometry field
 			UPDATE om_campaign SET the_geom=collect_aux WHERE campaign_id=p_campaign_lot_id;
 

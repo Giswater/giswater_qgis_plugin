@@ -809,3 +809,12 @@ CREATE TABLE cm.doc_x_link (
 
 ALTER TABLE cm.doc_x_link ADD CONSTRAINT doc_x_link_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES cm.doc(id) ON DELETE CASCADE ON UPDATE CASCADE;
 
+CREATE TABLE cm.config_qindex_suspicious (
+	param_name text NOT NULL,
+	threshold numeric NULL,
+	weight numeric NULL,
+	tooltip text NULL,
+	addparam json NULL,
+	cur_user text DEFAULT CURRENT_USER NOT NULL,
+	CONSTRAINT config_qindex_suspicious_pkey PRIMARY KEY (param_name, cur_user)
+);

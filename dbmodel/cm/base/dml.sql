@@ -371,3 +371,27 @@ UPDATE config_form_tableview
 UPDATE config_form_tableview
 	SET objectname='v_ui_lot'
 	WHERE objectname='v_ui_campaign_lot';
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+VALUES('edit_campaign_lot_geom', '{"buffer_campaign":40, "buffer_lot":10}', 'Variable para configurar el buffer de campañas y lotes', 'Buffer de lotes y campañas', NULL, NULL, true, NULL, 'utils', NULL, NULL, 'json', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
+INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('om_state_mpicture', 0, 0.2, NULL, CURRENT_USER, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('node_proximity', 0.1, 0.2, NULL, CURRENT_USER, 'Sus unidades son metros y expresa el valor máximo que consideramemos nodos cercanos. El valor mínimo es de sistema (0.1). Por debajo de esta medida se considera nodos duplicados. A más distancia menos qindex.') ON CONFLICT DO NOTHING;
+INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('arc_diam_jump', 50, 0.2, NULL, CURRENT_USER, 'Sus unidades son milimetros y expresa la diferencia los diametres de las dos tuberías que le llegan al nodo. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('valve_dn_wrong', 30, 0.2, NULL, CURRENT_USER, 'Sus unidades son milimetros y expresa la diferencia de los diametros de las tuberias que le llegan en comparación de la propia de la valvula. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('elev_inconsistency', 50, 0.2, NULL, CURRENT_USER, 'Se expresa en metros y el umbral expresa la diferencia entre la cota gps y la cota dem a partir de la cual es sospechoso. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active) 
+VALUES(104, 'Comprobar topología de nodarcos', 'cm', '{"replaceParams": {"table_name": "om_campaign_lot_x_node"}}'::json, 'core', false, 'Check project', NULL, 2, 'nodarcos con más de 2 tramos conectados', 'cm_{geom_type}', NULL, 
+'WITH opts AS (
+SELECT arc_id, node_1 AS node_id FROM cm.om_campaign_x_arc UNION
+SELECT arc_id, node_2 AS node_id FROM cm.om_campaign_x_arc
+)
+SELECT a.node_id, b.campaign_id, c.lot_id, b.the_geom FROM opts a
+LEFT JOIN cm.om_campaign_x_node b USING (node_id)
+LEFT JOIN cm.om_campaign_lot_x_node c USING (node_id)
+WHERE b.node_type IN (SELECT id FROM ap.cat_feature WHERE feature_class IN (''PUMP'', ''VALVE''))
+GROUP BY a.node_id,  b.campaign_id, c.lot_id, b.the_geom, b.node_type HAVING count(*)>2', 
+'No hay nodarcos con inconsistencia topológica', '[gw_fct_cm_check_project]', true)
+ON CONFLICT DO NOTHING;

@@ -81,3 +81,17 @@ CREATE OR REPLACE VIEW v_filter_campaign AS
 -- Permissions for v_selector_lot
 GRANT SELECT ON TABLE cm.v_selector_lot TO role_cm_field;
 GRANT SELECT ON TABLE cm.v_filter_lot TO role_cm_field;
+
+
+CREATE OR REPLACE VIEW cm.ve_config_qindex_suspicious
+AS SELECT param_name,
+    threshold,
+    weight,
+    tooltip,
+    addparam
+   FROM cm.config_qindex_suspicious
+  WHERE cur_user = CURRENT_USER;
+
+-- View Triggers
+CREATE TRIGGER gw_trg_cm_edit_qindex INSTEAD OF INSERT OR DELETE OR UPDATE ON cm.ve_config_qindex_suspicious 
+FOR EACH ROW EXECUTE FUNCTION cm.gw_trg_cm_edit_qindex();

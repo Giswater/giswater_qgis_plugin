@@ -456,3 +456,65 @@ VALUES(3562, 'Check catalogs values', '{"featureType":[]}'::json, '[
     "filterquery": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6) and a.campaign_id = ''{parent_value}''"
   }
 ]'::json, NULL, true, '{4}') ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3556, 'gw_fct_cm_check_data_context', 'ws', 'function', 'json', 'json', 'Función para verificar el contexto del dato
+Se analizan los siguientes parámetros:
+- Comparación entre la cota del objeto y el valor en el MDE
+- Objetos con estado operacional o de conservación pero sin foto
+- Nodos muy próximos
+- Cambios de diámetro sin razón aparente
+- Diámetros en válvulas sin relación con sus tramos
+
+En caso de no marcar ''Rellenar tablas de revisión'', solamente devolverá un Log y tablas temporales para ver los resultados.
+En caso de marcar ''Rellenar tablas de revisión'', se llenan las tablas de control de calidad, dónde se establece un índice según los problemas de cada objeto.
+Sobre todos los objetos de la campaña, se marcan como candidatos a sospechoso un % variable a escojer, siempre ordenando de peor a mejor índice.', 'role_admin', NULL, 'cm', 'REPORTE DE CALIDAD DEL DATO')
+ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3558, 'gw_fct_cm_update_geom', 'ws', 'function', 'json', 'json', 'Función para actualizar la geometría de lotes y campañas', 'role_cm', NULL, 'cm', NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
+VALUES(3560, 'gw_fct_create_dscenario_losses', 'ws', 'function', 'json', 'json', 'Function to create losses dscenario', 'role_epa', NULL, 'core', NULL)
+ON CONFLICT DO NOTHING;
+
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) 
+VALUES(3558, '0- [CM] Actualizar geometría de lotes y campañas', '{"featureType":[]}'::json, '[
+  {
+    "widgetname": "campaignId",
+    "label": "Id Campaña:",
+    "widgettype": "combo",
+    "isparent": "true",
+    "datatype": "text",
+    "tooltip": "Escoja la campaña",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "dvQueryText": "SELECT c.campaign_id as id, name as idval FROM cm.om_campaign c JOIN (SELECT t.organization_id, bool_or(o.orgname = ''Org AyA'') AS is_aya FROM cm.cat_user u JOIN cm.cat_team t ON t.team_id = u.team_id JOIN cm.cat_organization o ON o.organization_id = t.organization_id WHERE u.username = current_user GROUP BY t.organization_id) ctx ON (c.organization_id = ctx.organization_id OR ctx.is_aya) where exists (select 1 from cm.om_campaign_lot l where status in (3,4,6) and l.campaign_id = c.campaign_id)"
+  },
+  {
+    "widgetname": "lotId",
+    "label": "Id Lote:",
+    "widgettype": "combo",
+    "parentname": "campaignId",
+    "datatype": "text",
+    "tooltip": "Escoja el lote",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "isNullValue": true,
+    "dvQueryText": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6)",
+    "filterquery": "select null as id, '''' as idval union all select lot_id as id, concat(a.name, '' - '', b.idval, '''') AS idval FROM cm.om_campaign_lot a JOIN cm.sys_typevalue b ON a.status = b.id::int WHERE b.typevalue = ''lot_status'' and status in (3,4,6) and a.campaign_id = {parent_value}"
+  },
+  {
+    "label": "Búfer [m]:",
+    "value": null,
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "buffer",
+    "widgettype": "text",
+    "isMandatory": true,
+    "layoutorder": 3
+  }
+]'::json, NULL, true, '{4}')
+ON CONFLICT DO NOTHING;
