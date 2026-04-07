@@ -53,6 +53,7 @@ BEGIN
 		END AS cal_age,
 		dma_id,
 		presszone_id,
+		sector_id,
 		node_1,
 		node_2
 		FROM rpt_inp_arc
@@ -73,6 +74,7 @@ BEGIN
 		END AS "family",
 		n.dma_id,
 		n.presszone_id,
+		n.sector_id,
 		lw.losses_weight
 		FROM rpt_inp_node n
 		LEFT JOIN (
@@ -98,6 +100,7 @@ BEGIN
 		END AS cal_family,
 		dma_id,
 		presszone_id,
+		sector_id,
 		NULL::numeric AS losses_weight,
 		node_1,
 		node_2
@@ -111,6 +114,7 @@ BEGIN
 		epa_type AS cal_family,
 		dma_id,
 		presszone_id,
+		sector_id,
 		losses_weight,
 		NULL::text AS node_1,
 		NULL::text AS node_2
@@ -129,7 +133,8 @@ BEGIN
 					'family', cal_family,
 					'zones', json_build_object(
 						'dma', dma_id,
-						'presszone', presszone_id
+						'presszone', presszone_id,
+						'sector', sector_id
 					),
 					'lossesWeight', losses_weight
 				)
@@ -143,7 +148,8 @@ BEGIN
 					'family', cal_family,
 					'zones', json_build_object(
 						'dma', dma_id,
-						'presszone', presszone_id
+						'presszone', presszone_id,
+						'sector', sector_id
 					),
 					'node1', node_1,
 					'node2', node_2
@@ -158,7 +164,8 @@ BEGIN
 					'family', cal_family,
 					'zones', json_build_object(
 						'dma', dma_id,
-						'presszone', presszone_id
+						'presszone', presszone_id,
+						'sector', sector_id
 					)
 				)
 		END
@@ -195,7 +202,7 @@ BEGIN
 	FROM families;
 
 	-- JSON with all mapzones that are in features
-	FOR rec IN SELECT unnest(ARRAY['dma', 'presszone'])
+	FOR rec IN SELECT unnest(ARRAY['dma', 'presszone', 'sector'])
     LOOP
         -- Build dynamic SQL to get JSON for this table (dma includes pattern_id)
         IF rec = 'dma' THEN
