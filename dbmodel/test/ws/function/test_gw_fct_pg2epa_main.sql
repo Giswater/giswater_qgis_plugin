@@ -254,7 +254,9 @@ SELECT is(
 -- NETWORK DMA
 
 UPDATE config_param_user SET value = '5' WHERE parameter = 'inp_options_networkmode' AND cur_user = current_user;
-UPDATE config_param_user SET value = '2' WHERE parameter = 'inp_options_selecteddma' AND cur_user = current_user;
+
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES ('inp_options_selecteddma', '2', current_user)
+ON CONFLICT ("parameter", cur_user) DO UPDATE SET value = EXCLUDED.value;
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
