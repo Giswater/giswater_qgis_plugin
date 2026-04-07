@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
-    <height>497</height>
+    <width>406</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -200,25 +200,6 @@
             <string>Feature parameters</string>
            </property>
            <layout class="QGridLayout" name="gridLayout_4">
-            <item row="3" column="1">
-             <widget class="QComboBox" name="new_featurecat_id">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="0">
              <widget class="QLabel" name="lbl_new_feature_type">
               <property name="font">
@@ -237,171 +218,6 @@
               </property>
               <property name="margin">
                <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="lbl_feature_type">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <property name="text">
-               <string>Current feature type:</string>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-              <property name="textInteractionFlags">
-               <set>Qt::LinksAccessibleByMouse</set>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QCheckBox" name="chk_keep_asset_id">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="lbl_new_catalog_id">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <property name="text">
-               <string>New catalog id:</string>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1" colspan="2">
-             <widget class="QLineEdit" name="current_featurecat_id">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1" colspan="2">
-             <widget class="QComboBox" name="feature_type_new">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="2">
-             <widget class="QPushButton" name="btn_catalog">
-              <property name="minimumSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>24</width>
-                <height>24</height>
-               </size>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../../../icons/dialogs/152.png</normaloff>../../../../icons/dialogs/152.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>22</width>
-                <height>22</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QCheckBox" name="keep_elements">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="lbl_current_catalog_id">
-              <property name="font">
-               <font>
-                <kerning>true</kerning>
-               </font>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <property name="text">
-               <string>Current catalog id:</string>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="lbl_keep_asset_id">
-              <property name="text">
-               <string>Keep asset id:</string>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="lbl_keep_epa_values">
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Keep EPA Values:</string>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1" colspan="2">
-             <widget class="QLineEdit" name="feature_type">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string/>
               </property>
              </widget>
             </item>
@@ -438,14 +254,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
-             <widget class="QCheckBox" name="keep_epa_values">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
+            <item row="9" column="0">
              <widget class="QLabel" name="lbl_description">
               <property name="text">
                <string>Description:</string>
@@ -455,8 +264,227 @@
               </property>
              </widget>
             </item>
-            <item row="7" column="1" colspan="2">
+            <item row="3" column="2">
+             <widget class="QPushButton" name="btn_catalog">
+              <property name="minimumSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>24</width>
+                <height>24</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../../../../icons/dialogs/152.png</normaloff>../../../../icons/dialogs/152.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>22</width>
+                <height>22</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1" colspan="2">
              <widget class="QLineEdit" name="description"/>
+            </item>
+            <item row="6" column="1">
+             <widget class="QCheckBox" name="chk_keep_asset_id">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1" colspan="2">
+             <widget class="QLineEdit" name="current_featurecat_id">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="lbl_feature_type">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <property name="text">
+               <string>Current feature type:</string>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::LinksAccessibleByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QCheckBox" name="keep_epa_values">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QCheckBox" name="chk_keep_customer_code">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="lbl_new_catalog_id">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <property name="text">
+               <string>New catalog id:</string>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QComboBox" name="new_featurecat_id">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="keep_elements">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QCheckBox" name="chk_keep_sys_code">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1" colspan="2">
+             <widget class="QComboBox" name="feature_type_new">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="lbl_current_catalog_id">
+              <property name="font">
+               <font>
+                <kerning>true</kerning>
+               </font>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <property name="text">
+               <string>Current catalog id:</string>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="QLineEdit" name="feature_type">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="lbl_keep_epa_values">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Keep EPA Values:</string>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0">
+             <widget class="QLabel" name="lbl_keep_asset_id">
+              <property name="text">
+               <string>Keep asset id:</string>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QLabel" name="lbl_keep_customer_code">
+              <property name="text">
+               <string>Keep customer code:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="lbl_keep_sys_code">
+              <property name="text">
+               <string>Keep sys code:</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>

@@ -147,6 +147,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.feature_type_cat = f'{self.feature_type}_type'
             self.feature_cat_id = f'{self.feature_type}cat_id'
             self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
+            self.feature_class = snapped_feat.attribute(f'sys_type')
             self._init_replace_feature_form(snapped_feat)
 
     # endregion
@@ -267,6 +268,15 @@ class GwFeatureReplaceButton(GwMaptool):
 
         keep_asset_id = tools_gw.get_config_parser('btn_feature_replace', 'chk_keep_asset_id', "user", "session")
         tools_qt.set_checked(self.dlg_replace, 'chk_keep_asset_id', tools_os.set_boolean(keep_asset_id))
+
+        # Keep customer code only for connec or node with feature class netwjoin and Set default value "True" for keep sys code and keep customer code
+        if self.feature_type == 'connec' or (self.feature_type == 'node' and self.feature_class.lower() == 'netwjoin'):
+            tools_qt.set_checked(self.dlg_replace, 'chk_keep_customer_code', True)
+        else:
+            self.dlg_replace.lbl_keep_customer_code.setVisible(False)
+            self.dlg_replace.chk_keep_customer_code.setVisible(False)
+        tools_qt.set_checked(self.dlg_replace, 'chk_keep_sys_code', True)
+
 
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
@@ -463,6 +473,9 @@ class GwFeatureReplaceButton(GwMaptool):
                 extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
                 extras += f', "keep_epa_values":"{tools_qt.is_checked(dialog, "keep_epa_values")}"'
                 extras += f', "keep_asset_id":"{tools_qt.is_checked(dialog, "chk_keep_asset_id")}"'
+                extras += f', "keep_sys_code":"{tools_qt.is_checked(dialog, "chk_keep_sys_code")}"'
+                if self.feature_type == 'connec':
+                    extras += f', "keep_customer_code":"{tools_qt.is_checked(dialog, "chk_keep_customer_code")}"'
                 body = tools_gw.create_body(feature=feature, extras=extras)
 
                 # Execute SQL function and show result to the user
@@ -546,6 +559,10 @@ class GwFeatureReplaceButton(GwMaptool):
             self.dlg_replace.keep_epa_values.setVisible(False)
             self.dlg_replace.lbl_keep_asset_id.setVisible(False)
             self.dlg_replace.chk_keep_asset_id.setVisible(False)
+            self.dlg_replace.lbl_keep_sys_code.setVisible(False)
+            self.dlg_replace.chk_keep_sys_code.setVisible(False)
+            self.dlg_replace.lbl_keep_customer_code.setVisible(False)
+            self.dlg_replace.chk_keep_customer_code.setVisible(False)
         else:
             self.dlg_replace.lbl_description.setVisible(False)
             self.dlg_replace.description.setVisible(False)
