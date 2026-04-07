@@ -20,7 +20,6 @@ VALUES('-901', 'Test psector for setfeaturereplaceplan', '2', NULL, NULL, 'Test 
 
 UPDATE config_param_user SET value = (SELECT psector_id::text FROM ve_plan_psector WHERE name = '-901')
 WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id FROM ve_plan_psector WHERE name = '-901'), current_user);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
