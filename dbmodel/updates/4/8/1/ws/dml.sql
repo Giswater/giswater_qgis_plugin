@@ -22,10 +22,6 @@ INSERT INTO inp_family (family_id,descript,age) VALUES
 	('JUNCTION','Junction',10);
 
 -- 07/04/2026
-UPDATE config_toolbox
-SET active = FALSE
-WHERE id = 3560;
-
-UPDATE inp_typevalue
-SET typevalue = '_inp_typevalue_dscenario'
-WHERE typevalue = 'inp_typevalue_dscenario' AND id = 'LOSSES';
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_typevalue_dscenario' AND id = 'LOSSES';
+DELETE FROM config_toolbox WHERE id = 3560;
+DELETE FROM sys_function WHERE id = 3560;
