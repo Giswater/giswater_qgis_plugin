@@ -200,7 +200,7 @@ BEGIN
 						SELECT feature_id, feature_type, v_arc, 'ARC', 2, expl_id, the_geom, 0, 0, linkcat_id, fluid_type, v_statetypeplan, link_type
 						FROM link WHERE link_id = v_link.link_id RETURNING link_id INTO v_link_id;
 					
-						INSERT INTO man_pipelink VALUES (v_link_id);
+						INSERT INTO man_conduitlink VALUES (v_link_id);
 
 					END IF;
 
