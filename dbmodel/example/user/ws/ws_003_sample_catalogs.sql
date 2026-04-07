@@ -7,14 +7,14 @@ or (at your option) any later version.
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 UPDATE config_param_system SET value = true WHERE parameter='admin_config_control_trigger';
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD', 'FD', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcrete', '{NODE,ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('CONCRETE', 'Concrete', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('BRICK+IRON', 'Brick and iron', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-LD', 'PE low density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, NULL, true, 'OTHER');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('FD', 'FD', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true, 'METAL');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true, 'PLASTIC');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('FC', 'Fiberconcrete', '{NODE,ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true, 'OTHER');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('CONCRETE', 'Concrete', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true, 'OTHER');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('BRICK+IRON', 'Brick and iron', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true, 'METAL');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true, 'PLASTIC');
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active, family) VALUES('PE-LD', 'PE low density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true, 'PLASTIC');
 UPDATE config_param_system SET value = false WHERE parameter='admin_config_control_trigger';
 
 INSERT INTO cat_arc VALUES ('PVC63-PN10', 'PIPE', 'PVC', '10', '63', 56.70000, 63.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_PVC63_PN10', 'S_REP', 'S_NULL', true, NULL, 'CIRCULAR', NULL, 'N_WATER-CONNECT');
