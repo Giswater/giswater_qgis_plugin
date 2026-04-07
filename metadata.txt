@@ -9,6 +9,7 @@ author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, J
 
 Changelog=Version 4.9.0
     - Search migrated to QGIS Locator (prefix gws), deprecated button search removed from basic toolbar, and gw_fct_getsearch/gw_fct_setsearch unified to v2 response logic for device 4 (QGIS).
+    - Feature replace updated to support keep_sys_code and keep_customer_code flags in gw_fct_setfeaturereplace, with UI visibility for customer code restricted to connec and node/netwjoin.
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
