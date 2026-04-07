@@ -43,7 +43,7 @@ VALUES('-901', 'Test psector for setfields', '2', NULL, NULL, 'Test psector for 
 DELETE FROM selector_psector WHERE cur_user = current_user;
 UPDATE config_param_user SET value = (SELECT psector_id::text FROM ve_plan_psector WHERE name = '-901')
 WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id::text FROM ve_plan_psector WHERE name = '-901'), current_user);
+INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id FROM ve_plan_psector WHERE name = '-901'), current_user);
 
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"en_US", "version":"4.8.1", "infoType":1, "epsg":25831}, "form":{}, 
@@ -64,7 +64,7 @@ UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_curr
 DELETE FROM selector_psector WHERE cur_user = current_user;
 UPDATE config_param_user SET value = (SELECT psector_id::text FROM ve_plan_psector WHERE name = '-902')
 WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id::text FROM ve_plan_psector WHERE name = '-902'), current_user);
+INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id FROM ve_plan_psector WHERE name = '-902'), current_user);
 
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"en_US", "version":"4.8.1", "infoType":1, "epsg":25831}, "form":{}, 
