@@ -177,7 +177,6 @@ BEGIN
 	v_querytext = v_querytext || ' WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 			||v_statetype||' AND ve_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-			AND ''ARC'' = ANY(cat_material.feature_type)
 			AND epa_type != ''UNDEFINED''
 			AND ve_arc.sector_id > 0 AND ve_arc.state > 0
 			AND st_length(ve_arc.the_geom) >= '||v_minlength;
