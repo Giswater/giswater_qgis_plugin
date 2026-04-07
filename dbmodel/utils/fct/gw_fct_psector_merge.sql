@@ -274,10 +274,7 @@ BEGIN
 
 				v_querytext = 'INSERT INTO ve_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
 				WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
-				EXECUTE 'INSERT INTO ve_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
-				WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
-
-
+				EXECUTE v_querytext;
 			END LOOP;
 
 			EXECUTE 'SELECT string_agg('||lower(rec_type.id)||'_id::text,'','') FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id=ANY($1) and state=1'
