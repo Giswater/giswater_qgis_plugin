@@ -496,7 +496,7 @@ BEGIN
 			-- getting value from geometry of mapzone
 			IF (NEW.crmzone_id IS NULL) THEN
 				SELECT count(*) INTO v_count FROM crmzone WHERE ST_DWithin(NEW.the_geom, crmzone.the_geom,0.001);
-				NEW.crmzone_id = (SELECT id FROM crmzone WHERE ST_DWithin(NEW.the_geom, crmzone.the_geom,0.001) LIMIT 1);
+				NEW.crmzone_id = (SELECT crmzone_id FROM crmzone WHERE ST_DWithin(NEW.the_geom, crmzone.the_geom,0.001) LIMIT 1);
 			END IF;
 		END IF;
 
