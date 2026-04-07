@@ -115,6 +115,9 @@ v_code_autofill_bool boolean;
 v_link text;
 v_nodetype text;
 v_check_featurecat_id boolean;
+v_keep_sys_code boolean;
+v_keep_customer_code boolean;
+v_excluded_columns text;
 
 BEGIN
 
@@ -142,6 +145,8 @@ BEGIN
 	v_keep_elements = ((p_data ->>'data')::json->>'keep_elements')::text;
 	v_feature_type_new = ((p_data ->>'data')::json->>'feature_type_new')::text;
 	v_featurecat_id_new = ((p_data ->>'data')::json->>'featurecat_id')::text;
+	v_keep_sys_code = COALESCE(((p_data ->>'data')::json->>'keep_sys_code')::boolean, false);
+	v_keep_customer_code = COALESCE(((p_data ->>'data')::json->>'keep_customer_code')::boolean, false);
 
 	EXECUTE format('SELECT 1 FROM cat_%I WHERE %I_type = %L AND id = %L', v_feature_type, v_feature_type, v_feature_type_new, v_featurecat_id_new) INTO v_check_featurecat_id;
 	IF v_check_featurecat_id IS NOT TRUE THEN
@@ -390,11 +395,18 @@ BEGIN
 		END IF;
 
 		-- updating values on feature parent table from values of old feature
+		v_excluded_columns := ''''||v_id_column||''',''the_geom'',''state'',''code'',''epa_type'',''state_type'','''||v_cat_column||''',
+			''sector_id'',''dma_id'',''expl_id'',''category_type'',''function_type'',''fluid_type'',''location_type'',''link''';
+		IF v_keep_sys_code IS NOT TRUE THEN
+			v_excluded_columns := v_excluded_columns || ',''sys_code''';
+		END IF;
+		IF v_feature_type = 'connec' AND v_keep_customer_code IS NOT TRUE THEN
+			v_excluded_columns := v_excluded_columns || ',''customer_code''';
+		END IF;
 		v_sql:='select column_name FROM information_schema.columns 
-				where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
+				where (table_schema=''schema_NAME'' and udt_name <> ''inet'' and 
 				table_name='''||v_feature_type||''') 
-				and column_name not in ('''||v_id_column||''',''the_geom'',''state'',''code'',''epa_type'',''state_type'','''||v_cat_column||''',
-					''sector_id'',''dma_id'',''expl_id'',''category_type'',''function_type'',''fluid_type'',''location_type'',''link'',''sys_code'');';
+				and column_name not in ('||v_excluded_columns||');';
 
 		FOR v_column IN EXECUTE v_sql
 		LOOP
