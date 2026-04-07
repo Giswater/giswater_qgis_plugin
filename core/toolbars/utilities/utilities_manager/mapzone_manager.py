@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, Q
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
 
-from qgis.gui import QgsMapToolEmitPoint, QgsMapToolPan
+from qgis.gui import QgsMapToolEmitPoint
 
 from ..toolbox_btn import GwToolBoxButton
 from ....ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
@@ -1267,10 +1267,6 @@ class GwMapzoneManager:
         if action:
             action.setChecked(False)
 
-        # Forcefully switch to Pan tool
-        pan_tool = QgsMapToolPan(self.canvas)
-        self.canvas.setMapTool(pan_tool)
-        self.iface.actionPan().trigger()
         # self.signal_activate.emit()
 
     def _select_with_expression_dialog(self, dialog, option):

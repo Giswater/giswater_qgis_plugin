@@ -36,6 +36,9 @@ class GwFileTransferButton(GwAction):
 
         self.menu = QMenu()
         self.menu.setObjectName("GW_import_export_menu")
+        self.menu.setProperty("last_selection", tools_gw.get_config_parser(
+            'btn_file_transfer', 'last_selection', 'user', 'session', prefix=False
+        ))
         self._fill_import_export_menu()
 
         self.menu.aboutToShow.connect(self._fill_import_export_menu)
@@ -98,8 +101,10 @@ class GwFileTransferButton(GwAction):
         """ Gets selected action """
 
         if name == tools_qt.tr('Import CSV'):
+            self._save_last_selection(self.menu, '_open_csv')
             self._open_csv()
         elif name == tools_qt.tr('Import INP file'):
+            self._save_last_selection(self.menu, '_open_import_inp')
             if global_vars.project_type == 'ws':
                 import_inp = GwImportEpanet()
                 import_inp.clicked_event()
@@ -109,10 +114,21 @@ class GwFileTransferButton(GwAction):
                 import_inp.clicked_event()
                 return
         elif name == tools_qt.tr('Export EPA result families'):
+            self._save_last_selection(self.menu, '_export_epa_result_families')
             self._export_epa_result_families()
 
     def _save_last_selection(self, menu, button_function):
         menu.setProperty("last_selection", button_function)
+        tools_gw.set_config_parser('btn_file_transfer', 'last_selection', button_function, prefix=False)
+
+    def _open_import_inp(self):
+        if global_vars.project_type == 'ws':
+            import_inp = GwImportEpanet()
+            import_inp.clicked_event()
+            return
+        if global_vars.project_type == 'ud':
+            import_inp = GwImportSwmm()
+            import_inp.clicked_event()
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
@@ -150,9 +166,7 @@ class GwFileTransferButton(GwAction):
             tools_gw.close_dialog(dlg_epa)
             return
 
-        json_format = tools_gw.get_config_parser('btn_export_epa_families', 'json_format', 'user', 'session', False)
-        if json_format:
-            dlg_epa.chk_format_json.setChecked(bool(json_format))
+        self._load_export_epa_settings(dlg_epa)
 
         # Connect browse signal
         dlg_epa.btn_browse.clicked.connect(
@@ -176,6 +190,7 @@ class GwFileTransferButton(GwAction):
             if not file_path.lower().endswith('.json'):
                 file_path += ".json"
             dlg.edit_path.setText(file_path)
+            self._save_export_epa_settings(dlg)
 
     def _do_export_epa_families(self, dlg):
         result_id = dlg.cmb_result_id.currentText()
@@ -216,10 +231,33 @@ class GwFileTransferButton(GwAction):
                 json.dump(data, f, ensure_ascii=False, indent=indent)
             msg = f"EPA Result Families exported successfully:\n{file_path}"
             tools_qgis.show_info(msg)
-            tools_gw.set_config_parser('btn_export_epa_families', 'json_format', f'{dlg.chk_format_json.isChecked()}', prefix=False)
+            self._save_export_epa_settings(dlg)
         except Exception as e:
             msg = f"Failed to write export file:\n{str(e)}"
             tools_qgis.show_warning(msg)
+
+    def _load_export_epa_settings(self, dlg):
+        result_id = tools_gw.get_config_parser('btn_export_epa_families', 'result_id', 'user', 'session', False)
+        export_path = tools_gw.get_config_parser('btn_export_epa_families', 'export_path', 'user', 'session', False)
+        json_format = tools_gw.get_config_parser('btn_export_epa_families', 'json_format', 'user', 'session', False)
+
+        if result_id:
+            tools_qt.set_combo_value(dlg.cmb_result_id, result_id, 0, add_new=False)
+        if export_path:
+            dlg.edit_path.setText(export_path)
+        if json_format is not None:
+            dlg.chk_format_json.setChecked(tools_os.set_boolean(json_format))
+
+    def _save_export_epa_settings(self, dlg):
+        tools_gw.set_config_parser(
+            'btn_export_epa_families', 'result_id', dlg.cmb_result_id.currentText(), prefix=False
+        )
+        tools_gw.set_config_parser(
+            'btn_export_epa_families', 'export_path', dlg.edit_path.text().strip(), prefix=False
+        )
+        tools_gw.set_config_parser(
+            'btn_export_epa_families', 'json_format', f'{dlg.chk_format_json.isChecked()}', prefix=False
+        )
 
     def _open_csv(self):
 
