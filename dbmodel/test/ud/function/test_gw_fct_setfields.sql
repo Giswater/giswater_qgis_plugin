@@ -41,9 +41,9 @@ INSERT INTO ve_plan_psector ( "name", descript, priority, text1, text2, observ, 
 VALUES('-901', 'Test psector for setfields', '2', NULL, NULL, 'Test psector for setfields', 0.0000, 750.00, '01', 19.00, 21.00, 0.00, 'SRID=25831;MULTIPOLYGON (((419209.60503196524 4576553.424854076, 419209.60503196524 4576503.357122214, 419089.7020131364 4576503.357122214, 419089.7020131364 4576553.424854076, 419209.60503196524 4576553.424854076)))'::public.geometry, 1, 1, true, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 DELETE FROM selector_psector WHERE cur_user = current_user;
-UPDATE config_param_user SET value = (SELECT id FROM ve_plan_psector WHERE name = '-901')
+UPDATE config_param_user SET value = (SELECT psector_id::text FROM ve_plan_psector WHERE name = '-901')
 WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT id FROM ve_plan_psector WHERE name = '-901'), current_user);
+INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id::text FROM ve_plan_psector WHERE name = '-901'), current_user);
 
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"en_US", "version":"4.8.1", "infoType":1, "epsg":25831}, "form":{}, 
@@ -62,9 +62,9 @@ VALUES('-902', 'Test psector for setfields with arcdivide', '2', NULL, NULL, 'Te
 
 UPDATE config_param_user SET value = NULL WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
 DELETE FROM selector_psector WHERE cur_user = current_user;
-UPDATE config_param_user SET value = (SELECT id FROM ve_plan_psector WHERE name = '-902')
+UPDATE config_param_user SET value = (SELECT psector_id::text FROM ve_plan_psector WHERE name = '-902')
 WHERE "parameter" = 'plan_psector_current' AND cur_user = current_user;
-INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT id FROM ve_plan_psector WHERE name = '-902'), current_user);
+INSERT INTO selector_psector (psector_id, cur_user) VALUES ((SELECT psector_id::text FROM ve_plan_psector WHERE name = '-902'), current_user);
 
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"en_US", "version":"4.8.1", "infoType":1, "epsg":25831}, "form":{}, 
