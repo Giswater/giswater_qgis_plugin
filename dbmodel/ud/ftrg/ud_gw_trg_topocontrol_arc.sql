@@ -209,11 +209,11 @@ BEGIN
             ELSE
 
                 -- node_1
-                SELECT * INTO nodeRecord1 FROM ve_node WHERE node_id = nodeRecord1.node_id;
+                --SELECT * INTO nodeRecord1 FROM ve_node WHERE node_id = nodeRecord1.node_id;
                 NEW.node_1 := nodeRecord1.node_id;
 
                 -- node_2
-                SELECT * INTO nodeRecord2 FROM ve_node WHERE node_id = nodeRecord2.node_id;
+                --SELECT * INTO nodeRecord2 FROM ve_node WHERE node_id = nodeRecord2.node_id;
                 NEW.node_2 := nodeRecord2.node_id;
 
                 -- the_geom
