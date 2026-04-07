@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, Q
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
 
-from qgis.gui import QgsMapToolEmitPoint, QgsMapToolPan
+from qgis.gui import QgsMapToolEmitPoint
 
 from ..toolbox_btn import GwToolBoxButton
 from ....ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
