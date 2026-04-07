@@ -5,3 +5,14 @@
 - Fix `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
 - Fix `gw_fct_graphanalytics_mapzones_v1` function.
 - Performance of dscenario views for ws and ud 
+- Fix `gw_trg_gully_proximity` , `gw_trg_connec_proximity` triggers to use `ve_gully` and `ve_connec` tables instead of `gully` and `connec` tables.
+- Fix `gw_fct_getfeatureupsert` function to use `ve_node` , `ve_connec` and `ve_gully` tables instead of `node` , `connec` and `gully` tables.
+- Recreate `ve_connec` and `ve_gully` views.
+- Add new indexes on `anl_*` tables.
+- Remove losses dscenario.
+- Improve `inp_family` table and result_families function.
+- Fix `gw_fct_setfeaturereplaceplan` function.
+- Fix `ud_gw_trg_topocontrol_node` trigger.
+- Fix `ud_gw_trg_topocontrol_arc` trigger.
+- Fix `gw_fct_psector_merge` function.
+- Fix `ud_pg2epa` noew export undefined nodes connected to not undefined arcs.
