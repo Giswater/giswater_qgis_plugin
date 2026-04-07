@@ -33,92 +33,103 @@ BEGIN
 
 	-- Create temp table with features
 	CREATE TEMP TABLE temp_features AS
-	WITH arcs AS (
-		SELECT arc_id,
-		CASE
-			WHEN epa_type = 'VALVE' OR epa_type = 'VIRTUALVALVE' THEN 'VALVE'
-			WHEN epa_type = 'PUMP' OR epa_type = 'VIRTUALPUMP' THEN 'PUMP'
-			ELSE 'PIPE'
-		END AS epa_type,
-		epa_type as giswater_epa_type,
-		arccat_id,
-		CASE
-			WHEN epa_type = 'VALVE' OR epa_type = 'VIRTUALVALVE' THEN addparam::json->>'valve_type'
-			WHEN epa_type = 'PUMP' OR epa_type = 'VIRTUALPUMP' THEN addparam::json->>'pump_type'
-			ELSE "family"
-		END AS "family",
-		CASE
-			WHEN builtdate > CURRENT_DATE - (f.age || ' years')::INTERVAL THEN 'NEW'
-			ELSE 'OLD'
-		END AS cal_age,
-		dma_id,
-		presszone_id,
-		sector_id,
-		node_1,
-		node_2
-		FROM rpt_inp_arc
-		LEFT JOIN inp_family f ON "family" = family_id AND f.age IS NOT NULL
-		WHERE result_id = v_result_id
-	),
-	nodes AS (
-		SELECT n.node_id,
-		CASE
-			WHEN n.epa_type = 'TANK' OR n.epa_type = 'RESERVOIR' THEN n.epa_type
-			ELSE 'JUNCTION'
-		END AS epa_type,
-		n.epa_type as giswater_epa_type,
-		n.nodecat_id,
-		CASE
-			WHEN n.epa_type = 'TANK' OR n.epa_type = 'RESERVOIR' THEN n.epa_type
-			ELSE 'JUNCTION'
-		END AS "family",
-		n.dma_id,
-		n.presszone_id,
-		n.sector_id,
-		lw.losses_weight
-		FROM rpt_inp_node n
+	WITH arc_link_weight AS (
+		SELECT
+		a.arc_id,
+		a.node_1,
+		a.node_2,
+		ST_Length(a.the_geom) + COALESCE(ls.link_len, 0) AS total_len
+		FROM arc a
 		LEFT JOIN (
-			SELECT node_id, SUM(arc_len) AS losses_weight
-			FROM (
-				SELECT node_1::text AS node_id, ST_Length(the_geom) AS arc_len FROM arc WHERE state = 1
-				UNION ALL
-				SELECT node_2::text AS node_id, ST_Length(the_geom) AS arc_len FROM arc WHERE state = 1
-			) s
-			GROUP BY node_id
-		) lw ON lw.node_id::text = n.node_id
-		WHERE n.result_id = v_result_id
-	)
-	SELECT
+			SELECT l.exit_id, SUM(ST_Length(l.the_geom)) AS link_len
+			FROM link l
+			WHERE l.state = 1
+			GROUP BY l.exit_id
+		) ls ON ls.exit_id = a.arc_id::text
+		WHERE a.state = 1
+	),
+	losses_weight AS (
+		SELECT node_id, SUM(arc_len) AS losses_weight
+		FROM (
+			SELECT node_1::text AS node_id, total_len AS arc_len FROM arc_link_weight
+			UNION ALL
+			SELECT node_2::text AS node_id, total_len AS arc_len FROM arc_link_weight
+		) s
+		GROUP BY node_id
+	),
+	arcs AS (
+		SELECT
 		arc_id AS feature_id,
-		epa_type AS feature_epa_type,
-		giswater_epa_type AS feature_giswater_epa_type,
+		CASE
+			WHEN epa_type IN ('VALVE', 'VIRTUALVALVE') THEN 'VALVE'
+			WHEN epa_type IN ('PUMP', 'VIRTUALPUMP') THEN 'PUMP'
+			ELSE 'PIPE'
+		END AS feature_epa_type,
+		epa_type AS feature_giswater_epa_type,
 		arccat_id AS feature_catalog,
 		CASE
-			WHEN "family" IS NULL THEN NULL
-			WHEN cal_age IS NULL THEN "family"
-			ELSE concat("family", '_', cal_age)
-		END AS cal_family,
+			WHEN epa_type IN ('VALVE', 'VIRTUALVALVE') THEN addparam::json->>'valve_type'
+			WHEN epa_type IN ('PUMP', 'VIRTUALPUMP') THEN addparam::json->>'pump_type'
+			ELSE family
+		END AS family,
+		builtdate,
 		dma_id,
 		presszone_id,
 		sector_id,
 		NULL::numeric AS losses_weight,
 		node_1,
 		node_2
-	FROM arcs
-	UNION ALL
-	SELECT
-		node_id AS feature_id,
-		epa_type AS feature_epa_type,
-		giswater_epa_type AS feature_giswater_epa_type,
-		nodecat_id AS feature_catalog,
-		epa_type AS cal_family,
-		dma_id,
-		presszone_id,
-		sector_id,
-		losses_weight,
+		FROM rpt_inp_arc
+		WHERE result_id = v_result_id
+	),
+	nodes AS (
+		SELECT
+		n.node_id AS feature_id,
+		CASE
+			WHEN n.epa_type IN ('TANK', 'RESERVOIR') THEN n.epa_type
+			ELSE 'JUNCTION'
+		END AS feature_epa_type,
+		n.epa_type AS feature_giswater_epa_type,
+		n.nodecat_id AS feature_catalog,
+		CASE
+			WHEN n.epa_type IN ('TANK', 'RESERVOIR') THEN n.epa_type
+			ELSE 'JUNCTION'
+		END AS family,
+		n.builtdate,
+		n.dma_id,
+		n.presszone_id,
+		n.sector_id,
+		lw.losses_weight,
 		NULL::text AS node_1,
 		NULL::text AS node_2
-	FROM nodes;
+		FROM rpt_inp_node n
+		LEFT JOIN losses_weight lw ON lw.node_id = n.node_id::text
+		WHERE n.result_id = v_result_id
+	),
+	features AS (
+		SELECT * FROM arcs
+		UNION ALL
+		SELECT * FROM nodes
+	)
+	SELECT
+	f.feature_id,
+	f.feature_epa_type,
+	f.feature_giswater_epa_type,
+	f.feature_catalog,
+	CASE
+		WHEN fam.family_id IS NULL THEN NULL
+		WHEN fam.age IS NULL THEN concat(f.family, '_OLD')
+		WHEN f.builtdate > CURRENT_DATE - make_interval(years => fam.age) THEN concat(f.family, '_NEW')
+		ELSE concat(f.family, '_OLD')
+	END AS cal_family,
+	f.dma_id,
+	f.presszone_id,
+	f.sector_id,
+	f.losses_weight,
+	f.node_1,
+	f.node_2
+	FROM features f
+	LEFT JOIN inp_family fam ON f.family = fam.family_id;
 
 	-- JSON with features: id = first digit run (e.g. 3924522P0 -> 3924522, VN3925355 -> 3925355)
 	SELECT COALESCE(json_agg(
