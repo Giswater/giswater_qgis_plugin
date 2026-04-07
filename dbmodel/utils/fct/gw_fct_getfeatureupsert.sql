@@ -358,7 +358,7 @@ BEGIN
 
 			IF upper(v_catfeature.feature_type) ='NODE' THEN
 
-				v_numnodes := (SELECT COUNT(*) FROM node WHERE ST_DWithin(v_reduced_geometry, node.the_geom, v_node_proximity) AND node.node_id != v_id::integer AND node.state!=0);
+				v_numnodes := (SELECT COUNT(*) FROM ve_node vn WHERE ST_DWithin(v_reduced_geometry, vn.the_geom, v_node_proximity) AND vn.node_id != v_id::integer AND vn.state!=0);
 				IF (v_numnodes >1) AND (v_node_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1096]:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1096);
 					v_status = false;
