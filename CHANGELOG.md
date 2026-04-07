@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - This changelog file
+- New indexes on `anl_*` tables.
 
 ### Fixed
 
@@ -18,6 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
 - `gw_fct_graphanalytics_mapzones_v1` function.
 - Performance of dscenario views for ws and ud 
+- `gw_trg_gully_proximity`, `gw_trg_connec_proximity` triggers to use `ve_gully` and `ve_connec` tables instead of `gully` and `connec` tables.
+- `gw_fct_getfeatureupsert` function to use `ve_node`, `ve_connec` and `ve_gully` tables instead of `node`, `connec` and `gully` tables.
+- Recreated `ve_connec` and `ve_gully` views.
+- Improved `inp_family` table and `result_families` function.
+- `gw_fct_setfeaturereplaceplan` function.
+- `ud_gw_trg_topocontrol_node` trigger.
+- `ud_gw_trg_topocontrol_arc` trigger.
+- `gw_fct_psector_merge` function.
+- `ud_pg2epa` now export undefined nodes connected to not undefined arcs.
+
+### Removed
+
+- Losses dscenario.
 
 ## [4.8.0] - 2026-03-17
 
