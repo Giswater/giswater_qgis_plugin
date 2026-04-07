@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_connec_proximity()
 RETURNS trigger AS 
 $BODY$
 DECLARE 
-v_numConnecs numeric;
+v_num_connecs numeric;
 v_arc_id integer;
 v_connec_proximity double precision;
 v_connec_proximity_control boolean;
@@ -40,7 +40,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing connecs  
-		v_numConnecs:= (SELECT COUNT(*) FROM connec c WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) 
+		v_num_connecs:= (SELECT COUNT(*) FROM ve_connec c WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) 
 			AND c.connec_id != NEW.connec_id AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
 		-- Existing arc
@@ -56,7 +56,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 	
 		-- Existing connecs  
-		v_numConnecs := (SELECT COUNT(*) FROM connec c 
+		v_num_connecs := (SELECT COUNT(*) FROM ve_connec c 
 		WHERE ST_DWithin(NEW.the_geom, c.the_geom, v_connec_proximity) AND c.connec_id != NEW.connec_id
 		AND ((c.state=1 AND NEW.state=1) OR (c.state=2 AND NEW.state=2)));
 
@@ -76,7 +76,7 @@ BEGIN
 	END IF;
 
 	-- If there is an existing connec closer than 'rec.connec_tolerance' meters --> error
-	IF (v_numConnecs > 0) AND (v_connec_proximity_control IS TRUE) THEN
+	IF (v_num_connecs > 0) AND (v_connec_proximity_control IS TRUE) THEN
 		IF v_dsbl_error IS NOT TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1044", "function":"1106","parameters":{"connec_id":"'||NEW.connec_id||'"}}}$$);';

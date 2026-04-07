@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_gully_proximity()
 RETURNS trigger AS 
 $BODY$
 DECLARE 
-v_numConnecs numeric;
+v_num_gullies numeric;
 v_arc text;
 v_gully_proximity double precision;
 v_gully_proximity_control boolean;
@@ -32,7 +32,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 		-- Existing gullys  
-		v_numConnecs:= (SELECT COUNT(*) FROM gully g WHERE ST_DWithin(NEW.the_geom, g.the_geom, v_gully_proximity) 
+		v_num_gullies:= (SELECT COUNT(*) FROM ve_gully g WHERE ST_DWithin(NEW.the_geom, g.the_geom, v_gully_proximity) 
 		AND g.gully_id != NEW.gully_id AND ((g.state=1 AND NEW.state=1) OR (g.state=2 AND NEW.state=2)));
 		
 		-- Existing arc
@@ -47,7 +47,7 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		-- Existing gullys  
-		v_numConnecs :=  (SELECT COUNT(*) FROM gully g WHERE ST_DWithin(NEW.the_geom, g.the_geom, v_gully_proximity) 
+		v_num_gullies :=  (SELECT COUNT(*) FROM ve_gully g WHERE ST_DWithin(NEW.the_geom, g.the_geom, v_gully_proximity) 
 		AND g.gully_id != NEW.gully_id AND ((g.state=1 AND NEW.state=1) OR (g.state=2 AND NEW.state=2)));
 
 		-- Existing arc
@@ -67,7 +67,7 @@ BEGIN
 	END IF;
 
 	-- If there is an existing gully closer than 'rec.gully_tolerance' meters --> error
-	IF (v_numConnecs > 0) AND (v_gully_proximity_control IS TRUE) THEN
+	IF (v_num_gullies > 0) AND (v_gully_proximity_control IS TRUE) THEN
 		IF v_dsbl_error IS NOT TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1044", "function":"2814","parameters":{"connec_id":"'||NEW.gully_id||'"}}}$$);';

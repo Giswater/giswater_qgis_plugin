@@ -358,7 +358,7 @@ BEGIN
 
 			IF upper(v_catfeature.feature_type) ='NODE' THEN
 
-				v_numnodes := (SELECT COUNT(*) FROM ve_node vn WHERE ST_DWithin(v_reduced_geometry, vn.the_geom, v_node_proximity) AND vn.node_id != v_id::integer AND vn.state!=0);
+				v_numnodes := (SELECT COUNT(*) FROM ve_node n WHERE ST_DWithin(v_reduced_geometry, n.the_geom, v_node_proximity) AND n.node_id != v_id::integer AND n.state!=0);
 				IF (v_numnodes >1) AND (v_node_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('Error[1096]:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1096);
 					v_status = false;
@@ -531,14 +531,14 @@ BEGIN
 				END IF;
 
 			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN
-				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(v_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != v_id::integer AND connec.state!=0);
+				v_numnodes := (SELECT COUNT(*) FROM ve_connec c WHERE ST_DWithin(v_reduced_geometry, c.the_geom, v_connec_proximity) AND c.connec_id != v_id::integer AND c.state!=0);
 				IF (v_numnodes >1) AND (v_connec_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('ERROR-1044:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1044);
 					v_status = false;
 				END IF;
 
 			ELSIF upper(v_catfeature.feature_type) ='GULLY' THEN
-				v_numnodes := (SELECT COUNT(*) FROM gully WHERE ST_DWithin(v_reduced_geometry, gully.the_geom, v_gully_proximity) AND gully.gully_id != v_id::integer AND gully.state!=0);
+				v_numnodes := (SELECT COUNT(*) FROM ve_gully g WHERE ST_DWithin(v_reduced_geometry, g.the_geom, v_gully_proximity) AND g.gully_id != v_id::integer AND g.state!=0);
 				IF (v_numnodes >1) AND (v_gully_proximity_control IS TRUE) THEN
 					v_message = (SELECT concat('ERROR-1045:',error_message, v_id,'. ',hint_message) FROM sys_message WHERE id=1045);
 					v_status = false;
