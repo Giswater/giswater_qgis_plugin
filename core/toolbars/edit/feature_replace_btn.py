@@ -277,7 +277,6 @@ class GwFeatureReplaceButton(GwMaptool):
             self.dlg_replace.chk_keep_customer_code.setVisible(False)
         tools_qt.set_checked(self.dlg_replace, 'chk_keep_sys_code', True)
 
-
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
