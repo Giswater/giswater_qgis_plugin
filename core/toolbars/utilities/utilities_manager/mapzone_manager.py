@@ -1301,10 +1301,6 @@ class GwMapzoneManager:
         if action:
             action.setChecked(False)
 
-        # Forcefully switch to Pan tool
-        pan_tool = QgsMapToolPan(self.canvas)
-        self.canvas.setMapTool(pan_tool)
-        self.iface.actionPan().trigger()
         # self.signal_activate.emit()
 
     def _select_with_expression_dialog(self, dialog, option):
