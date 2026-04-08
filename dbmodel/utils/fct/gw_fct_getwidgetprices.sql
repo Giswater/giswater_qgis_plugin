@@ -30,6 +30,7 @@ v_tablename text;
 v_psector_id text;
 v_currency text;
 v_error_context text;
+v_total_other text;
 
 BEGIN
 
@@ -61,6 +62,10 @@ BEGIN
 	)a '
 	INTO v_fields_array;
 
+	EXECUTE 'SELECT to_json(gw_fct_set_currency_config(SUM(total_budget))) as total_other
+		FROM '||v_tablename||' WHERE psector_id = '||v_psector_id
+	INTO v_total_other;
+
 	v_columns := array_to_json(v_columns_array);
 	v_fields := array_to_json(v_fields_array);
 
@@ -68,12 +73,14 @@ BEGIN
 	v_version := COALESCE(v_version, '');
 	v_columns := COALESCE(v_columns, '{}');
 	v_fields := COALESCE(v_fields, '{}');
+	v_total_other := COALESCE(v_total_other, concat('"0 ', v_currency, '"'));
 
 	-- Return
 	RETURN ('{"status":"Accepted"' ||', "version":"'|| v_version ||'"'||
 		/*', "columns":' || v_columns ||*/
 		/*', "layoutname":"price_layout"'||||*/
 		', "fields":' || v_fields ||
+		', "total_other":' || v_total_other ||
 		'}')::json;
 
 	-- Exception handling
