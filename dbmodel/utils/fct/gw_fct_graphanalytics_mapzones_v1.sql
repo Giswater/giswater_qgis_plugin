@@ -1437,6 +1437,20 @@ BEGIN
 				WHERE m.component = i.component
 			$sql$, v_query_text_aux, v_mapzone_table);
 
+			-- update mapzone_id for nodeParents
+			UPDATE temp_pgr_node t
+			SET mapzone_id = tn.mapzone_id
+			FROM (
+				SELECT 
+					a.node_parent,
+					MIN(a.mapzone_id) AS mapzone_id
+				FROM temp_pgr_arc a
+				WHERE a.node_parent IS NOT NULL
+				GROUP BY a.node_parent
+			) tn
+			WHERE t.pgr_node_id = tn.node_parent
+			AND t.graph_delimiter = 'nodeParent';
+
 		ELSE -- v_from_zero
 			-- mapzone_id
 			UPDATE temp_pgr_mapzone m
@@ -1528,6 +1542,22 @@ BEGIN
 		SET mapzone_id = m.mapzone_id
 		FROM temp_pgr_mapzone m 
 		WHERE m.component = t.component;
+
+		-- update mapzone_id for nodeParents if fromZero
+		IF v_from_zero THEN 
+			UPDATE temp_pgr_node t
+			SET mapzone_id = tn.mapzone_id
+			FROM (
+				SELECT 
+					a.node_parent,
+					MIN(a.mapzone_id) AS mapzone_id
+				FROM temp_pgr_arc a
+				WHERE a.node_parent IS NOT NULL
+				GROUP BY a.node_parent
+			) tn
+			WHERE t.pgr_node_id = tn.node_parent
+			AND t.graph_delimiter = 'nodeParent';
+		END IF;
 
 		-- EXCEPTION
 		-- NodeParent self-conflict: the arcs toArc and the ones that are not have the same mapzone_id
