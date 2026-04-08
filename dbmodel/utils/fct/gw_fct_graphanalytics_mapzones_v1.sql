@@ -1415,28 +1415,27 @@ BEGIN
 		-- update mapzone_ids, mapzone_id, name for temp_pgr_mapzone 
 		IF v_from_zero = TRUE THEN
 
-			WITH idx AS (
-				SELECT
-					component,
-					row_number() OVER () AS id
-				FROM temp_pgr_mapzone
-				WHERE component > 0
-			),
-			ids AS (
-				SELECT
-					i.component,
-					CASE 
-						WHEN v_commit_changes THEN nextval('urn_id_seq')
-						ELSE i.id
-					END AS new_id
+			IF v_commit_changes THEN
+				v_query_text_aux := 'nextval(''urn_id_seq'')';
+			ELSE
+				v_query_text_aux := 'row_number() OVER ()';
+			END IF;
+
+			EXECUTE format($sql$
+				WITH idx AS (
+					SELECT
+						t.component,
+						%s AS new_id
+					FROM temp_pgr_mapzone t
+					WHERE t.component > 0
+				)
+				UPDATE temp_pgr_mapzone m
+				SET mapzone_ids = ARRAY[i.new_id],
+					mapzone_id = i.new_id,
+					name = concat(%L, i.new_id)
 				FROM idx i
-			)
-			UPDATE temp_pgr_mapzone m
-			SET mapzone_ids = ARRAY[ids.new_id],
-				mapzone_id = ids.new_id,
-				name = concat(v_mapzone_table, ids.new_id)
-			FROM ids
-			WHERE m.component = ids.component;
+				WHERE m.component = i.component
+			$sql$, v_query_text_aux, v_mapzone_table);
 
 		ELSE -- v_from_zero
 			-- mapzone_id
