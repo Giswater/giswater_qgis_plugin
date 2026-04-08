@@ -558,31 +558,6 @@ class GwPsector:
         else:
             widget.setText("")
 
-    def update_total(self, dialog):
-        """ Show description of product plan/om _psector as label """
-
-        total_result = 0
-        widgets = dialog.tab_other_prices.findChildren(QLabel)
-
-        # Get currency config
-        currency_config = None
-        try:
-            row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
-            if row:
-                currency_config = json.loads(row[0])
-                symbol = currency_config.get('symbol', '$')
-        except Exception:
-            symbol = '$'
-
-        # Sum up all widget totals
-        for widget in widgets:
-            if 'widget_total' in widget.objectName():
-                total_result = float(total_result) + float(widget.text().replace(symbol, '').strip())
-
-        # Format using the currency formatter
-        formatted_total = tools_gw.format_currency(total_result, currency_config, with_symbol=False)
-        tools_qt.set_widget_text(dialog, 'lbl_total_count', formatted_total)
-
     def open_dlg_reports(self):
 
         default_file_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name")
@@ -1473,7 +1448,6 @@ class GwPsector:
                     widget.setObjectName(f"{widget.objectName().replace('widget_total', '_old')}")
                 widget.deleteLater()
         self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
-        self.update_total(dialog)
         self._manage_buttons_price(dialog)
 
     def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement', 'observ'],
@@ -1482,6 +1456,9 @@ class GwPsector:
         extras = (f'"tableName":"{tableright}", "psectorId":{psector_id}')
         body = tools_gw.create_body(extras=extras)
         complet_result = tools_gw.execute_procedure('gw_fct_getwidgetprices', body)
+
+        if complet_result['total_other'] is not None:
+            tools_qt.set_widget_text(dialog, 'lbl_total_count', complet_result['total_other'])
 
         if not complet_result or not complet_result.get('fields'):
             return
