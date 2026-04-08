@@ -318,35 +318,35 @@ BEGIN
 					--insert values into selectors with 1 field
 					ELSIF v_selector_name = 'selector_sector' THEN
 
-							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT sector_id FROM sector)'
+							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT sector_id FROM sector WHERE active is true)'
 							INTO v_deleted_sector;
 
 							EXECUTE 'INSERT INTO selector_sector
-							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT sector_id FROM sector);';
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT sector_id FROM sector WHERE active is true);';
 
 					ELSIF v_selector_name = 'selector_municipality' THEN
 
-							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT muni_id FROM ext_municipality)'
+							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT muni_id FROM v_municipality WHERE active is true)'
 							INTO v_deleted_muni;
 
 							EXECUTE 'INSERT INTO selector_municipality
-							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT muni_id FROM ext_municipality);';
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT muni_id FROM v_municipality WHERE active is true);';
 
 					ELSIF v_selector_name = 'selector_psector' THEN
 
-							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT psector_id FROM plan_psector)'
+							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT psector_id FROM plan_psector WHERE active is true)'
 							INTO v_deleted_psector;
 
 							EXECUTE 'INSERT INTO selector_psector
-							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT psector_id FROM plan_psector);';
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT psector_id FROM plan_psector WHERE active is true);';
 
 					ELSIF v_selector_name = 'selector_inp_dscenario' THEN
 
-							EXECUTE 'SELECT string_agg(value::text, '', '') FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT dscenario_id FROM cat_dscenario)'
+							EXECUTE 'SELECT string_agg(value::text, '', '') FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT dscenario_id FROM cat_dscenario WHERE active is true)'
 							INTO v_deleted_dscenario;
 
 							EXECUTE 'INSERT INTO selector_inp_dscenario
-							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT dscenario_id FROM cat_dscenario);';
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT dscenario_id FROM cat_dscenario WHERE active is true);';
 
 					ELSIF v_selector_name in ('selector_rpt_main', 'selector_rpt_compare') THEN
 
