@@ -177,9 +177,16 @@ VALUES ('inp_dscenario_pattern','Table to manage dscenario for pattern','role_ep
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('inp_dscenario_pattern_value','Table to manage dscenario for pattern value','role_epa','core');
 
-
+-- 08/04/2026
 UPDATE config_param_system SET isenabled = true WHERE "parameter" ILIKE 'basic_search_v2_tab_%';
 
--- 2026/04/08
+UPDATE config_form_fields
+SET dv_querytext='SELECT ''ALL'' as id, ''ALL'' as idval
+UNION
+SELECT id, id as idval
+FROM sys_feature_type
+WHERE classlevel = 1 OR classlevel = 2 OR classlevel = 4'
+WHERE formname='config_visit_parameter' AND formtype='form_feature' AND columnname='feature_type' AND tabname='tab_none';
+
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id_plan' AND tabname='tab_general';
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id' AND tabname='tab_general';
