@@ -1911,13 +1911,21 @@ BEGIN
 					'forceClosed', t.forceclosed_json
 					)
 					FROM (
-					SELECT
-						mapzone_id,
-						json_agg(pgr_node_id ORDER BY pgr_node_id) AS forceclosed_json
-					FROM temp_pgr_node
-					WHERE graph_delimiter = 'forceClosed'
-					AND mapzone_id > 0
-					GROUP BY mapzone_id
+						SELECT
+							tn.mapzone_id,
+							json_agg(tn.pgr_node_id ORDER BY tn.pgr_node_id) AS forceclosed_json
+						FROM (
+							SELECT
+								n.pgr_node_id,
+								MIN(a.mapzone_id) AS mapzone_id
+							FROM temp_pgr_node n
+							JOIN temp_pgr_arc_linegraph l ON l.pgr_node_id = n.pgr_node_id
+							JOIN temp_pgr_arc a ON a.pgr_arc_id IN (l.pgr_node_1, l.pgr_node_2)
+							WHERE n.graph_delimiter = 'forceClosed'
+								AND a.mapzone_id > 0
+							GROUP BY n.pgr_node_id
+						) tn
+						GROUP BY tn.mapzone_id
 					) t
 					WHERE mz.mapzone_id = t.mapzone_id;
 
