@@ -65,7 +65,7 @@ BEGIN
 		FOR v_parameter, v_tab_params, v_label IN
 			SELECT parameter, value, label
 			FROM config_param_system
-			WHERE parameter ILIKE concat('basic_search_v2_', lower(rec_tab.tabname), '%')
+			WHERE parameter ILIKE concat('basic_search_v2_', lower(rec_tab.tabname), '%') AND isenabled = TRUE
 		LOOP
 			IF v_parameter = 'basic_search_v2_tab_psector' AND v_tiled IS TRUE THEN
 				CONTINUE;
