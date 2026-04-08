@@ -660,6 +660,9 @@ BEGIN
         END LOOP;
     END IF;
 
+    -- Set ownsership for new tables according to inserted roles in sys_table
+    PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_edit"}}$$);
+   
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
