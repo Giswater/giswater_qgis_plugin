@@ -661,7 +661,7 @@ BEGIN
     END IF;
 
     -- Set ownsership for new tables according to inserted roles in sys_table
-    PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_edit"}}$$);
+    EXECUTE 'SELECT gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_edit"}}$$)';
    
 	-- get results
 	-- info
@@ -700,9 +700,9 @@ BEGIN
 	    '}')::json, 2690, null, null, null);
 
 
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, --'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
