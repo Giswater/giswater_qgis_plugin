@@ -45,60 +45,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,NULL,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,21),
 	 ('ve_element','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,22),
 	 ('ve_element','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''ECOVER''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-  "icon": "111"
-}','{
-  "saveValue": false
-}','{
-  "functionName": "insert_feature",
-  "parameters": {
-    "targetwidget": "tab_features_feature_id"
-  }
-}',NULL,false,NULL),
-	 ('ve_element','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-  "icon": "112"
-}','{
-  "saveValue": false
-}','{
-  "functionName": "delete_object",
-  "parameters": {
-    "columnfind": "element_id",
-    "targetwidget": "tab_features_tbl_element",
-    "sourceview": "element"
-  }
-}',NULL,false,NULL),
-	 ('ve_element','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-  "icon": "137"
-}','{
-  "saveValue": false
-}','{
-  "functionName": "selection_init"
-}',NULL,false,NULL),
-	 ('ve_element','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-  "icon": "178"
-}','{
-  "saveValue": false
-}',NULL,NULL,false,NULL),
-	 ('ve_element','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-  "saveValue": false,
-  "tableUpsert": "v_ui_element_x_arc",
-  "featureType": "arc"
-}',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-  "saveValue": false,
-  "tableUpsert": "v_ui_element_x_connec",
-  "featureType": "connec"
-}',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-  "saveValue": false,
-  "tableUpsert": "v_ui_element_x_link",
-  "featureType": "link"
-}',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-  "saveValue": false,
-  "tableUpsert": "v_ui_element_x_node",
-  "featureType": "node"
-}',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_ecover','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
 	 ('ve_element_ecover','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -136,61 +82,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_ecover','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,NULL,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,21),
 	 ('ve_element_ecover','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,22),
 	 ('ve_element_ecover','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''ECOVER''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element_ecover','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "111"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "insert_feature",
-    "parameters": {
-        "targetwidget": "tab_features_feature_id"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "112"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "delete_object",
-    "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "137"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "178"
-    }','{
-    "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_arc",
-    "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_connec",
-    "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_link",
-    "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_ecover','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_node",
-    "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_egate','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
 	 ('ve_element_egate','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -228,61 +119,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_egate','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,NULL,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,21),
 	 ('ve_element_egate','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,22),
 	 ('ve_element_egate','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EGATE''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element_egate','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "111"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "insert_feature",
-    "parameters": {
-        "targetwidget": "tab_features_feature_id"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "112"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "delete_object",
-    "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "137"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "178"
-    }','{
-    "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_arc",
-    "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_connec",
-    "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_link",
-    "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_egate','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_node",
-    "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_eiot_sensor','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
 	 ('ve_element_eiot_sensor','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -320,61 +156,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_eiot_sensor','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,NULL,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,21),
 	 ('ve_element_eiot_sensor','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,22),
 	 ('ve_element_eiot_sensor','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EIOT_SENSOR''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "111"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "insert_feature",
-    "parameters": {
-        "targetwidget": "tab_features_feature_id"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "112"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "delete_object",
-    "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "137"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "178"
-    }','{
-    "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_arc",
-    "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_connec",
-    "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_link",
-    "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_eiot_sensor','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_node",
-    "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_eorifice','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,3),
 	 ('ve_element_eorifice','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -416,61 +197,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_eorifice','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,26),
 	 ('ve_element_eorifice','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EORIFICE''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
 	 ('ve_element_eorifice','form_feature','tab_data','epa_type','lyt_top_1',3,'string','combo','EPA Type:','EPA Type',NULL,false,false,true,true,NULL,'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ELEMENT''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
-	 ('ve_element_eorifice','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "111"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "insert_feature",
-      "parameters": {
-        "targetwidget": "tab_features_feature_id"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "112"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "delete_object",
-      "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "137"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "178"
-    }','{
-      "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_arc",
-      "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_connec",
-      "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_link",
-      "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_eorifice','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_node",
-      "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_eoutlet','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,3),
 	 ('ve_element_eoutlet','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -512,61 +238,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_eoutlet','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,26),
 	 ('ve_element_eoutlet','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EOUTLET''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
 	 ('ve_element_eoutlet','form_feature','tab_data','epa_type','lyt_top_1',3,'string','combo','EPA Type:','EPA Type',NULL,false,false,true,true,NULL,'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ELEMENT''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
-	 ('ve_element_eoutlet','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "111"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "insert_feature",
-      "parameters": {
-        "targetwidget": "tab_features_feature_id"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "112"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "delete_object",
-      "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "137"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "178"
-    }','{
-      "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_arc",
-      "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_connec",
-      "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_link",
-      "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_eoutlet','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_node",
-      "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_eprotector','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
 	 ('ve_element_eprotector','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -604,61 +275,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_eprotector','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,NULL,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,21),
 	 ('ve_element_eprotector','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,22),
 	 ('ve_element_eprotector','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EPROTECTOR''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element_eprotector','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "111"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "insert_feature",
-    "parameters": {
-        "targetwidget": "tab_features_feature_id"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "112"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "delete_object",
-    "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "137"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "178"
-    }','{
-    "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_arc",
-    "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_connec",
-    "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_link",
-    "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_eprotector','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_node",
-    "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_epump','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,3),
 	 ('ve_element_epump','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -700,61 +316,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_epump','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,26),
 	 ('ve_element_epump','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EPUMP''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
 	 ('ve_element_epump','form_feature','tab_data','epa_type','lyt_top_1',3,'string','combo','EPA Type:','EPA Type',NULL,false,false,true,true,NULL,'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ELEMENT''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
-	 ('ve_element_epump','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "111"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "insert_feature",
-      "parameters": {
-        "targetwidget": "tab_features_feature_id"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "112"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "delete_object",
-      "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "137"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "178"
-    }','{
-      "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_arc",
-      "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_connec",
-      "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_link",
-      "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_epump','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_node",
-      "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_estep','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
 	 ('ve_element_estep','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -792,61 +353,6 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_estep','form_feature','tab_data','muni_id','lyt_data_3',1,'string','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,NULL,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,NULL,NULL,NULL,false,21),
 	 ('ve_element_estep','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,22),
 	 ('ve_element_estep','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''ESTEP''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element_estep','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "111"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "insert_feature",
-    "parameters": {
-        "targetwidget": "tab_features_feature_id"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "112"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "delete_object",
-    "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-    }
-    }',NULL,false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "137"
-    }','{
-    "saveValue": false
-    }','{
-    "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-    "icon": "178"
-    }','{
-    "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_arc",
-    "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_connec",
-    "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_link",
-    "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_estep','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-    "saveValue": false,
-    "tableUpsert": "v_ui_element_x_node",
-    "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL),
 	 ('ve_element_eweir','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector id',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,3),
 	 ('ve_element_eweir','form_feature','tab_data','state','lyt_bot_1',2,'integer','combo','State:','State',NULL,false,false,true,false,NULL,'WITH psector_value AS (
   		SELECT value::integer AS psector_value 
@@ -887,59 +393,4 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_element_eweir','form_feature','tab_data','muni_id','lyt_data_3',1,'integer','combo','Municipality:','Muni_id - Municipality to which the element belongs. If the configuration is not modified, the program automatically selects it based on the geometry',NULL,false,false,true,false,NULL,'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL',true,false,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,25),
 	 ('ve_element_eweir','form_feature','tab_data','observ','lyt_data_3',2,'string','text','Observations:','Observations',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":true}',NULL,NULL,false,26),
 	 ('ve_element_eweir','form_feature','tab_data','elementcat_id','lyt_top_1',1,'string','combo','Element Catalog:','Element Catalog',NULL,true,false,true,false,NULL,'SELECT id, id as idval FROM cat_element WHERE element_type = ''EWEIR''',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,1),
-	 ('ve_element_eweir','form_feature','tab_data','epa_type','lyt_top_1',3,'string','combo','EPA Type:','EPA Type',NULL,false,false,true,true,NULL,'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ELEMENT''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2),
-	 ('ve_element_eweir','form_feature','tab_features','feature_id','lyt_features_1',0,'text','text',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','btn_insert','lyt_features_1',1,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "111"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "insert_feature",
-      "parameters": {
-        "targetwidget": "tab_features_feature_id"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','btn_delete','lyt_features_1',2,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "112"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "delete_object",
-      "parameters": {
-        "columnfind": "element_id",
-        "targetwidget": "tab_features_tbl_element",
-        "sourceview": "element"
-      }
-    }',NULL,false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','btn_snapping','lyt_features_1',3,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "137"
-    }','{
-      "saveValue": false
-    }','{
-      "functionName": "selection_init"
-    }',NULL,false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','btn_expr_select','lyt_features_1',4,NULL,'button',NULL,NULL,NULL,false,false,true,false,false,NULL,NULL,NULL,NULL,NULL,'{
-      "icon": "178"
-    }','{
-      "saveValue": false
-    }',NULL,NULL,false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','tbl_element_x_arc','lyt_features_2_arc',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_arc",
-      "featureType": "arc"
-    }',NULL,'tbl_element_x_arc',false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','tbl_element_x_connec','lyt_features_2_connec',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_connec",
-      "featureType": "connec"
-    }',NULL,'tbl_element_x_connec',false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','tbl_element_x_link','lyt_features_2_link',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_link",
-      "featureType": "link"
-    }',NULL,'tbl_element_x_link',false,NULL),
-	 ('ve_element_eweir','form_feature','tab_features','tbl_element_x_node','lyt_features_2_node',0,NULL,'tableview',':',':',NULL,false,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,'{
-      "saveValue": false,
-      "tableUpsert": "v_ui_element_x_node",
-      "featureType": "node"
-    }',NULL,'tbl_element_x_node',false,NULL);
+	 ('ve_element_eweir','form_feature','tab_data','epa_type','lyt_top_1',3,'string','combo','EPA Type:','EPA Type',NULL,false,false,true,true,NULL,'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ELEMENT''',NULL,NULL,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,2);
