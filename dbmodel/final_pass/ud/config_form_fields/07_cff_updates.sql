@@ -45,3 +45,11 @@ UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue W
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''' WHERE formname='ve_node' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''' WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
 UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue = ''fluid_type''' WHERE formname='ve_gully' AND formtype='form_feature' AND columnname='fluid_type' AND tabname='tab_data';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM cat_element WHERE active IS true'
+WHERE formname = 've_element' AND columnname = 'elementcat_id';
+	
+UPDATE config_form_fields t SET dv_querytext = a.dv_querytext FROM (
+    SELECT CONCAT('SELECT id, id as idval FROM cat_element WHERE active IS true AND element_type = ', quote_literal(upper(split_part(formname, '_', 3)))), formname
+    FROM config_form_fields WHERE formname ilike 've_element_%' AND dv_querytext IS NOT NULL AND columnname = 'elementcat_id'
+)a WHERE t.formname = a.formname and t.columnname = 'elementcat_id';
