@@ -176,3 +176,6 @@ INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('inp_dscenario_pattern','Table to manage dscenario for pattern','role_epa','core');
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('inp_dscenario_pattern_value','Table to manage dscenario for pattern value','role_epa','core');
+
+
+UPDATE config_param_system SET isenabled = true WHERE "parameter" ILIKE 'basic_search_v2_tab_%';
