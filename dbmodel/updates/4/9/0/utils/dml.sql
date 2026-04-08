@@ -179,3 +179,7 @@ VALUES ('inp_dscenario_pattern_value','Table to manage dscenario for pattern val
 
 
 UPDATE config_param_system SET isenabled = true WHERE "parameter" ILIKE 'basic_search_v2_tab_%';
+
+-- 2026/04/08
+UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id_plan' AND tabname='tab_general';
+UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id' AND tabname='tab_general';
