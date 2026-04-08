@@ -763,7 +763,7 @@ def reset_feature_list():
     return ids, list_ids
 
 
-def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Optional[str] = None):
+def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Optional[str] = None, view_prefix='ve_'):
     """ Set feature_type and layer depending selected tab """
 
     tab_idx = dialog.tab_feature.currentIndex()
@@ -772,7 +772,8 @@ def get_signal_change_tab(dialog, excluded_layers=[], feature_id_widget_name: Op
 
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
-    viewname = f"ve_{feature_type}"
+    viewname = f"{view_prefix}{feature_type}"
+
     field_id = feature_type
     if feature_type == "element":
         viewname = ["ve_man_frelem", "ve_man_genelem", "ve_element"]
@@ -5654,7 +5655,7 @@ def set_completer_widget(tablename, widget, field_id, add_id=False,
     if add_id:
         field_id += '_id'
 
-    sql = (f"SELECT DISTINCT({field_id})"
+    sql = (f"SELECT ({field_id})"
            f" FROM {lib_vars.schema_name}.{tablename}"
            f" ORDER BY {field_id}")
     rows = tools_db.get_rows(sql)

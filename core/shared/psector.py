@@ -148,6 +148,9 @@ class GwPsector:
         self.price_loaded = False
         self.header_exist = None
         self.load_signals = False
+        self._relations_tab_feature_initialized = False
+        self._selection_widget_loaded = False
+        self._doc_completer_loaded = False
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
@@ -231,15 +234,11 @@ class GwPsector:
             # Load existing psector data and populate form
             self.load_psector(self.dlg_plan_psector, psector_id, list_coord=None, form_opened=True)
 
-        sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
-        rows = tools_db.get_rows(sql)
-        self.all_states = rows
-
         # Exclude the layer ve_element for adding relations
         self.excluded_layers = ['ve_element']
 
         # Set signals
-        excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_element", "ve_gully",
+        self.excluded_layers_tab_feature = ["ve_arc", "ve_node", "ve_connec", "ve_element", "ve_gully",
                            "ve_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -267,21 +266,13 @@ class GwPsector:
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
+        # TODO: Update to use view_prefix='vf_' after views creation
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
+            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, self.excluded_layers_tab_feature, view_prefix='ve_'))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._manage_tab_feature_buttons))
-        viewname = 've_plan_psector_x_other'
-
-        self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector", "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
-        general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
-        menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"]}
-        highlight_variables = {"callback_values": self.callback_values}
-        selection_on_top_variables = {"callback_later": self.reset_relation_tables_signals}
-        selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, highlight_variables=highlight_variables, selection_on_top_variables=selection_on_top_variables)
-        self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
 
         self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
@@ -291,11 +282,6 @@ class GwPsector:
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.tbl_document, 'doc_x_psector', 'doc_id'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
-
-        # Create list for completer QLineEdit
-        sql = "SELECT DISTINCT(name) FROM v_ui_doc ORDER BY name"
-        list_items = tools_db.create_list_for_completer(sql)
-        tools_qt.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
 
         if psector_id is not None:
             sql = (f"SELECT other, gexpenses, vat, active "
@@ -324,14 +310,6 @@ class GwPsector:
             )
             for label in currency_labels:
                 tools_qt.set_widget_text(self.dlg_plan_psector, label, self.sys_currency['symbol'])
-
-        # Adding auto-completion to a QLineEdit for default feature
-        viewname = "ve_" + self.rel_feature_type
-        tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.rel_feature_type) + "_id")
-
-        # Set default tab 'arc'
-        self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-        tools_gw.get_signal_change_tab(self.dlg_plan_psector, excluded_layers)
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
@@ -976,7 +954,26 @@ class GwPsector:
                 return
 
         self.psector_id = psector_id
-        if self.dlg_plan_psector.tabwidget.currentIndex() == 3:
+        if self.dlg_plan_psector.tabwidget.currentIndex() == 2:
+            if not self._relations_tab_feature_initialized:
+                self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
+                # TODO: Update to use view_prefix='vf_' after views creation
+                tools_gw.get_signal_change_tab(
+                    self.dlg_plan_psector,
+                    self.excluded_layers_tab_feature,
+                    view_prefix='ve_'
+                )
+                self._relations_tab_feature_initialized = True
+            if not self._selection_widget_loaded:
+                self_varibles = {"selection_mode": GwSelectionMode.PSECTOR, "method": "psector", "invert_selection": True, "zoom_to_selection": True, "selection_on_top": True}
+                general_variables = {"class_object": self, "dialog": self.dlg_plan_psector, "table_object": "psector"}
+                menu_variables = {"used_tools": ["rectangle", "polygon", "freehand"]}
+                highlight_variables = {"callback_values": self.callback_values}
+                selection_on_top_variables = {"callback_later": self.reset_relation_tables_signals}
+                selection_widget = GwSelectionWidget(self_varibles, general_variables, menu_variables, highlight_variables=highlight_variables, selection_on_top_variables=selection_on_top_variables)
+                self.dlg_plan_psector.lyt_selection.addWidget(selection_widget, 0)
+                self._selection_widget_loaded = True
+        elif self.dlg_plan_psector.tabwidget.currentIndex() == 3:
             tableleft = "v_price_compost"
             tableright = "ve_plan_psector_x_other"
             if not self.load_signals:
@@ -984,6 +981,11 @@ class GwPsector:
         elif self.dlg_plan_psector.tabwidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabwidget.currentIndex() == 5:
+            if not self._doc_completer_loaded:
+                sql = "SELECT DISTINCT(name) FROM v_ui_doc ORDER BY name"
+                list_items = tools_db.create_list_for_completer(sql)
+                tools_qt.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
+                self._doc_completer_loaded = True
             self.psector_name = self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").text()
             expr = f"psector_name = '{self.psector_name}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
@@ -1250,9 +1252,6 @@ class GwPsector:
         widget = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
         if widget is None:
             return None
-        if widget_name == 'tab_general_creation_date':
-            print(type(widget))
-
         value = None
         if isinstance(widget, QCheckBox):
             value = str(tools_qt.is_checked(self.dlg_plan_psector, widget)).upper()
@@ -2749,8 +2748,11 @@ class GwPsector:
 
     def _manage_tab_feature_buttons(self):
         """ Update rel_feature_type when tab changes to ensure buttons work on all tabs """
-        feature_type = tools_gw.get_signal_change_tab(self.dlg_plan_psector, self.excluded_layers)
-        self.rel_feature_type = feature_type
+        
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+        tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
+                    'tab_elem': 'element', 'tab_link': 'link'}
+        self.rel_feature_type = tab_name.get(self.dlg_plan_psector.tab_feature.widget(tab_idx).objectName(), 'arc')
 
     def _reset_snapping(self):
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
@@ -2964,7 +2966,7 @@ class GwPsector:
                     if f"{feature_id}" in feature_ids and f"{state}" == "1":
                         selection_model.select(index, (QItemSelectionModel.SelectionFlag.Select | QItemSelectionModel.SelectionFlag.Rows))
         except Exception as e:
-            print(f"Error in _manage_selection_changed: {e}")
+            tools_log.log_warning(f"Error in _manage_selection_changed: {e}")
 
     def callback_values(self):
         return self, self.dlg_plan_psector, "psector"
@@ -2984,19 +2986,7 @@ class GwPsector:
             for tab_index in range(1, self.dlg_plan_psector.tabwidget.count()):
                 tab_widget = self.dlg_plan_psector.tabwidget.widget(tab_index)
                 if tab_widget:
-                    self._disable_widgets_in_tab(tab_widget)
-
-    def _disable_widgets_in_tab(self, tab_widget):
-        """ Disable all editable widgets in a tab """
-        for widget in tab_widget.findChildren(QWidget):
-            if isinstance(widget, (QLineEdit, QTextEdit, QDoubleSpinBox)):
-                widget.setReadOnly(True)
-                widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-            elif isinstance(widget, (QCheckBox, QPushButton, QComboBox, QTableView)):
-                widget.setEnabled(False)
-            elif isinstance(widget, QDateEdit):
-                widget.setReadOnly(True)
-                widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                    tab_widget.setEnabled(True)
 
     def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes, connect=True, disconnect=True):
         """
