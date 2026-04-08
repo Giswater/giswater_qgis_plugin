@@ -45,7 +45,7 @@ BEGIN
 			FROM link l
 			WHERE l.state = 1
 			GROUP BY l.exit_id
-		) ls ON ls.exit_id = a.arc_id::text
+		) ls ON ls.exit_id = a.arc_id
 		WHERE a.state = 1
 	),
 	losses_weight AS (
