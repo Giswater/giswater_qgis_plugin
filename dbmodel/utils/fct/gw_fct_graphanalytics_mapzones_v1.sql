@@ -1919,8 +1919,7 @@ BEGIN
 								n.pgr_node_id,
 								MIN(a.mapzone_id) AS mapzone_id
 							FROM temp_pgr_node n
-							JOIN temp_pgr_arc_linegraph l ON l.pgr_node_id = n.pgr_node_id
-							JOIN temp_pgr_arc a ON a.pgr_arc_id IN (l.pgr_node_1, l.pgr_node_2)
+							JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 							WHERE n.graph_delimiter = 'forceClosed'
 								AND a.mapzone_id > 0
 							GROUP BY n.pgr_node_id
