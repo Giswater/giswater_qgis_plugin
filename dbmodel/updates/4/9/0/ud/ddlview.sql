@@ -3453,8 +3453,8 @@ AS WITH typevalue AS (
     diagonal
    FROM connec_selected;
 
--- NOTE: vf_selector_gully
-CREATE OR REPLACE VIEW vf_selector_gully AS 
+-- NOTE: vf_gully
+CREATE OR REPLACE VIEW vf_gully AS 
  SELECT a.gully_id, a.state
    FROM gully a
   WHERE (EXISTS ( SELECT 1
@@ -3669,7 +3669,7 @@ WITH typevalue AS (
      LEFT JOIN drainzone_table ON a.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON a.dwfzone_id = dwfzone_table.dwfzone_id
      LEFT JOIN arc_add ON arc_add.arc_id = a.arc_id
-     JOIN vf_selector_arc z ON z.arc_id = a.arc_id;
+     JOIN vf_arc z ON z.arc_id = a.arc_id;
      
 -- NOTE: ve_node
 CREATE OR REPLACE VIEW ve_node
@@ -3844,7 +3844,7 @@ AS WITH typevalue AS (
      LEFT JOIN drainzone_table ON n.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON n.dwfzone_id = dwfzone_table.dwfzone_id
      LEFT JOIN node_add ON node_add.node_id = n.node_id
-     JOIN vf_selector_node z ON z.node_id = n.node_id;
+     JOIN vf_node z ON z.node_id = n.node_id;
 
 -- NOTE: ve_connec
 CREATE OR REPLACE VIEW ve_connec
@@ -4013,7 +4013,7 @@ AS WITH typevalue AS (
      LEFT JOIN omzone_table ON omzone_table.omzone_id = c.omzone_id
      LEFT JOIN drainzone_table ON c.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON c.dwfzone_id = dwfzone_table.dwfzone_id
-     JOIN vf_selector_connec z ON z.connec_id = c.connec_id;
+     JOIN vf_connec z ON z.connec_id = c.connec_id;
 
 
 -- ve_link source
@@ -4173,7 +4173,7 @@ AS WITH typevalue AS (
      LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
      LEFT JOIN inp_network_mode ON true
-     JOIN vf_selector_link z ON z.link_id = l.link_id;
+     JOIN vf_link z ON z.link_id = l.link_id;
 
 
 -- NOTE: ve_gully
@@ -4357,4 +4357,4 @@ AS WITH typevalue AS (
      LEFT JOIN drainzone_table ON gully.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON gully.dwfzone_id = dwfzone_table.dwfzone_id
      LEFT JOIN inp_network_mode ON true
-     JOIN vf_selector_gully z ON z.gully_id = gully.gully_id;
+     JOIN vf_gully z ON z.gully_id = gully.gully_id;

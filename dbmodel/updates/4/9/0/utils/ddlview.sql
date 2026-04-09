@@ -122,8 +122,8 @@ SELECT * FROM ext_region;
 CREATE OR REPLACE VIEW v_province AS
 SELECT * FROM ext_province;
 
--- NOTE: vf_selector_arc
-CREATE OR REPLACE VIEW vf_selector_arc AS 
+-- NOTE: vf_arc
+CREATE OR REPLACE VIEW vf_arc AS 
  SELECT a.arc_id, COALESCE(pp.state, a.state) AS p_state
    FROM arc a
      LEFT JOIN LATERAL ( SELECT pp_1.state
@@ -143,8 +143,8 @@ CREATE OR REPLACE VIEW vf_selector_arc AS
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
           
--- NOTE: vf_selector_node
-CREATE OR REPLACE VIEW vf_selector_node AS 
+-- NOTE: vf_node
+CREATE OR REPLACE VIEW vf_node AS 
  SELECT a.node_id, COALESCE(pp.state, a.state) AS p_state
    FROM node a
      LEFT JOIN LATERAL ( SELECT pp_1.state
@@ -165,8 +165,8 @@ CREATE OR REPLACE VIEW vf_selector_node AS
           WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
         
 
--- NOTE: vf_selector_connec
-CREATE OR REPLACE VIEW vf_selector_connec AS 
+-- NOTE: vf_connec
+CREATE OR REPLACE VIEW vf_connec AS 
  SELECT a.connec_id, COALESCE(pp.state, a.state) AS p_state
    FROM connec a
      LEFT JOIN LATERAL ( SELECT pp_1.state
@@ -186,8 +186,8 @@ CREATE OR REPLACE VIEW vf_selector_connec AS
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
 
--- NOTE: vf_selector_element
- CREATE OR REPLACE VIEW vf_selector_element AS 
+-- NOTE: vf_element
+ CREATE OR REPLACE VIEW vf_element AS 
  SELECT a.element_id, a.state
    FROM element a
   WHERE (EXISTS ( SELECT 1
@@ -200,9 +200,9 @@ CREATE OR REPLACE VIEW vf_selector_connec AS
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));    
 
--- NOTE: vf_selector_link
+-- NOTE: vf_link
 
-CREATE OR REPLACE VIEW vf_selector_link AS 
+CREATE OR REPLACE VIEW vf_link AS 
  SELECT a.link_id, COALESCE(pp.state, a.state) AS p_state
    FROM link a
      LEFT JOIN LATERAL ( SELECT pp_1.state
@@ -272,4 +272,4 @@ AS SELECT e.element_id,
     e.uuid
    FROM element e
      JOIN cat_element ON e.elementcat_id::text = cat_element.id::text
-    JOIN vf_selector_element z ON z.element_id = e.element_id;
+    JOIN vf_element z ON z.element_id = e.element_id;

@@ -192,12 +192,12 @@ UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AN
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id' AND tabname='tab_general';
 
 
-INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_node', 'Filtered nodes', 'role_basic', 'core') ON CONFLICT DO NOTHING;
-INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_arc', 'Filtered arcs', 'role_basic', 'core') ON CONFLICT DO NOTHING;
-INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_connec', 'Filtered connecs', 'role_basic', 'core') ON CONFLICT DO NOTHING;
-INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_element', 'Filtered elements', 'role_basic', 'core') ON CONFLICT DO NOTHING;
-INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_gully', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
-INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_link', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_node', 'Filtered nodes', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_arc', 'Filtered arcs', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_connec', 'Filtered connecs', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_element', 'Filtered elements', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_gully', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_link', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
 
 
 INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,layoutname,iseditable,"source",vdefault)

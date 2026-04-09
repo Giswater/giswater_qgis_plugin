@@ -3713,7 +3713,7 @@ WITH typevalue AS (
      LEFT JOIN omzone_table ON omzone_table.omzone_id = a.omzone_id
      LEFT JOIN arc_add ON arc_add.arc_id = a.arc_id
      LEFT JOIN value_state_type vst ON vst.id = a.state_type
-     JOIN vf_selector_arc z ON a.arc_id = z.arc_id;
+     JOIN vf_arc z ON a.arc_id = z.arc_id;
 
 -- NOTE: ve_node
 CREATE OR REPLACE VIEW ve_node
@@ -3919,7 +3919,7 @@ AS WITH typevalue AS (
      LEFT JOIN omzone_table ON omzone_table.omzone_id = n.omzone_id
      LEFT JOIN node_add ON node_add.node_id = n.node_id
      LEFT JOIN man_valve m ON m.node_id = n.node_id
-     JOIN vf_selector_node z on z.node_id = n.node_id;
+     JOIN vf_node z on z.node_id = n.node_id;
 
 
 -- NOTE: ve_connec
@@ -4141,7 +4141,7 @@ AS WITH typevalue AS (
      LEFT JOIN connec_add ON connec_add.connec_id = c.connec_id
      LEFT JOIN value_state_type vst ON vst.id = c.state_type
      LEFT JOIN inp_network_mode ON true
-     JOIN vf_selector_connec z on z.connec_id = c.connec_id;
+     JOIN vf_connec z on z.connec_id = c.connec_id;
 
 -- NOTE: ve_link
 CREATE OR REPLACE VIEW ve_link
@@ -4312,4 +4312,4 @@ AS WITH typevalue AS (
      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l.supplyzone_id
      LEFT JOIN omzone_table ON omzone_table.omzone_id = l.omzone_id
      LEFT JOIN inp_network_mode ON true
-     JOIN vf_selector_link z on z.link_id = l.link_id;
+     JOIN vf_link z on z.link_id = l.link_id;
