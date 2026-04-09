@@ -929,7 +929,7 @@ class GwMincut:
         # Get values from mincut dialog
         muni_id = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.cmb_municipality, 0)
         street = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.txt_street, return_string_null=False)
-        postnumber = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.txt_postnumber, return_string_null=False    )
+        postnumber = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.txt_postnumber, return_string_null=False)
 
         # Set values to search widgets
         if muni_id and muni_id not in (None, ""):
