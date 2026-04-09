@@ -23,7 +23,7 @@ SELECT columns_are(
         'hydrometer_id', 'code', 'customer_name', 'address', 'house_number', 'id_number', 'start_date', 'hydro_number',
         'identif', 'state_id', 'expl_id', 'hydrometer_customer_code', 'plot_code', 'priority_id',
         'catalog_id', 'category_id', 'crm_number', 'muni_id', 'address1', 'address2', 'address3', 'address2_1',
-        'address2_2', 'address2_3', 'm3_volume', 'hydro_man_date', 'end_date', 'update_date', 'shutdown_date', 'is_waterbal', 'link'
+        'address2_2', 'address2_3', 'm3_volume', 'hydro_man_date', 'end_date', 'update_date', 'shutdown_date', 'is_waterbal', 'link', 'customer_code'
     ],
     'Table ext_rtc_hydrometer should have the correct columns'
 );
@@ -63,6 +63,7 @@ SELECT col_type_is('ext_rtc_hydrometer', 'update_date', 'date', 'Column update_d
 SELECT col_type_is('ext_rtc_hydrometer', 'shutdown_date', 'date', 'Column shutdown_date should be date');
 SELECT col_type_is('ext_rtc_hydrometer', 'is_waterbal', 'boolean', 'Column is_waterbal should be boolean');
 SELECT col_type_is('ext_rtc_hydrometer', 'link', 'text', 'Column link should be text');
+SELECT col_type_is('ext_rtc_hydrometer', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 
 -- Check foreign keys
 SELECT hasnt_fk('ext_rtc_hydrometer', 'Table ext_rtc_hydrometer should have no foreign keys');
