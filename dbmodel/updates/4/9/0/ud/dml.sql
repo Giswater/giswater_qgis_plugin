@@ -22,3 +22,19 @@ DELETE FROM config_param_user WHERE "parameter"='edit_insert_show_elevation_from
 
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('dwfzone_graph','Table to manage graph for dwfzone','role_edit','core');
+
+-- 09/04/2026
+WITH connec_customer AS (
+    SELECT rxc.hydrometer_id,
+        MIN(c.customer_code) AS customer_code
+    FROM rtc_hydrometer_x_connec rxc
+    JOIN connec c ON c.connec_id = rxc.connec_id
+    WHERE c.customer_code IS NOT NULL
+    GROUP BY rxc.hydrometer_id
+)
+UPDATE ext_rtc_hydrometer h
+SET customer_code = cc.customer_code
+FROM connec_customer cc
+WHERE h.hydrometer_id = cc.hydrometer_id;
+
+DROP TABLE IF EXISTS rtc_hydrometer_x_connec;

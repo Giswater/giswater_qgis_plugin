@@ -331,3 +331,28 @@ INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('dma_graph_object','Table to manage graph for dma','role_edit','core');
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('presszone_graph','Table to manage graph for presszone','role_edit','core');
+
+-- 09/04/2026
+WITH connec_customer AS (
+    SELECT rxc.hydrometer_id,
+        MIN(c.customer_code) AS customer_code
+    FROM rtc_hydrometer_x_connec rxc
+    JOIN connec c ON c.connec_id = rxc.connec_id
+    WHERE c.customer_code IS NOT NULL
+    GROUP BY rxc.hydrometer_id
+), node_customer AS (
+    SELECT rxn.hydrometer_id,
+        MIN(mn.customer_code) AS customer_code
+    FROM rtc_hydrometer_x_node rxn
+    JOIN man_netwjoin mn ON mn.node_id = rxn.node_id
+    WHERE mn.customer_code IS NOT NULL
+    GROUP BY rxn.hydrometer_id
+)
+UPDATE ext_rtc_hydrometer h
+SET customer_code = COALESCE(cc.customer_code, nc.customer_code)
+FROM connec_customer cc
+FULL OUTER JOIN node_customer nc ON nc.hydrometer_id = cc.hydrometer_id
+WHERE h.hydrometer_id = COALESCE(cc.hydrometer_id, nc.hydrometer_id);
+
+DROP TABLE IF EXISTS rtc_hydrometer_x_node;
+DROP TABLE IF EXISTS rtc_hydrometer_x_connec;

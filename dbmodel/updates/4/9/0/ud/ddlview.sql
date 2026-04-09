@@ -1009,7 +1009,7 @@ AS WITH sel_expl AS (
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     connec.connec_id AS feature_id,
     'CONNEC'::text AS feature_type,
-    COALESCE(connec.customer_code, 'XXXX'::text::character varying) AS customer_code,
+    COALESCE(ext_rtc_hydrometer.customer_code, 'XXXX'::character varying) AS customer_code,
     ext_rtc_hydrometer_state.name AS state,
     v_municipality.name AS muni_name,
     connec.expl_id,
@@ -1044,8 +1044,7 @@ AS WITH sel_expl AS (
     ext_rtc_hydrometer.shutdown_date
    FROM ext_rtc_hydrometer
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
-     JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
+     JOIN connec ON connec.customer_code = ext_rtc_hydrometer.customer_code
      LEFT JOIN v_municipality ON v_municipality.muni_id = connec.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
   WHERE (EXISTS ( SELECT 1
@@ -1063,7 +1062,7 @@ AS WITH sel_expl AS (
  SELECT ext_rtc_hydrometer.hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     COALESCE(connec.connec_id, NULL::integer) AS connec_id,
-    COALESCE(connec.customer_code, 'XXXX'::text::character varying) AS connec_customer_code,
+    COALESCE(ext_rtc_hydrometer.customer_code::character varying, 'XXXX'::character varying) AS connec_customer_code,
     ext_rtc_hydrometer_state.name AS state,
     v_municipality.name AS muni_name,
     connec.expl_id,
@@ -1096,13 +1095,80 @@ AS WITH sel_expl AS (
         END AS hydrometer_link
    FROM ext_rtc_hydrometer
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
-     JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
+     JOIN connec ON connec.customer_code = ext_rtc_hydrometer.customer_code
      LEFT JOIN v_municipality ON v_municipality.muni_id = connec.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
   WHERE (EXISTS ( SELECT 1
            FROM sel_expl
           WHERE sel_expl.expl_id = connec.expl_id));
+
+
+CREATE OR REPLACE VIEW v_ui_hydroval
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    connec.connec_id AS feature_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+  ORDER BY ext_rtc_hydrometer_x_data.id;
+
+
+CREATE OR REPLACE VIEW v_ui_hydroval_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    connec.connec_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.hydrometer_id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+  ORDER BY ext_rtc_hydrometer_x_data.id;
+
+
+CREATE OR REPLACE VIEW ve_rtc_hydro_data_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    connec.connec_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_cat_period.code AS cat_period_code,
+    ext_rtc_hydrometer_x_data.value_date,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.hydrometer_id::bigint
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::bigint = ext_rtc_hydrometer.catalog_id::bigint
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+  ORDER BY ext_rtc_hydrometer_x_data.hydrometer_id, ext_rtc_hydrometer_x_data.cat_period_id DESC;
 
 
 DROP VIEW IF EXISTS ve_link_gully;

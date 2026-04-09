@@ -870,7 +870,7 @@ AS WITH sel_expl AS (
  SELECT ext_rtc_hydrometer.hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     COALESCE(node.node_id, NULL::integer) AS node_id,
-    COALESCE(man_netwjoin.customer_code, 'XXXX'::text::character varying) AS node_customer_code,
+    COALESCE(ext_rtc_hydrometer.customer_code::character varying, 'XXXX'::character varying) AS node_customer_code,
     ext_rtc_hydrometer_state.name AS state,
     v_municipality.name AS muni_name,
     node.expl_id,
@@ -905,9 +905,8 @@ AS WITH sel_expl AS (
     ext_rtc_hydrometer.shutdown_date
    FROM ext_rtc_hydrometer
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-     JOIN rtc_hydrometer_x_node ON rtc_hydrometer_x_node.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
-     JOIN man_netwjoin ON man_netwjoin.node_id = rtc_hydrometer_x_node.node_id
-     JOIN node ON node.node_id = rtc_hydrometer_x_node.node_id
+     JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     JOIN node ON node.node_id = man_netwjoin.node_id
      LEFT JOIN v_municipality ON v_municipality.muni_id = node.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
   WHERE (EXISTS ( SELECT 1
@@ -925,7 +924,7 @@ AS WITH sel_expl AS (
  SELECT ext_rtc_hydrometer.hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     COALESCE(connec.connec_id, NULL::integer) AS connec_id,
-    COALESCE(connec.customer_code, 'XXXX'::text::character varying) AS connec_customer_code,
+    COALESCE(ext_rtc_hydrometer.customer_code::character varying, 'XXXX'::character varying) AS connec_customer_code,
     ext_rtc_hydrometer_state.name AS state,
     v_municipality.name AS muni_name,
     connec.expl_id,
@@ -960,8 +959,7 @@ AS WITH sel_expl AS (
     ext_rtc_hydrometer.shutdown_date
    FROM ext_rtc_hydrometer
      JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
-     JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
      LEFT JOIN v_municipality ON v_municipality.muni_id = connec.muni_id
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
   WHERE (EXISTS ( SELECT 1
@@ -976,33 +974,30 @@ AS WITH sel_expl AS (
            FROM selector_expl
           WHERE selector_expl.cur_user = CURRENT_USER
         ), node_data AS (
-         SELECT rtc_hydrometer_x_node.hydrometer_id,
+         SELECT ext_rtc_hydrometer.hydrometer_id,
             node.node_id,
             node.expl_id,
             exploitation.name AS expl_name,
-            v_municipality.name AS muni_name,
-            man_netwjoin.customer_code
-           FROM rtc_hydrometer_x_node
-             JOIN man_netwjoin ON man_netwjoin.node_id = rtc_hydrometer_x_node.node_id
-             JOIN node ON node.node_id = rtc_hydrometer_x_node.node_id
+            v_municipality.name AS muni_name
+           FROM ext_rtc_hydrometer
+             JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.customer_code::text
+             JOIN node ON node.node_id = man_netwjoin.node_id
              LEFT JOIN v_municipality ON v_municipality.muni_id = node.muni_id
              LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
         ), connec_data AS (
-         SELECT rtc_hydrometer_x_connec.hydrometer_id,
+         SELECT ext_rtc_hydrometer.hydrometer_id,
             connec.connec_id,
             connec.expl_id,
             exploitation.name AS expl_name,
-            v_municipality.name AS muni_name,
-            connec.customer_code
-           FROM rtc_hydrometer_x_connec
-             JOIN connec ON connec.connec_id = rtc_hydrometer_x_connec.connec_id
+            v_municipality.name AS muni_name
+           FROM ext_rtc_hydrometer
+             JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
              LEFT JOIN v_municipality ON v_municipality.muni_id = connec.muni_id
              LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
         ), feature_data AS (
          SELECT connec_data.hydrometer_id,
             connec_data.connec_id AS feature_id,
             'CONNEC'::text AS feature_type,
-            connec_data.customer_code,
             connec_data.expl_name,
             connec_data.muni_name,
             connec_data.expl_id
@@ -1011,7 +1006,6 @@ AS WITH sel_expl AS (
          SELECT node_data.hydrometer_id,
             node_data.node_id AS feature_id,
             'NODE'::text AS feature_type,
-            node_data.customer_code,
             node_data.expl_name,
             node_data.muni_name,
             node_data.expl_id
@@ -1021,7 +1015,7 @@ AS WITH sel_expl AS (
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
     d.feature_id,
     d.feature_type,
-    d.customer_code,
+    COALESCE(ext_rtc_hydrometer.customer_code, 'XXXX'::character varying(30)) AS customer_code,
     ext_rtc_hydrometer_state.name AS state,
     d.muni_name,
     d.expl_id,
@@ -1061,6 +1055,88 @@ AS WITH sel_expl AS (
            FROM sel_expl
           WHERE sel_expl.expl_id = d.expl_id));
 
+
+
+CREATE OR REPLACE VIEW v_ui_hydrometer
+AS SELECT v_rtc_hydrometer.hydrometer_id,
+    v_rtc_hydrometer.feature_id,
+    v_rtc_hydrometer.hydrometer_customer_code,
+    v_rtc_hydrometer.customer_code AS feature_customer_code,
+    v_rtc_hydrometer.state,
+    v_rtc_hydrometer.expl_name,
+    v_rtc_hydrometer.hydrometer_link
+   FROM v_rtc_hydrometer;
+
+
+CREATE OR REPLACE VIEW v_ui_hydroval_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    connec.connec_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+  ORDER BY ext_rtc_hydrometer_x_data.id;
+
+
+CREATE OR REPLACE VIEW v_ui_hydroval
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    node.node_id AS feature_id,
+    node.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     JOIN node ON node.node_id = man_netwjoin.node_id
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+UNION
+ SELECT ext_rtc_hydrometer_x_data.id,
+    connec.connec_id AS feature_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text;
 
 
 CREATE OR REPLACE VIEW v_om_mincut
@@ -3310,6 +3386,96 @@ AS WITH plan_netscenario_current AS (
   WHERE (EXISTS ( SELECT 1
            FROM sel_expl
           WHERE sel_expl.expl_id = p.expl_id));
+
+
+CREATE OR REPLACE VIEW v_ui_mincut_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.hydrometer_id,
+    connec.connec_id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut.mincut_state,
+    om_mincut.mincut_class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    om_mincut.anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_appropiate,
+        CASE
+            WHEN om_mincut.mincut_state = 0 THEN om_mincut.forecast_start::timestamp with time zone
+            WHEN om_mincut.mincut_state = 1 THEN now()
+            WHEN om_mincut.mincut_state = 2 THEN om_mincut.exec_start::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS start_date,
+        CASE
+            WHEN om_mincut.mincut_state = 0 THEN om_mincut.forecast_end::timestamp with time zone
+            WHEN om_mincut.mincut_state = 1 THEN now()
+            WHEN om_mincut.mincut_state = 2 THEN om_mincut.exec_end::timestamp with time zone
+            ELSE NULL::timestamp with time zone
+        END AS end_date,
+    om_mincut.shutoff_required
+   FROM om_mincut_hydrometer
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.hydrometer_id::text = om_mincut_hydrometer.hydrometer_id::text
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text;
+
+
+CREATE OR REPLACE VIEW v_om_mincut_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut_hydrometer.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    connec.connec_id,
+    connec.code AS connec_code
+   FROM selector_mincut_result,
+    om_mincut_hydrometer
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_hydrometer.result_id::text AND selector_mincut_result.cur_user = CURRENT_USER;
+
+
+CREATE OR REPLACE VIEW ve_rtc_hydro_data_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    connec.connec_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.code,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_cat_period.code AS cat_period_code,
+    ext_rtc_hydrometer_x_data.value_date,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.hydrometer_id::bigint
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::bigint = ext_rtc_hydrometer.catalog_id::bigint
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
+  ORDER BY ext_rtc_hydrometer_x_data.hydrometer_id, ext_rtc_hydrometer_x_data.cat_period_id DESC;
+
+
+CREATE OR REPLACE VIEW v_om_mincut_current_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut_hydrometer.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    connec.connec_id,
+    connec.code AS connec_code
+   FROM om_mincut_hydrometer
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id = ext_rtc_hydrometer.hydrometer_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.customer_code::text
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+  WHERE om_mincut.mincut_state = 1;
 
 CREATE OR REPLACE VIEW ve_plan_netscenario_presszone
 AS WITH plan_netscenario_current AS (

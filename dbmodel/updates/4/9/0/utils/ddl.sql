@@ -69,3 +69,7 @@ CREATE SEQUENCE ext_plot_id_seq
 ALTER TABLE ext_plot ALTER COLUMN id SET DEFAULT nextval('ext_plot_id_seq');
 ALTER TABLE ext_streetaxis ALTER COLUMN id SET DEFAULT nextval('ext_streetaxis_id_seq');
 ALTER TABLE ext_address ALTER COLUMN id SET DEFAULT nextval('ext_address_id_seq');
+
+
+-- 02/04/2026
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"customer_code", "dataType":"varchar(30)"}}$$);
