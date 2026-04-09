@@ -41,9 +41,3 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('DMA');
 CREATE TRIGGER gw_trg_edit_plan_netscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_plan_netscenario_presszone 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('PRESSZONE');
 
-
-CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_node 
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
-
-CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_arc 
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
