@@ -266,9 +266,8 @@ class GwPsector:
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_reports.clicked.connect(partial(self.open_dlg_reports))
-        # TODO: Update to use view_prefix='vf_' after views creation
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, self.excluded_layers_tab_feature, view_prefix='ve_'))
+            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, self.excluded_layers_tab_feature, view_prefix='vf_'))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(tools_qgis.disconnect_snapping, False, self.emit_point, self.vertex_marker))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
@@ -957,11 +956,10 @@ class GwPsector:
         if self.dlg_plan_psector.tabwidget.currentIndex() == 2:
             if not self._relations_tab_feature_initialized:
                 self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-                # TODO: Update to use view_prefix='vf_' after views creation
                 tools_gw.get_signal_change_tab(
                     self.dlg_plan_psector,
                     self.excluded_layers_tab_feature,
-                    view_prefix='ve_'
+                    view_prefix='vf_'
                 )
                 self._relations_tab_feature_initialized = True
             if not self._selection_widget_loaded:
