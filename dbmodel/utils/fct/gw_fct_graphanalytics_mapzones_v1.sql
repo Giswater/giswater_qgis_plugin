@@ -1513,7 +1513,7 @@ BEGIN
 					JOIN temp_pgr_arc n2 ON a.pgr_node_2 = n2.pgr_arc_id
 					WHERE a.graph_delimiter = 'initoverflowpath'
 				)
-				SELECT row_number() OVER (ORDER BY source, target) AS id,
+				SELECT row_number() OVER () AS id,
 						source,
 						target,
 						1 AS cost
