@@ -4313,3 +4313,157 @@ AS WITH typevalue AS (
      LEFT JOIN omzone_table ON omzone_table.omzone_id = l.omzone_id
      LEFT JOIN inp_network_mode ON true
      JOIN vf_link z on z.link_id = l.link_id;
+
+-- NOTE: ve_epa_valve
+CREATE OR REPLACE VIEW ve_epa_valve
+AS SELECT inp_valve.node_id,
+    inp_valve.valve_type,
+    cat_node.dint,
+    inp_valve.custom_dint,
+    inp_valve.setting,
+    inp_valve.curve_id,
+    inp_valve.minorloss,
+    v.to_arc,
+        CASE
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.broken IS FALSE AND (v.to_arc IS NOT NULL OR inp_valve.valve_type::text = 'TCV'::text) THEN 'ACTIVE'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
+        END AS status,
+    inp_valve.add_settings,
+    inp_valve.init_quality,
+    inp_valve.head,
+    inp_valve.pattern_id,
+    inp_valve.demand,
+    inp_valve.demand_pattern_id,
+    inp_valve.emitter_coeff,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.arc_id as nodarc_id
+   FROM node
+     JOIN inp_valve USING (node_id)
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_valve.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_valve.node_id;
+
+-- NOTE: ve_epa_pump
+CREATE OR REPLACE VIEW ve_epa_pump
+AS SELECT inp_pump.node_id,
+    inp_pump.power,
+    inp_pump.curve_id,
+    inp_pump.speed,
+    inp_pump.pattern_id,
+    inp_pump.status,
+    p.to_arc,
+    inp_pump.energyparam,
+    inp_pump.energyvalue,
+    inp_pump.pump_type,
+    inp_pump.effic_curve_id,
+    inp_pump.energy_price,
+    inp_pump.energy_pattern_id,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.arc_id as nodarc_id
+   FROM inp_pump
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_pump.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_pump p ON p.node_id = inp_pump.node_id;
+
+-- NOTE: ve_epa_pump_additional
+CREATE OR REPLACE VIEW ve_epa_pump_additional
+AS SELECT inp_pump_additional.id,
+    inp_pump_additional.node_id,
+    inp_pump_additional.order_id,
+    inp_pump_additional.power,
+    inp_pump_additional.curve_id,
+    inp_pump_additional.speed,
+    inp_pump_additional.pattern_id,
+    inp_pump_additional.status,
+    inp_pump_additional.energyparam,
+    inp_pump_additional.energyvalue,
+    inp_pump_additional.effic_curve_id,
+    inp_pump_additional.energy_price,
+    inp_pump_additional.energy_pattern_id,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.arc_id as nodarc_id
+    FROM inp_pump_additional
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_pump_additional.node_id, '_n2a', inp_pump_additional.order_id) = v_rpt_arc_stats.arc_id::text;
+
+-- NOTE: ve_epa_shortpipe
+CREATE OR REPLACE VIEW ve_epa_shortpipe
+AS SELECT inp_shortpipe.node_id,
+    inp_shortpipe.minorloss,
+    cat_node.dint,
+    inp_shortpipe.custom_dint,
+    v.to_arc,
+        CASE
+            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+            WHEN v.broken IS FALSE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
+            ELSE 'OPEN'::character varying(12)
+        END AS status,
+    inp_shortpipe.bulk_coeff,
+    inp_shortpipe.wall_coeff,
+    inp_shortpipe.head,
+    inp_shortpipe.pattern_id,
+    inp_shortpipe.demand,
+    inp_shortpipe.demand_pattern_id,
+    inp_shortpipe.emitter_coeff,
+    v_rpt_arc_stats.result_id,
+    v_rpt_arc_stats.flow_max AS flowmax,
+    v_rpt_arc_stats.flow_min AS flowmin,
+    v_rpt_arc_stats.flow_avg AS flowavg,
+    v_rpt_arc_stats.vel_max AS velmax,
+    v_rpt_arc_stats.vel_min AS velmin,
+    v_rpt_arc_stats.vel_avg AS velavg,
+    v_rpt_arc_stats.headloss_max,
+    v_rpt_arc_stats.headloss_min,
+    v_rpt_arc_stats.setting_max,
+    v_rpt_arc_stats.setting_min,
+    v_rpt_arc_stats.reaction_max,
+    v_rpt_arc_stats.reaction_min,
+    v_rpt_arc_stats.ffactor_max,
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.arc_id as nodarc_id  
+   FROM node
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN inp_shortpipe USING (node_id)
+     LEFT JOIN v_rpt_arc_stats ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
+     LEFT JOIN man_valve v ON v.node_id = inp_shortpipe.node_id;

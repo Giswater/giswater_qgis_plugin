@@ -356,3 +356,11 @@ WHERE h.hydrometer_id = COALESCE(cc.hydrometer_id, nc.hydrometer_id);
 
 DROP TABLE IF EXISTS rtc_hydrometer_x_node;
 DROP TABLE IF EXISTS rtc_hydrometer_x_connec;
+
+
+UPDATE config_form_fields SET layoutorder = layoutorder+1 WHERE layoutname = 'lyt_epa_data_2' AND formname IN ('ve_epa_valve', 've_epa_shortpipe', 've_epa_pump', 've_epa_pump_additional');
+
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_pump', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_pump_additional', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
+INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_valve', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
