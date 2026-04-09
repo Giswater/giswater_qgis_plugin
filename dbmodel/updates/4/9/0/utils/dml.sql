@@ -190,3 +190,11 @@ WHERE formname='config_visit_parameter' AND formtype='form_feature' AND columnna
 
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id_plan' AND tabname='tab_general';
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='psector' AND columnname='workcat_id' AND tabname='tab_general';
+
+
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_node', 'Filtered nodes', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_arc', 'Filtered arcs', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_connec', 'Filtered connecs', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_element', 'Filtered elements', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_gully', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_link', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;

@@ -121,3 +121,155 @@ SELECT * FROM ext_region;
 
 CREATE OR REPLACE VIEW v_province AS
 SELECT * FROM ext_province;
+
+-- NOTE: vf_selector_arc
+CREATE OR REPLACE VIEW vf_selector_arc AS 
+ SELECT a.arc_id, COALESCE(pp.state, a.state) AS p_state
+   FROM arc a
+     LEFT JOIN LATERAL ( SELECT pp_1.state
+           FROM plan_psector_x_arc pp_1
+          WHERE pp_1.arc_id = a.arc_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
+                   FROM selector_psector sp
+                  WHERE sp.cur_user = CURRENT_USER))
+          ORDER BY pp_1.psector_id DESC
+         LIMIT 1) pp ON true
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = COALESCE(pp.state, a.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = a.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = a.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
+          
+-- NOTE: vf_selector_node
+CREATE OR REPLACE VIEW vf_selector_node AS 
+ SELECT a.node_id, COALESCE(pp.state, a.state) AS p_state
+   FROM node a
+     LEFT JOIN LATERAL ( SELECT pp_1.state
+           FROM plan_psector_x_node pp_1
+          WHERE pp_1.node_id = a.node_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
+                   FROM selector_psector sp
+                  WHERE sp.cur_user = CURRENT_USER))
+          ORDER BY pp_1.psector_id DESC
+         LIMIT 1) pp ON true
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = COALESCE(pp.state, a.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = a.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = a.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
+        
+
+-- NOTE: vf_selector_connec
+CREATE OR REPLACE VIEW vf_selector_connec AS 
+ SELECT a.connec_id, COALESCE(pp.state, a.state) AS p_state
+   FROM connec a
+     LEFT JOIN LATERAL ( SELECT pp_1.state
+           FROM plan_psector_x_connec pp_1
+          WHERE pp_1.connec_id = a.connec_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
+                   FROM selector_psector sp
+                  WHERE sp.cur_user = CURRENT_USER))
+          ORDER BY pp_1.psector_id DESC
+         LIMIT 1) pp ON true
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = COALESCE(pp.state, a.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = a.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = a.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
+
+-- NOTE: vf_selector_element
+ CREATE OR REPLACE VIEW vf_selector_element AS 
+ SELECT a.element_id, a.state
+   FROM element a
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = a.state AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = a.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = a.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));    
+
+-- NOTE: vf_selector_link
+
+CREATE OR REPLACE VIEW vf_selector_link AS 
+ SELECT a.link_id, COALESCE(pp.state, a.state) AS p_state
+   FROM link a
+     LEFT JOIN LATERAL ( SELECT pp_1.state
+           FROM plan_psector_x_connec pp_1
+          WHERE pp_1.link_id = a.link_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
+                   FROM selector_psector sp
+                  WHERE sp.cur_user = CURRENT_USER))
+          ORDER BY pp_1.psector_id DESC
+         LIMIT 1) pp ON true
+  WHERE (EXISTS ( SELECT 1
+           FROM selector_state ss
+          WHERE ss.state_id = COALESCE(pp.state, a.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_sector ssec
+          WHERE ssec.sector_id = a.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_municipality sm
+          WHERE sm.muni_id = a.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+           FROM selector_expl se
+          WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
+
+-- NOTE: ve_element
+CREATE OR REPLACE VIEW ve_element
+AS SELECT e.element_id,
+    e.code,
+    e.sys_code,
+    e.top_elev,
+    cat_element.element_type,
+    e.elementcat_id,
+    e.num_elements,
+    e.epa_type,
+    e.state,
+    e.state_type,
+    e.expl_id,
+    e.muni_id,
+    e.sector_id,
+    e.omzone_id,
+    e.function_type,
+    e.category_type,
+    e.location_type,
+    e.observ,
+    e.comment,
+    cat_element.link,
+    e.workcat_id,
+    e.workcat_id_end,
+    e.builtdate,
+    e.enddate,
+    e.ownercat_id,
+    e.brand_id,
+    e.model_id,
+    e.serial_number,
+    e.asset_id,
+    e.verified,
+    e.datasource,
+    e.label_x,
+    e.label_y,
+    e.label_rotation,
+    e.rotation,
+    e.inventory,
+    e.publish,
+    e.trace_featuregeom,
+    e.lock_level,
+    e.expl_visibility,
+    e.created_at,
+    e.created_by,
+    e.updated_at,
+    e.updated_by,
+    e.the_geom,
+    e.uuid
+   FROM element e
+     JOIN cat_element ON e.elementcat_id::text = cat_element.id::text
+    JOIN vf_selector_element z ON z.element_id = e.element_id;
