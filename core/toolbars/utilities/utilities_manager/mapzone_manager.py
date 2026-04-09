@@ -1381,14 +1381,14 @@ class GwMapzoneManager:
             return
 
         # Get selected mapzone data
-        index = tableview.selectionModel().currentIndex()
-        mapzone_id = index.sibling(index.row(), 0).data()
-        active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
-        active = tools_os.set_boolean(active)
-        field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
+        for index in selected_list:
+            mapzone_id = index.sibling(index.row(), 0).data()
+            active = index.sibling(index.row(), tools_qt.get_col_index_by_col_name(tableview, 'active')).data()
+            active = tools_os.set_boolean(active)
+            field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
 
-        sql = f"UPDATE {view.replace('v_ui_', 've_')} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
-        tools_db.execute_sql(sql)
+            sql = f"UPDATE {view.replace('v_ui_', 've_')} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
+            tools_db.execute_sql(sql)
 
         # Refresh tableview
         self._manage_current_changed()
