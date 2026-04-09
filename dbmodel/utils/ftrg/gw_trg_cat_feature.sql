@@ -199,45 +199,41 @@ BEGIN
 		--on update and change of cat_feature.id or child layer name
 		IF NEW.id != OLD.id THEN
 
-			--if cat_feature has changed, rename the id in the definition of a child view
-			IF NEW.id != OLD.id THEN
+			IF v_viewname IS NOT NULL THEN
 
-				IF v_viewname IS NOT NULL THEN
+				IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = v_schemaname
+				AND table_name = v_viewname)) = true THEN
 
-					IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = v_schemaname
-					AND table_name = v_viewname)) = true THEN
+					--get the old view definition
+					EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
+					INTO v_definition;
 
-						--get the old view definition
-						EXECUTE 'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
-						INTO v_definition;
+					--replace cat_feature.id in the view definition
+					v_definition = replace(v_definition,quote_literal(OLD.id),quote_literal(NEW.id));
 
-						--replace cat_feature.id in the view definition
-						v_definition = replace(v_definition,quote_literal(OLD.id),quote_literal(NEW.id));
+					--replace the existing view and drop the old trigger
+					EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||NEW.child_layer||' AS '||v_definition||';';
+					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
 
-						--replace the existing view and drop the old trigger
-						EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||NEW.child_layer||' AS '||v_definition||';';
-						EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
+					EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
+					INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE
+					PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
-						EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
-						INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_viewname||' FOR EACH ROW EXECUTE
-						PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
-
-					ELSE
-						IF NEW.feature_class <> 'LINK' THEN
-							v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
-							"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
-							PERFORM gw_fct_admin_manage_child_views(v_query::json);
-						END IF;
-
-						--insert definition into config_info_layer_x_type if its not present already
-						IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
-						and NEW.child_layer IS NOT NULL THEN
-							INSERT INTO config_info_layer_x_type (tableinfo_id,infotype_id,tableinfotype_id)
-							VALUES (NEW.child_layer,1,NEW.child_layer);
-						END IF;
-
-						EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
+				ELSE
+					IF NEW.feature_class <> 'LINK' THEN
+						v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
+						"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
+						PERFORM gw_fct_admin_manage_child_views(v_query::json);
 					END IF;
+
+					--insert definition into config_info_layer_x_type if its not present already
+					IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
+					and NEW.child_layer IS NOT NULL THEN
+						INSERT INTO config_info_layer_x_type (tableinfo_id,infotype_id,tableinfotype_id)
+						VALUES (NEW.child_layer,1,NEW.child_layer);
+					END IF;
+
+					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
 				END IF;
 			END IF;
 		END IF;
@@ -265,6 +261,7 @@ BEGIN
 					--replace the existing view
 					EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
 					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_old_child_layer||';';
+					EXECUTE 'ALTER TABLE man_' ||lower(OLD.feature_type)||'_'||lower(OLD.id)||' RENAME TO man_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||';';
 					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(OLD.id)||' ON '||v_viewname||';';
 
 					EXECUTE 'CREATE TRIGGER gw_trg_edit_'||lower(NEW.feature_type)||'_'||lower(NEW.id)||'
