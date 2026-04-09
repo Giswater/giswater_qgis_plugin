@@ -8,6 +8,7 @@ or (at your option) any later version.
 import json
 import os
 import csv
+import re
 from qgis.PyQt.sip import isdeleted
 from time import time
 from datetime import datetime, timedelta
@@ -18,7 +19,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdi
     QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
-    QgsVectorLayer, Qgis
+    QgsVectorLayer, Qgis, QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools
@@ -79,6 +80,7 @@ class GwMincut:
         self.mincut_aux_conn = None
         self.mincut_cursor = None
         self.search_rubber_band = tools_gw.create_rubberband(self.canvas)
+        self.geom_by_source = {"street": {}, "postnumber": {}}
 
     def manage_mincuts(self, dialog):
         """ Button 12: Mincut management """
@@ -357,7 +359,7 @@ class GwMincut:
         tools_gw.disable_tab_log(self.dlg_mincut)
 
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
-        self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
+        self.state = self.dlg_mincut.findChild(QLineEdit, "state")
         self.work_order = self.dlg_mincut.findChild(QLineEdit, "work_order")
         self.pred_description = self.dlg_mincut.findChild(QTextEdit, "pred_description")
         self.real_description = self.dlg_mincut.findChild(QTextEdit, "real_description")
@@ -365,6 +367,10 @@ class GwMincut:
         self.depth = self.dlg_mincut.findChild(QLineEdit, "depth")
         self.chlorine = self.dlg_mincut.findChild(QLineEdit, "chlorine")
         self.turbidity = self.dlg_mincut.findChild(QLineEdit, "turbidity")
+
+        self.municipality = self.dlg_mincut.findChild(QLineEdit, "cmb_municipality")
+        self.street = self.dlg_mincut.findChild(QLineEdit, "txt_street")
+        self.number = self.dlg_mincut.findChild(QLineEdit, "txt_postnumber")
 
         tools_qt.double_validator(self.distance, 0, 9999999, 3)
         tools_qt.double_validator(self.depth, 0, 9999999, 3)
@@ -390,6 +396,9 @@ class GwMincut:
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows)
+
+        # Manage search widgets
+        self._manage_search_widgets(self.dlg_mincut)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
@@ -450,6 +459,25 @@ class GwMincut:
         self._refresh_tab_hydro()
 
         self._load_widgets_values()
+
+    def _manage_search_widgets(self, dialog):
+        """ Manage search widgets """
+
+        # Fill ComboBox municipality
+        sql = ("SELECT muni_id, name "
+               "FROM ext_municipality " 
+               "WHERE active is True and muni_id > 0 "
+               "ORDER BY name")
+        rows = tools_db.get_rows(sql)
+
+        tools_qt.fill_combo_values(dialog.cmb_municipality, rows)
+
+        # Connect signals to load street and postnumbers
+        dialog.cmb_municipality.currentIndexChanged.connect(partial(self._load_street, dialog, dialog.cmb_municipality))
+        dialog.txt_street.textChanged.connect(partial(self._load_postnumbers, dialog, dialog.txt_street))
+
+        # Emit current index to load street and postnumbers
+        dialog.cmb_municipality.currentIndexChanged.emit(dialog.cmb_municipality.currentIndex())
 
     def set_id_val(self):
         next_id = tools_gw.get_sequence_next_preview(
@@ -591,6 +619,73 @@ class GwMincut:
         tools_gw.set_config_parser('dlg_mincut', 'type', f"{type}")
         tools_gw.set_config_parser('dlg_mincut', 'cause', f"{cause}")
 
+    def _load_street(self, dialog, filter_widget):
+        """Load street typeahead values filtered by selected municipality."""
+
+        tools_qt.set_widget_text(dialog, dialog.txt_street, "")
+        self.muni_id = tools_qt.get_combo_value(dialog, filter_widget, 0)
+        if self.muni_id in (None, "", "-1", -1):
+            self.geom_by_source["street"] = {}
+            tools_qt.set_completer_rows(dialog.txt_street, [])
+            return
+
+        sql = (f"SELECT name, ST_AsText(ST_Simplify(ST_Collect(the_geom), 0)) "
+               f"FROM ve_streetaxis "
+               f"WHERE muni_id = '{self.muni_id}' "
+               f"GROUP BY name "
+               f"ORDER BY name")
+        rows = tools_db.get_rows(sql)
+        tools_qt.set_completer_rows(dialog.txt_street, rows, "contains")
+        self.geom_by_source["street"] = {row[0]: row[1] for row in rows or [] if row and row[0]}
+        completer = dialog.txt_street.completer()
+        if completer:
+            completer.activated.connect(partial(self._zoom_to_geom_text, "street"))
+
+    def _load_postnumbers(self, dialog, filter_widget):
+        """Load postnumbers typeahead values filtered by selected street."""
+
+        tools_qt.set_widget_text(dialog, dialog.txt_postnumber, "")
+        self.street = tools_qt.get_text(dialog, filter_widget)
+        if self.street in (None, "", "-1", -1):
+            self.geom_by_source["postnumber"] = {}
+            tools_qt.set_completer_rows(dialog.txt_postnumber, [])
+            return
+
+        sql = (f"SELECT postnumber, ST_AsText(ST_Simplify(ST_Collect(the_geom), 0)) "
+               f"FROM ve_address "
+               f"WHERE name = '{self.street}' "
+               f"GROUP BY postnumber "
+               f"ORDER BY postnumber")
+        rows = tools_db.get_rows(sql)
+        tools_qt.set_completer_rows(dialog.txt_postnumber, rows)
+        self.geom_by_source["postnumber"] = {row[0]: row[1] for row in rows or [] if row and row[0]}
+        completer = dialog.txt_postnumber.completer()
+        if completer:
+            completer.activated.connect(partial(self._zoom_to_geom_text, "postnumber"))
+
+    def _zoom_to_geom_text(self, source, result):
+        """Zoom to geometry represented as WKT text."""
+        if not result:
+            return
+        geom = self.geom_by_source.get(source, {}).get(result)
+        if not geom:
+            return
+        list_coord = re.search(r'\((.*)\)', str(geom))
+        if not list_coord:
+            return
+        max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+        # For POINT geometries bbox has zero size; expand extent before zoom.
+        if max_x == min_x and max_y == min_y:
+            delta = 10
+            tools_qgis.zoom_to_rectangle(max_x + delta, max_y + delta, min_x - delta, min_y - delta, 0)
+            tools_qgis.draw_point(
+                QgsPointXY(float(max_x), float(max_y)),
+                self.search_rubber_band
+            )
+            return
+        else:
+            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
+
     def _set_states(self):
         """ Serialize data of mincut states """
 
@@ -627,7 +722,7 @@ class GwMincut:
             self.dlg_mincut.dlg_closed.connect(partial(tools_gw.close_docker, option_name='position'))
 
         self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
-        self.dlg_mincut.btn_accept.clicked.connect(self._accept_save_data)
+        self.dlg_mincut.btn_accept.clicked.connect(partial(self._accept_save_data, self.dlg_mincut))
         self.dlg_mincut.btn_cancel.clicked.connect(self._mincut_close)
         self.dlg_mincut.dlg_closed.connect(self._mincut_close)
         self.dlg_mincut.btn_start.clicked.connect(self._real_start)
@@ -828,6 +923,22 @@ class GwMincut:
         if str(work_order) != 'null':
             tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.work_order, work_order)
 
+        # Manage search widgets
+        self._manage_search_widgets(self.dlg_fin)
+
+        # Get values from mincut dialog
+        muni_id = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.cmb_municipality, 0)
+        street = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.txt_street, return_string_null=False)
+        postnumber = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.txt_postnumber, return_string_null=False    )
+
+        # Set values to search widgets
+        if muni_id and muni_id not in (None, ""):
+            tools_qt.set_combo_value(self.dlg_fin.cmb_municipality, muni_id, 0)
+        if street and street not in (None, ""):
+            tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.txt_street, street)
+        if postnumber and postnumber not in (None, ""):
+            tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.txt_postnumber, postnumber)
+
         # Fill ComboBox exec_user
         sql = ("SELECT name as id, name as idval "
                "FROM cat_users "
@@ -855,8 +966,9 @@ class GwMincut:
 
         # Set signals
         self.dlg_fin.btn_accept.clicked.connect(self._real_end_accept)
-        self.dlg_fin.btn_accept.clicked.connect(self._accept_save_data)
+        self.dlg_fin.btn_accept.clicked.connect(partial(self._accept_save_data, self.dlg_fin))
         self.dlg_fin.btn_cancel.clicked.connect(self._real_end_cancel)
+        self.dlg_fin.btn_set_real_location.clicked.connect(self._set_real_location)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_fin, dlg_name='mincut_end')
@@ -876,11 +988,16 @@ class GwMincut:
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._snapping_node_arc_real_location,
                                 'mincut', 'real_end_ep_canvasClicked_snapping_node_arc_real_location')
 
-    def _accept_save_data(self):
+    def _accept_save_data(self, dialog):
         """ Slot function button 'Accept' """
 
         tools_gw.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
+
+        # Manage 'address'
+        municipality = tools_qt.get_combo_value(dialog, dialog.cmb_municipality)
+        street = tools_qt.get_text(dialog, dialog.txt_street, return_string_null=False)
+        postnumber = tools_qt.get_text(dialog, dialog.txt_postnumber, return_string_null=False)
 
         mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
         anl_cause = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.cause, 0)
@@ -987,6 +1104,14 @@ class GwMincut:
             sql += f", equipment_code = $${equipment_code}$$"
         if reagent_lot != "":
             sql += f", reagent_lot = $${reagent_lot}$$"
+
+        # Manage address
+        if municipality != -1:
+            sql += f", muni_id = '{municipality}'"
+        if street:
+            sql += f", streetaxis_id = '{street}'"
+        if postnumber:
+            sql += f", postnumber = '{postnumber}'"
 
         # If state 'In Progress' or 'Finished'
         if mincut_result_state == 1 or mincut_result_state == 2:
@@ -2673,6 +2798,10 @@ class GwMincut:
         if state == '0':
 
             self.dlg_mincut.work_order.setDisabled(False)
+            # Group Address
+            self.dlg_mincut.cmb_municipality.setDisabled(False)
+            self.dlg_mincut.txt_street.setDisabled(False)
+            self.dlg_mincut.txt_postnumber.setDisabled(False)
             # Group Details
             self.dlg_mincut.type.setDisabled(False)
             self.dlg_mincut.cause.setDisabled(False)
@@ -2712,6 +2841,10 @@ class GwMincut:
         elif state == '1':
 
             self.dlg_mincut.work_order.setDisabled(True)
+            # Group Address
+            self.dlg_mincut.cmb_municipality.setDisabled(True)
+            self.dlg_mincut.txt_street.setDisabled(True)
+            self.dlg_mincut.txt_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)
@@ -2751,6 +2884,10 @@ class GwMincut:
         elif state == '2':
 
             self.dlg_mincut.work_order.setDisabled(True)
+            # Group Address
+            self.dlg_mincut.cmb_municipality.setDisabled(True)
+            self.dlg_mincut.txt_street.setDisabled(True)
+            self.dlg_mincut.txt_postnumber.setDisabled(True)
             # Group Details
             self.dlg_mincut.type.setDisabled(True)
             self.dlg_mincut.cause.setDisabled(True)

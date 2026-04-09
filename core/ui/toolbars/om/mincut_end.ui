@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>365</width>
-    <height>467</height>
+    <height>519</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,24 +20,61 @@
       <string>Close mincut</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="work_order">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="lbl_msg">
         <property name="text">
-         <string/>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         <string>No results found</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_mincut">
+      <item row="2" column="0" colspan="2">
+       <widget class="QGroupBox" name="grb_adress">
+        <property name="title">
+         <string>Adress</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lbl_street">
+           <property name="text">
+            <string>Street</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="lbl_municiplity">
+           <property name="text">
+            <string>Municipality</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lbl_postnumber">
+           <property name="text">
+            <string>Number</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="cmb_municipality"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="txt_street"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="txt_postnumber"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QPushButton" name="btn_set_real_location">
+        <property name="text">
+         <string>Set real location</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbl_work_order">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -50,7 +87,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Mincut:</string>
+         <string>Work order:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -63,27 +100,6 @@
         </property>
         <property name="margin">
          <number>3</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="mincut">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="font">
-         <font>
-          <italic>false</italic>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -350,15 +366,8 @@
         </layout>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="lbl_msg">
-        <property name="text">
-         <string>No results found</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lbl_work_order">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_mincut">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -371,7 +380,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Work order:</string>
+         <string>Mincut:</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -387,29 +396,40 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="0">
-       <widget class="QPushButton" name="btn_set_real_location">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="mincut">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="font">
+         <font>
+          <italic>false</italic>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
         <property name="text">
-         <string>Set real location</string>
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QTabWidget" name="main_tab">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="work_order">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>100</height>
-         </size>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
-        <property name="currentIndex">
-         <number>-1</number>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -480,7 +500,6 @@
  <tabstops>
   <tabstop>mincut</tabstop>
   <tabstop>work_order</tabstop>
-  <tabstop>main_tab</tabstop>
   <tabstop>cbx_date_start_fin</tabstop>
   <tabstop>cbx_hours_start_fin</tabstop>
   <tabstop>cbx_date_end_fin</tabstop>
