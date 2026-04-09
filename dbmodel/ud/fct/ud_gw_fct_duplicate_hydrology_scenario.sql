@@ -51,6 +51,7 @@ v_infiltration text;
 v_text text;
 v_inp_hydrology text;
 v_sourcename text;
+v_function_id integer = 3294;
 
 BEGIN
 
@@ -75,27 +76,27 @@ BEGIN
 	SELECT name INTO v_sourcename FROM cat_hydrology WHERE hydrology_id  = v_copyfrom;
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"function":"3156","fid":"'||v_fid||'","criticity":"4","is_process":true,"is_header":"true"}}$$)';
+	"data":{"function":"'||v_function_id||'","fid":"'||v_fid||'","criticity":"4","is_process":true,"is_header":"true"}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"4312","function":"3156","parameters":{"v_sourcename":"'||v_sourcename||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+	"data":{"message":"4312","function":"'||v_function_id||'","parameters":{"v_sourcename":"'||v_sourcename||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"4314","function":"3156","parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+	"data":{"message":"4314","function":"'||v_function_id||'","parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"4022","function":"3156","parameters":{"v_text":"'||quote_nullable(v_text)||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+	"data":{"message":"4022","function":"'||v_function_id||'","parameters":{"v_text":"'||quote_nullable(v_text)||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"3892","function":"3156","parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+	"data":{"message":"3892","function":"'||v_function_id||'","parameters":{"v_expl_id":"'||v_expl_id||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"3890","function":"3156","parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
+	"data":{"message":"3890","function":"'||v_function_id||'","parameters":{"v_active":"'||v_active||'"}, "fid":"'||v_fid||'","criticity":"4","is_process":true}}$$)';
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat(''));
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"3", "is_process":true,"is_header":"true", "prefix_id":"3003"}}$$)';
+	"data":{"fid":"'||v_fid||'", "criticity":"3", "is_process":true,"is_header":"true", "label_id":"3003"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
-                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "prefix_id":"3002"}}$$)';
+    "data":{"function":"'||v_function_id||'", "fid":"'||v_fid||'", "criticity":"2", "is_process":true, "is_header":"true", "label_id":"3002"}}$$)';
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{}, 
-                        "data":{"function":"3156", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "prefix_id":"3001"}}$$)';
+	"data":{"function":"'||v_function_id||'", "fid":"'||v_fid||'", "criticity":"1", "is_process":true, "is_header":"true", "label_id":"3001"}}$$)';
 
 	-- setting the infitration data from source scenario
 	SELECT infiltration INTO v_inp_hydrology FROM cat_hydrology WHERE hydrology_id = v_copyfrom;
@@ -105,10 +106,11 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_create_hydrology_scenario_empty($$'||p_data||'$$);';
 	SELECT hydrology_id INTO v_scenarioid FROM cat_hydrology where name = v_name;
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"4316","function":"3156","parameters":{"v_name":"'||v_name||'","v_sourcename":"'||v_sourcename||'"}, "fid":"'||v_fid||'","criticity":"1","is_process":true, "prefix_id":"1001"}}$$)';
+	"data":{"message":"4316","function":"'||v_function_id||'","parameters":{"v_name":"'||v_name||'","v_sourcename":"'||v_sourcename||'"}, "fid":"'||v_fid||'","criticity":"1","is_process":true, "prefix_id":"1001"}}$$)';
 
 	-- Copy values from hydrology scenario to copy from
-	EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||', "sector":-998}}}$$);';
+	EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client": '||(p_data ->>'client')::json||', 
+	"data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||', "sector":-998}}}$$);';
 
 
 	-- setting current dwf for user
@@ -116,7 +118,7 @@ BEGIN
 
 	-- manage log (fid: v_fid)
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4,"infoType":1,"lang":"ES"},"feature":{}, 
-						"data":{"message":"4318","function":"3156","parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "criticity":"1","is_process":true}}$$)';
+	"data":{"message":"4318","function":"'||v_function_id||'","parameters":{"v_name":"'||v_name||'"}, "fid":"'||v_fid||'","result_id":"'||quote_nullable(v_result_id)||'", "criticity":"1","is_process":true}}$$)';
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
