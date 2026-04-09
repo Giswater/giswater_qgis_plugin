@@ -80,7 +80,6 @@ v_query text;
 v_id integer;
 v_code text;
 v_hydro_number text;
-v_feature_id integer;
 v_link text;
 v_state_id integer;
 v_catalog_id integer;
@@ -92,6 +91,7 @@ v_end_date date;
 v_update_date date;
 v_shutdown_date date;
 v_exists boolean;
+v_customer_code text;
 
 BEGIN
 
@@ -119,12 +119,7 @@ BEGIN
 	IF v_action = 'REPLACE' THEN
 		-- Count before deleting
 		SELECT count(*) INTO v_deleted FROM ext_rtc_hydrometer;
-
-		TRUNCATE rtc_hydrometer_x_connec CASCADE;
 		TRUNCATE ext_rtc_hydrometer CASCADE;
-		IF v_project_type = 'WS' THEN
-			TRUNCATE rtc_hydrometer_x_node CASCADE;
-		END IF;
 	END IF;
 
 	-- Process each hydrometer in the array
@@ -135,7 +130,7 @@ BEGIN
 		-- Extract fields from JSON
 		v_code := v_hydrometer->>'code';
 		v_hydro_number := v_hydrometer->>'hydro_number';
-		v_feature_id := (v_hydrometer->>'feature_id')::integer;
+		v_customer_code := (v_hydrometer->>'customer_code');
 		v_link := v_hydrometer->>'link';
 		v_state_id := (v_hydrometer->>'state_id')::integer;
 		v_catalog_id := (v_hydrometer->>'catalog_id')::integer;
@@ -183,11 +178,6 @@ BEGIN
 				SELECT EXISTS(SELECT 1 FROM ext_rtc_hydrometer WHERE code = v_code) INTO v_exists;
 
 				IF v_exists THEN
-					-- Delete from relation tables first
-					DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id = v_id;
-					IF v_project_type = 'WS' THEN
-						DELETE FROM rtc_hydrometer_x_node WHERE hydrometer_id = v_id;
-					END IF;
 					DELETE FROM ext_rtc_hydrometer WHERE code = v_code;
 					v_deleted := v_deleted + 1;
 				END IF;
@@ -207,7 +197,8 @@ BEGIN
 				end_date,
 				update_date,
 				shutdown_date,
-				link
+				link,
+				customer_code
 			) VALUES (
 				v_code,
 				v_hydro_number,
@@ -220,28 +211,11 @@ BEGIN
 				v_end_date,
 				v_update_date,
 				v_shutdown_date,
-				v_link
+				v_link,
+				v_customer_code
 			) RETURNING hydrometer_id INTO v_id;
 
 			v_inserted := v_inserted + 1;
-			-- Insert into rtc_hydrometer_x_connec/node (relation table) if feature_id is provided
-			IF v_feature_id IS NOT NULL THEN
-				IF v_project_type = 'WS' THEN
-					IF (SELECT EXISTS(SELECT 1 FROM node WHERE node_id = v_feature_id)) THEN
-						INSERT INTO rtc_hydrometer_x_node (hydrometer_id, node_id)
-						VALUES (v_id, v_feature_id)
-						ON CONFLICT (hydrometer_id, node_id) DO NOTHING;
-					ELSE
-						INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
-						VALUES (v_id, v_feature_id)
-						ON CONFLICT (hydrometer_id, connec_id) DO NOTHING;
-					END IF;
-				ELSE
-					INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
-					VALUES (v_id, v_feature_id)
-					ON CONFLICT (hydrometer_id, connec_id) DO NOTHING;
-				END IF;
-			END IF;
 
 		ELSIF v_action = 'UPDATE' THEN
 			-- Check if hydrometer exists
@@ -296,6 +270,10 @@ BEGIN
 				v_query := concat(v_query, 'shutdown_date = ', quote_nullable(v_shutdown_date::text), '::date, ');
 			END IF;
 
+			IF v_customer_code IS NOT NULL THEN
+				v_query := concat(v_query, 'customer_code = ', v_customer_code, ', ');
+			END IF;
+
 			-- Remove trailing comma and space
 			v_query := rtrim(v_query, ', ');
 
@@ -316,25 +294,6 @@ BEGIN
 				IF NOT FOUND THEN
 					INSERT INTO ext_rtc_hydrometer (code, link) VALUES (v_code, v_link);
 				END IF;
-			END IF;
-
-			-- Update connec relation if provided
-			IF v_feature_id IS NOT NULL THEN
-				-- Delete old relation
-				IF v_project_type = 'WS' THEN
-					IF (SELECT EXISTS(SELECT 1 FROM node WHERE node_id = v_feature_id)) THEN
-						DELETE FROM rtc_hydrometer_x_node WHERE hydrometer_id = v_id;
-
-						INSERT INTO rtc_hydrometer_x_node (hydrometer_id, node_id)
-						VALUES (v_id, v_feature_id)
-						ON CONFLICT (hydrometer_id, node_id) DO NOTHING;
-					END IF;
-				END IF;
-				DELETE FROM rtc_hydrometer_x_connec WHERE hydrometer_id = v_id;
-				-- Insert new relation
-				INSERT INTO rtc_hydrometer_x_connec (hydrometer_id, connec_id)
-				VALUES (v_id, v_feature_id)
-				ON CONFLICT (hydrometer_id, connec_id) DO NOTHING;
 			END IF;
 		END IF;
 
