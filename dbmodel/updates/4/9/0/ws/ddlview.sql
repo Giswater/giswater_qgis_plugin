@@ -3730,7 +3730,8 @@ AS WITH typevalue AS (
     COALESCE(pp.state, n.state) AS p_state,
     n.uuid,
     n.uncertain,
-    n.xyz_date
+    n.xyz_date,
+    m.to_arc
    FROM node n
      LEFT JOIN LATERAL ( SELECT pp_1.state
            FROM plan_psector_x_node pp_1
@@ -3743,7 +3744,7 @@ AS WITH typevalue AS (
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
      JOIN value_state_type vst ON vst.id = n.state_type
      JOIN exploitation ON n.expl_id = exploitation.expl_id
-     JOIN ext_municipality mu ON n.muni_id = mu.muni_id
+     JOIN v_municipality mu ON n.muni_id = mu.muni_id
      JOIN sector_table ON sector_table.sector_id = n.sector_id
      LEFT JOIN presszone_table ON presszone_table.presszone_id = n.presszone_id
      LEFT JOIN dma_table ON dma_table.dma_id = n.dma_id
@@ -3874,7 +3875,7 @@ AS WITH typevalue AS (
     mu.region_id,
     mu.province_id,
     c.block_code,
-    c.plot_code,
+    c.plot_id,
     c.workcat_id,
     c.workcat_id_end,
     c.workcat_id_plan,
@@ -3954,7 +3955,7 @@ AS WITH typevalue AS (
             l.exit_id,
             l.exit_type
            FROM plan_psector_x_connec pp_1
-             JOIN link l ON l.link_id = pp_1.link_id
+             LEFT JOIN link l ON l.link_id = pp_1.link_id AND l.state = 2
           WHERE pp_1.connec_id = c.connec_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
                    FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER))
@@ -3963,14 +3964,14 @@ AS WITH typevalue AS (
      JOIN cat_connec ON cat_connec.id::text = c.conneccat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
      JOIN exploitation ON c.expl_id = exploitation.expl_id
-     JOIN ext_municipality mu ON c.muni_id = mu.muni_id
+     JOIN v_municipality mu ON c.muni_id = mu.muni_id
      JOIN sector_table ON sector_table.sector_id = c.sector_id
      LEFT JOIN presszone_table ON presszone_table.presszone_id = c.presszone_id
      LEFT JOIN dma_table ON dma_table.dma_id = c.dma_id
      LEFT JOIN dqa_table ON dqa_table.dqa_id = c.dqa_id
      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = c.supplyzone_id
      LEFT JOIN omzone_table ON omzone_table.omzone_id = c.omzone_id
-     LEFT JOIN crmzone ON crmzone.id::text = c.crmzone_id::text
+     LEFT JOIN crmzone ON crmzone.crmzone_id = c.crmzone_id
      LEFT JOIN connec_add ON connec_add.connec_id = c.connec_id
      LEFT JOIN value_state_type vst ON vst.id = c.state_type
      LEFT JOIN inp_network_mode ON true
@@ -4021,7 +4022,8 @@ AS WITH typevalue AS (
         ), omzone_table AS (
          SELECT omzone.omzone_id,
             t.id::character varying(16) AS omzone_type,
-            omzone.macroomzone_id
+            omzone.macroomzone_id,
+            omzone.stylesheet
            FROM omzone
              LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
         ), inp_network_mode AS (
@@ -4051,6 +4053,10 @@ AS WITH typevalue AS (
     cat_link.link_type,
     cat_feature.feature_class AS sys_type,
     l.linkcat_id,
+    cat_link.matcat_id,
+    cat_link.dnom AS cat_dnom,
+    cat_link.dint AS cat_dint,
+    cat_link.pnom AS cat_pnom,
     l.state,
     l.state_type,
     l.expl_id,
@@ -4097,6 +4103,12 @@ AS WITH typevalue AS (
     l.userdefined_geom,
     l.datasource,
     l.is_operative,
+    sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+    omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
+    dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
+    dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
+    supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
         CASE
             WHEN l.sector_id > 0 AND l.is_operative = true AND c.epa_type = 'JUNCTION'::text AND inp_network_mode.value = '4'::text THEN c.epa_type
             ELSE NULL::text

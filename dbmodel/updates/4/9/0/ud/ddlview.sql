@@ -4291,4 +4291,4 @@ AS WITH typevalue AS (
      LEFT JOIN drainzone_table ON gully.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON gully.dwfzone_id = dwfzone_table.dwfzone_id
      LEFT JOIN inp_network_mode ON true
-     JOIN vf_selector_gully z ON z.gully_id = g.gully_id;
+     JOIN vf_selector_gully z ON z.gully_id = gully.gully_id;
