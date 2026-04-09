@@ -3346,52 +3346,52 @@ AS WITH plan_netscenario_current AS (
 
 
 -- NOTE: ve_arc
-CREATE OR REPLACE VIEW ws_0408_11.ve_arc AS 
+CREATE OR REPLACE VIEW ve_arc AS 
 WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
-           FROM ws_0408_11.edit_typevalue
+           FROM edit_typevalue
           WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
         ), sector_table AS (
          SELECT sector.sector_id,
             sector.macrosector_id,
             sector.stylesheet,
             t.id::character varying(16) AS sector_type
-           FROM ws_0408_11.sector
+           FROM sector
              LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
         ), dma_table AS (
          SELECT dma.dma_id,
             dma.macrodma_id,
             dma.stylesheet,
             t.id::character varying(16) AS dma_type
-           FROM ws_0408_11.dma
+           FROM dma
              LEFT JOIN typevalue t ON t.id::text = dma.dma_type::text AND t.typevalue::text = 'dma_type'::text
         ), presszone_table AS (
          SELECT presszone.presszone_id,
             presszone.head AS presszone_head,
             presszone.stylesheet,
             t.id::character varying(16) AS presszone_type
-           FROM ws_0408_11.presszone
+           FROM presszone
              LEFT JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
         ), dqa_table AS (
          SELECT dqa.dqa_id,
             dqa.stylesheet,
             t.id::character varying(16) AS dqa_type,
             dqa.macrodqa_id
-           FROM ws_0408_11.dqa
+           FROM dqa
              LEFT JOIN typevalue t ON t.id::text = dqa.dqa_type::text AND t.typevalue::text = 'dqa_type'::text
         ), supplyzone_table AS (
          SELECT supplyzone.supplyzone_id,
             supplyzone.stylesheet,
             t.id::character varying(16) AS supplyzone_type
-           FROM ws_0408_11.supplyzone
+           FROM supplyzone
              LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type::text AND t.typevalue::text = 'supplyzone_type'::text
         ), omzone_table AS (
          SELECT omzone.omzone_id,
             t.id::character varying(16) AS omzone_type,
             omzone.macroomzone_id
-           FROM ws_0408_11.omzone
+           FROM omzone
              LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
         )
  SELECT a.arc_id,
@@ -3527,75 +3527,75 @@ WITH typevalue AS (
     COALESCE(pp.state, a.state) AS p_state,
     a.uuid,
     a.uncertain
-   FROM ws_0408_11.arc a
+   FROM arc a
      LEFT JOIN LATERAL ( SELECT pp_1.state
-           FROM ws_0408_11.plan_psector_x_arc pp_1
+           FROM plan_psector_x_arc pp_1
           WHERE pp_1.arc_id = a.arc_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
-                   FROM ws_0408_11.selector_psector sp
+                   FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER))
           ORDER BY pp_1.psector_id DESC
          LIMIT 1) pp ON true
-     JOIN ws_0408_11.cat_arc ON cat_arc.id::text = a.arccat_id::text
-     JOIN ws_0408_11.cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
-     JOIN ws_0408_11.exploitation ON a.expl_id = exploitation.expl_id
-     JOIN ws_0408_11.ext_municipality mu ON a.muni_id = mu.muni_id
+     JOIN cat_arc ON cat_arc.id::text = a.arccat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
+     JOIN exploitation ON a.expl_id = exploitation.expl_id
+     JOIN ext_municipality mu ON a.muni_id = mu.muni_id
      JOIN sector_table ON sector_table.sector_id = a.sector_id
      LEFT JOIN presszone_table ON presszone_table.presszone_id = a.presszone_id
      LEFT JOIN dma_table ON dma_table.dma_id = a.dma_id
      LEFT JOIN dqa_table ON dqa_table.dqa_id = a.dqa_id
      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = a.supplyzone_id
      LEFT JOIN omzone_table ON omzone_table.omzone_id = a.omzone_id
-     LEFT JOIN ws_0408_11.arc_add ON arc_add.arc_id = a.arc_id
-     LEFT JOIN ws_0408_11.value_state_type vst ON vst.id = a.state_type
+     LEFT JOIN arc_add ON arc_add.arc_id = a.arc_id
+     LEFT JOIN value_state_type vst ON vst.id = a.state_type
      JOIN vf_selector_arc z ON a.arc_id = z.arc_id;
 
 -- NOTE: ve_node
-CREATE OR REPLACE VIEW ws_0326_09.ve_node
+CREATE OR REPLACE VIEW ve_node
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
-           FROM ws_0326_09.edit_typevalue
+           FROM edit_typevalue
           WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
         ), sector_table AS (
          SELECT sector.sector_id,
             sector.macrosector_id,
             sector.stylesheet,
             t.id::character varying(16) AS sector_type
-           FROM ws_0326_09.sector
+           FROM sector
              LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
         ), dma_table AS (
          SELECT dma.dma_id,
             dma.macrodma_id,
             dma.stylesheet,
             t.id::character varying(16) AS dma_type
-           FROM ws_0326_09.dma
+           FROM dma
              LEFT JOIN typevalue t ON t.id::text = dma.dma_type::text AND t.typevalue::text = 'dma_type'::text
         ), presszone_table AS (
          SELECT presszone.presszone_id,
             presszone.head AS presszone_head,
             presszone.stylesheet,
             t.id::character varying(16) AS presszone_type
-           FROM ws_0326_09.presszone
+           FROM presszone
              LEFT JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
         ), dqa_table AS (
          SELECT dqa.dqa_id,
             dqa.stylesheet,
             t.id::character varying(16) AS dqa_type,
             dqa.macrodqa_id
-           FROM ws_0326_09.dqa
+           FROM dqa
              LEFT JOIN typevalue t ON t.id::text = dqa.dqa_type::text AND t.typevalue::text = 'dqa_type'::text
         ), supplyzone_table AS (
          SELECT supplyzone.supplyzone_id,
             supplyzone.stylesheet,
             t.id::character varying(16) AS supplyzone_type
-           FROM ws_0326_09.supplyzone
+           FROM supplyzone
              LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type::text AND t.typevalue::text = 'supplyzone_type'::text
         ), omzone_table AS (
          SELECT omzone.omzone_id,
             t.id::character varying(16) AS omzone_type,
             omzone.macroomzone_id
-           FROM ws_0326_09.omzone
+           FROM omzone
              LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
         )
  SELECT n.node_id,
@@ -3731,81 +3731,81 @@ AS WITH typevalue AS (
     n.uuid,
     n.uncertain,
     n.xyz_date
-   FROM ws_0326_09.node n
+   FROM node n
      LEFT JOIN LATERAL ( SELECT pp_1.state
-           FROM ws_0326_09.plan_psector_x_node pp_1
+           FROM plan_psector_x_node pp_1
           WHERE pp_1.node_id = n.node_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
-                   FROM ws_0326_09.selector_psector sp
+                   FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER))
           ORDER BY pp_1.psector_id DESC
          LIMIT 1) pp ON true
-     JOIN ws_0326_09.cat_node ON cat_node.id::text = n.nodecat_id::text
-     JOIN ws_0326_09.cat_feature ON cat_feature.id::text = cat_node.node_type::text
-     JOIN ws_0326_09.value_state_type vst ON vst.id = n.state_type
-     JOIN ws_0326_09.exploitation ON n.expl_id = exploitation.expl_id
-     JOIN ws_0326_09.ext_municipality mu ON n.muni_id = mu.muni_id
+     JOIN cat_node ON cat_node.id::text = n.nodecat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
+     JOIN value_state_type vst ON vst.id = n.state_type
+     JOIN exploitation ON n.expl_id = exploitation.expl_id
+     JOIN ext_municipality mu ON n.muni_id = mu.muni_id
      JOIN sector_table ON sector_table.sector_id = n.sector_id
      LEFT JOIN presszone_table ON presszone_table.presszone_id = n.presszone_id
      LEFT JOIN dma_table ON dma_table.dma_id = n.dma_id
      LEFT JOIN dqa_table ON dqa_table.dqa_id = n.dqa_id
      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = n.supplyzone_id
      LEFT JOIN omzone_table ON omzone_table.omzone_id = n.omzone_id
-     LEFT JOIN ws_0326_09.node_add ON node_add.node_id = n.node_id
-     LEFT JOIN ws_0326_09.man_valve m ON m.node_id = n.node_id
+     LEFT JOIN node_add ON node_add.node_id = n.node_id
+     LEFT JOIN man_valve m ON m.node_id = n.node_id
      JOIN vf_selector_node z on z.node_id = n.node_id;
 
 
 -- NOTE: ve_connec
-CREATE OR REPLACE VIEW ws_0326_09.ve_connec
+CREATE OR REPLACE VIEW ve_connec
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
-           FROM ws_0326_09.edit_typevalue
+           FROM edit_typevalue
           WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
         ), sector_table AS (
          SELECT sector.sector_id,
             sector.macrosector_id,
             sector.stylesheet,
             t.id::character varying(16) AS sector_type
-           FROM ws_0326_09.sector
+           FROM sector
              LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
         ), dma_table AS (
          SELECT dma.dma_id,
             dma.macrodma_id,
             dma.stylesheet,
             t.id::character varying(16) AS dma_type
-           FROM ws_0326_09.dma
+           FROM dma
              LEFT JOIN typevalue t ON t.id::text = dma.dma_type::text AND t.typevalue::text = 'dma_type'::text
         ), presszone_table AS (
          SELECT presszone.presszone_id,
             presszone.head AS presszone_head,
             presszone.stylesheet,
             t.id::character varying(16) AS presszone_type
-           FROM ws_0326_09.presszone
+           FROM presszone
              LEFT JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
         ), dqa_table AS (
          SELECT dqa.dqa_id,
             dqa.stylesheet,
             t.id::character varying(16) AS dqa_type,
             dqa.macrodqa_id
-           FROM ws_0326_09.dqa
+           FROM dqa
              LEFT JOIN typevalue t ON t.id::text = dqa.dqa_type::text AND t.typevalue::text = 'dqa_type'::text
         ), supplyzone_table AS (
          SELECT supplyzone.supplyzone_id,
             supplyzone.stylesheet,
             t.id::character varying(16) AS supplyzone_type
-           FROM ws_0326_09.supplyzone
+           FROM supplyzone
              LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type::text AND t.typevalue::text = 'supplyzone_type'::text
         ), omzone_table AS (
          SELECT omzone.omzone_id,
             t.id::character varying(16) AS omzone_type,
             omzone.macroomzone_id
-           FROM ws_0326_09.omzone
+           FROM omzone
              LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
         ), inp_network_mode AS (
          SELECT config_param_user.value
-           FROM ws_0326_09.config_param_user
+           FROM config_param_user
           WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
         )
  SELECT c.connec_id,
@@ -3948,85 +3948,85 @@ AS WITH typevalue AS (
     c.uuid,
     c.uncertain,
     c.xyz_date
-   FROM ws_0326_09.connec c
+   FROM connec c
      LEFT JOIN LATERAL ( SELECT pp_1.state,
             pp_1.arc_id,
             l.exit_id,
             l.exit_type
-           FROM ws_0326_09.plan_psector_x_connec pp_1
-             JOIN ws_0326_09.link l ON l.link_id = pp_1.link_id
+           FROM plan_psector_x_connec pp_1
+             JOIN link l ON l.link_id = pp_1.link_id
           WHERE pp_1.connec_id = c.connec_id AND (pp_1.psector_id IN ( SELECT sp.psector_id
-                   FROM ws_0326_09.selector_psector sp
+                   FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER))
           ORDER BY pp_1.psector_id DESC, pp_1.state DESC
          LIMIT 1) pp ON true
-     JOIN ws_0326_09.cat_connec ON cat_connec.id::text = c.conneccat_id::text
-     JOIN ws_0326_09.cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
-     JOIN ws_0326_09.exploitation ON c.expl_id = exploitation.expl_id
-     JOIN ws_0326_09.ext_municipality mu ON c.muni_id = mu.muni_id
+     JOIN cat_connec ON cat_connec.id::text = c.conneccat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
+     JOIN exploitation ON c.expl_id = exploitation.expl_id
+     JOIN ext_municipality mu ON c.muni_id = mu.muni_id
      JOIN sector_table ON sector_table.sector_id = c.sector_id
      LEFT JOIN presszone_table ON presszone_table.presszone_id = c.presszone_id
      LEFT JOIN dma_table ON dma_table.dma_id = c.dma_id
      LEFT JOIN dqa_table ON dqa_table.dqa_id = c.dqa_id
      LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = c.supplyzone_id
      LEFT JOIN omzone_table ON omzone_table.omzone_id = c.omzone_id
-     LEFT JOIN ws_0326_09.crmzone ON crmzone.id::text = c.crmzone_id::text
-     LEFT JOIN ws_0326_09.connec_add ON connec_add.connec_id = c.connec_id
-     LEFT JOIN ws_0326_09.value_state_type vst ON vst.id = c.state_type
+     LEFT JOIN crmzone ON crmzone.id::text = c.crmzone_id::text
+     LEFT JOIN connec_add ON connec_add.connec_id = c.connec_id
+     LEFT JOIN value_state_type vst ON vst.id = c.state_type
      LEFT JOIN inp_network_mode ON true
      JOIN vf_selector_connec z on z.connec_id = c.connec_id;
 
 -- NOTE: ve_link
-CREATE OR REPLACE VIEW ws_0326_09.ve_link
+CREATE OR REPLACE VIEW ve_link
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
             edit_typevalue.idval
-           FROM ws_0326_09.edit_typevalue
+           FROM edit_typevalue
           WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
         ), sector_table AS (
          SELECT sector.sector_id,
             sector.macrosector_id,
             sector.stylesheet,
             t.id::character varying(16) AS sector_type
-           FROM ws_0326_09.sector
+           FROM sector
              LEFT JOIN typevalue t ON t.id::text = sector.sector_type::text AND t.typevalue::text = 'sector_type'::text
         ), dma_table AS (
          SELECT dma.dma_id,
             dma.macrodma_id,
             dma.stylesheet,
             t.id::character varying(16) AS dma_type
-           FROM ws_0326_09.dma
+           FROM dma
              LEFT JOIN typevalue t ON t.id::text = dma.dma_type::text AND t.typevalue::text = 'dma_type'::text
         ), presszone_table AS (
          SELECT presszone.presszone_id,
             presszone.head AS presszone_head,
             presszone.stylesheet,
             t.id::character varying(16) AS presszone_type
-           FROM ws_0326_09.presszone
+           FROM presszone
              LEFT JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
         ), dqa_table AS (
          SELECT dqa.dqa_id,
             dqa.stylesheet,
             t.id::character varying(16) AS dqa_type,
             dqa.macrodqa_id
-           FROM ws_0326_09.dqa
+           FROM dqa
              LEFT JOIN typevalue t ON t.id::text = dqa.dqa_type::text AND t.typevalue::text = 'dqa_type'::text
         ), supplyzone_table AS (
          SELECT supplyzone.supplyzone_id,
             supplyzone.stylesheet,
             t.id::character varying(16) AS supplyzone_type
-           FROM ws_0326_09.supplyzone
+           FROM supplyzone
              LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type::text AND t.typevalue::text = 'supplyzone_type'::text
         ), omzone_table AS (
          SELECT omzone.omzone_id,
             t.id::character varying(16) AS omzone_type,
             omzone.macroomzone_id
-           FROM ws_0326_09.omzone
+           FROM omzone
              LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
         ), inp_network_mode AS (
          SELECT config_param_user.value
-           FROM ws_0326_09.config_param_user
+           FROM config_param_user
           WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
         )
  SELECT l.link_id,
@@ -4110,24 +4110,24 @@ AS WITH typevalue AS (
     l.the_geom,
     COALESCE(pp.state, l.state) AS p_state,
     l.uuid
-   FROM ws_0326_09.link l
-     LEFT JOIN ws_0326_09.connec c ON c.connec_id = l.feature_id
+   FROM link l
+     LEFT JOIN connec c ON c.connec_id = l.feature_id
      LEFT JOIN LATERAL ( SELECT pp1.connec_id,
             pp1.psector_id
-           FROM ws_0326_09.plan_psector_x_connec pp1
+           FROM plan_psector_x_connec pp1
           WHERE (pp1.psector_id IN ( SELECT sp.psector_id
-                   FROM ws_0326_09.selector_psector sp
+                   FROM selector_psector sp
                   WHERE sp.cur_user = CURRENT_USER)) AND pp1.connec_id = l.feature_id
           ORDER BY pp1.psector_id DESC
          LIMIT 1) last_ps ON true
      LEFT JOIN LATERAL ( SELECT pp2.state
-           FROM ws_0326_09.plan_psector_x_connec pp2
+           FROM plan_psector_x_connec pp2
           WHERE pp2.link_id = l.link_id AND pp2.psector_id = last_ps.psector_id
          LIMIT 1) pp ON true
      JOIN sector_table ON sector_table.sector_id = l.sector_id
-     JOIN ws_0326_09.cat_link ON cat_link.id::text = l.linkcat_id::text
-     JOIN ws_0326_09.cat_feature ON cat_feature.id::text = cat_link.link_type::text
-     JOIN ws_0326_09.exploitation ON l.expl_id = exploitation.expl_id
+     JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text
+     JOIN exploitation ON l.expl_id = exploitation.expl_id
      LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
      LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
      LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id

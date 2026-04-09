@@ -3778,7 +3778,7 @@ AS WITH typevalue AS (
      LEFT JOIN drainzone_table ON n.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON n.dwfzone_id = dwfzone_table.dwfzone_id
      LEFT JOIN node_add ON node_add.node_id = n.node_id
-     JOIN vf_selector_node z ON z.node_id = a.node_id;
+     JOIN vf_selector_node z ON z.node_id = n.node_id;
 
 -- NOTE: ve_connec
 CREATE OR REPLACE VIEW ve_connec
@@ -3947,7 +3947,7 @@ AS WITH typevalue AS (
      LEFT JOIN omzone_table ON omzone_table.omzone_id = c.omzone_id
      LEFT JOIN drainzone_table ON c.omzone_id = drainzone_table.drainzone_id
      LEFT JOIN dwfzone_table ON c.dwfzone_id = dwfzone_table.dwfzone_id
-     JOIN vf_selector_connec z ON z.connec_id = a.connec_id;
+     JOIN vf_selector_connec z ON z.connec_id = c.connec_id;
 
 
 -- ve_link source
