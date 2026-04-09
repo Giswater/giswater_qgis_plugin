@@ -198,3 +198,7 @@ INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_con
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_element', 'Filtered elements', 'role_basic', 'core') ON CONFLICT DO NOTHING;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_gully', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_selector_link', 'Filtered gullys', 'role_basic', 'core') ON CONFLICT DO NOTHING;
+
+
+INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,layoutname,iseditable,"source",vdefault)
+VALUES ('edit_insert_show_elevation_from_dem','config','If true, the elevation will be showed from the DEM raster when inserting a new feature','role_edit','Show elevation from DEM:',true,28,'utils',false,false,'boolean','check',true,'lyt_other',true,'core', 'TRUE') ON CONFLICT (id) DO NOTHING;
