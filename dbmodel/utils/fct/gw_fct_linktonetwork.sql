@@ -157,10 +157,15 @@ BEGIN
 	END IF;
 
   	IF v_projecttype = 'WS' THEN
-		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM ve_arc) THEN
-		  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		  "data":{"message":"3260", "function":"3188","parameters":{"edit_link_check_arcdnom":"'||v_check_arcdnom||'"}, "is_process":true}}$$);';
-		END IF;
+		BEGIN
+			IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM ve_arc) THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3260", "function":"3188","parameters":{"edit_link_check_arcdnom":"'||v_check_arcdnom||'"}, "is_process":true}}$$);';
+			END IF;
+		EXCEPTION WHEN invalid_text_representation THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4626", "function":"3188","parameters":{"invalid_dnom":"'||(SELECT string_agg(id, ',') FROM cat_arc WHERE trim(dnom) !~ '^[+-]?([0-9]+(\.[0-9]+)?|\.[0-9]+)$')||'"}, "is_process":true}}$$);';
+		END;
 	END IF;
 
 	-- create query text for forced arcs

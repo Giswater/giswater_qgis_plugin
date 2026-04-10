@@ -202,3 +202,7 @@ INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('vf_link', 'Filt
 
 INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,layoutname,iseditable,"source",vdefault)
 VALUES ('edit_insert_show_elevation_from_dem','config','If true, the elevation will be showed from the DEM raster when inserting a new feature','role_edit','Show elevation from DEM:',true,28,'utils',false,false,'boolean','check',true,'lyt_other',true,'core', 'TRUE') ON CONFLICT (id) DO NOTHING;
+
+-- 10/04/2026
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES (4626, 'The following catalogs have invalid dnom: %invalid_dnom%', 'Check the catalogs and correct dnom values', 2, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
