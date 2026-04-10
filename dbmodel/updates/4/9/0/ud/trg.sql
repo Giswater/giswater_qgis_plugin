@@ -16,3 +16,7 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_link('LINK');
 
 CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_connec 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
+
+-- 10/04/2026
+CREATE TRIGGER gw_trg_fk_array_array_table_expl AFTER INSERT OR UPDATE OF expl_visibility ON gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('expl_visibility', 'exploitation', 'expl_id');
