@@ -500,6 +500,11 @@ BEGIN
  		    WHERE cur_user = current_user
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
+			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+			END IF;
+
 			-- psector
 			DELETE FROM selector_psector WHERE psector_id NOT IN
 			(SELECT psector_id FROM plan_psector WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
@@ -532,6 +537,10 @@ BEGIN
  		    WHERE cur_user = current_user
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
+			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+			END IF;
 
 			-- psector
 			DELETE FROM selector_psector WHERE psector_id NOT IN
