@@ -237,6 +237,12 @@ BEGIN
             ALTER TABLE temp_pgr_mapzone ADD COLUMN IF NOT EXISTS mapzone_ids INTEGER[];
             ALTER TABLE temp_pgr_mapzone ADD COLUMN IF NOT EXISTS mapzone_id INTEGER DEFAULT 0;
             CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_mapzone_id_idx ON temp_pgr_mapzone USING btree (mapzone_id);
+            ALTER TABLE temp_pgr_mapzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0]::integer[];
+            ALTER TABLE temp_pgr_mapzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0]::integer[];
+            
+            IF v_fct_name <> 'SECTOR' THEN
+                ALTER TABLE temp_pgr_mapzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0]::integer[];
+            END IF;
             
 
             ALTER TABLE temp_pgr_node ADD COLUMN IF NOT EXISTS component INTEGER DEFAULT 0;
