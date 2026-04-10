@@ -1873,6 +1873,8 @@ BEGIN
 
 				IF v_project_type = 'WS' THEN
 					-- update graphconfig 'use'
+					-- in the case of ws it can be possible that there are new mapzones with selfConflict that have to be saved also
+					-- use mapzpne_ids[1] instead of mapzone_id because mapzone_id = -1 for selfConflict mapzones
 					UPDATE temp_pgr_mapzone mz
 					SET graphconfig = json_build_object(
 					'use',         s.use_json,
@@ -1880,28 +1882,29 @@ BEGIN
 					'forceClosed', json_build_array()
 					)
 					FROM (
-					SELECT
-						mapzone_id,
-						json_agg(
-						json_build_object(
-							'nodeParent', node_parent,
-							'toArc',      to_arc
-						)
-						ORDER BY node_parent
-						) AS use_json
-					FROM (
 						SELECT
-						mapzone_id,
-						node_parent::text AS node_parent,
-						json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS to_arc
-						FROM temp_pgr_arc
-						WHERE node_parent IS NOT NULL
-						AND mapzone_id > 0
-						GROUP BY mapzone_id, node_parent
-					) x
-					GROUP BY mapzone_id
+							mapzone_id,
+							json_agg(
+							json_build_object(
+								'nodeParent', node_parent,
+								'toArc',      to_arc
+							)
+							ORDER BY node_parent
+							) AS use_json
+						FROM (
+							SELECT
+							m.mapzone_ids[1] as mapzone_id,
+							a.node_parent::text AS node_parent,
+							json_agg(a.pgr_arc_id ORDER BY a.pgr_arc_id) AS to_arc
+							FROM temp_pgr_arc a
+							JOIN temp_pgr_mapzone m ON a.component = m.component
+							WHERE a.node_parent IS NOT NULL
+							AND m.mapzone_id <> 0
+							GROUP BY m.mapzone_ids[1], a.node_parent
+						) x
+						GROUP BY mapzone_id
 					) s
-					WHERE mz.mapzone_id = s.mapzone_id;
+					WHERE mz.mapzone_ids[1] = s.mapzone_id;
 
 					-- forceClosed (nodes)
 					UPDATE temp_pgr_mapzone mz
@@ -1915,18 +1918,19 @@ BEGIN
 							tn.mapzone_id,
 							json_agg(tn.pgr_node_id ORDER BY tn.pgr_node_id) AS forceclosed_json
 						FROM (
-							SELECT
+							SELECT DISTINCT ON (n.pgr_node_id)
 								n.pgr_node_id,
-								MIN(a.mapzone_id) AS mapzone_id
+								m.mapzone_ids[1] AS mapzone_id
 							FROM temp_pgr_node n
 							JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+							JOIN temp_pgr_mapzone m ON a.component = m.component
 							WHERE n.graph_delimiter = 'forceClosed'
-								AND a.mapzone_id > 0
-							GROUP BY n.pgr_node_id
+							AND m.mapzone_id <> 0
+							ORDER BY n.pgr_node_id, m.mapzone_id DESC
 						) tn
 						GROUP BY tn.mapzone_id
 					) t
-					WHERE mz.mapzone_id = t.mapzone_id;
+					WHERE mz.mapzone_ids[1] = t.mapzone_id;
 
 					-- ignore (nodes)
 					UPDATE temp_pgr_mapzone mz
@@ -1937,16 +1941,19 @@ BEGIN
 					)
 					FROM (
 					SELECT
-						mapzone_id,
-						json_agg(pgr_node_id ORDER BY pgr_node_id) AS ignore_json
-					FROM temp_pgr_node
-					WHERE graph_delimiter = 'forceOpen'
-					AND mapzone_id > 0
-					GROUP BY mapzone_id
+						m.mapzone_ids[1] AS mapzone_id,
+						json_agg(n.pgr_node_id ORDER BY n.pgr_node_id) AS ignore_json
+					FROM temp_pgr_node n
+					JOIN temp_pgr_mapzone m ON n.component = m.component
+					WHERE n.graph_delimiter = 'forceOpen'
+					AND m.mapzone_id <> 0
+					GROUP BY m.mapzone_ids[1]
 					) t
-					WHERE mz.mapzone_id = t.mapzone_id;
+					WHERE mz.mapzone_ids[1] = t.mapzone_id;
 				
 				ELSE -- v_project_type (UD)
+					
+					-- there are no selfConflict mapzones in case of UD project
 
 					-- update graphconfig 'use'
 					UPDATE temp_pgr_mapzone mz
@@ -2228,30 +2235,27 @@ BEGIN
 				-- insert the new mapzones
 				EXECUTE format($sql$
 				INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
-				SELECT t.mapzone_id, t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
+				SELECT t.mapzone_ids[1], t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
 				FROM temp_pgr_mapzone t
-				WHERE t.mapzone_id > 0
+				WHERE t.mapzone_id <> 0
 				$sql$, v_mapzone_table, v_mapzone_field);
 
 			ELSE
 				EXECUTE format($sql$
 					UPDATE %I m
 					SET
-						name = t.name,
 						expl_id = t.expl_id,
 						muni_id = t.muni_id,
 						the_geom = t.the_geom,
 						addparam = t.addparam,
 						graphconfig = t.graphconfig,
-						created_at = t.created_at,
-						created_by = t.created_by,
 						updated_at = t.created_at,
 						updated_by = t.created_by
 					FROM temp_pgr_mapzone t
-					WHERE m.%I = t.mapzone_id
-						AND t.mapzone_id > 0
+					WHERE m.%I = ANY (t.mapzone_ids)
+						AND m.%I > 0
 					$sql$
-				, v_mapzone_table, v_mapzone_field);
+				, v_mapzone_table, v_mapzone_field, v_mapzone_field);
 			END IF;
 
 			IF v_class <> 'SECTOR' THEN
@@ -2259,10 +2263,10 @@ BEGIN
 					UPDATE %I m
 					SET sector_id = t.sector_id
 					FROM temp_pgr_mapzone t
-					WHERE m.%I = t.mapzone_id
-						AND t.mapzone_id > 0
+					WHERE m.%I = ANY (t.mapzone_ids)
+						AND m.%I > 0
 					$sql$
-				, v_mapzone_table, v_mapzone_field);
+				, v_mapzone_table, v_mapzone_field, v_mapzone_field);
 			
 			ELSE 
 				-- Synchronize selector_sector with the sectors that match muni_id and expl_id
@@ -2303,6 +2307,7 @@ BEGIN
 			EXECUTE format($sql$
 				UPDATE %I tm
 				SET the_geom   = NULL,
+					addparam = NULL,
 					updated_at = now(),
 					updated_by = current_user
 				WHERE EXISTS (
