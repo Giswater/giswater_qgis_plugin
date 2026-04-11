@@ -607,14 +607,16 @@ BEGIN
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
 				)
-				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
 				SELECT
-					mapzone_id,
+					g.mapzone_id,
 					'use',
-					node_parent
-				FROM graphconfig
-				WHERE mapzone_id > 0
-				AND node_parent IS DISTINCT FROM 0
+					g.node_parent,
+					a.pgr_arc_id
+				FROM graphconfig g
+				LEFT JOIN v_temp_arc a ON a.node_2 = g.node_parent
+				WHERE g.mapzone_id > 0
+				AND g.node_parent IS DISTINCT FROM 0
 			$sql$, v_mapzone_field, v_mapzone_table);
 
 			-- forceClosed
@@ -656,7 +658,7 @@ BEGIN
 			SET mapzone_id = g.mapzone_id,
 				node_parent = g.pgr_node_id
 			FROM temp_pgr_graphconfig g
-			WHERE a.pgr_node_2= g.pgr_node_id
+			WHERE a.pgr_arc_id= g.pgr_arc_id
 			AND g.graph_type = 'use';
 
 			-- update temp_pgr_arc (forceClosed)
@@ -692,17 +694,19 @@ BEGIN
 	IF v_from_zero = FALSE THEN
 
 		IF v_project_type = 'WS' THEN
-			-- Check if there are any nodes in the graphconfig that are not in the network
+			-- Check if there are any nodes in the graphconfig that are not in the operative network
 			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - node_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
 					g.mapzone_id,
-					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
-					AS mapzone_block
-				FROM temp_pgr_graphconfig g
-				LEFT JOIN v_temp_node n ON g.pgr_node_id = n.node_id
-				WHERE n.node_id IS NULL
+					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id) AS mapzone_block
+				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig) g
+				WHERE NOT EXISTS (
+					SELECT 1
+					FROM v_temp_node n
+					WHERE n.node_id = g.pgr_node_id
+				)
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -720,9 +724,12 @@ BEGIN
 				SELECT
 					g.mapzone_id,
 					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
-				FROM temp_pgr_graphconfig g
-				LEFT JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
-				WHERE g.graph_type = 'use' AND a.arc_id IS NULL
+				FROM (SELECT DISTINCT pgr_arc_id, mapzone_id FROM temp_pgr_graphconfig) g
+				WHERE NOT EXISTS (
+					SELECT 1
+					FROM v_temp_arc a
+					WHERE a.arc_id = g.pgr_arc_id
+				)
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -733,17 +740,17 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
 			
-			-- Check if there are any nodes set in more than one mapzone
+			-- Check if there are any nodes set in more than one mapzone - IN use, forceClosed or ignore
 			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
 				SELECT
 					g.pgr_node_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
-				FROM temp_pgr_graphconfig g
-				JOIN v_temp_node n ON g.pgr_node_id = n.node_id
+				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig) g
+				WHERE EXISTS (SELECT 1 FROM v_temp_node n WHERE g.pgr_node_id = n.node_id)
 				GROUP BY g.pgr_node_id
-				HAVING  count(DISTINCT (g.mapzone_id, g.graph_type)) > 1
+				HAVING  count(g.mapzone_id) > 1
 				ORDER BY g.pgr_node_id
 			) sub;
 
@@ -761,8 +768,7 @@ BEGIN
 					g.pgr_arc_id AS arc_id,
 					string_agg(concat('[mapzone_id: ', g.mapzone_id, ', node_id: ', g.pgr_node_id, ']'), ' ' ORDER BY g.mapzone_id) AS pair_block
 				FROM temp_pgr_graphconfig g
-				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
-				WHERE g.graph_type = 'use'
+				WHERE EXISTS (SELECT 1 FROM v_temp_arc a WHERE g.pgr_arc_id = a.arc_id)
 				GROUP BY g.pgr_arc_id
 				HAVING COUNT(*) > 1
 			) sub;
@@ -921,10 +927,8 @@ BEGIN
 					g.mapzone_id,
 					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
 					AS mapzone_block
-				FROM temp_pgr_graphconfig g
-				LEFT JOIN v_temp_node n ON g.pgr_node_id = n.node_id
-				WHERE g.graph_type = 'use' 
-				AND n.node_id IS NULL
+				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig WHERE graph_type = 'use') g
+				WHERE NOT EXISTS (SELECT 1 FROM v_temp_node n WHERE g.pgr_node_id = n.node_id)
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -943,9 +947,8 @@ BEGIN
 					g.mapzone_id,
 					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				LEFT JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
 				WHERE g.graph_type IN ('forceClosed', 'forceOpen')
-				AND a.arc_id IS NULL
+				AND NOT EXISTS (SELECT 1 FROM v_temp_arc a WHERE g.pgr_arc_id = a.arc_id)
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -963,8 +966,8 @@ BEGIN
 				SELECT
 					g.pgr_node_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
-				FROM temp_pgr_graphconfig g
-				JOIN v_temp_node n ON g.pgr_node_id = n.node_id
+				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig WHERE graph_type = 'use') g
+				WHERE EXISTS (SELECT 1 FROM v_temp_node n WHERE g.pgr_node_id = n.node_id)
 				GROUP BY g.pgr_node_id
 				HAVING  count(*) > 1
 				ORDER BY g.pgr_node_id
@@ -984,7 +987,8 @@ BEGIN
 					g.pgr_arc_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
-				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
+				WHERE g.graph_type IN ('forceClosed', 'forceOpen')
+				AND EXISTS (SELECT 1 FROM v_temp_arc a WHERE g.pgr_arc_id = a.arc_id)
 				GROUP BY g.pgr_arc_id
 				HAVING  count(*) > 1
 				ORDER BY g.pgr_arc_id
@@ -995,6 +999,26 @@ BEGIN
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 			END IF;
+
+			/* TO DO ARNAU
+			
+			-- Check if nodeParent or toArc is null
+			SELECT string_agg(sub.mapzone_arcs, '')
+			INTO message
+			FROM (
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
+				FROM temp_pgr_graphconfig g
+				WHERE g.graph_type = 'use' 
+				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
+				ORDER BY g.mapzone_id,  g.pgr_node_id
+			) sub;
+
+			IF message IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"3508","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+			END IF;
+			*/
 
 			-- Check when 2 arcs make a circle
 			SELECT string_agg(concat('arc_1: ', lg.source, ' - arc_2: ', lg.target, '\n'), '') AS message
@@ -1864,157 +1888,210 @@ BEGIN
 			SELECT (v_audit_result::json -> 'body' -> 'data' -> 'info' ->> 'message') INTO v_message;
 		END IF;
 
+		-- fill table temp_pgr_graphconfig when from_zero and graphconfig for temp_pgr_mapzone
+		IF v_from_zero = TRUE THEN
+
+			IF v_project_type = 'WS' THEN
+				
+				-- insert into temp_pgr_graphconfig
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
+				SELECT
+					m.mapzone_ids[1] as mapzone_id,
+					'use' AS graph_type,
+					a.node_parent AS pgr_node_id,
+					a.pgr_arc_id AS pgr_arc_id
+				FROM temp_pgr_arc a
+				JOIN temp_pgr_mapzone m ON a.component = m.component
+				WHERE a.node_parent IS NOT NULL
+				AND m.mapzone_id <> 0;
+
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
+				SELECT DISTINCT ON (n.pgr_node_id)
+					m.mapzone_ids[1] AS mapzone_id,
+					'forceClosed' AS graph_type,
+					n.pgr_node_id		
+				FROM temp_pgr_node n
+				JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+				JOIN temp_pgr_mapzone m ON a.component = m.component
+				WHERE n.graph_delimiter = 'forceClosed'
+				AND m.mapzone_id <> 0
+				ORDER BY n.pgr_node_id, m.mapzone_id DESC;
+
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id)
+				SELECT
+					m.mapzone_ids[1] AS mapzone_id,
+					'forceOpen' AS graph_type,
+					n.pgr_node_id		
+				FROM temp_pgr_node n
+				JOIN temp_pgr_mapzone m ON n.component = m.component
+				WHERE n.graph_delimiter = 'forceOpen'
+				AND m.mapzone_id <> 0;
+
+				-- update graphconfig 'use'
+				-- in the case of ws it can be possible that there are new mapzones with selfConflict that have to be saved also
+				-- use mapzpne_ids[1] instead of mapzone_id because mapzone_id = -1 for selfConflict mapzones
+				UPDATE temp_pgr_mapzone mz
+				SET graphconfig = json_build_object(
+				'use',         s.use_json,
+				'ignore',      json_build_array(),
+				'forceClosed', json_build_array()
+				)
+				FROM (
+					SELECT
+						mapzone_id,
+						json_agg(
+						json_build_object(
+							'nodeParent', node_parent,
+							'toArc',      to_arc
+						)
+						ORDER BY node_parent
+						) AS use_json
+					FROM (
+						SELECT
+						g.mapzone_id,
+						g.pgr_node_id::text AS node_parent,
+						json_agg(g.pgr_arc_id ORDER BY g.pgr_arc_id) AS to_arc
+						FROM temp_pgr_graphconfig g
+						WHERE g.graph_type = 'use'
+						GROUP BY g.mapzone_id, g.pgr_node_id
+					) x
+					GROUP BY mapzone_id
+				) s
+				WHERE mz.mapzone_ids[1] = s.mapzone_id;
+
+				-- forceClosed (nodes)
+				UPDATE temp_pgr_mapzone mz
+				SET graphconfig = json_build_object(
+				'use',         mz.graphconfig->'use',
+				'ignore',      mz.graphconfig->'ignore',
+				'forceClosed', t.forceclosed_json
+				)
+				FROM (
+					SELECT
+						g.mapzone_id,
+						json_agg(g.pgr_node_id ORDER BY g.pgr_node_id) AS forceclosed_json
+					FROM temp_pgr_graphconfig g
+					WHERE g.graph_type = 'forceClosed'
+					GROUP BY g.mapzone_id
+				) t
+				WHERE mz.mapzone_ids[1] = t.mapzone_id;
+
+				-- ignore (nodes)
+				UPDATE temp_pgr_mapzone mz
+				SET graphconfig = json_build_object(
+				'use',         mz.graphconfig->'use',
+				'ignore',      t.ignore_json,
+				'forceClosed', mz.graphconfig->'forceClosed'
+				)
+				FROM (
+					SELECT
+						g.mapzone_id,
+						json_agg(g.pgr_node_id ORDER BY g.pgr_node_id) AS ignore_json
+					FROM temp_pgr_graphconfig g
+					WHERE g.graph_type = 'forceOpen'
+					GROUP BY g.mapzone_id
+				) t
+				WHERE mz.mapzone_ids[1] = t.mapzone_id;
+
+			ELSE -- v_project_type
+
+				-- no selfConflict for UD
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
+				SELECT
+					a.mapzone_id,
+					'use' AS graph_type,
+					a.node_parent AS pgr_node_id,
+					a.pgr_arc_id AS pgr_arc_id
+				FROM temp_pgr_arc a
+				WHERE a.node_parent IS NOT NULL
+				AND a.mapzone_id > 0;
+
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
+				SELECT 
+					a.mapzone_id,
+					'forceClosed' AS graph_type,
+					a.pgr_arc_id AS pgr_arc_id	
+				FROM temp_pgr_arc a
+				WHERE a.graph_delimiter = 'forceClosed'
+				AND a.mapzone_id > 0;
+
+				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
+				SELECT 
+					a.mapzone_id,
+					'forceOpen' AS graph_type,
+					a.pgr_arc_id AS pgr_arc_id			
+				FROM temp_pgr_arc a
+				WHERE a.graph_delimiter = 'forceOpen'
+				AND a.mapzone_id > 0;
+
+				-- update graphconfig for temp_pgr_mapzone
+				-- there are no selfConflict mapzones in case of UD project
+				UPDATE temp_pgr_mapzone mz
+				SET graphconfig = json_build_object(
+					'use',         s.use_json,
+					'ignore',      json_build_array(),
+					'forceClosed', json_build_array()
+				)
+				FROM (
+					SELECT
+						g.mapzone_id,
+						json_agg(
+							json_build_object('nodeParent', g.pgr_node_id::text)
+							ORDER BY g.pgr_node_id
+						) AS use_json
+					FROM (
+						SELECT DISTINCT
+							mapzone_id,
+							pgr_node_id
+						FROM temp_pgr_graphconfig 
+						WHERE graph_type = 'use'
+					) g
+					GROUP BY g.mapzone_id
+				) s
+				WHERE mz.mapzone_id = s.mapzone_id;
+
+				-- forceClosed (arcs)
+				UPDATE temp_pgr_mapzone mz
+				SET graphconfig = json_build_object(
+				'use',         mz.graphconfig->'use',
+				'ignore',      mz.graphconfig->'ignore',
+				'forceClosed', t.forceclosed_json
+				)
+				FROM (
+				SELECT
+					mapzone_id,
+					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS forceclosed_json
+				FROM temp_pgr_graphconfig 
+				WHERE graph_type = 'forceClosed'
+				GROUP BY mapzone_id
+				) t
+				WHERE mz.mapzone_id = t.mapzone_id;
+
+				--  ignore (arcs)
+				UPDATE temp_pgr_mapzone mz
+				SET graphconfig = json_build_object(
+				'use',         mz.graphconfig->'use',
+				'ignore',      t.ignore_json,
+				'forceClosed', mz.graphconfig->'forceClosed'
+				)
+				FROM (
+				SELECT
+					mapzone_id,
+					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS ignore_json
+				FROM temp_pgr_graphconfig 
+				WHERE graph_type = 'forceOpen'
+				GROUP BY mapzone_id
+				) t
+				WHERE mz.mapzone_id = t.mapzone_id;
+
+			END IF; -- v_project_type
+		
+		END IF; -- v_from_zero
+
 		IF v_commit_changes IS TRUE THEN
 
 			-- UPDATE TEMP_PGR_MAPZONE
 			-- =======================
-
-			IF v_from_zero = TRUE THEN
-
-				IF v_project_type = 'WS' THEN
-					-- update graphconfig 'use'
-					-- in the case of ws it can be possible that there are new mapzones with selfConflict that have to be saved also
-					-- use mapzpne_ids[1] instead of mapzone_id because mapzone_id = -1 for selfConflict mapzones
-					UPDATE temp_pgr_mapzone mz
-					SET graphconfig = json_build_object(
-					'use',         s.use_json,
-					'ignore',      json_build_array(),
-					'forceClosed', json_build_array()
-					)
-					FROM (
-						SELECT
-							mapzone_id,
-							json_agg(
-							json_build_object(
-								'nodeParent', node_parent,
-								'toArc',      to_arc
-							)
-							ORDER BY node_parent
-							) AS use_json
-						FROM (
-							SELECT
-							m.mapzone_ids[1] as mapzone_id,
-							a.node_parent::text AS node_parent,
-							json_agg(a.pgr_arc_id ORDER BY a.pgr_arc_id) AS to_arc
-							FROM temp_pgr_arc a
-							JOIN temp_pgr_mapzone m ON a.component = m.component
-							WHERE a.node_parent IS NOT NULL
-							AND m.mapzone_id <> 0
-							GROUP BY m.mapzone_ids[1], a.node_parent
-						) x
-						GROUP BY mapzone_id
-					) s
-					WHERE mz.mapzone_ids[1] = s.mapzone_id;
-
-					-- forceClosed (nodes)
-					UPDATE temp_pgr_mapzone mz
-					SET graphconfig = json_build_object(
-					'use',         mz.graphconfig->'use',
-					'ignore',      mz.graphconfig->'ignore',
-					'forceClosed', t.forceclosed_json
-					)
-					FROM (
-						SELECT
-							tn.mapzone_id,
-							json_agg(tn.pgr_node_id ORDER BY tn.pgr_node_id) AS forceclosed_json
-						FROM (
-							SELECT DISTINCT ON (n.pgr_node_id)
-								n.pgr_node_id,
-								m.mapzone_ids[1] AS mapzone_id
-							FROM temp_pgr_node n
-							JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-							JOIN temp_pgr_mapzone m ON a.component = m.component
-							WHERE n.graph_delimiter = 'forceClosed'
-							AND m.mapzone_id <> 0
-							ORDER BY n.pgr_node_id, m.mapzone_id DESC
-						) tn
-						GROUP BY tn.mapzone_id
-					) t
-					WHERE mz.mapzone_ids[1] = t.mapzone_id;
-
-					-- ignore (nodes)
-					UPDATE temp_pgr_mapzone mz
-					SET graphconfig = json_build_object(
-					'use',         mz.graphconfig->'use',
-					'ignore',      t.ignore_json,
-					'forceClosed', mz.graphconfig->'forceClosed'
-					)
-					FROM (
-					SELECT
-						m.mapzone_ids[1] AS mapzone_id,
-						json_agg(n.pgr_node_id ORDER BY n.pgr_node_id) AS ignore_json
-					FROM temp_pgr_node n
-					JOIN temp_pgr_mapzone m ON n.component = m.component
-					WHERE n.graph_delimiter = 'forceOpen'
-					AND m.mapzone_id <> 0
-					GROUP BY m.mapzone_ids[1]
-					) t
-					WHERE mz.mapzone_ids[1] = t.mapzone_id;
-				
-				ELSE -- v_project_type (UD)
-					
-					-- there are no selfConflict mapzones in case of UD project
-
-					-- update graphconfig 'use'
-					UPDATE temp_pgr_mapzone mz
-					SET graphconfig = json_build_object(
-					'use',         s.use_json,
-					'ignore',      json_build_array(),
-					'forceClosed', json_build_array()
-					)
-					FROM (
-					SELECT
-						mapzone_id,
-						json_agg(
-						json_build_object('nodeParent', node_parent::text)
-						ORDER BY node_parent
-						) AS use_json
-					FROM temp_pgr_arc
-					WHERE node_parent IS NOT NULL
-					AND mapzone_id > 0
-					GROUP BY mapzone_id
-					) s
-					WHERE mz.mapzone_id = s.mapzone_id;
-
-					-- forceClosed (arcs)
-					UPDATE temp_pgr_mapzone mz
-					SET graphconfig = json_build_object(
-					'use',         mz.graphconfig->'use',
-					'ignore',      mz.graphconfig->'ignore',
-					'forceClosed', t.forceclosed_json
-					)
-					FROM (
-					SELECT
-						mapzone_id,
-						json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS forceclosed_json
-					FROM temp_pgr_arc
-					WHERE graph_delimiter = 'forceClosed'
-					AND mapzone_id > 0
-					GROUP BY mapzone_id
-					) t
-					WHERE mz.mapzone_id = t.mapzone_id;
-
-					--  ignore (arcs)
-					UPDATE temp_pgr_mapzone mz
-					SET graphconfig = json_build_object(
-					'use',         mz.graphconfig->'use',
-					'ignore',      t.ignore_json,
-					'forceClosed', mz.graphconfig->'forceClosed'
-					)
-					FROM (
-					SELECT
-						mapzone_id,
-						json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS ignore_json
-					FROM temp_pgr_arc
-					WHERE graph_delimiter = 'forceOpen'
-					AND mapzone_id > 0
-					GROUP BY mapzone_id
-					) t
-					WHERE mz.mapzone_id = t.mapzone_id;
-
-				END IF; -- v_project_type
-
-			END IF; -- v_from_zero
 
 			RAISE NOTICE 'Creating geometry of mapzones';
 			-- SECTION: Creating geometry of mapzones
@@ -2252,21 +2329,84 @@ BEGIN
 						updated_at = t.created_at,
 						updated_by = t.created_by
 					FROM temp_pgr_mapzone t
-					WHERE m.%I = ANY (t.mapzone_ids)
-						AND m.%I > 0
+					WHERE m.%I = t.mapzone_id
+						AND t.mapzone_id > 0
 					$sql$
-				, v_mapzone_table, v_mapzone_field, v_mapzone_field);
+				, v_mapzone_table, v_mapzone_field);
 			END IF;
+
+			-- update expl_id for the mapzones with conflict
+			EXECUTE format($sql$
+				UPDATE %I m
+				SET expl_id = t.expl_ids
+				FROM (
+					SELECT
+						g.mapzone_id,
+						array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_ids
+					FROM temp_pgr_graphconfig g
+					JOIN arc a ON a.arc_id = g.pgr_arc_id
+					WHERE EXISTS (
+						SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
+					)
+					AND g.graph_type = 'use'
+					AND a.expl_id > 0
+					GROUP BY g.mapzone_id
+				) t
+				WHERE m.%I = t.mapzone_id
+				$sql$
+			, v_mapzone_table, v_mapzone_field);
+
+			-- update muni_id for the mapzones with conflict
+			EXECUTE format($sql$
+				UPDATE %I m
+				SET muni_id = t.muni_ids
+				FROM (
+					SELECT
+						g.mapzone_id,
+						array_agg(DISTINCT a.muni_id ORDER BY a.muni_id) AS muni_ids
+					FROM temp_pgr_graphconfig g
+					JOIN arc a ON a.arc_id = g.pgr_arc_id
+					WHERE EXISTS (
+						SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
+					)
+					AND g.graph_type = 'use'
+					AND a.muni_id > 0
+					GROUP BY g.mapzone_id
+				) t
+				WHERE m.%I = t.mapzone_id
+				$sql$
+			, v_mapzone_table, v_mapzone_field);
 
 			IF v_class <> 'SECTOR' THEN
 				EXECUTE format($sql$
 					UPDATE %I m
 					SET sector_id = t.sector_id
 					FROM temp_pgr_mapzone t
-					WHERE m.%I = ANY (t.mapzone_ids)
-						AND m.%I > 0
+					WHERE m.%I = t.mapzone_id
+						AND t.mapzone_id > 0
 					$sql$
-				, v_mapzone_table, v_mapzone_field, v_mapzone_field);
+				, v_mapzone_table, v_mapzone_field);
+
+				-- update sector_id for the mapzones with conflict
+				EXECUTE format($sql$
+					UPDATE %I m
+					SET sector_id = t.sector_ids
+					FROM (
+						SELECT
+							g.mapzone_id,
+							array_agg(DISTINCT a.sector_id ORDER BY a.sector_id) AS sector_ids
+						FROM temp_pgr_graphconfig g
+						JOIN arc a ON a.arc_id = g.pgr_arc_id
+						WHERE EXISTS (
+							SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
+						)
+						AND g.graph_type = 'use'
+						AND a.sector_id > 0
+						GROUP BY g.mapzone_id
+					) t
+					WHERE m.%I = t.mapzone_id
+					$sql$
+				, v_mapzone_table, v_mapzone_field);
 			
 			ELSE 
 				-- Synchronize selector_sector with the sectors that match muni_id and expl_id
