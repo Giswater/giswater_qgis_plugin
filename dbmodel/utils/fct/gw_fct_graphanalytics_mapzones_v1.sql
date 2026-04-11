@@ -1026,8 +1026,8 @@ BEGIN
 		  AND error_message NOT IN ('ERRORS', '-----------')
 	) > 0 THEN
 
-		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, expl_id, name)
-		VALUES (0,0, array[0]::int[], array[0]::int[], 'Disconnected');
+		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, name)
+		VALUES (0,0, array[0]::int[], 'Disconnected');
 
 	ELSE -- check errors
 
@@ -1396,11 +1396,11 @@ BEGIN
 		SELECT seq, component, node
 		FROM pgr_connectedComponents(v_query_text);
 
-		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, expl_id, name)
-		VALUES (0,0, array[0]::int[], array[0]::int[], 'Disconnected');
+		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, name)
+		VALUES (0,0, array[0]::int[], 'Disconnected');
 
-		INSERT INTO temp_pgr_mapzone (component, expl_id, name)
-		SELECT DISTINCT c.component, ARRAY[0]::int[], ''::text
+		INSERT INTO temp_pgr_mapzone (component, name)
+		SELECT DISTINCT c.component, ''::text
 		FROM temp_pgr_connectedcomponents c;
 
 		-- UPDATE MAPZONES
