@@ -380,7 +380,9 @@ WITH typevalue AS (
     a.fluid_type,
     a.custom_length,
     st_length(a.the_geom)::numeric(12,2) AS gis_length,
-    a.sys_slope AS slope,
+	(case when sys_slope is null then
+	((coalesce (node_custom_elev_1, node_elev_1, elev1, node_top_elev_1-y1, node_elev_1)-coalesce (node_custom_elev_2, node_elev_2, elev2, node_top_elev_2-y2, node_elev_2))/st_length(a.the_geom))::numeric(12,4)
+	else sys_slope end) as slope,
     a.descript,
     a.annotation,
     a.observ,
@@ -3252,3 +3254,10 @@ AS WITH typevalue AS (
     the_geom,
     diagonal
    FROM connec_selected;
+   
+   
+create view v_anl_node_massiveinterpolate as select a.id, a.node_id, expl_id, fid, descript,top_elev::numeric(12,3), elev::numeric(12,3), ymax::numeric(12,3), the_geom 
+from anl_node a join selector_expl using (expl_id) where fid = 496;
+
+create view v_anl_arc_massiveinterpolate as select a.id, a.arc_id, a.expl_id, fid, descript, state_type, the_geom from anl_arc a 
+join selector_expl using (expl_id) where fid = 496;

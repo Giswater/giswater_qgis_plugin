@@ -9,132 +9,950 @@ or (at your option) any later version.
 
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node_interpolate_massive(p_data json)
-RETURNS json AS
+RETURNS json
+LANGUAGE plpgsql
+AS $function$
 
-$BODY$
 /*
-SELECT SCHEMA_NAME.gw_fct_node_interpolate_massive ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"queryFilter":"WHERE custom_top_elev IS NULL AND custom_elev IS NULL"}}}$$);
 
-fid = 496
+fid 496
 
+FUNCTION
+    gw_fct_node_interpolate_massive(p_data json)
+
+PURPOSE
+    This function calculates node invert elevations using different strategies
+    depending on the requested calculation type.
+
+SUPPORTED TYPES
+    1) MASSIVE
+       Legacy mode. For each node with sys_elev IS NULL, the function tries to
+       identify upstream and downstream reference nodes with known system elevation
+       and delegates interpolation to gw_fct_node_interpolate.
+
+    2) FLOWEXIT
+       Advanced profile solver mode. The function:
+         - computes the shortest path between node1 and node2,
+         - truncates that corridor at the first downstream node with sys_elev,
+         - validates the calculation window,
+         - solves the profile globally using:
+             minYmax,
+             maxYmax,
+             minSlope,
+             maxSlope,
+         - and assigns elevations according to profileMode.
+
+ELEVATION MODEL
+    - sys_elev is the authoritative known elevation.
+    - custom_elev is the calculated elevation written by this function.
+    - The function only writes custom_elev for nodes where sys_elev IS NULL.
+
+ANCHORS
+    - The downstream outlet node is always fixed because it must have sys_elev.
+    - If node1 also has sys_elev, it is treated as an upstream fixed anchor.
+    - Fixed anchors are never modified.
+
+PROFILE MODES
+    - DEEP:
+        Selects the deepest feasible solution.
+    - SHALLOW:
+        Selects the shallowest feasible solution.
+    - CENTERED:
+        Selects the midpoint between the lower and upper feasible envelopes.
+    - SMOOTH:
+        Starts from a centered feasible solution and applies internal smoothing
+        iterations while preserving feasibility and fixed anchors.
+
+SMOOTH PARAMETERS
+    - smoothAlpha:
+        Strength of each smoothing iteration.
+        Lower values = rougher / more conservative.
+        Higher values = smoother / more aggressive.
+    - smoothIterations:
+        Number of smoothing iterations.
+        Lower values = rougher profile.
+        Higher values = smoother profile.
+
+BUSINESS RULES
+    - The function only writes custom_elev for nodes where sys_elev IS NULL.
+    - FLOWEXIT always works inside a controlled corridor:
+        shortest path(node1, node2)
+    - The effective calculation window ends at the first downstream node
+      in that corridor having sys_elev IS NOT NULL.
+    - All nodes inside the calculation window must have sys_top_elev.
+      If only one node is missing it, the whole calculation is rejected.
+    - The resulting profile must satisfy:
+        top_elev - maxYmax <= invert_elev <= top_elev - minYmax
+        minSlope <= slope <= maxSlope
+    - If no feasible profile exists, the function returns status = Rejected.
 */
 
 DECLARE
+    v_version text;
+    v_project text;
+    v_fid integer := 496;
 
-p_x float;
-p_y float;
-p_node1 text;
-p_node2 text;
-v_version text;
-v_project text;
+    v_type text;
+    v_queryfilter text;
+    v_node1 integer;
+    v_node2 integer;
+    v_minymax numeric(12,3);
+    v_maxymax numeric(12,3);
+    v_minslope numeric(12,6);
+    v_maxslope numeric(12,6);
+    v_profile_mode text;
 
-v_node record;
-v_node1 text;
-v_node2 text;
-v_x float;
-v_y float;
-v_querytext text;
-v_queryfilter text;
+    v_node record;
+    v_querytext text;
+    v_x float8;
+    v_y float8;
 
-v_result text;
-v_result_info json;
-v_result_point json;
-v_result_polygon json;
-v_result_line json;
-v_result_fields text;
-v_result_ymax text;
-v_result_top text;
-v_result_elev text;
-v_error_context text;
-v_fid integer = 496;
+    v_upstream_node integer;
+    v_downstream_node integer;
+
+    v_node1_is_fixed boolean := false;
+    v_min_seq integer;
+    v_max_seq integer;
+
+    -- SMOOTH controls (can be overridden from JSON)
+    v_smooth_iterations integer := 25;
+    v_smooth_alpha float8 := 0.35;
+
+    v_result jsonb;
+    v_result_info jsonb;
+    v_result_point jsonb;
+    v_result_line jsonb;
+    v_status text := 'Accepted';
+    v_message_level integer := 1;
+    v_message_text text := 'Node interpolation done successfully';
+    v_error_context text;
+	v_fixchanges boolean;
+	v_state_type int2;
+
+    v_eps float8 := 1e-6;
+    i integer;
 
 BEGIN
+    SET search_path = "SCHEMA_NAME", public;
 
-	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+    SELECT giswater, upper(project_type)
+    INTO v_version, v_project
+    FROM sys_version
+    ORDER BY id DESC
+    LIMIT 1;
 
-	-- get system variables
-	SELECT  giswater, upper(project_type) INTO v_version, v_project FROM sys_version order by id desc limit 1;
-	v_queryfilter = ((p_data->>'data')::json->>'parameters')::json->>'queryFilter';
+    v_queryfilter  := p_data->'data'->'parameters'->>'queryFilter';
+    v_type         := upper(COALESCE(p_data->'data'->'parameters'->>'type', ''));
+    v_node1        := (p_data->'data'->'parameters'->>'node1')::integer;
+    v_node2        := (p_data->'data'->'parameters'->>'node2')::integer;
+    v_minymax      := (p_data->'data'->'parameters'->>'minYmax')::numeric;
+    v_maxymax      := (p_data->'data'->'parameters'->>'maxYmax')::numeric;
+    v_minslope     := (p_data->'data'->'parameters'->>'minSlope')::numeric;
+    v_maxslope     := (p_data->'data'->'parameters'->>'maxSlope')::numeric;
+    v_profile_mode := upper(COALESCE(p_data->'data'->'parameters'->>'profileMode', 'SMOOTH'));
 
-	v_querytext = 'SELECT * FROM ve_node '||v_queryfilter;
+	-- used to fix values and do not overwrite with this function
+    v_fixchanges   := (p_data->'data'->'parameters'->>'fixChanges')::boolean;
+	IF v_fixchanges = true then v_state_type = 1; ELSE v_state_type = 0; END IF;
 
-	DELETE FROM anl_node WHERE fid = v_fid and cur_user = current_user;
+    -- Optional SMOOTH parameters
+    v_smooth_alpha := COALESCE((p_data->'data'->'parameters'->>'smoothFactor')::float8, 0.35);
+    v_smooth_iterations := COALESCE((p_data->'data'->'parameters'->>'smoothIterations')::integer, 25);
 
-	FOR v_node IN EXECUTE v_querytext
-	LOOP
-		v_x = st_x(v_node.the_geom);
-		v_y = st_y(v_node.the_geom);
+    CREATE TEMP TABLE IF NOT EXISTS temp_anl_node (LIKE anl_node INCLUDING ALL);
+    CREATE TEMP TABLE IF NOT EXISTS temp_anl_arc  (LIKE anl_arc INCLUDING ALL);
 
-		-- getting for node_1
-		SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL AND sys_elev IS NOT NULL
-		AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
-		IF v_node1 IS NULL THEN
-			SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node.node_id AND node_1 IS NOT NULL ORDER BY sys_elev asc limit 1;
-			IF v_node1 IS NOT NULL THEN
-				SELECT node_1 INTO v_node1 FROM ve_arc JOIN ve_node ON node_2 = node_id WHERE node_2 = v_node1 AND node_1 IS NOT NULL AND sys_elev IS NOT NULL
-				AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
-			END IF;
-		END IF;
+    TRUNCATE temp_anl_node;
+    TRUNCATE temp_anl_arc;
 
-		-- getting for node_2
-		SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
-		IF v_node2 IS NULL THEN
-			SELECT node_1 INTO v_node2  FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node.node_id AND node_2 IS NOT NULL ORDER BY sys_elev asc limit 1;
-			IF v_node2 IS NOT NULL THEN
-				SELECT node_2 INTO v_node2 FROM ve_arc JOIN ve_node ON node_1 = node_id WHERE node_1 = v_node2 AND node_2 IS NOT NULL AND sys_elev IS NOT NULL
-				AND sys_top_elev IS NOT NULL ORDER BY sys_elev asc limit 1;
-			END IF;
-		END IF;
+    IF v_type = 'MASSIVE' THEN
 
-		IF v_node1 IS NOT NULL AND v_node2 IS NOT NULL THEN
-			v_querytext = 'SELECT gw_fct_node_interpolate (''{"data":{"parameters":{"action":"MASSIVE-INTERPOLATE", "x":'||v_x||', "y":'||v_y||', "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}}'')';
-			EXECUTE v_querytext;
-		END IF;
+        v_querytext := 'SELECT * FROM ve_node WHERE sys_elev IS NULL ' || COALESCE(v_queryfilter, '');
 
-		-- inserting log
-		INSERT INTO anl_node (node_id, fid, the_geom, descript, cur_user) VALUES (v_node.node_id, v_fid, v_node.the_geom, 'Node massively interpolated', current_user);
+        FOR v_node IN EXECUTE v_querytext
+        LOOP
+            v_x := ST_X(v_node.the_geom);
+            v_y := ST_Y(v_node.the_geom);
 
-	END LOOP;
+            v_upstream_node := NULL;
+            v_downstream_node := NULL;
 
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by
-	criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"values":',v_result,'}');
+            SELECT a.node_1
+            INTO v_upstream_node
+            FROM ve_arc a
+            JOIN ve_node n ON a.node_1 = n.node_id
+            WHERE a.node_2 = v_node.node_id
+              AND a.node_1 IS NOT NULL
+              AND n.sys_elev IS NOT NULL
+            ORDER BY n.sys_elev ASC
+            LIMIT 1;
 
-	--points
-	v_result = null;
-	SELECT jsonb_build_object(
-	    'type', 'FeatureCollection',
-	    'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
-	) INTO v_result
-	FROM (
-	SELECT jsonb_build_object(
-	'type',       'Feature',
-	'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-	'properties', to_jsonb(row) - 'the_geom'
-	) AS feature
-	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid) row) features;
+            IF v_upstream_node IS NULL THEN
+                SELECT a.node_1
+                INTO v_upstream_node
+                FROM ve_arc a
+                JOIN ve_node n ON a.node_1 = n.node_id
+                WHERE a.node_2 = v_node.node_id
+                  AND a.node_1 IS NOT NULL
+                ORDER BY n.sys_elev ASC NULLS LAST
+                LIMIT 1;
 
-	v_result_point = v_result;
+                IF v_upstream_node IS NOT NULL THEN
+                    SELECT a.node_1
+                    INTO v_upstream_node
+                    FROM ve_arc a
+                    JOIN ve_node n ON a.node_1 = n.node_id
+                    WHERE a.node_2 = v_upstream_node
+                      AND a.node_1 IS NOT NULL
+                      AND n.sys_elev IS NOT NULL
+                    ORDER BY n.sys_elev ASC
+                    LIMIT 1;
+                END IF;
+            END IF;
 
-	-- Control NULL's
-	v_version:=COALESCE(v_version,'{}');
-	v_result_info:=COALESCE(v_result_info,'{}');
-	v_result_point:=COALESCE(v_result_point,'{}');
+            SELECT a.node_2
+            INTO v_downstream_node
+            FROM ve_arc a
+            JOIN ve_node n ON a.node_2 = n.node_id
+            WHERE a.node_1 = v_node.node_id
+              AND a.node_2 IS NOT NULL
+              AND n.sys_elev IS NOT NULL
+            ORDER BY n.sys_elev ASC
+            LIMIT 1;
 
-	--return definition for v_audit_check_result
-	RETURN  ('{"status":"Accepted", "message":{"level":1, "text":"Node interpolation done successfully"}, "version":"'||v_version||'"'||
-		     ',"body":{"form":{}'||
-			     ',"data":{ "info":'||v_result_info||','||
-					'"point":'||v_result_point||'}'||
-			      '}}');
+            IF v_downstream_node IS NULL THEN
+                SELECT a.node_2
+                INTO v_downstream_node
+                FROM ve_arc a
+                JOIN ve_node n ON a.node_2 = n.node_id
+                WHERE a.node_1 = v_node.node_id
+                  AND a.node_2 IS NOT NULL
+                ORDER BY n.sys_elev ASC NULLS LAST
+                LIMIT 1;
 
+                IF v_downstream_node IS NOT NULL THEN
+                    SELECT a.node_2
+                    INTO v_downstream_node
+                    FROM ve_arc a
+                    JOIN ve_node n ON a.node_2 = n.node_id
+                    WHERE a.node_1 = v_downstream_node
+                      AND a.node_2 IS NOT NULL
+                      AND n.sys_elev IS NOT NULL
+                    ORDER BY n.sys_elev ASC
+                    LIMIT 1;
+                END IF;
+            END IF;
+
+            IF v_upstream_node IS NOT NULL AND v_downstream_node IS NOT NULL THEN
+                v_querytext :=
+                    'SELECT gw_fct_node_interpolate(''{"data":{"parameters":{"action":"MASSIVE-INTERPOLATE","x":'
+                    || v_x || ',"y":' || v_y || ',"node1":"' || v_upstream_node || '","node2":"' || v_downstream_node || '"}}}'')';
+                EXECUTE v_querytext;
+            END IF;
+
+            INSERT INTO temp_anl_node (node_id, fid, the_geom, descript, top_elev, elev, ymax, cur_user, expl_id, state_type)
+            SELECT
+                node_id,
+                v_fid,
+                the_geom,
+                'MASSIVE',
+                sys_top_elev,
+                COALESCE(custom_elev, sys_elev),
+                sys_ymax,
+                current_user,
+				expl_id,
+				v_state_type				
+            FROM ve_node
+            WHERE node_id = v_node.node_id;
+
+        END LOOP;
+
+    ELSIF v_type = 'FLOWEXIT' THEN
+
+		UPDATE node SET custom_elev = null FROM (select distinct node_id n from anl_node a WHERE fid = 496 AND cur_user=current_user AND a.state_type = 0)
+		where node_id = n::integer;
+
+        IF v_node1 IS NULL OR v_node2 IS NULL THEN
+            v_message_level := 2;
+            v_message_text := 'FLOWEXIT requires node1 and node2.';
+
+        ELSIF v_minymax IS NULL OR v_maxymax IS NULL OR v_minslope IS NULL OR v_maxslope IS NULL THEN
+            v_message_level := 2;
+            v_message_text := 'FLOWEXIT requires minYmax, maxYmax, minSlope and maxSlope.';
+
+        ELSIF v_minymax > v_maxymax THEN
+            v_message_level := 2;
+            v_message_text := 'minYmax cannot be greater than maxYmax.';
+
+        ELSIF v_minslope < 0 OR v_maxslope < 0 THEN
+            v_message_level := 2;
+            v_message_text := 'minSlope and maxSlope must be greater than or equal to zero.';
+
+        ELSIF v_minslope > v_maxslope THEN
+            v_message_level := 2;
+            v_message_text := 'minSlope cannot be greater than maxSlope.';
+
+        ELSIF v_profile_mode NOT IN ('DEEP', 'SHALLOW', 'CENTERED', 'SMOOTH') THEN
+            v_message_level := 2;
+            v_message_text := 'profileMode must be DEEP, SHALLOW, CENTERED or SMOOTH.';
+
+        ELSIF v_smooth_alpha <= 0 OR v_smooth_alpha > 1 THEN
+            v_message_level := 2;
+            v_message_text := 'smoothAlpha must be greater than 0 and less than or equal to 1.';
+
+        ELSIF v_smooth_iterations < 1 OR v_smooth_iterations > 500 THEN
+            v_message_level := 2;
+            v_message_text := 'smoothIterations must be between 1 and 500.';
+
+        ELSE
+            SELECT EXISTS (
+                SELECT 1
+                FROM ve_node
+                WHERE node_id = v_node1
+                  AND sys_elev IS NOT NULL
+            )
+            INTO v_node1_is_fixed;
+
+            DROP TABLE IF EXISTS temp_path_raw;
+            DROP TABLE IF EXISTS temp_path_window;
+            DROP TABLE IF EXISTS temp_profile_down_lower;
+            DROP TABLE IF EXISTS temp_profile_down_upper;
+            DROP TABLE IF EXISTS temp_profile_up_bounds;
+            DROP TABLE IF EXISTS temp_profile_bounds;
+            DROP TABLE IF EXISTS temp_profile_final;
+            DROP TABLE IF EXISTS temp_profile_work;
+
+            CREATE TEMP TABLE temp_path_raw AS
+            WITH route AS (
+                SELECT *
+                FROM pgr_dijkstra(
+                    'SELECT
+                        arc_id AS id,
+                        node_1 AS source,
+                        node_2 AS target,
+                        ST_Length(the_geom)::float8 AS cost,
+                        ST_Length(the_geom)::float8 AS reverse_cost
+                     FROM arc',
+                    v_node1,
+                    v_node2,
+                    false
+                )
+            )
+            SELECT
+                r.path_seq AS seq,
+                r.node AS node_id,
+                CASE WHEN r.edge = -1 THEN NULL ELSE r.edge END AS arc_id,
+                CASE
+                    WHEN LAG(r.agg_cost) OVER (ORDER BY r.path_seq) IS NULL THEN NULL
+                    ELSE (r.agg_cost - LAG(r.agg_cost) OVER (ORDER BY r.path_seq))::float8
+                END AS step_len
+            FROM route r
+            ORDER BY r.path_seq;
+
+            IF NOT EXISTS (SELECT 1 FROM temp_path_raw) THEN
+                v_message_level := 2;
+                v_message_text := 'No shortest path was found between node1 and node2.';
+
+            ELSE
+                CREATE TEMP TABLE temp_path_window AS
+                WITH first_anchor AS (
+                    SELECT MIN(r.seq) AS stop_seq
+                    FROM temp_path_raw r
+                    JOIN ve_node n ON n.node_id = r.node_id
+                    WHERE r.seq > (SELECT MIN(seq) FROM temp_path_raw)
+                      AND n.sys_elev IS NOT NULL
+                )
+                SELECT
+                    r.seq,
+                    r.node_id,
+                    r.arc_id,
+                    r.step_len,
+                    v_minslope::float8 AS minslope,
+                    v_maxslope::float8 AS maxslope,
+                    n.sys_top_elev::float8 AS top_elev,
+                    (n.sys_top_elev::float8 - v_maxymax::float8) AS min_bound,
+                    (n.sys_top_elev::float8 - v_minymax::float8) AS max_bound,
+                    n.sys_elev::float8 AS sys_elev,
+                    n.custom_elev::float8 AS custom_elev,
+                    n.the_geom
+                FROM temp_path_raw r
+                JOIN ve_node n ON n.node_id = r.node_id
+                CROSS JOIN first_anchor fa
+                WHERE fa.stop_seq IS NOT NULL
+                  AND r.seq <= fa.stop_seq
+                ORDER BY r.seq;
+
+                IF NOT EXISTS (SELECT 1 FROM temp_path_window) THEN
+                    v_message_level := 2;
+                    v_message_text := 'No downstream node with sys_elev was found inside the selected corridor.';
+
+                    INSERT INTO temp_anl_arc (arc_id, fid, the_geom, descript, cur_user, expl_id, state_type)
+                    SELECT
+                        a.arc_id,
+                        v_fid,
+                        a.the_geom,
+                        'FLOWEXIT corridor without downstream sys_elev',
+                        current_user,
+						expl_id,
+						v_state_type
+                    FROM arc a
+                    JOIN temp_path_raw r ON r.arc_id = a.arc_id
+                    WHERE r.arc_id IS NOT NULL;
+
+                ELSIF EXISTS (
+                    SELECT 1
+                    FROM temp_path_window
+                    WHERE top_elev IS NULL
+                ) THEN
+                    v_message_level := 2;
+                    v_message_text := 'The calculation window contains nodes without sys_top_elev.';
+
+                ELSIF EXISTS (
+                    SELECT 1
+                    FROM temp_path_window
+                    WHERE step_len IS NOT NULL
+                      AND step_len <= 0
+                ) THEN
+                    v_message_level := 2;
+                    v_message_text := 'The calculation window contains arcs with non-positive length.';
+
+                ELSIF NOT EXISTS (
+                    SELECT 1
+                    FROM temp_path_window
+                    WHERE seq = (SELECT MAX(seq) FROM temp_path_window)
+                      AND sys_elev IS NOT NULL
+                ) THEN
+                    v_message_level := 2;
+                    v_message_text := 'The effective outlet node does not have sys_elev.';
+
+                ELSE
+                    SELECT MIN(seq), MAX(seq)
+                    INTO v_min_seq, v_max_seq
+                    FROM temp_path_window;
+
+                    CREATE TEMP TABLE temp_profile_down_lower AS
+                    WITH RECURSIVE rec AS (
+                        SELECT
+                            p.seq,
+                            p.node_id,
+                            p.arc_id,
+                            p.step_len,
+                            p.minslope,
+                            p.maxslope,
+                            p.top_elev,
+                            p.min_bound,
+                            p.max_bound,
+                            p.sys_elev,
+                            p.the_geom,
+                            p.sys_elev::float8 AS down_low
+                        FROM temp_path_window p
+                        WHERE p.seq = v_max_seq
+
+                        UNION ALL
+
+                        SELECT
+                            up.seq,
+                            up.node_id,
+                            up.arc_id,
+                            up.step_len,
+                            up.minslope,
+                            up.maxslope,
+                            up.top_elev,
+                            up.min_bound,
+                            up.max_bound,
+                            up.sys_elev,
+                            up.the_geom,
+                            GREATEST(
+                                up.min_bound,
+                                downrec.down_low + COALESCE(downrec.minslope, 0::float8) * COALESCE(downrec.step_len, 0::float8)
+                            ) AS down_low
+                        FROM rec downrec
+                        JOIN temp_path_window up
+                          ON up.seq = downrec.seq - 1
+                    )
+                    SELECT *
+                    FROM rec
+                    ORDER BY seq;
+
+                    CREATE TEMP TABLE temp_profile_down_upper AS
+                    WITH RECURSIVE rec AS (
+                        SELECT
+                            p.seq,
+                            p.node_id,
+                            p.arc_id,
+                            p.step_len,
+                            p.minslope,
+                            p.maxslope,
+                            p.top_elev,
+                            p.min_bound,
+                            p.max_bound,
+                            p.sys_elev,
+                            p.the_geom,
+                            p.sys_elev::float8 AS down_high
+                        FROM temp_path_window p
+                        WHERE p.seq = v_max_seq
+
+                        UNION ALL
+
+                        SELECT
+                            up.seq,
+                            up.node_id,
+                            up.arc_id,
+                            up.step_len,
+                            up.minslope,
+                            up.maxslope,
+                            up.top_elev,
+                            up.min_bound,
+                            up.max_bound,
+                            up.sys_elev,
+                            up.the_geom,
+                            LEAST(
+                                up.max_bound,
+                                downrec.down_high + COALESCE(downrec.maxslope, 0::float8) * COALESCE(downrec.step_len, 0::float8)
+                            ) AS down_high
+                        FROM rec downrec
+                        JOIN temp_path_window up
+                          ON up.seq = downrec.seq - 1
+                    )
+                    SELECT *
+                    FROM rec
+                    ORDER BY seq;
+
+                    IF v_node1_is_fixed THEN
+                        CREATE TEMP TABLE temp_profile_up_bounds AS
+                        WITH RECURSIVE rec AS (
+                            SELECT
+                                p.seq,
+                                p.node_id,
+                                p.arc_id,
+                                p.step_len,
+                                p.minslope,
+                                p.maxslope,
+                                p.top_elev,
+                                p.min_bound,
+                                p.max_bound,
+                                p.sys_elev,
+                                p.the_geom,
+                                p.sys_elev::float8 AS up_low,
+                                p.sys_elev::float8 AS up_high
+                            FROM temp_path_window p
+                            WHERE p.seq = v_min_seq
+
+                            UNION ALL
+
+                            SELECT
+                                dn.seq,
+                                dn.node_id,
+                                dn.arc_id,
+                                dn.step_len,
+                                dn.minslope,
+                                dn.maxslope,
+                                dn.top_elev,
+                                dn.min_bound,
+                                dn.max_bound,
+                                dn.sys_elev,
+                                dn.the_geom,
+                                GREATEST(
+                                    dn.min_bound,
+                                    upr.up_low - COALESCE(dn.maxslope, 0::float8) * COALESCE(dn.step_len, 0::float8)
+                                ) AS up_low,
+                                LEAST(
+                                    dn.max_bound,
+                                    upr.up_high - COALESCE(dn.minslope, 0::float8) * COALESCE(dn.step_len, 0::float8)
+                                ) AS up_high
+                            FROM rec upr
+                            JOIN temp_path_window dn
+                              ON dn.seq = upr.seq + 1
+                        )
+                        SELECT *
+                        FROM rec
+                        ORDER BY seq;
+                    ELSE
+                        CREATE TEMP TABLE temp_profile_up_bounds AS
+                        SELECT
+                            p.seq,
+                            p.node_id,
+                            p.arc_id,
+                            p.step_len,
+                            p.minslope,
+                            p.maxslope,
+                            p.top_elev,
+                            p.min_bound,
+                            p.max_bound,
+                            p.sys_elev,
+                            p.the_geom,
+                            p.min_bound AS up_low,
+                            p.max_bound AS up_high
+                        FROM temp_path_window p
+                        ORDER BY p.seq;
+                    END IF;
+
+                    CREATE TEMP TABLE temp_profile_bounds AS
+                    SELECT
+                        p.seq,
+                        p.node_id,
+                        p.arc_id,
+                        p.step_len,
+                        p.minslope,
+                        p.maxslope,
+                        p.top_elev,
+                        p.min_bound,
+                        p.max_bound,
+                        p.sys_elev,
+                        p.custom_elev,
+                        p.the_geom,
+                        GREATEST(
+                            p.min_bound,
+                            dl.down_low,
+                            ub.up_low
+                        ) AS low_elev,
+                        LEAST(
+                            p.max_bound,
+                            du.down_high,
+                            ub.up_high
+                        ) AS high_elev
+                    FROM temp_path_window p
+                    JOIN temp_profile_down_lower dl USING (seq, node_id)
+                    JOIN temp_profile_down_upper du USING (seq, node_id)
+                    JOIN temp_profile_up_bounds ub USING (seq, node_id)
+                    ORDER BY p.seq;
+
+                    IF EXISTS (
+                        SELECT 1
+                        FROM temp_profile_bounds b
+                        WHERE b.low_elev > b.high_elev + v_eps
+                    ) THEN
+                        v_message_level := 2;
+                        v_message_text := 'No feasible profile satisfies minYmax, maxYmax, minSlope and maxSlope.Check anl_node (fid=492) for more details';
+
+                        INSERT INTO temp_anl_node (node_id, fid, the_geom, descript, top_elev, elev, ymax, cur_user, expl_id, state_type)
+                        SELECT
+                            b.node_id,
+                            v_fid,
+                            b.the_geom,
+                            'FLOWEXIT - Infeasible: low_elev > high_elev',
+                            b.top_elev,
+                            b.low_elev,
+                            (b.top_elev - b.low_elev),
+                            current_user,
+							expl_id,
+							0
+                        FROM temp_profile_bounds b
+						JOIN node USING (node_id)
+                        WHERE b.low_elev > b.high_elev + v_eps;
+
+                    ELSE
+                        CREATE TEMP TABLE temp_profile_final AS
+                        SELECT
+                            b.seq,
+                            b.node_id,
+                            b.arc_id,
+                            b.step_len,
+                            b.minslope,
+                            b.maxslope,
+                            b.top_elev,
+                            b.min_bound,
+                            b.max_bound,
+                            b.sys_elev,
+                            b.the_geom,
+                            b.low_elev,
+                            b.high_elev,
+                            CASE
+                                WHEN b.seq = v_max_seq THEN b.sys_elev::float8
+                                WHEN b.seq = v_min_seq AND v_node1_is_fixed THEN b.sys_elev::float8
+                                WHEN v_profile_mode = 'DEEP' THEN b.low_elev
+                                WHEN v_profile_mode = 'SHALLOW' THEN b.high_elev
+                                WHEN v_profile_mode = 'CENTERED' THEN (b.low_elev + b.high_elev) / 2.0
+                                WHEN v_profile_mode = 'SMOOTH' THEN (b.low_elev + b.high_elev) / 2.0
+                            END AS calc_elev
+                        FROM temp_profile_bounds b
+                        ORDER BY b.seq;
+
+                        -- If first node is not fixed, force first span to respect slope limits.
+                        IF NOT v_node1_is_fixed THEN
+                            UPDATE temp_profile_final f0
+                            SET calc_elev = adj.new_elev
+                            FROM (
+                                SELECT
+                                    f.seq,
+                                    CASE
+                                        WHEN v_profile_mode = 'DEEP' THEN
+                                            GREATEST(
+                                                f.low_elev,
+                                                LEAST(
+                                                    f.high_elev,
+                                                    f1.calc_elev + COALESCE(f1.minslope, 0::float8) * COALESCE(f1.step_len, 0::float8)
+                                                )
+                                            )
+                                        WHEN v_profile_mode = 'SHALLOW' THEN
+                                            GREATEST(
+                                                f.low_elev,
+                                                LEAST(
+                                                    f.high_elev,
+                                                    f1.calc_elev + COALESCE(f1.maxslope, 0::float8) * COALESCE(f1.step_len, 0::float8)
+                                                )
+                                            )
+                                        ELSE
+                                            (
+                                                GREATEST(
+                                                    f.low_elev,
+                                                    f1.calc_elev + COALESCE(f1.minslope, 0::float8) * COALESCE(f1.step_len, 0::float8)
+                                                )
+                                                +
+                                                LEAST(
+                                                    f.high_elev,
+                                                    f1.calc_elev + COALESCE(f1.maxslope, 0::float8) * COALESCE(f1.step_len, 0::float8)
+                                                )
+                                            ) / 2.0
+                                    END AS new_elev
+                                FROM temp_profile_final f
+                                JOIN temp_profile_final f1
+                                  ON f1.seq = (
+                                      SELECT MIN(seq)
+                                      FROM temp_profile_final
+                                      WHERE seq > f.seq
+                                  )
+                                WHERE f.seq = v_min_seq
+                            ) adj
+                            WHERE f0.seq = adj.seq;
+                        END IF;
+
+                        IF v_profile_mode = 'SMOOTH' THEN
+                            FOR i IN 1..v_smooth_iterations LOOP
+                                DROP TABLE IF EXISTS temp_profile_work;
+
+                                CREATE TEMP TABLE temp_profile_work AS
+                                SELECT
+                                    cur.seq,
+                                    cur.node_id,
+                                    cur.arc_id,
+                                    cur.step_len,
+                                    cur.minslope,
+                                    cur.maxslope,
+                                    cur.top_elev,
+                                    cur.low_elev,
+                                    cur.high_elev,
+                                    cur.sys_elev,
+                                    cur.calc_elev,
+                                    prv.calc_elev AS prev_elev,
+                                    nxt.calc_elev AS next_elev,
+                                    cur.step_len AS len_prev_to_cur,
+                                    nxt.step_len AS len_cur_to_next
+                                FROM temp_profile_final cur
+                                LEFT JOIN temp_profile_final prv ON prv.seq = cur.seq - 1
+                                LEFT JOIN temp_profile_final nxt ON nxt.seq = cur.seq + 1
+                                ORDER BY cur.seq;
+
+                                UPDATE temp_profile_final f
+                                SET calc_elev = upd.new_elev
+                                FROM (
+                                    SELECT
+                                        w.seq,
+                                        CASE
+                                            WHEN w.seq = v_max_seq THEN w.calc_elev
+                                            WHEN w.seq = v_min_seq AND v_node1_is_fixed THEN w.calc_elev
+                                            WHEN w.seq = v_min_seq AND NOT v_node1_is_fixed THEN
+                                                GREATEST(
+                                                    GREATEST(
+                                                        w.low_elev,
+                                                        w.next_elev + COALESCE(w.minslope, 0::float8) * COALESCE(w.len_cur_to_next, 0::float8)
+                                                    ),
+                                                    LEAST(
+                                                        LEAST(
+                                                            w.high_elev,
+                                                            w.next_elev + COALESCE(w.maxslope, 0::float8) * COALESCE(w.len_cur_to_next, 0::float8)
+                                                        ),
+                                                        (1.0 - v_smooth_alpha) * w.calc_elev
+                                                        + v_smooth_alpha * (
+                                                            w.next_elev + (
+                                                                (COALESCE(w.minslope, 0::float8) + COALESCE(w.maxslope, 0::float8)) / 2.0
+                                                            ) * COALESCE(w.len_cur_to_next, 0::float8)
+                                                        )
+                                                    )
+                                                )
+                                            WHEN w.prev_elev IS NULL OR w.next_elev IS NULL THEN w.calc_elev
+                                            ELSE
+                                                GREATEST(
+                                                    GREATEST(
+                                                        w.low_elev,
+                                                        w.next_elev + COALESCE(w.minslope, 0::float8) * COALESCE(w.len_cur_to_next, 0::float8),
+                                                        w.prev_elev - COALESCE(w.maxslope, 0::float8) * COALESCE(w.len_prev_to_cur, 0::float8)
+                                                    ),
+                                                    LEAST(
+                                                        LEAST(
+                                                            w.high_elev,
+                                                            w.next_elev + COALESCE(w.maxslope, 0::float8) * COALESCE(w.len_cur_to_next, 0::float8),
+                                                            w.prev_elev - COALESCE(w.minslope, 0::float8) * COALESCE(w.len_prev_to_cur, 0::float8)
+                                                        ),
+                                                        (1.0 - v_smooth_alpha) * w.calc_elev
+                                                        + v_smooth_alpha * (
+                                                            CASE
+                                                                WHEN COALESCE(w.len_prev_to_cur, 0) + COALESCE(w.len_cur_to_next, 0) = 0
+                                                                    THEN (w.prev_elev + w.next_elev) / 2.0
+                                                                ELSE
+                                                                    (
+                                                                        COALESCE(w.len_cur_to_next, 0) * w.prev_elev +
+                                                                        COALESCE(w.len_prev_to_cur, 0) * w.next_elev
+                                                                    ) / NULLIF(COALESCE(w.len_prev_to_cur, 0) + COALESCE(w.len_cur_to_next, 0), 0)
+                                                            END
+                                                        )
+                                                    )
+                                                )
+                                        END AS new_elev
+                                    FROM temp_profile_work w
+                                ) upd
+                                WHERE f.seq = upd.seq;
+                            END LOOP;
+                        END IF;
+
+						-- insert those nodes that will be updated
+						INSERT INTO temp_anl_node (node_id, fid, the_geom, descript, cur_user, state_type, expl_id)
+                        SELECT
+                            s.node_id,
+                            v_fid,
+                            s.the_geom,
+                            'FLOWEXIT(' || v_profile_mode || ') from node ' || v_node1 || ' to node ' || v_node2,
+							current_user,
+							v_state_type,
+							expl_id
+                        FROM temp_profile_final s
+                        JOIN ve_node n ON n.node_id = s.node_id
+    	                WHERE n.sys_elev IS NULL;
+
+                        UPDATE ve_node n
+                           SET custom_elev = s.calc_elev
+                        FROM temp_profile_final s
+                        WHERE n.node_id = s.node_id
+                          AND n.sys_elev IS NULL;
+
+                        INSERT INTO temp_anl_arc (arc_id, fid, the_geom, descript, cur_user, expl_id, state_type)
+                        SELECT
+                            a.arc_id,
+                            v_fid,
+                            a.the_geom,
+                            'FLOWEXIT(' || v_profile_mode || ') from node ' || v_node1 || ' to node ' || v_node2,
+                            current_user,
+							expl_id,
+							v_state_type
+                        FROM arc a
+                        JOIN temp_path_window p
+                          ON p.arc_id = a.arc_id
+                        WHERE p.arc_id IS NOT NULL;
+                    END IF;
+                END IF;
+            END IF;
+        END IF;
+
+    ELSE
+        v_message_level := 2;
+        v_message_text := 'Unknown type. Allowed values are MASSIVE and FLOWEXIT.';
+    END IF;
+
+    INSERT INTO anl_node
+    SELECT * FROM temp_anl_node WHERE node_id NOT IN (SELECT node_id FROM anl_node WHERE fid = v_fid AND cur_user = current_user);
+
+	UPDATE anl_node a
+	SET state_type = t.state_type FROM temp_anl_node t WHERE a.node_id = t.node_id AND t.fid = v_fid AND t.cur_user = current_user;
+
+
+	DELETE FROM anl_arc WHERE cur_user = current_user AND fid = v_fid;
+    INSERT INTO anl_arc
+    SELECT * FROM temp_anl_arc;
+
+    SELECT array_to_json(array_agg(row_to_json(row)))
+    INTO v_result
+    FROM (
+        SELECT id, error_message AS message
+        FROM audit_check_data
+        WHERE cur_user = current_user
+          AND fid = v_fid
+        ORDER BY criticity DESC, id ASC
+    ) row;
+
+    v_result := COALESCE(v_result, '[]');
+    v_result_info := concat('{"values":', v_result, '}');
+
+    v_result := NULL;
+    SELECT jsonb_build_object(
+        'type', 'FeatureCollection',
+        'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+    )::jsonb
+    INTO v_result
+    FROM (
+        SELECT jsonb_build_object(
+            'type', 'Feature',
+            'geometry', ST_AsGeoJSON(the_geom)::jsonb,
+            'properties', to_jsonb(row) - 'the_geom'
+        ) AS feature
+        FROM (
+            SELECT
+                id,
+                node_id,
+                nodecat_id,
+                state,
+                expl_id,
+                descript,
+                fid,
+                ST_Transform(the_geom, 4326) AS the_geom
+            FROM temp_anl_node
+            WHERE cur_user = current_user
+              AND fid = v_fid
+        ) row
+    ) features;
+
+    v_result_point := COALESCE(v_result, '{"type":"FeatureCollection","features":[]}'::jsonb)::json;
+
+    v_result := NULL;
+    SELECT jsonb_build_object(
+        'type', 'FeatureCollection',
+        'features', COALESCE(jsonb_agg(features.feature), '[]'::jsonb)
+    )
+    INTO v_result
+    FROM (
+        SELECT jsonb_build_object(
+            'type', 'Feature',
+            'geometry', ST_AsGeoJSON(the_geom)::jsonb,
+            'properties', to_jsonb(row) - 'the_geom'
+        ) AS feature
+        FROM (
+            SELECT
+                id,
+                arc_id,
+                arccat_id,
+                state,
+                expl_id,
+                descript,
+                fid,
+                ST_Transform(the_geom, 4326) AS the_geom
+            FROM temp_anl_arc
+            WHERE cur_user = current_user
+              AND fid = v_fid
+        ) row
+    ) features;
+
+    v_result_line := COALESCE(v_result, '{"type":"FeatureCollection","features":[]}'::jsonb);
+
+    v_version      := COALESCE(v_version, '');
+    v_result_info  := COALESCE(v_result_info, '{"values":[]}'::jsonb);
+    v_result_point := COALESCE(v_result_point, '{"type":"FeatureCollection","features":[]}'::jsonb);
+    v_result_line  := COALESCE(v_result_line, '{"type":"FeatureCollection","features":[]}'::jsonb);
+
+    DROP TABLE temp_anl_node;
+    DROP TABLE temp_anl_arc;
+
+    RETURN (
+        '{"status":"' || v_status || '", "message":{"level":' || v_message_level || ', "text":"' ||
+        replace(v_message_text, '"', '\"') || '"}, "version":"' || replace(v_version, '"', '\"') || '"' ||
+        ',"body":{"form":{}' ||
+        ',"data":{"info":' || v_result_info::text || ',' ||
+        '"point":' || v_result_point::text || ',' ||
+        '"line":' || v_result_line::text || '}' ||
+        '}}'
+    )::json;
+
+EXCEPTION
+    WHEN OTHERS THEN
+        GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+        RAISE EXCEPTION 'gw_fct_node_interpolate_massive error: % | context: %', SQLERRM, v_error_context;
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$function$;

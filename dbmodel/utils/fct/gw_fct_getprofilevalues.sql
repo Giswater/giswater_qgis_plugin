@@ -111,6 +111,7 @@ DECLARE
 	v_initv float;
 	v_inith float;
 	v_initpoint json;
+	v_fid integer = 222;
 
 
 	-- field variables to work with UD/WS
