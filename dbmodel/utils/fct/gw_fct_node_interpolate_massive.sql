@@ -269,7 +269,7 @@ BEGIN
 
     ELSIF v_type = 'FLOWEXIT' THEN
 
-		UPDATE node SET custom_elev = null FROM (select distinct node_id n from anl_node a WHERE fid = 496 AND cur_user=current_user AND a.state_type = 0)
+		UPDATE node SET custom_elev = null FROM (select distinct node_id n from anl_node a WHERE fid = 496 AND a.state_type = 0)
 		where node_id = n::integer;
 
         IF v_node1 IS NULL OR v_node2 IS NULL THEN
