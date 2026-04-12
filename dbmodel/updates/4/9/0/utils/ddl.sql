@@ -73,3 +73,7 @@ ALTER TABLE ext_address ALTER COLUMN id SET DEFAULT nextval('ext_address_id_seq'
 
 -- 02/04/2026
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"customer_code", "dataType":"varchar(30)"}}$$);
+
+-- 12/04/2026
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"state_type", "dataType":"int2"}}$$);
+
