@@ -3256,9 +3256,31 @@ AS WITH typevalue AS (
    FROM connec_selected;
    
    
-create view v_anl_node_massiveinterpolate as select a.id, a.node_id, expl_id, fid, descript,
-top_elev::numeric(12,3), elev::numeric(12,3), ymax::numeric(12,3), cur_user, the_geom
-from anl_node a join selector_expl using (expl_id) where fid = 496;
+CREATE VIEW v_anl_node_massiveinterpolate
+AS SELECT
+    n.id,
+    n.node_id,
+    expl_id,
+    fid,
+    descript,
+    top_elev::numeric(12,3),
+    elev::numeric(12,3),
+    ymax::numeric(12,3),
+    n.cur_user,
+    the_geom
+  FROM anl_node n
+    JOIN selector_expl ON n.expl_id = selector_expl.expl_id
+  WHERE fid = 496;
 
-create view v_anl_arc_massiveinterpolate as select a.id, a.arc_id, a.expl_id, fid, descript, cur_user, the_geom from anl_arc a 
-join selector_expl using (expl_id) where fid = 496;
+CREATE VIEW v_anl_arc_massiveinterpolate
+AS SELECT
+    a.id,
+    a.arc_id,
+    a.expl_id,
+    fid,
+    descript,
+    a.cur_user,
+    the_geom
+  FROM anl_arc a 
+    JOIN selector_expl ON a.expl_id = selector_expl.expl_id
+  WHERE fid = 496;
