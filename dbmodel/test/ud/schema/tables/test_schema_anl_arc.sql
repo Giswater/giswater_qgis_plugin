@@ -22,7 +22,7 @@ SELECT columns_are(
     ARRAY[
         'id', 'arc_id', 'arccat_id', 'state', 'arc_id_aux', 'expl_id', 'fid','cur_user', 'the_geom', 'the_geom_p', 'descript',
          'result_id', 'node_1', 'node_2','sys_type', 'code', 'cat_geom1', 'length', 'slope', 'total_length', 'z1','z2', 'y1', 'y2', 'elev1',
-          'elev2', 'dma_id', 'addparam', 'sector_id', 'drainzone_id', 'dwfzone_id', 'omunit_id'
+          'elev2', 'dma_id', 'addparam', 'sector_id', 'drainzone_id', 'dwfzone_id', 'omunit_id', 'state_type'
     ],
     'Table anl_arc should have the correct columns'
 );
@@ -62,6 +62,7 @@ SELECT col_type_is('anl_arc', 'sector_id', 'integer', 'Column sector_id should b
 SELECT col_type_is('anl_arc', 'drainzone_id', 'integer', 'Column drainzone_id should be integer');
 SELECT col_type_is('anl_arc', 'dwfzone_id', 'integer', 'Column dwfzone_id should be integer');
 SELECT col_type_is('anl_arc', 'omunit_id', 'integer', 'Column omunit_id should be integer');
+SELECT col_type_is('anl_arc', 'state_type', 'int2', 'Column state_type should be int2');
 
 -- Check check default values
 SELECT col_has_default('anl_arc', 'cur_user', 'Column cur_user should have default value');

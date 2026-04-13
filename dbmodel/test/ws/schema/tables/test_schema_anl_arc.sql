@@ -23,7 +23,7 @@ SELECT columns_are(
         'id', 'arc_id', 'arccat_id', 'state', 'arc_id_aux', 'expl_id', 'fid', 'cur_user', 'the_geom', 'the_geom_p',
         'descript', 'result_id', 'node_1', 'node_2', 'sys_type', 'code', 'cat_geom1', 'length', 'slope', 'total_length',
         'z1', 'z2', 'y1', 'y2', 'elev1', 'elev2', 'losses', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id',
-        'addparam', 'sector_id'
+        'addparam', 'sector_id', 'state_type'
     ],
     'Table anl_arc should have the correct columns'
 );
@@ -69,6 +69,7 @@ SELECT col_type_is('anl_arc', 'dqa_id', 'integer', 'Column dqa_id should be inte
 SELECT col_type_is('anl_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('anl_arc', 'addparam', 'text', 'Column addparam should be text');
 SELECT col_type_is('anl_arc', 'sector_id', 'integer', 'Column sector_id should be integer');
+SELECT col_type_is('anl_arc', 'state_type', 'int2', 'Column state_type should be int2');
 
 -- Check foreign keys
 SELECT hasnt_fk('anl_arc', 'Table anl_arc should have no foreign keys');
