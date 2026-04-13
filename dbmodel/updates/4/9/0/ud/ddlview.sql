@@ -3260,7 +3260,7 @@ CREATE VIEW v_anl_node_massiveinterpolate
 AS SELECT
     n.id,
     n.node_id,
-    expl_id,
+    n.expl_id,
     fid,
     descript,
     top_elev::numeric(12,3),
