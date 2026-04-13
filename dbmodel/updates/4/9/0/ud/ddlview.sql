@@ -3255,8 +3255,7 @@ AS WITH typevalue AS (
     diagonal
    FROM connec_selected;
    
-   
-CREATE VIEW v_anl_node_massiveinterpolate
+CREATE or replace VIEW v_anl_node_massiveinterpolate
 AS SELECT
     n.id,
     n.node_id,
@@ -3269,10 +3268,10 @@ AS SELECT
     n.cur_user,
     the_geom
   FROM anl_node n
-    JOIN selector_expl ON n.expl_id = selector_expl.expl_id
-  WHERE fid = 496;
+    JOIN selector_expl s ON n.expl_id = s.expl_id 
+  WHERE fid = 496 AND s.cur_user = current_user;
 
-CREATE VIEW v_anl_arc_massiveinterpolate
+create or replace VIEW v_anl_arc_massiveinterpolate
 AS SELECT
     a.id,
     a.arc_id,
@@ -3281,6 +3280,6 @@ AS SELECT
     descript,
     a.cur_user,
     the_geom
-  FROM anl_arc a 
-    JOIN selector_expl ON a.expl_id = selector_expl.expl_id
-  WHERE fid = 496;
+  FROM anl_arc a
+    JOIN selector_expl s ON a.expl_id = s.expl_id 
+  WHERE fid = 496 AND s.cur_user = current_user;

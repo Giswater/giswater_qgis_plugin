@@ -8,11 +8,10 @@ or (at your option) any later version.
 --FUNCTION CODE: 2720
 
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node_interpolate(float, float, text, text);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node_interpolate(p_data json)
-RETURNS json AS
-
-$BODY$
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_interpolate(p_data json)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
 /*
 SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"INTERPOLATE""x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
@@ -136,7 +135,6 @@ BEGIN
 		SELECT node_id INTO v_node FROM ve_node WHERE st_equals(the_geom, v_geom0) LIMIT 1;
 	end if;
 
-
 	-- Get node1 system values
 	v_geom1:= (SELECT the_geom FROM node WHERE node_id=p_node1);
 	IF v_project='UD' THEN
@@ -150,9 +148,7 @@ BEGIN
 		v_depth1:= (SELECT depth FROM ve_node WHERE node_id=p_node1);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', depth:', v_depth1));
-
 	END IF;
-
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
@@ -195,25 +191,14 @@ BEGIN
 
 	-- update values
 	IF v_project='UD' THEN
-
 		IF v_top_status THEN
 			v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Top elev:',v_top0::numeric(12,3)::text));
-
-			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
-				v_querytext =  'UPDATE node SET '||v_col_top||' = '||v_top0::numeric(12,3)||' WHERE node_id = '||v_node||'::text';
-				EXECUTE v_querytext;
-			END IF;
 		END IF;
 
 		IF v_ymax_status THEN
 			v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
-
-			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
-				v_querytext =  'UPDATE node SET '||v_col_ymax||' = '||(v_top0-v_elev0)::numeric(12,3)||' WHERE node_id = '||v_node||'::text';
-				EXECUTE v_querytext;
-			END IF;
 		END IF;
 
 		IF v_elev_status THEN
@@ -221,7 +206,8 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
 
 			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
-				v_querytext =  'UPDATE node SET '||v_col_elev||' = '||v_elev0::numeric(12,3)||' WHERE node_id = '||v_node||'::text';
+				v_querytext =  'UPDATE node SET custom_elev = '||v_elev0::numeric(12,3)||' WHERE node_id = '||v_node;
+				raise notice 'v_querytext %', v_querytext;
 				EXECUTE v_querytext;
 			END IF;
 		END IF;
@@ -291,6 +277,5 @@ BEGIN
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$function$
+;
