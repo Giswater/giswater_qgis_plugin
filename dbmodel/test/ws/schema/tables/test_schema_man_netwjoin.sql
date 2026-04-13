@@ -40,6 +40,9 @@ SELECT col_not_null('man_netwjoin', 'node_id', 'Column node_id should be NOT NUL
 -- Check foreign keys
 SELECT fk_ok('man_netwjoin', 'node_id', 'node', 'node_id', 'FK node_id should reference node.node_id');
 
+-- Check indexes
+SELECT has_index('man_netwjoin', 'man_netwjoin_customer_code_idx', 'Index man_netwjoin_customer_code_idx should exist');
+
 SELECT * FROM finish();
 
 ROLLBACK;
