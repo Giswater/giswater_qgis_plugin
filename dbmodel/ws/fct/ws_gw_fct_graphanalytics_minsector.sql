@@ -383,7 +383,7 @@ BEGIN
             JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
             JOIN node n ON n.node_id = mn.node_id
             JOIN temp_pgr_node pgr_n ON pgr_n.pgr_node_id = n.node_id
-            WHERE n.mapzone_id > 0
+            WHERE pgr_n.mapzone_id > 0
         ),
         hydrometer_result AS (
             SELECT h.mapzone_id, count(*) AS num_hydro
