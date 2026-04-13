@@ -89,7 +89,14 @@ BEGIN
 			IF (NEW.state=1) AND (v_node_proximity_control IS TRUE) THEN
 
 				-- check existing state=1 nodes
-				SELECT * INTO v_node FROM node WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity) AND node.node_id != NEW.node_id AND node.state=1;
+				SELECT * INTO v_node
+				FROM node
+					LEFT JOIN plan_psector_x_node p ON node.node_id = p.node_id
+				WHERE ST_DWithin(NEW.the_geom, node.the_geom, v_node_proximity)
+				AND node.node_id != NEW.node_id
+				AND COALESCE(p.state, node.state)=1
+				AND (psector_id=v_psector_id OR psector_id IS NULL);
+
 				IF v_node.node_id IS NOT NULL THEN
 
 					IF v_dsbl_error IS NOT TRUE THEN
