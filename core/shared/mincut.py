@@ -1754,7 +1754,8 @@ class GwMincut:
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = tools_qt.get_text(self.dlg_hydro, self.result_mincut_id)
-        sql = (f"SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
+        sql = (f"SELECT DISTINCT(connec_id) FROM ext_rtc_hydrometer AS rtc"
+               f" JOIN connec ON connec.customer_code::text = rtc.customer_code::text"
                f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
                f" WHERE result_id = {result_mincut_id}")
