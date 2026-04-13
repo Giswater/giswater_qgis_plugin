@@ -7,3 +7,4 @@
 - Delete expl_id and sector_id columns from utils tables.
 - Harmonize 'code' columns for utils tables.
 - New typevalue for dscenario type: CALIBRATION.
+- Refactor hydrometers: remove rtc_hydromter_x_connec/node tables and add ext_rtc_hydrometer.customer_code column
