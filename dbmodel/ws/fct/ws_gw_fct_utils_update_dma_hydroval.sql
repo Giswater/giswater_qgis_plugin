@@ -32,8 +32,8 @@ BEGIN
 	
 	UPDATE ext_rtc_dma_period SET m3_total_period=b.sum, m3_total_period_hydro=b.sum, effc=1 
 	FROM (	SELECT cat_period_id, dma_id, sum(sum) FROM ext_rtc_hydrometer_x_data a
-			JOIN rtc_hydrometer_x_connec b on b.hydrometer_id=a.hydrometer_id
-			JOIN connec c ON b.connec_id=c.connec_id
+			JOIN ext_rtc_hydrometer erh ON erh.hydrometer_id=a.hydrometer_id
+			JOIN connec c ON erh.customer_code = c.customer_code
 			group by cat_period_id, dma_id
 			order by 1, 2) b
 		WHERE ext_rtc_dma_period.cat_period_id=b.cat_period_id AND ext_rtc_dma_period.dma_id::integer=b.dma_id;

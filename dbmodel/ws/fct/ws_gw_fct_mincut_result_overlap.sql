@@ -420,18 +420,22 @@ BEGIN
 		ON CONFLICT (connec_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT v_mincutid,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec
-		JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id
-		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-		JOIN ve_connec ON om_mincut_connec.connec_id=ve_connec.connec_id
-		WHERE om_mincut_connec.result_id=v_mincutid AND ve_connec.is_operative=TRUE
+		SELECT v_mincutid, erh.hydrometer_id
+		FROM ext_rtc_hydrometer erh
+		JOIN ve_connec c ON erh.customer_code=c.customer_code
+		JOIN om_mincut_connec omc ON c.connec_id=omc.connec_id
+		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=erh.hydrometer_id
+		WHERE omc.result_id=v_mincutid AND c.is_operative=TRUE
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-		SELECT v_mincutid,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node
-		JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id
-		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
-		WHERE result_id=v_mincutid
+		SELECT v_mincutid,erh.hydrometer_id
+		FROM ext_rtc_hydrometer erh
+		JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+		JOIN node n ON n.node_id = mn.node_id
+		JOIN om_mincut_node omn ON n.node_id=omn.node_id
+		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=erh.hydrometer_id
+		WHERE omn.result_id=v_mincutid
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
 		-- count arcs
@@ -443,24 +447,26 @@ BEGIN
 
 		-- count hydrometers
 		SELECT count (*) INTO v_numhydrometer FROM
-		(SELECT om_mincut_connec.connec_id FROM rtc_hydrometer_x_connec JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id
-				JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-				WHERE result_id=v_mincutid
-			UNION SELECT om_mincut_node.node_id FROM rtc_hydrometer_x_node JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id
-				JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
-				WHERE result_id=v_mincutid)a	;
+		(SELECT omc.connec_id
+				FROM v_rtc_hydrometer
+				JOIN om_mincut_connec omc ON v_rtc_hydrometer.feature_id=omc.connec_id
+				WHERE omc.result_id=v_mincutid
+			UNION SELECT omn.node_id
+				FROM v_rtc_hydrometer
+				JOIN om_mincut_node omn ON v_rtc_hydrometer.feature_id=omn.node_id
+				WHERE omn.result_id=v_mincutid)a	;
 
 		-- priority hydrometers
 		v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(hydrometer_id), '"}')::json as b FROM
-				(SELECT h.hydrometer_id, h.category_id FROM rtc_hydrometer_x_connec
-				JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id
-				JOIN v_rtc_hydrometer h ON h.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-				WHERE result_id=v_mincutid
+				(SELECT h.hydrometer_id, h.category_id
+				FROM v_rtc_hydrometer h
+				JOIN om_mincut_connec omc ON h.feature_id=omc.connec_id
+				WHERE omc.result_id=v_mincutid
 				union
-				SELECT h.hydrometer_id, h.category_id FROM rtc_hydrometer_x_node
-				JOIN om_mincut_node ON rtc_hydrometer_x_node.node_id=om_mincut_node.node_id
-				JOIN v_rtc_hydrometer h ON h.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
-				WHERE result_id=v_mincutid)a
+				SELECT h.hydrometer_id, h.category_id
+				FROM v_rtc_hydrometer h
+				JOIN om_mincut_node omn ON h.feature_id=omn.node_id
+				WHERE omn.result_id=v_mincutid)a
 				GROUP BY category_id ORDER BY category_id)a)b;
 
 

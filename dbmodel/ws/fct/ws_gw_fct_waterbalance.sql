@@ -122,12 +122,13 @@ v_queryhydro =
 		'WITH 
 			hydrometer AS (
 				SELECT h.hydrometer_id, c.dma_id
-				FROM rtc_hydrometer_x_connec h
-				JOIN connec c USING (connec_id) 
+				FROM ext_rtc_hydrometer h
+				JOIN connec c ON c.customer_code = h.customer_code
 				UNION 
 				SELECT h.hydrometer_id, n.dma_id
-				FROM rtc_hydrometer_x_node h
-				JOIN node n USING (node_id) 
+				FROM ext_rtc_hydrometer h
+				JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+				JOIN node n ON n.node_id = mn.node_id
 			),
 			hydro_data AS (
 				SELECT
@@ -298,12 +299,13 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM rtc_hydrometer_x_connec h
-					JOIN connec c USING (connec_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM rtc_hydrometer_x_node h
-					JOIN node n USING (node_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN node n ON n.node_id = mn.node_id
 				)
 			UPDATE om_waterbalance n 
 			SET auth_bill_met_hydro = a.value::numeric
@@ -337,12 +339,13 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM rtc_hydrometer_x_connec h
-					JOIN connec c USING (connec_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM rtc_hydrometer_x_node h
-					JOIN node n USING (node_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN node n ON n.node_id = mn.node_id
 				)
 			SELECT count(DISTINCT d.hydrometer_id)
 			FROM ext_rtc_hydrometer_x_data d
@@ -399,12 +402,13 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM rtc_hydrometer_x_connec h
-					JOIN connec c USING (connec_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM rtc_hydrometer_x_node h
-					JOIN node n USING (node_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN node n ON n.node_id = mn.node_id
 				),
 				period AS (
 					SELECT p.id as cat_period_id, p.start_date::date, p.end_date::date, p.period_seconds AS p_seconds,
@@ -466,12 +470,13 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM rtc_hydrometer_x_connec h
-					JOIN connec c USING (connec_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM rtc_hydrometer_x_node h
-					JOIN node n USING (node_id) 
+					FROM ext_rtc_hydrometer h
+					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN node n ON n.node_id = mn.node_id
 				),
 				period AS (
 					SELECT p.id as cat_period_id, p.start_date::date, p.end_date::date, p.period_seconds AS p_seconds,
@@ -526,12 +531,12 @@ v_queryhydro =
 		-- n_hydro
 		EXECUTE '
 		UPDATE om_waterbalance n SET n_hydro = coalesce(count_hydro,0) FROM 
-		(SELECT dma_id, count(hydrometer_id) as count_hydro
-		FROM rtc_hydrometer_x_connec d
-		JOIN connec c USING (connec_id) 
+		(SELECT dma_id, count(erh.hydrometer_id) as count_hydro
+		FROM ext_rtc_hydrometer erh
+		JOIN connec c ON erh.customer_code = c.customer_code
 		GROUP BY dma_id)a
 		WHERE n.dma_id = a.dma_id AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
-		AND n.enddate::date = '||quote_literal(v_enddate )||'::date AND expl_id && ARRAY['||v_expl||']';
+		AND n.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- arc_length
 		EXECUTE '

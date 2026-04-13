@@ -48,35 +48,33 @@ BEGIN
     IF v_project_type = 'WS' THEN
         -- WS projects: hydrometers can be linked to both nodes and connecs
         v_select = concat('SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
-                         'rhxc.connec_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+                         'c.connec_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
                          'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
                          'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
                          'c.dma_id as "dmaId" ',
                          'FROM ext_rtc_hydrometer h ',
-                         'JOIN rtc_hydrometer_x_connec rhxc ON rhxc.hydrometer_id = h.hydrometer_id ',
-                         'JOIN connec c ON c.connec_id = rhxc.connec_id ',
+                         'JOIN connec c ON c.customer_code = h.customer_code ',
                          'WHERE c.dma_id = ', v_dma_id, ' ',
                          'UNION ',
                          'SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
-                         'rhxn.node_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+                         'n.node_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
                          'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
                          'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
                          'n.dma_id as "dmaId" ',
                          'FROM ext_rtc_hydrometer h ',
-                         'JOIN rtc_hydrometer_x_node rhxn ON rhxn.hydrometer_id = h.hydrometer_id ',
-                         'JOIN node n ON n.node_id = rhxn.node_id ',
+                         'JOIN man_netwjoin mn ON mn.customer_code = h.customer_code ',
+                         'JOIN node n ON n.node_id = mn.node_id ',
                          'WHERE n.dma_id = ', v_dma_id, ' ',
                          'ORDER BY "hydrometerId"');
     ELSE
         -- UD projects: hydrometers are only linked to connecs
         v_select = concat('SELECT h.hydrometer_id as "hydrometerId", h.code as "hydrometerCode", h.customer_name as "customerName", ',
-                         'rhxc.connec_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
+                         'c.connec_id as "featureId", h.hydrometer_customer_code as "hydrometerCustomerCode", ',
                          'h.address1 as "address", h.hydro_number as "hydroNumber", h.state_id as "stateId", ',
                          'h.start_date as "startDate", h.end_date as "endDate", h.m3_volume as "m3Volume", ',
                          'c.dma_id as "dmaId" ',
                          'FROM ext_rtc_hydrometer h ',
-                         'JOIN rtc_hydrometer_x_connec rhxc ON rhxc.hydrometer_id = h.hydrometer_id ',
-                         'JOIN connec c ON c.connec_id = rhxc.connec_id ',
+                         'JOIN connec c ON c.customer_code = h.customer_code ',
                          'WHERE c.dma_id = ', v_dma_id, ' ',
                          'ORDER BY h.hydrometer_id');
     END IF;

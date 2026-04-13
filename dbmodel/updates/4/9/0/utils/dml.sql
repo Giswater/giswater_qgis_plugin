@@ -206,3 +206,8 @@ VALUES ('edit_insert_show_elevation_from_dem','config','If true, the elevation w
 -- 10/04/2026
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4626, 'The following catalogs have invalid dnom: %invalid_dnom%', 'Check the catalogs and correct dnom values', 2, true, 'ws', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+-- 13/04/2026
+DELETE FROM sys_table WHERE id='rtc_hydrometer';
+DELETE FROM sys_table WHERE id='rtc_hydrometer_x_connec';
+DELETE FROM sys_table WHERE id='rtc_hydrometer_x_node';

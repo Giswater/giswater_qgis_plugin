@@ -128,15 +128,16 @@ BEGIN
 	), hydro_data_selected_expl AS (
 	     SELECT d.*, c.expl_id AS expl_id
 	     FROM hydro_data_selected d
-	     JOIN rtc_hydrometer_x_connec hc ON hc.hydrometer_id = d.hydrometer_id
-	     JOIN connec c ON c.connec_id = hc.connec_id
-		 WHERE expl_id in ('||v_expl||')
+	     JOIN ext_rtc_hydrometer hc ON hc.hydrometer_id = d.hydrometer_id
+	     JOIN connec c ON c.customer_code = hc.customer_code
+		 WHERE c.expl_id in ('||v_expl||')
 	     UNION ALL
 	     SELECT d.*, n.expl_id AS expl_id
 	     FROM hydro_data_selected d
-	     JOIN rtc_hydrometer_x_node hn ON hn.hydrometer_id = d.hydrometer_id
-	     JOIN node n ON n.node_id = hn.node_id
-	     WHERE expl_id in ('||v_expl||')
+	     JOIN ext_rtc_hydrometer erh ON erh.hydrometer_id = d.hydrometer_id
+	     JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+	     JOIN node n ON n.node_id = mn.node_id
+	     WHERE n.expl_id in ('||v_expl||')
      ), hydro_estimated_statistic AS (
     	SELECT
         d.*,
@@ -241,13 +242,14 @@ BEGIN
 			v_querytext = 
 				'WITH hydros AS (
 					SELECT hydrometer_id, c.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
-					from rtc_hydrometer_x_connec e
-						JOIN connec c ON c.connec_id = e.connec_id
+					from ext_rtc_hydrometer e
+						JOIN connec c ON c.customer_code = e.customer_code
 					UNION ALL
 					SELECT
 						hydrometer_id, n.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
-					from rtc_hydrometer_x_node e
-						JOIN node n ON n.node_id = e.node_id
+					from ext_rtc_hydrometer erh
+						JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+						JOIN node n ON n.node_id = mn.node_id
 				),
 				data AS (
 					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, sum, custom_sum
@@ -275,8 +277,8 @@ BEGIN
 			with final_hydros as (
 				SELECT hydrometer_id, sum, custom_sum, pattern_id from ext_rtc_hydrometer_x_data where cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
-				SELECT b.hydrometer_id, b.connec_id AS feature_id, ''CONNEC'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_connec b JOIN connec a USING (connec_id) UNION
-						SELECT hydrometer_id, node_id AS feature_id, ''NODE'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_node JOIN node a USING (node_id)
+				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM ext_rtc_hydrometer erh JOIN connec c ON c.customer_code = erh.customer_code UNION
+						SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM ext_rtc_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code JOIN node n ON n.node_id = mn.node_id
 			)
 			SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
 		END IF;
@@ -309,13 +311,14 @@ BEGIN
 		IF v_dma_weight_factor IS TRUE THEN
 			v_querytext = v_query_period||
 			'hydros AS (
-				SELECT b.hydrometer_id, b.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
-				FROM rtc_hydrometer_x_connec b
-				JOIN connec c ON c.connec_id = b.connec_id
+				SELECT erh.hydrometer_id, c.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
+				FROM ext_rtc_hydrometer erh
+				JOIN connec c ON c.customer_code = erh.customer_code
 				UNION ALL
-				SELECT b.hydrometer_id, b.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
-				FROM rtc_hydrometer_x_node b
-				JOIN node n ON n.node_id = b.node_id
+				SELECT erh.hydrometer_id, n.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
+				FROM ext_rtc_hydrometer erh
+				JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+				JOIN node n ON n.node_id = mn.node_id
 			),
 			data AS (
 				SELECT
@@ -358,8 +361,8 @@ BEGIN
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
 			), aux_data AS (
-				SELECT b.hydrometer_id, b.connec_id AS feature_id, ''CONNEC'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_connec b JOIN connec a USING (connec_id) UNION
-				SELECT hydrometer_id, node_id AS feature_id, ''NODE'' AS feature_type, a.expl_id FROM rtc_hydrometer_x_node JOIN node a USING (node_id)
+				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM ext_rtc_hydrometer erh JOIN connec c ON erh.customer_code = c.customer_code UNION
+				SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM ext_rtc_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code JOIN node n ON n.node_id = mn.node_id
 			)
 				SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
 		END IF;
@@ -435,8 +438,8 @@ BEGIN
 
 				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
 				FROM sector s
-				JOIN connec USING (sector_id)
-				JOIN rtc_hydrometer_x_connec h USING (connec_id)
+				JOIN connec c ON s.sector_id = c.sector_id
+				JOIN ext_rtc_hydrometer h ON h.customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
@@ -444,8 +447,8 @@ BEGIN
 				-- LO MATEIX PERÒ PER AL PATTERN DE LA DMA
 				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
 				FROM dma s
-				JOIN connec c ON c.dma_id = s.dma_id::integer
-				JOIN rtc_hydrometer_x_connec h USING (connec_id)
+				JOIN connec c ON c.dma_id = s.dma_id
+				JOIN ext_rtc_hydrometer h ON h.customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
@@ -455,7 +458,7 @@ BEGIN
 				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
 				FROM ext_rtc_dma_period s
 				JOIN connec c ON c.dma_id = s.dma_id::integer
-				JOIN rtc_hydrometer_x_connec h USING (connec_id)
+				JOIN ext_rtc_hydrometer h ON h.customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
 				AND dscenario_id = '||v_scenarioid||'';
 
@@ -480,16 +483,17 @@ BEGIN
 				-- update wjoins (connec)
 				UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
 				FROM inp_connec i
-				JOIN connec c USING (connec_id)
-				JOIN rtc_hydrometer_x_connec h ON h.connec_id = c.connec_id
+				JOIN connec c ON c.connec_id = i.connec_id
+				JOIN ext_rtc_hydrometer h ON h.customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 				
 				-- update netwjoins (node)
 				UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
 				FROM inp_junction i
-				JOIN node n USING (node_id)
-				JOIN rtc_hydrometer_x_node h ON h.node_id = n.node_id
+				JOIN node n ON n.node_id = i.node_id
+				JOIN man_netwjoin mn ON mn.node_id = n.node_id
+				JOIN ext_rtc_hydrometer h ON h.customer_code = mn.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 

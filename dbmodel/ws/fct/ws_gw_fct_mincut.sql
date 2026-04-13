@@ -324,23 +324,42 @@ BEGIN
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
 
 	-- insert hydrometer from connec
+	WITH states as (
+		SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER as state_id
+		FROM config_param_system
+		WHERE parameter  = 'admin_hydrometer_state'
+	)
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT result_id_arg, rhxc.hydrometer_id 
-	FROM rtc_hydrometer_x_connec rhxc
-	JOIN om_mincut_connec omc ON rhxc.connec_id = omc.connec_id 
-	JOIN ext_rtc_hydrometer erh ON rhxc.hydrometer_id=erh.hydrometer_id
-	WHERE result_id = result_id_arg 
-		AND rhxc.connec_id = omc.connec_id
-		AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+	SELECT result_id_arg, erh.hydrometer_id 
+	FROM ext_rtc_hydrometer erh
+	JOIN connec c ON erh.customer_code = c.customer_code
+	WHERE erh.state_id IN (SELECT state_id FROM states)
+		AND EXISTS (
+			SELECT 1
+			FROM om_mincut_connec omc
+			WHERE omc.connec_id = c.connec_id
+			AND omc.result_id = result_id_arg
+		);
 
 	-- insert hydrometer from node
+	WITH states as (
+		SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER as state_id
+		FROM config_param_system
+		WHERE parameter  = 'admin_hydrometer_state'
+	)
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT result_id_arg, rhxn.hydrometer_id FROM rtc_hydrometer_x_node rhxn
-	JOIN om_mincut_node omn ON rhxn.node_id = omn.node_id 
-	JOIN ext_rtc_hydrometer erh ON rhxn.hydrometer_id = erh.hydrometer_id
-	WHERE result_id = result_id_arg 
-		AND rhxn.node_id = omn.node_id
-		AND erh.state_id IN (SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER FROM config_param_system where parameter  = 'admin_hydrometer_state');
+	SELECT result_id_arg, erh.hydrometer_id
+	FROM ext_rtc_hydrometer erh
+	JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+	JOIN node n ON n.node_id = mn.node_id
+	JOIN om_mincut_node omn ON n.node_id = omn.node_id
+	WHERE erh.state_id IN (SELECT state_id FROM states)
+		AND EXISTS (
+			SELECT 1
+			FROM om_mincut_node omn
+			WHERE omn.node_id = n.node_id
+			AND omn.result_id = result_id_arg
+		);
 
 	-- fill connnec & hydrometer details on om_mincut.output
 	-- count arcs
@@ -363,11 +382,12 @@ BEGIN
 
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM
-	(SELECT concat('{"category":"',hc.observ,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec
-			JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id
-			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
+	(SELECT concat('{"category":"',hc.observ,'","number":"', count(v_rtc_hydrometer.hydrometer_id), '"}')::json as b
+			FROM v_rtc_hydrometer
+			JOIN connec c ON v_rtc_hydrometer.feature_id = c.connec_id
+			JOIN om_mincut_connec omc ON c.connec_id=omc.connec_id
 			LEFT JOIN ext_hydrometer_category hc ON hc.id::text=v_rtc_hydrometer.category_id::text
-			JOIN connec ON connec.connec_id=v_rtc_hydrometer.feature_id WHERE result_id=result_id_arg
+			WHERE omc.result_id=result_id_arg
 			GROUP BY hc.observ ORDER BY hc.observ)a);
 
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;

@@ -79,6 +79,9 @@ SELECT has_sequence('ext_rtc_hydrometer_hydrometer_id_seq', 'Sequence ext_rtc_hy
 SELECT col_not_null('ext_rtc_hydrometer', 'hydrometer_id', 'Column hydrometer_id should be NOT NULL');
 SELECT col_default_is('ext_rtc_hydrometer', 'is_waterbal', 'true', 'Column is_waterbal should default to true');
 
+-- Check indexes
+SELECT has_index('ext_rtc_hydrometer', 'ext_rtc_hydrometer_customer_code_idx', 'Table should have index on customer_code');
+
 SELECT * FROM finish();
 
 ROLLBACK;

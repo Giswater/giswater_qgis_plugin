@@ -373,14 +373,16 @@ BEGIN
     -- Update minsector temporary num_hydro
     WITH
         hydrometer AS (
-            SELECT h.hydrometer_id, c.mapzone_id
-            FROM rtc_hydrometer_x_connec h
-            JOIN temp_pgr_connec c ON c.pgr_connec_id = h.connec_id
-
+            SELECT erh.hydrometer_id, pgr_c.mapzone_id
+            FROM ext_rtc_hydrometer erh
+            JOIN connec c ON c.customer_code = erh.customer_code
+            JOIN temp_pgr_connec pgr_c ON pgr_c.pgr_connec_id = c.connec_id
             UNION
-            SELECT h.hydrometer_id, n.mapzone_id
-            FROM rtc_hydrometer_x_node h
-            JOIN temp_pgr_node n ON n.pgr_node_id = h.node_id
+            SELECT erh.hydrometer_id, pgr_n.mapzone_id
+            FROM ext_rtc_hydrometer erh
+            JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+            JOIN node n ON n.node_id = mn.node_id
+            JOIN temp_pgr_node pgr_n ON pgr_n.pgr_node_id = n.node_id
             WHERE n.mapzone_id > 0
         ),
         hydrometer_result AS (

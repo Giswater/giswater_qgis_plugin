@@ -185,6 +185,7 @@ SELECT has_index('connec', 'connec_sector', 'Table should have index on sector_i
 SELECT has_index('connec', 'connec_street1', 'Table should have index on streetaxis_id');
 SELECT has_index('connec', 'connec_street2', 'Table should have index on streetaxis2_id');
 SELECT has_index('connec', 'connec_sys_code_idx', 'Table should have index on sys_code');
+SELECT has_index('connec', 'connec_customer_code_idx', 'Table should have index on customer_code');
 
 -- Check triggers
 SELECT has_trigger('connec', 'gw_trg_cat_material_fk_insert', 'Table should have trigger gw_trg_cat_material_fk_insert');
