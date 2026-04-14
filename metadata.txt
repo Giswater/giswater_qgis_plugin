@@ -19,6 +19,7 @@ category=Plugins
 icon=icons/dialogs/136.png
 experimental=False
 supportsQt6=True
+plugin_dependencies=qpip
 
 # Compatibility versions
 minorPgVersion=16.00.00
