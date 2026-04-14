@@ -5,3 +5,4 @@ tqdm>=4.0.0
 wntr>=1.2.0
 matplotlib>=2.0.0
 shapely>=1.6.0
+pyproj>=3.0.0
