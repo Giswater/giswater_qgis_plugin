@@ -839,7 +839,8 @@ BEGIN
 	END IF;
 
 	-- force 0 
-	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
+	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
+	INSERT INTO selector_expl VALUES (0, current_user) ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 	-- warn the user that in the selected psectors, there is a connec connected to different arcs
 	WITH mec AS (
