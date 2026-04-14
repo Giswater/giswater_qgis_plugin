@@ -20,7 +20,7 @@ INSERT INTO config_param_user ("parameter", value, cur_user) VALUES ('plan_netsc
 ON CONFLICT ("parameter", cur_user) DO UPDATE SET value = EXCLUDED.value;
 
 INSERT INTO ve_plan_netscenario_dma (netscenario_id, netscenario_name, dma_id, "name", pattern_id, graphconfig, the_geom, active, stylesheet, expl_id, muni_id, sector_id)
-VALUES(-901, '', -901, '', '', null, null, false, null, '{1}', null, null);
+VALUES(-901, '', -901, '', '', null, null, false, null, '{1}', '{1}', '{0}');
 SELECT is((SELECT count(*)::integer FROM ve_plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: ve_plan_netscenario_dma -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: plan_netscenario_dma -901 was inserted');
 

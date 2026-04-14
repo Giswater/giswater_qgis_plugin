@@ -14,8 +14,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO ve_macroomzone (macroomzone_id, code, "name", descript, the_geom, expl_id)
-VALUES(-901, '-901', 'Undefined', NULL, NULL, '{1}');
+INSERT INTO ve_macroomzone (macroomzone_id, code, "name", descript, the_geom, expl_id, sector_id, muni_id)
+VALUES(-901, '-901', 'Undefined', NULL, NULL, '{1}', '{0}', '{1}');
 
 SELECT is((SELECT count(*)::integer FROM ve_macroomzone WHERE code = '-901'), 1, 'INSERT: ve_macroomzone -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM macroomzone WHERE code = '-901'), 1, 'INSERT: macroomzone -901 was inserted');

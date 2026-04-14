@@ -203,8 +203,8 @@ AS WITH typevalue AS (
     n.streetaxis2_id,
     n.postnumber2,
     n.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     n.workcat_id,
     n.workcat_id_end,
     n.workcat_id_plan,
@@ -270,7 +270,7 @@ AS WITH typevalue AS (
   JOIN cat_node ON n.nodecat_id::text = cat_node.id::text
   JOIN cat_feature ON cat_feature.id::text = n.node_type::text
   JOIN exploitation ON n.expl_id = exploitation.expl_id
-  JOIN v_municipality mu ON n.muni_id = mu.muni_id
+  JOIN v_municipality vm ON n.muni_id = vm.muni_id
   JOIN value_state_type vst ON vst.id = n.state_type
   JOIN sector_table ON sector_table.sector_id = n.sector_id
   LEFT JOIN omzone_table ON omzone_table.omzone_id = n.omzone_id
@@ -397,8 +397,8 @@ WITH typevalue AS (
     a.streetaxis2_id,
     a.postnumber2,
     a.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     a.workcat_id,
     a.workcat_id_end,
     a.workcat_id_plan,
@@ -467,7 +467,7 @@ WITH typevalue AS (
   JOIN cat_arc ON a.arccat_id::text = cat_arc.id::text
   JOIN cat_feature ON a.arc_type::text = cat_feature.id::text
   JOIN exploitation e ON e.expl_id = a.expl_id
-  JOIN v_municipality mu ON a.muni_id = mu.muni_id
+  JOIN v_municipality vm ON a.muni_id = vm.muni_id
   JOIN value_state_type vst ON vst.id = a.state_type
   JOIN sector_table ON sector_table.sector_id = a.sector_id
   LEFT JOIN omzone_table ON omzone_table.omzone_id = a.omzone_id
@@ -567,8 +567,8 @@ AS WITH typevalue AS (
     c.streetaxis2_id,
     c.postnumber2,
     c.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     c.block_code,
     c.plot_id,
     c.workcat_id,
@@ -626,7 +626,7 @@ AS WITH typevalue AS (
   JOIN cat_connec ON cat_connec.id::text = c.conneccat_id::text
   JOIN cat_feature ON cat_feature.id::text = c.connec_type::text
   JOIN exploitation ON c.expl_id = exploitation.expl_id
-  JOIN v_municipality mu ON c.muni_id = mu.muni_id
+  JOIN v_municipality vm ON c.muni_id = vm.muni_id
   JOIN value_state_type vst ON vst.id = c.state_type
   JOIN sector_table ON sector_table.sector_id = c.sector_id
   LEFT JOIN omzone_table ON omzone_table.omzone_id = c.omzone_id
@@ -770,8 +770,8 @@ AS WITH typevalue AS (
     gully.streetaxis2_id,
     gully.postnumber2,
     gully.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     gully.workcat_id,
     gully.workcat_id_end,
     gully.workcat_id_plan,
@@ -827,7 +827,7 @@ AS WITH typevalue AS (
   JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
   LEFT JOIN cat_connec cc ON cc.id::text = gully._connec_arccat_id::text
   JOIN value_state_type vst ON vst.id = gully.state_type
-  JOIN v_municipality mu ON gully.muni_id = mu.muni_id
+  JOIN v_municipality vm ON gully.muni_id = vm.muni_id
   JOIN sector_table ON gully.sector_id = sector_table.sector_id
   LEFT JOIN omzone_table ON gully.omzone_id = omzone_table.omzone_id
   LEFT JOIN drainzone_table ON gully.omzone_id = drainzone_table.drainzone_id

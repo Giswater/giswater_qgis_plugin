@@ -299,8 +299,8 @@ AS WITH typevalue AS (
     n.streetaxis2_id,
     n.postnumber2,
     n.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     n.workcat_id,
     n.workcat_id_end,
     n.workcat_id_plan,
@@ -378,7 +378,7 @@ AS WITH typevalue AS (
   JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
   JOIN value_state_type vst ON vst.id = n.state_type
   JOIN exploitation ON n.expl_id = exploitation.expl_id
-  JOIN v_municipality mu ON n.muni_id = mu.muni_id
+  JOIN v_municipality vm ON n.muni_id = vm.muni_id
   JOIN sector_table ON sector_table.sector_id = n.sector_id
   LEFT JOIN presszone_table ON presszone_table.presszone_id = n.presszone_id
   LEFT JOIN dma_table ON dma_table.dma_id = n.dma_id
@@ -544,8 +544,8 @@ WITH typevalue AS (
     a.streetaxis2_id,
     a.postnumber2,
     a.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     a.workcat_id,
     a.workcat_id_end,
     a.workcat_id_plan,
@@ -739,8 +739,8 @@ AS WITH typevalue AS (
     c.streetaxis2_id,
     c.postnumber2,
     c.postcomplement2,
-    mu.region_id,
-    mu.province_id,
+    vm.region_id,
+    vm.province_id,
     c.block_code,
     c.plot_id,
     c.workcat_id,
@@ -821,7 +821,7 @@ AS WITH typevalue AS (
   JOIN cat_connec ON cat_connec.id::text = c.conneccat_id::text
   JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
   JOIN exploitation ON c.expl_id = exploitation.expl_id
-  JOIN v_municipality mu ON c.muni_id = mu.muni_id
+  JOIN v_municipality vm ON c.muni_id = vm.muni_id
   JOIN sector_table ON sector_table.sector_id = c.sector_id
   LEFT JOIN presszone_table ON presszone_table.presszone_id = c.presszone_id
   LEFT JOIN dma_table ON dma_table.dma_id = c.dma_id

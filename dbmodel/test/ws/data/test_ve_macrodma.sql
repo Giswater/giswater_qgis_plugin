@@ -13,8 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO ve_macrodma (macrodma_id, code, "name", descript, the_geom, expl_id)
-VALUES(-901, '-901', 'Undefined', NULL, NULL, '{0}');
+INSERT INTO ve_macrodma (macrodma_id, code, "name", descript, the_geom, expl_id, muni_id, sector_id)
+VALUES(-901, '-901', 'Undefined', NULL, NULL, '{1}', '{1}', '{0}');
 SELECT is((SELECT count(*)::integer FROM ve_macrodma WHERE code = '-901'), 1, 'INSERT: ve_macrodma -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM macrodma WHERE code = '-901'), 1, 'INSERT: macrodma -901 was inserted');
 
