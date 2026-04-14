@@ -64,8 +64,6 @@ class Go2Iber:
         self.dlg_go2iber.btn_cancel.clicked.connect(partial(self._btn_cancel_clicked))
 
         # Open dialog
-        msg = "This tool is still in developement, it might not work as intended."
-        tools_qgis.show_warning(msg, dialog=self.dlg_go2iber)  # TODO: remove this
         tools_gw.open_dialog(self.dlg_go2iber, dlg_name='go2iber')
 
     def _btn_swmm_options_clicked(self):
