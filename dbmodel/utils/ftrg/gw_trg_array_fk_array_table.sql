@@ -71,7 +71,7 @@ BEGIN
 
             v_querystring := format('SELECT NOT EXISTS (SELECT 1 FROM unnest(($1).%I) as arrays
             LEFT JOIN '||name_id_table||' ON arrays = '||name_id_table||'.'||name_id_column||'::int4 WHERE '||name_id_table||'.'||name_id_column||' IS NULL)', name_array_column);
-
+            RAISE NOTICE 'v_querystring: %', v_querystring;
             EXECUTE v_querystring USING NEW INTO all_exist;
 
 

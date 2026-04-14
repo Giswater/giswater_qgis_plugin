@@ -77,3 +77,70 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hyd
 -- 12/04/2026
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"anl_arc", "column":"state_type", "dataType":"int2"}}$$);
 
+-- 13/04/2026
+-- trgs at this point are broken, they recreate after in [ud|ws]/trg.sql
+-- we disable them to avoid errors
+ALTER TABLE exploitation DISABLE TRIGGER ALL;
+ALTER TABLE sector DISABLE TRIGGER ALL;
+ALTER TABLE macrosector DISABLE TRIGGER ALL;
+ALTER TABLE dma DISABLE TRIGGER ALL;
+ALTER TABLE omzone DISABLE TRIGGER ALL;
+ALTER TABLE macroomzone DISABLE TRIGGER ALL;
+
+UPDATE exploitation SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+UPDATE exploitation SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+ALTER TABLE exploitation ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE exploitation ALTER COLUMN muni_id SET NOT NULL;
+ALTER TABLE exploitation ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE exploitation ALTER COLUMN sector_id SET NOT NULL;
+
+UPDATE sector SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE sector SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE sector ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE sector ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE sector ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE sector ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE macrosector SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE macrosector SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE macrosector ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrosector ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE macrosector ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrosector ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE dma SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE dma SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE dma SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE dma ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE dma ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE dma ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE dma ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE dma ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE dma ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE omzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE omzone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE omzone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE omzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE omzone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE omzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+--ALTER TABLE omzone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE omzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+--ALTER TABLE omzone ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE macroomzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE macroomzone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE macroomzone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE macroomzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE macroomzone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE macroomzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE macroomzone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE macroomzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE macroomzone ALTER COLUMN muni_id SET NOT NULL;
+
+ALTER TABLE exploitation ENABLE TRIGGER ALL;
+ALTER TABLE sector ENABLE TRIGGER ALL;
+ALTER TABLE macrosector ENABLE TRIGGER ALL;
+ALTER TABLE dma ENABLE TRIGGER ALL;
+ALTER TABLE omzone ENABLE TRIGGER ALL;
+ALTER TABLE macroomzone ENABLE TRIGGER ALL;

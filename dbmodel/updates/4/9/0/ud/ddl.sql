@@ -59,3 +59,54 @@ CREATE TABLE IF NOT EXISTS inp_dscenario_pattern_value (
 ALTER TABLE inp_dscenario_pattern_value ADD CONSTRAINT inp_dscenario_pattern_value_dscenario_id_pattern_id_fkey 
 FOREIGN KEY (dscenario_id, pattern_id) REFERENCES inp_dscenario_pattern(dscenario_id, pattern_id) 
 ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- 13/04/2026
+ALTER TABLE dwfzone DISABLE TRIGGER ALL;
+ALTER TABLE drainzone DISABLE TRIGGER ALL;
+ALTER TABLE omunit DISABLE TRIGGER ALL;
+ALTER TABLE macroomunit DISABLE TRIGGER ALL;
+
+UPDATE dwfzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE dwfzone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE dwfzone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE dwfzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE dwfzone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE dwfzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE dwfzone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE dwfzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE dwfzone ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE drainzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE drainzone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE drainzone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE drainzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE drainzone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE drainzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE drainzone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE drainzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE drainzone ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE omunit SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE omunit SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE omunit SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE omunit ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE omunit ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE omunit ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE omunit ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE omunit ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE omunit ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE macroomunit SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE macroomunit SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE macroomunit SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE macroomunit ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE macroomunit ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE macroomunit ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE macroomunit ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE macroomunit ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE macroomunit ALTER COLUMN muni_id SET NOT NULL;
+
+ALTER TABLE dwfzone ENABLE TRIGGER ALL;
+ALTER TABLE drainzone ENABLE TRIGGER ALL;
+ALTER TABLE omunit ENABLE TRIGGER ALL;
+ALTER TABLE macroomunit ENABLE TRIGGER ALL;

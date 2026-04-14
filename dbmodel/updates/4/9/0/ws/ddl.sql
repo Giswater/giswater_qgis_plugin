@@ -127,3 +127,102 @@ ALTER TABLE crmzone ALTER COLUMN "descript" TYPE varchar(255) USING "descript"::
 ALTER TABLE crmzone ADD expl_id int4[] NULL;
 ALTER TABLE crmzone ADD sector_id int4[] NULL;
 ALTER TABLE crmzone ADD muni_id int4[] NULL;
+
+-- 13/04/2026
+ALTER TABLE macrodma DISABLE TRIGGER ALL;
+ALTER TABLE dqa DISABLE TRIGGER ALL;
+ALTER TABLE macrodqa DISABLE TRIGGER ALL;
+ALTER TABLE presszone DISABLE TRIGGER ALL;
+ALTER TABLE supplyzone DISABLE TRIGGER ALL;
+ALTER TABLE crmzone DISABLE TRIGGER ALL;
+ALTER TABLE plan_netscenario_dma DISABLE TRIGGER ALL;
+ALTER TABLE plan_netscenario_presszone DISABLE TRIGGER ALL;
+
+UPDATE macrodma SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE macrodma SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE macrodma SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE macrodma ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrodma ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE macrodma ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrodma ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE macrodma ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrodma ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE dqa SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE dqa SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE dqa SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE dqa ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE dqa ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE dqa ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE dqa ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE dqa ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE dqa ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE macrodqa SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE macrodqa SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE macrodqa SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE macrodqa ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrodqa ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE macrodqa ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrodqa ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE macrodqa ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE macrodqa ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE presszone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE presszone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE presszone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE presszone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE presszone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE presszone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE presszone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE presszone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE presszone ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE supplyzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE supplyzone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE supplyzone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE supplyzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE supplyzone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE supplyzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE supplyzone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE supplyzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE supplyzone ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE crmzone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE crmzone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE crmzone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE crmzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE crmzone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE crmzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE crmzone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE crmzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE crmzone ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE plan_netscenario_dma SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE plan_netscenario_dma SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE plan_netscenario_dma SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE plan_netscenario_dma ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE plan_netscenario_dma ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE plan_netscenario_dma ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE plan_netscenario_dma ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE plan_netscenario_dma ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE plan_netscenario_dma ALTER COLUMN muni_id SET NOT NULL;
+
+UPDATE plan_netscenario_presszone SET expl_id = ARRAY[0] WHERE expl_id IS NULL;
+UPDATE plan_netscenario_presszone SET sector_id = ARRAY[0] WHERE sector_id IS NULL;
+UPDATE plan_netscenario_presszone SET muni_id = ARRAY[0] WHERE muni_id IS NULL;
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN expl_id SET DEFAULT ARRAY[0];
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN expl_id SET NOT NULL;
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN sector_id SET DEFAULT ARRAY[0];
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN sector_id SET NOT NULL;
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
+ALTER TABLE plan_netscenario_presszone ALTER COLUMN muni_id SET NOT NULL;
+
+ALTER TABLE macrodma ENABLE TRIGGER ALL;
+ALTER TABLE dqa ENABLE TRIGGER ALL;
+ALTER TABLE macrodqa ENABLE TRIGGER ALL;
+ALTER TABLE presszone ENABLE TRIGGER ALL;
+ALTER TABLE supplyzone ENABLE TRIGGER ALL;
+ALTER TABLE crmzone ENABLE TRIGGER ALL;
+ALTER TABLE plan_netscenario_dma ENABLE TRIGGER ALL;
+ALTER TABLE plan_netscenario_presszone ENABLE TRIGGER ALL;
