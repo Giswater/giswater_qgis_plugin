@@ -56,7 +56,7 @@ VALUES(3248, 'Massive node interpolation', '{"featureType":[]}'::json,
 NULL, true, '{4}');
 
 
-update sys_function set sys_role = 'role_edit', function_alias = 'Massive node interpolation' ,
+UPDATE sys_function SET sys_role = 'role_edit', function_alias = 'Massive node interpolation' ,
 descript = 
 'PURPOSE
 This function calculates node invert elevations using different strategies depending on the requested calculation type.
@@ -100,7 +100,7 @@ BUSINESS RULES
 - INIT only processes head arcs where node_1 has degree = 1. In INIT, node_2 must already have fixed elevation.
 - FLOWEXIT and INIT must satisfy Ymax and slope constraints.
 - Infeasible cases are logged in audit_check_data with detailed diagnostics.'
-where id  = 3248;
+WHERE id  = 3248;
 
 
 INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_anl_node_massiveinterpolate', 'Massive interpolate for nodes', 'role_basic', 'core') ON CONFLICT DO NOTHING;
@@ -109,11 +109,3 @@ INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_anl_arc_massi
 -- 13/04/2026
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4628, 'Number of nodes interpolated', null, 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
-
-
-
-Canvis del que us he ensenyat:
-Fix changes sempre surt en false
-La resta de valors, es guarda la darrera elecció
-He millorat els missatges
-Ara és superfast!
