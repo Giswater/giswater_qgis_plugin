@@ -393,4 +393,4 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerGeometryType>1</layerGeometryType>
-</qgis>' WHERE layername = 'v_rpt_comp_arcflow_sum';
+</qgis>' WHERE layername IN ('v_rpt_arcflow_sum', 'v_rpt_comp_arcflow_sum');
