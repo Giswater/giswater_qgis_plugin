@@ -655,7 +655,7 @@ LEFT JOIN LATERAL ( SELECT pp_1.state,
          LIMIT 1) pp ON true
   WHERE (EXISTS ( SELECT 1
            FROM selector_state ss
-          WHERE ss.state_id = g.state AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+          WHERE ss.state_id = COALESCE(pp.state, g.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_sector ssec
           WHERE ssec.sector_id = g.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_municipality sm
@@ -1133,7 +1133,7 @@ AS WITH typevalue AS (
   FROM link l
   JOIN vf_link vf ON vf.link_id = l.link_id
   JOIN exploitation ON l.expl_id = exploitation.expl_id
-  JOIN ext_municipality mu ON l.muni_id = mu.muni_id
+  JOIN v_municipality vm ON l.muni_id = vm.muni_id
   JOIN sector_table ON l.sector_id = sector_table.sector_id
   JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
   JOIN cat_feature ON cat_feature.id::text = l.link_type::text
