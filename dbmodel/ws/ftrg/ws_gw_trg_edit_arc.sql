@@ -697,6 +697,11 @@ BEGIN
 			UPDATE link SET fluid_type = NEW.fluid_type WHERE exit_id = NEW.arc_id;
 		END IF;
 
+		IF NEW. expl_id != OLD. expl_id THEN
+			UPDATE connec SET expl_id = NEW.expl_id WHERE arc_id = NEW.arc_id;
+			UPDATE link SET expl_id = NEW.expl_id WHERE exit_id = NEW.arc_id;
+		END IF;
+
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
