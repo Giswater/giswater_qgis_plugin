@@ -316,6 +316,9 @@ BEGIN
             IF v_fct_name = 'OMUNIT' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
                 CREATE INDEX IF NOT EXISTS temp_pgr_arc_macromapzone_id_idx ON temp_pgr_arc USING btree ("macromapzone_id");
+
+                ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS catchment_id INTEGER DEFAULT 0;
+                CREATE INDEX IF NOT EXISTS temp_pgr_arc_catchment_id_idx ON temp_pgr_arc USING btree ("catchment_id");
                 
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_omunit (LIKE SCHEMA_NAME.omunit INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_macroomunit (LIKE SCHEMA_NAME.macroomunit INCLUDING ALL);
