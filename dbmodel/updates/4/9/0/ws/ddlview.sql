@@ -1488,7 +1488,6 @@ AS WITH typevalue AS (
   JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
   JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text
   JOIN exploitation ON l.expl_id = exploitation.expl_id
-  JOIN v_municipality vm ON l.muni_id = vm.muni_id
   LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
   LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
   LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id

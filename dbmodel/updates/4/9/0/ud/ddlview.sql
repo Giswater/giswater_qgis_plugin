@@ -1133,7 +1133,6 @@ AS WITH typevalue AS (
   FROM link l
   JOIN vf_link vf ON vf.link_id = l.link_id
   JOIN exploitation ON l.expl_id = exploitation.expl_id
-  JOIN v_municipality vm ON l.muni_id = vm.muni_id
   JOIN sector_table ON l.sector_id = sector_table.sector_id
   JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
   JOIN cat_feature ON cat_feature.id::text = l.link_type::text
