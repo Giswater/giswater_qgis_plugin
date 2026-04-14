@@ -11,7 +11,7 @@ import json
 
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.PyQt.QtWidgets import QTextEdit
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsVectorLayer, QgsProject
 from qgis.PyQt.QtCore import QDate
 
 from .epa_file_manager import GwEpaFileManager
@@ -161,6 +161,8 @@ class GwGo2IberTask(GwTask):
         self.dlg_go2iber.btn_accept.setEnabled(True)
 
         if not self.isCanceled() and result:
+            relative_path = os.path.relpath(self.folder_path, QgsProject.instance().absolutePath())
+            tools_qgis.set_project_variable('project_results_folder', relative_path)
             self.ig_execute_model._import_results()
             self.ig_execute_model._delete_raster_results()
 
