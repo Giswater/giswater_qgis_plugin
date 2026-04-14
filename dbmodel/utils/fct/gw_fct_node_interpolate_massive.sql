@@ -536,7 +536,14 @@ BEGIN
                 END AS step_len
             FROM route r
             ORDER BY r.path_seq;
-
+			
+			-- disabling temporary triggers in order to make faster transactions
+			UPDATE config_param_user SET value='true' WHERE parameter = 'edit_disable_noderotation_complete' and cur_user = current_user;
+			UPDATE config_param_user SET value='true' WHERE parameter = 'edit_disable_statetopocontrol' and cur_user = current_user;
+			UPDATE config_param_user SET value='true' WHERE parameter = 'edit_disable_planpsector_node' and cur_user = current_user;
+			UPDATE config_param_user SET value='true' WHERE parameter = 'edit_disable_topocontrol_complete' and cur_user = current_user;
+			UPDATE config_param_user SET value='true' WHERE parameter = 'edit_disable_arc_divide' and cur_user = current_user;
+			
             -- Clean previous custom_elev only on nodes that are not hard points
             UPDATE ve_node n
                SET custom_elev = NULL
@@ -1168,6 +1175,9 @@ BEGIN
                         FROM temp_profile_final s
                         JOIN ve_node n ON n.node_id = s.node_id;
 
+						-- restoring trigger topocontrol to propoagate values to arc
+						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_topocontrol_complete' and cur_user = current_user;
+
                         UPDATE ve_node n
                            SET custom_elev = s.calc_elev
                         FROM temp_profile_final s
@@ -1191,7 +1201,13 @@ BEGIN
                               AND s.seq <> v_min_seq
                               AND s.seq <> v_max_seq
                           );
-
+						 
+						-- restoring the rest of the triggers
+						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_noderotation_complete' and cur_user = current_user;
+						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_statetopocontrol' and cur_user = current_user;
+						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_planpsector_node' and cur_user = current_user;
+						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_arc_divide' and cur_user = current_user;		  
+						  
                         INSERT INTO temp_anl_arc (arc_id, fid, the_geom, descript, cur_user, expl_id, state_type)
                         SELECT
                             a.arc_id,
