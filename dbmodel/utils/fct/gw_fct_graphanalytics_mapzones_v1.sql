@@ -176,6 +176,8 @@ BEGIN
 	ELSIF v_class = 'DWFZONE' THEN
 		-- dwfzone and drainzone are calculated in the same process
 		v_fid := 481;
+	ELSIF v_class = 'SUPPLYZONE' THEN
+		v_fid := 712;
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3090", "function":"3508","parameters":null, "is_process":true}}$$);' INTO v_audit_result;

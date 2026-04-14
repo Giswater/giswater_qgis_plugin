@@ -211,3 +211,7 @@ VALUES (4626, 'The following catalogs have invalid dnom: %invalid_dnom%', 'Check
 DELETE FROM sys_table WHERE id='rtc_hydrometer';
 DELETE FROM sys_table WHERE id='rtc_hydrometer_x_connec';
 DELETE FROM sys_table WHERE id='rtc_hydrometer_x_node';
+
+-- 14/04/2026
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active) 
+VALUES(712, 'Supply Zonification', 'ws', NULL, 'core', true, 'Function process', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true) ON CONFLICT (fid) DO NOTHING;
