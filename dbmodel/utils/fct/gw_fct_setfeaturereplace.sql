@@ -404,7 +404,7 @@ BEGIN
 			v_excluded_columns := v_excluded_columns || ',''customer_code''';
 		END IF;
 		v_sql:='select column_name FROM information_schema.columns 
-				where (table_schema=''schema_NAME'' and udt_name <> ''inet'' and 
+				where (table_schema=''SCHEMA_NAME'' and udt_name <> ''inet'' and 
 				table_name='''||v_feature_type||''') 
 				and column_name not in ('||v_excluded_columns||');';
 
