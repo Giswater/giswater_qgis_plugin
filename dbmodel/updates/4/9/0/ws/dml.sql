@@ -181,43 +181,45 @@ FROM _inp_dscenario_demand_;
 UPDATE config_toolbox
 	SET inputparams='[
   {
+    "widgetname": "graphClass",
     "label": "Graph class:",
+    "widgettype": "combo",
+    "datatype": "text",
     "tooltip": "Graphanalytics method used",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
     "comboIds": [
       "MACROSECTOR",
-      "MACROOMZONE"
+      "MACROOMZONE",
+      "MACRODMA"
     ],
-    "datatype": "text",
     "comboNames": [
       "MACROSECTOR",
-      "MACROOMZONE"
+      "MACROOMZONE",
+       "MACRODMA"
     ],
-    "layoutname": "grl_option_parameters",
-    "selectedId": null,
-    "widgetname": "graphClass",
-    "widgettype": "combo",
-    "layoutorder": 1
+    "selectedId": null
   },
   {
-    "label": "Exploitation:",
-    "tooltip": "Choose exploitation to work with",
-    "datatype": "text",
-    "layoutname": "grl_option_parameters",
-    "selectedId": null,
     "widgetname": "exploitation",
+    "label": "Exploitation:",
     "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Choose exploitation to work with",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
     "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC",
-    "layoutorder": 2
+    "selectedId": null
   },
   {
-    "label": "Commit changes:",
-    "value": null,
-    "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be showed in a temporal layer",
-    "datatype": "boolean",
-    "layoutname": "grl_option_parameters",
     "widgetname": "commitChanges",
+    "label": "Commit changes:",
     "widgettype": "check",
-    "layoutorder": 8
+    "datatype": "boolean",
+    "tooltip": "If True, changes will be applied to DB. If False, algorithm results will be saved in a temporal layer",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 8,
+    "value": null
   },
   {
     "label": "Mapzone constructor method:",
@@ -240,7 +242,7 @@ UPDATE config_toolbox
     "selectedId": null,
     "widgetname": "updateMapZone",
     "widgettype": "combo",
-    "layoutorder": 10
+    "layoutorder": 9
   },
   {
     "label": "Pipe buffer",
@@ -251,11 +253,12 @@ UPDATE config_toolbox
     "widgetname": "geomParamUpdate",
     "widgettype": "text",
     "isMandatory": false,
-    "layoutorder": 11,
+    "layoutorder": 10,
     "placeholder": "5-30"
   }
 ]'::json
 	WHERE id=3482;
+
 
 
 -- 26/03/2026

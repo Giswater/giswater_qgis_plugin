@@ -7,8 +7,6 @@ or (at your option) any later version.
 
 SET search_path = 'SCHEMA_NAME', public, pg_catalog;
 
-UPDATE config_param_system SET VALUE = '{"SECTOR":true, "PRESSZONE":true, "DQA":true, "MINSECTOR":true, "DMA":true}' WHERE parameter = 'utils_graphanalytics_status';
-
 INSERT INTO sys_function VALUES (2888, 'gw_fct_fill_om_tables','ws','function','void','void','Create example visits (used on sample creation)','role_admin',false);
 INSERT INTO sys_function VALUES (2918, 'gw_fct_fill_doc_tables','ws','function','void','void','Create example documents (used on sample creation)','role_admin',false);
 UPDATE sys_function SET input_params ='void', return_type ='void' WHERE id =2888;
@@ -313,8 +311,6 @@ WHERE parameter = 'admin_checkproject';
 
 
 UPDATE ext_rtc_dma_period set avg_press = 30;
-
-SELECT setval('SCHEMA_NAME.urn_id_seq', 114465, true);
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
 

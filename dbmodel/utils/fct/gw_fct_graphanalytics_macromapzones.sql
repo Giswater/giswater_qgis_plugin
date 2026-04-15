@@ -123,7 +123,7 @@ BEGIN
 	END IF;
 
 	IF v_update_map_zone > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4626","function":"3482","parameters":{"graphClass":"'
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4608","function":"3482","parameters":{"graphClass":"'
 			|| upper(v_class) || '"}, "tempTable":"temp_", "criticity":"1", "fid": '||v_fid||'}}$$);';
 
 		DROP TABLE IF EXISTS temp_macromapzone_geom;

@@ -215,3 +215,24 @@ DELETE FROM sys_table WHERE id='rtc_hydrometer_x_node';
 -- 14/04/2026
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active) 
 VALUES(712, 'Supply Zonification', 'ws', NULL, 'core', true, 'Function process', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true) ON CONFLICT (fid) DO NOTHING;
+
+-- 15/04/2026
+UPDATE config_param_system
+SET value = (
+  COALESCE(value::jsonb, '{}'::jsonb)
+  || jsonb_build_object(
+    'SECTOR', true,
+    'DMA', true,
+    'DQA', true,
+    'PRESSZONE', true,
+    'DWFZONE', true,
+    'SUPPLYZONE', true,
+    'MACROSECTOR', true,
+    'MACRODMA', true,
+    'MACRODQA', true,
+    'MACROOMZONE', true,
+    'OMZONE', false,
+    'DRAINZONE', false
+  )
+)::json
+WHERE parameter = 'utils_graphanalytics_status';
