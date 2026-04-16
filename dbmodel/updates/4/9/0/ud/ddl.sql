@@ -106,6 +106,9 @@ ALTER TABLE macroomunit ALTER COLUMN sector_id SET NOT NULL;
 ALTER TABLE macroomunit ALTER COLUMN muni_id SET DEFAULT ARRAY[0];
 ALTER TABLE macroomunit ALTER COLUMN muni_id SET NOT NULL;
 
+ALTER TABLE omunit ALTER COLUMN the_geom TYPE public.geometry(multilinestring, SRID_VALUE) USING the_geom::public.geometry(multilinestring, SRID_VALUE);
+ALTER TABLE macroomunit ALTER COLUMN the_geom TYPE public.geometry(multilinestring, SRID_VALUE) USING the_geom::public.geometry(multilinestring, SRID_VALUE);
+
 ALTER TABLE dwfzone ENABLE TRIGGER ALL;
 ALTER TABLE drainzone ENABLE TRIGGER ALL;
 ALTER TABLE omunit ENABLE TRIGGER ALL;
