@@ -22,17 +22,8 @@ from ....ui.ui_manager import EmitterCalibrationUi
 
 from ....threads.emitter_calibration_execute import EmitterCalibrationExecute
 
-from .....libs import tools_qt, tools_db
+from .....libs import tools_qt, tools_db, tools_qgis
 from ....utils import tools_gw
-
-try:
-    import wntr
-    from wntr.network import WaterNetworkModel 
-    from wntr.sim import EpanetSimulator
-except ImportError:
-    wntr = None
-    WaterNetworkModel = None
-    EpanetSimulator = None
 
 
 class EmitterCalibration:
@@ -81,6 +72,15 @@ class EmitterCalibration:
         tools_gw.open_dialog(self.dlg_vol_cal, dlg_name='emitter_calibration')
 
     def _execute_process(self):
+
+        try:
+            import wntr  # noqa: F401
+        except ImportError:
+            tools_qgis.show_critical(
+                "Python package 'wntr' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return
 
         self._get_form_values()
 
@@ -139,6 +139,8 @@ class EmitterCalibration:
         )
 
     def _check_inputs(self):
+        from wntr.network import WaterNetworkModel
+        from wntr.sim import EpanetSimulator
 
         valid = True
         # INPUT FILE
@@ -196,6 +198,8 @@ class EmitterCalibration:
         return True
 
     def _adjust_patterns(self):
+        from wntr.sim import EpanetSimulator
+
         # Get patterns in use for this config
         dmas = {junction["dma_id"] for junction in self.config.junctions.values()}
         patterns = {
@@ -399,6 +403,7 @@ class ConfigEC:
         self._get_emitters_coefficients(inpfile)
 
     def _get_emitters_coefficients(self, inpfile):
+        from wntr.network import WaterNetworkModel
         wn = WaterNetworkModel(inpfile)
         len_by_node = {}
 

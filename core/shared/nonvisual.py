@@ -11,13 +11,6 @@ import webbrowser
 from functools import partial
 
 
-try:
-    from scipy.interpolate import CubicSpline
-    import numpy as np
-    scipy_imported = True
-except ImportError:
-    scipy_imported = False
-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QShortcut, QApplication, QMenu, QAction, QPushButton, QHeaderView
 from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -25,7 +18,7 @@ from qgis.PyQt.QtCore import Qt
 from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVisualCurveUi, GwNonVisualPatternUDUi, \
     GwNonVisualPatternWSUi, GwNonVisualRulesUi, GwNonVisualTimeseriesUi, GwNonVisualLidsUi, GwNonVisualPrint, \
     GwNonVisualRoughnessUi
-from ..utils.matplotlib_widget import MplCanvas
+from ..utils.matplotlib_widget import create_mpl_canvas
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log, tools_os
 from ... import global_vars
@@ -669,10 +662,14 @@ class GwNonVisual:
     def get_curves(self, curve_id=None, duplicate=False):
         """ Opens dialog for curve """
 
-        # Show warning message if scipy/numpy is not available
-        if scipy_imported is False:
-            msg = "Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version"
-            tools_qgis.show_warning(msg, dialog=self.manager_dlg)
+        try:
+            from scipy.interpolate import CubicSpline  # noqa: F401
+            import numpy as np  # noqa: F401
+        except ImportError:
+            tools_qgis.show_critical(
+                "Python packages 'scipy' and 'numpy' are not installed. "
+                "Please install them using pip or the 'qpip' QGIS plugin."
+            )
             return
 
         # Get dialog
@@ -1019,6 +1016,8 @@ class GwNonVisual:
                 self.valid = VALID if valid else NOT_VALID_PAIRS
 
     def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None, geom2=None):
+        from scipy.interpolate import CubicSpline
+        import numpy as np
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
@@ -1061,7 +1060,7 @@ class GwNonVisual:
 
         # Create curve if only one value with curve_type 'PUMP'
         curve_type = tools_qt.get_combo_value(dialog, dialog.cmb_curve_type)
-        if scipy_imported and len(x_list) == 1 and curve_type == 'PUMP':
+        if len(x_list) == 1 and curve_type == 'PUMP':
             # Draw curve with points (0, 1.33y), (x, y), (2x, 0)
             x = x_list[0]
             y = y_list[0]
@@ -1083,7 +1082,7 @@ class GwNonVisual:
                 tools_qgis.show_warning(msg, dialog=dialog)
 
         # Manage inverted plot and mirror plot for SHAPE type
-        if scipy_imported and curve_type == 'SHAPE':
+        if curve_type == 'SHAPE':
             if [] in (x_list, y_list):
                 if file_name:
                     fig_title = f"{file_name}"
@@ -3088,7 +3087,9 @@ class GwNonVisual:
 
     def _create_plot_widget(self, dialog):
 
-        plot_widget = MplCanvas(dialog, width=5, height=4, dpi=100)
+        plot_widget = create_mpl_canvas(dialog, width=5, height=4, dpi=100)
+        if plot_widget is None:
+            return None
         plot_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
         plot_widget.setMinimumSize(100, 100)
         dialog.lyt_plot.addWidget(plot_widget, 0, 0)

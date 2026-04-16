@@ -9,7 +9,6 @@ import webbrowser
 import json
 from functools import partial
 from osgeo import gdal
-from pyproj import CRS, Transformer
 from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QStandardItemModel, QCursor
@@ -918,6 +917,15 @@ class GwDocument(QObject):
             lon = self.convert_to_degrees(lon_values)
             if lon_ref != "E":
                 lon = -lon
+
+            try:
+                from pyproj import CRS, Transformer
+            except ImportError:
+                tools_qgis.show_critical(
+                    "Python package 'pyproj' is not installed. "
+                    "Please install it using pip or the 'qpip' QGIS plugin."
+                )
+                return None
 
             # Perform coordinate transformation
             crs_in = CRS.from_epsg(4326)

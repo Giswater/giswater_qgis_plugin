@@ -17,15 +17,8 @@ from qgis.PyQt.QtWidgets import QWidget
 
 from ....threads.valve_operation_check import GwValveOperationCheck
 from ....ui.ui_manager import ValveOperationCheckUi
-from .....libs import tools_qt, tools_db
+from .....libs import tools_qt, tools_db, tools_qgis
 from ....utils import tools_gw
-
-try:
-    import wntr
-    from wntr.network import WaterNetworkModel
-except ImportError:
-    wntr = None
-    WaterNetworkModel = None
 
 
 class ValveOperationCheck:
@@ -45,6 +38,15 @@ class ValveOperationCheck:
         tools_gw.open_dialog(dlg, dlg_name="valve_operation_check")
 
     def _execute_process(self):
+        try:
+            import wntr  # noqa: F401
+        except ImportError:
+            tools_qgis.show_critical(
+                "Python package 'wntr' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return
+
         dlg = self.dlg_voc
 
         if not self._validate_inputs():
@@ -243,6 +245,8 @@ class ValveOperationCheck:
                 )
 
     def _validate_inputs(self):
+        from wntr.network import WaterNetworkModel
+
         dlg = self.dlg_voc
 
         input_file = dlg.data_inp_input_file.toPlainText()

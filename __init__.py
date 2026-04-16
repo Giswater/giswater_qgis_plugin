@@ -22,19 +22,6 @@ import sys
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(plugin_path)
 
-if sys.version_info >= (3, 10):
-    # Improves startup speed for tools by pre-loading required packages
-    # (e.g., Import INP tool)
-    try:
-        import swmm_api  # noqa: F401
-    except ImportError:
-        pass
-
-    try:
-        import wntr  # noqa: F401
-    except ImportError:
-        pass
-
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name

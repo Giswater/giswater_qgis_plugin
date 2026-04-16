@@ -11,24 +11,11 @@ from pathlib import Path
 from random import choice, choices
 from statistics import mean
 
-import pandas as pd
-
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ...resources.epatools.utils import anl_quantized_demands
-
-try:
-    import wntr
-    from wntr.network import write_inpfile, WaterNetworkModel
-    from wntr.sim import EpanetSimulator
-    from wntr.metrics import expected_demand
-except ImportError:
-    wntr = None
-    write_inpfile = None
-    WaterNetworkModel = None
-    EpanetSimulator = None
 
 
 class GwQuantizedDemands(GwTask):
@@ -54,6 +41,16 @@ class GwQuantizedDemands(GwTask):
         self.file_name = file_name
 
     def run(self):
+        try:
+            import pandas  # noqa: F401
+            from wntr.network import write_inpfile
+        except ImportError as e:
+            self.exception = (
+                f"Python package '{e.name}' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         try:
             self.status.emit("Creating quantized model...")
             model = QuantizedModel(
@@ -97,6 +94,9 @@ class GwQuantizedDemands(GwTask):
             return False
 
     def write_statistics(self, model, file):
+        import pandas as pd
+        from wntr.sim import EpanetSimulator
+
         self.status.emit("Running simulation...")
         sim = EpanetSimulator(model.quantized_network)
         results = {}
@@ -225,6 +225,8 @@ class QuantizedModel:
                 junc_obj[time] += consumption.flow
 
     def _get_demand_matrix(self):
+        import pandas as pd
+
         obj = {}
 
         for index, consumptions in enumerate(self.consumptions_per_timestep):
@@ -357,6 +359,8 @@ class InputFlow:
 
 class InputModel:
     def __init__(self, input_file):
+        from wntr.network import WaterNetworkModel
+
         self._wn = WaterNetworkModel(input_file)
 
     @property
@@ -384,11 +388,15 @@ class InputModel:
     @property
     @cache
     def _expected_demands(self):
+        from wntr.metrics import expected_demand
+
         return expected_demand(self.network)
 
     @property
     @cache
     def results(self):
+        from wntr.sim import EpanetSimulator
+
         sim = EpanetSimulator(self.network)
         return sim.run_sim()
 

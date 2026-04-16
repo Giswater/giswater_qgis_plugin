@@ -19,24 +19,6 @@ from qgis.core import QgsTask
 from .task import GwTask
 from ...libs import tools_db
 
-WNTR_IMPORT_ERROR = "Couldn't import WNTR Python package. Please check if the Giswater plugin is installed and it has a 'packages' folder in it with 'wntr'. Also note that WNTR only works with Python 3.12 (QGIS >3.34.5)."
-
-try:
-    import wntr
-    from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
-    from wntr.network import read_inpfile
-    from wntr.sim import EpanetSimulator
-    from wntr.metrics.hydraulic import average_expected_demand
-except ImportError:
-    wntr = None
-    read_inpfile = None
-    EpanetSimulator = None
-    average_expected_demand = None
-    # error_traceback = traceback.format_exc()
-    # title = "Epatools Plugin"
-    # tools_qgis.show_critical(title=title, text=WNTR_IMPORT_ERROR)
-    # tools_qgis.show_critical(title=title, text=error_traceback)
-
 
 class GwAddDemandCheck(GwTask):
     def __init__(
@@ -55,6 +37,15 @@ class GwAddDemandCheck(GwTask):
         self.total_simulations = 2 * self.qtd_nodes + math.comb(self.qtd_nodes, 2)
 
     def run(self):
+        try:
+            import wntr  # noqa: F401
+        except ImportError as e:
+            self.exception = (
+                f"Python package '{e.name}' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         if not self._execute_check_suite():
             return False
         self.cur_step += "\n\nSaving files..."
@@ -209,9 +200,9 @@ class GwAddDemandCheck(GwTask):
         return True
 
     def _create_network(self):
-        if wntr is None:
-            self.cur_step = WNTR_IMPORT_ERROR
-            raise ImportError(WNTR_IMPORT_ERROR)
+        from wntr.network import read_inpfile
+        from wntr.metrics.hydraulic import average_expected_demand
+
         self.cur_step = "Preparing network model..."
         wn = read_inpfile(self.input_file)
         self.adjusted_demands = average_expected_demand(wn)
@@ -246,6 +237,9 @@ class GwAddDemandCheck(GwTask):
         return True
 
     def _execute_individual_check(self, nodes):
+        from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
+        from wntr.sim import EpanetSimulator
+
         test_wn = copy.deepcopy(self.network)
         units = test_wn.options.hydraulic.inpfile_units
         pat = test_wn.get_pattern("constant_pattern")

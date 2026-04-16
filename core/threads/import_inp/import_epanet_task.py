@@ -9,12 +9,6 @@ from datetime import date
 from itertools import count
 from typing import Any
 
-try:
-    from wntr.epanet.util import FlowUnits, HydParam, from_si
-    from wntr.network.model import WaterNetworkModel
-except ImportError:
-    pass
-
 from qgis.PyQt.QtCore import pyqtSignal
 
 from ....libs import lib_vars, tools_db
@@ -71,7 +65,7 @@ class GwImportInpTask(GwTask):
     ) -> None:
         super().__init__(description)
         self.filepath = filepath
-        self.network: WaterNetworkModel = network
+        self.network = network
         self.workcat: str = workcat
         self.exploitation: int = exploitation
         self.sector: int = sector
@@ -96,6 +90,16 @@ class GwImportInpTask(GwTask):
 
     def run(self) -> bool:
         super().run()
+        try:
+            from wntr.epanet.util import FlowUnits, HydParam, from_si  # noqa: F401
+            from wntr.network.model import WaterNetworkModel  # noqa: F401
+        except ImportError:
+            self.exception = (
+                "Python package 'wntr' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         try:
             # Disable triggers except plan trigger
             self._enable_triggers(False, plan_trigger=True)
@@ -561,6 +565,8 @@ class GwImportInpTask(GwTask):
                 execute_sql(sql, values, commit=self.force_commit, is_thread=True)
 
     def _save_curves(self) -> None:
+        from wntr.epanet.util import FlowUnits, HydParam, from_si
+
         curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit, is_thread=True)
         curves_db: set[str] = set()
         if curve_rows:
@@ -617,6 +623,7 @@ class GwImportInpTask(GwTask):
         return result
 
     def _save_controls_and_rules(self) -> None:
+        from wntr.epanet.util import FlowUnits, HydParam, from_si
         from wntr.network.controls import Control, Rule, SimTimeCondition, TimeOfDayCondition, ValueCondition
         from wntr.network.model import Valve, Tank, Junction, Link
         from wntr.network.base import LinkStatus

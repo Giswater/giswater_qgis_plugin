@@ -5,43 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import traceback
-import sys
 from datetime import date
 from itertools import count
 from typing import Any
 from datetime import datetime
 from typing import Optional
-
-try:
-    if sys.version_info < (3, 10):
-        raise ImportError
-    from swmm_api import SwmmInput
-    from swmm_api.input_file.section_labels import (
-        TITLE, OPTIONS, REPORT, FILES,
-        JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
-        CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-        XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS,
-        PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE,
-        LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES, SUBAREAS,
-        INFILTRATION, ADJUSTMENTS
-    )
-    from swmm_api.input_file.sections import (
-        TimeseriesData, TimeseriesFile,
-        InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber
-    )
-except ImportError:
-    SwmmInput = None
-
-    TITLE, OPTIONS, REPORT, FILES = None, None, None, None
-    JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
-    CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
-    XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS = None, None, None, None, None
-    PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE = None, None, None, None, None, None
-    LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES, SUBAREAS = None, None, None, None, None, None
-    INFILTRATION, ADJUSTMENTS = None, None
-
-    Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile = None, None, None, None, None
-    InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber = object, object, object
 
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -52,6 +20,7 @@ from ..task import GwTask
 
 
 def get_geometry_from_link(inp, link) -> str:
+    from swmm_api.input_file.section_labels import COORDINATES, VERTICES
 
     from_node = link.from_node
     if from_node not in inp[COORDINATES]:
@@ -106,7 +75,7 @@ class GwImportInpTask(GwTask):
     ) -> None:
         super().__init__(description)
         self.filepath = filepath
-        self.network: SwmmInput = network
+        self.network = network
         self.workcat: str = workcat
         self.exploitation: int = exploitation
         self.sector: int = sector
@@ -131,6 +100,15 @@ class GwImportInpTask(GwTask):
 
     def run(self) -> bool:
         super().run()
+        try:
+            from swmm_api.input_file.section_labels import TITLE, FILES  # noqa: F401
+        except ImportError:
+            self.exception = (
+                "Python package 'swmm-api' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         try:
             # Disable triggers except plan trigger
             self._enable_triggers(False, plan_trigger=True)
@@ -210,6 +188,7 @@ class GwImportInpTask(GwTask):
             self._create_new_flwreg_catalogs()
 
     def _manage_nonvisual(self) -> None:
+        from swmm_api.input_file.section_labels import PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS
         if self.network.get(PATTERNS):
             self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
             self._save_patterns()
@@ -231,6 +210,10 @@ class GwImportInpTask(GwTask):
             self._save_lids()
 
     def _manage_visual(self) -> None:
+        from swmm_api.input_file.section_labels import (
+            JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE, CONDUITS, PUMPS,
+            ORIFICES, WEIRS, OUTLETS, RAINGAGES
+        )
         if self.network.get(JUNCTIONS):
             self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
             self._save_junctions()
@@ -272,6 +255,7 @@ class GwImportInpTask(GwTask):
             self._save_raingages()
 
     def _manage_others(self) -> None:
+        from swmm_api.input_file.section_labels import INFLOWS, DWF, SUBCATCHMENTS
         if self.network.get(INFLOWS):
             self.progress_changed.emit("Others", lerp_progress(0, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing inflows", True)
             self._save_inflows()
@@ -377,6 +361,7 @@ class GwImportInpTask(GwTask):
         """
             Import options to table 'config_param_user'.
         """
+        from swmm_api.input_file.section_labels import OPTIONS, REPORT
         params_map = {
 
         }
@@ -423,6 +408,7 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=self.force_commit)
 
     def _save_title(self):
+        from swmm_api.input_file.section_labels import TITLE
         title = self.network[TITLE].txt
 
         sql = """
@@ -440,6 +426,7 @@ class GwImportInpTask(GwTask):
         """
             Import options to table 'config_param_user'.
         """
+        from swmm_api.input_file.section_labels import FILES
 
         params = []
         for k, v in self.network[FILES].items():
@@ -621,6 +608,8 @@ class GwImportInpTask(GwTask):
             flwregcat_db.append(self.catalogs[flwreg_type])
 
     def _save_patterns(self):
+        from swmm_api.input_file.section_labels import PATTERNS
+
         pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit, is_thread=True)
         patterns_db: list[str] = []
         if pattern_rows:
@@ -663,6 +652,8 @@ class GwImportInpTask(GwTask):
             self.results["patterns"] += 1
 
     def _save_curves(self) -> None:
+        from swmm_api.input_file.section_labels import CURVES
+
         curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit, is_thread=True)
         curves_db: set[str] = set()
         if curve_rows:
@@ -704,6 +695,9 @@ class GwImportInpTask(GwTask):
             self.results["curves"] += 1
 
     def _save_timeseries(self) -> None:
+        from swmm_api.input_file.section_labels import TIMESERIES
+        from swmm_api.input_file.sections import TimeseriesData, TimeseriesFile
+
         ts_rows = get_rows("SELECT id FROM inp_timeseries", commit=self.force_commit, is_thread=True)
         ts_db: set[str] = set()
         if ts_rows:
@@ -784,6 +778,8 @@ class GwImportInpTask(GwTask):
             self.results["timeseries"] += 1
 
     def _save_controls(self) -> None:
+        from swmm_api.input_file.section_labels import CONTROLS
+
         controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit, is_thread=True)
         controls_db: set[str] = set()
         if controls_rows:
@@ -802,6 +798,8 @@ class GwImportInpTask(GwTask):
             self.results["controls"] += 1
 
     def _save_lids(self) -> None:
+        from swmm_api.input_file.section_labels import LID_CONTROLS
+
         lid_rows = get_rows("SELECT lidco_id FROM inp_lid", commit=self.force_commit, is_thread=True)
         lids_db: set[str] = set()
         if lid_rows:
@@ -853,6 +851,8 @@ class GwImportInpTask(GwTask):
             self.results["lids"] += 1
 
     def _save_junctions(self) -> None:
+        from swmm_api.input_file.section_labels import JUNCTIONS, COORDINATES
+
         feature_class = self.catalogs['features']['junctions']
 
         node_sql = """ 
@@ -963,6 +963,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_outfalls(self) -> None:
+        from swmm_api.input_file.section_labels import OUTFALLS, COORDINATES
+
         feature_class = self.catalogs['features']['outfalls']
 
         node_sql = """ 
@@ -1074,6 +1076,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_dividers(self) -> None:
+        from swmm_api.input_file.section_labels import DIVIDERS, COORDINATES
+
         feature_class = self.catalogs['features']['dividers']
 
         node_sql = """ 
@@ -1189,6 +1193,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_storage(self) -> None:
+        from swmm_api.input_file.section_labels import STORAGE, COORDINATES
+
         feature_class = self.catalogs['features']['storage']
 
         node_sql = """ 
@@ -1307,6 +1313,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pumps(self) -> None:
+        from swmm_api.input_file.section_labels import PUMPS
+
         feature_class = self.catalogs['features']['pumps']
         arccat_id = self.catalogs["pumps"]
         # Set 'fake' catalogs if it will be converted to flwreg
@@ -1424,6 +1432,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_orifices(self) -> None:
+        from swmm_api.input_file.section_labels import ORIFICES, XSECTIONS
+
         feature_class = self.catalogs['features']['orifices']
         arccat_id = self.catalogs["orifices"]
         # Set 'fake' catalogs if it will be converted to flwreg
@@ -1550,6 +1560,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_weirs(self) -> None:
+        from swmm_api.input_file.section_labels import WEIRS, XSECTIONS
+
         feature_class = self.catalogs['features']['weirs']
         arccat_id = self.catalogs["weirs"]
         # Set 'fake' catalogs if it will be converted to flwreg
@@ -1681,6 +1693,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_outlets(self) -> None:
+        from swmm_api.input_file.section_labels import OUTLETS, JUNCTIONS
+
         feature_class = self.catalogs['features']['outlets']
         arccat_id = self.catalogs["outlets"]
         # Set 'fake' catalogs if it will be converted to flwreg
@@ -1802,6 +1816,8 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_conduits(self) -> None:
+        from swmm_api.input_file.section_labels import CONDUITS, XSECTIONS, LOSSES
+
         feature_class = self.catalogs['features']['conduits']
         # TODO: get rid of dma_id
         arc_sql = """ 
@@ -1934,6 +1950,7 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_raingages(self) -> None:
+        from swmm_api.input_file.section_labels import RAINGAGES, SYMBOLS
 
         node_sql = """ 
             INSERT INTO raingage (
@@ -1991,6 +2008,8 @@ class GwImportInpTask(GwTask):
             return
 
     def _save_inflows(self):
+        from swmm_api.input_file.section_labels import INFLOWS
+
         sql = """
             INSERT INTO inp_inflows (node_id, timser_id, sfactor, base, pattern_id)
             VALUES %s
@@ -2012,6 +2031,8 @@ class GwImportInpTask(GwTask):
         self.results["inflows"] = len(inflows) if inflows else 0
 
     def _save_dwf(self):
+        from swmm_api.input_file.section_labels import DWF
+
         sql = """
             INSERT INTO inp_dwf (dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4)
             VALUES %s
@@ -2034,6 +2055,9 @@ class GwImportInpTask(GwTask):
         self.results["dwf"] = len(dwfs) if dwfs else 0
 
     def _save_subcatchments(self):
+        from swmm_api.input_file.section_labels import SUBCATCHMENTS, SUBAREAS, INFILTRATION, ADJUSTMENTS, POLYGONS
+        from swmm_api.input_file.sections import InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber
+
         sql = """
             INSERT INTO inp_subcatchment (
                 the_geom, subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, 
