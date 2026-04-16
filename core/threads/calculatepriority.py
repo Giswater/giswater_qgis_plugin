@@ -113,7 +113,7 @@ class GwCalculatePriority(GwTask):
 
     def run(self):
         try:
-            pass
+            import pandas  # noqa: F401
         except ImportError:
             self.exception = (
                 "Python package 'pandas' is not installed. "

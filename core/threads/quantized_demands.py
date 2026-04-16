@@ -42,6 +42,7 @@ class GwQuantizedDemands(GwTask):
 
     def run(self):
         try:
+            import pandas  # noqa: F401
             from wntr.network import write_inpfile
         except ImportError as e:
             self.exception = (

@@ -39,6 +39,7 @@ class GwStaticCalibration(GwTask):
     def run(self):
         try:
             from wntr.network import write_inpfile
+            import scipy  # noqa: F401
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "

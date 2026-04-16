@@ -56,7 +56,9 @@ class EmitterCalibrationExecute(QgsTask, QObject):
     def run(self):
 
         try:
-            pass
+            import matplotlib.pyplot  # noqa: F401
+            import pandas  # noqa: F401
+            import wntr  # noqa: F401
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "

@@ -38,7 +38,7 @@ class GwAddDemandCheck(GwTask):
 
     def run(self):
         try:
-            pass
+            import wntr  # noqa: F401
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "
