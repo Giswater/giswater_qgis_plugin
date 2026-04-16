@@ -2551,7 +2551,7 @@ class GwInfo(QObject):
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             tab_feature = dialog.tab_main.findChild(QTabWidget, 'tab_feature')
-            tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab, dialog, self.excluded_layers, 'tab_features_feature_id'))
+            tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab, dialog, self.excluded_layers, 'tab_features_feature_id', 've_'))
             if global_vars.project_type == 'ws':
                 tools_qt.remove_tab(tab_feature, 'tab_gully')
             tools_gw.get_signal_change_tab(dialog, self.excluded_layers, 'tab_features_feature_id')
