@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import math
-import subprocess
 import os
 from collections import OrderedDict
 from decimal import Decimal
@@ -24,21 +23,6 @@ from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
 from ...utils.snap_manager import GwSnapManager
 from ....libs import lib_vars, tools_qt, tools_log, tools_qgis
-
-try:
-    import matplotlib.pyplot as plt
-except ImportError:
-    plt = None
-    msg = "Matplotlib Python package not found. Do you want to install Matplotlib?"
-    if tools_qt.show_question(msg):
-        subprocess.run(["python", "-m", "ensurepip"])
-        install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
-        if install_matplotlib.returncode:
-            msg = "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
-            tools_qt.show_info_box(msg)
-        else:
-            msg = "Matplotlib installed successfully. Please restart QGIS."
-            tools_qt.show_info_box(msg)
 
 
 class GwNodeData:
@@ -169,6 +153,15 @@ class GwProfileButton(GwAction):
             self.endNode = None
 
     def _get_profile(self):
+
+        try:
+            import matplotlib.pyplot as plt  # noqa: F401
+        except ImportError:
+            tools_qgis.show_critical(
+                "Python package 'matplotlib' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return
 
         # Clear main variables
         self.nodes.clear()
@@ -515,6 +508,7 @@ class GwProfileButton(GwAction):
 
     def _draw_profile(self, arcs, nodes, terrains):
         """ Parent function - Draw profiles """
+        import matplotlib.pyplot as plt
 
         # Clear plot
         plt.gcf().clear()
@@ -580,6 +574,7 @@ class GwProfileButton(GwAction):
 
     def _set_profile_layout(self):
         """ Set properties of main window """
+        import matplotlib.pyplot as plt
 
         # Set window name
         self.win = plt.gcf()
@@ -685,6 +680,7 @@ class GwProfileButton(GwAction):
 
     def _draw_start_node(self, node):
         """ Draw first node """
+        import matplotlib.pyplot as plt
 
         # Get superior points
         s1x = -node.geom / 2
@@ -749,6 +745,7 @@ class GwProfileButton(GwAction):
 
     def _draw_guitar_vertical_lines(self, start_point):
         """ Draw fixed part of table """
+        import matplotlib.pyplot as plt
 
         # Get stylesheet
         line_color = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['color']
@@ -772,6 +769,7 @@ class GwProfileButton(GwAction):
 
     def _draw_guitar_auxiliar_lines(self, start_point, first_vl=True):
         """ Draw marks for each node """
+        import matplotlib.pyplot as plt
 
         # Get stylesheet
         auxline_color = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['color']
@@ -811,6 +809,7 @@ class GwProfileButton(GwAction):
         plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
     def _fill_guitar_text_legend(self):
+        import matplotlib.pyplot as plt
 
         # Get stylesheet values
         text_color = self.profile_json['body']['data']['stylesheet']['guitar']['text']['color']
@@ -868,6 +867,7 @@ class GwProfileButton(GwAction):
 
     def _draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
+        import matplotlib.pyplot as plt
 
         z1 = prev_node.z2
         z2 = node.z1
@@ -975,6 +975,7 @@ class GwProfileButton(GwAction):
         self.ilast2 = [i3x, i3y]
 
     def _fill_guitar_text_node(self, start_point, index):
+        import matplotlib.pyplot as plt
 
         # Get stylesheet values
         text_color = self.profile_json['body']['data']['stylesheet']['guitar']['text']['color']
@@ -1107,6 +1108,7 @@ class GwProfileButton(GwAction):
                      horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
 
     def _fill_guitar_text_terrain(self, start_point, index):
+        import matplotlib.pyplot as plt
 
         if str(self.links[index].surface_type) == 'VNODE':
 
@@ -1154,13 +1156,13 @@ class GwProfileButton(GwAction):
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
     def _draw_end_node(self, node, prev_node, index):
-        """
-        draws last arc and nodes of profile
+        """draws last arc and nodes of profile
         :param node:
         :param prev_node:
         :param index:
         :return:
         """
+        import matplotlib.pyplot as plt
 
         s1x = self.slast[0]
         s1y = self.slast[1]
@@ -1282,6 +1284,7 @@ class GwProfileButton(GwAction):
         Draw horitzontal lines of table
         :return:
         """
+        import matplotlib.pyplot as plt
         line_color = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['color']
         line_style = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['style']
         line_width = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['width']
@@ -1317,6 +1320,7 @@ class GwProfileButton(GwAction):
         plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
 
     def _draw_grid(self):
+        import matplotlib.pyplot as plt
 
         # get values for lines
         line_color = self.profile_json['body']['data']['stylesheet']['grid']['lines']['color']
@@ -1401,6 +1405,7 @@ class GwProfileButton(GwAction):
                          fontsize=6.5, color=text_color, fontweight=text_weight, horizontalalignment='center')
 
     def _draw_terrain(self, index):
+        import matplotlib.pyplot as plt
 
         # getting variables
         line_color = self.profile_json['body']['data']['stylesheet']['terrain']['color']

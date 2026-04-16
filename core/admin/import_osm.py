@@ -7,12 +7,6 @@ or (at your option) any later version.
 
 # -*- coding: utf-8 -*-
 import sys
-from shapely.wkt import loads
-from shapely.ops import transform
-from pyproj import Transformer
-import pandas as pd
-import numpy as np
-
 import json
 from functools import partial
 from ..ui.ui_manager import GwAdminImportOsmUi
@@ -20,12 +14,6 @@ from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt
 from qgis.PyQt.QtWidgets import QCheckBox, QVBoxLayout, QTabWidget
 from qgis.PyQt.QtCore import Qt
-
-if sys.version_info >= (3, 10):
-    import osmnx as ox
-    ox.settings.useful_tags_way = ox.settings.useful_tags_way + ["surface"]
-else:
-    ox = None
 
 
 class GwImportOsm:
@@ -48,7 +36,7 @@ class GwImportOsm:
             tools_qgis.show_warning(msg)
             return
 
-        if ox is None:
+        if sys.version_info < (3, 10):
             msg = "Import OSM Streetaxis is only available on Python 3.10 or higher. " \
                   "Please update your QGIS's Python version."
             tools_qgis.show_warning(msg, dialog=self.dlg_import_osm)
@@ -88,6 +76,21 @@ class GwImportOsm:
 
     def run(self):
         """ Start import process """
+
+        try:
+            from shapely.wkt import loads
+            from shapely.ops import transform
+            from pyproj import Transformer
+            import pandas as pd
+            import numpy as np
+            import osmnx as ox
+            ox.settings.useful_tags_way = ox.settings.useful_tags_way + ["surface"]
+        except ImportError as e:
+            tools_qgis.show_critical(
+                f"Python package required for OSM import is not installed: {e.name}. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return
 
         # Enable the "Log" tab after pressing execute and disable execute button
         qtabwidget = self.dlg_import_osm.findChild(QTabWidget, 'mainTab')

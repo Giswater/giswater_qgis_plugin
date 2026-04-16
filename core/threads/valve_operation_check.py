@@ -10,34 +10,23 @@ import json
 from pathlib import Path
 
 from qgis.core import QgsTask
-from wntr.epanet.util import to_si, FlowUnits, HydParam
 
 from .task import GwTask
 from ...libs import tools_db, lib_vars
-
-try:
-    import wntr
-    from wntr.network import WaterNetworkModel, Link, LinkStatus
-    from wntr.sim import EpanetSimulator
-    from wntr.metrics.hydraulic import average_expected_demand
-except ImportError:
-    wntr = None
-    WaterNetworkModel = None
-    Link = None
-    LinkStatus = None
-    EpanetSimulator = None
 
 
 class GwValveOperationCheck(GwTask):
     def __init__(
         self,
         description,
-        network: WaterNetworkModel,
+        network,
         config,
         output_folder,
         file_name,
     ):
         super().__init__(description, QgsTask.Flag.CanCancel)
+        from wntr.epanet.util import to_si, FlowUnits, HydParam
+
         self.input_network = network
         self.config = config
         self.output_folder = output_folder
@@ -84,6 +73,8 @@ class GwValveOperationCheck(GwTask):
         self.log += message + "\n"
 
     def _prepare_network(self):
+        from wntr.metrics.hydraulic import average_expected_demand
+
         self._add_log("Preparing network...")
         adjusted_demands = (
             average_expected_demand(self.input_network)
@@ -150,6 +141,8 @@ class GwValveOperationCheck(GwTask):
             infile.write("\n[SCENARIOS]\n")
 
     def _run_scenarios_simulations(self):
+        from wntr.network import LinkStatus
+
         scenarios = self.config.scenarios.values()
         for index, scenario in enumerate(scenarios):
             self.cur_scenario += 1
@@ -211,7 +204,10 @@ class GwValveOperationCheck(GwTask):
             self._save_scenario_to_infile(scenario["name"])
         return True
 
-    def _run_simulation(self, network: WaterNetworkModel):
+    def _run_simulation(self, network):
+        import wntr
+        from wntr.sim import EpanetSimulator
+
         nodes = {}
         unserviced = 0
         partial = 0
@@ -406,7 +402,7 @@ class GwValveOperationCheck(GwTask):
                 ]
                 writer.writerow(line)
 
-    def _wkt_from_link(self, link: Link):
+    def _wkt_from_link(self, link):
         linestring = "LINESTRING ("
         x1, y1 = link.start_node.coordinates
         linestring += f"{x1} {y1},"

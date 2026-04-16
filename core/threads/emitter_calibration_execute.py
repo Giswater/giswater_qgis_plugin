@@ -4,9 +4,6 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
-import matplotlib.pyplot as plt
-import pandas as pd
-
 from copy import deepcopy
 from pathlib import Path
 
@@ -15,15 +12,6 @@ from qgis.core import QgsTask
 
 from ... import global_vars
 from ...libs import tools_log
-
-try:
-    import wntr
-    from wntr.network import write_inpfile
-    from wntr.sim import EpanetSimulator
-except ImportError:
-    wntr = None
-    write_inpfile = None
-    EpanetSimulator = None
 
 
 class EmitterCalibrationExecute(QgsTask, QObject):
@@ -67,6 +55,15 @@ class EmitterCalibrationExecute(QgsTask, QObject):
 
     def run(self):
 
+        try:
+            pass
+        except ImportError as e:
+            self.exception = (
+                f"Python package '{e.name}' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         # Step 2: Run EPANET iterations to find emitter coefficient
         self._run_iterations()
         # Step 3:
@@ -96,6 +93,9 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 tools_log.log_info(msg, msg_params=msg_params)
 
     def _run_iterations(self):
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        from wntr.sim import EpanetSimulator
 
         network_junctions = {}
         network_junctions["all_network"] = []
@@ -318,6 +318,10 @@ class EmitterCalibrationExecute(QgsTask, QObject):
         self.network = network
 
     def _run_iterations_interpolating(self, network_junctions, sum_dem, junctions_coeff_cal, expected_demand, df_dict, interpolated_idx, demands_list_plt):
+        import matplotlib.pyplot as plt
+        import pandas as pd
+        from wntr.sim import EpanetSimulator
+
         for trial in range(self.trials):
             # Set current trial
             self.current_trial = trial
@@ -405,6 +409,8 @@ class EmitterCalibrationExecute(QgsTask, QObject):
         return network
 
     def _add_emitters_loop(self, network_junctions, network, expected_demand, df_dict, idx):
+        from wntr.sim import EpanetSimulator
+
         for l_coeff in [self.min_coeff_mult, self.mid_coeff_mult, self.max_coeff_mult]:
             # Set emitter coefficients
             for junction_name, junction in network.junctions():
@@ -493,6 +499,8 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 network_junctions["0"].append(v["node_id"])
 
     def _export_network(self):
+        from wntr.network import write_inpfile
+
         write_inpfile(
             self.network, Path(self.output_folder) / f"{self.file_name}.inp"
         )

@@ -3,17 +3,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from swmm_api import read_inp_file, SwmmInput
-from swmm_api.input_file.section_labels import (
-    OPTIONS,
-    JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
-    CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-    XSECTIONS, SUBCATCHMENTS
-)
-from swmm_api.input_file.sections import (
-    Conduit, CrossSection
-)
-
 from ....libs import tools_db
 from ...ui.dialog import GwDialog
 from ..task import GwTask
@@ -29,6 +18,9 @@ class GwParseInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
+            from swmm_api import read_inp_file
+            from swmm_api.input_file.section_labels import OPTIONS
+
             self.log.append("Reading INP file...")
             self.network = read_inp_file(self.inp_file_path)
             flow_units: str = self.network[OPTIONS].get('FLOW_UNITS')
@@ -77,7 +69,14 @@ class Catalogs:
     roughness_catalog: Optional[list[float]]
 
     @classmethod
-    def from_network_model(cls, wn: SwmmInput, log: Optional[list[str]] = None):
+    def from_network_model(cls, wn, log: Optional[list[str]] = None):
+        from swmm_api.input_file.section_labels import (
+            JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
+            CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
+            XSECTIONS, SUBCATCHMENTS
+        )
+        from swmm_api.input_file.sections import Conduit, CrossSection
+
         def tofloat(x):
             return 0.0 if x is None else float(x)
         # Get node catalog from DB

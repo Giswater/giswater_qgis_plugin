@@ -12,7 +12,6 @@ from datetime import date
 from math import log, log1p, exp
 from pathlib import Path
 
-import pandas as pd
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -113,6 +112,15 @@ class GwCalculatePriority(GwTask):
             self.msg_task_canceled = tools_qt.tr("Task canceled.")
 
     def run(self):
+        try:
+            pass
+        except ImportError:
+            self.exception = (
+                "Python package 'pandas' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         try:
             if self.method == "SH":
                 return self._run_sh()
@@ -612,6 +620,7 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
+        import pandas as pd
 
         self._emit_report(tools_qt.tr("Getting auxiliary data from DB") + " (1/4)...")
         self.setProgress(10)

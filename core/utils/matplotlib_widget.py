@@ -5,37 +5,28 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import subprocess
-from ...libs import tools_qt
-
-try:
-    import matplotlib
-    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-    from matplotlib.figure import Figure
-
-    matplotlib.use('Qt5Agg')
-
-except ImportError:
-    matplotlib = None
-    FigureCanvasQTAgg = None
-    Figure = None
-    msg = "Matplotlib Python package not found. Do you want to install Matplotlib?"
-    if tools_qt.show_question(msg):
-        subprocess.run(["python", "-m", "ensurepip"])
-        install_matplotlib = subprocess.run(['python', '-m', 'pip', 'install', '-U', 'matplotlib'])
-        if install_matplotlib.returncode:
-            msg = "Matplotlib cannot be installed automatically. Please install Matplotlib manually."
-            tools_qt.show_info_box(msg)
-        else:
-            msg = "Matplotlib installed successfully. Please restart QGIS."
-            tools_qt.show_info_box(msg)
+from ...libs import tools_qgis
 
 
-class MplCanvas(FigureCanvasQTAgg):
+def create_mpl_canvas(parent=None, width=5, height=4, dpi=100):
+    """Factory function that creates a matplotlib FigureCanvasQTAgg widget.
 
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        if not Figure:
-            return
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        super(MplCanvas, self).__init__(fig)
+    Returns the canvas widget with an ``axes`` attribute, or ``None`` if
+    matplotlib is not installed.
+    """
+    try:
+        import matplotlib
+        matplotlib.use('Qt5Agg')
+        from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+        from matplotlib.figure import Figure
+    except ImportError:
+        tools_qgis.show_critical(
+            "Python package 'matplotlib' is not installed. "
+            "Please install it using pip or the 'qpip' QGIS plugin."
+        )
+        return None
+
+    fig = Figure(figsize=(width, height), dpi=dpi)
+    canvas = FigureCanvasQTAgg(fig)
+    canvas.axes = fig.add_subplot(111)
+    return canvas

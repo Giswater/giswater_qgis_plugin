@@ -11,27 +11,10 @@ import re
 
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
-from scipy.optimize import root_scalar
 
 from .task import GwTask
 from ...libs import tools_db
 from ..utils import tools_gw
-
-try:
-    import wntr
-    from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
-    from wntr.network import write_inpfile, LinkStatus, WaterNetworkModel
-    from wntr.sim import EpanetSimulator
-except ImportError:
-    wntr = None
-    from_si = None
-    to_si = None
-    FlowUnits = None
-    HydParam = None
-    write_inpfile = None
-    WaterNetworkModel = None
-    LinkStatus = None
-    EpanetSimulator = None
 
 
 class GwStaticCalibration(GwTask):
@@ -54,6 +37,15 @@ class GwStaticCalibration(GwTask):
         self.file_name = file_name
 
     def run(self):
+        try:
+            from wntr.network import write_inpfile
+        except ImportError as e:
+            self.exception = (
+                f"Python package '{e.name}' is not installed. "
+                "Please install it using pip or the 'qpip' QGIS plugin."
+            )
+            return False
+
         try:
             self.status.emit({"message": "Reading input files...", "step": "first"})
             static_calibration = Calibrations(self, self.input_file, self.config)
@@ -104,6 +96,7 @@ class Calibrator:
 
     def calibrate(self):
         """Return a calibrated network"""
+        from scipy.optimize import root_scalar
 
         wn = copy.deepcopy(self.network)
         if abs(self.checker.difference(wn)) < self.tolerance:
@@ -142,6 +135,9 @@ class Calibrator:
 
 
 def zero_time_value(network, target, attribute, hyd_param):
+    from wntr.epanet.util import from_si, FlowUnits
+    from wntr.sim import EpanetSimulator
+
     # Set duration to zero for performance
     duration = network.options.time.duration
     network.options.time.duration = 0
@@ -172,6 +168,8 @@ class FlowChecker:
         return self.target_value - self.value(network)
 
     def value(self, network):
+        from wntr.epanet.util import HydParam
+
         return zero_time_value(network, self.target_arc, "flowrate", HydParam.Flow)
 
 
@@ -184,6 +182,8 @@ class PressureChecker:
         return self.target_value - self.value(network)
 
     def value(self, network):
+        from wntr.epanet.util import HydParam
+
         return zero_time_value(network, self.target_node, "pressure", HydParam.Pressure)
 
 
@@ -254,6 +254,8 @@ class PowerModder:
         self.bracket = brackets.get("power", None)
 
     def modify_feature(self, network, feature, factor):
+        from wntr.epanet.util import to_si, FlowUnits, HydParam
+
         if feature.link_type != "Pump":
             raise ValueError(f'The link "{feature.name}" is not a pump.')
 
@@ -278,6 +280,8 @@ class RoughnessModder:
         self.bracket = brackets.get("roughness", None)
 
     def modify_feature(self, network, feature, factor):
+        from wntr.epanet.util import to_si, FlowUnits, HydParam
+
         units = network.options.hydraulic.inpfile_units
         if feature.link_type == "Pipe":
             feature.roughness = to_si(FlowUnits[units], factor, HydParam.RoughnessCoeff)
@@ -288,6 +292,8 @@ class RoughnessModder:
 
 class SettingModder:
     def __init__(self, valves, brackets={}):
+        from wntr.epanet.util import HydParam
+
         self.hyd_param = {
             "PRV": HydParam.Pressure,
             "PSV": HydParam.Pressure,
@@ -298,6 +304,9 @@ class SettingModder:
         self.bracket = brackets.get("setting", None)
 
     def modify_feature(self, network, feature, factor):
+        from wntr.epanet.util import to_si, FlowUnits
+        from wntr.network import LinkStatus
+
         units = network.options.hydraulic.inpfile_units
         if feature.link_type != "Valve":
             raise ValueError(f'The link "{feature.name}" is not a valve.')
@@ -369,14 +378,14 @@ class Calibrations:
     }
 
     def __init__(self, task, inp_file, config):
+        from wntr.network import WaterNetworkModel
+
         self.task = task
         self.accuracy = config.options["accuracy"]
         self.trials = config.options["trials"]
         self.calibrations = config.scenarios.values()
         self._fill_brackets()
         self._check_input()
-        if not wntr:
-            raise ImportError("WNTR not installed.")
 
         # Apparently WNTR expects one of the first lines of the
         # [OPTIONS] section to be UNITS
@@ -446,6 +455,8 @@ class Calibrations:
         self.calibrated_network = wn
 
     def report_arc_changes(self):
+        from wntr.epanet.util import from_si, FlowUnits, HydParam
+
         units = FlowUnits[self.network.options.hydraulic.inpfile_units]
         report = []
         for calibration in self.calibrations:
@@ -479,6 +490,8 @@ class Calibrations:
         return report
 
     def report_node_changes(self):
+        from wntr.epanet.util import from_si, FlowUnits, HydParam
+
         units = FlowUnits[self.network.options.hydraulic.inpfile_units]
         report = []
         for calibration in self.calibrations:
@@ -502,6 +515,8 @@ class Calibrations:
         return report
 
     def report_pump_changes(self):
+        from wntr.epanet.util import from_si, FlowUnits, HydParam
+
         units = FlowUnits[self.network.options.hydraulic.inpfile_units]
         report = []
         for calibration in self.calibrations:
@@ -531,6 +546,8 @@ class Calibrations:
         return report
 
     def report_valve_changes(self):
+        from wntr.epanet.util import from_si, FlowUnits, HydParam
+
         units = FlowUnits[self.network.options.hydraulic.inpfile_units]
         hyd_param = {
             "PRV": HydParam.Pressure,
