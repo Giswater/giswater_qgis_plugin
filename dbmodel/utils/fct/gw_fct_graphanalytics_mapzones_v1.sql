@@ -1048,7 +1048,7 @@ BEGIN
 		WHERE fid = v_fid
 		  AND criticity = 3
 		  AND COALESCE(error_message, ' ') <> ' '
-		  AND error_message NOT IN ('ERRORS', '-----------')
+		  AND error_message NOT IN ('ERRORS', 'ERRORES', '-----------')
 		) = 0 THEN
 
 		-- GENERATE LINEGRAPH
