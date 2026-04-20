@@ -11,6 +11,7 @@ import subprocess
 from functools import partial
 import json
 from collections import defaultdict
+from xml.sax.saxutils import escape as xml_escape
 
 import psycopg2
 import psycopg2.extras
@@ -184,11 +185,19 @@ class GwI18NGenerator:
     # endregion
     # region PY files
 
+    def _xml_text(self, value):
+        """Return XML-safe text for TS source/translation nodes."""
+        if value is None:
+            return ""
+        return xml_escape(str(value), {'"': "&quot;", "'": "&apos;"})
+
     def _get_matching_columns(self, table, key):
         """ Get columns matching the language of the key """
 
         if table not in self._column_cache:
-            sql = f"SELECT column_name FROM information_schema.columns WHERE table_schema = '{self.schema_i18n}' AND table_name = '{table}'"
+            sql = (f"SELECT column_name FROM information_schema.columns "
+                   f"WHERE table_schema = '{self.schema_i18n}' AND table_name = '{table}' "
+                   f"ORDER BY column_name")
             rows = self._get_rows(sql, commit=False)
             self._column_cache[table] = [row['column_name'] for row in rows] if rows else []
 
@@ -290,25 +299,27 @@ class GwI18NGenerator:
 
         # Get python toolbars and buttons values
         if self.lower_lang == 'en_us':
-            sql = "SELECT source, ms_en_us FROM i18n.pymessage;"  # ADD new columns
+            sql = "SELECT source, ms_en_us FROM i18n.pymessage ORDER BY source;"  # ADD new columns
             py_messages = self._get_rows(sql, self.cursor_i18n)
-            sql = "SELECT source, lb_en_us FROM i18n.pytoolbar;"
+            sql = "SELECT source, lb_en_us FROM i18n.pytoolbar ORDER BY source;"
             py_toolbars = self._get_rows(sql, self.cursor_i18n)
             print(py_toolbars)
             # Get python dialog values
             sql = ("SELECT dialog_name, source, lb_en_us, tt_en_us"
                 " FROM i18n.pydialog"
-                " ORDER BY dialog_name;")
+                " ORDER BY dialog_name, source;")
             py_dialogs = self._get_rows(sql, self.cursor_i18n)
         else:
             extra_ms = self._get_matching_columns('pymessage', key_message)
             extra_ms_str = ", " + ", ".join(extra_ms) if extra_ms else ""
-            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message}{extra_ms_str} FROM i18n.pymessage;"  # ADD new columns
+            sql = (f"SELECT source, ms_en_us, {key_message}, auto_{key_message}{extra_ms_str} "
+                   f"FROM i18n.pymessage ORDER BY source;")  # ADD new columns
             py_messages = self._get_rows(sql, self.cursor_i18n)
 
             extra_lb = self._get_matching_columns('pytoolbar', key_label)
             extra_lb_str = ", " + ", ".join(extra_lb) if extra_lb else ""
-            sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label}{extra_lb_str} FROM i18n.pytoolbar;"
+            sql = (f"SELECT source, lb_en_us, {key_label}, auto_{key_label}{extra_lb_str} "
+                   f"FROM i18n.pytoolbar ORDER BY source;")
             py_toolbars = self._get_rows(sql, self.cursor_i18n)
             # Get python dialog values
             extra_dlg_lb = self._get_matching_columns('pydialog', key_label)
@@ -317,7 +328,7 @@ class GwI18NGenerator:
             extra_dlg_tt_str = ", " + ", ".join(extra_dlg_tt) if extra_dlg_tt else ""
             sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}{extra_dlg_lb_str}, tt_en_us,"
                 f" {key_tooltip}, auto_{key_tooltip}{extra_dlg_tt_str} FROM i18n.pydialog"
-                f" ORDER BY dialog_name;")
+                f" ORDER BY dialog_name, source;")
             py_dialogs = self._get_rows(sql, self.cursor_i18n)
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
@@ -346,13 +357,12 @@ class GwI18NGenerator:
         ts_file.write(line)
         for py_tlb in py_toolbars:
             line = "\t\t<message>\n"
-            line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
+            line += f"\t\t\t<source>{self._xml_text(py_tlb['source'])}</source>\n"
             
             translation = self._get_translation(dict(py_tlb), key_label, 'lb_en_us', return_source=True)
             
-            line += f"\t\t\t<translation>{translation}</translation>\n"
+            line += f"\t\t\t<translation>{self._xml_text(translation)}</translation>\n"
             line += "\t\t</message>\n"
-            line = line.replace("&", "")
             ts_file.write(line)
 
         line = '\t\t<!-- PYTHON MESSAGES -->\n'
@@ -361,13 +371,12 @@ class GwI18NGenerator:
         # Create children for message
         for py_msg in py_messages:
             line = "\t\t<message>\n"
-            line += f"\t\t\t<source>{py_msg['source']}</source>\n"
+            line += f"\t\t\t<source>{self._xml_text(py_msg['source'])}</source>\n"
             
             translation = self._get_translation(dict(py_msg), key_message, 'ms_en_us', return_source=True)
             
-            line += f"\t\t\t<translation>{translation}</translation>\n"
+            line += f"\t\t\t<translation>{self._xml_text(translation)}</translation>\n"
             line += "\t\t</message>\n"
-            line = line.replace("&", "")
             ts_file.write(line)
         line = '\t</context>\n\n'
 
@@ -385,36 +394,36 @@ class GwI18NGenerator:
             if name != py_dlg['dialog_name']:
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
-                line += f'\t\t<name>{name}</name>\n'
+                line += f'\t\t<name>{self._xml_text(name)}</name>\n'
                 title = self._get_title(py_dialogs, name, key_label)
                 if title:
                     line += '\t\t<message>\n'
                     line += '\t\t\t<source>title</source>\n'
-                    line += f'\t\t\t<translation>{title}</translation>\n'
+                    line += f'\t\t\t<translation>{self._xml_text(title)}</translation>\n'
                     line += '\t\t</message>\n'
 
             # Create child for labels
             line += "\t\t<message>\n"
-            line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
+            line += f"\t\t\t<source>{self._xml_text(py_dlg['source'])}</source>\n"
             
             translation = self._get_translation(dict(py_dlg), key_label, 'lb_en_us')
 
-            line += f"\t\t\t<translation>{translation}</translation>\n"
+            line += f"\t\t\t<translation>{self._xml_text(translation)}</translation>\n"
             line += "\t\t</message>\n"
 
             # Create child for tooltip
             line += "\t\t<message>\n"
-            line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
+            tooltip_source = f"tooltip_{py_dlg['source']}"
+            line += f"\t\t\t<source>{self._xml_text(tooltip_source)}</source>\n"
             
             translation = self._get_translation(dict(py_dlg), key_tooltip, 'tt_en_us')
             
-            line += f"\t\t\t<translation>{translation}</translation>\n"
+            line += f"\t\t\t<translation>{self._xml_text(translation)}</translation>\n"
             line += "\t\t</message>\n"
 
         # Close last context and TS
         line += '\t</context>\n'
         line += '</TS>\n\n'
-        line = line.replace("&", "")
         ts_file.write(line)
         ts_file.close()
         del ts_file
@@ -710,7 +719,8 @@ class GwI18NGenerator:
             values_by_context[context].append((row, texts))
 
         with open(path, "a") as file:
-            for context, data in values_by_context.items():
+            for context in sorted(values_by_context.keys(), key=self._to_sortable):
+                data = sorted(values_by_context[context], key=lambda item: self._get_table_row_sort_key(item[0]))
                 values_str = ''
                 if 'dbconfig_form_fields' in table:
                     if 'feat' in table:
@@ -842,7 +852,8 @@ class GwI18NGenerator:
                 key = (row["source"], row["context"], text)
             updates.setdefault(key, []).append(row)
 
-        for key, related_rows in updates.items():
+        for key in sorted(updates.keys(), key=lambda item: tuple(self._to_sortable(value) for value in item)):
+            related_rows = updates[key]
             # Unpack key
             source, context, original_text, *extra = key
             # Correct column based on context
@@ -879,7 +890,8 @@ class GwI18NGenerator:
 
         # Now write to file
         with open(path, "a", encoding="utf-8") as file:
-            for context, data in values_by_context.items():
+            for context in sorted(values_by_context.keys(), key=self._to_sortable):
+                data = sorted(values_by_context[context], key=lambda item: self._get_table_row_sort_key(item[1]))
                 # Assume all entries in this context share same column
                 column = data[0][3]
 
@@ -910,7 +922,8 @@ class GwI18NGenerator:
             key = (row["source"], row["layername"], row["context"], row["org_text"].replace("'", "''"))
             updates[key].append(row)
 
-        for key, related_rows in updates.items():
+        for key in sorted(updates.keys(), key=lambda item: tuple(self._to_sortable(value) for value in item)):
+            related_rows = updates[key]
             source, layername, context, stylevalue = key
             new_stylevalue = stylevalue
             do_style_update = False
@@ -945,6 +958,24 @@ class GwI18NGenerator:
         return ""
     # endregion
     # region Extra functions
+
+    def _to_sortable(self, value):
+        """Convert any value to a deterministic sortable representation."""
+        if value is None:
+            return ""
+        if isinstance(value, (dict, list)):
+            return json.dumps(value, sort_keys=True, ensure_ascii=False)
+        return str(value)
+
+    def _get_table_row_sort_key(self, row):
+        """Build stable sort key for output rows across all i18n table types."""
+        preferred_columns = [
+            "source_code", "project_type", "context",
+            "feature_type", "formname", "formtype", "tabname",
+            "source", "columnname", "typevalue", "parameter", "method",
+            "layername", "hint", "id"
+        ]
+        return tuple(self._to_sortable(row.get(column)) for column in preferred_columns)
 
     def _write_header(self, path, file_type):
         """
