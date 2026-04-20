@@ -204,13 +204,14 @@ BEGIN
 		IF v_elev_status THEN
 			v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
-
-			IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
-				v_querytext =  'UPDATE node SET custom_elev = '||v_elev0::numeric(12,3)||' WHERE node_id = '||v_node;
-				raise notice 'v_querytext %', v_querytext;
-				EXECUTE v_querytext;
-			END IF;
 		END IF;
+
+		IF p_action =  'MASSIVE-INTERPOLATE' AND v_node IS NOT NULL THEN
+			v_querytext =  'UPDATE node SET custom_elev = '||v_elev0::numeric(12,3)||' WHERE node_id = '||v_node;
+			raise notice 'v_querytext %', v_querytext;
+			EXECUTE v_querytext;
+		END IF;
+
 
 	ELSE
 		IF v_top_status THEN

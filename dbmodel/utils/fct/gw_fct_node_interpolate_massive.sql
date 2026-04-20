@@ -5,9 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_node_interpolate_massive(p_data json)
-RETURNS json
-LANGUAGE plpgsql
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_interpolate_massive(p_data json)
+ RETURNS json
+ LANGUAGE plpgsql
 AS $function$
 
 /*
@@ -253,7 +254,7 @@ BEGIN
 	                v_state_type
 	            FROM ve_node
 	            WHERE node_id = v_node.node_id;
-            END IF;
+            END IF;           
         END LOOP;
      
       	INSERT INTO audit_check_data (fid, error_message, criticity, cur_user)
@@ -536,6 +537,12 @@ BEGIN
                 END AS step_len
             FROM route r
             ORDER BY r.path_seq;
+           
+         	CREATE INDEX IF NOT EXISTS idx_temp_path_raw_seq  ON temp_path_raw(seq);
+		   	CREATE INDEX IF NOT EXISTS idx_temp_path_raw_node_id  ON temp_path_raw(node_id);
+           
+              	raise notice '1.1';
+
 			
 			-- disabling temporary triggers in order to make faster transactions
 			UPDATE config_param_user SET value='true' WHERE parameter = 'edit_disable_noderotation_complete' and cur_user = current_user;
@@ -574,7 +581,67 @@ BEGIN
                 INSERT INTO audit_check_data (fid, error_message, criticity, cur_user)
                 VALUES (v_fid, v_message_text, 1, current_user);
 
-            ELSE
+            else
+                          
+                           
+                CREATE TEMP TABLE temp_path_window AS
+				WITH
+				path_limits AS (
+				    SELECT MIN(seq) AS min_seq
+				    FROM temp_path_raw
+				),
+				arc_stats AS (
+				    SELECT
+				        node_id,
+				        COUNT(*) AS arc_count,
+				        BOOL_OR(slope IS NOT NULL) AS has_slope
+				    FROM (
+				        SELECT node_1 AS node_id, slope FROM ve_arc
+				        UNION ALL
+				        SELECT node_2 AS node_id, slope FROM ve_arc
+				    ) q
+				    GROUP BY node_id
+				),
+				first_anchor AS (
+				    SELECT MIN(r.seq) AS stop_seq
+				    FROM temp_path_raw r
+				    JOIN path_limits pl ON true
+				    JOIN ve_node n ON n.node_id = r.node_id
+				    LEFT JOIN arc_stats s ON s.node_id = r.node_id
+				    WHERE r.seq > pl.min_seq
+				      AND (
+				          n.sys_elev IS NOT NULL
+				          OR (
+				              COALESCE(s.arc_count, 0) > 2
+				              AND n.custom_elev IS NOT NULL
+				              AND COALESCE(s.has_slope, false)
+				          )
+				      )
+				)
+				SELECT
+				    r.seq,
+				    r.node_id,
+				    r.arc_id,
+				    r.step_len,
+				    v_minslope::float8 AS minslope,
+				    v_maxslope::float8 AS maxslope,
+				    n.sys_top_elev::float8 AS top_elev,
+				    (n.sys_top_elev::float8 - v_maxymax::float8) AS min_bound,
+				    (n.sys_top_elev::float8 - v_minymax::float8) AS max_bound,
+				    n.sys_elev::float8 AS sys_elev,
+				    n.custom_elev::float8 AS custom_elev,
+				    COALESCE(n.sys_elev::float8, n.custom_elev::float8) AS anchor_elev,
+				    n.the_geom,
+				    n.expl_id
+				FROM temp_path_raw r
+				JOIN ve_node n ON n.node_id = r.node_id
+				CROSS JOIN first_anchor fa
+				WHERE fa.stop_seq IS NOT NULL
+				  AND r.seq <= fa.stop_seq
+				ORDER BY r.seq;
+                           
+                           /*
+                           
                 CREATE TEMP TABLE temp_path_window AS
                 WITH first_anchor AS (
                     SELECT MIN(r.seq) AS stop_seq
@@ -586,7 +653,7 @@ BEGIN
                           OR (
                               (
                                   SELECT count(*)
-                                  FROM arc a
+                                  FROM ve_arc a
                                   WHERE a.node_1 = r.node_id
                                      OR a.node_2 = r.node_id
                               ) > 2
@@ -1175,9 +1242,6 @@ BEGIN
                         FROM temp_profile_final s
                         JOIN ve_node n ON n.node_id = s.node_id;
 
-						-- restoring trigger topocontrol to propoagate values to arc
-						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_topocontrol_complete' and cur_user = current_user;
-
                         UPDATE ve_node n
                            SET custom_elev = s.calc_elev
                         FROM temp_profile_final s
@@ -1201,8 +1265,19 @@ BEGIN
                               AND s.seq <> v_min_seq
                               AND s.seq <> v_max_seq
                           );
+                         
+                          raise notice '3';
+                         
+                         update arc set custom_elev1 = s.calc_elev FROM temp_profile_final s where 
+                         s.node_id = node_1 AND s.node_id <> v_node1 AND s.node_id <> v_node2;
+                        
+                         raise notice '4';
+                        
+                         update arc set custom_elev2 = s.calc_elev FROM temp_profile_final s where 
+                         s.node_id = node_2 AND s.node_id <> v_node1 AND s.node_id <> v_node2;                        
 						 
 						-- restoring the rest of the triggers
+   						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_topocontrol_complete' and cur_user = current_user;
 						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_noderotation_complete' and cur_user = current_user;
 						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_statetopocontrol' and cur_user = current_user;
 						UPDATE config_param_user SET value='false' WHERE parameter = 'edit_disable_planpsector_node' and cur_user = current_user;
@@ -1280,6 +1355,7 @@ BEGIN
                 state,
                 expl_id,
                 descript,
+                top_elev, elev, ymax,
                 fid,
                 ST_Transform(the_geom, 4326) AS the_geom
             FROM temp_anl_node
@@ -1338,9 +1414,10 @@ BEGIN
         '}}'
     )::json;
 
-EXCEPTION
-    WHEN OTHERS THEN
-        GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-        RAISE EXCEPTION 'gw_fct_node_interpolate_massive error: % | context: %', SQLERRM, v_error_context;
+	EXCEPTION
+	WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RAISE EXCEPTION 'gw_fct_node_interpolate_massive error: % | context: %', SQLERRM, v_error_context;
 END;
-$function$;
+$function$
+;
