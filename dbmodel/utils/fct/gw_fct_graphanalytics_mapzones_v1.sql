@@ -1049,12 +1049,7 @@ BEGIN
 		  AND criticity = 3
 		  AND COALESCE(error_message, ' ') <> ' '
 		  AND error_message NOT IN ('ERRORS', '-----------')
-	) > 0 THEN
-
-		INSERT INTO temp_pgr_mapzone (component, mapzone_id, mapzone_ids, name)
-		VALUES (0,0, array[0]::int[], 'Disconnected');
-
-	ELSE -- check errors
+		) = 0 THEN
 
 		-- GENERATE LINEGRAPH
 		-- ===================
