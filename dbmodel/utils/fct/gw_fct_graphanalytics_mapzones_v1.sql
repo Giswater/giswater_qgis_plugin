@@ -613,7 +613,7 @@ BEGIN
 					g.mapzone_id,
 					'use',
 					g.node_parent,
-					a.pgr_arc_id
+					a.arc_id
 				FROM graphconfig g
 				LEFT JOIN v_temp_arc a ON a.node_2 = g.node_parent
 				WHERE g.mapzone_id > 0
