@@ -123,8 +123,14 @@ BEGIN
 
 		-- managing gully_type
 		IF NEW.gully_type IS NULL THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3262", "function":"1206","parameters":null}}$$);';
+
+			SELECT gully_type INTO NEW.gully_type FROM cat_gully WHERE id = NEW.gullycat_id;
+
+			IF NEW.gully_type IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3262", "function":"1206","parameters":null}}$$);';
+			END IF;
+
 		END IF;
 
 		--check if feature is double geom
