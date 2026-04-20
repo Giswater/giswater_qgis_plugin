@@ -236,3 +236,10 @@ SET value = (
   )
 )::json
 WHERE parameter = 'utils_graphanalytics_status';
+
+INSERT INTO config_param_system ("parameter",value,standardvalue,isenabled) VALUES
+	 ('plan_psector_disable_checktopology_trigger','false','false',true),
+	 ('edit_disable_topocontrol','false','false',true),
+	 ('edit_disable_statetopocontrol','false','false',true),
+	 ('edit_disable_topocontrol_complete','false','false',true)
+	 ON CONFLICT DO NOTHING;
