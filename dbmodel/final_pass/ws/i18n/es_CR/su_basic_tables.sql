@@ -25,9 +25,9 @@ UPDATE value_state_type AS t SET name = v.name FROM (
     (100, 'OBSOLETO-FICTICIO'),
     (2, 'OPERATIVO'),
     (3, 'PLANIFICADO'),
-    (4, 'RECONSTRUIR'),
+    (4, 'RECONSTRUIDO'),
     (5, 'PROVISIONAL'),
-    (99, 'VIRTUAL')
+    (99, 'FICTICIO')
 ) AS v(id, name)
 WHERE t.id = v.id;
 

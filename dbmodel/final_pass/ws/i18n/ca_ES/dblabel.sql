@@ -8,11 +8,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE sys_label AS t SET idval = v.idval FROM (
 	VALUES
 	(1001, 'INFO'),
-    (1002, 'ADVERTIMENT'),
+    (1002, 'WARNING'),
     (1003, 'ERROR'),
-    (1004, 'ERRORS CRÍTICS'),
-    (1005, 'PISTA'),
-    (1006, 'ADVERTIMENT-403'),
+    (1004, 'CRITICAL ERRORS'),
+    (1005, 'HINT'),
+    (1006, 'WARNING-403'),
     (1007, 'ERROR-403'),
     (1008, 'ERROR-357'),
     (2000, ' '),
@@ -22,20 +22,20 @@ UPDATE sys_label AS t SET idval = v.idval FROM (
     (2010, '----------'),
     (2011, '-----------'),
     (2014, '--------------'),
-    (2022, '-----------------------'),
+    (2022, '----------------------'),
     (2025, '-------------------------'),
-    (2030, '-------------------------------'),
+    (2030, '------------------------------'),
     (2049, '-------------------------------------------------'),
-    (3001, 'INFO'),
-    (3002, 'ADVERTIMENTS'),
+    (3001, 'INFORMACIÓ'),
+    (3002, 'WARNINGS'),
     (3003, 'ERRORS'),
-    (3006, 'ARC DIVIDE = VERDADER'),
-    (3008, 'ARC DIVIDE = FALS'),
-    (3009, 'CURRÍCULA'),
-    (3010, 'SISTEMA DE VERIFICACIÓ'),
-    (3011, 'VERIFICAR LES DADES DE LA BD'),
-    (3012, 'DETALLS'),
-    (3013, 'Per comprovar ERRORS CRÍTICS o ADVERTIMENTS, executeu una consulta FROM anl_table WHERE fid=número d''error I usuari_actual.Per exemple:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Només es poden comprovar d''aquesta manera els errors amb anl_table al costat del número.Amb Giswater Toolbox també és possible comprovar aquests errors.')
+    (3006, 'ARC DIVIDE = TRUE'),
+    (3008, 'ARC DIVIDE = FALSE'),
+    (3009, 'RESUME'),
+    (3010, 'CHECK SYSTEM'),
+    (3011, 'CHECK DB DATA'),
+    (3012, 'DETAILS'),
+    (3013, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user. For example:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Only the errors with anl_table next to the number can be checked this way. Using Giswater Toolbox it''s also posible to check these errors.')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 

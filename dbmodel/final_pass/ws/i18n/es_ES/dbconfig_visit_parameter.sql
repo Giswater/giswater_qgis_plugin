@@ -8,15 +8,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_visit_parameter AS t SET descript = v.descript FROM (
 	VALUES
 	('clean_node', 'Limpieza de nodo'),
-    ('defect_node', 'Defectos del nodo'),
+    ('defect_node', 'Defectos de nodo'),
     ('incident_comment', 'comentario_incidente'),
     ('incident_type', 'tipo de incidente'),
-    ('insp_observ', 'Observaciones de la inspección'),
+    ('insp_observ', 'Observaciones de inspección'),
     ('photo', 'Fotografía'),
-    ('sediments_node', 'Sedimentos en el nodo'),
-    ('leak_arc', 'pequeña fuga en el arco'),
-    ('leak_connec', 'pequeña fuga en la conexión'),
-    ('leak_link', 'pequeña fuga en el enlace')
+    ('sediments_node', 'Sedimentos en nodo'),
+    ('leak_arc', 'fuga menor en arco'),
+    ('leak_connec', 'fuga menor en conexión'),
+    ('leak_link', 'fuga menor en enlace')
 ) AS v(id, descript)
 WHERE t.id = v.id;
 

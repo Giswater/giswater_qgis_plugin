@@ -7,14 +7,14 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE sys_label AS t SET idval = v.idval FROM (
 	VALUES
-	(1001, 'INFO'),
-    (1002, 'WARNING'),
-    (1003, 'ERROR'),
-    (1004, 'CRITICAL ERRORS'),
-    (1005, 'HINT'),
-    (1006, 'WARNING-403'),
-    (1007, 'ERROR-403'),
-    (1008, 'ERROR-357'),
+	(1001, 'ІНФО'),
+    (1002, 'ПОПЕРЕДЖЕННЯ'),
+    (1003, 'ПОМИЛКА'),
+    (1004, 'КРИТИЧНІ ПОМИЛКИ'),
+    (1005, 'ПІДКАЗКА'),
+    (1006, 'ПОПЕРЕДЖЕННЯ-403'),
+    (1007, 'ПОМИЛКА-403'),
+    (1008, 'ПОМИЛКА-357'),
     (2000, ' '),
     (2007, '-------'),
     (2008, '--------'),
@@ -26,16 +26,16 @@ UPDATE sys_label AS t SET idval = v.idval FROM (
     (2025, '-------------------------'),
     (2030, '------------------------------'),
     (2049, '-------------------------------------------------'),
-    (3001, 'INFO'),
-    (3002, 'WARNINGS'),
-    (3003, 'ERRORS'),
-    (3006, 'ARC DIVIDE = TRUE'),
-    (3008, 'ARC DIVIDE = FALSE'),
-    (3009, 'RESUME'),
-    (3010, 'CHECK SYSTEM'),
-    (3011, 'CHECK DB DATA'),
-    (3012, 'DETAILS'),
-    (3013, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user. For example:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Only the errors with anl_table next to the number can be checked this way. Using Giswater Toolbox it''s also posible to check these errors.')
+    (3001, 'ІНФОРМАЦІЯ'),
+    (3002, 'ПОПЕРЕДЖЕННЯ'),
+    (3003, 'ПОМИЛКИ'),
+    (3006, 'ДУГА РОЗДІЛ = TRUE'),
+    (3008, 'ДУГА РОЗДІЛ = FALSE'),
+    (3009, 'ПІДСУМОК'),
+    (3010, 'ПЕРЕВІРИТИ СИСТЕМУ'),
+    (3011, 'ПЕРЕВІРИТИ ДАНІ БД'),
+    (3012, 'ДЕТАЛІ'),
+    (3013, 'Щоб перевірити КРИТИЧНІ ПОМИЛКИ або ПОПЕРЕДЖЕННЯ, виконайте запит FROM anl_table WHERE fid=номер помилки AND current_user. Наприклад:  SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;  Тільки помилки з anl_table поруч із номером можна перевірити таким чином. Використовуючи Giswater Toolbox також можливо перевірити ці помилки.')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 

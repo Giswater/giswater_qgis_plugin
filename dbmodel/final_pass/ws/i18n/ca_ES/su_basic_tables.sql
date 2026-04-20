@@ -14,7 +14,7 @@ WHERE t.parameter = v.parameter;
 UPDATE value_state AS t SET name = v.name, observ = v.observ FROM (
 	VALUES
 	(0, 'OBSOLET', NULL),
-    (1, 'OPERATIVA', NULL),
+    (1, 'OPERATIU', NULL),
     (2, 'PLANIFICAT', NULL)
 ) AS v(id, name, observ)
 WHERE t.id = v.id;
@@ -23,11 +23,11 @@ UPDATE value_state_type AS t SET name = v.name FROM (
 	VALUES
 	(1, 'OBSOLET'),
     (100, 'OBSOLET-FICTICIUS'),
-    (2, 'OPERATIVA'),
+    (2, 'OPERATIU'),
     (3, 'PLANIFICAT'),
-    (4, 'RECONSTRUIR'),
+    (4, 'RECONSTRUÏT'),
     (5, 'PROVISIONAL'),
-    (99, 'FÀBRICA')
+    (99, 'FICTICIUS')
 ) AS v(id, name)
 WHERE t.id = v.id;
 

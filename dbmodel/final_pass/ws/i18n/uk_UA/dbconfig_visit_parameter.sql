@@ -7,16 +7,16 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_visit_parameter AS t SET descript = v.descript FROM (
 	VALUES
-	('clean_node', 'Clean of node'),
-    ('defect_node', 'Defects of node'),
-    ('incident_comment', 'incident_comment'),
-    ('incident_type', 'incident type'),
-    ('insp_observ', 'Inspection observations'),
-    ('photo', 'Photography'),
-    ('sediments_node', 'Sediments in node'),
-    ('leak_arc', 'minor leak on arc'),
-    ('leak_connec', 'minor leak on connec'),
-    ('leak_link', 'minor leak on link')
+	('clean_node', 'Очищення вузла'),
+    ('defect_node', 'Дефекти вузла'),
+    ('incident_comment', 'коментар_інциденту'),
+    ('incident_type', 'тип інциденту'),
+    ('insp_observ', 'Зауваження інспекції'),
+    ('photo', 'Фотографія'),
+    ('sediments_node', 'Відкладення у вузлі'),
+    ('leak_arc', 'невелика теча на дузі'),
+    ('leak_connec', 'невелика теча на з''єднанні'),
+    ('leak_link', 'невелика теча на лінії')
 ) AS v(id, descript)
 WHERE t.id = v.id;
 

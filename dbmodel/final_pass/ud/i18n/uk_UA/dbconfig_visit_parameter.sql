@@ -7,26 +7,26 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_visit_parameter AS t SET descript = v.descript FROM (
 	VALUES
-	('clean_arc', 'Clean of arc'),
-    ('clean_connec', 'Clean of connec'),
-    ('clean_gully', 'Clean of gully'),
-    ('clean_link', 'Clean of link'),
-    ('defect_arc', 'Defects of arc'),
-    ('defect_connec', 'Defects of connec'),
-    ('defect_gully', 'Defects of gully'),
-    ('defect_link', 'Defects of link'),
-    ('sediments_arc', 'Sediments in arc'),
-    ('sediments_connec', 'Sediments in connec'),
-    ('sediments_gully', 'Sediments in gully'),
-    ('sediments_link', 'Sediments in link'),
-    ('smells_gully', 'Smells of gully'),
-    ('clean_node', 'Clean of node'),
-    ('defect_node', 'Defects of node'),
-    ('incident_comment', 'incident_comment'),
-    ('incident_type', 'incident type'),
-    ('insp_observ', 'Inspection observations'),
-    ('photo', 'Photography'),
-    ('sediments_node', 'Sediments in node')
+	('clean_arc', 'Очищення дуги'),
+    ('clean_connec', 'Очищення з''єднання'),
+    ('clean_gully', 'Очищення ливнеприймальника'),
+    ('clean_link', 'Очищення лінії'),
+    ('defect_arc', 'Дефекти дуги'),
+    ('defect_connec', 'Дефекти з''єднання'),
+    ('defect_gully', 'Дефекти ливнеприймальника'),
+    ('defect_link', 'Дефекти лінії'),
+    ('sediments_arc', 'Відкладення в дузі'),
+    ('sediments_connec', 'Відкладення в з''єднанні'),
+    ('sediments_gully', 'Відкладення в ливнеприймальнику'),
+    ('sediments_link', 'Відкладення в лінії'),
+    ('smells_gully', 'Неприємні запахи в ливнеприймальнику'),
+    ('clean_node', 'Очищення вузла'),
+    ('defect_node', 'Дефекти вузла'),
+    ('incident_comment', 'коментар_інциденту'),
+    ('incident_type', 'тип інциденту'),
+    ('insp_observ', 'Зауваження інспекції'),
+    ('photo', 'Фотографія'),
+    ('sediments_node', 'Відкладення у вузлі')
 ) AS v(id, descript)
 WHERE t.id = v.id;
 

@@ -7,7 +7,7 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_param_system AS t SET value = v.value FROM (
 	VALUES
-	('admin_currency', '{"id":"CRC", "descript":"COLONOS", "symbol":"₡", "separator":".", "decimals":false}')
+	('admin_currency', '{"id":"EUR", "descript":"EURO", "symbol":"€", "separator":".", "decimals":true}')
 ) AS v(parameter, value)
 WHERE t.parameter = v.parameter;
 
@@ -25,9 +25,9 @@ UPDATE value_state_type AS t SET name = v.name FROM (
     (100, 'OBSOLETO-FICTICIO'),
     (2, 'OPERATIVO'),
     (3, 'PLANIFICADO'),
-    (4, 'RECONSTRUIR'),
+    (4, 'RECONSTRUIDO'),
     (5, 'PROVISIONAL'),
-    (99, 'VIRTUAL')
+    (99, 'FICTICIO')
 ) AS v(id, name)
 WHERE t.id = v.id;
 

@@ -8,6 +8,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name FROM (
 	VALUES
 	(-1, NULL, NULL, 'Hay'),
+    (-2, NULL, NULL, 'Hay'),
     (101, NULL, NULL, 'Comprobación del proyecto Qgis'),
     (102, NULL, NULL, 'Esquema de coherencia de datos'),
     (103, 'arcos con estado=1 y sin nodo_1 o nodo_2.', 'No se encontraron arcos con estado=1 y sin nodos node_1 o node_2.', 'Arco sin nodos inicio-final'),
@@ -103,7 +104,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (197, 'arcos con estado = 1 usando nodos extremos con estado = 2. Por favor, verifique sus datos antes de continuar.', 'No se encontraron arcos con estado=2 que utilicen nodos con estado=0.', 'Arcos con estado=1 utilizando nodos en estado=2'),
     (198, 'tank con valores nulos al menos en las columnas obligatorias para el tank(initial level, min level, max level, diameter, minvol). Consulte la tabla temporal para obtener más detalles.', 'Tanks revisados. No faltan valores obligatorios.', 'Depósitos con valores obligatorios nulos'),
     (199, NULL, NULL, 'Proceso Mincut'),
-    (-2, NULL, NULL, 'Hay'),
     (200, NULL, NULL, 'Establecer valores to_arc para delimitadores de gráficos'),
     (201, 'código de cliente de connecs duplicado. Por favor, verifique sus datos antes de continuar.', 'Sin connecs con código de cliente duplicado.', 'Conexiones con código_cliente duplicado'),
     (203, NULL, NULL, 'Nodos finales con arc_id'),
@@ -184,7 +184,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (282, 'tuberías con valores nulos para rugosidad. Verifica las columnas del catálogo de rugosidad (init_age, end_age, roughness) antes de continuar.', 'Catálogo de rugosidad verificado. No faltan valores obligatorios.', 'Valores nulos en el catálogo de rugosidad'),
     (283, 'registros en el catálogo de arcos con valores nulos en la columna dint.', 'Dint para el catálogo de arcos verificado. No faltan valores.', 'Valores nulos en el catálogo de arcos - dint'),
     (284, 'arcos sin valores en sys_elev1 o sys_elev2.', 'No se han encontrado arcos con valores nulos en el campo elevación (sys_elev1 o sys_elev2).', 'Arcos sin elevación'),
-    (285, 'raingages con valores nulos al menos en las columnas obligatorias para el tipo de lluvia (form_type, intvl, scf, rgage_type).', 'Se han comprobado las columnas obligatorias para el raingage (form_type, intvl, scf, rgage_type) sin que falte ningún valor.', 'Valores nulos en raingage'),
+    (285, 'raingages con valores nulos al menos en las columnas obligatorias para el tipo de lluvia (form_type, intvl, rgage_type).', 'Se han comprobado las columnas obligatorias para el raingage (form_type, intvl, rgage_type) sin que falte ningún valor.', 'Valores nulos en raingage'),
     (286, 'raingages con valores nulos en la columna obligatoria para el tipo de raingage ''TIMESERIES''.', 'Se han comprobado las columnas obligatorias para el tipo de raingage ''TIMESERIES'' sin que se haya omitido ningún valor.', 'Valores nulos en las series temporales de racionamiento'),
     (287, 'raingages con valores nulos al menos en las columnas obligatorias para el tipo de raingage "FILE" (fname, sta, units).', 'Se han comprobado las columnas obligatorias (fname, sta, units) para el tipo de raingage ''FILE'' sin omitir ningún valor.', 'Valores nulos en el fichero raingage'),
     (288, NULL, NULL, 'Almacenar valores psectoriales para un usuario específico'),
@@ -353,7 +353,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (518, NULL, NULL, 'Fijar característica final'),
     (520, NULL, NULL, 'Fusión de sectores'),
     (521, NULL, NULL, 'Set reparación psector'),
-    (532, 'gullys sin arc_id o arc_id incorrecto.', NULL, 'Análisis dinámico del macrominsector'),
+    (532, NULL, NULL, 'Análisis dinámico del macrominsector'),
     (533, 'NO obligatorio node2arcs con menos de dos arcos. Se transformará sobre la marcha utilizando un solo arco''.', 'No se han encontrado resultados para Node2arcs NO obligatorios con menos de dos arcos.', 'Nodarc no obligatorio con menos de dos arcos'),
     (534, 'válvulas con valores nulos en la columna "valv_type".', 'Columna "valv_type" de válvulas virtuales verificada. No faltan valores obligatorios.', 'Comprobar si los nodos definidos (nodeParent) existen en una base de datos'),
     (541, 'barrancos sin enlaces o barrancos sobre arco sin arc_id.', 'Todos los barrancos tienen enlaces o están sobre arco con arc_id.', 'Barranco sin enlace'),

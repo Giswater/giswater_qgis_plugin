@@ -7,8 +7,8 @@ The program is free software: you can redistribute it and/or modify it under the
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_report AS t SET alias = v.alias, descript = v.descript FROM (
 	VALUES
-	(100, 'Longitud del conducte per explotació i catàleg', NULL),
-    (101, 'Connexió per explotació', NULL),
+	(100, 'Conduit longitud per Explotació i Catàleg', NULL),
+    (101, 'Connexions per Explotació', NULL),
     (105, 'Nodes per explotació i tipus', NULL)
 ) AS v(id, alias, descript)
 WHERE t.id = v.id;
