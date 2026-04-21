@@ -245,5 +245,5 @@ INSERT INTO config_param_system ("parameter",value,standardvalue,isenabled) VALU
 	 ON CONFLICT DO NOTHING;
 
 -- 21/04/2026
-UPDATE config_param_system SET parameter= 'basic_search_v2_tab_psector' AND value = '{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"ve_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}'
+UPDATE config_param_system SET parameter= 'basic_search_v2_tab_psector', value = '{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"ve_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}'
 WHERE parameter = 'basic_search_v2_tab_psector ';
