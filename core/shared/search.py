@@ -25,8 +25,6 @@ class GwSearchLocatorFilter(QgsLocatorFilter):
         self.canvas = global_vars.canvas
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.manage_new_psector = GwPsector()
-        self.min_text_length = int(tools_gw.get_config_parser("search_location", "min_text_length", "user", "init", False) or 1)
-        self.max_results = int(tools_gw.get_config_parser("search_location", "max_results", "user", "init", False) or 80)
         self.use_without_prefix = tools_os.set_boolean(
             tools_gw.get_config_parser("search_location", "use_without_prefix", "user", "init", False))
     
@@ -50,7 +48,7 @@ class GwSearchLocatorFilter(QgsLocatorFilter):
         if feedback and feedback.isCanceled():
             return
         search_text = self._parse_query(string, context)
-        if not search_text or len(search_text) < self.min_text_length:
+        if not search_text:
             return
 
         response = self._get_search_results(search_text)
@@ -61,7 +59,6 @@ class GwSearchLocatorFilter(QgsLocatorFilter):
         if not isinstance(groups, list):
             return
 
-        emitted = 0
         group_index = 0
         for group in groups:
             if feedback and feedback.isCanceled():
@@ -99,10 +96,7 @@ class GwSearchLocatorFilter(QgsLocatorFilter):
                     "searchAdd": group.get("searchAdd", False),
                 }
                 self.resultFetched.emit(result)
-                emitted += 1
                 item_index += 1
-                if emitted >= self.max_results:
-                    return
             group_index += 1
 
     def triggerResult(self, result):
