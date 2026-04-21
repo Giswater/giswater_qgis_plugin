@@ -25,6 +25,10 @@ class GwTask(QgsTask, QObject):
         self.duration = duration
         self.aux_conn = None
         self.use_aux_conn = True
+        # Must not touch iface/QActions in run() — QgsTask runs on a worker thread;
+        # on macOS, QAction.setEnabled from a worker triggers AppKit asserts via QMenu/Cocoa.
+        iface.actionOpenProject().setEnabled(False)
+        iface.actionNewProject().setEnabled(False)
 
     def run(self) -> bool:
 
@@ -36,8 +40,6 @@ class GwTask(QgsTask, QObject):
         msg = "Started task {0}"
         msg_params = (self.description(),)
         tools_log.log_info(msg, msg_params=msg_params)
-        iface.actionOpenProject().setEnabled(False)
-        iface.actionNewProject().setEnabled(False)
         return True
 
     def finished(self, result):
