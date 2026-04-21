@@ -109,3 +109,6 @@ INSERT INTO sys_table (id, descript, sys_role, "source") VALUES('v_anl_arc_massi
 -- 13/04/2026
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4628, 'Number of nodes interpolated', null, 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+-- 21/04/2026
+INSERT INTO dwfzone (dwfzone_id, code, "name", dwfzone_type, expl_id, sector_id, muni_id, descript, link, graphconfig, stylesheet, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by, drainzone_id, addparam) VALUES(-1, '-1', 'Conflict', NULL, '{0}', '{0}', '{0}', 'Dwfzone used on graphanalytics algorithm when two ore more zones has conflict in terms of some interconnection.', NULL, '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL) ON CONFLICT DO NOTHING;
