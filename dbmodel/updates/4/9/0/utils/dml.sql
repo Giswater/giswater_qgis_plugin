@@ -309,3 +309,6 @@ UPDATE config_function
   }
 }'::json
 	WHERE id=3508;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4628, 'MAPZONES COULD NOT BE CALCULATED DUE TO ERRORS ON GRAPHCONFIG - CHECK ERRORS PARAGRAPH FOR MORE INFO', NULL, 0, true, 'ws', 'core', 'AUDIT');

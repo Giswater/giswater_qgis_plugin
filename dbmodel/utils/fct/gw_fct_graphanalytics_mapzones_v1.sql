@@ -62,6 +62,7 @@ DECLARE
 	v_srid integer;
 	v_project_type text;
 	v_fid integer;
+	v_checks_fid integer := 909;
 
 	-- dialog variables
 	v_class text;
@@ -259,10 +260,10 @@ BEGIN
 	END IF;
 
 	-- Reset log tables content for this run
-	DELETE FROM t_audit_check_data WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM t_audit_check_data WHERE (fid = v_fid OR fid = v_checks_fid) AND cur_user = current_user;
 	DELETE FROM t_audit_check_project WHERE fid = v_fid AND cur_user = current_user;
 	DELETE FROM t_audit_log_data WHERE fid = v_fid AND cur_user = current_user;
-	DELETE FROM temp_audit_check_data WHERE fid = v_fid AND cur_user = current_user;
+	DELETE FROM temp_audit_check_data WHERE (fid = v_fid OR fid = v_checks_fid) AND cur_user = current_user;
 
 	-- Start Building Log Message
 	-- =======================
@@ -713,9 +714,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4480", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any arcs in the graphconfig that are not in the network
@@ -736,9 +737,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4484", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4484", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 			
 			-- Check if there are any nodes set in more than one mapzone - IN use, forceClosed or ignore
@@ -756,9 +757,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4488", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4488", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4490", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4490", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any arcs set in more than one nodeParent
@@ -775,9 +776,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4492", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4492", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4494", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4494", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any to_arcs not connected to its nodeParent
@@ -793,9 +794,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4496", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4496", "function":"2706","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4498", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4498", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if nodeParent or toArc is null
@@ -810,9 +811,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"2706","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"2706","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			IF v_use_plan_psector = FALSE THEN 
@@ -840,9 +841,9 @@ BEGIN
 				) sub;
 
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4500", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4500", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 				ELSE
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4502", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4502", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 				END IF;
 
 				-- Check if there are tank/source/waterwell/wtp nodeParent where its to_arc is inlet in its man_table
@@ -868,9 +869,9 @@ BEGIN
 				) sub;
 
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4504", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 				ELSE
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 				END IF;
 				
 				-- check if there are arcs for nodeParents that are not toArc, neither inlet_arc 
@@ -911,9 +912,9 @@ BEGIN
 				) sub;
 				
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_checks_fid||'}}$$);';
 				ELSE
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 				END IF;
 
 			END IF;
@@ -935,9 +936,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4512", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4512", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4514", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4514", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any forceClose/forceOpen in the graphconfig that are not in the operative network
@@ -955,9 +956,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4516", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4516", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4518", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4518", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any nodeParents set in more than one mapzone
@@ -975,9 +976,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4520", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4520", "function":"3508","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4522", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4522", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			-- Check if there are any forceClosed/forceOpen set in more than one mapzone
@@ -996,9 +997,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4524", "function":"3508","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4524", "function":"3508","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
 			/* TO DO ARNAU
@@ -1015,9 +1016,9 @@ BEGIN
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"3508","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"3508","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 			*/
 
@@ -1032,9 +1033,9 @@ BEGIN
 			WHERE reverse_cost =  1;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4536", "function":"3508","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4536", "function":"3508","parameters":{"arc_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4538", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4538", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 		END IF;
 	END IF; --v_from_zero
@@ -1042,15 +1043,7 @@ BEGIN
 	-- check if there are any errors in graphconfig, when v_from_zero FALSE
 	-- Detect real errors in graphconfig, ignoring UI scaffolding rows
 	-- (we insert section headers/spacers into t_audit_check_data as well).
-	IF (
-		SELECT count(*)
-		FROM t_audit_check_data
-		WHERE fid = v_fid
-		  AND criticity = 3
-		  AND COALESCE(error_message, ' ') <> ' '
-		  AND error_message NOT IN ('ERRORS', 'ERRORES', '-----------')
-		) = 0 THEN
-
+	IF NOT EXISTS (SELECT 1 FROM t_audit_check_data WHERE fid = v_checks_fid AND criticity = 3) THEN
 		-- GENERATE LINEGRAPH
 		-- ===================
 
@@ -2804,12 +2797,16 @@ BEGIN
 			END IF; -- v_netscenario
 
 		END IF; -- v_commit_changes
+	ELSE
+		-- Insert message for graphconfig errors found
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4628", "function":"2706", "tempTable":"temp_", "criticity":"3", "fid": '||v_fid||'}}$$);';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "tempTable":"temp_", "separator_id": 2049, "criticity":"3", "fid": '||v_fid||'}}$$);';
 	END IF;
 
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
 	SELECT v_fid, criticity, error_message 
 	FROM t_audit_check_data
-	where fid = v_fid;
+	where fid = v_fid or fid = v_checks_fid;
 
 	-- insert spacer lines from sys_label separator
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3508","parameters":null, "tempTable":"", "criticity":"3", "fid": '||v_fid||', "separator_id":"2000"}}$$);';
