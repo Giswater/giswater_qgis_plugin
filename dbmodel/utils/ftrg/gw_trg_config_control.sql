@@ -20,6 +20,8 @@ v_message json;
 v_variables text;
 rec_feature text;
 v_project_type text;
+v_sql TEXT;
+rec record;
 
 BEGIN
 
@@ -46,6 +48,83 @@ BEGIN
 						PERFORM gw_fct_getmessage(v_message);
 					END IF;
 				END LOOP;
+			
+				IF v_configtable = 'cat_material' THEN
+					IF v_project_type = 'UD' THEN
+					
+						v_sql := format($sql$
+						WITH mec AS (
+						    SELECT lower(id) AS feature_type
+						    FROM sys_feature_type
+						    WHERE id NOT IN ('ELEMENT', 'LINK')
+						      AND id NOT IN (
+						      	SELECT unnest(feature_type) FROM cat_material WHERE id =%L
+						    )
+						)
+						SELECT format(
+				           'SELECT %%L as feature_type FROM %%I WHERE matcat_id = %%L',
+				           feature_type,
+				           feature_type,
+				           %L
+				      	) AS feature_query, feature_type
+						FROM mec
+						$sql$, NEW.id, NEW.id);
+				
+					ELSIF v_project_type = 'WS' THEN 
+										
+						v_sql := format($sql$
+						WITH mec AS (
+							    SELECT lower(id) AS feature_type
+							    FROM sys_feature_type
+							    WHERE id NOT IN ('ELEMENT', 'LINK')
+							      AND id NOT IN (
+							      	SELECT unnest(feature_type) FROM cat_material WHERE id =%L
+							    )
+							)
+						SELECT format(
+				           'SELECT %%L as feature_type FROM %%I
+				            JOIN %%I ON %%I.%%I = %%I.id
+				            WHERE %%I.matcat_id = %%L',
+							feature_type,
+				           feature_type,
+				           'cat_' || feature_type,
+				           feature_type,
+				           feature_type || 'cat_id',
+				           'cat_' || feature_type,
+				           'cat_' || feature_type,
+				           %L
+				       	) AS feature_query, feature_type
+						FROM mec
+						$sql$, NEW.id, NEW.id);
+					
+					/* EXAMPLE:
+						with mec as (
+							SELECT lower(id) as feature_type from sys_Feature_type where id <> 'ELEMENT' AND id NOT IN (
+							SELECT unnest(feature_type) FROM cat_material WHERE id = 'PVC'
+							)
+						)
+						SELECT 
+						' SELECT COUNT(*) FROM '||feature_type||'
+						JOIN cat_'|| feature_type ||' ON '|| feature_type ||'.'|| feature_type ||'cat_id = cat_'|| feature_type ||'.id
+						WHERE cat_'|| feature_type ||'.matcat_id = ''PVC'''
+						as num FROM mec;
+					*/
+					
+					END IF;
+				
+					
+					FOR rec IN EXECUTE v_sql
+					
+					LOOP
+										
+						EXECUTE 'SELECT COUNT(*) FROM ('||rec.feature_query||')' INTO v_count;
+						IF v_count > 0 THEN
+							RAISE EXCEPTION 'Tienes % con este material. Ajusta antes de modificar los features del material', rec.feature_type;
+						END IF;
+					END LOOP;
+				END IF;
+			ELSE -- NEW.feature_type IS NULL
+			
 			END IF;
 
 			IF NEW.featurecat_id IS NOT NULL THEN
