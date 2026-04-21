@@ -2838,7 +2838,7 @@ BEGIN
 		EXECUTE format($sql$
 			SELECT jsonb_build_object(
 				'type', 'FeatureCollection',
-				'layerName', 'graphconfig',
+				'layerName', 'Graphconfig',
 				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
 			)
 			FROM (
@@ -2897,7 +2897,7 @@ BEGIN
 		EXECUTE format($sql$
 			SELECT jsonb_build_object(
 				'type', 'FeatureCollection',
-				'layerName', 'graphconfig',
+				'layerName', 'Graphconfig',
 				'features', COALESCE(jsonb_agg(f.feature), '[]'::jsonb)
 			)
 			FROM (

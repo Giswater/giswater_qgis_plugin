@@ -243,3 +243,69 @@ WHERE parameter = 'basic_search_v2_tab_psector ';
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
 VALUES('qgis_mapzone_inundation_from_arc', 'false', 'If true, graph inundation starts by selecting an arc', 'Inundation from arc:', NULL, NULL, true, 18, 'utils', NULL, NULL, 'boolean', 'check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_other') ON CONFLICT DO NOTHING;
+
+
+-- 21/04/2026
+UPDATE config_function
+	SET "style"='{
+  "style": {
+    "point": {
+      "style": "categorized",
+      "field": "descript",
+      "transparency": 0.5,
+      "width": 2.5,
+      "values": [
+        {
+          "id": "Disconnected",
+          "color": [
+            255,
+            124,
+            64
+          ]
+        },
+        {
+          "id": "Conflict",
+          "color": [
+            14,
+            206,
+            253
+          ]
+        }
+      ]
+    },
+    "line": {
+      "style": "categorized",
+      "field": "descript",
+      "transparency": 0.5,
+      "width": 2.5,
+      "values": [
+        {
+          "id": "Disconnected",
+          "color": [
+            255,
+            124,
+            64
+          ]
+        },
+        {
+          "id": "Conflict",
+          "color": [
+            14,
+            206,
+            253
+          ]
+        }
+      ]
+    },
+    "polygon": {
+      "style": "categorized",
+      "field": "descript",
+      "transparency": 0.5
+    },
+    "Graphconfig": {
+      "style": "qml",
+      "id": "103"
+    }
+  }
+}'::json
+	WHERE id=3508;
