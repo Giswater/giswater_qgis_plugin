@@ -316,14 +316,12 @@ class GwMapzoneManager:
 
     def _handle_flood_analysis_click(self):
         """Handle flood button click based on user settings."""
-        if self._use_hinundation_from_arc():
+        qgis_mapzone_inundation_from_arc = tools_gw.get_config_value('qgis_mapzone_inundation_from_arc', table='config_param_system')
+
+        if qgis_mapzone_inundation_from_arc and qgis_mapzone_inundation_from_arc[0] == 'true':
             self._start_flood_analysis_from_arc()
         else:
             self._open_flood_analysis()
-
-    def _use_hinundation_from_arc(self) -> bool:
-        value = tools_gw.get_config_parser("system", "inundation_from_arc", "user", "init", prefix=False)
-        return str(value) == 'True'
 
     def _start_flood_analysis_from_arc(self):
         """Enable arc selection before running inundation analysis."""
