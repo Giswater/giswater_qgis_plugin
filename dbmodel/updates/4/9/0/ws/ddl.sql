@@ -226,3 +226,7 @@ ALTER TABLE supplyzone ENABLE TRIGGER ALL;
 ALTER TABLE crmzone ENABLE TRIGGER ALL;
 ALTER TABLE plan_netscenario_dma ENABLE TRIGGER ALL;
 ALTER TABLE plan_netscenario_presszone ENABLE TRIGGER ALL;
+
+-- 21/04/2026
+DROP RULE IF EXISTS presszone_expl ON presszone;
+DROP RULE IF EXISTS dqa_expl ON dqa;
