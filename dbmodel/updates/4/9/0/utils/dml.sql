@@ -240,3 +240,6 @@ WHERE parameter = 'utils_graphanalytics_status';
 -- 21/04/2026
 UPDATE config_param_system SET parameter= 'basic_search_v2_tab_psector', value = '{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"ve_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}'
 WHERE parameter = 'basic_search_v2_tab_psector ';
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+VALUES('qgis_mapzone_inundation_from_arc', 'false', 'If true, graph inundation starts by selecting an arc', 'Inundation from arc:', NULL, NULL, true, 18, 'utils', NULL, NULL, 'boolean', 'check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_other') ON CONFLICT DO NOTHING;
