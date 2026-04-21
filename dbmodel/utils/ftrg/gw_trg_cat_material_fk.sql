@@ -47,11 +47,11 @@ BEGIN
 	v_querytext = 'SELECT array_agg('||v_columname_table||') FROM '||v_type_table||' 
 									WHERE active IS TRUE
 									AND (
-										feature_type IS NULL
+										COALESCE(cardinality(feature_type), 0) = 0
 										OR '''||upper(v_table)||''' = ANY(feature_type)
 									)
 									AND (
-										featurecat_id IS NULL
+										COALESCE(cardinality(featurecat_id), 0) = 0
 										OR '''||v_feature_type_value||''' = ANY(featurecat_id)
 									)';
 	EXECUTE v_querytext INTO v_list;
