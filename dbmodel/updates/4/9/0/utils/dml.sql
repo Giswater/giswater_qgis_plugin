@@ -312,3 +312,40 @@ UPDATE config_function
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4628, 'MAPZONES COULD NOT BE CALCULATED DUE TO ERRORS ON GRAPHCONFIG - CHECK ERRORS PARAGRAPH FOR MORE INFO', NULL, 0, true, 'ws', 'core', 'AUDIT');
+
+-- 21/04/2026
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fprocess_type = 'Check epa-data' and except_msg is not null and isaudit = TRUE;
+UPDATE sys_fprocess SET except_table=NULL WHERE fid IN (482, 272);
+UPDATE sys_fprocess SET except_table='anl_arc' WHERE fid IN (169, 284);
+
+UPDATE sys_fprocess SET except_table='anl_arc', query_text='SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_pump table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_pump JOIN arc a USING (arc_id) WHERE epa_type !=''PUMP''
+UNION
+SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_conduit table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_conduit JOIN arc a USING (arc_id) WHERE epa_type !=''CONDUIT''
+UNION
+SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_outlet table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_outlet JOIN arc a USING (arc_id) WHERE epa_type !=''OUTLET''
+UNION
+SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_orifice table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_orifice JOIN arc a USING (arc_id) WHERE epa_type !=''ORIFICE''
+UNION
+SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_weir table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_weir JOIN arc a USING (arc_id) WHERE epa_type !=''WEIR''
+UNION
+SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_virtual table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_virtual JOIN arc a USING (arc_id) WHERE epa_type !=''VIRTUAL''' 
+WHERE fid=295;
+
+UPDATE sys_fprocess SET except_table='anl_arc', query_text='SELECT  a.arc_id,  b.arccat_id, b.expl_id, b.the_geom from t_inp_weir a
+JOIN arc b USING (arc_id)
+where weir_type is null or cd is null or geom1 is null or geom2 is null or offsetval is NULL'
+WHERE fid=529;
+
+UPDATE sys_fprocess SET except_table='anl_arc', query_text='SELECT a.arc_id, b.arccat_id, b.expl_id, b.the_geom from t_inp_orifice a
+JOIN arc b USING (arc_id)
+where ori_type is null or geom1 is null or offsetval is null'
+WHERE fid=530;
+
+UPDATE sys_fprocess SET except_table='anl_node', query_text='SELECT rg_id AS node_id, null as nodecat_id, expl_id, the_geom FROM t_raingage where (form_type is null) OR (intvl is null) OR (rgage_type is null) OR (scf is null)'
+WHERE fid=285;
+
+UPDATE sys_fprocess SET except_table='anl_node', query_text='SELECT rg_id as node_id, null as nodecat_id, expl_id, the_geom FROM t_raingage where rgage_type=''TIMESERIES'' AND timser_id IS NULL'
+WHERE fid=286;
+
+UPDATE sys_fprocess SET except_table='anl_node', query_text='SELECT rg_id as node_id, null as nodecat_id, expl_id, the_geom FROM t_raingage where rgage_type=''FILE'' AND (fname IS NULL or sta IS NULL or units IS NULL)'
+WHERE fid=287;
