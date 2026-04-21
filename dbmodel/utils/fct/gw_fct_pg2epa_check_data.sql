@@ -57,7 +57,8 @@ BEGIN
     IF v_fid = 225 THEN
        
         -- Critical Errors (Criticity 3)
-        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'","criticity":"3", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"1004", "separator_id":"2022"}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'", "criticity":"3", "tempTable":"t_", "is_process":true, "is_header":"true"}}$$)';
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'","criticity":"3", "tempTable":"t_", "is_process":true, "is_header":true, "label_id":"1004", "separator_id":"2014"}}$$)';
 
         -- Warnings (Criticity 2)
         EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2430", "fid":"'||v_fid||'", "criticity":"2", "tempTable":"t_","is_process":true, "separator_id":"2000"}}$$)';
