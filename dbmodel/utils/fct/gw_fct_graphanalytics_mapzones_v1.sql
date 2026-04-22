@@ -2801,6 +2801,8 @@ BEGIN
 		-- Insert message for graphconfig errors found
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4628", "function":"2706", "tempTable":"temp_", "criticity":"3", "fid": '||v_fid||'}}$$);';
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2706", "tempTable":"temp_", "separator_id": 2049, "criticity":"3", "fid": '||v_fid||'}}$$);';
+
+		v_visible_layer := NULL;
 	END IF;
 
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
