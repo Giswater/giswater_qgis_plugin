@@ -20,6 +20,27 @@ jobs:
           submodules: recursive
           path: ./giswater
 
+      # 2. Generate build metadata used by "About" dialog
+      - name: Generate build info
+        working-directory: ./giswater
+        run: |
+          PLUGIN_SHA="$(git rev-parse --short=12 HEAD)"
+          LIBS_SHA="$(git -C libs rev-parse --short=12 HEAD 2>/dev/null || echo N/A)"
+          DBMODEL_SHA="$(git -C dbmodel rev-parse --short=12 HEAD 2>/dev/null || echo N/A)"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          cat > build_info.json <<EOF
+          {
+            "plugin_commit": "${PLUGIN_SHA}",
+            "libs_commit": "${LIBS_SHA}",
+            "dbmodel_commit": "${DBMODEL_SHA}",
+            "github_sha": "${GITHUB_SHA}",
+            "github_ref": "${GITHUB_REF}",
+            "github_run_id": "${GITHUB_RUN_ID}",
+            "build_date_utc": "${BUILD_DATE}"
+          }
+          EOF
+
       # 2. Create ZIP
       - name: Create ZIP
         if: github.event_name == 'release'

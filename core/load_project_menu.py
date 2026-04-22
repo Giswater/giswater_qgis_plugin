@@ -6,13 +6,17 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+import json
 import os
+import platform
+import subprocess
+import sys
 from functools import partial
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QMenu, QPushButton, QTreeWidget, QTreeWidgetItem, QHeaderView
-from qgis.core import QgsApplication
+from qgis.core import QgsApplication, Qgis
 
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
@@ -98,6 +102,11 @@ class GwMenuLoad(QObject):
         icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}105.png"
         folder_icon = QIcon(icon_path)
         action_manage_file.setIcon(folder_icon)
+        # endregion
+
+        # region About / Diagnostics
+        action_about = self.main_menu.addAction(tools_qt.tr("About / Diagnostics"))
+        action_about.triggered.connect(self._show_about_diagnostics)
         # endregion
 
         # region Open user folder
@@ -309,5 +318,101 @@ class GwMenuLoad(QObject):
         for i in range(0, len(global_vars.active_rubberbands)):
             global_vars.active_rubberbands[0].reset()
             global_vars.active_rubberbands.pop(0)
+
+    def _show_about_diagnostics(self):
+        """Show environment and version diagnostics."""
+
+        plugin_dir = lib_vars.plugin_dir
+        libs_dir = f"{plugin_dir}{os.sep}libs" if plugin_dir else None
+        build_info_path = f"{plugin_dir}{os.sep}build_info.json" if plugin_dir else None
+
+        build_info = {}
+        if build_info_path and os.path.exists(build_info_path):
+            try:
+                with open(build_info_path, encoding="utf-8") as file:
+                    build_info = json.load(file)
+            except (OSError, json.JSONDecodeError, TypeError):
+                build_info = {}
+
+        def _git_sha(path):
+            if not path or not os.path.isdir(path):
+                return None
+            try:
+                return subprocess.check_output(
+                    ["git", "-C", path, "rev-parse", "--short=12", "HEAD"],
+                    stderr=subprocess.DEVNULL,
+                    text=True
+                ).strip()
+            except (subprocess.CalledProcessError, OSError):
+                return None
+
+        plugin_sha = _git_sha(plugin_dir) or build_info.get("plugin_commit") or build_info.get("github_sha") or "N/A"
+        libs_sha = _git_sha(libs_dir) or build_info.get("libs_commit") or "N/A"
+        dbmodel_sha = _git_sha(f"{plugin_dir}{os.sep}dbmodel" if plugin_dir else None) or build_info.get("dbmodel_commit") or "N/A"
+
+        plugin_version, _ = tools_qgis.get_plugin_version()
+        qgis_version = f"{Qgis.QGIS_VERSION} ({Qgis.QGIS_RELEASE_NAME})"
+        py_version = sys.version.split()[0]
+        os_info = platform.platform()
+
+        schema_version = "N/A"
+        pg_version = "N/A"
+        postgis_version = "N/A"
+        pgrouting_version = "N/A"
+
+        if lib_vars.schema_name and tools_db.dao is not None:
+            schema_name = lib_vars.schema_name.replace('"', '')
+            row = tools_db.get_row(f"SELECT giswater FROM {schema_name}.sys_version ORDER BY id DESC LIMIT 1", is_admin=True, log_info=False)
+            if row and row[0] is not None:
+                schema_version = str(row[0])
+
+            row = tools_db.get_row("SHOW server_version", is_admin=True, log_info=False)
+            if row and row[0] is not None:
+                pg_version = str(row[0])
+
+            row = tools_db.get_row("SELECT extversion FROM pg_extension WHERE extname = 'postgis'", is_admin=True, log_info=False)
+            if row and row[0] is not None:
+                postgis_version = str(row[0])
+
+            row = tools_db.get_row("SELECT extversion FROM pg_extension WHERE extname = 'pgrouting'", is_admin=True, log_info=False)
+            if row and row[0] is not None:
+                pgrouting_version = str(row[0])
+
+        requirements_path = f"{plugin_dir}{os.sep}requirements.txt"
+        package_lines = []
+        if os.path.exists(requirements_path):
+            try:
+                with open(requirements_path, encoding="utf-8") as req_file:
+                    for raw_line in req_file:
+                        line = raw_line.strip()
+                        if not line or line.startswith("#"):
+                            continue
+                        package_lines.append(f"- {line}")
+            except OSError:
+                package_lines = ["- Unable to read requirements.txt"]
+   
+        if not package_lines:
+            package_lines = ["- none"]
+
+        details = (
+            f"<b>OS</b>: {os_info}<br>"
+            f"<b>QGIS</b>: {qgis_version}<br>"
+            f"<b>Python</b>: {py_version}<br>"
+            f"<b>Giswater plugin version</b>: {plugin_version or 'N/A'}<br>"
+            f"<b>Giswater plugin commit</b>: {plugin_sha}<br>"
+            f"<b>Giswater libs commit</b>: {libs_sha}<br>"
+            f"<b>Giswater dbmodel commit</b>: {dbmodel_sha}<br>"
+            f"<b>Giswater schema version</b>: {schema_version}<br>"
+            f"<b>PostgreSQL</b>: {pg_version}<br>"
+            f"<b>PostGIS</b>: {postgis_version}<br>"
+            f"<b>pgRouting</b>: {pgrouting_version}<br>"
+            f"<b>Build date (UTC)</b>: {build_info.get('build_date_utc', 'N/A')}<br>"
+            f"<b>Build ref</b>: {build_info.get('github_ref', 'N/A')}<br>"
+            f"<b>Build run id</b>: {build_info.get('github_run_id', 'N/A')}<br>"
+            "<b>Package versions</b>:<br>"
+            + "<br>".join(package_lines)
+        )
+
+        tools_qt.show_details(details, title="Giswater - About / Diagnostics", copy_button=True)
 
     # endregion
