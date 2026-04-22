@@ -3616,3 +3616,22 @@ AS SELECT inp_shortpipe.node_id,
      LEFT JOIN v_rpt_arc_stats ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc_stats.arc_id::text
      LEFT JOIN man_valve v ON v.node_id = inp_shortpipe.node_id;
 
+-- 22/04/2026
+CREATE OR REPLACE VIEW v_ui_crmzone
+AS SELECT DISTINCT ON (c.crmzone_id) c.crmzone_id,
+    c.code,
+    c.name,
+    c.descript,
+    c.active,
+    mc.name AS macrocrmzone,
+    c.expl_id,
+    c.sector_id,
+    c.muni_id,
+    c.created_at,
+    c.created_by,
+    c.updated_at,
+    c.updated_by
+FROM crmzone c
+LEFT JOIN macrocrmzone mc USING (macrocrmzone_id)
+WHERE c.crmzone_id > 0
+ORDER BY c.crmzone_id;
