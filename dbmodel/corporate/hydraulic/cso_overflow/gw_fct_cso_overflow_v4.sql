@@ -281,7 +281,7 @@ BEGIN
 			-- sum of demand (L/s) from sewage thyssen group by drainzone 
 			execute '
 			update cso_inp_system_subc s set demand = a.consumo from (
-			select drainzone_id, sum(consumption) as consumo from cso_subc_dwf_all cntr
+			select drainzone_id, sum(consumption*coalesce(c_calibra,1)) as consumo from cso_subc_dwf_all cntr
 			where drainzone_id is not null
 			group by drainzone_id)a 
 			where s.drainzone_id = a.drainzone_id and s.drainzone_id in ('||v_drainzone_array||')';
