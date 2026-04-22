@@ -20,7 +20,7 @@ SELECT has_table('cat_users'::name, 'Table cat_users should exist');
 SELECT columns_are(
     'cat_users',
     ARRAY[
-        'id', 'name', 'context', 'sys_role', 'active', 'external'
+        'id', 'name', 'context', 'sys_role', 'active', 'external', 'mail'
     ],
     'Table cat_users should have the correct columns'
 );
@@ -35,6 +35,7 @@ SELECT col_type_is('cat_users', 'context', 'character varying(50)', 'Column cont
 SELECT col_type_is('cat_users', 'sys_role', 'character varying(30)', 'Column sys_role should be varchar(30)');
 SELECT col_type_is('cat_users', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('cat_users', 'external', 'boolean', 'Column external should be boolean');
+SELECT col_type_is('cat_users', 'mail', 'text', 'Column mail should be text');
 
 -- Check foreign keys
 SELECT has_fk('cat_users', 'Table cat_users should have foreign keys');

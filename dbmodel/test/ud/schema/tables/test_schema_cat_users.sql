@@ -20,7 +20,7 @@ SELECT has_table('cat_users'::name, 'Table cat_users should exist');
 SELECT columns_are(
     'cat_users',
     ARRAY[
-        'id', 'name', 'context', 'sys_role', 'active', 'external'
+        'id', 'name', 'context', 'sys_role', 'active', 'external', 'mail'
     ],
     'Table cat_users should have the correct columns'
 );
@@ -35,6 +35,7 @@ SELECT col_type_is('cat_users', 'context', 'varchar(50)', 'Column context should
 SELECT col_type_is('cat_users', 'sys_role', 'varchar(30)', 'Column sys_role should be varchar(30)');
 SELECT col_type_is('cat_users', 'active', 'bool', 'Column active should be bool');
 SELECT col_type_is('cat_users', 'external', 'bool', 'Column external should be bool');
+SELECT col_type_is('cat_users', 'mail', 'text', 'Column mail should be text');
 
 -- Check default values
 SELECT col_has_default('cat_users', 'active', 'Column active should have default value');

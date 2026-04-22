@@ -22,7 +22,8 @@ SELECT columns_are(
     ARRAY[
         'id', 'visitcat_id', 'ext_code', 'startdate', 'enddate', 'user_name', 'webclient_id', 'expl_id',
         'the_geom', 'descript', 'is_done', 'lot_id', 'class_id', 'status', 'visit_type', 'publish',
-        'unit_id', 'vehicle_id', 'muni_id', 'sector_id'
+        'unit_id', 'vehicle_id', 'muni_id', 'sector_id', 'address', 'process_rejection_date',
+        'reassignment', 'comment', 'comment_extra'
     ],
     'Table om_visit should have the correct columns'
 );
@@ -51,6 +52,11 @@ SELECT col_type_is('om_visit', 'unit_id', 'integer', 'Column unit_id should be i
 SELECT col_type_is('om_visit', 'vehicle_id', 'integer', 'Column vehicle_id should be integer');
 SELECT col_type_is('om_visit', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('om_visit', 'sector_id', 'integer', 'Column sector_id should be integer');
+SELECT col_type_is('om_visit', 'address', 'text', 'Column address should be text');
+SELECT col_type_is('om_visit', 'process_rejection_date', 'timestamp without time zone', 'Column process_rejection_date should be timestamp');
+SELECT col_type_is('om_visit', 'reassignment', 'character varying(50)', 'Column reassignment should be varchar(50)');
+SELECT col_type_is('om_visit', 'comment', 'text', 'Column comment should be text');
+SELECT col_type_is('om_visit', 'comment_extra', 'text', 'Column comment_extra should be text');
 
 -- Check default values
 SELECT col_has_default('om_visit', 'startdate', 'Column startdate should have a default value');
@@ -63,6 +69,7 @@ SELECT has_fk('om_visit', 'Table om_visit should have foreign keys');
 SELECT fk_ok('om_visit', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation.expl_id');
 SELECT fk_ok('om_visit', 'muni_id', 'ext_municipality', 'muni_id', 'FK muni_id should reference ext_municipality.muni_id');
 SELECT fk_ok('om_visit', 'visitcat_id', 'om_visit_cat', 'id', 'FK visitcat_id should reference om_visit_cat.id');
+SELECT fk_ok('om_visit', 'reassignment', 'cat_users', 'id', 'FK reassignment should reference cat_users.id');
 
 -- Check constraints
 SELECT col_not_null('om_visit', 'id', 'Column id should be NOT NULL');
