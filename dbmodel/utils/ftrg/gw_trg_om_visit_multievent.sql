@@ -37,14 +37,28 @@ DECLARE
 BEGIN
 
     EXECUTE 'SET search_path TO ' || quote_literal(TG_TABLE_SCHEMA) || ', public';
-    visit_class := TG_ARGV[0];
+
+    -- Resolve class with dual mode:
+    -- 1) optional trigger argument (TG_ARGV[0]) as explicit override
+    -- 2) fallback to row class_id when no argument is provided
+    IF TG_NARGS > 0 AND NULLIF(TG_ARGV[0], '') IS NOT NULL THEN
+        visit_class := TG_ARGV[0]::integer;
+    ELSIF TG_OP = 'DELETE' THEN
+        visit_class := OLD.class_id;
+    ELSE
+        visit_class := NEW.class_id;
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+        v_new_json := to_jsonb(OLD);
+    ELSE
+        v_new_json := to_jsonb(NEW);
+    END IF;
 
     SELECT lower(feature_type)
     INTO v_class_feature_type
     FROM config_visit_class
     WHERE id = visit_class;
-
-    v_new_json := to_jsonb(NEW);
 
     IF v_class_feature_type = 'all' THEN
         IF (v_new_json ? 'node_id') AND NULLIF(v_new_json->>'node_id','') IS NOT NULL THEN
@@ -68,8 +82,10 @@ BEGIN
     v_uuid_field := visit_table || '_uuid';
     v_link_table := 'om_visit_x_' || visit_table;
 
-    -- INFO: v_visit_type=1 (planned), v_visit_type=2 (unexpected/incidencia)
-    v_visit_type := (SELECT visit_type FROM config_visit_class WHERE id = visit_class);
+    SELECT visit_type
+    INTO v_visit_type
+    FROM config_visit_class
+    WHERE id = visit_class;
 
     SELECT upper(value::json->>'lotManage')
     INTO v_pluginlot

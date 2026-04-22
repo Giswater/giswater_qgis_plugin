@@ -381,3 +381,568 @@ INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_link_leak', '
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_node_insp', 'v_ui_visit_node_insp', 'role_edit');
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('v_ui_visit_incid_node', 'v_ui_visit_incid_node', 'role_edit');
 
+-- 22/04/2026
+CREATE OR REPLACE VIEW ve_visit_node_incident
+AS SELECT ov.id,
+    ov.id AS visit_id,
+    ovn.node_id,
+    ov.visitcat_id,
+    ov.ext_code,
+    ov.startdate,
+    ov.enddate,
+    ov.user_name,
+    ov.webclient_id,
+    ov.expl_id,
+    n.the_geom,
+    ov.descript,
+    ov.address,
+    ov.process_rejection_date,
+    ov.reassignment,
+    ov.comment,
+    ov.comment_extra,
+    ov.is_done,
+    ov.class_id,
+    ov.status,
+    ev.generic_incident,
+    ev.photo
+   FROM om_visit ov
+     JOIN config_visit_class cvc ON cvc.id = ov.class_id
+     JOIN om_visit_x_node ovn ON ovn.visit_id = ov.id
+     JOIN node n ON n.node_id = ovn.node_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.generic_incident,
+            ct.photo
+           FROM crosstab('
+        SELECT
+            ov2.id,
+            ove.parameter_id,
+            ove.value
+        FROM om_visit ov2
+        JOIN om_visit_event ove
+            ON ove.visit_id = ov2.id
+        JOIN config_visit_class cvc2
+            ON cvc2.id = ov2.class_id
+        WHERE cvc2.visit_type = 2
+          AND cvc2.ismultievent IS TRUE
+          AND cvc2.feature_type IN (''ALL'', ''NODE'')
+          AND ove.parameter_id IN (''generic_incident'', ''photo'')
+        ORDER BY 1, 2
+        '::text, '
+        VALUES
+            (''generic_incident''),
+            (''photo'')
+        '::text) ct(visit_id integer, generic_incident text, photo text)) ev ON ev.visit_id = ov.id
+  WHERE cvc.visit_type = 2 AND cvc.ismultievent IS TRUE AND (cvc.feature_type = ANY (ARRAY['ALL'::text, 'NODE'::text]));
+
+CREATE OR REPLACE VIEW v_ui_node_incident
+AS SELECT v.visit_id,
+    v.node_id,
+    v.startdate AS "Start date",
+    v.process_rejection_date AS "Process rejection date",
+    v.enddate AS "End date",
+    v.user_name AS "User",
+    c.idval AS "Visit class",
+    s.idval AS "Status",
+    v.descript AS "Description",
+    v.address AS "Address",
+    v.comment AS "Observations",
+    v.comment_extra AS "Extra Observations",
+    v.reassignment AS "Reassignment",
+    v.is_done AS "Is done",
+    v.generic_incident AS "Generic incident",
+    v.photo AS "Photo",
+    v.the_geom AS "Geom"
+   FROM ve_visit_node_incident v
+     JOIN config_visit_class c ON c.id = v.class_id
+     JOIN om_typevalue s ON s.id::integer = v.status AND s.typevalue = 'visit_status'::text;
+
+CREATE OR REPLACE VIEW ve_visit_arc_incident
+AS SELECT ov.id,
+    ov.id AS visit_id,
+    ova.arc_id,
+    ov.visitcat_id,
+    ov.ext_code,
+    ov.startdate,
+    ov.enddate,
+    ov.user_name,
+    ov.webclient_id,
+    ov.expl_id,
+    a.the_geom,
+    ov.descript,
+    ov.address,
+    ov.process_rejection_date,
+    ov.reassignment,
+    ov.comment,
+    ov.is_done,
+    ov.class_id,
+    ov.status,
+    ev.generic_incident,
+    ev.photo
+   FROM om_visit ov
+     JOIN config_visit_class cvc ON cvc.id = ov.class_id
+     JOIN om_visit_x_arc ova ON ova.visit_id = ov.id
+     JOIN arc a ON a.arc_id = ova.arc_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.generic_incident,
+            ct.photo
+           FROM crosstab('
+        SELECT
+            ov2.id,
+            ove.parameter_id,
+            ove.value
+        FROM om_visit ov2
+        JOIN om_visit_event ove
+            ON ove.visit_id = ov2.id
+        JOIN config_visit_class cvc2
+            ON cvc2.id = ov2.class_id
+        WHERE cvc2.visit_type = 2
+          AND cvc2.ismultievent IS TRUE
+          AND cvc2.feature_type IN (''ALL'', ''ARC'')
+          AND ove.parameter_id IN (''generic_incident'', ''photo'')
+        ORDER BY 1, 2
+        '::text, '
+        VALUES
+            (''generic_incident''),
+            (''photo'')
+        '::text) ct(visit_id integer, generic_incident text, photo text)) ev ON ev.visit_id = ov.id
+  WHERE cvc.visit_type = 2 AND cvc.ismultievent IS TRUE AND (cvc.feature_type = ANY (ARRAY['ALL'::text, 'ARC'::text]));
+
+CREATE OR REPLACE VIEW v_ui_arc_incident
+AS SELECT v.visit_id,
+    v.arc_id,
+    v.startdate AS "Start date",
+    v.process_rejection_date AS "Process rejection date",
+    v.enddate AS "End date",
+    v.user_name AS "User",
+    c.idval AS "Visit class",
+    s.idval AS "Status",
+    v.descript AS "Description",
+    v.address AS "Address",
+    v.comment AS "Observations",
+    v.reassignment AS "Reassignment",
+    v.is_done AS "Is done",
+    v.generic_incident AS "Generic incident",
+    v.photo AS "Photo",
+    v.the_geom AS "Geom"
+   FROM ve_visit_arc_incident v
+     JOIN config_visit_class c ON c.id = v.class_id
+     JOIN om_typevalue s ON s.id::integer = v.status AND s.typevalue = 'visit_status'::text;
+
+CREATE OR REPLACE VIEW ve_visit_connec_incident
+AS SELECT ov.id,
+    ov.id AS visit_id,
+    ovc.connec_id,
+    ov.visitcat_id,
+    ov.ext_code,
+    ov.startdate,
+    ov.enddate,
+    ov.user_name,
+    ov.webclient_id,
+    ov.expl_id,
+    c.the_geom,
+    ov.descript,
+    ov.address,
+    ov.process_rejection_date,
+    ov.reassignment,
+    ov.comment,
+    ov.is_done,
+    ov.class_id,
+    ov.status,
+    ev.generic_incident,
+    ev.photo
+   FROM om_visit ov
+     JOIN config_visit_class cvc ON cvc.id = ov.class_id
+     JOIN om_visit_x_connec ovc ON ovc.visit_id = ov.id
+     JOIN connec c ON c.connec_id = ovc.connec_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.generic_incident,
+            ct.photo
+           FROM crosstab('
+        SELECT
+            ov2.id,
+            ove.parameter_id,
+            ove.value
+        FROM om_visit ov2
+        JOIN om_visit_event ove
+            ON ove.visit_id = ov2.id
+        JOIN config_visit_class cvc2
+            ON cvc2.id = ov2.class_id
+        WHERE cvc2.visit_type = 2
+          AND cvc2.ismultievent IS TRUE
+          AND cvc2.feature_type IN (''ALL'', ''CONNEC'')
+          AND ove.parameter_id IN (''generic_incident'', ''photo'')
+        ORDER BY 1, 2
+        '::text, '
+        VALUES
+            (''generic_incident''),
+            (''photo'')
+        '::text) ct(visit_id integer, generic_incident text, photo text)) ev ON ev.visit_id = ov.id
+  WHERE cvc.visit_type = 2 AND cvc.ismultievent IS TRUE AND (cvc.feature_type = ANY (ARRAY['ALL'::text, 'CONNEC'::text]));
+
+CREATE OR REPLACE VIEW v_ui_connec_incident
+AS SELECT v.visit_id,
+    v.connec_id,
+    v.startdate AS "Start date",
+    v.process_rejection_date AS "Process rejection date",
+    v.enddate AS "End date",
+    v.user_name AS "User",
+    c.idval AS "Visit class",
+    s.idval AS "Status",
+    v.descript AS "Description",
+    v.address AS "Address",
+    v.comment AS "Observations",
+    v.reassignment AS "Reassignment",
+    v.is_done AS "Is done",
+    v.generic_incident AS "Generic incident",
+    v.photo AS "Photo",
+    v.the_geom AS "Geom"
+   FROM ve_visit_connec_incident v
+     JOIN config_visit_class c ON c.id = v.class_id
+     JOIN om_typevalue s ON s.id::integer = v.status AND s.typevalue = 'visit_status'::text;
+
+CREATE OR REPLACE VIEW ve_visit_link_incident
+AS SELECT ov.id,
+    ov.id AS visit_id,
+    ovl.link_id,
+    ov.visitcat_id,
+    ov.ext_code,
+    ov.startdate,
+    ov.enddate,
+    ov.user_name,
+    ov.webclient_id,
+    ov.expl_id,
+    l.the_geom,
+    ov.descript,
+    ov.address,
+    ov.process_rejection_date,
+    ov.reassignment,
+    ov.comment,
+    ov.is_done,
+    ov.class_id,
+    ov.status,
+    ev.generic_incident,
+    ev.photo
+   FROM om_visit ov
+     JOIN config_visit_class cvc ON cvc.id = ov.class_id
+     JOIN om_visit_x_link ovl ON ovl.visit_id = ov.id
+     JOIN link l ON l.link_id = ovl.link_id
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.generic_incident,
+            ct.photo
+           FROM crosstab('
+        SELECT
+            ov2.id,
+            ove.parameter_id,
+            ove.value
+        FROM om_visit ov2
+        JOIN om_visit_event ove
+            ON ove.visit_id = ov2.id
+        JOIN config_visit_class cvc2
+            ON cvc2.id = ov2.class_id
+        WHERE cvc2.visit_type = 2
+          AND cvc2.ismultievent IS TRUE
+          AND cvc2.feature_type IN (''ALL'', ''LINK'')
+          AND ove.parameter_id IN (''generic_incident'', ''photo'')
+        ORDER BY 1, 2
+        '::text, '
+        VALUES
+            (''generic_incident''),
+            (''photo'')
+        '::text) ct(visit_id integer, generic_incident text, photo text)) ev ON ev.visit_id = ov.id
+  WHERE cvc.visit_type = 2 AND cvc.ismultievent IS TRUE AND (cvc.feature_type = ANY (ARRAY['ALL'::text, 'LINK'::text]));
+
+CREATE OR REPLACE VIEW v_ui_link_incident
+AS SELECT v.visit_id,
+    v.link_id,
+    v.startdate AS "Start date",
+    v.process_rejection_date AS "Process rejection date",
+    v.enddate AS "End date",
+    v.user_name AS "User",
+    c.idval AS "Visit class",
+    s.idval AS "Status",
+    v.descript AS "Description",
+    v.address AS "Address",
+    v.comment AS "Observations",
+    v.reassignment AS "Reassignment",
+    v.is_done AS "Is done",
+    v.generic_incident AS "Generic incident",
+    v.photo AS "Photo",
+    v.the_geom AS "Geom"
+   FROM ve_visit_link_incident v
+     JOIN config_visit_class c ON c.id = v.class_id
+     JOIN om_typevalue s ON s.id::integer = v.status AND s.typevalue = 'visit_status'::text;
+
+CREATE TRIGGER gw_trg_om_visit_multievent_node INSTEAD OF INSERT OR DELETE OR UPDATE
+ON ve_visit_node_incident FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent();
+
+CREATE TRIGGER gw_trg_om_visit_multievent_arc INSTEAD OF INSERT OR DELETE OR UPDATE  
+ON ve_visit_arc_incident FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent();
+
+CREATE TRIGGER gw_trg_om_visit_multievent_connec INSTEAD OF INSERT OR DELETE OR UPDATE  
+ON ve_visit_connec_incident FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent();
+
+CREATE TRIGGER gw_trg_om_visit_multievent_link INSTEAD OF INSERT OR DELETE OR UPDATE  
+ON ve_visit_link_incident FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent();
+
+CREATE TRIGGER gw_trg_edit_om_visit INSTEAD OF INSERT OR DELETE OR UPDATE
+ON ve_om_visit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_om_visit('om_visit');
+
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(6, 'New feature', NULL, true, false, true, 'ALL', 'role_om', 2, NULL, 'visit_web_all_incident', 've_visit_all_incident', 'v_ui_all_incident', NULL, NULL);
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(7, 'Breakdown', NULL, true, false, true, 'ALL', 'role_om', 2, NULL, 'visit_web_all_incident', 've_visit_all_incident', 'v_ui_all_incident', NULL, NULL);
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(8, 'Maintenance', NULL, true, false, true, 'ALL', 'role_om', 2, NULL, 'visit_web_all_incident', 've_visit_all_incident', 'v_ui_all_incident', NULL, NULL);
+INSERT INTO config_visit_class
+(id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
+VALUES(9, 'Improvements', NULL, true, false, true, 'ALL', 'role_om', 2, NULL, 'visit_web_all_incident', 've_visit_all_incident', 'v_ui_all_incident', NULL, NULL);
+
+INSERT INTO config_visit_parameter
+(id, code, parameter_type, feature_type, data_type, criticity, descript, form_type, vdefault, ismultifeature, short_descript, active)
+VALUES('generic_incident', NULL, 'INCIDENCE', 'ALL', 'text', NULL, 'global incident', 'event_standard', 'defaultvalue', false, 'generic_incident', true);
+
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(6, 'photo', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(6, 'generic_incident', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(7, 'photo', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(7, 'generic_incident', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(8, 'photo', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(8, 'generic_incident', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(9, 'photo', true);
+INSERT INTO config_visit_class_x_parameter
+(class_id, parameter_id, active)
+VALUES(9, 'generic_incident', true);
+
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval
+FROM config_visit_class
+WHERE active IS TRUE
+  AND visit_type = 2
+  AND sys_role IN (
+    SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')
+  )', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName":"get_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'descript', 'lyt_data_1', NULL, 'string', 'text', 'Description:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'address', 'lyt_data_1', NULL, 'string', 'text', 'Address:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', NULL, 'date', 'datetime', 'Start datetime:', NULL, NULL, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'process_rejection_date', 'lyt_data_1', NULL, 'date', 'datetime', 'Rejection datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'enddate', 'lyt_data_1', NULL, 'date', 'datetime', 'Resolution datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'user_name', 'lyt_data_1', NULL, 'string', 'text', 'Created by:', NULL, NULL, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'reassignment', 'lyt_data_1', NULL, 'string', 'combo', 'Reassignment:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, name as idval FROM cat_users WHERE active IS TRUE', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'send_mail', 'lyt_data_1', NULL, 'boolean', 'check', 'Send mail:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 10);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'comment', 'lyt_data_1', NULL, 'string', 'text', 'Comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 11);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'comment_extra', 'lyt_data_1', NULL, 'string', 'text', 'Extra comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 12);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_data', 'acceptbutton', 'lyt_data_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}'::json, '{"functionName":"set_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', NULL, NULL, 'fileselector', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Add File"}'::json, '{"functionName":"add_file"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_file', 'tbl_files', 'lyt_files_1', NULL, NULL, 'tableview', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false, "displayFields": ["text", "tstamp"]}'::json, NULL, 'om_visit_event_photo', false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_node_incident', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}'::json, '{"functionName":"set_previous_form_back"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval
+FROM config_visit_class
+WHERE active IS TRUE
+  AND visit_type = 2
+  AND sys_role IN (
+    SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')
+  )', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName":"get_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'descript', 'lyt_data_1', NULL, 'string', 'text', 'Description:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'address', 'lyt_data_1', NULL, 'string', 'text', 'Address:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', NULL, 'date', 'datetime', 'Start datetime:', NULL, NULL, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'process_rejection_date', 'lyt_data_1', NULL, 'date', 'datetime', 'Rejection datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'enddate', 'lyt_data_1', NULL, 'date', 'datetime', 'Resolution datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'user_name', 'lyt_data_1', NULL, 'string', 'text', 'Created by:', NULL, NULL, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'reassignment', 'lyt_data_1', NULL, 'string', 'combo', 'Reassignment:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, name as idval FROM cat_users WHERE active IS TRUE', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'send_mail', 'lyt_data_1', NULL, 'boolean', 'check', 'Send mail:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 10);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'comment', 'lyt_data_1', NULL, 'string', 'text', 'Comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 11);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'comment_extra', 'lyt_data_1', NULL, 'string', 'text', 'Extra comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 12);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_data', 'acceptbutton', 'lyt_data_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}'::json, '{"functionName":"set_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', NULL, NULL, 'fileselector', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Add File"}'::json, '{"functionName":"add_file"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_file', 'tbl_files', 'lyt_files_1', NULL, NULL, 'tableview', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false, "displayFields": ["text", "tstamp"]}'::json, NULL, 'om_visit_event_photo', false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_arc_incident', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}'::json, '{"functionName":"set_previous_form_back"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval
+FROM config_visit_class
+WHERE active IS TRUE
+  AND visit_type = 2
+  AND sys_role IN (
+    SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')
+  )', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName":"get_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'descript', 'lyt_data_1', NULL, 'string', 'text', 'Description:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'address', 'lyt_data_1', NULL, 'string', 'text', 'Address:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', NULL, 'date', 'datetime', 'Start datetime:', NULL, NULL, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'process_rejection_date', 'lyt_data_1', NULL, 'date', 'datetime', 'Rejection datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'enddate', 'lyt_data_1', NULL, 'date', 'datetime', 'Resolution datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'user_name', 'lyt_data_1', NULL, 'string', 'text', 'Created by:', NULL, NULL, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'reassignment', 'lyt_data_1', NULL, 'string', 'combo', 'Reassignment:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, name as idval FROM cat_users WHERE active IS TRUE', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'send_mail', 'lyt_data_1', NULL, 'boolean', 'check', 'Send mail:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 10);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'comment', 'lyt_data_1', NULL, 'string', 'text', 'Comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 11);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'comment_extra', 'lyt_data_1', NULL, 'string', 'text', 'Extra comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 12);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_data', 'acceptbutton', 'lyt_data_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}'::json, '{"functionName":"set_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', NULL, NULL, 'fileselector', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Add File"}'::json, '{"functionName":"add_file"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_file', 'tbl_files', 'lyt_files_1', NULL, NULL, 'tableview', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false, "displayFields": ["text", "tstamp"]}'::json, NULL, 'om_visit_event_photo', false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_connec_incident', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}'::json, '{"functionName":"set_previous_form_back"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval
+FROM config_visit_class
+WHERE active IS TRUE
+  AND visit_type = 2
+  AND sys_role IN (
+    SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')
+  )', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName":"get_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'descript', 'lyt_data_1', NULL, 'string', 'text', 'Description:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'address', 'lyt_data_1', NULL, 'string', 'text', 'Address:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', NULL, 'date', 'datetime', 'Start datetime:', NULL, NULL, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'process_rejection_date', 'lyt_data_1', NULL, 'date', 'datetime', 'Rejection datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'enddate', 'lyt_data_1', NULL, 'date', 'datetime', 'Resolution datetime:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, true, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'user_name', 'lyt_data_1', NULL, 'string', 'text', 'Created by:', NULL, NULL, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 8);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'reassignment', 'lyt_data_1', NULL, 'string', 'combo', 'Reassignment:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, name as idval FROM cat_users WHERE active IS TRUE', NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, false, 9);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'send_mail', 'lyt_data_1', NULL, 'boolean', 'check', 'Send mail:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 10);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'comment', 'lyt_data_1', NULL, 'string', 'text', 'Comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 11);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'comment_extra', 'lyt_data_1', NULL, 'string', 'text', 'Extra comments:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 12);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_data', 'acceptbutton', 'lyt_data_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}'::json, '{"functionName":"set_visit"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', NULL, NULL, 'fileselector', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Add File"}'::json, '{"functionName":"add_file"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_file', 'tbl_files', 'lyt_files_1', NULL, NULL, 'tableview', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false, "displayFields": ["text", "tstamp"]}'::json, NULL, 'om_visit_event_photo', false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('visit_web_link_incident', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}'::json, '{"functionName":"set_previous_form_back"}'::json, NULL, false, 1);

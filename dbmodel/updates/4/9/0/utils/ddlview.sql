@@ -256,4 +256,21 @@ SELECT
   e.uuid
 FROM element e
 JOIN vf_element vf ON vf.element_id = e.element_id
-JOIN cat_element ON e.elementcat_id::text = cat_element.id::text
+JOIN cat_element ON e.elementcat_id::text = cat_element.id::text;
+
+-- 22/04/2026
+DROP VIEW IF EXISTS ve_om_visit;
+CREATE OR REPLACE VIEW ve_om_visit
+AS SELECT om_visit.id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.status,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.the_geom,
+    om_visit.webclient_id,
+    om_visit.expl_id
+   FROM selector_expl,
+    om_visit
+  WHERE om_visit.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"();

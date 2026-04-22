@@ -147,3 +147,15 @@ ALTER TABLE macroomzone ENABLE TRIGGER ALL;
 
 -- 21/04/2026
 DROP RULE IF EXISTS dma_expl ON dma;
+
+-- 22/04/2026
+ALTER TABLE om_visit
+    ADD COLUMN address text,
+    ADD COLUMN process_rejection_date timestamp,
+    ADD COLUMN reassignment varchar(50),
+    ADD COLUMN "comment" text,
+    ADD COLUMN comment_extra text,
+    ADD CONSTRAINT om_visit_reassignment_fkey FOREIGN KEY (reassignment) REFERENCES cat_users(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE cat_users
+    ADD COLUMN mail text NULL;
