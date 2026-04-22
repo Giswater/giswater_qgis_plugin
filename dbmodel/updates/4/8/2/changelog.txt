@@ -1,0 +1,3 @@
+4.8.2
+*************
+- Fix `ws_gw_fct_pg2epa_dscenario` ensure proper type casting for feature IDs
