@@ -2205,8 +2205,8 @@ BEGIN
 			IF v_from_zero = TRUE THEN
 				-- insert the new mapzones
 				EXECUTE format($sql$
-				INSERT INTO %I (%I, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
-				SELECT t.mapzone_ids[1], t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
+				INSERT INTO %I (%I, code, name, expl_id, muni_id, the_geom, addparam, graphconfig, created_at , created_by)
+				SELECT t.mapzone_ids[1], t.mapzone_ids[1], t.name, t.expl_id, t.muni_id, t.the_geom, t.addparam, t.graphconfig, t.created_at , t.created_by
 				FROM temp_pgr_mapzone t
 				WHERE t.mapzone_id <> 0
 				$sql$, v_mapzone_table, v_mapzone_field);
