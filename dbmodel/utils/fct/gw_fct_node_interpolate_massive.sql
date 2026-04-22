@@ -639,55 +639,6 @@ BEGIN
 				WHERE fa.stop_seq IS NOT NULL
 				  AND r.seq <= fa.stop_seq
 				ORDER BY r.seq;
-                           
-                           /*
-                           
-                CREATE TEMP TABLE temp_path_window AS
-                WITH first_anchor AS (
-                    SELECT MIN(r.seq) AS stop_seq
-                    FROM temp_path_raw r
-                    JOIN ve_node n ON n.node_id = r.node_id
-                    WHERE r.seq > (SELECT MIN(seq) FROM temp_path_raw)
-                      AND (
-                          n.sys_elev IS NOT NULL
-                          OR (
-                              (
-                                  SELECT count(*)
-                                  FROM ve_arc a
-                                  WHERE a.node_1 = r.node_id
-                                     OR a.node_2 = r.node_id
-                              ) > 2
-                              AND n.custom_elev IS NOT NULL
-                              AND EXISTS (
-                                  SELECT 1
-                                  FROM ve_arc a
-                                  WHERE (a.node_1 = r.node_id OR a.node_2 = r.node_id)
-                                    AND a.slope IS NOT NULL
-                              )
-                          )
-                      )
-                )
-                SELECT
-                    r.seq,
-                    r.node_id,
-                    r.arc_id,
-                    r.step_len,
-                    v_minslope::float8 AS minslope,
-                    v_maxslope::float8 AS maxslope,
-                    n.sys_top_elev::float8 AS top_elev,
-                    (n.sys_top_elev::float8 - v_maxymax::float8) AS min_bound,
-                    (n.sys_top_elev::float8 - v_minymax::float8) AS max_bound,
-                    n.sys_elev::float8 AS sys_elev,
-                    n.custom_elev::float8 AS custom_elev,
-                    COALESCE(n.sys_elev::float8, n.custom_elev::float8) AS anchor_elev,
-                    n.the_geom,
-                    n.expl_id
-                FROM temp_path_raw r
-                JOIN ve_node n ON n.node_id = r.node_id
-                CROSS JOIN first_anchor fa
-                WHERE fa.stop_seq IS NOT NULL
-                  AND r.seq <= fa.stop_seq
-                ORDER BY r.seq;
 
                 IF EXISTS (SELECT 1 FROM temp_path_window) THEN
                     SELECT
