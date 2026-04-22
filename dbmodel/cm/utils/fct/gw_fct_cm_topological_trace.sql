@@ -62,6 +62,10 @@ BEGIN
 		v_lot_id_array := array[v_lot_id];
 	END IF;
 
+	IF (SELECT lot_id FROM cm.om_campaign_lot_x_node WHERE node_id = v_node_id) <> ALL(v_lot_id_array) THEN
+		EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_getmessage($${"data":{"message": "4630", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "is_process":true}}$$)';
+	END IF;
+
 	-- NOTE: temp tables and header to show in tab_info
 	EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"LOG"}}}$$)';
 	EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"ANL"}}}$$)';
@@ -189,6 +193,11 @@ BEGIN
 			'}}'||
 	    '}')::json, 3542, null, null, null);
    
+   -- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+
 END;
 $function$
 ;

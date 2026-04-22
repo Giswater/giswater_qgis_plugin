@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3564
 
 CREATE OR REPLACE FUNCTION cm.gw_fct_cm_hydraulic_trace(p_data json)
 RETURNS json
@@ -22,6 +22,8 @@ DECLARE
 -- Init
 v_version text;
 v_srid integer;
+v_function_id int = 3564;
+v_fid int = 998;
 
 -- Inputs
 v_header bigint;
@@ -35,6 +37,10 @@ tblname text;
 
 -- Control
 v_exists boolean;
+v_lot_id_array integer[];
+v_lot_id integer;
+v_campaign_id integer;
+v_error_context text;
 
 -- Return
 v_result json;
@@ -51,6 +57,18 @@ BEGIN
 
     -- Params from JSON
     v_header := (p_data -> 'data' -> 'parameters' ->> 'nodeId')::bigint;
+    v_campaign_id := (p_data ->'data' ->'parameters'->>'campaignId')::integer;
+   	v_lot_id := (p_data ->'data' ->'parameters'->>'lotId')::integer;
+
+	IF v_lot_id IS NULL THEN
+		SELECT array_agg(lot_id) INTO v_lot_id_array FROM cm.om_campaign_lot WHERE status IN (3,4,6) AND campaign_id = v_campaign_id GROUP BY campaign_id;
+	ELSE
+		v_lot_id_array := array[v_lot_id];
+	END IF;
+
+    IF (SELECT lot_id FROM cm.om_campaign_lot_x_node WHERE node_id = v_header) <> ALL(v_lot_id_array) THEN
+		EXECUTE 'SELECT PARENT_SCHEMA.gw_fct_getmessage($${"data":{"message": "4630", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "is_process":true}}$$)';
+	END IF;
 
     SELECT array_agg(value::bigint)
     INTO v_stoppers
@@ -239,6 +257,12 @@ BEGIN
         )::json,
         2110, null, null, null
     );
+
+    -- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+
 
 END;
 $function$;
