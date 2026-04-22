@@ -362,3 +362,5 @@ WHERE fid=287;
 -- 22/04/2026
 UPDATE sys_style SET stylevalue = replace(stylevalue, 'MS Shell Dlg 2', 'Arial') WHERE stylevalue LIKE '%MS Shell Dlg 2%';
 UPDATE sys_style SET stylevalue = replace(stylevalue, 'Calibri Light', 'Arial') WHERE stylevalue LIKE '%Calibri Light%';
+
+UPDATE sys_function SET function_alias='CHECK DATA ACCORDING TO EPA RULES' WHERE id=2430;
