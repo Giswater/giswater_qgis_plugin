@@ -684,9 +684,6 @@ ON ve_visit_connec_incident FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multie
 CREATE TRIGGER gw_trg_om_visit_multievent_link INSTEAD OF INSERT OR DELETE OR UPDATE  
 ON ve_visit_link_incident FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent();
 
-CREATE TRIGGER gw_trg_edit_om_visit INSTEAD OF INSERT OR DELETE OR UPDATE
-ON ve_om_visit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_om_visit('om_visit');
-
 INSERT INTO config_visit_class
 (id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values)
 VALUES(6, 'New feature', NULL, true, false, true, 'ALL', 'role_om', 2, NULL, 'visit_web_all_incident', 've_visit_all_incident', 'v_ui_all_incident', NULL, NULL);
