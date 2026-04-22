@@ -358,3 +358,7 @@ WHERE fid=286;
 
 UPDATE sys_fprocess SET except_table='anl_node', query_text='SELECT rg_id as node_id, null as nodecat_id, expl_id, the_geom FROM t_raingage where rgage_type=''FILE'' AND (fname IS NULL or sta IS NULL or units IS NULL)'
 WHERE fid=287;
+
+-- 22/04/2026
+UPDATE sys_style SET stylevalue = replace(stylevalue, 'MS Shell Dlg 2', 'Arial') WHERE stylevalue LIKE '%MS Shell Dlg 2%';
+UPDATE sys_style SET stylevalue = replace(stylevalue, 'Calibri Light', 'Arial') WHERE stylevalue LIKE '%Calibri Light%';
