@@ -2158,14 +2158,14 @@ class GwImportInpTask(GwTask):
 
         sql = f"""
             UPDATE node n 
-            SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) 
+            SET muni_id = (SELECT m.muni_id FROM v_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) 
             WHERE workcat_id = '{self.workcat}' AND sector_id = {self.sector}
-            AND EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom));
+            AND EXISTS (SELECT 1 FROM v_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom));
 
             UPDATE arc a 
-            SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom) LIMIT 1) 
+            SET muni_id = (SELECT m.muni_id FROM v_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom) LIMIT 1) 
             WHERE workcat_id = '{self.workcat}' AND sector_id = {self.sector}
-            AND EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
+            AND EXISTS (SELECT 1 FROM v_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
         """
         execute_sql(sql, commit=self.force_commit, is_thread=True)
 

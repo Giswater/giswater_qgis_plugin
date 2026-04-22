@@ -284,14 +284,14 @@ class GwImportSwmm:
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",
                 "DELETE FROM cat_arc CASCADE;"
                 "DELETE FROM cat_material CASCADE;",
-                "DELETE FROM ext_address CASCADE;",
-                "DELETE FROM ext_streetaxis CASCADE;",
+                "DELETE FROM ve_address CASCADE;",
+                "DELETE FROM ve_streetaxis CASCADE;",
                 # "DELETE FROM sector WHERE sector_id = 1;",
-                # "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                # "DELETE FROM ve_municipality WHERE muni_id = 1;",
                 # "DELETE FROM exploitation WHERE expl_id = 1;",
                 "INSERT INTO cat_material (id, descript, feature_type, n) VALUES ('PVC', 'PVC', '{ARC}', 0.011), ('Brick', 'Brick', '{ARC}', 0.014);",
                 # "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
-                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO ve_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
@@ -669,7 +669,7 @@ class GwImportSwmm:
 
         rows = tools_db.get_rows("""
             SELECT muni_id, name
-            FROM ext_municipality
+            FROM v_municipality
             WHERE muni_id > 0
         """)
         tools_qt.fill_combo_values(cmb_muni, rows)

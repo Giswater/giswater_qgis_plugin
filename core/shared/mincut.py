@@ -94,10 +94,10 @@ class GwMincut:
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
-        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_ext_streetaxis.descript AS street_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_streetaxis.descript AS street_name"
                f" FROM om_mincut"
                f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
-               f" LEFT JOIN v_ext_streetaxis ON v_ext_streetaxis.id = om_mincut.streetaxis_id"
+               f" LEFT JOIN v_streetaxis ON v_streetaxis.id = om_mincut.streetaxis_id"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -465,7 +465,7 @@ class GwMincut:
 
         # Fill ComboBox municipality
         sql = ("SELECT muni_id, name "
-               "FROM ext_municipality " 
+               "FROM v_municipality " 
                "WHERE active is True and muni_id > 0 "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)

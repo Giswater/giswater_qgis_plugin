@@ -267,14 +267,14 @@ class GwImportEpanet:
                 "DELETE FROM cat_mat_roughness CASCADE;",
                 "DELETE FROM cat_material CASCADE;",
                 "DELETE FROM sector WHERE sector_id = 1;",
-                "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                "DELETE FROM ve_municipality WHERE muni_id = 1;",
                 "DELETE FROM exploitation WHERE expl_id = 1;",
                 "INSERT INTO cat_material (id, descript, feature_type, active) VALUES ('FC', 'FC', '{ARC}', true), ('PVC', 'PVC', '{ARC}', true), ('FD', 'FD', '{ARC}', true);",
                 "INSERT INTO cat_mat_roughness (matcat_id, roughness, descript) VALUES ('FC', 0.025, 'FC');",
                 "INSERT INTO cat_mat_roughness (matcat_id, roughness, descript) VALUES ('PVC', 0.0025, 'PVC');",
                 "INSERT INTO cat_mat_roughness (matcat_id, roughness, descript) VALUES ('FD', 0.03, 'FD');",
                 "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
-                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO ve_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
@@ -615,7 +615,7 @@ class GwImportEpanet:
 
         rows = tools_db.get_rows("""
             SELECT muni_id, name
-            FROM ext_municipality
+            FROM v_municipality
             WHERE muni_id > 0
         """)
         tools_qt.fill_combo_values(cmb_muni, rows)

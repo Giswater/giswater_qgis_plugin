@@ -131,12 +131,12 @@ class GwSnapshotViewButton(GwAction):
                     action.triggered.connect(partial(self._update_current_polygon, "exploitation", "expl_id", row[0]))
 
             # Fill actions from municipality
-            result = tools_db.get_rows(f"SELECT muni_id, name FROM {lib_vars.schema_name}.ext_municipality WHERE the_geom IS NOT NULL;")
+            result = tools_db.get_rows(f"SELECT muni_id, name FROM {lib_vars.schema_name}.v_municipality WHERE the_geom IS NOT NULL;")
             if result:
                 for row in result:
                     action = QAction(f"{row[0]} - {row[1]}", self.btn_coordinate_actions)
                     dict_menu[calc_muni].addAction(action)
-                    action.triggered.connect(partial(self._update_current_polygon, "ext_municipality", "muni_id", row[0]))
+                    action.triggered.connect(partial(self._update_current_polygon, "v_municipality", "muni_id", row[0]))
 
             # Map Canvas Extent
             dict_menu[cur_canvas].triggered.connect(partial(self._update_current_polygon, "map_canvas"))
@@ -165,7 +165,7 @@ class GwSnapshotViewButton(GwAction):
             ymax = extent.yMaximum()
             tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
 
-        elif origin in ("exploitation", "ext_municipality"):
+        elif origin in ("exploitation", "v_municipality"):
             sql = f"SELECT ST_Xmin(the_geom), ST_Xmax(the_geom), ST_Ymin(the_geom), ST_Ymax(the_geom) FROM {lib_vars.schema_name}.{origin} where {id_name} = {id};"
             xmin, xmax, ymin, ymax = tools_db.get_row(sql)
             tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")

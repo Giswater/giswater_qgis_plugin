@@ -62,7 +62,7 @@ class GwImportOsm:
         """ Get municipalities and add a checkbox widget for each of them """
         sql = (f"""
             SELECT muni_id, name
-            FROM {self.schema_name}.ext_municipality;
+            FROM {self.schema_name}.v_municipality;
         """)
         chk_municipalities = tools_db.get_rows(sql)
         layout = self.dlg_import_osm.mainTab.findChild(QVBoxLayout, "lyt_data_1")
@@ -116,7 +116,7 @@ class GwImportOsm:
         # Fetch `muni_id` and geometry
         cur.execute(f"""
             SELECT m.muni_id, ST_AsText(m.the_geom)
-            FROM {self.schema_name}.ext_municipality m            
+            FROM {self.schema_name}.v_municipality m            
             WHERE m.muni_id in {checked_municipalities};
         """)
         municipalities = cur.fetchall()

@@ -825,9 +825,9 @@ class GwLoadProject(QObject):
         return True
 
     def _manage_guided_map(self):
-        """ Guide map works using ext_municipality """
+        """ Guide map works using v_municipality """
 
-        self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
+        self.layer_muni = tools_qgis.get_layer_by_tablename('v_municipality')
         if self.layer_muni is None:
             return
 
