@@ -161,7 +161,7 @@ class GwMapzoneManager:
         self._fill_mapzone_table(expr=expr)
 
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        if self._is_readonly_mapzone(mapzone_type):
+        if self._is_readonly_mapzone(self.mapzone_mng_dlg, mapzone_type):
             self.mapzone_mng_dlg.btn_execute.setEnabled(False)
             self.mapzone_mng_dlg.btn_flood.setEnabled(False)
             self.mapzone_mng_dlg.btn_config.setEnabled(False)
@@ -190,9 +190,11 @@ class GwMapzoneManager:
         can_enable_flood = is_enabled_from_config and mapzone_type in self.flood_enabled_mapzones
         self.mapzone_mng_dlg.btn_flood.setEnabled(can_enable_flood and self._flood_enabled_by_tab.get(mapzone_type, False))
 
-    def _is_readonly_mapzone(self, mapzone_type=None):
+    def _is_readonly_mapzone(self, dialog=None, mapzone_type=None):
+        if dialog is None:
+            dialog = self.mapzone_mng_dlg
         if mapzone_type is None:
-            mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+            mapzone_type = dialog.main_tab.tabText(dialog.main_tab.currentIndex()).lower()
         return mapzone_type in self.readonly_mapzone_tabs
 
     def _get_mapzone_enabled_status_from_config(self, mapzone_type):
@@ -297,7 +299,7 @@ class GwMapzoneManager:
     def _open_mapzones_analysis(self):
         """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
         mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-        if self._is_readonly_mapzone(mapzone_name):
+        if self._is_readonly_mapzone(self.mapzone_mng_dlg, mapzone_name):
             return
 
         # Execute toolbox function
@@ -339,7 +341,7 @@ class GwMapzoneManager:
 
     def _handle_flood_analysis_click(self):
         """Handle flood button click based on user settings."""
-        if self._is_readonly_mapzone():
+        if self._is_readonly_mapzone(self.mapzone_mng_dlg):
             return
         qgis_mapzone_inundation_from_arc = tools_gw.get_config_value('qgis_mapzone_inundation_from_arc', table='config_param_system')
 
@@ -1401,7 +1403,7 @@ class GwMapzoneManager:
         self._manage_current_changed()
 
     def manage_create(self, dialog, tableview=None):
-        if self._is_readonly_mapzone():
+        if self._is_readonly_mapzone(dialog):
             return
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
@@ -1421,7 +1423,7 @@ class GwMapzoneManager:
         self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT")
 
     def manage_update(self, dialog, tableview=None):
-        if self._is_readonly_mapzone():
+        if self._is_readonly_mapzone(dialog):
             return
         # Get selected row
         if tableview is None:
@@ -1459,7 +1461,7 @@ class GwMapzoneManager:
         self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
 
     def _manage_delete(self):
-        if self._is_readonly_mapzone():
+        if self._is_readonly_mapzone(self.mapzone_mng_dlg):
             return
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
