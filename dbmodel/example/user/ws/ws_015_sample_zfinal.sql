@@ -48,7 +48,8 @@ UPDATE cat_feature_node SET graph_delimiter='{SECTOR,DMA,PRESSZONE}' WHERE id='T
 UPDATE config_param_system
 	SET value='{"status":true, "values":[
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head = CASE WHEN top_elev + pressure_exit IS NOT NULL THEN top_elev + pressure_exit ELSE t.head END FROM ve_node_pr_reduc_valve s "},
-{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head= CASE WHEN top_elev + hmax/2 IS NOT NULL THEN top_elev + hmax/2 ELSE t.head END FROM ve_node_tank s "}]}'
+{"sourceTable":"ve_node_pump", "query":"UPDATE presszone t SET head = CASE WHEN top_elev + pressure_exit IS NOT NULL THEN top_elev + pressure_exit ELSE t.head END FROM ve_node_pump s "},
+{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head= CASE WHEN invert_level + hmax IS NOT NULL THEN invert_level + hmax ELSE t.head END FROM ve_node_tank s "}]}'
 	WHERE "parameter"='epa_automatic_man2graph_values';
 
 
