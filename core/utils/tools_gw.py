@@ -29,7 +29,7 @@ from datetime import datetime
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, \
     QItemSelectionModel, QTimer
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
-    QIntValidator, QDoubleValidator, QRegularExpressionValidator
+    QIntValidator, QDoubleValidator, QRegularExpressionValidator, QPalette
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
@@ -76,6 +76,54 @@ geom_types_dict: Dict = {
     "point": Qgis.GeometryType.Point,
     "polygon": Qgis.GeometryType.Polygon
 }
+
+
+class ThemeManager:
+    """Theme-aware colors and reusable stylesheet helpers."""
+
+    @classmethod
+    def _get_palette(cls, widget=None):
+        app = QApplication.instance()
+        if app is None:
+            return None
+        return widget.palette() if widget is not None else app.palette()
+
+    @classmethod
+    def is_dark_mode(cls, widget=None):
+        palette = cls._get_palette(widget)
+        if palette is None:
+            return False
+        window_color = palette.color(QPalette.ColorRole.Window)
+        text_color = palette.color(QPalette.ColorRole.WindowText)
+        return window_color.lightness() < text_color.lightness()
+
+    @classmethod
+    def color(cls, role, widget=None, fallback="#ffffff"):
+        palette = cls._get_palette(widget)
+        if palette is None:
+            return fallback
+        return palette.color(role).name()
+
+    @classmethod
+    def alternate_base_color(cls, widget=None):
+        palette = cls._get_palette(widget)
+        if palette is None:
+            return "#2c2a2a" if cls.is_dark_mode(widget) else "#e9e7e3"
+
+        base_color = palette.color(QPalette.ColorRole.Base)
+        alt_color = base_color.lighter(150) if cls.is_dark_mode(widget) else base_color.darker(104)
+
+        return alt_color.name()
+
+    @classmethod
+    def selector_colors(cls, widget=None):
+        is_dark = cls.is_dark_mode(widget)
+        fallback_color = "#ffffff" if is_dark else "#000000"
+        base = cls.color(QPalette.ColorRole.Base, widget=widget, fallback=fallback_color)
+        alt = cls.alternate_base_color(widget=widget)
+        if cls.is_dark_mode(widget):
+            return alt, base
+        return base, alt
 
 
 def _get_geom_type(geometry_type: QgsGeometryType = None):

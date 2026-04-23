@@ -174,6 +174,8 @@ class GwSelector:
             color_rows = tools_os.set_boolean(stylesheet.get('rowsColor'), False)
 
         selection_modes = {}
+        # selector_alt_row_color, selector_bg_color = tools_gw.ThemeManager.selector_colors(dialog)
+        selector_bg_color, selector_alt_row_color = tools_gw.ThemeManager.selector_colors(dialog)
         for form_tab in json_result['body']['form']['formTabs']:
 
             tab_name = form_tab['tabName']
@@ -191,7 +193,7 @@ class GwSelector:
             scroll_area = QScrollArea(main_tab)
             scroll_area.setObjectName(tab_name)
             scroll_area.setProperty('selector_type', form_tab['selectorType'])
-            scroll_area.viewport().setStyleSheet("background-color: white;")
+            scroll_area.viewport().setStyleSheet(f"background-color: {selector_bg_color};")
             tab_widget = QWidget()
             tab_widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding)
             if filter:
@@ -309,7 +311,9 @@ class GwSelector:
                         style += field.get('stylesheet')
                     # Set background color every other item (if enabled)
                     if color_rows and order % 2 == 0:
-                        style += "background-color: #E9E7E3"
+                        if style and not style.rstrip().endswith(";"):
+                            style += ";"
+                        style += f"background-color: {selector_alt_row_color};"
                     if style:
                         widget.setStyleSheet(style)
 
