@@ -894,8 +894,8 @@ class GwNetscenarioManagerButton(GwAction):
             graphconfig = json.dumps(row[2])
             the_geom = row[3]
             active = str(row[4]).lower()
-            sql = f"INSERT INTO ve_{view} (netscenario_id, dma_id, name, pattern_id, graphconfig, the_geom, active) " \
-                  f"VALUES ({self.selected_netscenario_id}, '{feature_id}', '{dma_name}', '{pattern_id}', $${graphconfig}$$, $${the_geom}$$, {active});"
+            sql = f"INSERT INTO ve_{view} (netscenario_id, name, pattern_id, graphconfig, the_geom, active) " \
+                  f"VALUES ({self.selected_netscenario_id}, '{dma_name}', '{pattern_id}', $${graphconfig}$$, $${the_geom}$$, {active});"
             result = tools_db.execute_sql(sql)
         elif view == 'plan_netscenario_presszone':
             sql = f"SELECT name, head, graphconfig, the_geom, active FROM presszone WHERE presszone_id = '{feature_id}';"
@@ -911,8 +911,8 @@ class GwNetscenarioManagerButton(GwAction):
             graphconfig = json.dumps(row[2])
             the_geom = row[3]
             active = str(row[4]).lower()
-            sql = f"INSERT INTO ve_{view} (netscenario_id, presszone_id, name, head, graphconfig, the_geom, active) " \
-                  f"VALUES ({self.selected_netscenario_id}, '{feature_id}', '{presszone_name}', {head_sql}, $${graphconfig}$$, $${the_geom}$$, {active});"
+            sql = f"INSERT INTO ve_{view} (netscenario_id, name, head, graphconfig, the_geom, active) " \
+                  f"VALUES ({self.selected_netscenario_id}, '{presszone_name}', {head_sql}, $${graphconfig}$$, $${the_geom}$$, {active});"
             result = tools_db.execute_sql(sql)
         else:
             sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{feature_id}');"
