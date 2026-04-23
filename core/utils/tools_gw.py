@@ -2086,7 +2086,9 @@ def build_dialog_info(dialog, result, my_json=None, layout_positions=None, tab_n
         grid_layout.addWidget(widget, order, 1)
 
     vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-    grid_layout.addItem(vertical_spacer1)
+    spacer_row = grid_layout.rowCount()
+    grid_layout.addItem(vertical_spacer1, spacer_row, 0, 1, 2)
+    grid_layout.setRowStretch(spacer_row, 1)
 
     # Handle actions dynamically based on tab_name
     form_config = result['body'].get('form', {})

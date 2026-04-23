@@ -833,7 +833,9 @@ class GwInfo(QObject):
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-            layout.addItem(vertical_spacer1)
+            spacer_row = layout.rowCount()
+            layout.addItem(vertical_spacer1, spacer_row, 0, 1, 2)
+            layout.setRowStretch(spacer_row, 1)
 
         # Manage dscenario sub-tab from epa tab
         try:
