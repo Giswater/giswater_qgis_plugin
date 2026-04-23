@@ -9,7 +9,7 @@ UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_con
 
 UPDATE config_form_fields AS t SET widgetcontrols = v.text::json FROM (
 	VALUES
-	('btn_accept', 'arc', 'form_feature', 'tab_none', '{"text": "Accept"}'),
+	('btn_accept', 'arc', 'form_feature', 'tab_none', '{"text": "Acceptar"}'),
     ('btn_apply', 'arc', 'form_feature', 'tab_none', '{"text": "Aplicar"}'),
     ('btn_cancel', 'arc', 'form_feature', 'tab_none', '{"text": "Cancel"}'),
     ('btn_accept', 'connec', 'form_feature', 'tab_none', '{"text": "Acceptar"}'),
@@ -28,7 +28,7 @@ UPDATE config_form_fields AS t SET widgetcontrols = v.text::json FROM (
     ('btn_close', 'generic', 'dscenario', 'tab_none', '{"text": "Close"}'),
     ('btn_close', 'generic', 'dscenario_manager', 'tab_none', '{"text": "Close"}'),
     ('btn_close', 'generic', 'epa_manager', 'tab_none', '{"text": "Close"}'),
-    ('btn_accept', 'generic', 'epa_selector', 'tab_none', '{"text": "Accept"}'),
+    ('btn_accept', 'generic', 'epa_selector', 'tab_none', '{"text": "Acceptar"}'),
     ('btn_cancel', 'generic', 'epa_selector', 'tab_none', '{"text": "Cancel"}'),
     ('btn_accept', 'generic', 'form_featuretype_change', 'tab_none', '{"text": "Acceptar"}'),
     ('btn_cancel', 'generic', 'form_featuretype_change', 'tab_none', '{"text": "Cancel"}'),

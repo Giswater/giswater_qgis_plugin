@@ -324,7 +324,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (387, NULL, NULL, 'Encontrar arcos cortos'),
     (389, NULL, NULL, 'Nodos con valores duplicados de top_elev, ymax y elev'),
     (390, NULL, NULL, 'Arcos con valores duplicados de y y elev'),
-    (391, 'nodos con epa_type SIN DEFINIR actuando como node_1 o node_2 de arcos. Por favor, verifica tus datos antes de continuar.', 'No hay arcos más cortos que el valor establecido como proximidad de nodo.', 'Arcos más cortos que el valor establecido como proximidad del nodo'),
+    (391, 'Arcos con una longitud inferior al valor establecido como proximidad de nodo. Por favor, compruebe sus datos antes de continuar.', 'No hay arcos más cortos que el valor establecido como proximidad de nodo.', 'Arcos más cortos que el valor establecido como proximidad del nodo'),
     (393, NULL, NULL, 'Comprobar barranco duplicado'),
     (394, NULL, NULL, 'Compruebe el enlace en topocontrol'),
     (395, 'bombas con valores faltantes en la columna obligatoria to_arc.', 'Valores faltantes de bomba to_arc verificados. No se perdieron valores obligatorios.', 'Comprobar to_arc missed VALUES para bombas'),
