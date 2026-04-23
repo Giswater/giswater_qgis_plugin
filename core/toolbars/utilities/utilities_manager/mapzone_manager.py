@@ -6,13 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import json
+import copy
 
 from functools import partial
 from qgis.PyQt.sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QDateTime
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton, QHeaderView, QListWidget
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QPushButton, QHeaderView, QListWidget, QLineEdit, QCheckBox, QTabWidget
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
 
@@ -54,60 +55,33 @@ class GwMapzoneManager:
         # The -901 is transformed to user selected exploitation in the mapzones analysis
         self.user_selected_exploitation = '-901'
         self._flood_enabled_by_tab = {}
+        self._dynamic_dialog_result = None
 
     def manage_mapzones(self):
+        """Open mapzone manager with dynamic widgets and Python signal wiring."""
 
         # Create dialog
         self.mapzone_mng_dlg = GwMapzoneManagerUi(self)
         tools_gw.load_settings(self.mapzone_mng_dlg)
+        if not self._setup_dynamic_dialog():
+            tools_qgis.show_warning("Mapzone manager dynamic config not found.")
+            return
 
-        # Add icons
-        tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "169")
-        tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "174")
+        if not self._load_main_tabs():
+            return
+
+        # Icons come from config_form_fields.stylesheet.icon
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
-        tabs = []
-        project_tabs = {'ws': ['macrosector', 'sector', 'presszone', 'macrodma', 'dma', 'macrodqa', 'dqa', 'macroomzone', 'supplyzone', 'crmzone'],
-                        'ud': ['macrosector', 'sector', 'drainzone', 'dwfzone', 'dma', 'macroomzone']}
-
-        tabs.extend(project_tabs.get(global_vars.project_type, []))
-
-        for tab in tabs:
-            view = f'v_ui_{tab}'
-            qtableview = QTableView()
-            qtableview.setObjectName(f"tbl_{view}")
-            qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
-            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
-
-            # Populate custom context menu
-            qtableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-            qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
-
-            tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, f"{view.split('_')[-1].capitalize()}")
-            self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
-
-        # Restore last active tab for this project type
+        # Restore state
         self._restore_last_tab()
-
-        # Restore show inactive checkbox state
         self._restore_show_inactive_state()
 
-        # Connect signals
-        self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
-        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._handle_flood_analysis_click))
-        self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
-        self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
-        self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
-        self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
-        self.mapzone_mng_dlg.btn_update.clicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
-        self.mapzone_mng_dlg.btn_delete.clicked.connect(partial(self._manage_delete))
+        # Keep only lifecycle/non-config-driven signals in Python.
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
-        self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
         self.mapzone_mng_dlg.finished.connect(partial(self._on_dialog_closed))
-
-        # Connect checkbox state change to save settings
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(self._save_show_inactive_state)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, 'mapzone_manager'))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
@@ -116,6 +90,245 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg, None))
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
+
+    def _setup_dynamic_dialog(self):
+        """Load and bind dynamic widgets for mapzone manager (strict mode)."""
+
+        json_result = self._load_dynamic_dialog_config()
+        if not json_result:
+            return False
+        self._dynamic_dialog_result = json_result
+        setattr(tools_gw, 'mapzone_manager', self)
+        
+        try:
+            self._manage_dlg_widgets(json_result)
+            self._bind_dynamic_widgets()
+            self._connect_dynamic_widget_signals(json_result)
+        except Exception:
+            self._clear_dynamic_module_reference()
+            raise
+        required_widgets = {
+            'txt_name': self.mapzone_mng_dlg.txt_name,
+            'chk_active': self.mapzone_mng_dlg.chk_active,
+            'main_tab': self.mapzone_mng_dlg.main_tab,
+            'btn_flood': self.mapzone_mng_dlg.btn_flood,
+            'btn_execute': self.mapzone_mng_dlg.btn_execute,
+            'btn_config': self.mapzone_mng_dlg.btn_config,
+            'btn_toggle_active': self.mapzone_mng_dlg.btn_toggle_active,
+            'btn_create': self.mapzone_mng_dlg.btn_create,
+            'btn_update': self.mapzone_mng_dlg.btn_update,
+            'btn_delete': self.mapzone_mng_dlg.btn_delete,
+            'btn_cancel': self.mapzone_mng_dlg.btn_cancel,
+        }
+        missing = [name for name, widget in required_widgets.items() if widget is None]
+        if missing:
+            tools_qgis.show_warning("Mapzone dynamic widgets not found", parameter=", ".join(missing), dialog=self.mapzone_mng_dlg)
+            self._clear_dynamic_module_reference()
+            return False
+        return True
+
+    def _load_dynamic_dialog_config(self):
+        """Populate mapzone manager dialog from config_form_fields using gw_fct_get_dialog."""
+
+        form = {"formName": "mapzone_manager", "formType": "form_mapzone"}
+        body = {"client": {"cur_user": tools_db.current_user}, "form": form}
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+        if not json_result or json_result.get('status') != 'Accepted':
+            return None
+        if not json_result.get('body', {}).get('data', {}).get('fields'):
+            return None
+        return json_result
+
+    def _manage_dlg_widgets(self, complet_result):
+        """Create dynamic widgets using shared tools_gw pipeline plus mapzone-only gaps."""
+
+        normalized_result = copy.deepcopy(complet_result)
+        fields = normalized_result.get('body', {}).get('data', {}).get('fields') or []
+        layouts = normalized_result.get('body', {}).get('form', {}).get('layouts', {}) or {}
+        layout_orientations = {
+            layout_name: (layout_info or {}).get('lytOrientation')
+            for layout_name, layout_info in layouts.items()
+            if (layout_info or {}).get('lytOrientation')
+        }
+        tabwidget_fields = []
+
+        for field in fields:
+            if field is None or field.get('hidden'):
+                continue
+
+            if field.get('layoutorder') is None:
+                msg = "The field layoutorder is not configured for"
+                param = f"formname:mapzone_manager, columnname:{field.get('columnname')}"
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Critical, parameter=param, dialog=self.mapzone_mng_dlg)
+                field['hidden'] = True
+                continue
+
+            # Keep manager buttons as QPushButton (avoid _manage_button topology fallback).
+            if field.get('widgettype') == 'button':
+                stylesheet = field.get('stylesheet') or {}
+                if not field.get('value') and stylesheet.get('icon') is None:
+                    fallback_text = (field.get('widgetcontrols') or {}).get('text') or field.get('label') or ''
+                    field['value'] = fallback_text
+
+            # tools_gw.set_widgets currently skips tabwidget; inject it after generic build.
+            if field.get('widgettype') == 'tabwidget':
+                tabwidget_fields.append(field)
+
+        tools_gw.manage_dlg_widgets(self, self.mapzone_mng_dlg, normalized_result)
+
+        for field in tabwidget_fields:
+            widget_name = field.get('widgetname') or f"{field.get('tabname', 'tab_none')}_{field.get('columnname', 'main_tab')}"
+            if self.mapzone_mng_dlg.findChild(QTabWidget, widget_name) is not None:
+                continue
+
+            layout = self.mapzone_mng_dlg.findChild(QGridLayout, field.get('layoutname'))
+            if layout is None:
+                continue
+
+            orientation = layout_orientations.get(layout.objectName(), "vertical")
+            layout.setProperty('lytOrientation', orientation)
+
+            widget = QTabWidget(self.mapzone_mng_dlg)
+            widget.setObjectName(widget_name)
+            if field.get('columnname'):
+                widget.setProperty('columnname', field['columnname'])
+            if 'iseditable' in field:
+                widget.setEnabled(bool(field['iseditable']))
+
+            tools_gw.add_widget_combined(self.mapzone_mng_dlg, field, None, widget, 0)
+
+    def _bind_widget(self, widget_type, *columnnames):
+        """Find a dynamic widget by prefixed or plain objectName."""
+        widget = None
+        for columnname in columnnames:
+            widget = self.mapzone_mng_dlg.findChild(widget_type, f"tab_none_{columnname}")
+            if widget is None:
+                widget = self.mapzone_mng_dlg.findChild(widget_type, columnname)
+            if widget is not None:
+                break
+        return widget
+
+    def _get_dynamic_fields(self, complet_result=None):
+        result = complet_result
+        if result is None:
+            result = self._dynamic_dialog_result
+        if result is None:
+            return []
+
+        body = result.get('body')
+        if not isinstance(body, dict):
+            return []
+
+        data = body.get('data')
+        if not isinstance(data, dict):
+            return []
+
+        fields = data.get('fields')
+        if not isinstance(fields, list):
+            return []
+
+        return fields
+
+    def _find_field_by_columnnames(self, columnnames, complet_result=None):
+        fields = self._get_dynamic_fields(complet_result)
+        for field in fields:
+            if field is None:
+                continue
+            if field.get('columnname') in columnnames:
+                return field
+        return None
+
+    def _get_tabwidget_field(self):
+        """Return the first visible tabwidget field from dynamic dialog data."""
+        fields = self._get_dynamic_fields()
+        for field in fields:
+            if field is None:
+                continue
+            if field.get('hidden'):
+                continue
+            if field.get('widgettype') == 'tabwidget':
+                return field
+        return None
+
+    def _bind_dynamic_widgets(self):
+        """Bind dynamic widgets using the same explicit pattern used elsewhere."""
+        # Keep legacy alias while DB is being normalized to txt_name.
+        txt_field = self._find_field_by_columnnames(("txt_name",))
+        txt_column = (txt_field or {}).get('columnname')
+        self.mapzone_mng_dlg.txt_name = self._bind_widget(QLineEdit, txt_column) if txt_column else None
+        self.mapzone_mng_dlg.chk_active = self._bind_widget(QCheckBox, "chk_active")
+        tabwidget_field = self._get_tabwidget_field()
+        tabwidget_column = (tabwidget_field or {}).get('columnname')
+        self.mapzone_mng_dlg.main_tab = self._bind_widget(QTabWidget, tabwidget_column) if tabwidget_column else None
+        self.mapzone_mng_dlg.btn_flood = self._bind_widget(QPushButton, "btn_flood")
+        self.mapzone_mng_dlg.btn_execute = self._bind_widget(QPushButton, "btn_execute")
+        self.mapzone_mng_dlg.btn_config = self._bind_widget(QPushButton, "btn_config")
+        self.mapzone_mng_dlg.btn_toggle_active = self._bind_widget(QPushButton, "btn_toggle_active")
+        self.mapzone_mng_dlg.btn_create = self._bind_widget(QPushButton, "btn_create")
+        self.mapzone_mng_dlg.btn_update = self._bind_widget(QPushButton, "btn_update")
+        self.mapzone_mng_dlg.btn_delete = self._bind_widget(QPushButton, "btn_delete")
+        self.mapzone_mng_dlg.btn_cancel = self._bind_widget(QPushButton, "btn_cancel")
+
+    def _connect_dynamic_widget_signals(self, complet_result):
+        """Connect widget signals from DB metadata when handler belongs to this manager."""
+        txt_field = self._find_field_by_columnnames(("txt_name"), complet_result)
+        if txt_field is None or self.mapzone_mng_dlg.txt_name is None:
+            return
+
+        widgetfunction = txt_field.get('widgetfunction')
+        if not isinstance(widgetfunction, dict):
+            return
+
+        module_name = widgetfunction.get('module')
+        function_name = widgetfunction.get('functionName')
+        if not function_name:
+            return
+        if module_name and module_name != 'mapzone_manager':
+            return
+
+        handler = getattr(self, function_name, None)
+        if callable(handler):
+            self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(handler))
+
+    def _load_main_tabs(self):
+        """Create dynamic manager tabs (table views) for project mapzone types."""
+        if self.mapzone_mng_dlg.main_tab is None:
+            return False
+
+        self.mapzone_mng_dlg.main_tab.clear()
+        tabs_config = []
+        tabwidget_field = self._get_tabwidget_field()
+        if tabwidget_field:
+            tabwidget_column = tabwidget_field.get('columnname')
+            tabs_key = f"tabs_{tabwidget_column}" if tabwidget_column else None
+            if tabs_key:
+                tabs_config = tabwidget_field.get(tabs_key) or []
+
+        tabs = []
+        for tab_cfg in tabs_config:
+            if not isinstance(tab_cfg, dict):
+                continue
+            tab_name = tab_cfg.get('tabName') or tab_cfg.get('tabname')
+            if not tab_name:
+                continue
+            mapzone_type = tab_name.replace('tab_', '', 1)
+            tabs.append((mapzone_type, tab_cfg.get('tabLabel') or mapzone_type.capitalize()))
+
+        if not tabs:
+            tools_qgis.show_warning("Mapzone manager tabs not configured in DB.", dialog=self.mapzone_mng_dlg)
+            return False
+
+        for mapzone_type, tab_label in tabs:
+            view = f'v_ui_{mapzone_type}'
+            qtableview = QTableView()
+            qtableview.setObjectName(f"tbl_{view}")
+            qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
+            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
+            qtableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
+            tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, tab_label)
+            self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
+        return self.mapzone_mng_dlg.main_tab.count() > 0
 
     def _manage_highlight(self, qtableview, view, index):
         """ Creates rubberband to indicate which feature is selected """
@@ -144,6 +357,8 @@ class GwMapzoneManager:
     def _manage_current_changed(self):
         """ Manages tab changes """
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
+            return
+        if self.mapzone_mng_dlg.main_tab.currentWidget() is None:
             return
         # Get the state of the "show inactive" checkbox
         show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
@@ -227,10 +442,13 @@ class GwMapzoneManager:
         # Manage exception if dialog is closed
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
+        current_widget = self.mapzone_mng_dlg.main_tab.currentWidget()
+        if current_widget is None:
+            return
 
         # Get the table name
-        self.table_name = f"{self.mapzone_mng_dlg.main_tab.currentWidget().objectName()}"
-        widget = self.mapzone_mng_dlg.main_tab.currentWidget()
+        self.table_name = f"{current_widget.objectName()}"
+        widget = current_widget
 
         if self.schema_name not in self.table_name:
             self.table_name = self.schema_name + "." + self.table_name
@@ -296,7 +514,7 @@ class GwMapzoneManager:
         widget_table.model().setFilter(expr)
         widget_table.model().select()
 
-    def _open_mapzones_analysis(self):
+    def _open_mapzones_analysis(self, *args, **kwargs):
         """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
         mapzone_name = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
         if self._is_readonly_mapzone(self.mapzone_mng_dlg, mapzone_name):
@@ -339,7 +557,7 @@ class GwMapzoneManager:
         expr = "" if show_inactive else "active is true"
         self._fill_mapzone_table(expr=expr)
 
-    def _handle_flood_analysis_click(self):
+    def _handle_flood_analysis_click(self, *args, **kwargs):
         """Handle flood button click based on user settings."""
         if self._is_readonly_mapzone(self.mapzone_mng_dlg):
             return
@@ -668,8 +886,14 @@ class GwMapzoneManager:
 
     def _on_dialog_closed(self):
         """Ensure snapping is deactivated and Pan tool is set when dialog closes."""
+        self._clear_dynamic_module_reference()
         self._cancel_snapping_tool(self.mapzone_mng_dlg, None)
         self.iface.actionPan().trigger()
+
+    def _clear_dynamic_module_reference(self):
+        """Remove temporary tools_gw module alias for this manager instance."""
+        if getattr(tools_gw, 'mapzone_manager', None) is self:
+            delattr(tools_gw, 'mapzone_manager')
 
     def _run_mapzones_analysis(self, graph_class, exploitation):
         """Executes the mapzones analysis with only the required parameters."""
@@ -700,8 +924,10 @@ class GwMapzoneManager:
 
     # region config button
 
-    def manage_config(self, dialog, tableview=None):
+    def manage_config(self, dialog=None, tableview=None, *args, **kwargs):
         """ Dialog from config button """
+        if dialog is None:
+            dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone():
             return
 
@@ -1377,7 +1603,7 @@ class GwMapzoneManager:
         tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
 
-    def _manage_toggle_active(self):
+    def _manage_toggle_active(self, *args, **kwargs):
         if self._is_readonly_mapzone():
             return
         # Get selected row
@@ -1402,7 +1628,9 @@ class GwMapzoneManager:
         # Refresh tableview
         self._manage_current_changed()
 
-    def manage_create(self, dialog, tableview=None):
+    def manage_create(self, dialog=None, tableview=None, *args, **kwargs):
+        if dialog is None:
+            dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone(dialog):
             return
         if tableview is None:
@@ -1422,7 +1650,9 @@ class GwMapzoneManager:
 
         self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT")
 
-    def manage_update(self, dialog, tableview=None):
+    def manage_update(self, dialog=None, tableview=None, *args, **kwargs):
+        if dialog is None:
+            dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone(dialog):
             return
         # Get selected row
@@ -1460,7 +1690,7 @@ class GwMapzoneManager:
 
         self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
 
-    def _manage_delete(self):
+    def _manage_delete(self, *args, **kwargs):
         if self._is_readonly_mapzone(self.mapzone_mng_dlg):
             return
         # Get selected row
