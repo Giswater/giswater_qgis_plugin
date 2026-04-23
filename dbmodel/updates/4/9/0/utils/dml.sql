@@ -363,6 +363,69 @@ WHERE fid=287;
 UPDATE sys_style SET stylevalue = replace(stylevalue, 'MS Shell Dlg 2', 'Arial') WHERE stylevalue LIKE '%MS Shell Dlg 2%';
 UPDATE sys_style SET stylevalue = replace(stylevalue, 'Calibri Light', 'Arial') WHERE stylevalue LIKE '%Calibri Light%';
 
+-- 23/04/2026
 UPDATE sys_function SET function_alias='CHECK DATA ACCORDING TO EPA RULES' WHERE function_name='gw_fct_pg2epa_check_data';
-
 UPDATE cat_feature_node SET graph_delimiter = '{NONE}' WHERE graph_delimiter IS NULL;
+
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_mapzone_mng_1', 'lyt_mapzone_mng_1', 'layoutMapzoneManager1', '{"lytOrientation":"horizontal"}'::json);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_mapzone_mng_2', 'lyt_mapzone_mng_2', 'layoutMapzoneManager2', '{"lytOrientation":"horizontal"}'::json);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('formtype_typevalue', 'form_mapzone', 'form_mapzone', 'formMapzone', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_dma', 'tab_dma', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_macroomzone', 'tab_macroomzone', 'tabRelations', NULL);
+
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_macrosector', 'Macrosector', 'Macrosector', 'role_basic', NULL, NULL, 1, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_sector', 'Sector', 'Sector', 'role_basic', NULL, NULL, 2, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_dma', 'Dma', 'Dma', 'role_basic', NULL, NULL, 3, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_macroomzone', 'Macroomzone', 'Macroomzone', 'role_basic', NULL, NULL, 4, '{4}');
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'hspacer_lyt_bot_3', 'lyt_buttons', 1, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_cancel', 'lyt_buttons', 2, 'string', 'button', NULL, 'Close dialog', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Close", "saveValue": false}'::json, '{"functionName": "close_manager",  "parameters":{}}'::json, NULL, false, 1);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'txt_name', 'lyt_mapzone_mng_1', 1, 'string', 'text', 'Filter by: name, id OR code:', 'Word filtered by', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName": "_txt_name_changed", "parameters":{"columnfind":"name, id, code"}}'::json, 'tbl_mapzone_manager', false, NULL);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'chk_active', 'lyt_mapzone_mng_1', 2, 'boolean', 'check', 'Show inactive', 'Show inactive mapzones', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_flood', 'lyt_mapzone_mng_1', 3, 'string', 'button', NULL, 'Flood action', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"174"}'::json, '{"saveValue":false}'::json, '{"functionName": "_handle_flood_analysis_click", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 4);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_execute', 'lyt_mapzone_mng_1', 4, 'string', 'button', NULL, 'Execute action', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"169"}'::json, '{"saveValue":false}'::json, '{"functionName": "_open_mapzones_analysis", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 3);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_config', 'lyt_mapzone_mng_1', 5, 'string', 'button', NULL, 'Open configuration', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Config", "saveValue": false, "onContextMenu": "Config"}'::json, '{"functionName": "manage_config", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 5);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_toggle_active', 'lyt_mapzone_mng_1', 6, 'string', 'button', NULL, 'Toggle active status', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Toggle active", "saveValue": false, "onContextMenu": "Toggle active"}'::json, '{"functionName": "_manage_toggle_active", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 6);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_create', 'lyt_mapzone_mng_1', 7, 'string', 'button', NULL, 'Create mapzone', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Create", "saveValue": false, "onContextMenu": "Create"}'::json, '{"functionName": "manage_create", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 7);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_update', 'lyt_mapzone_mng_1', 8, 'string', 'button', NULL, 'Update mapzone', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Update", "saveValue": false, "onContextMenu": "Update"}'::json, '{"functionName": "manage_update", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 8);
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_delete', 'lyt_mapzone_mng_1', 9, 'string', 'button', NULL, 'Delete mapzone', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Delete", "saveValue": false, "onContextMenu": "Delete"}'::json, '{"functionName": "_manage_delete", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 9);

@@ -117,3 +117,31 @@ INSERT INTO dwfzone (dwfzone_id, code, "name", dwfzone_type, expl_id, sector_id,
 -- 22/04/2026
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES (4630, 'The node does not belong to the selected lot', 'Choose a node that belongs to the selected lot or change selected lot', 2, true, 'ud', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+-- 23/04/2026
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_drainzone', 'tab_drainzone', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_dwfzone', 'tab_dwfzone', 'tabRelations', NULL);
+
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_drainzone', 'Drainzone', 'Drainzone', 'role_basic', NULL, NULL, 5, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_dwfzone', 'Dwfzone', 'Dwfzone', 'role_basic', NULL, NULL, 6, '{4}');
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'tab_main', 'lyt_mapzone_mng_2', 1, NULL, 'tabwidget', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "tabs": [
+    "tab_macrosector",
+	"tab_sector",
+	"tab_drainzone",
+	"tab_dwfzone",
+	"tab_dma",
+	"tab_macroomzone"
+  ]
+}'::json, NULL, NULL, false, 10);

@@ -367,3 +367,59 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_pump_additional', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_shortpipe', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, iseditable) VALUES('ve_epa_valve', 'form_feature', 'tab_epa', 'nodarc_id', 'lyt_epa_data_2', 1, 'string', 'text', 'Nodarc id:', 'Nodarc id', false) ON CONFLICT DO NOTHING;
+
+-- 23/04/2026
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_presszone', 'tab_presszone', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_macrodma', 'tab_macrodma', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_macrodqa', 'tab_macrodqa', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_dqa', 'tab_dqa', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_supplyzone', 'tab_supplyzone', 'tabRelations', NULL);
+INSERT INTO config_typevalue
+(typevalue, id, idval, camelstyle, addparam)
+VALUES('tabname_typevalue', 'tab_crmzone', 'tab_crmzone', 'tabRelations', NULL);
+
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_presszone', 'Presszone', 'Presszone', 'role_basic', NULL, NULL, 5, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_macrodma', 'Macrodma', 'Macrodma', 'role_basic', NULL, NULL, 6, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_macrodqa', 'Macrodqa', 'Macrodqa', 'role_basic', NULL, NULL, 7, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_dqa', 'Dqa', 'Dqa', 'role_basic', NULL, NULL, 8, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_supplyzone', 'Supplyzone', 'Supplyzone', 'role_basic', NULL, NULL, 9, '{4}');
+INSERT INTO config_form_tabs
+(formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('form_mapzone', 'tab_crmzone', 'Crmzone', 'Crmzone', 'role_basic', NULL, NULL, 10, '{4}');
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'tab_main', 'lyt_mapzone_mng_2', 1, NULL, 'tabwidget', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "tabs": [
+    "tab_macrosector",
+	"tab_sector",
+	"tab_presszone",
+	"tab_macrodma",
+	"tab_dma",
+	"tab_macrodqa",
+	"tab_dqa",
+	"tab_macroomzone",
+	"tab_supplyzone",
+	"tab_crmzone"
+  ]
+}'::json, NULL, NULL, false, 10);
