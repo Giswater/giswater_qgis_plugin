@@ -11,37 +11,30 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_plan_netscenario()  RETURNS
 $BODY$
 
 DECLARE 
-v_newpattern json;
-v_status boolean;
-v_value text;
-v_table text;
+	v_table text = TG_ARGV[0];
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
-	v_table = TG_ARGV[0];
-
 	IF TG_OP = 'INSERT' THEN
 		
 		IF v_table = 'DMA' THEN
 
-			-- dma_id
-			IF NEW.dma_id is null THEN
-				SELECT max(dma_id) +1 into NEW.dma_id FROM plan_netscenario_dma WHERE netscenario_id = NEW.netscenario_id;
+			IF NEW.dma_id != (SELECT last_value FROM urn_id_seq) OR NEW.dma_id IS NULL THEN
+				NEW.dma_id = (SELECT nextval('urn_id_seq'));
 			END IF;
 
 			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, name, code, descript, pattern_id, graphconfig, the_geom, active, stylesheet, expl_id, muni_id, sector_id)
-			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.name, NEW.code, NEW.descript, NEW.pattern_id, NEW.graphconfig::json, NEW.the_geom, NEW.active, NEW.stylesheet::json, NEW.expl_id, NEW.muni_id, NEW.sector_id) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
+			VALUES (NEW.netscenario_id, NEW.dma_id, NEW.name, NEW.code, NEW.descript, NEW.pattern_id, NEW.graphconfig::json, NEW.the_geom, NEW.active, NEW.stylesheet::json, COALESCE(NEW.expl_id, '{0}'), COALESCE(NEW.muni_id, '{0}'), COALESCE(NEW.sector_id, '{0}')) ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 
 		ELSIF v_table = 'PRESSZONE' THEN
 
-			-- presszone_id
-			IF NEW.presszone_id is null THEN
-				 SELECT max(presszone_id) +1 into NEW.presszone_id FROM plan_netscenario_presszone WHERE netscenario_id = NEW.netscenario_id;
+			IF NEW.presszone_id != (SELECT last_value FROM urn_id_seq) OR NEW.presszone_id IS NULL THEN
+				NEW.presszone_id = (SELECT nextval('urn_id_seq'));
 			END IF;
 
 			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, name, code, descript, head, graphconfig, the_geom, active, presszone_type, stylesheet, expl_id, muni_id, sector_id)
-			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.name, NEW.code, NEW.descript, NEW.head, NEW.graphconfig::json, NEW.the_geom, NEW.active, NEW.presszone_type, NEW.stylesheet::json, NEW.expl_id, NEW.muni_id, NEW.sector_id) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
+			VALUES (NEW.netscenario_id, NEW.presszone_id, NEW.name, NEW.code, NEW.descript, NEW.head, NEW.graphconfig::json, NEW.the_geom, NEW.active, NEW.presszone_type, NEW.stylesheet::json, COALESCE(NEW.expl_id, '{0}'), COALESCE(NEW.muni_id, '{0}'), COALESCE(NEW.sector_id, '{0}')) ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 
 		ELSIF v_table = 'VALVE' THEN
 
