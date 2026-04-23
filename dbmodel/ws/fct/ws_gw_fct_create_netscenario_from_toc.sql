@@ -92,12 +92,12 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3766", "function":"3262", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 		IF v_netscenario_type = 'DMA' THEN
-			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id,name, code, descript, pattern_id, graphconfig, the_geom, active)
-			SELECT v_scenario_id, dma_id, name, code, descript, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE (v_expl_id = ANY(expl_id) AND active = true) OR dma_id = 0 OR dma_id = -1
+			INSERT INTO plan_netscenario_dma (netscenario_id, name, code, descript, pattern_id, graphconfig, the_geom, active)
+			SELECT v_scenario_id, name, code, descript, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE (v_expl_id = ANY(expl_id) AND active = true) OR dma_id = 0 OR dma_id = -1
 			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 		ELSIF v_netscenario_type = 'PRESSZONE' THEN
-			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,name, code, descript, head, graphconfig, the_geom, active)
-			SELECT v_scenario_id, presszone_id, name, code, descript, head, graphconfig, the_geom, TRUE FROM presszone WHERE (v_expl_id = ANY(expl_id) AND active = true) OR presszone_id = 0 OR presszone_id = -1
+			INSERT INTO plan_netscenario_presszone (netscenario_id, name, code, descript, head, graphconfig, the_geom, active)
+			SELECT v_scenario_id, name, code, descript, head, graphconfig, the_geom, TRUE FROM presszone WHERE (v_expl_id = ANY(expl_id) AND active = true) OR presszone_id = 0 OR presszone_id = -1
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 

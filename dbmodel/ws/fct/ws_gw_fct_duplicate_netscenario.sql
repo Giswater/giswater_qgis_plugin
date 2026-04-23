@@ -88,12 +88,12 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"3812", "function":"3262", "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 		IF v_netscenario_type = 'DMA' THEN
-			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id, name, code, descript, pattern_id, graphconfig, the_geom) 
-			SELECT v_scenario_id, dma_id, name, code, descript, pattern_id, graphconfig, the_geom FROM plan_netscenario_dma WHERE netscenario_id= v_copy_from
+			INSERT INTO plan_netscenario_dma (netscenario_id, name, code, descript, pattern_id, graphconfig, the_geom) 
+			SELECT v_scenario_id, name, code, descript, pattern_id, graphconfig, the_geom FROM plan_netscenario_dma WHERE netscenario_id= v_copy_from
 			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 		ELSIF v_netscenario_type = 'PRESSZONE' THEN
-			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id, name, code, descript, head, graphconfig, the_geom) 
-			SELECT v_scenario_id, presszone_id, name, code, descript, head, graphconfig, the_geom FROM plan_netscenario_presszone WHERE netscenario_id= v_copy_from
+			INSERT INTO plan_netscenario_presszone (netscenario_id, name, code, descript, head, graphconfig, the_geom) 
+			SELECT v_scenario_id, name, code, descript, head, graphconfig, the_geom FROM plan_netscenario_presszone WHERE netscenario_id= v_copy_from
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 
