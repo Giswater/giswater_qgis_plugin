@@ -31,6 +31,7 @@ drop view if exists ve_inp_connec;
 drop view if exists v_ui_workcat_x_feature_end;
 drop view if exists v_ui_node_x_connection_upstream;
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"data":{"action":"MULTI-DELETE"}, "feature":{"parentLayer":"ve_connec"}}$$);
 drop view if exists v_edit_connec;
 drop view if exists ve_connec;
 

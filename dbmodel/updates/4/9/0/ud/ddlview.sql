@@ -1005,7 +1005,7 @@ AS SELECT ext_rtc_hydrometer_x_data.id,
      JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
   ORDER BY ext_rtc_hydrometer_x_data.hydrometer_id, ext_rtc_hydrometer_x_data.cat_period_id DESC;
 
-
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"data":{"action":"MULTI-DELETE"}, "feature":{"parentLayer":"ve_link"}}$$);
 DROP VIEW IF EXISTS ve_link_gully;
 DROP VIEW IF EXISTS ve_link_connec;
 DROP VIEW IF EXISTS ve_link;
