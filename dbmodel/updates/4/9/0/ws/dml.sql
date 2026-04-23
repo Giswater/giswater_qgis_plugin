@@ -423,3 +423,9 @@ VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'tab_main', 'lyt_mapzone_m
 	"tab_crmzone"
   ]
 }'::json, NULL, NULL, false, 10);
+
+UPDATE config_param_system
+	SET value='{"status":true, "values":[
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head = CASE WHEN top_elev + pressure_exit IS NOT NULL THEN top_elev + pressure_exit ELSE t.head END FROM ve_node_pr_reduc_valve s "},
+{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head= CASE WHEN top_elev + hmax/2 IS NOT NULL THEN top_elev + hmax/2 ELSE t.head END FROM ve_node_tank s "}]}'
+	WHERE "parameter"='epa_automatic_man2graph_values';
