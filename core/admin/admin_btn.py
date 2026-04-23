@@ -1722,9 +1722,6 @@ class GwAdminButton:
 
         info_updates.setText(self.message_update)
 
-        if str(self.message_update) == '':
-            self.dlg_readsql_show_info.btn_update.setEnabled(False)
-
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_readsql_show_info)
 
