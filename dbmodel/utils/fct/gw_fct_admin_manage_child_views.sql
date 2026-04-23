@@ -63,6 +63,7 @@ v_error_context text;
 v_newcolumn text;
 v_query json;
 v_sys_feature_class text;
+v_parent text;
 
 
 BEGIN
@@ -82,6 +83,7 @@ BEGIN
 	v_newcolumn = ((p_data ->>'data')::json->>'newColumn')::text;
 	v_feature_type = ((p_data ->>'feature')::json->>'featureType')::text;
 	v_sys_feature_class = ((p_data ->>'feature')::json->>'systemId')::text;
+	v_parent = ((p_data ->>'feature')::json->>'parentLayer')::text;
 
 	IF v_cat_feature IS NULL THEN
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
@@ -89,7 +91,11 @@ BEGIN
 
 	IF v_action = 'MULTI-DELETE' THEN
 
-		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
+		FOR v_childview IN
+			SELECT child_layer
+			FROM cat_feature
+			WHERE child_layer IS NOT NULL
+			AND (v_parent IS NULL OR parent_layer = v_parent)
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||'';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
