@@ -363,6 +363,6 @@ WHERE fid=287;
 UPDATE sys_style SET stylevalue = replace(stylevalue, 'MS Shell Dlg 2', 'Arial') WHERE stylevalue LIKE '%MS Shell Dlg 2%';
 UPDATE sys_style SET stylevalue = replace(stylevalue, 'Calibri Light', 'Arial') WHERE stylevalue LIKE '%Calibri Light%';
 
-UPDATE sys_function SET function_alias='CHECK DATA ACCORDING TO EPA RULES' WHERE id=2430;
+UPDATE sys_function SET function_alias='CHECK DATA ACCORDING TO EPA RULES' WHERE function_name='gw_fct_pg2epa_check_data';
 
 UPDATE cat_feature_node SET graph_delimiter = '{NONE}' WHERE graph_delimiter IS NULL;
