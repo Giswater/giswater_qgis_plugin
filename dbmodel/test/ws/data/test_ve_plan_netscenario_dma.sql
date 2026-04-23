@@ -19,20 +19,20 @@ INSERT INTO selector_expl (cur_user, expl_id) VALUES (current_user, 1) ON CONFLI
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES ('plan_netscenario_current', '-901', current_user)
 ON CONFLICT ("parameter", cur_user) DO UPDATE SET value = EXCLUDED.value;
 
-INSERT INTO ve_plan_netscenario_dma (netscenario_id, netscenario_name, dma_id, "name", pattern_id, graphconfig, the_geom, active, stylesheet, expl_id, muni_id, sector_id)
+INSERT INTO ve_plan_netscenario_dma (netscenario_id, netscenario_name, code, "name", pattern_id, graphconfig, the_geom, active, stylesheet, expl_id, muni_id, sector_id)
 VALUES(-901, '', -901, '', '', null, null, false, null, '{1}', '{1}', '{0}');
-SELECT is((SELECT count(*)::integer FROM ve_plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: ve_plan_netscenario_dma -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: plan_netscenario_dma -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM ve_plan_netscenario_dma WHERE code = -901), 1, 'INSERT: ve_plan_netscenario_dma -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE code = -901), 1, 'INSERT: plan_netscenario_dma -901 was inserted');
 
 
-UPDATE ve_plan_netscenario_dma SET name = 'updated name' WHERE dma_id = -901;
-SELECT is((SELECT name FROM ve_plan_netscenario_dma WHERE dma_id = -901), 'updated name', 'UPDATE: ve_plan_netscenario_dma -901 was updated');
-SELECT is((SELECT name FROM plan_netscenario_dma WHERE dma_id = -901), 'updated name', 'UPDATE: plan_netscenario_dma -901 was updated');
+UPDATE ve_plan_netscenario_dma SET name = 'updated name' WHERE code = -901;
+SELECT is((SELECT name FROM ve_plan_netscenario_dma WHERE code = -901), 'updated name', 'UPDATE: ve_plan_netscenario_dma -901 was updated');
+SELECT is((SELECT name FROM plan_netscenario_dma WHERE code = -901), 'updated name', 'UPDATE: plan_netscenario_dma -901 was updated');
 
 
-DELETE FROM ve_plan_netscenario_dma WHERE dma_id = -901;
-SELECT is((SELECT count(*)::integer FROM ve_plan_netscenario_dma WHERE dma_id = -901), 0, 'DELETE: ve_plan_netscenario_dma -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE dma_id = -901), 0, 'DELETE: plan_netscenario_dma -901 was deleted');
+DELETE FROM ve_plan_netscenario_dma WHERE code = -901;
+SELECT is((SELECT count(*)::integer FROM ve_plan_netscenario_dma WHERE code = -901), 0, 'DELETE: ve_plan_netscenario_dma -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE code = -901), 0, 'DELETE: plan_netscenario_dma -901 was deleted');
 
 
 SELECT * FROM finish();
