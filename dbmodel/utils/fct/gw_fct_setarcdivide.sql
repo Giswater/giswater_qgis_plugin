@@ -45,7 +45,7 @@ v_arc_divide_tolerance float =0.05;
 v_array_connec varchar [];
 v_array_gully varchar [];
 v_arc_searchnodes float;
-v_newarc varchar;
+v_newarc integer;
 v_visitlocation	float;
 v_eventlocation	float;
 v_srid integer;
