@@ -57,6 +57,8 @@ DROP TRIGGER IF EXISTS gw_trg_fk_array_array_table_expl ON sector;
 DROP TRIGGER IF EXISTS gw_trg_fk_array_array_table_muni ON sector;
 DROP TRIGGER IF EXISTS gw_trg_fk_array_array_table_expl ON macroomzone;
 DROP TRIGGER IF EXISTS gw_trg_fk_array_array_table_expl ON omzone;
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON sector;
+DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON exploitation;
 
 DO $$
 DECLARE
@@ -78,6 +80,14 @@ BEGIN
         FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
         CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE OF muni_id ON macroomzone 
         FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'utils.municipality', 'muni_id');
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE OF sector_id ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id','{"utils.municipality":"sector_id", "exploitation":"sector_id"}');
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE OF expl_id ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id','{"supplyzone":"expl_id", "macrodma":"expl_id", "macrodqa":"expl_id", "macroomzone":"expl_id", "utils.municipality":"expl_id"}');
+
+        DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON utils.municipality;
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE OF muni_id ON utils.municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id','{"supplyzone":"muni_id", "exploitation":"muni_id"}');
     ELSE
         CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE OF muni_id ON exploitation 
         FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
@@ -91,6 +101,14 @@ BEGIN
         FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
         CREATE TRIGGER gw_trg_fk_array_array_table_muni AFTER INSERT OR UPDATE OF muni_id ON macroomzone 
         FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_array_table('muni_id', 'ext_municipality', 'muni_id');
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE OF sector_id ON sector
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('sector_id','{"ext_municipality":"sector_id", "exploitation":"sector_id"}');
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE OF expl_id ON exploitation
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('expl_id','{"supplyzone":"expl_id", "macrodma":"expl_id", "macrodqa":"expl_id", "macroomzone":"expl_id", "ext_municipality":"expl_id"}');
+
+        DROP TRIGGER IF EXISTS gw_trg_fk_array_id_table_update ON ext_municipality;
+        CREATE TRIGGER gw_trg_fk_array_id_table_update AFTER UPDATE OF muni_id ON ext_municipality
+        FOR EACH ROW EXECUTE FUNCTION gw_trg_array_fk_id_table('muni_id','{"supplyzone":"muni_id", "exploitation":"muni_id"}');
     END IF;
 
     CREATE TRIGGER gw_trg_fk_array_array_table_sector AFTER INSERT OR UPDATE OF sector_id ON exploitation 
