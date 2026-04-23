@@ -400,10 +400,10 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
 <qgis version="3.40.8-Bratislava" styleCategories="Symbology|Labeling" labelsEnabled="1">
   <renderer-v2 forceraster="0" referencescale="-1" type="RuleRenderer" enableorderby="0" symbollevels="0">
     <rules key="{fa44a69a-c6e2-45fc-8b74-9424880bcf8e}">
-      <rule label="0% - 50%" filter="&quot;mfull_dept&quot; >= 0 AND &quot;mfull_dept&quot; &lt;= 0.5" key="{5228d50d-7467-4079-b88f-079bc22aa232}" symbol="0"/>
-      <rule label="51% - 70%" filter="&quot;mfull_dept&quot; > 0.5 AND &quot;mfull_dept&quot; &lt;= 0.7" key="{605ca4d9-4f82-4656-b48f-16f77067c1a7}" symbol="1"/>
-      <rule label="71% - 85%" filter="&quot;mfull_dept&quot; > 0.7 AND &quot;mfull_dept&quot; &lt;= 0.85" key="{606f5076-56a8-493b-89b9-60a974e9e6fb}" symbol="2"/>
-      <rule label="86% - 100%" filter="&quot;mfull_dept&quot; > 0.85 AND &quot;mfull_dept&quot; &lt;= 1" key="{f8e30195-8b1c-483f-9d5e-defca173ac2f}" symbol="3"/>
+      <rule label="0% - 50%" filter="&quot;mfull_depth&quot; >= 0 AND &quot;mfull_depth&quot; &lt;= 0.5" key="{5228d50d-7467-4079-b88f-079bc22aa232}" symbol="0"/>
+      <rule label="51% - 70%" filter="&quot;mfull_depth&quot; > 0.5 AND &quot;mfull_depth&quot; &lt;= 0.7" key="{605ca4d9-4f82-4656-b48f-16f77067c1a7}" symbol="1"/>
+      <rule label="71% - 85%" filter="&quot;mfull_depth&quot; > 0.7 AND &quot;mfull_depth&quot; &lt;= 0.85" key="{606f5076-56a8-493b-89b9-60a974e9e6fb}" symbol="2"/>
+      <rule label="86% - 100%" filter="&quot;mfull_depth&quot; > 0.85 AND &quot;mfull_depth&quot; &lt;= 1" key="{f8e30195-8b1c-483f-9d5e-defca173ac2f}" symbol="3"/>
     </rules>
     <symbols>
       <symbol type="line" clip_to_extent="1" alpha="1" is_animated="0" force_rhr="0" frame_rate="10" name="0">

@@ -3282,3 +3282,66 @@ AS SELECT
   FROM anl_arc a
     JOIN selector_expl s ON a.expl_id = s.expl_id 
   WHERE fid = 496 AND s.cur_user = current_user;
+
+
+DROP VIEW IF EXISTS ve_epa_conduit;
+DROP VIEW IF EXISTS v_rpt_arcflow_sum;
+
+CREATE OR REPLACE VIEW v_rpt_arcflow_sum AS 
+SELECT rpt_inp_arc.id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.result_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom,
+    rpt_arcflow_sum.arc_type AS swarc_type,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    COALESCE(rpt_arcflow_sum.mfull_flow, 0::numeric(12,4)) AS mfull_flow,
+    COALESCE(rpt_arcflow_sum.mfull_depth, 0::numeric(12,4)) AS mfull_depth,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM rpt_inp_arc
+   JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id::TEXT
+   AND rpt_arcflow_sum.result_id = rpt_inp_arc.result_id
+  WHERE
+EXISTS (SELECT 1 FROM selector_rpt_main r WHERE r.result_id = rpt_inp_arc.result_id AND r.cur_user = CURRENT_USER);
+
+
+CREATE OR REPLACE VIEW ve_epa_conduit
+AS SELECT inp_conduit.arc_id,
+    inp_conduit.barrels,
+    inp_conduit.culvert,
+    inp_conduit.kentry,
+    inp_conduit.kexit,
+    inp_conduit.kavg,
+    inp_conduit.flap,
+    inp_conduit.q0,
+    inp_conduit.qmax,
+    inp_conduit.seepage,
+    inp_conduit.custom_n,
+    v_rpt_arcflow_sum.max_flow,
+    v_rpt_arcflow_sum.time_days,
+    v_rpt_arcflow_sum.time_hour,
+    v_rpt_arcflow_sum.max_veloc,
+    v_rpt_arcflow_sum.mfull_flow,
+    v_rpt_arcflow_sum.mfull_depth,
+    v_rpt_arcflow_sum.max_shear,
+    v_rpt_arcflow_sum.max_hr,
+    v_rpt_arcflow_sum.max_slope,
+    v_rpt_arcflow_sum.day_max,
+    v_rpt_arcflow_sum.time_max,
+    v_rpt_arcflow_sum.min_shear,
+    v_rpt_arcflow_sum.day_min,
+    v_rpt_arcflow_sum.time_min
+   FROM inp_conduit
+     LEFT JOIN v_rpt_arcflow_sum ON inp_conduit.arc_id::text = v_rpt_arcflow_sum.arc_id::text;
