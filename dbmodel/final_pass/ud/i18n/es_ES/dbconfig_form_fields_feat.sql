@@ -24,7 +24,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
 ('elev2', '%_arc%', 'form_feature', 'tab_data', 'Elev2:', 'Elev2'),
 ('initoverflowpath', '%_arc%', 'form_feature', 'tab_data', 'Inicio flujos derivados:', 'Este campo es de suma importancia puesto que identifica aquellos tramos de red que son inicio de de flujo de caudales en tiempo de lluvia. Esta propiedad les convierte en ser frontera entre las DWFzones y la Drainzones'),
 ('inlet_offset', '%_arc%', 'form_feature', 'tab_data', 'Desplazamiento entrada:', 'Desplazamiento_entrada'),
-('inverted_slope', '%_arc%', 'form_feature', 'tab_data', 'Inicio de flujos derivados:', 'Este campo es de suma importancia puesto que identifica aquellos tramos de red que son inicio de de flujo de caudales en tiempo de lluvia. Esta propiedad les convierte en ser frontera entre las DWFzones y la Drainzones'),
+('inverted_slope', '%_arc%', 'form_feature', 'tab_data', 'Pendiente invertida:', 'Pendiente invertida- Para establecer si el conducto tiene pendiente invertido o no'),
 ('macrodma_id', '%_arc%', 'form_feature', 'tab_data', 'Macroomzone Id:', 'Macroomzone_id - Identifier of the macroomzone. Auto-populates based on omzone'),
 ('matcat_id', '%_arc%', 'form_feature', 'tab_data', 'Material:', 'Matcat_id - Material del elemento. No se puede rellenar. Se utiliza el del campo matcat_id del catálogo correspondiente'),
 ('name', '%_arc%', 'form_feature', 'tab_data', 'Nombre:', 'Name - Nombre del elemento'),
