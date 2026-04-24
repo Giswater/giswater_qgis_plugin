@@ -145,3 +145,5 @@ VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'tab_main', 'lyt_mapzone_m
 	"tab_macroomzone"
   ]
 }'::json, NULL, NULL, false, 10);
+
+UPDATE sys_function SET id = 2430, project_type = 'utils' WHERE function_name = 'gw_fct_pg2epa_check_data';

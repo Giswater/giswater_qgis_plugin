@@ -430,3 +430,6 @@ UPDATE config_param_system
 {"sourceTable":"ve_node_pump", "query":"UPDATE presszone t SET head = CASE WHEN top_elev + pressure_exit IS NOT NULL THEN top_elev + pressure_exit ELSE t.head END FROM ve_node_pump s "},
 {"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head= CASE WHEN invert_level + hmax IS NOT NULL THEN invert_level + hmax ELSE t.head END FROM ve_node_tank s "}]}'
 	WHERE "parameter"='epa_automatic_man2graph_values';
+
+UPDATE config_toolbox SET id = 2212 WHERE id = 2302;
+DELETE FROM sys_function WHERE id = 2302 AND function_name = 'gw_fct_anl_node_topological_consistency';
