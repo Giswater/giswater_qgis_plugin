@@ -429,3 +429,11 @@ VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_update', 'lyt_mapzone
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('mapzone_manager', 'form_mapzone', 'tab_none', 'btn_delete', 'lyt_mapzone_mng_1', 9, 'string', 'button', NULL, 'Delete mapzone', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Delete", "saveValue": false, "onContextMenu": "Delete"}'::json, '{"functionName": "_manage_delete", "module":"mapzone_manager", "parameters":{}}'::json, 'tbl_mapzone_manager', false, 9);
+
+DELETE FROM sys_message WHERE id = 4018;
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4018, 'Use psectors: %v_usepsector%', null, 0, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message
+(id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4632, 'Hydraulic performance for this result: %(100*v_performance)::numeric(12,2)% %', NULL, 0, true, 'ud', 'core', 'AUDIT');
