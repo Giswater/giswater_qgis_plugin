@@ -2383,7 +2383,12 @@ BEGIN
 					SELECT %s, n.node_id, t.mapzone_id, n.the_geom
 					FROM temp_pgr_node t
 					JOIN node n ON n.node_id = t.pgr_node_id
-					WHERE t.mapzone_id > 0
+					WHERE EXISTS (
+						SELECT 1 
+						FROM temp_pgr_arc ta 
+						WHERE ta.mapzone_id > 0 
+						AND t.pgr_node_id IN (ta.pgr_node_1, ta.pgr_node_2)
+					)
 					$sql$
 				, v_mapzone_field, v_netscenario);
 
