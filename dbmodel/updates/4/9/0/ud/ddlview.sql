@@ -1511,22 +1511,104 @@ AS SELECT arc_id,
             v_plan_aux_arc_cost.the_geom
            FROM v_plan_aux_arc_cost
              JOIN arc ON v_plan_aux_arc_cost.arc_id = arc.arc_id
-             LEFT JOIN ( SELECT DISTINCT ON (c.arc_id) c.arc_id,
-                    (min(p.price) * count(*)::numeric)::numeric(12,2) AS connec_total_cost
-                   FROM ve_connec c
-                     JOIN arc arc_1 USING (arc_id)
+             LEFT JOIN LATERAL ( WITH selected_psector AS (
+                         SELECT selector_psector.psector_id
+                           FROM selector_psector
+                          WHERE selector_psector.cur_user = CURRENT_USER
+                        ), candidate_connec AS (
+                         SELECT connec.connec_id
+                           FROM connec
+                          WHERE connec.arc_id = v_plan_aux_arc_cost.arc_id
+                        UNION
+                         SELECT plan_psector_x_connec.connec_id
+                           FROM plan_psector_x_connec
+                             JOIN selected_psector USING (psector_id)
+                          WHERE plan_psector_x_connec.arc_id = v_plan_aux_arc_cost.arc_id
+                        ), vf_connec_arc AS (
+                         SELECT connec.connec_id,
+                            COALESCE(plan_connec.state, connec.state) AS p_state,
+                            COALESCE(plan_connec.arc_id, connec.arc_id) AS arc_id,
+                            connec.expl_id,
+                            connec.expl_visibility,
+                            connec.sector_id,
+                            connec.muni_id
+                           FROM connec
+                             JOIN candidate_connec USING (connec_id)
+                             LEFT JOIN LATERAL ( SELECT pp.state,
+                                    pp.arc_id,
+                                    link.exit_id,
+                                    link.exit_type
+                                   FROM plan_psector_x_connec pp
+                                     LEFT JOIN link ON link.link_id = pp.link_id AND link.state = 2
+                                  WHERE pp.connec_id = connec.connec_id AND (pp.psector_id IN ( SELECT selected_psector.psector_id
+   FROM selected_psector))
+                                  ORDER BY pp.psector_id DESC, pp.state DESC
+                                 LIMIT 1) plan_connec ON true
+                          WHERE (EXISTS ( SELECT 1
+                                   FROM selector_state
+                                  WHERE selector_state.state_id = COALESCE(plan_connec.state, connec.state) AND selector_state.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+                                   FROM selector_sector
+                                  WHERE selector_sector.sector_id = connec.sector_id AND selector_sector.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+                                   FROM selector_municipality
+                                  WHERE selector_municipality.muni_id = connec.muni_id AND selector_municipality.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+                                   FROM selector_expl
+                                  WHERE (selector_expl.expl_id = ANY (array_append(connec.expl_visibility::integer[], connec.expl_id))) AND selector_expl.cur_user = CURRENT_USER))
+                        )
+                 SELECT (min(v_price_compost.price) * count(*)::numeric)::numeric(12,2) AS connec_total_cost
+                   FROM vf_connec_arc
+                     JOIN arc arc_1 ON arc_1.arc_id = vf_connec_arc.arc_id
                      JOIN cat_arc ON cat_arc.id::text = arc_1.arccat_id::text
-                     LEFT JOIN v_price_compost p ON cat_arc.connect_cost = p.id::text
-                  WHERE c.arc_id IS NOT NULL
-                  GROUP BY c.arc_id) v_plan_aux_arc_connec ON v_plan_aux_arc_connec.arc_id = v_plan_aux_arc_cost.arc_id
-             LEFT JOIN ( SELECT DISTINCT ON (c.arc_id) c.arc_id,
-                    (min(p.price) * count(*)::numeric)::numeric(12,2) AS gully_total_cost
-                   FROM ve_gully c
-                     JOIN arc arc_1 USING (arc_id)
+                     LEFT JOIN v_price_compost ON cat_arc.connect_cost = v_price_compost.id::text
+                  WHERE vf_connec_arc.arc_id = v_plan_aux_arc_cost.arc_id) v_plan_aux_arc_connec ON true
+             LEFT JOIN LATERAL ( WITH selected_psector AS (
+                         SELECT selector_psector.psector_id
+                           FROM selector_psector
+                          WHERE selector_psector.cur_user = CURRENT_USER
+                        ), candidate_gully AS (
+                         SELECT gully.gully_id
+                           FROM gully
+                          WHERE gully.arc_id = v_plan_aux_arc_cost.arc_id
+                        UNION
+                         SELECT plan_psector_x_gully.gully_id
+                           FROM plan_psector_x_gully
+                             JOIN selected_psector USING (psector_id)
+                          WHERE plan_psector_x_gully.arc_id = v_plan_aux_arc_cost.arc_id
+                        ), vf_gully_arc AS (
+                         SELECT gully.gully_id,
+                            COALESCE(plan_gully.state, gully.state) AS p_state,
+                            COALESCE(plan_gully.arc_id, gully.arc_id) AS arc_id,
+                            gully.expl_id,
+                            gully.expl_visibility,
+                            gully.sector_id,
+                            gully.muni_id
+                           FROM gully
+                             JOIN candidate_gully USING (gully_id)
+                             LEFT JOIN LATERAL ( SELECT pp.state,
+                                    pp.arc_id,
+                                    link.exit_id,
+                                    link.exit_type
+                                   FROM plan_psector_x_gully pp
+                                     LEFT JOIN link ON link.link_id = pp.link_id AND link.state = 2
+                                  WHERE pp.gully_id = gully.gully_id AND (pp.psector_id IN ( SELECT selected_psector.psector_id
+   FROM selected_psector))
+                                  ORDER BY pp.psector_id DESC, pp.state DESC
+                                 LIMIT 1) plan_gully ON true
+                          WHERE (EXISTS ( SELECT 1
+                                   FROM selector_state
+                                  WHERE selector_state.state_id = COALESCE(plan_gully.state, gully.state) AND selector_state.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+                                   FROM selector_sector
+                                  WHERE selector_sector.sector_id = gully.sector_id AND selector_sector.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+                                   FROM selector_municipality
+                                  WHERE selector_municipality.muni_id = gully.muni_id AND selector_municipality.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+                                   FROM selector_expl
+                                  WHERE (selector_expl.expl_id = ANY (array_append(gully.expl_visibility::integer[], gully.expl_id))) AND selector_expl.cur_user = CURRENT_USER))
+                        )
+                 SELECT (min(v_price_compost.price) * count(*)::numeric)::numeric(12,2) AS gully_total_cost
+                   FROM vf_gully_arc
+                     JOIN arc arc_1 ON arc_1.arc_id = vf_gully_arc.arc_id
                      JOIN cat_arc ON cat_arc.id::text = arc_1.arccat_id::text
-                     LEFT JOIN v_price_compost p ON cat_arc.connect_cost = p.id::text
-                  WHERE c.arc_id IS NOT NULL
-                  GROUP BY c.arc_id) v_plan_aux_arc_gully ON v_plan_aux_arc_gully.arc_id = v_plan_aux_arc_cost.arc_id) d;
+                     LEFT JOIN v_price_compost ON cat_arc.connect_cost = v_price_compost.id::text
+                  WHERE vf_gully_arc.arc_id = v_plan_aux_arc_cost.arc_id) v_plan_aux_arc_gully ON true) d;
   
   
 CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream

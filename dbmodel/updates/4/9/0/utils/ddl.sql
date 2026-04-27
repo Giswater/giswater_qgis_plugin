@@ -160,3 +160,6 @@ ALTER TABLE om_visit
 
 ALTER TABLE cat_users
     ADD COLUMN mail text NULL;
+
+-- 27/04/2026
+CREATE INDEX IF NOT EXISTS idx_connec_arc_id ON connec USING btree (arc_id);

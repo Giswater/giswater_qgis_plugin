@@ -117,3 +117,6 @@ ALTER TABLE macroomunit ENABLE TRIGGER ALL;
 -- 21/04/2026
 DROP RULE IF EXISTS omzone_expl ON omzone;
 DROP RULE IF EXISTS dwfzone_expl ON dwfzone;
+
+-- 27/04/2026
+CREATE INDEX IF NOT EXISTS idx_gully_arc_id ON gully USING btree (arc_id);
