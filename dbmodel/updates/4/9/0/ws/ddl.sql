@@ -230,3 +230,8 @@ ALTER TABLE plan_netscenario_presszone ENABLE TRIGGER ALL;
 -- 21/04/2026
 DROP RULE IF EXISTS presszone_expl ON presszone;
 DROP RULE IF EXISTS dqa_expl ON dqa;
+
+-- 27/04/2026
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
+

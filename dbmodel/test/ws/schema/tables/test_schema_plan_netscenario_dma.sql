@@ -21,7 +21,7 @@ SELECT columns_are(
     'plan_netscenario_dma',
     ARRAY[
         'netscenario_id', 'dma_id', 'name', 'code', 'descript', 'pattern_id', 'graphconfig', 'the_geom',
-        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id', 'muni_id', 'sector_id'
+        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id', 'muni_id', 'sector_id', 'addparam'
     ],
     'Table plan_netscenario_dma should have the correct columns'
 );
@@ -45,6 +45,7 @@ SELECT col_type_is('plan_netscenario_dma', 'stylesheet', 'json', 'Column stylesh
 SELECT col_type_is('plan_netscenario_dma', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('plan_netscenario_dma', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('plan_netscenario_dma', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
+SELECT col_type_is('plan_netscenario_dma', 'addparam', 'json', 'Column addparam should be json');
 
 -- Check default values
 SELECT col_default_is('plan_netscenario_dma', 'active', 'true', 'Default value for active should be true');

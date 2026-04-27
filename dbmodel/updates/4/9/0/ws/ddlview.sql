@@ -3274,7 +3274,8 @@ AS WITH plan_netscenario_current AS (
     n.stylesheet::text AS stylesheet,
     n.expl_id,
     n.muni_id,
-    n.sector_id
+    n.sector_id,
+    n.addparam
    FROM plan_netscenario_dma n
      JOIN plan_netscenario p USING (netscenario_id)
      JOIN plan_netscenario_current pnc ON n.netscenario_id = pnc.netscenario_id
@@ -3397,7 +3398,8 @@ AS WITH plan_netscenario_current AS (
     n.stylesheet::text AS stylesheet,
     n.expl_id,
     n.muni_id,
-    n.sector_id
+    n.sector_id,
+    n.addparam
    FROM plan_netscenario_presszone n
      JOIN plan_netscenario p USING (netscenario_id)
      JOIN plan_netscenario_current pnc ON n.netscenario_id = pnc.netscenario_id
