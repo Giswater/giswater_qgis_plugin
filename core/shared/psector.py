@@ -462,7 +462,6 @@ class GwPsector:
             self.fill_widget(dialog, "text6", row)
             self.fill_widget(dialog, "num_value", row)
 
-            self.populate_budget(dialog, psector_id)
             self.update = True
 
             dialog.rejected.connect(self.rubber_band_point.reset)
