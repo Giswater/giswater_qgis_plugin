@@ -120,3 +120,5 @@ DROP RULE IF EXISTS dwfzone_expl ON dwfzone;
 
 -- 27/04/2026
 CREATE INDEX IF NOT EXISTS idx_gully_arc_id ON gully USING btree (arc_id);
+
+DROP TABLE IF EXISTS dwfzone_graph;

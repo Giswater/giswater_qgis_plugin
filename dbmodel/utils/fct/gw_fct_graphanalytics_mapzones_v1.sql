@@ -97,6 +97,7 @@ DECLARE
 	v_mapzones_ids text;
 
 	v_mapzone_table text;
+	v_mapzone_graph_table text;
 	v_mapzone_field text;
 	v_visible_layer text;
 	v_mapzone_id int4;
@@ -185,9 +186,11 @@ BEGIN
 
 	-- SECTION[epic=mapzones]: SET VARIABLES
 	v_mapzone_table := LOWER(v_class);
+	v_mapzone_graph_table := 'mapzone_graph';
 	v_mapzone_field := v_mapzone_table || '_id';
 	IF v_netscenario IS NOT NULL THEN
 		v_mapzone_table := 'plan_netscenario_' || v_mapzone_table;
+		v_mapzone_graph_table := 'plan_netscenario_' || v_mapzone_graph_table;
 		v_from_zero := FALSE; -- from zero is not allowed for netscenario
 	END IF;
 	v_visible_layer := 've_' || v_mapzone_table;
@@ -2371,7 +2374,7 @@ BEGIN
 					SELECT %s, a.arc_id, t.mapzone_id, a.the_geom
 					FROM temp_pgr_arc t
 					JOIN arc a ON a.arc_id = t.pgr_arc_id
-					WHERE t.mapzone_id <> -1
+					WHERE t.mapzone_id > 0
 					$sql$
 				, v_mapzone_field, v_netscenario);
 
@@ -2380,7 +2383,7 @@ BEGIN
 					SELECT %s, n.node_id, t.mapzone_id, n.the_geom
 					FROM temp_pgr_node t
 					JOIN node n ON n.node_id = t.pgr_node_id
-					WHERE t.mapzone_id <> -1
+					WHERE t.mapzone_id > 0
 					$sql$
 				, v_mapzone_field, v_netscenario);
 
@@ -2389,7 +2392,7 @@ BEGIN
 					SELECT %s, c.connec_id, t.mapzone_id, c.the_geom
 					FROM temp_pgr_connec t
 					JOIN connec c ON c.connec_id = t.pgr_connec_id
-					WHERE t.mapzone_id <> -1
+					WHERE t.mapzone_id > 0
 					$sql$
 				, v_mapzone_field, v_netscenario);
 
@@ -2743,39 +2746,7 @@ BEGIN
 
 					ELSIF v_class = 'DMA' THEN
 
-						RAISE NOTICE 'Filling temp_pgr_om_waterbalance_dma_graph ';
-
-						-- it's SELECT DISTINCT in case the graph_delimiter is a source with 2 toArc with the same DMA 
-						-- restriction unicity: dma_id, node_id
-						INSERT INTO temp_pgr_om_waterbalance_dma_graph (node_id, dma_id, flow_sign)
-						SELECT DISTINCT n.pgr_node_id, a.mapzone_id,
-						CASE WHEN a.node_parent IS NOT NULL THEN 1
-						ELSE -1
-						END 
-						FROM temp_pgr_node n
-						JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-						WHERE n.graph_delimiter = 'nodeParent'
-						AND a.mapzone_id > 0;
-
 						
-						WITH
-						affected_dma AS (
-							SELECT DISTINCT dma_id FROM temp_pgr_om_waterbalance_dma_graph
-							UNION
-							SELECT DISTINCT mapzone_id AS dma_id FROM temp_pgr_old_mapzone
-						)
-						DELETE FROM om_waterbalance_dma_graph o
-						WHERE EXISTS (SELECT 1 FROM affected_dma d WHERE o.dma_id =d.dma_id);
-
-						WITH
-							affected_node AS (
-								SELECT DISTINCT node_id FROM temp_pgr_om_waterbalance_dma_graph
-							)
-						DELETE FROM om_waterbalance_dma_graph o
-						WHERE EXISTS (SELECT 1 FROM affected_node n WHERE o.node_id = n.node_id);
-
-						INSERT INTO om_waterbalance_dma_graph
-						SELECT * FROM temp_pgr_om_waterbalance_dma_graph;
 
 						-- todo work in progress
 						/* 
@@ -2795,6 +2766,46 @@ BEGIN
 				END IF; -- v_project_type
 
 			END IF; -- v_netscenario
+
+			RAISE NOTICE 'Filling temp_pgr_mapzone_graph ';
+
+			-- it's SELECT DISTINCT in case the graph_delimiter is a source with 2 toArc with the same DMA 
+			-- restriction unicity: mapzone_id, node_id
+			INSERT INTO temp_pgr_mapzone_graph (node_id, netscenario_id, mapzone_id, mapzone_type, flow_sign)
+			SELECT DISTINCT n.pgr_node_id, v_netscenario, a.mapzone_id, v_class,
+			CASE WHEN a.node_parent IS NOT NULL THEN 1
+			ELSE -1
+			END 
+			FROM temp_pgr_node n
+			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+			WHERE n.graph_delimiter = 'nodeParent'
+			AND a.mapzone_id > 0;
+
+			EXECUTE format($sql$
+				WITH affected_mapzone AS (
+					SELECT DISTINCT mapzone_id FROM temp_pgr_mapzone_graph
+					UNION
+					SELECT DISTINCT mapzone_id FROM temp_pgr_old_mapzone
+				)
+				DELETE FROM %I mzg
+				WHERE EXISTS (SELECT 1 FROM affected_mapzone am WHERE mzg.mapzone_id = am.mapzone_id);
+			$sql$, v_mapzone_graph_table);
+
+			EXECUTE format($sql$
+				WITH affected_node AS (
+					SELECT DISTINCT node_id FROM temp_pgr_mapzone_graph
+				)
+				DELETE FROM %I mzg
+				WHERE EXISTS (SELECT 1 FROM affected_node an WHERE mzg.node_id = an.node_id);
+			$sql$, v_mapzone_graph_table);
+
+			IF v_netscenario IS NOT NULL THEN
+				INSERT INTO plan_netscenario_mapzone_graph (node_id, netscenario_id, mapzone_id, mapzone_type, flow_sign)
+				SELECT node_id, v_netscenario, mapzone_id, mapzone_type, flow_sign FROM temp_pgr_mapzone_graph;
+			ELSE
+				INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign)
+				SELECT node_id, mapzone_id, mapzone_type, flow_sign FROM temp_pgr_mapzone_graph;
+			END IF;
 
 		END IF; -- v_commit_changes
 	ELSE

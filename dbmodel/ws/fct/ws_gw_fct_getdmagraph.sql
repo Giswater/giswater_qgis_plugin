@@ -64,8 +64,8 @@ BEGIN
 	DELETE FROM dma_graph_object WHERE expl_id = v_expl_id;
 
 	-- Get topology of dma's: 
-	v_sql_pgrouting = 'WITH entr AS (SELECT node_id, dma_id AS dma_2 FROM om_waterbalance_dma_graph WHERE flow_sign = 1),
-	sort AS (SELECT node_id, dma_id AS dma_1 FROM om_waterbalance_dma_graph WHERE flow_sign = -1)
+	v_sql_pgrouting = 'WITH entr AS (SELECT node_id, dma_id AS dma_2 FROM mapzone_graph WHERE mapzone_type = ''DMA'' AND flow_sign = 1),
+	sort AS (SELECT node_id, dma_id AS dma_1 FROM mapzone_graph WHERE mapzone_type = ''DMA'' AND flow_sign = -1)
 	SELECT node_id AS id, 
 	case when dma_1 IS NULL THEN 0 else dma_1 end AS source,
 	case when dma_2 IS NULL THEN 0 else dma_2 end AS target, 
@@ -107,10 +107,10 @@ BEGIN
 	-- INSERT dmas
 	INSERT INTO dma_graph_object (object_id, object_type, the_geom, order_id)
 	SELECT DISTINCT d.dma_id, 'DMA', st_centroid(the_geom), min(b.agg_cost) 
-	FROM om_waterbalance_dma_graph a
+	FROM mapzone_graph a
 	LEFT JOIN dma d USING (dma_id) 
 	LEFT JOIN temp_dma_order b ON dma_id = b.dma_2
-	WHERE v_expl_id = ANY(d.expl_id)
+	WHERE v_expl_id = ANY(d.expl_id) AND a.mapzone_type = 'DMA'
 	group by d.dma_id, st_centroid(the_geom)
 	ON CONFLICT (object_id) DO NOTHING;
 

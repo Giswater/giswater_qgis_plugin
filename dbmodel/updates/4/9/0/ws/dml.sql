@@ -332,8 +332,6 @@ INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('dma_graph_meter','Table to manage graph for dma','role_edit','core');
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('dma_graph_object','Table to manage graph for dma','role_edit','core');
-INSERT INTO sys_table (id,descript,sys_role,"source")
-VALUES ('presszone_graph','Table to manage graph for presszone','role_edit','core');
 
 -- 09/04/2026
 WITH connec_customer AS (
@@ -433,3 +431,7 @@ UPDATE config_param_system
 
 UPDATE config_toolbox SET id = 2212 WHERE id = 2302;
 DELETE FROM sys_function WHERE id = 2302 AND function_name = 'gw_fct_anl_node_topological_consistency';
+
+-- 27/04/2026
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('plan_netscenario_mapzone_graph','Table to manage graph for plan_netscenario_mapzone','role_edit','core');

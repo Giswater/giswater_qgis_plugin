@@ -235,3 +235,19 @@ DROP RULE IF EXISTS dqa_expl ON dqa;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_dma", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_netscenario_presszone", "column":"addparam", "dataType":"json", "isUtils":"False"}}$$);
 
+
+
+DROP TABLE IF EXISTS presszone_graph;
+
+CREATE TABLE IF NOT EXISTS plan_netscenario_mapzone_graph (
+    node_id int4 NOT NULL,
+    netscenario_id int4 NOT NULL,
+    mapzone_id int4 NOT NULL,
+    mapzone_type text NOT NULL,
+    flow_sign int2 NULL,
+    CONSTRAINT plan_netscenario_mapzone_graph_pkey PRIMARY KEY (node_id, mapzone_id)
+);
+
+CREATE INDEX IF NOT EXISTS plan_netscenario_mapzone_graph_mapzone_id_idx ON plan_netscenario_mapzone_graph USING btree (mapzone_id);
+CREATE INDEX IF NOT EXISTS plan_netscenario_mapzone_graph_netscenario_id_idx ON plan_netscenario_mapzone_graph USING btree (netscenario_id);
+CREATE INDEX IF NOT EXISTS plan_netscenario_mapzone_graph_node_id_idx ON plan_netscenario_mapzone_graph USING btree (node_id);

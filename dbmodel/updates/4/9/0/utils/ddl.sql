@@ -163,3 +163,17 @@ ALTER TABLE cat_users
 
 -- 27/04/2026
 CREATE INDEX IF NOT EXISTS idx_connec_arc_id ON connec USING btree (arc_id);
+
+DROP TABLE IF EXISTS sector_graph;
+DROP TABLE IF EXISTS dma_graph;
+
+CREATE TABLE IF NOT EXISTS mapzone_graph (
+    node_id int4 NOT NULL,
+    mapzone_id int4 NOT NULL,
+    mapzone_type text NOT NULL,
+    flow_sign int2 NULL,
+    CONSTRAINT mapzone_graph_pkey PRIMARY KEY (node_id, mapzone_id)
+);
+
+CREATE INDEX IF NOT EXISTS mapzone_graph_mapzone_id_idx ON mapzone_graph USING btree (mapzone_id);
+CREATE INDEX IF NOT EXISTS mapzone_graph_node_id_idx ON mapzone_graph USING btree (node_id);

@@ -24,16 +24,15 @@ UPDATE connec SET builtdate = now() -  random() * (now() - timestamp '1990-01-01
 UPDATE link SET builtdate = c.builtdate FROM connec c WHERE feature_id = connec_id;
 UPDATE element SET builtdate = now() -  random() * (now() - timestamp '1990-01-01 00:00:00');
 
-INSERT INTO om_waterbalance_dma_graph VALUES ('1080',1,-1);
-INSERT INTO om_waterbalance_dma_graph VALUES ('1080',2,1);
-INSERT INTO om_waterbalance_dma_graph VALUES ('1097',4,1);
-INSERT INTO om_waterbalance_dma_graph VALUES ('1101',4,1);
-INSERT INTO om_waterbalance_dma_graph VALUES ('113766',1,1);
-INSERT INTO om_waterbalance_dma_graph VALUES ('113766',4,-1);
-
-INSERT INTO om_waterbalance_dma_graph VALUES('111111', 5, 1);
-INSERT INTO om_waterbalance_dma_graph VALUES('113952', 5, -1);
-INSERT INTO om_waterbalance_dma_graph VALUES('113952', 3, 1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES ('1080',1, 'DMA', -1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES ('1080',2, 'DMA', 1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES ('1097',4, 'DMA', 1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES ('1101',4, 'DMA', 1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES ('113766',1, 'DMA', 1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES ('113766',4, 'DMA', -1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES('111111', 5, 'DMA', 1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES('113952', 5, 'DMA', -1);
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign) VALUES('113952', 3, 'DMA', 1);
 
 UPDATE config_param_user SET value = replace(value, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true')
 WHERE parameter = 'inp_options_debug';

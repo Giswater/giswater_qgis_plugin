@@ -177,11 +177,6 @@ INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('inp_family','Defines inp families contained in the network','role_edit','core');
 
 INSERT INTO sys_table (id,descript,sys_role,"source")
-VALUES ('dma_graph','Table to manage graph for dma','role_edit','core');
-INSERT INTO sys_table (id,descript,sys_role,"source")
-VALUES ('sector_graph','Table to manage graph for sector','role_edit','core');
-
-INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('inp_dscenario_pattern','Table to manage dscenario for pattern','role_epa','core');
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('inp_dscenario_pattern_value','Table to manage dscenario for pattern value','role_epa','core');
@@ -437,3 +432,15 @@ VALUES(4018, 'Use psectors: %v_usepsector%', null, 0, true, 'utils', 'core', 'AU
 INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4632, 'Hydraulic performance for this result: %(100*v_performance)::numeric(12,2)% %', NULL, 0, true, 'ud', 'core', 'AUDIT');
+
+-- 27/04/2026
+INSERT INTO sys_table (id,descript,sys_role,"source")
+VALUES ('mapzone_graph','Table to manage graph for mapzones','role_edit','core');
+
+INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign)
+SELECT node_id, dma_id, 'DMA', flow_sign
+FROM om_waterbalance_dma_graph
+ON CONFLICT (node_id, mapzone_id) DO NOTHING;
+
+DROP TABLE IF EXISTS om_waterbalance_dma_graph;
+DELETE FROM sys_table WHERE id = 'om_waterbalance_dma_graph';
