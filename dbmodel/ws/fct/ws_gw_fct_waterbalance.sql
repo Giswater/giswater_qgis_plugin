@@ -86,6 +86,8 @@ v_step integer;
 v_descript TEXT;
 v_propose_initdate text;
 
+v_mapzones_version integer;
+
 
 BEGIN
 
@@ -223,11 +225,16 @@ v_queryhydro =
 
 			v_updatemapzone = (SELECT (value::json->>'DMA')::json->>'updateMapZone' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
 			v_paramupdate = (SELECT (value::json->>'DMA')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter  = 'utils_graphanalytics_vdefault');
+			v_mapzones_version = (SELECT (value::json->>'version')::int2 FROM config_param_system WHERE parameter='mapzones_config');
 
 			v_data =  concat ('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "',v_expl,'", "updateMapZone":',v_updatemapzone,
 			', "geomParamUpdate":',v_paramupdate,', "updateFeature":true, "commitChanges":true}}}');
 
-			PERFORM gw_fct_graphanalytics_mapzones(v_data);
+			IF v_mapzones_version = 1 THEN
+				PERFORM gw_fct_graphanalytics_mapzones_v1(v_data::jsonb);
+			ELSE
+				PERFORM gw_fct_graphanalytics_mapzones(v_data);
+			END IF;
 
 		END IF;
 
@@ -262,12 +269,12 @@ v_queryhydro =
 			EXECUTE '
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3) 
 			FROM (
-				SELECT g.dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
+				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
 				FROM ext_rtc_scada_x_data e JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date 
 				AND g.flow_sign = 1 AND g.mapzone_type = ''DMA''
-				GROUP BY dma_id
+				GROUP BY mapzone_id
 			)a
 			WHERE n.dma_id = a.dma_id 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
@@ -277,12 +284,12 @@ v_queryhydro =
 			EXECUTE '
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
 			FROM (
-				SELECT g.dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
+				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
 				FROM ext_rtc_scada_x_data e JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date
 				AND g.mapzone_type = ''DMA''
-				GROUP BY dma_id
+				GROUP BY mapzone_id
 			)a
 			WHERE n.dma_id = a.dma_id 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
@@ -364,13 +371,13 @@ v_queryhydro =
 			EXECUTE '
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3)
 			FROM (
-				SELECT g.dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
+				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
 				FROM ext_rtc_scada_x_data e 
 				JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date 
 				AND g.flow_sign = 1 AND g.mapzone_type = ''DMA''
-				GROUP BY dma_id
+				GROUP BY mapzone_id
 			)a
 			WHERE n.dma_id = a.dma_id 
 			AND n.startdate = '||quote_literal(v_startdate)||'::date 
@@ -380,13 +387,13 @@ v_queryhydro =
 			EXECUTE '
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
 			FROM (
-				SELECT g.dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
+				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
 				FROM ext_rtc_scada_x_data e 
 				JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date
 				AND g.mapzone_type = ''DMA''
-				GROUP BY dma_id
+				GROUP BY mapzone_id
 			)a
 			WHERE n.dma_id = a.dma_id 
 			AND n.startdate = '||quote_literal(v_startdate)||'::date 
@@ -552,14 +559,14 @@ v_queryhydro =
 		-- meters_in
 		EXECUTE '
 		UPDATE om_waterbalance w SET meters_in = meters FROM 
-		(SELECT string_agg (node_id::text, '', '') as meters, dma_id FROM mapzone_graph WHERE mapzone_type = ''DMA'' AND flow_sign = 1 group by dma_id) a
+		(SELECT string_agg (node_id::text, '', '') as meters, mapzone_id AS dma_id FROM mapzone_graph WHERE mapzone_type = ''DMA'' AND flow_sign = 1 group by mapzone_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
 		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- meters_out
 		EXECUTE '
 		UPDATE om_waterbalance w SET meters_out = meters FROM 
-		(SELECT string_agg (node_id::text, '', '') as meters, dma_id FROM mapzone_graph WHERE mapzone_type = ''DMA'' AND flow_sign = -1 group by dma_id) a
+		(SELECT string_agg (node_id::text, '', '') as meters, mapzone_id AS dma_id FROM mapzone_graph WHERE mapzone_type = ''DMA'' AND flow_sign = -1 group by mapzone_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
 		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
