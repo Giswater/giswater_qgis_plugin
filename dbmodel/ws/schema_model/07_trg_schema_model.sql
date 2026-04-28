@@ -679,14 +679,6 @@ CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE O
 
 CREATE TRIGGER gw_trg_edit_review_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();
 
-
---
--- Name: v_edit_samplepoint gw_trg_edit_samplepoint; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_samplepoint FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_samplepoint('samplepoint');
-
-
 --
 -- Name: v_edit_sector gw_trg_edit_sector; Type: TRIGGER; Schema: Schema; Owner: -
 --

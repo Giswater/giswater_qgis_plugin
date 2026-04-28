@@ -274,13 +274,11 @@ BEGIN
 			ALTER TABLE node ALTER COLUMN verified DROP NOT NULL;
 			ALTER TABLE connec ALTER COLUMN verified DROP NOT NULL;
 			ALTER TABLE element ALTER COLUMN verified DROP NOT NULL;
-			ALTER TABLE samplepoint ALTER COLUMN verified DROP NOT NULL;
 
 			ALTER TABLE arc ALTER COLUMN workcat_id DROP NOT NULL;
 			ALTER TABLE node ALTER COLUMN workcat_id DROP NOT NULL;
 			ALTER TABLE connec ALTER COLUMN workcat_id DROP NOT NULL;
 			ALTER TABLE element ALTER COLUMN workcat_id DROP NOT NULL;
-			ALTER TABLE samplepoint ALTER COLUMN workcat_id DROP NOT NULL;
 
 			IF v_projecttype = 'UD' THEN
 				ALTER TABLE cat_feature_gully DROP COLUMN IF EXISTS _type;

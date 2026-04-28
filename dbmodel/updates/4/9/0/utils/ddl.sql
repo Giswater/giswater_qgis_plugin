@@ -177,3 +177,20 @@ CREATE TABLE IF NOT EXISTS mapzone_graph (
 
 CREATE INDEX IF NOT EXISTS mapzone_graph_mapzone_id_idx ON mapzone_graph USING btree (mapzone_id);
 CREATE INDEX IF NOT EXISTS mapzone_graph_node_id_idx ON mapzone_graph USING btree (node_id);
+
+ALTER TABLE samplepoint DROP CONSTRAINT man_samplepoint_pkey;
+ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_pkey PRIMARY KEY (sample_id);
+
+CREATE TABLE IF NOT EXISTS man_samplepoint (
+    connec_id int4 NOT NULL,
+    lab_code varchar(30) NULL,
+    place_name varchar(254) NULL,
+	cabinet varchar(150) NULL,
+    CONSTRAINT man_samplepoint_pkey PRIMARY KEY (connec_id),
+    CONSTRAINT man_samplepoint_connec_id_fkey FOREIGN KEY (connec_id) REFERENCES connec(connec_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
+
+DROP VIEW IF EXISTS ve_samplepoint;
+ALTER TABLE samplepoint RENAME TO _samplepoint_;

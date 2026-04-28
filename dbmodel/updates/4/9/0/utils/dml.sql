@@ -444,3 +444,14 @@ ON CONFLICT (node_id, mapzone_id) DO NOTHING;
 
 DROP TABLE IF EXISTS om_waterbalance_dma_graph;
 DELETE FROM sys_table WHERE id = 'om_waterbalance_dma_graph';
+
+-- 28/04/2026
+INSERT INTO sys_feature_class (id, type, epa_default, man_table) VALUES ('SAMPLEPOINT', 'CONNEC', 'JUNCTION', 'man_samplepoint');
+
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+VALUES('man_samplepoint', 'Additional information for samplepoint management', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
+
+DELETE FROM sys_table WHERE id = 'samplepoint';
+DELETE FROM sys_table WHERE id = 've_samplepoint';
+DELETE FROM sys_function WHERE id = 1122; -- gw_trg_edit_samplepoint
+DROP FUNCTION IF EXISTS gw_trg_edit_samplepoint;

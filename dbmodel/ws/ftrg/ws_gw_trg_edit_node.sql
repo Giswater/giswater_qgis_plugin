@@ -639,8 +639,8 @@ BEGIN
 			VALUES(NEW.node_id, NEW.automated, NEW.fence_type);
 
 		ELSIF v_man_table='man_netsamplepoint' THEN
-			INSERT INTO man_netsamplepoint (node_id, lab_code)
-			VALUES (NEW.node_id, NEW.lab_code);
+			INSERT INTO man_netsamplepoint (node_id, lab_code, place_name, cabinet)
+			VALUES (NEW.node_id, NEW.lab_code, NEW.place_name, NEW.cabinet);
 
 		ELSIF v_man_table='man_wtp' THEN
 			INSERT INTO man_wtp (node_id, name, maxflow, opsflow, screening, desander, chemical, oxidation, coagulation, floculation, presendiment, sediment,
@@ -1045,7 +1045,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netsamplepoint' THEN
-			UPDATE man_netsamplepoint SET node_id=NEW.node_id, lab_code=NEW.lab_code
+			UPDATE man_netsamplepoint SET node_id=NEW.node_id, lab_code=NEW.lab_code, place_name=NEW.place_name, cabinet=NEW.cabinet
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_wtp' THEN

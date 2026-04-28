@@ -576,6 +576,10 @@ BEGIN
 		ELSIF v_man_table='man_wjoin' THEN
 		 	INSERT INTO man_wjoin (connec_id, top_floor,wjoin_type)
 			VALUES (NEW.connec_id, NEW.top_floor, NEW.wjoin_type);
+		
+		ELSIF v_man_table='man_samplepoint' THEN
+			INSERT INTO man_samplepoint (connec_id, lab_code, place_name, cabinet)
+			VALUES (NEW.connec_id, NEW.lab_code, NEW.place_name, NEW.cabinet);
 
 		END IF;
 
@@ -912,6 +916,10 @@ BEGIN
 		ELSIF v_man_table ='man_fountain' THEN
 			UPDATE man_fountain SET vmax=NEW.vmax,vtotal=NEW.vtotal,container_number=NEW.container_number,pump_number=NEW.pump_number,power=NEW.power,
 			regulation_tank=NEW.regulation_tank,name=NEW.name,chlorinator=NEW.chlorinator, linked_connec=NEW.linked_connec, arq_patrimony=NEW.arq_patrimony
+			WHERE connec_id=OLD.connec_id;
+		
+		ELSIF v_man_table='man_samplepoint' THEN
+			UPDATE man_samplepoint SET lab_code=NEW.lab_code, place_name=NEW.place_name, cabinet=NEW.cabinet
 			WHERE connec_id=OLD.connec_id;
 		END IF;
 

@@ -55,10 +55,6 @@ BEGIN
 		ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_streetaxis_id_fkey"; 
 		ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_streetaxis2_id_fkey"; 
 		ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_district_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis2_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_district_id_fkey"; 
 		
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_muni_id_fkey;';
 		EXECUTE 'ALTER TABLE '|| ext_utils_schema_aux||'.streetaxis DROP CONSTRAINT IF EXISTS streetaxis_type_street_fkey;';
@@ -143,17 +139,6 @@ BEGIN
 			REFERENCES '|| ext_utils_schema_aux||'."district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 
 
-			EXECUTE 'ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_streetaxis_id_fkey" FOREIGN KEY ("muni_id","streetaxis_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("muni_id","id") ON DELETE RESTRICT ON UPDATE CASCADE;';		
-
-			EXECUTE 'ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_streetaxis2_id_fkey" FOREIGN KEY ("muni_id","streetaxis2_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."streetaxis" ("muni_id","id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-		
-			EXECUTE 'ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
-			
-			EXECUTE 'ALTER TABLE samplepoint ADD CONSTRAINT "samplepoint_district_id_fkey" FOREIGN KEY ("district_id") 
-			REFERENCES '|| ext_utils_schema_aux||'."district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;';
 		
 
 		IF project_type_aux='UD' THEN
@@ -233,10 +218,6 @@ BEGIN
 		ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_streetaxis_id_fkey"; 
 		ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_streetaxis2_id_fkey"; 
 		ALTER TABLE connec DROP CONSTRAINT IF EXISTS "connec_district_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis2_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_streetaxis_muni_id_fkey"; 
-		ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS "samplepoint_district_id_fkey";
 
 		IF project_type_aux='UD' THEN
 			ALTER TABLE gully DROP CONSTRAINT IF EXISTS "gully_muni_id_fkey";
@@ -299,15 +280,6 @@ BEGIN
 		ALTER TABLE "connec" ADD CONSTRAINT "connec_streetaxis2_id_fkey" FOREIGN KEY("muni_id","streetaxis2_id") 
 		REFERENCES "ext_streetaxis" ("muni_id","id") ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE "connec" ADD CONSTRAINT "connec_district_id_fkey" FOREIGN KEY ("district_id") 
-		REFERENCES "ext_district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
-		ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_id_fkey" FOREIGN KEY ("muni_id","streetaxis_id") 
-		REFERENCES "ext_streetaxis" ("muni_id","id") ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis2_id_fkey" FOREIGN KEY ("muni_id","streetaxis2_id") 
-		REFERENCES "ext_streetaxis" ("muni_id","id") ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_streetaxis_muni_id_fkey" FOREIGN KEY ("muni_id") 
-		REFERENCES "ext_municipality" ("muni_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE "samplepoint" ADD CONSTRAINT "samplepoint_district_id_fkey" FOREIGN KEY ("district_id") 
 		REFERENCES "ext_district" ("district_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		IF project_type_aux='UD' THEN

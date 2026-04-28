@@ -523,6 +523,9 @@ BEGIN
 			INSERT INTO man_cjoin (connec_id) VALUES (NEW.connec_id);
 		ELSIF v_man_table = 'man_vconnec' THEN
 			INSERT INTO man_vconnec (connec_id) VALUES (NEW.connec_id);
+		ELSIF v_man_table = 'man_samplepoint' THEN
+			INSERT INTO man_samplepoint (connec_id, lab_code, place_name, cabinet)
+			VALUES (NEW.connec_id, NEW.lab_code, NEW.place_name, NEW.cabinet);
 		ELSIF v_man_table = 'parent' THEN
 			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN cat_connec ON cat_connec.id=NEW.conneccat_id
 		    	WHERE c.id = cat_connec.connec_type LIMIT 1)::text;
@@ -794,6 +797,15 @@ BEGIN
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(),
 			updated_by=current_user, matcat_id = NEW.matcat_id, asset_id=NEW.asset_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			plot_id=NEW.plot_id, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id
+			WHERE connec_id = OLD.connec_id;
+		END IF;
+
+		IF v_man_table = 'man_cjoin' THEN
+			-- todo when cjoin has more fields
+		ELSIF v_man_table = 'man_vconnec' THEN
+			-- todo when vconnec has more fields
+		ELSIF v_man_table = 'man_samplepoint' THEN
+			UPDATE man_samplepoint SET lab_code = NEW.lab_code, place_name = NEW.place_name, cabinet = NEW.cabinet
 			WHERE connec_id = OLD.connec_id;
 		END IF;
 

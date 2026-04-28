@@ -122,3 +122,13 @@ DROP RULE IF EXISTS dwfzone_expl ON dwfzone;
 CREATE INDEX IF NOT EXISTS idx_gully_arc_id ON gully USING btree (arc_id);
 
 DROP TABLE IF EXISTS dwfzone_graph;
+
+-- 28/04/2026
+CREATE TABLE IF NOT EXISTS man_netsamplepoint (
+	node_id int4 NOT NULL,
+	lab_code varchar(30) NULL,
+	place_name varchar(254) NULL,
+	cabinet varchar(150) NULL,
+	CONSTRAINT man_netsamplepoint_pkey PRIMARY KEY (node_id),
+	CONSTRAINT man_netsamplepoint_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);

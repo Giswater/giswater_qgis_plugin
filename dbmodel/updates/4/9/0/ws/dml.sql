@@ -435,3 +435,90 @@ DELETE FROM sys_function WHERE id = 2302 AND function_name = 'gw_fct_anl_node_to
 -- 27/04/2026
 INSERT INTO sys_table (id,descript,sys_role,"source")
 VALUES ('plan_netscenario_mapzone_graph','Table to manage graph for plan_netscenario_mapzone','role_edit','core');
+
+-- 28/04/2026
+DO $$
+DECLARE
+	rec record;
+	v_new_id integer;
+	v_exit_id integer;
+	v_conneccat_id varchar;
+	v_connec_epa text;
+	v_has_exit boolean;
+	v_exit_is_arc boolean;
+BEGIN
+  IF (SELECT COUNT(*) FROM _samplepoint_) > 0 THEN
+    RAISE NOTICE 'Samplepoints found, inserting new connecs...';
+    INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('SAMPLEPOINT', 'SAMPLEPOINT','CONNEC', 've_connec', 've_connec_samplepoint', true) ON CONFLICT (id) DO NOTHING;
+
+    INSERT INTO cat_connec (id,connec_type,matcat_id,pnom,dnom,dint,active)
+	  VALUES ('UPDATE_SAMPLEPOINT_490','SAMPLEPOINT','PVC','16','25',25.00000,true) ON CONFLICT (id) DO NOTHING;
+
+    v_conneccat_id := 'UPDATE_SAMPLEPOINT_490';
+    v_connec_epa := 'JUNCTION';
+
+    FOR rec IN
+      SELECT *
+      FROM _samplepoint_ sp
+      ORDER BY sp.sample_id
+    LOOP
+      v_new_id := NULL;
+      v_exit_id := CASE WHEN rec.feature_id ~ '^[0-9]+$' THEN rec.feature_id::integer ELSE NULL END;
+
+      INSERT INTO connec (
+        code, top_elev, depth, conneccat_id, epa_type, state, state_type,
+        expl_id, muni_id, sector_id, dma_id, presszone_id, district_id,
+        streetaxis_id, postcode, postnumber, postcomplement,
+        streetaxis2_id, postnumber2, postcomplement2,
+        workcat_id, workcat_id_end, builtdate, enddate,
+        verified, rotation, the_geom
+      ) VALUES (
+        rec.code, NULL, NULL, v_conneccat_id, v_connec_epa, rec.state, 2,
+        rec.expl_id, rec.muni_id, COALESCE(rec.sector_id, 0), rec.dma_id, rec.presszone_id, rec.district_id,
+        rec.streetaxis_id, rec.postcode, rec.postnumber, rec.postcomplement,
+        rec.streetaxis2_id, rec.postnumber2, rec.postcomplement2,
+        rec.workcat_id, rec.workcat_id_end, rec.builtdate, rec.enddate,
+        rec.verified, rec.rotation, rec.the_geom
+      )
+      RETURNING connec_id INTO v_new_id;
+
+      INSERT INTO man_samplepoint (connec_id, lab_code, place_name, cabinet)
+      VALUES (v_new_id, rec.lab_code, rec.place_name, rec.cabinet);
+
+      v_has_exit := v_exit_id IS NOT NULL AND (
+        EXISTS (SELECT 1 FROM arc a WHERE a.arc_id = v_exit_id)
+        OR EXISTS (SELECT 1 FROM node n WHERE n.node_id = v_exit_id)
+        OR EXISTS (SELECT 1 FROM connec c WHERE c.connec_id = v_exit_id)
+      );
+      IF v_has_exit THEN
+        v_exit_is_arc := EXISTS (SELECT 1 FROM arc a WHERE a.arc_id = v_exit_id);
+
+        IF v_exit_is_arc IS FALSE THEN 
+          -- If exit_id refers to a node, find an arc that connects to this node
+          SELECT arc_id INTO v_exit_id 
+          FROM arc 
+          WHERE node_1 = v_exit_id OR node_2 = v_exit_id
+          LIMIT 1;
+
+          v_exit_is_arc := v_exit_id IS NOT NULL;
+        END IF;
+
+        IF v_exit_is_arc THEN
+          PERFORM gw_fct_setlinktonetwork(
+            json_build_object(
+              'client', json_build_object('device', 4, 'infoType', 1, 'lang', 'ES'),
+              'feature', json_build_object('id', to_json(ARRAY[v_new_id::text])),
+              'data', json_build_object(
+                'feature_type', 'CONNEC',
+                'forcedArcs', to_json(ARRAY[v_exit_id::text])
+              )
+            )
+          );
+        END IF;
+      END IF;
+    END LOOP;
+
+  ELSE
+    RAISE NOTICE 'No samplepoints found, skipping...';
+  END IF;
+END $$;

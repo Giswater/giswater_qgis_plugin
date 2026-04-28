@@ -251,3 +251,7 @@ CREATE TABLE IF NOT EXISTS plan_netscenario_mapzone_graph (
 CREATE INDEX IF NOT EXISTS plan_netscenario_mapzone_graph_mapzone_id_idx ON plan_netscenario_mapzone_graph USING btree (mapzone_id);
 CREATE INDEX IF NOT EXISTS plan_netscenario_mapzone_graph_netscenario_id_idx ON plan_netscenario_mapzone_graph USING btree (netscenario_id);
 CREATE INDEX IF NOT EXISTS plan_netscenario_mapzone_graph_node_id_idx ON plan_netscenario_mapzone_graph USING btree (node_id);
+
+-- 28/04/2026
+ALTER TABLE man_netsamplepoint ADD COLUMN place_name varchar(254) NULL;
+ALTER TABLE man_netsamplepoint ADD COLUMN cabinet varchar(150) NULL;
