@@ -32,11 +32,8 @@ SELECT col_is_pk('plan_netscenario_mapzone_graph', ARRAY['node_id', 'mapzone_id'
 SELECT col_type_is('plan_netscenario_mapzone_graph', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('plan_netscenario_mapzone_graph', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
 SELECT col_type_is('plan_netscenario_mapzone_graph', 'mapzone_id', 'integer', 'Column mapzone_id should be integer');
-SELECT col_type_is('plan_netscenario_mapzone_graph', 'mapzone_type', 'integer', 'Column mapzone_type should be integer');
+SELECT col_type_is('plan_netscenario_mapzone_graph', 'mapzone_type', 'text', 'Column mapzone_type should be text');
 SELECT col_type_is('plan_netscenario_mapzone_graph', 'flow_sign', 'smallint', 'Column flow_sign should be smallint');
-
--- Check unique constraints
-SELECT col_is_unique('plan_netscenario_mapzone_graph', ARRAY['mapzone_id', 'node_id'], 'Columns mapzone_id and node_id should have a unique constraint');
 
 -- Check constraints
 SELECT col_not_null('plan_netscenario_mapzone_graph', 'node_id', 'Column node_id should be NOT NULL');

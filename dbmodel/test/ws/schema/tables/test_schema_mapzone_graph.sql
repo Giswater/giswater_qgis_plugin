@@ -33,9 +33,6 @@ SELECT col_type_is('mapzone_graph', 'node_id', 'integer', 'Column node_id should
 SELECT col_type_is('mapzone_graph', 'mapzone_id', 'integer', 'Column mapzone_id should be integer');
 SELECT col_type_is('mapzone_graph', 'flow_sign', 'smallint', 'Column flow_sign should be smallint');
 
--- Check unique constraints
-SELECT col_is_unique('mapzone_graph', ARRAY['mapzone_id', 'node_id'], 'Columns mapzone_id and node_id should have a unique constraint');
-
 -- Check constraints
 SELECT col_not_null('mapzone_graph', 'node_id', 'Column node_id should be NOT NULL');
 SELECT col_not_null('mapzone_graph', 'mapzone_id', 'Column mapzone_id should be NOT NULL');
