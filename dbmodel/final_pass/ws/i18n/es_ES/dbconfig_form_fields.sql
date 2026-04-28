@@ -636,7 +636,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
     ('value', 'price_compost_value', 'form_feature', 'tab_none', 'Valor:', 'Medición'),
     ('descript', 'price_value_unit', 'form_feature', 'tab_none', 'Descripción:', 'Campo para almacenar información adicional sobre las unidades de valor del precio.'),
     ('id', 'price_value_unit', 'form_feature', 'tab_none', 'Id:', 'Identificador de unidades de precio. Clave primaria.'),
-    ('composer', 'print', 'form_print', 'tab_none', 'Composer:', 'Composición'),
+    ('composer', 'print', 'form_print', 'tab_none', 'Composición:', 'Composición'),
     ('rotation', 'print', 'form_print', 'tab_none', 'Rotación:', 'Rotación:'),
     ('title', 'print', 'form_print', 'tab_none', 'Título:', 'Título:'),
     ('add_muni', 'search', 'form_feature', 'tab_none', 'Municipio:', 'Municipio'),
