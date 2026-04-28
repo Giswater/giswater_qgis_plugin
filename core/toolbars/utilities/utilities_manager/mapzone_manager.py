@@ -493,18 +493,34 @@ class GwMapzoneManager:
         # Sort the table
         model.sort(0, Qt.SortOrder.AscendingOrder)
 
+    def _is_show_inactive_checked(self, dialog=None, state=None):
+        """Return True only when checkbox state is explicitly Checked."""
+        if dialog is None:
+            dialog = self.mapzone_mng_dlg
+        if dialog is None or isdeleted(dialog) or dialog.chk_active is None:
+            return False
+
+        if state is None:
+            state = dialog.chk_active.checkState()
+
+        if isinstance(state, bool):
+            return state
+
+        checked_value = int(Qt.CheckState.Checked)
+        try:
+            return int(state) == checked_value
+        except (TypeError, ValueError):
+            return dialog.chk_active.isChecked()
+
     def _filter_active(self, dialog, active):
         """ Filters manager table by active """
 
         widget_table = dialog.main_tab.currentWidget()
 
-        if active is None:
-            active = dialog.chk_active.checkState()
+        show_inactive = self._is_show_inactive_checked(dialog, active)
 
         search_text = dialog.txt_name.text()
-        expr = ""
-        if not active:
-            expr = "active is true"
+        expr = "" if show_inactive else "active is true"
 
         if search_text:
             if expr:
@@ -1706,9 +1722,16 @@ class GwMapzoneManager:
         field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
         mapzone_ids = [index.sibling(index.row(), 0).data() for index in selected_list]
 
+        record_labels = []
+        for index in selected_list:
+            mapzone_id = index.sibling(index.row(), 0).data()
+            mapzone_name = index.sibling(index.row(), 1).data()
+            label = mapzone_name if mapzone_name not in (None, "", "NULL") else str(mapzone_id)
+            record_labels.append(label)
+
         msg = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.show_question(msg, title, [index.sibling(index.row(), 1).data() for index in selected_list], force_action=True)
+        answer = tools_qt.show_question(msg, title, record_labels, force_action=True)
         if answer:
             # Build WHERE IN clause for SQL
             where_clause = f"{field_id} IN ({', '.join(map(str, mapzone_ids))})"
