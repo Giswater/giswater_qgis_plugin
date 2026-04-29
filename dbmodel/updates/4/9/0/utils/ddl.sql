@@ -194,3 +194,7 @@ ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
 
 DROP VIEW IF EXISTS ve_samplepoint;
 ALTER TABLE samplepoint RENAME TO _samplepoint_;
+
+-- 29/04/2026
+DROP INDEX IF EXISTS connec_plot_code;
+CREATE INDEX IF NOT EXISTS idx_connec_plot_id ON connec USING btree (plot_id);
