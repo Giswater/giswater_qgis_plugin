@@ -155,7 +155,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
 ('elementcat_id', '%_element%', 'form_feature', 'tab_data', 'Catálogo:', 'Catálogo'),
 ('enddate', '%_element%', 'form_feature', 'tab_data', 'Fecha final:', 'Fecha final'),
 ('epa_type', '%_element%', 'form_feature', 'tab_data', 'Tipo EPA:', 'Tipo_epa'),
-('expl_id', '%_element%', 'form_feature', 'tab_data', 'Funcionamiento:', 'Funcionamiento'),
+('expl_id', '%_element%', 'form_feature', 'tab_data', 'Explotación id:', 'Explotación id:'),
 ('flwreg_length', '%_element%', 'form_feature', 'tab_data', 'Longitud Flwreg:', 'Flwreg_length'),
 ('function_type', '%_element%', 'form_feature', 'tab_data', 'Tipo de función:', 'Tipo de función'),
 ('location_type', '%_element%', 'form_feature', 'tab_data', 'Tipo de ubicación:', 'Tipo de ubicación'),

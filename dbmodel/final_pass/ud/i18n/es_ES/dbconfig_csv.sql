@@ -8,8 +8,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_csv AS t SET alias = v.alias, descript = v.descript FROM (
 	VALUES
 	(385, 'Importar inp timeseries', 'Function to assist the import of timeseries for inp models. The csv file must containts next columns on same position: timseries, timser_type, times_type, descript, expl_id, date, hour, time, value (fill date/hour for ABSOLUTE or time for RELATIVE)'),
-    (408, 'Import istram nodes', NULL),
-    (409, 'Import istram arcs', NULL),
+    (408, 'Importar nodos istram', NULL),
+    (409, 'Importar arcos istram', NULL),
     (445, 'Import cat_feature_node', 'The csv file must contain the following columns in the exact same order:  id, system_id, epa_default, isarcdivide, isprofilesurface, code_autofill, choose_hemisphere, double_geom, num_arcs, isexitupperintro, shortcut_key, link_path, descript, active'),
     (446, 'Import cat_feature_connec', 'The csv file must contain the following columns in the exact same order:  id, system_id, code_autofill, double_geom, shortcut_key, link_path, descript, active'),
     (447, 'Import cat_feature_gully', 'The csv file must contain the following columns in the exact same order:  id, system_id, epa_default, code_autofill, double_geom, shortcut_key, link_path, descript, active'),
