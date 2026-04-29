@@ -42,7 +42,7 @@ BEGIN
       IF v_isutils IS FALSE OR v_isutils IS NULL THEN  
         --get muni value if its null    
         IF NEW.muni_id IS NULL THEN
-          NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) AND active IS TRUE LIMIT 1);
+          NEW.muni_id := (SELECT muni_id FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001) AND active IS TRUE LIMIT 1);
         END IF;
 
         INSERT INTO ext_plot(id, plot_code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, 

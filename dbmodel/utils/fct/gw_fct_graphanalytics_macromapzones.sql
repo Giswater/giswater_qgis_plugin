@@ -180,15 +180,15 @@ BEGIN
 					AND (cardinality($1) = 0 OR ar.expl_id = ANY($1))
 					UNION ALL
 					SELECT ch.'||v_macro_id_field||' AS mapzone_id,
-						ep.the_geom AS geom
+						vp.the_geom AS geom
 					FROM connec vc
 					JOIN '||v_child_table||' ch ON vc.'||v_child_fk||' = ch.'||v_child_fk||'
-					LEFT JOIN ext_plot ep
-						ON vc.plot_code = ep.plot_code
-						AND ST_DWithin(vc.the_geom, ep.the_geom, 0.001)
+					LEFT JOIN v_plot vp
+						ON vc.plot_id = vp.id
+						AND ST_DWithin(vc.the_geom, vp.the_geom, 0.001)
 					WHERE ch.'||v_macro_id_field||' IS NOT NULL AND ch.'||v_macro_id_field||' > 0
 					AND (cardinality($1) = 0 OR vc.expl_id = ANY($1))
-					AND ep.the_geom IS NOT NULL
+					AND vp.the_geom IS NOT NULL
 				) a
 				GROUP BY mapzone_id
 			';

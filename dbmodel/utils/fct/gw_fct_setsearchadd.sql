@@ -27,14 +27,14 @@ SELECT gw_fct_setsearchadd($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 SELECT array_to_json(array_agg(row_to_json(a))) 
 			FROM (
 
-			SELECT ext_streetaxis.muni_id, ext_address.postnumber as display_name, st_x (ext_address.
+			SELECT v_streetaxis.muni_id, ext_address.postnumber as display_name, st_x (ext_address.
 			the_geom) as sys_x
 			,st_y (ext_address.the_geom) as sys_y, (SELECT concat('EPSG:',epsg) FROM sys_version ORDER BY id DESC LIMIT 1) AS srid
 			FROM ext_address
-			JOIN ext_streetaxis ON ext_streetaxis.id = 
+			JOIN v_streetaxis ON v_streetaxis.id = 
 			ext_address.streetaxis_id
-			WHERE ext_streetaxis.text = 'Carrer de Jacint Verdaguer'
-			AND  ext_streetaxis.muni_id = 8141
+			WHERE v_streetaxis.text = 'Carrer de Jacint Verdaguer'
+			AND  v_streetaxis.muni_id = 8141
 			AND ext_address.postnumber ILIKE '%22%' 
 			ORDER BY regexp_replace(postnumber,'[^0-9]+','','g')::integer LIMIT 10
 			)a	

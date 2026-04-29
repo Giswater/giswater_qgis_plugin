@@ -142,7 +142,7 @@ BEGIN
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
-				NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
+				NEW.muni_id := (SELECT m.muni_id FROM v_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 			END IF;
 		END IF;
 

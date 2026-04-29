@@ -23,7 +23,7 @@ SELECT SCHEMA_NAME.gw_fct_gettypeahead($${
 	"textToSearch":"FD"}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
-"queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN ext_municipality m USING (muni_id) WHERE id IS NOT NULL",
+"queryText":"SELECT id AS id, a.name AS idval FROM ext_streetaxis a JOIN v_municipality m USING (muni_id) WHERE id IS NOT NULL",
 "queryTextFilter":"AND m.name", "parentId":"muni_id", "parentValue":"", "textToSearch":"Ave"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_gettypeahead($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
@@ -68,7 +68,7 @@ BEGIN
 
 	-- control nulls for parent mapzone hidden (muni_id) the only parent mapzone with typeahead childs
 	IF v_parentvalue = '' AND v_parent = 'muni_id' THEN
-		v_parentvalue =  (SELECT name FROM ext_municipality WHERE active IS TRUE LIMIT 1);
+		v_parentvalue =  (SELECT name FROM v_municipality WHERE active IS TRUE LIMIT 1);
 	END IF;
 
 	-- building query text

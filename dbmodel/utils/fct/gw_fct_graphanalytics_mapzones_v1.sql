@@ -2067,14 +2067,14 @@ BEGIN
 							UNION ALL
 							SELECT
 								t.mapzone_id,
-								ep.the_geom AS geom
+								vp.the_geom AS geom
 							FROM temp_pgr_connec t
 							JOIN connec vc ON t.pgr_connected_id = vc.connec_id
-							LEFT JOIN ext_plot ep
-								ON vc.plot_code = ep.plot_code
-							AND ST_DWithin(vc.the_geom, ep.the_geom, 0.001)
+							LEFT JOIN v_plot vp
+								ON vc.plot_id = vp.id
+							AND ST_DWithin(vc.the_geom, vp.the_geom, 0.001)
 							WHERE t.mapzone_id > 0
-							AND ep.the_geom IS NOT NULL
+							AND vp.the_geom IS NOT NULL
 						) a
 						GROUP BY mapzone_id
 					) b

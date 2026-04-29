@@ -63,7 +63,7 @@ BEGIN
 	v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
 	v_polygonlayer := ((p_data ->>'data')::json->>'parameters')::json->>'insersectPolygonLayer';
 	Select count(*)
-	into v_count From ext_address
+	into v_count From v_address
 	Where postnumber NOT SIMILAR TO '[0-9]*';
 
 
@@ -156,7 +156,7 @@ BEGIN
 		EXECUTE 'UPDATE '||v_feature_type||' a set streetaxis_id = q.streetaxis_id, '||v_fieldtoupdate||' = q.postnumber from (
 		SELECT distinct on ('||v_feature_type||'_id) '||v_feature_type||'_id, ea.streetaxis_id ,'||v_partialquery3||'
 	    FROM '||v_feature_type||' a
-	        JOIN ext_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
+	        JOIN v_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
 		'||v_partialquery||'
 		'||v_partialquery2||'
 		'||v_partialquery4||'
@@ -168,7 +168,7 @@ BEGIN
 		EXECUTE 'UPDATE '||v_feature_type||' a set streetaxis_id = q.streetaxis_id, '||v_fieldtoupdate||' = q.postnumber from (
 		SELECT distinct on ('||v_feature_type||'_id) '||v_feature_type||'_id, ea.streetaxis_id ,'||v_partialquery3||'
 	    FROM '||v_feature_type||' a
-	        JOIN ext_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
+	        JOIN v_address ea ON ST_DWithin(a.the_geom, ea.the_geom, '||v_searchbuffer||')
 		'||v_partialquery||'
 		'||v_partialquery2||' '||v_partialquery4||' '||v_expl||' '||v_state||'
 	    ORDER BY '||v_feature_type||'_id, ST_Distance(a.the_geom, ea.the_geom))q
