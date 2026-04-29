@@ -1668,7 +1668,7 @@ FROM (
 <qgis hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" simplifyDrawingHints="0" simplifyLocal="1" maxScale="0" symbologyReferenceScale="-1" minScale="100000000" simplifyAlgorithm="0" simplifyMaxScale="1" styleCategories="Symbology|Rendering" version="3.22.4-Białowieża">
   <renderer-v2 forceraster="0" referencescale="-1" symbollevels="0" type="RuleRenderer" enableorderby="0">
     <rules key="{cd75f41e-3b1d-443c-8148-fbc4436aa9cb}">
-      <rule filter="&quot;original_state&quot;  =  1 AND &quot;plan_state&quot;=0" symbol="0" scalemaxdenom="1500" label="Barranco obsoleto planificado" key="{abcdb374-fe6a-4d04-a466-31fdd93144e8}" scalemindenom="1"/>
+      <rule filter="&quot;original_state&quot;  =  1 AND &quot;plan_state&quot;=0" symbol="0" scalemaxdenom="1500" label="Sumidero obsoleto planificado" key="{abcdb374-fe6a-4d04-a466-31fdd93144e8}" scalemindenom="1"/>
     </rules>
     <symbols>
       <symbol name="0" alpha="1" clip_to_extent="1" type="marker" force_rhr="0">
@@ -2678,7 +2678,7 @@ FROM (
 <qgis labelsEnabled="1" version="3.40.8-Bratislava" styleCategories="Symbology|Labeling">
   <renderer-v2 symbollevels="0" type="RuleRenderer" referencescale="-1" enableorderby="0" forceraster="0">
     <rules key="{cd75f41e-3b1d-443c-8148-fbc4436aa9cb}">
-      <rule key="{abcdb374-fe6a-4d04-a466-31fdd93144e8}" label="Barranco" filter="state = 1 or state=2" symbol="0" scalemaxdenom="1500"/>
+      <rule key="{abcdb374-fe6a-4d04-a466-31fdd93144e8}" label="Sumidero" filter="state = 1 or state=2" symbol="0" scalemaxdenom="1500"/>
       <rule key="{5ed6d5c8-0054-42c1-a268-53e042760284}" label="OBSOLETE" filter="state=0" symbol="1" scalemaxdenom="1500"/>
       <rule key="{fcb93b3a-1412-448e-b95f-627bfe328230}" label="(dibujo)" filter="ELSE" symbol="2"/>
     </rules>
@@ -8511,10 +8511,10 @@ FROM (
   <renderer-v2 enableorderby="0" type="RuleRenderer" referencescale="-1" forceraster="0" symbollevels="0">
     <rules key="{e4d87f5e-3fd2-4d97-8962-998d1cba9adf}">
       <rule label="Corriente principal Connec" filter="&quot;feature_type&quot; = ''CONNEC'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{9c94b1b8-8153-4cce-b198-b2bda93a93d6}" symbol="0"/>
-      <rule label="Corriente principal del barranco" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{979e0699-2e15-403a-9c69-e30227975796}" symbol="1"/>
+      <rule label="Corriente principal del sumidero" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{979e0699-2e15-403a-9c69-e30227975796}" symbol="1"/>
       <rule label="Nodo principal" filter=" &quot;feature_type&quot;  = ''NODE'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{a38e0b7e-b58a-4a05-baab-8018a82d3727}" symbol="2"/>
       <rule label="Flujo desviado Connec" filter="&quot;feature_type&quot; = ''CONNEC'' and  &quot;stream_type&quot; = ''diverted flow''" key="{b32d9276-a77a-4179-8d27-2b2015c5b2f1}" symbol="3"/>
-      <rule label="Caudal desviado del barranco" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{10fed0c0-d299-4d2f-b388-0722768847f0}" symbol="4"/>
+      <rule label="Caudal desviado del sumidero" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{10fed0c0-d299-4d2f-b388-0722768847f0}" symbol="4"/>
       <rule label="Nodo flujo desviado" filter=" &quot;feature_type&quot;  = ''NODE'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{26c49b63-1fab-4676-afc2-37a7b531592c}" symbol="5"/>
     </rules>
     <symbols>
@@ -8821,10 +8821,10 @@ FROM (
   <renderer-v2 enableorderby="0" type="RuleRenderer" referencescale="-1" forceraster="0" symbollevels="0">
     <rules key="{e4d87f5e-3fd2-4d97-8962-998d1cba9adf}">
       <rule label="Corriente principal Connec" filter="&quot;feature_type&quot; = ''CONNEC'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{9c94b1b8-8153-4cce-b198-b2bda93a93d6}" symbol="0"/>
-      <rule label="Corriente principal del barranco" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{979e0699-2e15-403a-9c69-e30227975796}" symbol="1"/>
+      <rule label="Corriente principal del sumidero" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{979e0699-2e15-403a-9c69-e30227975796}" symbol="1"/>
       <rule label="Nodo principal" filter=" &quot;feature_type&quot;  = ''NODE'' and  &quot;stream_type&quot;  =  ''mainstream'' " key="{a38e0b7e-b58a-4a05-baab-8018a82d3727}" symbol="2"/>
       <rule label="Flujo desviado Connec" filter="&quot;feature_type&quot; = ''CONNEC'' and  &quot;stream_type&quot; = ''diverted flow''" key="{b32d9276-a77a-4179-8d27-2b2015c5b2f1}" symbol="3"/>
-      <rule label="Caudal desviado del barranco" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{10fed0c0-d299-4d2f-b388-0722768847f0}" symbol="4"/>
+      <rule label="Caudal desviado del sumidero" filter=" &quot;feature_type&quot;  = ''GULLY'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{10fed0c0-d299-4d2f-b388-0722768847f0}" symbol="4"/>
       <rule label="Nodo flujo desviado" filter=" &quot;feature_type&quot;  = ''NODE'' and  &quot;stream_type&quot;  =  ''diverted flow''" key="{26c49b63-1fab-4676-afc2-37a7b531592c}" symbol="5"/>
     </rules>
     <symbols>
@@ -13078,7 +13078,7 @@ FROM (
 <qgis labelsEnabled="1" version="3.40.8-Bratislava" styleCategories="Symbology|Labeling">
   <renderer-v2 symbollevels="0" type="RuleRenderer" referencescale="-1" enableorderby="0" forceraster="0">
     <rules key="{cd75f41e-3b1d-443c-8148-fbc4436aa9cb}">
-      <rule key="{abcdb374-fe6a-4d04-a466-31fdd93144e8}" label="Barranco" filter="state = 1 and (p_state &lt;> 0 or p_state is null)" symbol="0" scalemaxdenom="1500"/>
+      <rule key="{abcdb374-fe6a-4d04-a466-31fdd93144e8}" label="Sumidero" filter="state = 1 and (p_state &lt;> 0 or p_state is null)" symbol="0" scalemaxdenom="1500"/>
       <rule key="{5ed6d5c8-0054-42c1-a268-53e042760284}" label="OBSOLETE" filter="state=0" symbol="1" scalemaxdenom="1500"/>
       <rule key="{deedf78b-1b14-4314-b775-536678965a4f}" label="PLANIFICADO" filter="state=2" symbol="2" scalemaxdenom="1500"/>
       <rule key="{b0e34206-b0d8-424d-a80a-21fec3287f94}" label="FASE-SALIDA" filter="state=1 AND p_state=0" symbol="3" scalemaxdenom="1500"/>

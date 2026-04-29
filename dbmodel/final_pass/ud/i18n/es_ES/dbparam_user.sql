@@ -44,7 +44,7 @@ UPDATE sys_param_user AS t SET label = v.label, descript = v.descript FROM (
     ('edit_node_ymax_vdefault', 'Ymax predeterminados por nodos:', 'Default value of ymax for nodes'),
     ('edit_nodecat_vdefault', 'Catálogo por defecto para el nodo (capa padre):', 'Catálogo de nodos por defecto cuando se utiliza la capa padre (v_edit_node)'),
     ('edit_state_vdefault', 'Estado:', 'Valor del parámetro de estado'),
-    ('epa_gully_efficiency_vdefault', 'Eficiencia de barranco 1D/2D vdefault:', 'Valor por defecto para eficiencia en gullies'),
+    ('epa_gully_efficiency_vdefault', 'Eficiencia de sumidero 1D/2D vdefault:', 'Valor por defecto para eficiencia en gullies'),
     ('epa_gully_method_vdefault', 'Método de cálculo 1D/2D Gully vdefault:', 'Valor por defecto para el método de cálculo en gullies. Hay dos opciones disponibles (UPC, W/O).'),
     ('epa_gully_orifice_cd_vdefault', '1D/2D Gully CD-ORIFICE vpredeterminado para el método W/O:', 'Valor predeterminado para rifice_cd utilizando el método de cálculo W/O en gullies'),
     ('epa_gully_outlet_type_vdefault', '1D/2D Gully outlet_type vdefault:', 'Valor predeterminado para activar/desactivar gully. Hay dos opciones disponibles (Sink, To_network). En caso de pérdida, se pierde agua.'),
