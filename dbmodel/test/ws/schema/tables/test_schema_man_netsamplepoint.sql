@@ -20,7 +20,7 @@ SELECT has_table('man_netsamplepoint'::name, 'Table man_netsamplepoint should ex
 SELECT columns_are(
     'man_netsamplepoint',
     ARRAY[
-        'node_id', 'lab_code'
+        'node_id', 'lab_code', 'cabinet', 'place_name'
     ],
     'Table man_netsamplepoint should have the correct columns'
 );
@@ -31,6 +31,8 @@ SELECT col_is_pk('man_netsamplepoint', ARRAY['node_id'], 'Column node_id should 
 -- Check column types
 SELECT col_type_is('man_netsamplepoint', 'node_id', 'integer', 'Column node_id should be integer');
 SELECT col_type_is('man_netsamplepoint', 'lab_code', 'varchar(30)', 'Column lab_code should be varchar(30)');
+SELECT col_type_is('man_netsamplepoint', 'cabinet', 'varchar(150)', 'Column cabinet should be varchar(150)');
+SELECT col_type_is('man_netsamplepoint', 'place_name', 'varchar(254)', 'Column place_name should be varchar(254)');
 
 -- Check not null constraints
 SELECT col_not_null('man_netsamplepoint', 'node_id', 'Column node_id should be NOT NULL');

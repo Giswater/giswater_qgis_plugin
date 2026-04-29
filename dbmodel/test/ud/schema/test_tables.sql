@@ -11,7 +11,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(319);
+SELECT plan(320);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -206,6 +206,8 @@ SELECT has_table('man_varc') AS "Table 'man_varc' exists";
 SELECT has_table('man_waccel') AS "Table 'man_waccel' exists";
 SELECT has_table('man_wjump') AS "Table 'man_wjump' exists";
 SELECT has_table('man_wwtp') AS "Table 'man_wwtp' exists";
+SELECT has_table('man_samplepoint') AS "Table 'man_samplepoint' exists";
+SELECT has_table('man_netsamplepoint') AS "Table 'man_netsamplepoint' exists";
 SELECT has_table('node') AS "Table 'node' exists";
 SELECT has_table('om_profile') AS "Table 'om_profile' exists";
 SELECT has_table('om_typevalue') AS "Table 'om_typevalue' exists";
@@ -287,7 +289,6 @@ SELECT has_table('rpt_summary_subcatchment') AS "Table 'rpt_summary_subcatchment
 SELECT has_table('rpt_timestep_critelem') AS "Table 'rpt_timestep_critelem' exists";
 SELECT has_table('rpt_warning_summary') AS "Table 'rpt_warning_summary' exists";
 SELECT has_table('rtc_scada_node') AS "Table 'rtc_scada_node' exists";
-SELECT has_table('samplepoint') AS "Table 'samplepoint' exists";
 SELECT has_table('selector_audit') AS "Table 'selector_audit' exists";
 SELECT has_table('selector_date') AS "Table 'selector_date' exists";
 SELECT has_table('selector_expl') AS "Table 'selector_expl' exists";
