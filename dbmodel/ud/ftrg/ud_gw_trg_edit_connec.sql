@@ -614,7 +614,7 @@ BEGIN
 
 			-- plot_id from plot layer
 			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_connec_autofill_plotcode') = TRUE THEN
-				NEW.plot_id = (SELECT plot_id FROM v_ext_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
+				NEW.plot_id = (SELECT plot_id FROM ve_plot WHERE st_dwithin(the_geom, NEW.the_geom, 0) LIMIT 1);
 			END IF;
 
 		END IF;
