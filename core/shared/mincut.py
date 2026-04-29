@@ -94,7 +94,7 @@ class GwMincut:
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
-        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_streetaxis.descript AS street_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_streetaxis.name AS street_name"
                f" FROM om_mincut"
                f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
                f" LEFT JOIN v_streetaxis ON v_streetaxis.id = om_mincut.streetaxis_id"
@@ -662,6 +662,33 @@ class GwMincut:
         completer = dialog.txt_postnumber.completer()
         if completer:
             completer.activated.connect(partial(self._zoom_to_geom_text, "postnumber"))
+
+    def _sync_address_widgets_from_mincut(self, result_mincut_id):
+        """Load address from om_mincut and reflect it in address widgets."""
+
+        if result_mincut_id in (None, "", "-1"):
+            return
+
+        sql = (
+            f"SELECT om.muni_id, om.postnumber, vs.name AS street_name "
+            f"FROM om_mincut om "
+            f"LEFT JOIN v_streetaxis vs ON vs.id = om.streetaxis_id "
+            f"WHERE om.id = '{result_mincut_id}'"
+        )
+        row = tools_db.get_row(sql)
+        if not row:
+            return
+
+        muni_id = row.get("muni_id")
+        street_name = row.get("street_name")
+        postnumber = row.get("postnumber")
+
+        if muni_id not in (None, "", "-1", -1):
+            tools_qt.set_combo_value(self.dlg_mincut.cmb_municipality, muni_id, 0)
+        if street_name not in (None, ""):
+            tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_street, street_name)
+        if postnumber not in (None, ""):
+            tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_postnumber, postnumber)
 
     def _zoom_to_geom_text(self, source, result):
         """Zoom to geometry represented as WKT text."""
@@ -2387,6 +2414,8 @@ class GwMincut:
                 tools_qgis.restore_cursor()
                 self.action_mincut.setChecked(False)
                 return
+
+            self._sync_address_widgets_from_mincut(real_mincut_id)
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
             self._enable_post_mincut_actions()
