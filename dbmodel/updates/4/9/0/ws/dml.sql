@@ -1109,8 +1109,7 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
 </qgis>
 ' WHERE layername='ve_connec' AND styleconfig_id=101;
 
--- Auto-generated SQL script #202604290917
-UPDATE ws_490_sample_29042026_0840.sys_style
+UPDATE sys_style
 	SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis labelsEnabled="1" layerType="Vector" styleCategories="Symbology|Labeling" version="4.0.1-Norrköping">
   <renderer-v2 enableorderby="0" forceraster="0" referencescale="-1" symbollevels="0" type="RuleRenderer">
