@@ -76,6 +76,11 @@ v_ycoord double precision;
 v_epsg integer;
 v_client_epsg integer;
 v_zoomratio float;
+v_muni_id integer;
+v_streetaxis_id character varying(250);
+v_postnumber text;
+v_street_name text;
+v_has_address_match boolean := FALSE;
 
 v_sensibility_f float;
 v_sensibility float;
@@ -327,6 +332,109 @@ BEGIN
 			anl_feature_type = 'ARC',
 			anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
 		WHERE id = v_mincut_id;
+	END IF;
+
+	-- Address auto-fill for network mincut (null-safe):
+	-- 1) ve_address (street + number + muni)
+	-- 2) ve_streetaxis (street + muni)
+	-- 3) mun / v_municipality (muni)
+	IF v_action IN ('mincutNetwork', 'mincutRefresh') THEN
+
+		IF v_point IS NULL THEN
+			SELECT anl_the_geom INTO v_point
+			FROM om_mincut
+			WHERE id = v_mincut_id;
+		END IF;
+
+		IF v_point IS NOT NULL THEN
+
+			v_muni_id := NULL;
+			v_streetaxis_id := NULL;
+			v_postnumber := NULL;
+			v_street_name := NULL;
+			v_has_address_match := FALSE;
+
+			-- Primary source: closest address
+			SELECT
+				CASE
+					WHEN a.muni_id::text ~ '^[0-9]+$' THEN a.muni_id::integer
+					ELSE NULL
+				END,
+				a.name,
+				a.postnumber
+			INTO v_muni_id, v_street_name, v_postnumber
+			FROM ve_address a
+			ORDER BY a.the_geom <-> v_point
+			LIMIT 1;
+			v_has_address_match := FOUND;
+
+			-- Resolve streetaxis from address street
+			IF v_street_name IS NOT NULL THEN
+				SELECT s.id
+				INTO v_streetaxis_id
+				FROM ve_streetaxis s
+				WHERE s.name = v_street_name
+				AND (v_muni_id IS NULL OR s.muni_id = v_muni_id)
+				ORDER BY s.the_geom <-> v_point
+				LIMIT 1;
+			END IF;
+
+			-- Fallback street/muni from closest streetaxis
+			IF v_street_name IS NULL OR v_muni_id IS NULL OR v_streetaxis_id IS NULL THEN
+				SELECT
+					COALESCE(v_muni_id, s.muni_id),
+					COALESCE(v_streetaxis_id, s.id),
+					COALESCE(v_street_name, s.name)
+				INTO v_muni_id, v_streetaxis_id, v_street_name
+				FROM ve_streetaxis s
+				ORDER BY s.the_geom <-> v_point
+				LIMIT 1;
+			END IF;
+
+			-- Municipality fallback from mun table, if present
+			IF v_muni_id IS NULL AND to_regclass('mun') IS NOT NULL THEN
+				EXECUTE 'SELECT muni_id FROM mun WHERE ST_Intersects(the_geom, $1) ORDER BY ST_Area(the_geom) ASC LIMIT 1'
+				INTO v_muni_id
+				USING v_point;
+
+				IF v_muni_id IS NULL THEN
+					EXECUTE 'SELECT muni_id FROM mun ORDER BY the_geom <-> $1 LIMIT 1'
+					INTO v_muni_id
+					USING v_point;
+				END IF;
+			END IF;
+
+			-- Final municipality fallback from view
+			IF v_muni_id IS NULL AND to_regclass('v_municipality') IS NOT NULL THEN
+				SELECT m.muni_id
+				INTO v_muni_id
+				FROM v_municipality m
+				WHERE m.active IS TRUE
+					AND ST_Intersects(m.the_geom, v_point)
+				ORDER BY ST_Area(m.the_geom) ASC
+				LIMIT 1;
+
+				IF v_muni_id IS NULL THEN
+					SELECT m.muni_id
+					INTO v_muni_id
+					FROM v_municipality m
+					WHERE m.active IS TRUE
+					ORDER BY m.the_geom <-> v_point
+					LIMIT 1;
+				END IF;
+			END IF;
+
+			UPDATE om_mincut
+			SET muni_id = COALESCE(v_muni_id, om_mincut.muni_id),
+				streetaxis_id = COALESCE(v_streetaxis_id, om_mincut.streetaxis_id),
+				postnumber = CASE
+					WHEN v_has_address_match THEN v_postnumber
+					WHEN v_streetaxis_id IS NOT NULL THEN NULL
+					ELSE om_mincut.postnumber
+				END
+			WHERE id = v_mincut_id;
+
+		END IF;
 	END IF;
 
 	-- check if there is at least one operative node, if not - exit
