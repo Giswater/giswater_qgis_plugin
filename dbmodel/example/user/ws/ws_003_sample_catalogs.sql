@@ -54,6 +54,8 @@ VALUES ('PVC50-PN16', 'PIPELINK', 'PVC', '16', '50', 50.00000, NULL, NULL, NULL,
 INSERT INTO cat_link (id, link_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, label)
 VALUES ('PVC63-PN16', 'PIPELINK', 'PVC', '16', '63', 63.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL);
 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('SAMPLEPOINT', 'SAMPLEPOINT','CONNEC', 've_connec', 've_connec_samplepoint', true) ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
 VALUES('FACADE-CABINET', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
 INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
@@ -70,6 +72,8 @@ INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, desc
 VALUES('DRINKING-FOUNTAIN', 'FOUNTAIN', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
 INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
 VALUES('ORNAMENTAL-FOUNTAIN', 'GREENTAP', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES('SAMPLEPOINT', 'SAMPLEPOINT', 'PVC', '16', '25', 25.00000, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_dscenario VALUES (1, 'Hydrants_50%', NULL, NULL, 'DEMAND', true, NULL, NULL);
 

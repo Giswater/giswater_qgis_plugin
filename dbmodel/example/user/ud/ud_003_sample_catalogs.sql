@@ -65,6 +65,8 @@ INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC025_T', 'COND
 INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC030_D', 'CONDUITLINK', NULL, true);
 INSERT INTO cat_link (id, link_type, matcat_id, active) VALUES ('CC020_D', 'CONDUITLINK', NULL, true);
 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('SAMPLEPOINT', 'SAMPLEPOINT','CONNEC', 've_connec', 've_connec_samplepoint', true) ON CONFLICT (id) DO NOTHING;
+
 INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
 VALUES('DIRECT-CONNECTION', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
 INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
@@ -75,6 +77,8 @@ INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, 
 VALUES('SAMPLING-CHAMBER', 'CJOIN', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, NULL, 'Connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
 INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
 VALUES ('VIRTUAL', 'VCONNEC', NULL, 'VIRTUAL', 0.3000, 0.0000, 0.0000, 0.0000, NULL, 'Virtual connec', NULL, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cat_connec (id, connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg, active, "label", estimated_depth)
+VALUES ('SAMPLEPOINT', 'SAMPLEPOINT', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'Samplepoint', NULL, NULL, NULL, NULL, true, NULL, NULL);
 
 
 INSERT INTO cat_node VALUES ('CHAMBER-01', 'CHAMBER', NULL, NULL, 3.00, 2.50, 3.00, 'Chamber 3x2.5x3m', NULL, NULL, NULL, NULL, 2.00, 'u', 'N_CH300x250-H300', true, NULL, NULL);
