@@ -157,9 +157,10 @@ EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"2118", "fid":"116", "cr
 			INTO v_arclist;
 		end if;
 
-		-- execute function
-		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":'||v_arclist||'},
-		"data":{}}$$);';
+		IF v_arclist IS NOT NULL THEN
+			EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":'||v_arclist||'},
+			"data":{}}$$);';
+		END IF;
 
 	END IF;
 
