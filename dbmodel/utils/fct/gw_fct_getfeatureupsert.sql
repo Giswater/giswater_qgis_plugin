@@ -723,7 +723,7 @@ BEGIN
 
 		-- plot code from connecs
 		IF v_idname = 'connec_id' AND v_connec_autofill_plotcode THEN
-			v_plot_code = (SELECT plot_code FROM ve_plot WHERE st_dwithin(v_reduced_geometry, the_geom, 0) LIMIT 1);
+			v_plot_code = (SELECT code FROM ve_plot WHERE st_dwithin(v_reduced_geometry, the_geom, 0) LIMIT 1);
 		END IF;
 
 		-- static pressure
