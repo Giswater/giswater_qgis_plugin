@@ -40,7 +40,7 @@ UPDATE sys_param_user AS t SET label = v.label, descript = v.descript FROM (
     ('edit_gully_linkcat_vdefault', 'Catàleg d''enllaços per a insercions automàtiques:', 'Valor predeterminat del catàleg d''enllaç'),
     ('edit_gully_location_vdefault', 'Ubicació de l''embornal:', 'Valor predeterminat del tipus d''ubicació per a l''embornal'),
     ('edit_gullyrotation_disable', 'Deshabilitar la rotació del barranc automàtica:', 'Si és cert, el càlcul automàtic de rotació als barrancs està desactivat. S''utilitza per a una actualització manual absoluta del camp de rotació'),
-    ('edit_node_topelev_options', 'Actualització Automàtica Cota/ymax:', 'Si elev, ymax es recalcula quan node top_elev canvia. Si ymax, elev es recalcula quan node elev canvia.'),
+    ('edit_node_topelev_options', 'Actualització Automàtica Cota/ymax:', 'Si elev, ymax es recalcula quan node cota terreny canvia. Si ymax, elev es recalcula quan node elev canvia.'),
     ('edit_node_ymax_vdefault', 'Ymax predeterminats per nodes:', 'Default value of ymax for nodes'),
     ('edit_nodecat_vdefault', 'Catàleg predeterminat per al node (capa pare):', 'Catàleg predeterminat de node quan s''utilitza la capa pare (v_edit_node)'),
     ('edit_state_vdefault', 'Estat:', 'Valor Del Paràmetre D''Estat'),

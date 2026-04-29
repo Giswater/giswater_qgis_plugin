@@ -721,7 +721,7 @@ UPDATE config_form_tableview AS t SET alias = v.alias FROM (
     ('v_plan_node', 'sector_id', 'Sector id'),
     ('v_plan_node', 'state', 'State'),
     ('v_plan_node', 'the_geom', 'The geom'),
-    ('v_plan_node', 'top_elev', 'Cota Superior'),
+    ('v_plan_node', 'top_elev', 'Cota terreny:'),
     ('v_price_compost', 'descript', 'Descript'),
     ('v_price_compost', 'id', 'Id'),
     ('v_price_compost', 'price', 'Preu'),

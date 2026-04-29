@@ -36,7 +36,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (1042, 'Un o més arcs no es van insertar/actualitzar perquè no tenen un node inicial/final. Arc_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració'),
     (1044, 'Existeixen una o més conexions més properes que la distancia mínima configurada, conneec_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració'),
     (1046, 'Existeixen un o més nodes més aprop que la distancia configurada, node_id:', 'Verifiqui el seu projecte o modifiqui les propietats de configuració'),
-    (1048, 'Elev no és una columna actualitzable', 'Si us plau, utilitzeu top_elev o ymax per modificar aquest valor'),
+    (1048, 'Elev no és una columna actualitzable', 'Si us plau, utilitzeu cota terreny o ymax per modificar aquest valor'),
     (1050, 'És impossible dividir un arc amb estat=(0)', 'Per a dividir un arc, l''estat ha de ser 1'),
     (1052, 'És impossible dividir un arc utilitzant un node que té un estat=(0)', 'Per dividir u arc, l''estat del node ha de ser 1'),
     (1054, 'És impossible dividir un arc amb estat=(1) utilitzant un node amb estat=(2)', 'Per a dividir un arc, l''estat del node utilitzat ha de ser 1'),

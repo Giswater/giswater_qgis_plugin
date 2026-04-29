@@ -56,7 +56,7 @@ UPDATE sys_function AS t SET descript = v.descript FROM (
     (2986, 'Identifica arcs que tenen una direcció de dibuix oposada al cabal d''aigua. Càlcul basat en els valors sys_elev de l''arc'),
     (3036, 'Trigger per fer editable v_edit_inp_dwf'),
     (3046, 'Funció per ajudar la importació de sèries temporals per a models inp'),
-    (3064, 'Anàlisi de valors duplicats inserits en els camps top_elev, ymax i elev'),
+    (3064, 'Anàlisi de valors duplicats inserits en els camps cota terreny, ymax i elev'),
     (3066, 'Anàlisi de valors duplicats inserits en els camps y i elev'),
     (3100, 'Funció per gestionar els valors del catàleg d''hidrologia de destinació definit (eliminar o copiar des d''un altre). Funciona amb tots els elements vinculats al catàleg d''hidrologia (Conca, Lids, Càrregues, Cobertures i Aigua subterrània).'),
     (3102, 'Funció per gestionar els valors del catàleg de destinació dwf definit (inserir, eliminar o copiar des d''un altre). Funciona amb la taula dwf'),
