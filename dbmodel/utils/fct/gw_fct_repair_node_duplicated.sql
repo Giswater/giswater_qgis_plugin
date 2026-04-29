@@ -91,11 +91,11 @@ BEGIN
 
 			-- log
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3646", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3646", "function":"3080", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3648", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3650", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3650", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 		ELSIF v_action = 'DOWNGRADE' THEN
 
@@ -108,11 +108,11 @@ BEGIN
 
 			-- log
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3652", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3652", "function":"3080", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3648", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3650", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3650", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 
 		ELSIF v_action = 'MOVE-LOSE-TOPO' THEN
@@ -128,11 +128,11 @@ BEGIN
 
 			-- log
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3654", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3654", "function":"3080", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3648", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3650", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3650", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 		ELSIF v_action = 'MOVE-KEEP-TOPO' THEN
 
@@ -143,11 +143,11 @@ BEGIN
 
 			-- log
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3654", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3654", "function":"3080", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3648", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3648", "function":"3080", "parameters":{"v_targetnode":"'||v_targetnode||'", "v_nodetolerance":"'||v_nodetolerance||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3656", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3656", "function":"3080", "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 
 		ELSIF v_action = 'MOVE-GET-TOPO' THEN
 
@@ -162,9 +162,9 @@ BEGIN
 
 			-- log
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3654", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3654", "function":"3080", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3080", "function":"3658", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
+                       "data":{"message":"3658", "function":"3080", "parameters":{"v_node":"'||v_node||'"}, "fid":"'||v_fid||'", "criticity":"4", "is_process":true}}$$)';
 		END IF;
 	END IF;
 
