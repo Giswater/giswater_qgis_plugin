@@ -2188,9 +2188,6 @@ class GwPsector:
         # Load existing psector
         self.load_psector(dialog, scenario_id)
 
-        # Re-open the dialog
-        tools_gw.open_dialog(dialog, dlg_name='plan_psector')
-
     def _filter_table(self, dialog, table, widget_txt, chk_active=None, chk_archived=None, tablename=None):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
@@ -2688,13 +2685,6 @@ class GwPsector:
             msg_params = ("name", "psector_id",)
             tools_log.log_warning(msg, msg_params)
             return
-        if psector_id is not None:
-            # Define `extras` with the retrieved psector ID and other parameters
-            extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{psector_id}, '
-                      f'"isAlone":"False", "disableParent":"False", '
-                      f'"value":"True"')
-            body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure("gw_fct_getselectors", body)
 
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @feature_type """
