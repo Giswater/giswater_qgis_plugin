@@ -452,7 +452,7 @@ UPDATE config_form_tableview AS t SET alias = v.alias FROM (
     ('element', 'enddate', 'Enddate'),
     ('element', 'expl_id', 'Expl id'),
     ('element', 'feature_type', 'Feature type'),
-    ('element', 'fluid_type', 'Fluid type'),
+    ('element', 'fluid_type', 'Tipo de fluido'),
     ('element', 'function_type', 'Function type'),
     ('element', 'inventory', 'Inventory'),
     ('element', 'label_rotation', 'Label rotation'),
