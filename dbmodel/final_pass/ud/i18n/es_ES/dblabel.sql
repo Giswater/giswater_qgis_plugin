@@ -29,13 +29,13 @@ UPDATE sys_label AS t SET idval = v.idval FROM (
     (3001, 'INFO'),
     (3002, 'ADVERTENCIAS'),
     (3003, 'ERRORES'),
-    (3006, 'ARC DIVIDE = TRUE'),
-    (3008, 'ARC DIVIDE = FALSE'),
-    (3009, 'CURRICULUM'),
+    (3006, 'DIVIDIR ARCO = TRUE'),
+    (3008, 'DIVIDIR ARCO = FALSE'),
+    (3009, 'REANUDAR'),
     (3010, 'SISTEMA DE CONTROL'),
     (3011, 'COMPROBAR DATOS DE BASE DE DATOS'),
     (3012, 'DETALLES'),
-    (3013, 'Para comprobar ERRORES CRÍTICOS o ADVERTENCIAS, ejecute una consulta FROM anl_table WHERE fid=error de error AND usuario_actual. Por ejemplo:  SELECT * FROM anl_arc WHERE fid = 103 AND cur_user=current_user;  Sólo los errores con anl_table al lado del número se pueden comprobar de esta manera. Utilizando Giswater Toolbox también es posible comprobar estos errores.')
+    (3013, 'Para comprobar ERRORES CRÍTICOS o ADVERTENCIAS, ejecute una consulta FROM anl_table WHERE fid=NUMERO ERROR AND current_user. Por ejemplo:  SELECT * FROM anl_arc WHERE fid = 103 AND cur_user=current_user;  Sólo los errores con anl_table al lado del número se pueden comprobar de esta manera. Utilizando la Toolbox de  Giswater también es posible comprobar estos errores.')
 ) AS v(id, idval)
 WHERE t.id = v.id;
 

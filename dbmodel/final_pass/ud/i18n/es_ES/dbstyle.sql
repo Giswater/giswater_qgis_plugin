@@ -8215,7 +8215,7 @@ FROM (
 <qgis version="3.28.4-Firenze" styleCategories="Symbology">
   <renderer-v2 enableorderby="0" forceraster="0" symbollevels="0" type="RuleRenderer" referencescale="-1">
     <rules key="{2b70c7cf-3215-47bb-be52-2168a74bf823}">
-      <rule key="{3c19d0bd-e4a9-460c-8e13-d4ebabe76cde}" label="JUNCO" filter="&quot;inp_type&quot; = ''JUNCTION''" symbol="0"/>
+      <rule key="{3c19d0bd-e4a9-460c-8e13-d4ebabe76cde}" label="JUNCTION" filter="&quot;inp_type&quot; = ''JUNCTION''" symbol="0"/>
       <rule key="{53ff0c3f-982c-414b-9b96-5c2191b0da78}" label="IMBORNAL" filter="&quot;inp_type&quot; = ''NETGULLY''" symbol="1"/>
       <rule key="{dc169491-eb61-4958-894f-6224db06045c}" label="DESAGÜE" filter="&quot;inp_type&quot; = ''OUTFALL''" symbol="2"/>
       <rule key="{09224b9c-f6fe-4624-aea0-bc86a447066e}" label="ALMACENAMIENTO" filter="&quot;inp_type&quot; = ''STORAGE''" symbol="3"/>

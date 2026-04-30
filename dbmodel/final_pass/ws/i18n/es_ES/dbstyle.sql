@@ -6205,7 +6205,7 @@ FROM (
    <rule scalemaxdenom="25000" label="Fuente" key="{88ef1cea-1727-4681-9d7e-964bcfee179f}" filter="&quot;sys_type&quot; = ''SOURCE''" symbol="2"/>
    <rule scalemaxdenom="25000" label="Depósito" key="{5d885b4a-fd95-42b2-8da9-717face5a272}" filter="&quot;sys_type&quot; = ''TANK''" symbol="3"/>
    <rule scalemaxdenom="10000" label="Expantank" key="{eed06555-2d38-4bfe-b114-13e014b63af1}" filter="&quot;sys_type&quot; = ''EXPANSIONTANK''" symbol="4"/>
-   <rule scalemaxdenom="10000" label="Filtros" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" filter="&quot;sys_type&quot; = ''FILTER''" symbol="5"/>
+   <rule scalemaxdenom="10000" label="Filtro" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" filter="&quot;sys_type&quot; = ''FILTER''" symbol="5"/>
    <rule scalemaxdenom="10000" label="Flexunion" key="{9f0ffeda-84af-4676-9263-119eb6042786}" filter="&quot;sys_type&quot; = ''FLEXUNION''" symbol="6"/>
    <rule scalemaxdenom="10000" label="Hidrante" key="{bfe404fe-23c9-4c26-a91e-bc5e89b7203b}" filter="&quot;sys_type&quot; = ''HYDRANT''" symbol="7"/>
    <rule scalemaxdenom="10000" label="metros" key="{70f23680-8f8d-4eb8-ad9d-b6c222b1359a}" filter="&quot;sys_type&quot; = ''METER''" symbol="8"/>
@@ -13709,7 +13709,7 @@ FROM (
       <rule symbol="2" key="{88ef1cea-1727-4681-9d7e-964bcfee179f}" label="Fuente" filter="&quot;sys_type&quot; = ''SOURCE''" scalemaxdenom="25000"/>
       <rule symbol="3" key="{5d885b4a-fd95-42b2-8da9-717face5a272}" label="Depósito" filter="&quot;sys_type&quot; = ''TANK''" scalemaxdenom="25000"/>
       <rule symbol="4" key="{eed06555-2d38-4bfe-b114-13e014b63af1}" label="Expantank" filter="&quot;sys_type&quot; = ''EXPANSIONTANK''" scalemaxdenom="10000"/>
-      <rule symbol="5" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" label="Filtros" filter="&quot;sys_type&quot; = ''FILTER''" scalemaxdenom="10000"/>
+      <rule symbol="5" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" label="Filtro" filter="&quot;sys_type&quot; = ''FILTER''" scalemaxdenom="10000"/>
       <rule symbol="6" key="{9f0ffeda-84af-4676-9263-119eb6042786}" label="Flexunion" filter="&quot;sys_type&quot; = ''FLEXUNION''" scalemaxdenom="10000"/>
       <rule symbol="7" key="{bfe404fe-23c9-4c26-a91e-bc5e89b7203b}" label="Hidrante" filter="&quot;sys_type&quot; = ''HYDRANT''" scalemaxdenom="10000"/>
       <rule symbol="8" key="{70f23680-8f8d-4eb8-ad9d-b6c222b1359a}" label="metros" filter="&quot;sys_type&quot; = ''METER''" scalemaxdenom="10000"/>
@@ -15576,7 +15576,7 @@ FROM (
       <rule symbol="2" key="{88ef1cea-1727-4681-9d7e-964bcfee179f}" label="Fuente" filter="&quot;sys_type&quot; = ''SOURCE''" scalemaxdenom="25000"/>
       <rule symbol="3" key="{5d885b4a-fd95-42b2-8da9-717face5a272}" label="Depósito" filter="&quot;sys_type&quot; = ''TANK''" scalemaxdenom="25000"/>
       <rule symbol="4" key="{eed06555-2d38-4bfe-b114-13e014b63af1}" label="Expantank" filter="&quot;sys_type&quot; = ''EXPANSIONTANK''" scalemaxdenom="10000"/>
-      <rule symbol="5" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" label="Filtros" filter="&quot;sys_type&quot; = ''FILTER''" scalemaxdenom="10000"/>
+      <rule symbol="5" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" label="Filtro" filter="&quot;sys_type&quot; = ''FILTER''" scalemaxdenom="10000"/>
       <rule symbol="6" key="{9f0ffeda-84af-4676-9263-119eb6042786}" label="Flexunion" filter="&quot;sys_type&quot; = ''FLEXUNION''" scalemaxdenom="10000"/>
       <rule symbol="7" key="{bfe404fe-23c9-4c26-a91e-bc5e89b7203b}" label="Hidrante" filter="&quot;sys_type&quot; = ''HYDRANT''" scalemaxdenom="10000"/>
       <rule symbol="8" key="{70f23680-8f8d-4eb8-ad9d-b6c222b1359a}" label="metros" filter="&quot;sys_type&quot; = ''METER''" scalemaxdenom="10000"/>
@@ -17443,7 +17443,7 @@ FROM (
       <rule symbol="2" key="{88ef1cea-1727-4681-9d7e-964bcfee179f}" label="Fuente" filter="&quot;sys_type&quot; = ''SOURCE''" scalemaxdenom="25000"/>
       <rule symbol="3" key="{5d885b4a-fd95-42b2-8da9-717face5a272}" label="Depósito" filter="&quot;sys_type&quot; = ''TANK''" scalemaxdenom="25000"/>
       <rule symbol="4" key="{eed06555-2d38-4bfe-b114-13e014b63af1}" label="Expantank" filter="&quot;sys_type&quot; = ''EXPANSIONTANK''" scalemaxdenom="10000"/>
-      <rule symbol="5" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" label="Filtros" filter="&quot;sys_type&quot; = ''FILTER''" scalemaxdenom="10000"/>
+      <rule symbol="5" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}" label="Filtro" filter="&quot;sys_type&quot; = ''FILTER''" scalemaxdenom="10000"/>
       <rule symbol="6" key="{9f0ffeda-84af-4676-9263-119eb6042786}" label="Flexunion" filter="&quot;sys_type&quot; = ''FLEXUNION''" scalemaxdenom="10000"/>
       <rule symbol="7" key="{bfe404fe-23c9-4c26-a91e-bc5e89b7203b}" label="Hidrante" filter="&quot;sys_type&quot; = ''HYDRANT''" scalemaxdenom="10000"/>
       <rule symbol="8" key="{70f23680-8f8d-4eb8-ad9d-b6c222b1359a}" label="metros" filter="&quot;sys_type&quot; = ''METER''" scalemaxdenom="10000"/>
@@ -20963,7 +20963,7 @@ FROM (
       <rule filter="&quot;sys_type&quot; = ''SOURCE''" symbol="2" scalemaxdenom="25000" label="Fuente" key="{88ef1cea-1727-4681-9d7e-964bcfee179f}"/>
       <rule filter="&quot;sys_type&quot; = ''TANK''" symbol="3" scalemaxdenom="25000" label="Depósito" key="{5d885b4a-fd95-42b2-8da9-717face5a272}"/>
       <rule filter="&quot;sys_type&quot; = ''EXPANSIONTANK''" symbol="4" scalemaxdenom="10000" label="Expantank" key="{eed06555-2d38-4bfe-b114-13e014b63af1}"/>
-      <rule filter="&quot;sys_type&quot; = ''FILTER''" symbol="5" scalemaxdenom="10000" label="Filtros" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}"/>
+      <rule filter="&quot;sys_type&quot; = ''FILTER''" symbol="5" scalemaxdenom="10000" label="Filtro" key="{d2138541-5cb8-4896-b97e-494fa6df6d40}"/>
       <rule filter="&quot;sys_type&quot; = ''FLEXUNION''" symbol="6" scalemaxdenom="10000" label="Flexunion" key="{9f0ffeda-84af-4676-9263-119eb6042786}"/>
       <rule filter="&quot;sys_type&quot; = ''HYDRANT''" symbol="7" scalemaxdenom="10000" label="Hidrante" key="{bfe404fe-23c9-4c26-a91e-bc5e89b7203b}"/>
       <rule filter="&quot;sys_type&quot; = ''METER''" symbol="8" scalemaxdenom="10000" label="metros" key="{70f23680-8f8d-4eb8-ad9d-b6c222b1359a}"/>

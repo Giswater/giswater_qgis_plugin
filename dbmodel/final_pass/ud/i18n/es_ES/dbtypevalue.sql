@@ -310,7 +310,7 @@ UPDATE inp_typevalue AS t SET idval = v.idval, descript = v.descript FROM (
     ('HOURLY', 'inp_typevalue_pattern', 'POR HORA', NULL),
     ('INLET', 'inp_typevalue_dscenario', 'ENTRADA', NULL),
     ('JOINED', 'inp_typevalue_dscenario', 'CONECTADO', NULL),
-    ('JUNCTION', 'inp_typevalue_dscenario', 'JUNCO', NULL),
+    ('JUNCTION', 'inp_typevalue_dscenario', 'JUNCTION', NULL),
     ('MONTHLY', 'inp_typevalue_pattern', 'MENSUAL', NULL),
     ('NETWORK', 'inp_typevalue_dscenario', 'RED', NULL),
     ('NO', 'inp_value_yesno', 'NO', NULL),
