@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import sys
 from typing import List, Optional, Sequence, Tuple
 
 from qgis.PyQt.QtCore import QAbstractListModel, QEvent, QModelIndex, Qt
@@ -17,6 +18,7 @@ from qgis.PyQt.QtWidgets import (
     QListView,
     QProxyStyle,
     QStyle,
+    QStyleFactory,
 )
 from qgis.core import QgsApplication
 
@@ -116,17 +118,53 @@ MAX_POPUP_VISIBLE_HEIGHT_ITEMS = 15
 class _NonNativeComboPopupStyle(QProxyStyle):
     """Style proxy that forces a non-native combo popup.
 
-    Some styles (GTK+, macOS) return `true` for `SH_ComboBox_Popup`, which
-    makes Qt show a native-looking popup that ignores `setMaxVisibleItems` on
-    non-editable combos. By proxying the platform style and overriding only
-    that hint we keep every other style detail (paint, metrics, sub-controls)
-    untouched. See QComboBox::maxVisibleItems doc.
+    Some styles (GTK+, macOS, sometimes Breeze) return `true` for
+    `SH_ComboBox_Popup`, which makes Qt show a native popup that ignores
+    `setMaxVisibleItems` on non-editable combos. By proxying the platform
+    style and overriding only that hint we keep every other style detail
+    (paint, metrics, sub-controls) untouched.
+
+    Important: the base style passed to `QProxyStyle` is **reparented** by
+    the proxy (Qt takes ownership). Never pass `QApplication.style()`
+    directly — that steals the app's style and causes a crash later when
+    the proxy (and with it, the app style) is destroyed. Always feed a
+    fresh `QStyleFactory.create(...)` instance (or `None` to let Qt build
+    its default).
     """
 
     def styleHint(self, hint, option=None, widget=None, returnData=None):  # noqa: N802 - Qt API
         if hint == QStyle.StyleHint.SH_ComboBox_Popup:
             return 0
         return super().styleHint(hint, option, widget, returnData)
+
+
+def _build_non_native_combo_style() -> Optional[QProxyStyle]:
+    """Build a `_NonNativeComboPopupStyle` over a fresh copy of the current
+    application style. Returns `None` if no suitable style key is found
+    (caller should then skip applying the proxy).
+    """
+    app_style = QApplication.style()
+    if app_style is None:
+        return None
+    # Try the QObject name first. QStyleFactory sets it to the key it was
+    # created with (e.g. "Fusion"); native platform styles often have it
+    # too (e.g. "Breeze" on KDE).
+    style_key = app_style.objectName()
+    if not style_key:
+        # Fall back: derive from class name (QFusionStyle -> Fusion).
+        cls_name = type(app_style).__name__
+        if cls_name.startswith("Q") and cls_name.endswith("Style"):
+            style_key = cls_name[1:-len("Style")]
+    base = None
+    if style_key:
+        base = QStyleFactory.create(style_key)
+    if base is None:
+        # Anything is fine here — only used to delegate non-overridden
+        # hints. Fusion is available on every Qt build.
+        base = QStyleFactory.create("Fusion")
+    if base is None:
+        return None
+    return _NonNativeComboPopupStyle(base)
 
 
 class _ComboPopupView(QListView):
@@ -228,13 +266,27 @@ class GwAsyncComboBox(QComboBox):
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setEditable(False)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        # On GTK+ / macOS, `SH_ComboBox_Popup` is true by default which makes
-        # Qt show a native popup that ignores `maxVisibleItems`. The proxy
-        # style flips that single hint so the cap is honored everywhere.
-        try:
-            self.setStyle(_NonNativeComboPopupStyle(self.style()))
-        except Exception:
-            pass
+        # On GTK+ / macOS / KDE Breeze, `SH_ComboBox_Popup` is true by
+        # default which makes Qt show a native popup that ignores
+        # `maxVisibleItems`. The proxy style flips that single hint so the
+        # cap is honored everywhere.
+        #
+        # Skip on Windows: the Windows/Vista style already returns false
+        # for `SH_ComboBox_Popup`, so the proxy is unnecessary there — and
+        # avoiding it dodges any QStyle ownership / lifetime weirdness on
+        # platforms where it isn't needed in the first place.
+        #
+        # We also must hand `QProxyStyle` a fresh `QStyleFactory.create(...)`
+        # instance — passing `self.style()` would let the proxy reparent
+        # (and later free) the application style, which crashes any
+        # subsequent `style()` lookup (e.g. `QMenuPrivate::init`).
+        if not sys.platform.startswith("win"):
+            try:
+                proxy = _build_non_native_combo_style()
+                if proxy is not None:
+                    self.setStyle(proxy)
+            except Exception:
+                pass
         self.setMaxVisibleItems(MAX_POPUP_VISIBLE_HEIGHT_ITEMS)
 
         # Use a custom QAbstractListModel; this is the whole point of the
