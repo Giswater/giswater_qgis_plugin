@@ -437,7 +437,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
 ('supplyzone_id', '%_connec%', 'form_feature', 'tab_data', 'Zona de suministro:', 'Id_zona_de_abastecimiento'),
 ('sys_type', '%_connec%', 'form_feature', 'tab_data', 'Tipo sistema:', 'Tipo_sistema'),
 ('top_floor', '%_connec%', 'form_feature', 'tab_data', 'Planta superior:', 'Planta superior'),
-('valve_location', '%_connec%', 'form_feature', 'tab_data', 'Localización de válvulas:', 'Localización_de_válvulas'),
+('valve_location', '%_connec%', 'form_feature', 'tab_data', 'Localización de la válvula:', 'Localización_de_válvulas'),
 ('valve_type', '%_connec%', 'form_feature', 'tab_data', 'Tipo válvula:', 'Tipo_válvula'),
 ('vmax', '%_connec%', 'form_feature', 'tab_data', 'Volumen máximo:', 'Vmax - Volumen máximo.'),
 ('vtotal', '%_connec%', 'form_feature', 'tab_data', 'Volumen total:', 'Vtotal - Volumen total.'),

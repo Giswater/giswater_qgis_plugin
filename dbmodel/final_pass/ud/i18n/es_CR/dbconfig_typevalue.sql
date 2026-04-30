@@ -125,7 +125,7 @@ UPDATE config_typevalue AS t SET idval = v.idval FROM (
     ('element', 'formtemplate_typevalue', 'elemento'),
     ('info_feature', 'formtemplate_typevalue', 'info_característica'),
     ('info_generic', 'formtemplate_typevalue', 'info generic'),
-    ('visit', 'formtemplate_typevalue', 'visite'),
+    ('visit', 'formtemplate_typevalue', 'visita'),
     ('visit_class', 'formtemplate_typevalue', 'clase_visita'),
     ('audit', 'formtype_typevalue', 'auditoría'),
     ('audit_manager', 'formtype_typevalue', 'gestor_auditoría'),

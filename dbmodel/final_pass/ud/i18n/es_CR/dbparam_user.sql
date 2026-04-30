@@ -176,7 +176,7 @@ UPDATE sys_param_user AS t SET label = v.label, descript = v.descript FROM (
     ('edit_arc_fluid_vdefault', 'Fluido de arc:', 'Valor predeterminado del tipo de fluido para el arc'),
     ('edit_arc_function_vdefault', 'Función de arc:', 'Valor predeterminado del tipo de función para el arc'),
     ('edit_arc_insert_automatic_endpoint', 'Inserción automática de node como punto final del arco:', 'Si tiene valor, permite digitalizar nuevos arcos sin node_2. Node2 se activa automáticamente utilizando el valor de nodecat predeterminado del usuario y los valores comunes de arc'),
-    ('edit_arc_location_vdefault', 'Localización de arc:', 'Valor predeterminado para el tipo de localización para arc'),
+    ('edit_arc_location_vdefault', 'Localización del arco:', 'Valor predeterminado para el tipo de localización para arc'),
     ('edit_builtdate_vdefault', 'Fecha de construcción:', 'Valor por defecto de la fecha de construcción de la función'),
     ('edit_cadtools_baselayer_vdefault', 'Capa base de herramientas CAD:', 'La capa seleccionada será la única que permita el ajuste con herramientas CAD'),
     ('edit_connec_automatic_link', 'Conexión automática desde la acometida a la red:', 'Si es cierto, la conexión se generará automáticamente al insertar una nueva acometida con state=1. Para las acometidas planificadas, el enlace siempre se generará automáticamente.'),

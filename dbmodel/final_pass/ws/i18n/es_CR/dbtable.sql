@@ -333,7 +333,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('ve_inp_dscenario_controls', 'Controles Dscenario', '"Vista editable para gestionar el escenario de los controles"'),
     ('ve_inp_dscenario_frpump', 'FRpump Dscenario', 'v_edit_inp_dscenario_frpump'),
     ('ve_inp_frpump', 'Bomba Inp flwreg', 've_inp_frpump'),
-    ('ve_inp_junction', 'Empalme Inp', 'Muestra información editable sobre la unión de tipos de nodos'),
+    ('ve_inp_junction', 'Unión Inp', 'Muestra información editable sobre la unión de tipos de nodos'),
     ('ve_inp_pump', 'Bomba Inp', 'Muestra información editable sobre el tipo de nodo bomba'),
     ('ve_link', 'Enlace', 'Muestra información editable sobre los enlaces.'),
     ('ve_link_servconnection', 'Servoconexión', 'Vista editable personalizada para SERVCONNECTION'),
