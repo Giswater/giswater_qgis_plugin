@@ -23,6 +23,7 @@ v_filter text := '';
 v_tiled boolean;
 v_filter_poly text;
 v_epsg int;
+v_device int;
 
 rec_tab record;
 v_parameter text;
@@ -46,6 +47,7 @@ BEGIN
 	v_addschema = (p_data ->>'data')::json->>'addSchema';
 	v_filter = ((p_data ->>'data')::json->>'parameters')::json->>'searchText';
 	v_tiled = ((p_data ->>'client')::json->>'tiled')::boolean;
+	v_device = ((p_data ->>'client')::json->>'device')::int;
 	v_filter_poly = ((p_data ->>'data')::json->>'filterFields')::json->>'searchPoly';
 
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' THEN
@@ -65,7 +67,9 @@ BEGIN
 		FOR v_parameter, v_tab_params, v_label IN
 			SELECT parameter, value, label
 			FROM config_param_system
-			WHERE parameter ILIKE concat('basic_search_v2_', lower(rec_tab.tabname), '%') AND isenabled = TRUE
+			WHERE parameter ILIKE concat('basic_search_v2_', lower(rec_tab.tabname), '%')
+				AND isenabled = TRUE
+				AND (v_device = ANY(device) OR device IS NULL)
 		LOOP
 			IF v_parameter = 'basic_search_v2_tab_psector' AND v_tiled IS TRUE THEN
 				CONTINUE;

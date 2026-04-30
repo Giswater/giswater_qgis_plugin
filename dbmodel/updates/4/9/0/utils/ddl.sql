@@ -198,3 +198,6 @@ ALTER TABLE samplepoint RENAME TO _samplepoint_;
 -- 29/04/2026
 DROP INDEX IF EXISTS connec_plot_code;
 CREATE INDEX IF NOT EXISTS idx_connec_plot_id ON connec USING btree (plot_id);
+
+-- 30/04/2026
+ALTER TABLE config_param_system ADD device _int4 NULL;

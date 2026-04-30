@@ -22,7 +22,8 @@ SELECT columns_are(
     ARRAY[
         'parameter', 'value', 'descript', 'label', 'dv_querytext', 'dv_filterbyfield', 'isenabled', 'layoutorder',
         'project_type', 'dv_isparent', 'isautoupdate', 'datatype', 'widgettype', 'ismandatory', 'iseditable',
-        'dv_orderby_id', 'dv_isnullvalue', 'stylesheet', 'widgetcontrols', 'placeholder', 'standardvalue', 'layoutname'
+        'dv_orderby_id', 'dv_isnullvalue', 'stylesheet', 'widgetcontrols', 'placeholder', 'standardvalue', 'layoutname',
+        'device'
     ],
     'Table config_param_system should have the correct columns'
 );
@@ -53,6 +54,7 @@ SELECT col_type_is('config_param_system', 'widgetcontrols', 'json', 'Column widg
 SELECT col_type_is('config_param_system', 'placeholder', 'text', 'Column placeholder should be text');
 SELECT col_type_is('config_param_system', 'standardvalue', 'text', 'Column standardvalue should be text');
 SELECT col_type_is('config_param_system', 'layoutname', 'text', 'Column layoutname should be text');
+SELECT col_type_is('config_param_system', 'device', 'integer[]', 'Column device should be integer[]');
 
 -- Check foreign keys
 SELECT hasnt_fk('config_param_system', 'Table config_param_system should have no foreign keys');
