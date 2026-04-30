@@ -2582,10 +2582,8 @@ rec_feature TEXT;
 BEGIN
 
 -- Create aux cols
-ALTER TABLE doc DROP COLUMN IF EXISTS aux;
 ALTER TABLE doc DROP COLUMN IF EXISTS unique_doc;
 
-ALTER TABLE doc ADD COLUMN aux TEXT;
 ALTER TABLE doc ADD COLUMN unique_doc int;
 
 
@@ -2630,7 +2628,6 @@ DELETE FROM doc WHERE id IN (
 
 
 -- Drop aux cols
-ALTER TABLE doc DROP COLUMN aux;
 ALTER TABLE doc DROP COLUMN unique_doc;
 
 
