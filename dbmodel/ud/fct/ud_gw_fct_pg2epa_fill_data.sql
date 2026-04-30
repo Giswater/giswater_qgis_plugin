@@ -116,11 +116,11 @@ BEGIN
 	WHERE outfallparam IS NOT NULL AND fid = 113 AND cur_user=current_user
 	AND temp_t_node.node_id=a.node_id::text;
 
-	INSERT INTO temp_t_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id)
-	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id FROM ve_inp_inflows;
+	INSERT INTO temp_t_node_other (node_id, type, timser_id, other, mfactor, sfactor, base, pattern_id, active)
+	SELECT node_id, 'FLOW', timser_id, 'FLOW', 1, sfactor, base, pattern_id, true FROM ve_inp_inflows;
 
-	INSERT INTO temp_t_node_other (node_id, type, timser_id, poll_id, other, mfactor, sfactor, base, pattern_id)
-	SELECT node_id, 'POLLUTANT', timser_id, poll_id, form_type, mfactor, sfactor, base, pattern_id FROM ve_inp_inflows_poll;
+	INSERT INTO temp_t_node_other (node_id, type, timser_id, poll_id, other, mfactor, sfactor, base, pattern_id, active)
+	SELECT node_id, 'POLLUTANT', timser_id, poll_id, form_type, mfactor, sfactor, base, pattern_id, true FROM ve_inp_inflows_poll;
 
 	INSERT INTO temp_t_node_other (node_id, type, poll_id, other)
 	SELECT node_id, 'TREATMENT', poll_id, function FROM ve_inp_treatment;
