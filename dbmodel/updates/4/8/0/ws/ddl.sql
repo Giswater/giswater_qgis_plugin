@@ -21,7 +21,11 @@ DROP VIEW IF EXISTS v_ui_doc_x_element;
 DROP VIEW IF EXISTS v_ui_om_visit_x_doc;
 ALTER TABLE doc ADD COLUMN code varchar(30);
 UPDATE doc SET code = id;
-ALTER SEQUENCE doc_seq RESTART WITH 1;
+-- ALTER SEQUENCE doc_seq RESTART WITH 1;
+SELECT setval('doc_seq', (SELECT max(id::bigint)
+FROM doc
+WHERE id::text ~ '^[0-9]+(\.[0-9]+)?$'));
+
 UPDATE doc SET id = nextval('doc_seq'::regclass); 
 
 

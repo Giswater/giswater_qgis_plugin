@@ -1202,3 +1202,72 @@ ON CONFLICT DO NOTHING;
 
 -- 16/03/2026
 UPDATE config_form_fields SET iseditable=false WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_none' AND iseditable=true;
+
+DO $$
+
+DECLARE
+rec_feature TEXT;
+
+BEGIN
+
+-- Create aux cols
+ALTER TABLE doc DROP COLUMN IF EXISTS aux;
+ALTER TABLE doc DROP COLUMN IF EXISTS unique_doc;
+
+ALTER TABLE doc ADD COLUMN aux TEXT;
+ALTER TABLE doc ADD COLUMN unique_doc int;
+
+
+-- Set init values
+UPDATE doc t SET unique_doc = a.first_doc FROM (
+SELECT id, first_value(id) over(PARTITION BY "path" ORDER BY "path" asc) AS first_doc
+	FROM doc a
+)a WHERE t.id = a.id;
+
+UPDATE doc SET aux = '';
+UPDATE doc SET aux = concat(aux, ',', 'node') WHERE id IN (SELECT doc_id FROM doc_x_node);
+UPDATE doc SET aux = concat(aux, ',', 'arc')  WHERE id IN (SELECT doc_id FROM doc_x_arc);
+UPDATE doc SET aux = concat(aux, ',', 'connec')  WHERE id IN (SELECT doc_id FROM doc_x_connec);
+UPDATE doc SET aux = concat(aux, ',', 'link')  WHERE id IN (SELECT doc_id FROM doc_x_link);
+UPDATE doc SET aux = 'orphan' WHERE aux = '';
+
+FOREACH rec_feature in ARRAY array['arc', 'connec', 'node', 'link'] 
+LOOP
+
+  -- Insert normalized doc_x_features
+  execute format('INSERT INTO %s (%s, doc_id)
+  SELECT %s.%s, unique_doc 
+  FROM %s JOIN doc ON %s.doc_id = doc.id
+  ON CONFLICT DO NOTHING;',
+  'doc_x_' || rec_feature,
+  rec_feature || '_id',
+  'doc_x_' || rec_feature,
+  rec_feature || '_id',
+  'doc_x_' || rec_feature,
+  'doc_x_' || rec_feature
+  );
+
+  /* example
+  INSERT INTO doc_x_arc (arc_id, doc_id)
+  SELECT doc_x_arc.arc_id, unique_doc 
+  FROM doc_x_arc JOIN doc ON doc_x_arc.doc_id = doc.id
+  ON CONFLICT DO NOTHING;
+  */
+
+END LOOP;
+
+DELETE FROM doc WHERE id IN (
+  SELECT id--, unique_doc, "path", aux 
+  FROM doc WHERE id<> unique_doc AND "path" IN (
+  SELECT "path" FROM doc GROUP BY "path" HAVING count(*)>1)
+  ORDER BY unique_doc ASC
+);
+
+
+-- Drop aux cols
+ALTER TABLE doc DROP COLUMN aux;
+ALTER TABLE doc DROP COLUMN unique_doc;
+
+
+END
+$$;

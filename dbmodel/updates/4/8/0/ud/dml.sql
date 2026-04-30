@@ -2572,3 +2572,74 @@ INSERT INTO config_form_fields
 VALUES('ve_arc_waccel', 'form_feature', 'tab_data', 'nodetype_2', 'lyt_data_2',
 (SELECT COALESCE(max(layoutorder), 0) + 1 FROM config_form_fields WHERE formname = 've_arc_waccel' AND tabname = 'tab_data' AND layoutname = 'lyt_data_2'),
 'string', 'text', 'Node type 2:', 'Nodetype_2 - Type of node 2', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, 49);
+
+
+DO $$
+
+DECLARE
+rec_feature TEXT;
+
+BEGIN
+
+-- Create aux cols
+ALTER TABLE doc DROP COLUMN IF EXISTS aux;
+ALTER TABLE doc DROP COLUMN IF EXISTS unique_doc;
+
+ALTER TABLE doc ADD COLUMN aux TEXT;
+ALTER TABLE doc ADD COLUMN unique_doc int;
+
+
+-- Set init values
+UPDATE doc t SET unique_doc = a.first_doc FROM (
+SELECT id, first_value(id) over(PARTITION BY "path" ORDER BY "path" asc) AS first_doc
+	FROM doc a
+)a WHERE t.id = a.id;
+
+UPDATE doc SET aux = '';
+UPDATE doc SET aux = concat(aux, ',', 'node') WHERE id IN (SELECT doc_id FROM doc_x_node);
+UPDATE doc SET aux = concat(aux, ',', 'arc')  WHERE id IN (SELECT doc_id FROM doc_x_arc);
+UPDATE doc SET aux = concat(aux, ',', 'connec')  WHERE id IN (SELECT doc_id FROM doc_x_connec);
+UPDATE doc SET aux = concat(aux, ',', 'link')  WHERE id IN (SELECT doc_id FROM doc_x_link);
+UPDATE doc SET aux = concat(aux, ',', 'gully')  WHERE id IN (SELECT doc_id FROM doc_x_gully);
+UPDATE doc SET aux = 'orphan' WHERE aux = '';
+
+FOREACH rec_feature in ARRAY array['arc', 'connec', 'node', 'link', 'gully'] 
+LOOP
+
+  -- Insert normalized doc_x_features
+  execute format('INSERT INTO %s (%s, doc_id)
+  SELECT %s.%s, unique_doc 
+  FROM %s JOIN doc ON %s.doc_id = doc.id
+  ON CONFLICT DO NOTHING;',
+  'doc_x_' || rec_feature,
+  rec_feature || '_id',
+  'doc_x_' || rec_feature,
+  rec_feature || '_id',
+  'doc_x_' || rec_feature,
+  'doc_x_' || rec_feature
+  );
+
+  /* example
+  INSERT INTO doc_x_arc (arc_id, doc_id)
+  SELECT doc_x_arc.arc_id, unique_doc 
+  FROM doc_x_arc JOIN doc ON doc_x_arc.doc_id = doc.id
+  ON CONFLICT DO NOTHING;
+  */
+
+END LOOP;
+
+DELETE FROM doc WHERE id IN (
+  SELECT id--, unique_doc, "path", aux 
+  FROM doc WHERE id<> unique_doc AND "path" IN (
+  SELECT "path" FROM doc GROUP BY "path" HAVING count(*)>1)
+  ORDER BY unique_doc ASC
+);
+
+
+-- Drop aux cols
+ALTER TABLE doc DROP COLUMN aux;
+ALTER TABLE doc DROP COLUMN unique_doc;
+
+
+END
+$$;
