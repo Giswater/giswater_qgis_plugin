@@ -48,6 +48,7 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
+from .async_combo import GwAsyncComboBox
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ... import global_vars
@@ -1504,10 +1505,12 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
         if not use_vr:
             # Manage new values in ValueMap
             if field['widgettype'] == 'combo':
-                if 'comboIds' in field:
-                    # Set values
-                    for i in range(0, len(field['comboIds'])):
-                        valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
+                # Plain combos no longer ship comboIds/comboNames in the JSON;
+                # `resolve_combo_valuemap` falls back to executing dv_querytext
+                # so the QGIS native attribute form keeps showing a dropdown.
+                resolved = resolve_combo_valuemap(field)
+                if resolved:
+                    valuemap_values.update(resolved)
                 # Set values into valueMap
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
                 layer.setEditorWidgetSetup(field_index, editor_widget_setup)
@@ -2963,7 +2966,13 @@ def add_frame(field, x=None):
 
 
 def add_combo(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
-    widget = CustomQComboBox()
+    # Query-backed combos load their items asynchronously from dv_querytext.
+    # Static combos (with comboIds/comboNames already in the JSON, or with
+    # neither — e.g. literal value lists) keep the legacy CustomQComboBox.
+    if _is_async_combo_field(field):
+        widget = GwAsyncComboBox()
+    else:
+        widget = CustomQComboBox()
 
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -3411,6 +3420,18 @@ def set_multiple_checkbox_value(listwidget, value, add_new=True):
 
 
 def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
+    # Async (query-backed) combos: rebuild the SQL from queryText/queryTextFilter
+    # and the current parent value, then schedule the background load.
+    if getattr(widget, '_gw_is_async_combo', False):
+        if _is_async_combo_field(field):
+            return _fill_async_combo(widget, field, index_to_compare)
+        # Legacy callers (gw_fct_setcatalog, gw_fct_getchangefeaturetype) ship
+        # a comboIds/comboNames pair to override an existing combo. Route those
+        # through the async widget API so we don't bypass its model setup.
+        return _apply_legacy_rows_to_async(widget, field, index_to_compare)
+    if _is_async_combo_field(field):
+        return _fill_async_combo(widget, field, index_to_compare)
+
     # check if index_to_show is in widgetcontrols, then assign new value
     if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
         index_to_show = field.get('widgetcontrols')['index_to_show']
@@ -3440,6 +3461,222 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
     return widget
 
 
+# region Async combo helpers
+
+def _is_async_combo_field(field):
+    """Return True when the field metadata describes a query-backed combo.
+
+    Server functions (`gw_fct_getformfields`, `gw_fct_cm_getformfields`,
+    `gw_fct_getchilds`) keep the dv_querytext exposed for `widgettype = 'combo'`.
+    Multiple_checkbox / multiple_option still ship `comboIds`, so they do NOT
+    take this code path even when they have a queryText.
+    """
+    if not isinstance(field, dict):
+        return False
+    if field.get('widgettype') != 'combo':
+        return False
+    return _get_async_combo_query_text(field) is not None
+
+
+def _get_async_combo_query_text(field):
+    """Return dv_querytext under any of its known key spellings."""
+    for key in ('queryText', 'dvQueryText', 'dv_querytext'):
+        value = field.get(key)
+        if value:
+            return value
+    return None
+
+
+def _get_async_combo_query_filter(field):
+    for key in ('queryTextFilter', 'dv_querytext_filterc'):
+        value = field.get(key)
+        if value:
+            return value
+    return None
+
+
+def _get_async_combo_parent_id(field):
+    return field.get('parentId') or field.get('dv_parent_id')
+
+
+def _get_async_combo_order_by_id(field):
+    if 'orderById' in field:
+        return tools_os.set_boolean(field.get('orderById'), False)
+    return tools_os.set_boolean(field.get('dv_orderby_id'), False)
+
+
+def _get_async_combo_is_null_value(field):
+    if 'isNullValue' in field:
+        return tools_os.set_boolean(field.get('isNullValue'), False)
+    return tools_os.set_boolean(field.get('dv_isnullvalue'), False)
+
+
+def _sql_quote_literal(value):
+    """Postgres-style single quoted literal with escaped quotes."""
+    return "'" + str(value).replace("'", "''") + "'"
+
+
+def _resolve_parent_value(widget, field):
+    """Return the current value of the parent combo (or None) for a child combo."""
+    parent_id = _get_async_combo_parent_id(field)
+    if not parent_id:
+        return None
+    # Caller can pre-supply the parent value to avoid widget lookup.
+    if 'parentValue' in field and field['parentValue'] not in (None, ''):
+        return field['parentValue']
+    if widget is None:
+        return None
+    dialog = widget.window()
+    if dialog is None:
+        return None
+    # Match by columnname (config_form_fields.columnname); widgetname is
+    # `<tab>_<columnname>` so it isn't reliable to look up by name.
+    for combo in dialog.findChildren(QComboBox):
+        if combo is widget:
+            continue
+        if combo.property('columnname') == parent_id:
+            value = tools_qt.get_combo_value(dialog, combo, 0)
+            if value in (None, '', -1):
+                return None
+            return value
+    # Fallback: legacy "tab_data_<columnname>" pattern used by feature dialogs.
+    fallback = dialog.findChild(QWidget, f"tab_data_{parent_id}")
+    if isinstance(fallback, QComboBox):
+        value = tools_qt.get_combo_value(dialog, fallback, 0)
+        if value in (None, '', -1):
+            return None
+        return value
+    return None
+
+
+def _build_async_combo_query(widget, field):
+    """Build the final SQL the loader should execute.
+
+    Mirrors the wrapping the server used to do (subselect + ORDER BY decided
+    by `orderById`), so the items arrive in the same order legacy combos used.
+    """
+    query_text = _get_async_combo_query_text(field)
+    if not query_text:
+        return None
+
+    order_col = 'id' if _get_async_combo_order_by_id(field) else 'idval'
+    query_filter = _get_async_combo_query_filter(field)
+    parent_value = _resolve_parent_value(widget, field) if query_filter else None
+
+    if query_filter and parent_value not in (None, '', -1):
+        # Server pattern: `<queryText> <queryTextFilter>::text = '<value>' ORDER BY <orderby>`
+        inner = f"{query_text} {query_filter}::text = {_sql_quote_literal(parent_value)}"
+    elif query_filter:
+        # Child combo with a missing parent value: do not load anything yet.
+        # The combo will be reloaded via `manage_combo_child` once the parent
+        # has a value.
+        return None
+    else:
+        inner = query_text
+
+    return f"SELECT id, idval FROM ({inner}) a ORDER BY {order_col}"
+
+
+def _fill_async_combo(widget, field, index_to_compare=0):
+    """Configure an async combo from JSON metadata and start the background load."""
+    if not isinstance(widget, GwAsyncComboBox):
+        # Field declares a query-backed combo but the widget is something
+        # else (e.g. legacy CustomQComboBox created by existing code paths).
+        # Fall back to the synchronous behavior with whatever data we have.
+        return widget
+
+    widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
+
+    selected_id = field.get('selectedId')
+    if selected_id not in (None, ''):
+        widget.set_pending_selection(selected_id, index_to_compare)
+
+    query = _build_async_combo_query(widget, field)
+    widget.start_loading(query)
+    return widget
+
+
+def _apply_legacy_rows_to_async(widget, field, index_to_compare=0):
+    """Push a `comboIds`/`comboNames` payload into a `GwAsyncComboBox`.
+
+    Some server flows (`gw_fct_setcatalog`, `gw_fct_getchangefeaturetype`) keep
+    returning explicit lists/values that are meant to override the combo
+    contents. We translate them into the async widget's row API so we don't
+    bypass its model setup and pending-selection bookkeeping.
+    """
+    raw_ids = field.get('comboIds')
+    raw_names = field.get('comboNames')
+    ids = raw_ids if isinstance(raw_ids, list) else ([] if raw_ids is None else [raw_ids])
+    names = raw_names if isinstance(raw_names, list) else ([] if raw_names is None else [raw_names])
+
+    rows = []
+    for i in range(min(len(ids), len(names))):
+        if ids[i] is None and names[i] is None:
+            continue
+        rows.append((
+            '' if ids[i] is None else str(ids[i]),
+            '' if names[i] is None else str(names[i]),
+        ))
+
+    widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
+
+    selected_id = field.get('selectedId')
+    if selected_id not in (None, ''):
+        widget.set_pending_selection(selected_id, index_to_compare)
+
+    widget.apply_rows(rows)
+    return widget
+
+
+def resolve_combo_valuemap(field):
+    """Return a `{idval: id}` dict for a combo field.
+
+    Used by callers that build a QGIS `ValueMap` editor widget on a layer
+    (`config_layer_attributes`, `refresh_attribute_table`). Plain combos no
+    longer ship `comboIds`/`comboNames` in the JSON, so we synchronously
+    execute the configured `dv_querytext` here. This runs at project-load
+    time (already inside a worker `GwProjectLayersConfig` task), so a single
+    blocking query is acceptable.
+    """
+    if not isinstance(field, dict):
+        return {}
+    if 'comboIds' in field and 'comboNames' in field:
+        ids = field.get('comboIds') or []
+        names = field.get('comboNames') or []
+        return {
+            str(names[i]): str(ids[i])
+            for i in range(min(len(ids), len(names)))
+            if ids[i] is not None and names[i] is not None
+        }
+    query_text = _get_async_combo_query_text(field)
+    if not query_text:
+        return {}
+    try:
+        rows = tools_db.get_rows(
+            f"SELECT id, idval FROM ({query_text}) a", log_info=False
+        )
+    except Exception as exc:  # pragma: no cover - defensive
+        msg = "resolve_combo_valuemap: failed to load values for '{0}': {1}"
+        msg_params = (field.get('columnname'), exc,)
+        tools_log.log_warning(msg, msg_params=msg_params)
+        return {}
+    if not rows:
+        return {}
+    valuemap = {}
+    for row in rows:
+        try:
+            row_id = row[0]
+            row_idval = row[1]
+        except (IndexError, KeyError, TypeError):
+            continue
+        if row_id is None:
+            continue
+        valuemap[str(row_idval if row_idval is not None else row_id)] = str(row_id)
+    return valuemap
+
+# endregion
+
+
 def fill_combo_child(dialog, combo_child):
 
     if 'widgetname' in combo_child:
@@ -3456,7 +3693,18 @@ def manage_combo_child(dialog, combo_parent, combo_child):
         if child:
             child.setEnabled(True)
 
-            fill_combo_child(dialog, combo_child)
+            # Hint the parent value into the child JSON so that async combos
+            # can build their SQL without scanning the dialog. We do not mutate
+            # the original dict because it might be reused by callers.
+            parent_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
+            child_payload = combo_child
+            if _is_async_combo_field(combo_child):
+                child_payload = dict(combo_child)
+                child_payload['parentValue'] = (
+                    parent_value if parent_value not in (None, '', -1) else None
+                )
+
+            fill_combo_child(dialog, child_payload)
             if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
                     'enableWhenParent' not in combo_child['widgetcontrols']:
                 return

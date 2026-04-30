@@ -399,10 +399,16 @@ class AddNewLot:
 
         def create_combo_box():
             widget = QComboBox()
-            ids = field.get("comboIds", [])
-            names = field.get("comboNames", [])
-            for i, name in enumerate(names):
-                widget.addItem(name, ids[i] if i < len(ids) else name)
+            ids = field.get("comboIds", []) or []
+            names = field.get("comboNames", []) or []
+            if ids:
+                for i, name in enumerate(names):
+                    widget.addItem(name, ids[i] if i < len(ids) else name)
+            else:
+                # Plain combos no longer ship comboIds/comboNames; fall back
+                # to executing dv_querytext synchronously so this dialog works.
+                for name, _id in tools_gw.resolve_combo_valuemap(field).items():
+                    widget.addItem(name, _id)
             if not iseditable:
                 widget.setEnabled(False)
             return widget
