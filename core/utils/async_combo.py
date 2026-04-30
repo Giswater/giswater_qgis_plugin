@@ -9,7 +9,15 @@ from typing import List, Optional, Sequence, Tuple
 
 from qgis.PyQt.QtCore import QAbstractListModel, QEvent, QModelIndex, Qt
 from qgis.PyQt.QtGui import QKeyEvent
-from qgis.PyQt.QtWidgets import QApplication, QComboBox, QLineEdit
+from qgis.PyQt.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QFrame,
+    QLineEdit,
+    QListView,
+    QProxyStyle,
+    QStyle,
+)
 from qgis.core import QgsApplication
 
 from ..threads.combo_loader import GwComboLoaderTask
@@ -99,6 +107,70 @@ class _ComboListModel(QAbstractListModel):
 # stores the full set so filtering uses every row.
 MAX_POPUP_VISIBLE_ROWS = 200
 
+# Cap on how many items the popup shows on screen at once (height limit).
+# The popup scrolls past this; anything within the visible-rows cap can still
+# be reached by scrolling, anything past it by typing in the search box.
+MAX_POPUP_VISIBLE_HEIGHT_ITEMS = 15
+
+
+class _NonNativeComboPopupStyle(QProxyStyle):
+    """Style proxy that forces a non-native combo popup.
+
+    Some styles (GTK+, macOS) return `true` for `SH_ComboBox_Popup`, which
+    makes Qt show a native-looking popup that ignores `setMaxVisibleItems` on
+    non-editable combos. By proxying the platform style and overriding only
+    that hint we keep every other style detail (paint, metrics, sub-controls)
+    untouched. See QComboBox::maxVisibleItems doc.
+    """
+
+    def styleHint(self, hint, option=None, widget=None, returnData=None):  # noqa: N802 - Qt API
+        if hint == QStyle.StyleHint.SH_ComboBox_Popup:
+            return 0
+        return super().styleHint(hint, option, widget, returnData)
+
+
+class _ComboPopupView(QListView):
+    """`QListView` subclass that reserves a top viewport margin so a search
+    `QLineEdit` can sit above the items without overlapping them.
+
+    `setViewportMargins` is `protected` in `QAbstractScrollArea`, so we expose
+    a public method here. Setting the margin reserves space inside the view's
+    frame: the viewport (where items render) is shifted down by `margin`, but
+    the view itself keeps the same outer geometry.
+    """
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # Drop the default frame; the QComboBox popup container already draws
+        # its own frame around us.
+        self.setFrameShape(QFrame.Shape.NoFrame)
+        try:
+            self.setUniformItemSizes(True)
+        except AttributeError:
+            pass
+        self._top_margin = 0
+        self._top_widget: Optional[QLineEdit] = None
+
+    def set_top_margin(self, margin: int) -> None:
+        self._top_margin = max(0, int(margin))
+        self.setViewportMargins(0, self._top_margin, 0, 0)
+
+    def set_top_widget(self, widget: Optional[QLineEdit]) -> None:
+        self._top_widget = widget
+
+    def top_margin(self) -> int:
+        return self._top_margin
+
+    def resizeEvent(self, event):  # noqa: N802 - Qt API
+        super().resizeEvent(event)
+        # Keep the registered search overlay anchored at the top, full-width.
+        if self._top_margin <= 0 or self._top_widget is None:
+            return
+        try:
+            self._top_widget.setGeometry(0, 0, self.width(), self._top_margin)
+        except RuntimeError:
+            self._top_widget = None
+
 
 class GwAsyncComboBox(QComboBox):
     """Non-editable combobox that loads its items asynchronously and lets the
@@ -156,22 +228,24 @@ class GwAsyncComboBox(QComboBox):
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setEditable(False)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.setMaxVisibleItems(20)
+        # On GTK+ / macOS, `SH_ComboBox_Popup` is true by default which makes
+        # Qt show a native popup that ignores `maxVisibleItems`. The proxy
+        # style flips that single hint so the cap is honored everywhere.
+        try:
+            self.setStyle(_NonNativeComboPopupStyle(self.style()))
+        except Exception:
+            pass
+        self.setMaxVisibleItems(MAX_POPUP_VISIBLE_HEIGHT_ITEMS)
 
         # Use a custom QAbstractListModel; this is the whole point of the
         # widget — populating 15k+ rows must be a constant-cost operation.
         self._list_model = _ComboListModel(self)
         self.setModel(self._list_model)
 
-        # Uniform item sizes makes QListView::doItemsLayout O(1); without it
-        # Qt walks every row to compute layout bounds, which is the second
-        # big slowdown for 100k-row combos.
-        view = self.view()
-        if view is not None:
-            try:
-                view.setUniformItemSizes(True)
-            except AttributeError:
-                pass
+        # Custom view with a configurable top margin so the search edit gets
+        # its own reserved space at the top of the popup.
+        self._popup_view = _ComboPopupView(self)
+        self.setView(self._popup_view)
 
         self._show_placeholder('')
 
@@ -316,12 +390,39 @@ class GwAsyncComboBox(QComboBox):
 
     # region Popup with type-to-filter
     def showPopup(self):  # noqa: N802 - Qt API
+        # Make sure Qt sees enough non-hidden rows at the top of the model
+        # to size the popup at full height — otherwise, if a previous filter
+        # left only 1 visible row, Qt would open the popup at 1 row tall.
+        # We don't need to unhide everything, just enough rows for the
+        # height calc; the rest is restored to its proper state below by
+        # `_apply_search_filter("")`.
+        self._unhide_top_for_sizing()
+
         super().showPopup()
+
         # Don't waste any UI on a single-row placeholder list (Loading… or
         # the empty placeholder while we have no query).
         if self._list_model.rowCount() <= 1:
             return
         self._install_search_overlay()
+
+    def _unhide_top_for_sizing(self) -> None:
+        if not self._hidden_rows:
+            return
+        view = self.view()
+        if view is None:
+            return
+        # Qt only walks rows up to maxVisibleItems when computing the popup
+        # height; touching more is just wasted setRowHidden calls.
+        n = min(self.maxVisibleItems(), self._list_model.rowCount())
+        view.setUpdatesEnabled(False)
+        try:
+            for i in range(n):
+                if i in self._hidden_rows:
+                    view.setRowHidden(i, False)
+                    self._hidden_rows.discard(i)
+        finally:
+            view.setUpdatesEnabled(True)
 
     def hidePopup(self):  # noqa: N802 - Qt API
         self._teardown_search_overlay()
@@ -336,33 +437,38 @@ class GwAsyncComboBox(QComboBox):
             return
 
         if self._search_edit is None:
-            edit = QLineEdit(container)
+            edit = QLineEdit(view)
             edit.setObjectName(f"{self.objectName() or 'gw_async_combo'}_search")
-            edit.setPlaceholderText(self.tr("Type to filter…"))
+            edit.setPlaceholderText(self.tr("Type to filter..."))
             edit.setClearButtonEnabled(True)
             edit.textChanged.connect(self._apply_search_filter)
             edit.installEventFilter(self)
             self._search_edit = edit
         else:
-            self._search_edit.setParent(container)
+            self._search_edit.setParent(view)
+
+        if isinstance(view, _ComboPopupView):
+            view.set_top_widget(self._search_edit)
 
         edit = self._search_edit
         edit.blockSignals(True)
         edit.clear()
         edit.blockSignals(False)
 
-        # Capture the original view geometry *before* we touch the container,
-        # otherwise QComboBoxPrivateContainer's resizeEvent will have stretched
-        # the view to fill the larger container.
-        view_w = container.width()
-        view_h = view.height()
         edit_h = edit.sizeHint().height()
 
-        container.resize(view_w, view_h + edit_h)
-        # The container resize triggered view->resize(0, 0, view_w, view_h + edit_h);
-        # restore the view to its original height and shift it below the edit.
-        view.setGeometry(0, edit_h, view_w, view_h)
-        edit.setGeometry(0, 0, view_w, edit_h)
+        # Grow the popup container by `edit_h` so the items area keeps the
+        # same height it would have without the search box. Qt's container
+        # auto-resizes the view to fill itself, so we don't need to touch
+        # the view directly.
+        container.resize(container.width(), container.height() + edit_h)
+
+        # Reserve `edit_h` pixels at the top of the view's viewport — items
+        # render below it, never under it.
+        if isinstance(view, _ComboPopupView):
+            view.set_top_margin(edit_h)
+
+        edit.setGeometry(0, 0, view.width(), edit_h)
         edit.show()
         edit.raise_()
         edit.setFocus(Qt.FocusReason.PopupFocusReason)
@@ -373,11 +479,11 @@ class GwAsyncComboBox(QComboBox):
         self._apply_search_filter("")
 
     def _teardown_search_overlay(self):
-        # We deliberately do NOT unhide rows here. The popup is going away
-        # anyway, and reopening it will call _apply_search_filter("") which
-        # diffs against the current hidden set — so re-opening the same combo
-        # is essentially free if nothing has changed.
         self._search_active = False
+        view = self.view()
+        if isinstance(view, _ComboPopupView):
+            view.set_top_margin(0)
+            view.set_top_widget(None)
         if self._search_edit is None:
             return
         try:
@@ -386,7 +492,7 @@ class GwAsyncComboBox(QComboBox):
             self._search_edit.blockSignals(False)
             self._search_edit.hide()
         except RuntimeError:
-            # Container may already be gone.
+            # View may already be gone.
             self._search_edit = None
 
     def _apply_search_filter(self, text: str) -> None:
@@ -446,7 +552,7 @@ class GwAsyncComboBox(QComboBox):
             if match_count == 0:
                 tip = self.tr("No matches")
             elif match_count > visible_count:
-                tip = self.tr("Showing {0} of {1} matches — keep typing…").format(
+                tip = self.tr("Showing {0} of {1} matches - keep typing...").format(
                     visible_count, match_count
                 )
             else:
@@ -456,7 +562,7 @@ class GwAsyncComboBox(QComboBox):
                 MAX_POPUP_VISIBLE_ROWS, total
             )
         else:
-            tip = self.tr("Type to filter…")
+            tip = self.tr("Type to filter...")
         self._search_edit.setToolTip(tip)
         # Placeholder is only visible while the line edit is empty, but
         # showing the truncation hint there is exactly when it's most useful.
