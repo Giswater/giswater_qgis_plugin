@@ -1224,12 +1224,6 @@ SELECT id, first_value(id) over(PARTITION BY "path" ORDER BY "path" asc) AS firs
 	FROM doc a
 )a WHERE t.id = a.id;
 
-UPDATE doc SET aux = '';
-UPDATE doc SET aux = concat(aux, ',', 'node') WHERE id IN (SELECT doc_id FROM doc_x_node);
-UPDATE doc SET aux = concat(aux, ',', 'arc')  WHERE id IN (SELECT doc_id FROM doc_x_arc);
-UPDATE doc SET aux = concat(aux, ',', 'connec')  WHERE id IN (SELECT doc_id FROM doc_x_connec);
-UPDATE doc SET aux = concat(aux, ',', 'link')  WHERE id IN (SELECT doc_id FROM doc_x_link);
-UPDATE doc SET aux = 'orphan' WHERE aux = '';
 
 FOREACH rec_feature in ARRAY array['arc', 'connec', 'node', 'link'] 
 LOOP
