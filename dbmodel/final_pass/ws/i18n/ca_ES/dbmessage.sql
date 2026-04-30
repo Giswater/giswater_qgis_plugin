@@ -685,7 +685,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3956, '%v_count% files amb elements s''han inserit a la taula inp_dscenario_shortpipe', NULL),
     (3958, '%v_count% files amb elements s''han inserit a la taula inp_dscenario_valve', NULL),
     (4002, 'NivellInicial de %v_count% entrades ha estat actualitzat.', NULL),
-    (4004, 'NivellInicial de %v_count% tancs s''ha actualitzat.', NULL),
+    (4004, 'Nivell Inicial de %v_count% dipòsits s''ha actualitzat.', NULL),
     (4006, 'I1ST. STEP Resultat amb aquest nom ja està definit a les taules plan_result.', NULL),
     (4008, '1ST. STEP executat.', NULL),
     (4010, 'S''ha inserit una instantània dels valors de v_plan_arc i v_plan_node a les taules plan_result_arc i plan_result_node.', NULL),

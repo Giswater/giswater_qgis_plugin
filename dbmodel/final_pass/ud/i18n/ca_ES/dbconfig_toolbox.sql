@@ -53,7 +53,7 @@ UPDATE config_toolbox AS t SET alias = v.alias, observ = v.observ FROM (
     (3040, 'Check arcs duplicated', NULL),
     (3042, 'Gestionar valors Dscenario', NULL),
     (3052, 'Arcs més curts/més llargs que una longitud específica', NULL),
-    (3080, 'Reparar Nodes Duplicats (Un per Un)', NULL),
+    (3080, 'Reparació de nodes duplicats (un per un)', NULL),
     (3130, 'Topocontrol per a la migració de dades', NULL),
     (3134, 'Create empty Dscenario', NULL),
     (3156, 'Duplicar dscenario', NULL),

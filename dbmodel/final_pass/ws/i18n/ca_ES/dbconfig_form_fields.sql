@@ -488,7 +488,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
     ('btn_grid', 'generic', 'snapshot_view', 'tab_none', NULL, ' '),
     ('btn_run', 'generic', 'snapshot_view', 'tab_none', NULL, 'Executar'),
     ('chk_arc', 'generic', 'snapshot_view', 'tab_none', 'Arcs:', 'Arcs'),
-    ('chk_connec', 'generic', 'snapshot_view', 'tab_none', 'Connexions:', 'Connecta'),
+    ('chk_connec', 'generic', 'snapshot_view', 'tab_none', 'Connexions:', 'Escomesa'),
     ('chk_doc', 'generic', 'snapshot_view', 'tab_none', 'Documents:', 'Documents'),
     ('chk_element', 'generic', 'snapshot_view', 'tab_none', 'Elements:', 'Elements'),
     ('chk_gully', 'generic', 'snapshot_view', 'tab_none', 'Barrancs:', 'Barrancs'),
