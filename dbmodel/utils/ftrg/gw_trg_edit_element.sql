@@ -75,9 +75,13 @@ v_uuid_column TEXT;
 v_uuid_value uuid;
 v_feature_id TEXT;
 
+v_addfields record;
+v_new_value_param TEXT;
+v_old_value_param TEXT;
 BEGIN
 
 	v_tg_table_name = TG_TABLE_NAME;
+	v_man_table:= TG_ARGV[0];
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
@@ -97,15 +101,6 @@ BEGIN
 		IF v_feature_type IS NULL THEN
 			v_feature_type := 'element';
 		END IF;
-
-
-        EXECUTE '
-        SELECT man_table FROM cat_feature_'||v_feature_type||' n
-        JOIN cat_feature cf ON cf.id = n.id
-        JOIN sys_feature_class s ON cf.feature_class = s.id
-        JOIN cat_'||v_feature_type||' ON cat_'||v_feature_type||'.id= '||quote_literal(NEW.elementcat_id)||'
-        WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type LIMIT 1'
-        INTO v_man_table;
 
 
         --modify values for custom view inserts
@@ -159,6 +154,15 @@ BEGIN
 		-- Cat element
 		IF (NEW.elementcat_id IS NULL) THEN
 			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		
+			IF v_customfeature IS NOT NULL THEN
+				NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+			ELSE
+				NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			END IF;
+		
+		ELSE
+			SELECT element_type INTO v_customfeature FROM cat_element WHERE id = NEW.elementcat_id;
 		END IF;
 
 		-- Verified
@@ -365,6 +369,29 @@ BEGIN
 		END IF;
 
 		UPDATE element SET top_elev = NEW.top_elev WHERE element_id = NEW.element_id;
+	
+		-- childtable insert
+		IF v_customfeature IS NOT NULL THEN
+			
+			FOR v_addfields IN SELECT * FROM sys_addfields
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND (feature_type='NODE' OR feature_type='ALL' OR feature_type='CHILD') AND active IS TRUE AND iseditable IS TRUE
+			LOOP
+				
+				EXECUTE 'SELECT $1."' ||v_addfields.param_name||'"'
+					USING NEW
+					INTO v_new_value_param;
+					
+				v_childtable_name := 'man_element_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF v_new_value_param IS NOT NULL THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (element_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+							ON CONFLICT (element_id)
+							DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE '||v_childtable_name||'.element_id=$1'
+							USING NEW.element_id, v_new_value_param;
+					END IF;
+				END IF;
+			END LOOP;
+		END IF;
 
 		RETURN NEW;
 
@@ -433,7 +460,7 @@ BEGIN
 
 
 		IF v_man_table='man_frelem' THEN
-			UPDATE man_frelem SET node_id=NEW.node_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
+			UPDATE man_frelem SET element_id=NEW.element_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
 			WHERE element_id=OLD.element_id;
 		ELSIF v_man_table='man_genelem' THEN
 			UPDATE man_genelem SET element_id=NEW.element_id
@@ -582,6 +609,37 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
+	
+	
+		IF v_customfeature IS NOT NULL THEN
+			FOR v_addfields IN SELECT * FROM sys_addfields
+			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND (feature_type='element' OR feature_type='ALL' OR feature_type='CHILD') AND active IS TRUE AND iseditable IS TRUE
+			LOOP
+				EXECUTE 'SELECT $1."' || v_addfields.param_name ||'"'
+					USING NEW
+					INTO v_new_value_param;
+
+				EXECUTE 'SELECT $1."' || v_addfields.param_name ||'"'
+					USING OLD
+					INTO v_old_value_param;
+
+				v_childtable_name := 'man_element_' || lower(v_customfeature);
+				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+					IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (element_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+							ON CONFLICT (element_id)
+							DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE '||v_childtable_name||'.element_id=$1'
+							USING NEW.element_id, v_new_value_param;
+
+					ELSIF v_new_value_param IS NULL AND v_old_value_param IS NOT NULL THEN
+						EXECUTE 'UPDATE '||v_childtable_name||' SET '||v_addfields.param_name||' = null WHERE '||v_childtable_name||'.element_id=$1'
+							USING NEW.element_id;
+					END IF;
+				END IF;
+			END LOOP;
+		END IF;
+	
+	
 
 		RETURN NEW;
 

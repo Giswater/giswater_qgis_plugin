@@ -139,3 +139,5 @@ END; $$;
 CREATE TRIGGER gw_trg_edit_om_visit INSTEAD OF INSERT OR DELETE OR UPDATE
 ON ve_om_visit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_om_visit('om_visit');
 
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('parent');
