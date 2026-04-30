@@ -599,11 +599,11 @@
 		</message>
 		<message>
 			<source>{0} campaign(s) deleted.</source>
-			<translation>{0} campanya(s) eliminades.</translation>
+			<translation>{0} campanya(es) eliminada(es).</translation>
 		</message>
 		<message>
 			<source>{0} campaign(s) deleted.</source>
-			<translation>{0} campanya(es) eliminada(es).</translation>
+			<translation>{0} campanya(s) eliminades.</translation>
 		</message>
 		<message>
 			<source>{0}: Config file is not set</source>
@@ -687,11 +687,11 @@
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
-			<translation>{0} ordre(s) de treball eliminada(es).</translation>
+			<translation>{0} workorder(s) eliminat(s).</translation>
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
-			<translation>{0} workorder(s) eliminat(s).</translation>
+			<translation>{0} ordre(s) de treball eliminada(es).</translation>
 		</message>
 		<message>
 			<source>{1}</source>
@@ -895,11 +895,11 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} campaign(s)?</source>
-			<translation>Esteu segur que voleu eliminar {0} campanya(s)?</translation>
+			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} campaign(s)?</source>
-			<translation>Esteu segur que voleu eliminar {0} campanya(es)?</translation>
+			<translation>Esteu segur que voleu eliminar {0} campanya(s)?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} lot(s)?</source>
@@ -911,11 +911,11 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
-			<translation>Segur que voleu eliminar {0} ordre(s) de treball?</translation>
+			<translation>Esteu segur que voleu eliminar {0} ordre(s) de treball?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
-			<translation>Esteu segur que voleu eliminar {0} ordre(s) de treball?</translation>
+			<translation>Segur que voleu eliminar {0} ordre(s) de treball?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete the selected styles?</source>
@@ -931,11 +931,11 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records:</source>
-			<translation>Està segur que voleu eliminar aquests registres:</translation>
+			<translation>Esteu segurs que voleu eliminar aquests registres:</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records:</source>
-			<translation>Esteu segurs que voleu eliminar aquests registres:</translation>
+			<translation>Està segur que voleu eliminar aquests registres:</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records?</source>
@@ -2407,11 +2407,11 @@
 		</message>
 		<message>
 			<source>Failed to load campaign form.</source>
-			<translation>Error en carregar el formulari de campanya.</translation>
+			<translation>No s&apos;ha pogut carregar el formulari de campanya.</translation>
 		</message>
 		<message>
 			<source>Failed to load campaign form.</source>
-			<translation>No s&apos;ha pogut carregar el formulari de campanya.</translation>
+			<translation>Error en carregar el formulari de campanya.</translation>
 		</message>
 		<message>
 			<source>Failed to load layers</source>
@@ -2435,11 +2435,11 @@
 		</message>
 		<message>
 			<source>Failed to load workorder form.</source>
-			<translation>Error en carregar el formulari d&apos;ordre de treball.</translation>
+			<translation>No s&apos;ha pogut carregar el formulari de workorder.</translation>
 		</message>
 		<message>
 			<source>Failed to load workorder form.</source>
-			<translation>No s&apos;ha pogut carregar el formulari de workorder.</translation>
+			<translation>Error en carregar el formulari d&apos;ordre de treball.</translation>
 		</message>
 		<message>
 			<source>Failed to rename user from &apos;{0}&apos; to &apos;{1}&apos;. The new name might already be in use in the database.</source>
@@ -3103,7 +3103,7 @@
 		</message>
 		<message>
 			<source>Interpolate tool.\nTo modify columns (top_elev, ymax, elev among others) to be interpolated set variable edit_node_interpolate on table config_param_user</source>
-			<translation>Eina d&apos;interpolació.\nPer modificar columnes (top_elev, ymax, elev entre altres) a interpolar estableix la variable edit_node_interpolate a la taula config_param_user</translation>
+			<translation>Eina d&apos;interpolació.\nPer modificar columnes (cota terreny, ymax, elev entre altres) a interpolar estableix la variable edit_node_interpolate a la taula config_param_user</translation>
 		</message>
 		<message>
 			<source>Interrupted because `settings.cache_only_mode=True`.</source>
@@ -3195,11 +3195,11 @@
 		</message>
 		<message>
 			<source>Invalid workorder ID.</source>
-			<translation>ID d&apos;ordre de treball invàlid.</translation>
+			<translation>ID de workorder invàlid.</translation>
 		</message>
 		<message>
 			<source>Invalid workorder ID.</source>
-			<translation>ID de workorder invàlid.</translation>
+			<translation>ID d&apos;ordre de treball invàlid.</translation>
 		</message>
 		<message>
 			<source>INVENTORY</source>
@@ -3531,11 +3531,11 @@
 		</message>
 		<message>
 			<source>Missing required fields</source>
-			<translation>Falten camps obligatoris</translation>
+			<translation>Missing required fields</translation>
 		</message>
 		<message>
 			<source>Missing required fields</source>
-			<translation>Missing required fields</translation>
+			<translation>Falten camps obligatoris</translation>
 		</message>
 		<message>
 			<source> ... (more hidden) ...</source>
@@ -3775,11 +3775,11 @@
 		</message>
 		<message>
 			<source>No records selected</source>
-			<translation>No s&apos;han seleccionat registres</translation>
+			<translation>No hi ha registres seleccionats</translation>
 		</message>
 		<message>
 			<source>No records selected</source>
-			<translation>No hi ha registres seleccionats</translation>
+			<translation>No s&apos;han seleccionat registres</translation>
 		</message>
 		<message>
 			<source>No results</source>
@@ -4264,11 +4264,11 @@
 		</message>
 		<message>
 			<source>Please select a workorder to open.</source>
-			<translation>Seleccioneu una ordre de treball per obrir.</translation>
+			<translation>Si us plau seleccioneu una ordre de treball per obrir.</translation>
 		</message>
 		<message>
 			<source>Please select a workorder to open.</source>
-			<translation>Si us plau seleccioneu una ordre de treball per obrir.</translation>
+			<translation>Seleccioneu una ordre de treball per obrir.</translation>
 		</message>
 		<message>
 			<source>Please select one or more styles to delete.</source>
@@ -5682,7 +5682,7 @@
 		</message>
 		<message>
 			<source>This feature already has ELEV &amp; TOP_ELEV values! Review it and use at most two</source>
-			<translation>Aquest element ja té valors ELEV i TOP_ELEV! Revisa-ho i utilitza com a màxim dos</translation>
+			<translation>Aquest element ja té valors ELEV i COTA TERRENY! Revisa-ho i utilitza com a màxim dos</translation>
 		</message>
 		<message>
 			<source>This feature already has ELEV values! Review it and use only one</source>
@@ -5694,7 +5694,7 @@
 		</message>
 		<message>
 			<source>This feature already has Y &amp; TOP_ELEV values! Review it and use at most two</source>
-			<translation>Aquest element ja té valors Y i TOP_ELEV! Revisa-ho i utilitza com a màxim dos</translation>
+			<translation>Aquest element ja té valors Y i COTA TERRENY! Revisa-ho i utilitza com a màxim dos</translation>
 		</message>
 		<message>
 			<source>This feature already has Y values! Review it and use only one</source>
@@ -5734,7 +5734,7 @@
 		</message>
 		<message>
 			<source>This node has redundant data on (top_elev, ymax &amp; elev) values. Review it and use at most two.</source>
-			<translation>Aquest node té dades redundants a (top_elev, ymax &amp; elev). Revisa-ho i usa com a màxim dos.</translation>
+			<translation>Aquest node té dades redundants a (cota terreny, ymax &amp; elev). Revisa-ho i usa com a màxim dos.</translation>
 		</message>
 		<message>
 			<source>This parameter is mandatory. Please</source>
@@ -5802,11 +5802,11 @@
 		</message>
 		<message>
 			<source>This will also delete the database user(s):</source>
-			<translation>Això també eliminarà el/los usuari(s) de la base de dades:</translation>
+			<translation>Això també eliminarà l&apos;usuari(s) de la base de dades:</translation>
 		</message>
 		<message>
 			<source>This will also delete the database user(s):</source>
-			<translation>Això també eliminarà l&apos;usuari(s) de la base de dades:</translation>
+			<translation>Això també eliminarà el/los usuari(s) de la base de dades:</translation>
 		</message>
 		<message>
 			<source>!!!!! THIS WILL DELETE ALL DATA IN THE DATABASE !!!!!</source>
@@ -5850,7 +5850,7 @@
 		</message>
 		<message>
 			<source>To modify columns (top_elev, ymax, elev among others) to be interpolated set variable edit_node_interpolate on table config_param_user</source>
-			<translation>Per modificar columnes (top_elev, ymax, elev entre d&apos;altres) perquè s&apos;interpolin, estableix la variable edit_node_interpolate a la taula config_param_user</translation>
+			<translation>Per modificar columnes (cota terreny, ymax, elev entre d&apos;altres) perquè s&apos;interpolin, estableix la variable edit_node_interpolate a la taula config_param_user</translation>
 		</message>
 		<message>
 			<source>Toolbox task is already active!</source>
@@ -6539,11 +6539,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -9322,7 +9322,7 @@
 		</message>
 		<message>
 			<source>btn_run</source>
-			<translation>Run</translation>
+			<translation>Executar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_run</source>
@@ -11239,19 +11239,19 @@
 		</message>
 		<message>
 			<source>lbl_builtdate_range</source>
-			<translation>Rang de dates de construcció (anys):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate_range</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_builtdate_range</source>
 			<translation>Rang de data de construcció (anys):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate_range</source>
 			<translation>Interval de dates de construcció, en anys anteriors i posteriors a la tuberia inicial</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate_range</source>
+			<translation>Rang de dates de construcció (anys):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate_range</source>
+			<translation></translation>
 		</message>
 		<message>
 			<source>lbl_cluster_length</source>
@@ -11319,6 +11319,14 @@
 		</message>
 		<message>
 			<source>lbl_material</source>
+			<translation>Filtrar per material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>Utilitza només tuberies del mateix material que la inicial.</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
 			<translation>Filtre per material:</translation>
 		</message>
 		<message>
@@ -11326,12 +11334,12 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_material</source>
-			<translation>Filtrar per material:</translation>
+			<source>lbl_max_distance</source>
+			<translation>Distància màxima (m):</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>Utilitza només tuberies del mateix material que la inicial.</translation>
+			<source>tooltip_lbl_max_distance</source>
+			<translation></translation>
 		</message>
 		<message>
 			<source>lbl_max_distance</source>
@@ -11342,14 +11350,6 @@
 			<translation>Distància màxima, e metres, entre la tuberia inicial i altres tuberies incluides en el cluster. </translation>
 		</message>
 		<message>
-			<source>lbl_max_distance</source>
-			<translation>Distància màxima (m):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_max_distance</source>
-			<translation></translation>
-		</message>
-		<message>
 			<source>lbl_pipes</source>
 			<translation>Canonades</translation>
 		</message>
@@ -11363,6 +11363,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_pipes</source>
+			<translation></translation>
+		</message>
+		<message>
+			<source>lbl_years</source>
+			<translation>Anys a calcular:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_years</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -11374,14 +11382,6 @@
 			<translation>Nombre d&apos;anys de dades de fugues a tenir en compte, en funció de l&apos;antiguitat.</translation>
 		</message>
 		<message>
-			<source>lbl_years</source>
-			<translation>Anys a calcular:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_years</source>
-			<translation></translation>
-		</message>
-		<message>
 			<source>tab_config</source>
 			<translation>Configuració</translation>
 		</message>
@@ -11399,7 +11399,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Info log</translation>
+			<translation>Registre d&apos;Informació</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -11407,7 +11407,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Registre d&apos;Informació</translation>
+			<translation>Info log</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -12991,7 +12991,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -16367,7 +16367,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation></translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -16375,15 +16375,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -16392,6 +16384,14 @@
 		<message>
 			<source>tooltip_btn_close</source>
 			<translation></translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>dlg_info_generic</source>
@@ -16422,7 +16422,15 @@
 		<name>info_workcat</name>
 		<message>
 			<source>title</source>
-			<translation>Nou workcat</translation>
+			<translation>Nou expedt</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -16431,14 +16439,6 @@
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation></translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -16466,7 +16466,7 @@
 		</message>
 		<message>
 			<source>dlg_info_workcat</source>
-			<translation>Nou workcat</translation>
+			<translation>Nou expedt</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_workcat</source>
@@ -16474,7 +16474,7 @@
 		</message>
 		<message>
 			<source>dlg_info_workcat</source>
-			<translation>Nou expedt</translation>
+			<translation>Nou workcat</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_workcat</source>
@@ -17396,7 +17396,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -17567,7 +17567,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -17575,7 +17575,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation></translation>
+			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>btn_cancel_task</source>
@@ -17739,14 +17739,6 @@
 		</message>
 		<message>
 			<source>lbl_assigned_to</source>
-			<translation>Assignat a:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_assigned_to</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_assigned_to</source>
 			<translation>Asignat a:</translation>
 		</message>
 		<message>
@@ -17754,6 +17746,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_assigned_to</source>
+			<translation>Assignat a:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_assigned_to</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_cause</source>
 			<translation>Causa:</translation>
 		</message>
@@ -17787,7 +17787,7 @@
 		</message>
 		<message>
 			<source>lbl_depth</source>
-			<translation>Profunditat:</translation>
+			<translation>Calat:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_depth</source>
@@ -17795,7 +17795,7 @@
 		</message>
 		<message>
 			<source>lbl_depth</source>
-			<translation>Calat:</translation>
+			<translation>Profunditat:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_depth</source>
@@ -17883,14 +17883,6 @@
 		</message>
 		<message>
 			<source>lbl_exec_appropriate</source>
-			<translation>Adequat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>Si es verdader, la ubicació real coincideix amb la informació mincut programada.</translation>
-		</message>
-		<message>
-			<source>lbl_exec_appropriate</source>
 			<translation>Apropiat:</translation>
 		</message>
 		<message>
@@ -17898,6 +17890,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_exec_appropriate</source>
+			<translation>Adequat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_appropriate</source>
+			<translation>Si es verdader, la ubicació real coincideix amb la informació mincut programada.</translation>
+		</message>
+		<message>
 			<source>lbl_exec_enddate</source>
 			<translation>Data de finalització:</translation>
 		</message>
@@ -17911,6 +17911,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_enddate</source>
+			<translation></translation>
+		</message>
+		<message>
+			<source>lbl_exec_startdate</source>
+			<translation>Data d&apos;inici:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_startdate</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -17920,14 +17928,6 @@
 		<message>
 			<source>tooltip_lbl_exec_startdate</source>
 			<translation>Visita ID</translation>
-		</message>
-		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Data d&apos;inici:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation></translation>
 		</message>
 		<message>
 			<source>lbl_exec_user</source>
@@ -17963,7 +17963,7 @@
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>No s&apos;han trobat resultats</translation>
+			<translation>Sense resultats</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -17971,7 +17971,7 @@
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>Sense resultats</translation>
+			<translation>No s&apos;han trobat resultats</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -18011,14 +18011,6 @@
 		</message>
 		<message>
 			<source>lbl_start</source>
-			<translation>Inici:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_start</source>
 			<translation>Des de:</translation>
 		</message>
 		<message>
@@ -18026,6 +18018,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_start</source>
+			<translation>Inici:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_state</source>
 			<translation>Estat:</translation>
 		</message>
@@ -18043,7 +18043,7 @@
 		</message>
 		<message>
 			<source>lbl_turbidity</source>
-			<translation>Turbidesa:</translation>
+			<translation>Terbolesa:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_turbidity</source>
@@ -18051,7 +18051,7 @@
 		</message>
 		<message>
 			<source>lbl_turbidity</source>
-			<translation>Terbolesa:</translation>
+			<translation>Turbidesa:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_turbidity</source>
@@ -18166,7 +18166,15 @@
 		<name>mincut_composer</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut compositor</translation>
+			<translation>Compositor polígon de tall</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel·lar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -18175,14 +18183,6 @@
 		<message>
 			<source>tooltip_btn_cancel</source>
 			<translation></translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel·lar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>btn_ok</source>
@@ -18202,7 +18202,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_composer</source>
-			<translation>Mincut compositor</translation>
+			<translation>Compositor polígon de tall</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_composer</source>
@@ -18210,7 +18210,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_composer</source>
-			<translation>Compositor polígon de tall</translation>
+			<translation>Mincut compositor</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_composer</source>
@@ -18242,14 +18242,6 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Plantilla:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
 			<translation>Model:</translation>
 		</message>
 		<message>
@@ -18257,8 +18249,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_template</source>
+			<translation>Plantilla:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_title</source>
-			<translation>Títol</translation>
+			<translation>Títol:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
@@ -18266,7 +18266,7 @@
 		</message>
 		<message>
 			<source>lbl_title</source>
-			<translation>Títol:</translation>
+			<translation>Títol</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
@@ -18285,7 +18285,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18293,7 +18293,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation></translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -18356,7 +18356,15 @@
 		<name>mincut_end</name>
 		<message>
 			<source>title</source>
-			<translation>Finalitzar polígon de tall</translation>
+			<translation>Mincut final</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18365,14 +18373,6 @@
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation></translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -18392,7 +18392,7 @@
 		</message>
 		<message>
 			<source>btn_set_real_location</source>
-			<translation>Establir ubicació real</translation>
+			<translation>Definir ubicació real</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_real_location</source>
@@ -18400,7 +18400,7 @@
 		</message>
 		<message>
 			<source>btn_set_real_location</source>
-			<translation>Definir ubicació real</translation>
+			<translation>Establir ubicació real</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_real_location</source>
@@ -18432,14 +18432,6 @@
 		</message>
 		<message>
 			<source>dlg_mincut_end</source>
-			<translation>Finalitzar polígon de tall</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_end</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>dlg_mincut_end</source>
 			<translation>Mincut final</translation>
 		</message>
 		<message>
@@ -18447,8 +18439,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>dlg_mincut_end</source>
+			<translation>Finalitzar polígon de tall</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_end</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>grb_close_mincut</source>
-			<translation>Cerrar mincut</translation>
+			<translation>Tancar mincut</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_close_mincut</source>
@@ -18456,7 +18456,7 @@
 		</message>
 		<message>
 			<source>grb_close_mincut</source>
-			<translation>Tancar mincut</translation>
+			<translation>Cerrar mincut</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_close_mincut</source>
@@ -18488,7 +18488,7 @@
 		</message>
 		<message>
 			<source>lbl_end_hour</source>
-			<translation>Hora de finalització:</translation>
+			<translation>Hora final:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_hour</source>
@@ -18496,7 +18496,7 @@
 		</message>
 		<message>
 			<source>lbl_end_hour</source>
-			<translation>Hora final:</translation>
+			<translation>Hora de finalització:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_hour</source>
@@ -18600,7 +18600,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Ordre de treball:</translation>
+			<translation>Work order:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -18608,7 +18608,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Work order:</translation>
+			<translation>Ordre de treball:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -18619,15 +18619,7 @@
 		<name>mincut_hydrometer</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut hidròmetre</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Acceptar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Acceptar</translation>
+			<translation>Hidròmetre polígon de tall</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18636,6 +18628,14 @@
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation></translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Acceptar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -18655,14 +18655,6 @@
 		</message>
 		<message>
 			<source>dlg_mincut_hydrometer</source>
-			<translation>Mincut hidròmetre</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_hydrometer</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>dlg_mincut_hydrometer</source>
 			<translation>Hidròmetre polígon de tall</translation>
 		</message>
 		<message>
@@ -18670,11 +18662,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_ccc</source>
-			<translation>Codi client de connexió:</translation>
+			<source>dlg_mincut_hydrometer</source>
+			<translation>Mincut hidròmetre</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_ccc</source>
+			<source>tooltip_dlg_mincut_hydrometer</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -18686,11 +18678,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_hcc</source>
-			<translation>Codi client hidròmetre:</translation>
+			<source>lbl_ccc</source>
+			<translation>Codi client de connexió:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_hcc</source>
+			<source>tooltip_lbl_ccc</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -18701,12 +18693,20 @@
 			<source>tooltip_lbl_hcc</source>
 			<translation></translation>
 		</message>
+		<message>
+			<source>lbl_hcc</source>
+			<translation>Codi client hidròmetre:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hcc</source>
+			<translation></translation>
+		</message>
 	</context>
 	<context>
 		<name>mincut_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut gestió</translation>
+			<translation>Gestió polígon de tall</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -18758,7 +18758,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Mincut gestió</translation>
+			<translation>Gestió polígon de tall</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -18766,7 +18766,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Gestió polígon de tall</translation>
+			<translation>Mincut gestió</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -21196,7 +21196,7 @@
 		<name>priority</name>
 		<message>
 			<source>title</source>
-			<translation>Càlcul de Prioritat</translation>
+			<translation>Càlcul de prioritat</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -21224,7 +21224,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Cancel·lar</translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21232,7 +21232,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Tancar</translation>
+			<translation>Cancel·lar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21248,14 +21248,6 @@
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>Seleccionar elements al llenç</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -21263,8 +21255,16 @@
 			<translation>Seleccioni els elements en la vista del mapa</translation>
 		</message>
 		<message>
+			<source>btn_snapping</source>
+			<translation>Seleccionar elements al llenç</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>dlg_priority</source>
-			<translation>Càlcul de Prioritat</translation>
+			<translation>Càlcul de prioritat</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -21272,7 +21272,7 @@
 		</message>
 		<message>
 			<source>dlg_priority</source>
-			<translation>Càlcul de prioritat</translation>
+			<translation>Càlcul de Prioritat</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -21312,14 +21312,6 @@
 		</message>
 		<message>
 			<source>grb_selection</source>
-			<translation>Selecció d&apos;elements</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_selection</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>grb_selection</source>
 			<translation>Selecció D&apos;elements</translation>
 		</message>
 		<message>
@@ -21327,6 +21319,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>grb_selection</source>
+			<translation>Selecció d&apos;elements</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_budget</source>
 			<translation>Pressupost anual:</translation>
 		</message>
@@ -21360,7 +21360,7 @@
 		</message>
 		<message>
 			<source>lbl_dnom</source>
-			<translation>Diàmetre:</translation>
+			<translation>Diameter:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dnom</source>
@@ -21368,7 +21368,7 @@
 		</message>
 		<message>
 			<source>lbl_dnom</source>
-			<translation>Diameter:</translation>
+			<translation>Diàmetre:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dnom</source>
@@ -21520,7 +21520,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Info log</translation>
+			<translation>Registre D&apos;informació</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -21528,7 +21528,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Registre D&apos;informació</translation>
+			<translation>Info log</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -21703,7 +21703,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Info:</translation>
+			<translation>Informació:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -21711,7 +21711,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Informació:</translation>
+			<translation>Info:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -22592,7 +22592,7 @@
 		</message>
 		<message>
 			<source>chk_composer</source>
-			<translation>Arxiu pdf compositor</translation>
+			<translation>Composer pdf file</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_composer</source>
@@ -22600,7 +22600,7 @@
 		</message>
 		<message>
 			<source>chk_composer</source>
-			<translation>Composer pdf file</translation>
+			<translation>Arxiu pdf compositor</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_composer</source>
@@ -22663,14 +22663,6 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Tancar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>btn_close</source>
 			<translation>Close</translation>
 		</message>
 		<message>
@@ -22678,8 +22670,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>btn_close</source>
+			<translation>Tancar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>btn_repair</source>
-			<translation>Repair</translation>
+			<translation>Arreglar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_repair</source>
@@ -22687,7 +22687,7 @@
 		</message>
 		<message>
 			<source>btn_repair</source>
-			<translation>Arreglar</translation>
+			<translation>Repair</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_repair</source>
@@ -23316,14 +23316,6 @@
 		</message>
 		<message>
 			<source>lbl_result_compare</source>
-			<translation>Resultat a comparar:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
 			<translation>Resultat per comparar</translation>
 		</message>
 		<message>
@@ -23331,8 +23323,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_result_compare</source>
+			<translation>Resultat a comparar:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_compare</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_result_main</source>
-			<translation>Resultat per a mostrar</translation>
+			<translation>Resultat a mostrar:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -23340,7 +23340,7 @@
 		</message>
 		<message>
 			<source>lbl_result_main</source>
-			<translation>Resultat a mostrar:</translation>
+			<translation>Resultat per a mostrar</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -23541,7 +23541,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -23549,7 +23549,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation></translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -23836,7 +23836,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>OK</translation>
+			<translation>Acceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -23844,7 +23844,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Acceptar</translation>
+			<translation>OK</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -24414,7 +24414,7 @@
 		</message>
 		<message>
 			<source>btn_run</source>
-			<translation>Corre</translation>
+			<translation>Executar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_run</source>
@@ -24836,7 +24836,7 @@
 		<name>visit</name>
 		<message>
 			<source>title</source>
-			<translation>Visita</translation>
+			<translation>Visitar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -24912,7 +24912,7 @@
 		</message>
 		<message>
 			<source>btn_event_delete</source>
-			<translation>ELIMINAR ESDEVENIMENT</translation>
+			<translation>Esborrar event</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_delete</source>
@@ -24920,7 +24920,7 @@
 		</message>
 		<message>
 			<source>btn_event_delete</source>
-			<translation>Esborrar event</translation>
+			<translation>ELIMINAR ESDEVENIMENT</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_delete</source>
@@ -24992,7 +24992,7 @@
 		</message>
 		<message>
 			<source>dlg_visit</source>
-			<translation>Visita</translation>
+			<translation>Visitar</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit</source>
@@ -25000,7 +25000,7 @@
 		</message>
 		<message>
 			<source>dlg_visit</source>
-			<translation>Visitar</translation>
+			<translation>Visita</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit</source>
@@ -25016,14 +25016,6 @@
 		</message>
 		<message>
 			<source>label</source>
-			<translation>Tipus d&apos;objecte:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>label</source>
 			<translation>Tipus d&apos;element:</translation>
 		</message>
 		<message>
@@ -25031,6 +25023,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>label</source>
+			<translation>Tipus d&apos;objecte:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_code</source>
 			<translation>Codi:</translation>
 		</message>
@@ -25064,7 +25064,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>Data final:*</translation>
+			<translation>Fins a:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -25072,7 +25072,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>Fins a:</translation>
+			<translation>Data final:*</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -25136,14 +25136,6 @@
 		</message>
 		<message>
 			<source>lbl_start_date</source>
-			<translation>Des de:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
 			<translation>Data d&apos;inici:*</translation>
 		</message>
 		<message>
@@ -25151,6 +25143,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_start_date</source>
+			<translation>Des de:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_status</source>
 			<translation>Estat:</translation>
 		</message>
@@ -25184,7 +25184,7 @@
 		</message>
 		<message>
 			<source>lbl_visitcat_id</source>
-			<translation>Visita cat id</translation>
+			<translation>Visitcat id:*</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visitcat_id</source>
@@ -25192,7 +25192,7 @@
 		</message>
 		<message>
 			<source>lbl_visitcat_id</source>
-			<translation>Visitcat id:*</translation>
+			<translation>Visita cat id</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visitcat_id</source>
@@ -25240,7 +25240,7 @@
 		</message>
 		<message>
 			<source>tab_event</source>
-			<translation>Esdeveniment</translation>
+			<translation>Partes Feina</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_event</source>
@@ -25248,7 +25248,7 @@
 		</message>
 		<message>
 			<source>tab_event</source>
-			<translation>Partes Feina</translation>
+			<translation>Esdeveniment</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_event</source>
@@ -25284,7 +25284,7 @@
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation></translation>
+			<translation>Relacions</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
@@ -25292,7 +25292,7 @@
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>Relacions</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>tab_visit</source>
@@ -25390,7 +25390,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Afegir arxiu</translation>
+			<translation>Afegir Fitxer</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -25398,7 +25398,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Afegir Fitxer</translation>
+			<translation>Afegir arxiu</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -25414,7 +25414,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Eliminar Fitxer</translation>
+			<translation>Esborrar arxiu</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -25422,7 +25422,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Esborrar arxiu</translation>
+			<translation>Eliminar Fitxer</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -25470,14 +25470,6 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Id paràmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
 			<translation>Paràmetre id:</translation>
 		</message>
 		<message>
@@ -25485,11 +25477,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_position_id</source>
-			<translation>Id posició:</translation>
+			<source>lbl_parameter_id</source>
+			<translation>Id paràmetre:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_position_id</source>
+			<source>tooltip_lbl_parameter_id</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -25501,8 +25493,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_position_id</source>
+			<translation>Id posició:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_position_value</source>
-			<translation>Posició valor:</translation>
+			<translation>Valor posció</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -25510,7 +25510,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Valor posció</translation>
+			<translation>Posició valor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -25561,7 +25561,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation></translation>
+			<translation>Tancar</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -25569,7 +25569,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Tancar</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>dlg_visit_event_full</source>
@@ -25589,7 +25589,7 @@
 		</message>
 		<message>
 			<source>lbl_compass</source>
-			<translation>Otrientació:</translation>
+			<translation>Brúixola:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compass</source>
@@ -25597,7 +25597,7 @@
 		</message>
 		<message>
 			<source>lbl_compass</source>
-			<translation>Brúixola:</translation>
+			<translation>Otrientació:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compass</source>
@@ -25637,14 +25637,6 @@
 		</message>
 		<message>
 			<source>lbl_geom1</source>
-			<translation>Geom1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
 			<translation>Geom 1:</translation>
 		</message>
 		<message>
@@ -25652,11 +25644,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
+			<source>lbl_geom1</source>
+			<translation>Geom1:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_geom2</source>
+			<source>tooltip_lbl_geom1</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -25668,8 +25660,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_geom2</source>
+			<translation>Geom 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom2</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_geom3</source>
-			<translation>Geom3:</translation>
+			<translation>Geom 3:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
@@ -25677,7 +25677,7 @@
 		</message>
 		<message>
 			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
+			<translation>Geom3:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
@@ -25717,7 +25717,7 @@
 		</message>
 		<message>
 			<source>lbl_is_last</source>
-			<translation>És l&apos;últim:</translation>
+			<translation>Últim valor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_is_last</source>
@@ -25725,7 +25725,7 @@
 		</message>
 		<message>
 			<source>lbl_is_last</source>
-			<translation>Últim valor:</translation>
+			<translation>És l&apos;últim:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_is_last</source>
@@ -25749,14 +25749,6 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Id posició:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
 			<translation>Id de posició:</translation>
 		</message>
 		<message>
@@ -25764,8 +25756,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_position_id</source>
+			<translation>Id posició:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_position_value</source>
-			<translation>Valor de posició:</translation>
+			<translation>Valor posició:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -25773,7 +25773,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Valor posició:</translation>
+			<translation>Valor de posició:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -25845,7 +25845,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Valor 2:</translation>
+			<translation>Valor2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -25853,7 +25853,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Valor2:</translation>
+			<translation>Valor 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -25893,14 +25893,6 @@
 		</message>
 		<message>
 			<source>lbl_ycoord</source>
-			<translation>Ycoord:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ycoord</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_ycoord</source>
 			<translation>Cooordenad Y:</translation>
 		</message>
 		<message>
@@ -25908,8 +25900,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_ycoord</source>
+			<translation>Ycoord:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ycoord</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>tab_files</source>
-			<translation>Arxius</translation>
+			<translation>Fitxers</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_files</source>
@@ -25917,7 +25917,7 @@
 		</message>
 		<message>
 			<source>tab_files</source>
-			<translation>Fitxers</translation>
+			<translation>Arxius</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_files</source>
@@ -25956,7 +25956,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Afegir fitxer</translation>
+			<translation>Afegir arxiu</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -25964,7 +25964,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Afegir arxiu</translation>
+			<translation>Afegir fitxer</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -25980,7 +25980,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Esborrar arxiu</translation>
+			<translation>Eliminar fitxer</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -25988,7 +25988,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Eliminar fitxer</translation>
+			<translation>Esborrar arxiu</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -26044,7 +26044,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Geom2:</translation>
+			<translation>Geom 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -26052,7 +26052,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Geom 2:</translation>
+			<translation>Geom2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -26076,14 +26076,6 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Id de paràmetre:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
 			<translation>Id paràmetre:</translation>
 		</message>
 		<message>
@@ -26091,11 +26083,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_position_id</source>
-			<translation>Id posició.</translation>
+			<source>lbl_parameter_id</source>
+			<translation>Id de paràmetre:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_position_id</source>
+			<source>tooltip_lbl_parameter_id</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -26107,8 +26099,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_position_id</source>
+			<translation>Id posició.</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_position_value</source>
-			<translation>Valor posció</translation>
+			<translation>Posició valor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -26116,7 +26116,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Posició valor:</translation>
+			<translation>Valor posció</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -26156,7 +26156,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Valor2:</translation>
+			<translation>Valor 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -26164,7 +26164,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Valor 2:</translation>
+			<translation>Valor2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -26175,7 +26175,7 @@
 		<name>visit_gallery</name>
 		<message>
 			<source>title</source>
-			<translation>Galeria</translation>
+			<translation>Galería</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -26211,14 +26211,6 @@
 		</message>
 		<message>
 			<source>dlg_visit_gallery</source>
-			<translation>Galeria</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit_gallery</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>dlg_visit_gallery</source>
 			<translation>Galería</translation>
 		</message>
 		<message>
@@ -26226,8 +26218,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>dlg_visit_gallery</source>
+			<translation>Galeria</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_gallery</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_event_id</source>
-			<translation>Id event:</translation>
+			<translation>Esdeveniment id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
@@ -26235,7 +26235,7 @@
 		</message>
 		<message>
 			<source>lbl_event_id</source>
-			<translation>Esdeveniment id:</translation>
+			<translation>Id event:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
@@ -26322,19 +26322,19 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Visita id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
 			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
 			<translation>Identificador de Visita</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visita id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation></translation>
 		</message>
 	</context>
 	<context>
@@ -26563,7 +26563,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
-			<translation>Crear</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -26571,6 +26571,14 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
+			<translation>Crear</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -26580,14 +26588,6 @@
 		<message>
 			<source>tooltip_btn_delete</source>
 			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation></translation>
 		</message>
 		<message>
 			<source>dlg_workcat_manager</source>
@@ -26764,7 +26764,7 @@
 		<name>workspace_create</name>
 		<message>
 			<source>title</source>
-			<translation>Crear nou espai de treball</translation>
+			<translation>Crear nou espais de treball</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -26800,7 +26800,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_create</source>
-			<translation>Crear nou espai de treball</translation>
+			<translation>Crear nou espais de treball</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_create</source>
@@ -26808,7 +26808,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_create</source>
-			<translation>Crear nou espais de treball</translation>
+			<translation>Crear nou espai de treball</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_create</source>
