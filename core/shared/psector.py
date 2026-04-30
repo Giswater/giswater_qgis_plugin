@@ -540,6 +540,7 @@ class GwPsector:
 
         self.dlg_psector_rapport = GwPsectorRapportUi(self)
         tools_gw.load_settings(self.dlg_psector_rapport)
+        self._set_composer_warning('')
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " prices detail.csv")
@@ -621,7 +622,7 @@ class GwPsector:
             return False
 
         composer_checked = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
-        if not composer_checked and not initial:
+        if not composer_checked:
             self._set_composer_warning('')
             return False
 
@@ -654,11 +655,12 @@ class GwPsector:
 
         if atlas is None or not atlas.enabled() or coverage_layer is None:
             self._set_composer_warning(
-                "Composer disabled: atlas must be enabled with coverage layer 've_plan_psector'.")
+                "Composer disabled: atlas must be enabled with coverage layer 'v_plan_psector'.")
             return None
 
-        if coverage_layer.name() != "ve_plan_psector":
-            self._set_composer_warning("Composer disabled: atlas coverage layer must be 've_plan_psector'.")
+        coverage_layer_table = (tools_qgis.get_layer_source_table_name(coverage_layer) or "").lower()
+        if coverage_layer_table != "v_plan_psector":
+            self._set_composer_warning("Composer disabled: atlas coverage layer must be 'v_plan_psector'.")
             return None
 
         total_text_items = 0
@@ -679,6 +681,7 @@ class GwPsector:
             return
 
         label.setText(message)
+        label.setVisible(bool(message))
         if message:
             label.setStyleSheet('color: red')
         else:
@@ -700,7 +703,7 @@ class GwPsector:
             tools_qt.get_folder_path(self.dlg_psector_rapport.txt_path)
             folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
-        if chk_csv is False and chk_csv_detail is False:
+        if chk_composer is False and chk_csv is False and chk_csv_detail is False:
             msg = "You must choose at least one action"
             tools_qgis.show_warning(msg, dialog=self.dlg_psector_rapport)
             return
