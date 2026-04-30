@@ -122,7 +122,7 @@ UPDATE config_form_tabs AS t SET label = v.label, tooltip = v.tooltip FROM (
     ('search', 'tab_hydro', 'Hidrómetro', 'Hidro'),
     ('search', 'tab_network', 'Red', 'Red'),
     ('search', 'tab_psector', 'Psector', 'Psector'),
-    ('search', 'tab_visit', 'Visita', 'Visite'),
+    ('search', 'tab_visit', 'Visita', 'Visita'),
     ('search', 'tab_workcat', 'Workcat', 'Workcat'),
     ('selector_basic', 'tab_dscenario', 'Dscenario', 'Dscenario'),
     ('selector_basic', 'tab_exploitation', 'Expl', 'Explotación activa'),

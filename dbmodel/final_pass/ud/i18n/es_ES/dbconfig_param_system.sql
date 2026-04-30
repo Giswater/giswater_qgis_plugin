@@ -9,7 +9,7 @@ UPDATE config_param_system AS t SET label = v.label, descript = v.descript FROM 
 	VALUES
 	('edit_check_redundance_y_topelev_elev', 'Activar la comprobación de redundancia para los valores y/elev/topelev:', 'Si es verdadero, se activará una comprobación de redundancia en los campos y/elev/topelev.'),
     ('edit_connect_update_statetype', 'Conectar actualización statetype:', 'Si es TRUE, cuando conectes un elemento a la red, su state_type se actualizará al valor del json'),
-    ('edit_gully_proximity', 'Topología de cárcavas:', 'Activar/desactivar el control de inserción de sumideros duplicados.Distancia mínima aceptada entre dos sumideros'),
+    ('edit_gully_proximity', 'Topología de sumidero:', 'Activar/desactivar el control de inserción de sumideros duplicados.Distancia mínima aceptada entre dos sumideros'),
     ('edit_node_automatic_sander', 'Profundidad de lijado automático:', 'Calcular la profundidad de lijado de pozo, cámara y wjump en función del nodo sys_ymax y del arco sys_y1'),
     ('edit_review_arc_tolerance', 'Revisar la tolerancia del arco:', 'Tolerancia de diferencia permitida para los valores de arco en caso de revisión'),
     ('edit_review_connec_tolerance', 'Revisar tolerancia de conexión:', 'Tolerancia de diferencia permitida para los valores connec en caso de revisión'),
