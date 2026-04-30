@@ -7,8 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from typing import List, Optional, Sequence, Tuple
 
-from qgis.PyQt.QtCore import QAbstractListModel, QModelIndex, Qt
-from qgis.PyQt.QtWidgets import QComboBox, QCompleter
+from qgis.PyQt.QtCore import QAbstractListModel, QEvent, QModelIndex, Qt
+from qgis.PyQt.QtGui import QKeyEvent
+from qgis.PyQt.QtWidgets import QApplication, QComboBox, QLineEdit
 from qgis.core import QgsApplication
 
 from ..threads.combo_loader import GwComboLoaderTask
@@ -92,27 +93,32 @@ class _ComboListModel(QAbstractListModel):
 
 
 class GwAsyncComboBox(QComboBox):
-    """Editable combobox that loads its items asynchronously.
+    """Non-editable combobox that loads its items asynchronously and lets the
+    user type-to-filter inside the popup.
+
+    UX
+        - The widget is **not editable**: clicking on it just opens the popup,
+          the user can never type into the combo's display itself.
+        - When the popup opens, a small `QLineEdit` is overlaid at the top of
+          the popup container. It receives focus immediately so the user can
+          start typing right away to narrow the visible items.
+        - Up/Down/PageUp/PageDown navigate the visible (non-hidden) rows in
+          the popup view. Enter activates the highlighted row. Escape closes
+          the popup without changing the selection.
+        - Filtering is done by hiding rows in the popup view (`setRowHidden`)
+          so the underlying model is never modified — every other API
+          (`combo.count()`, `combo.itemData(i)`,
+          `tools_qt.get_combo_value`/`set_combo_value`) keeps seeing the full
+          list, regardless of the filter.
 
     Lifecycle
-        1. Widget is constructed and immediately shows a single placeholder row
-           so `tools_qt.get_combo_value(...)` returns `''` while loading.
+        1. Widget is constructed and immediately shows a single placeholder
+           row so `tools_qt.get_combo_value(...)` returns `''` while loading.
         2. `start_loading(query)` schedules a `GwComboLoaderTask`. The widget
            bumps an internal *token* so older tasks are ignored if multiple
            loads are queued (e.g. parent combo changed).
         3. When the task finishes, `_on_rows_loaded` swaps the model contents
-           in O(1) (single Python list assignment + `endResetModel`) and
-           re-applies any pending selection.
-
-    Compatibility
-        - Items are exposed through a custom `QAbstractListModel`. Keeping
-          `[id, idval]` under `Qt.UserRole` preserves the public API:
-          `combo.itemData(i)[0]`, `tools_qt.get_combo_value(...)` and
-          `tools_qt.set_combo_value(...)` all keep working.
-        - The widget is editable with a *contains* completer so users can type
-          any substring to narrow the popup. Clicking the arrow shows the full
-          list (no implicit filter on the model itself).
-        - The wheel-focus behavior matches `CustomQComboBox`.
+           in O(1) and re-applies any pending selection.
 
     Markers
         - ``_gw_is_async_combo``: True; used by external helpers to detect
@@ -130,9 +136,17 @@ class GwAsyncComboBox(QComboBox):
         self._is_null_value: bool = False
         self._loading: bool = False
 
+        # Popup search state.
+        self._search_edit: Optional[QLineEdit] = None
+        self._search_active: bool = False
+        # Set of row indices currently hidden in the popup view. Tracking it
+        # ourselves lets us only call setRowHidden on rows whose state has
+        # actually changed (huge win when typing/backspacing on 15k+ items).
+        self._hidden_rows: set = set()
+
         self.setProperty('rows_loaded', False)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.setEditable(True)
+        self.setEditable(False)
         self.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         self.setMaxVisibleItems(20)
 
@@ -140,20 +154,6 @@ class GwAsyncComboBox(QComboBox):
         # widget — populating 15k+ rows must be a constant-cost operation.
         self._list_model = _ComboListModel(self)
         self.setModel(self._list_model)
-
-        # Replace the default prefix completer with a contains-matching one
-        # that uses the same model. Contains matching scans the full model on
-        # every keystroke, but Qt does the iteration in C++ on our list-backed
-        # model, so 100k rows is still well under one frame.
-        completer = QCompleter(self._list_model, self)
-        completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
-        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        try:
-            completer.setFilterMode(Qt.MatchFlag.MatchContains)
-        except (TypeError, AttributeError):
-            # Older PyQt: fall back to the default prefix matching.
-            pass
-        self.setCompleter(completer)
 
         self._show_placeholder('')
 
@@ -263,7 +263,6 @@ class GwAsyncComboBox(QComboBox):
         it to the custom model in a single `set_rows` call. The model emits
         a single `modelReset`, so the QComboBox refreshes once.
         """
-
         items: List[_ComboRow] = []
         if self._is_null_value:
             items.append(('', ''))
@@ -291,6 +290,179 @@ class GwAsyncComboBox(QComboBox):
             self.currentIndexChanged.emit(self.currentIndex())
         except Exception:
             pass
+    # endregion
+
+    # region Popup with type-to-filter
+    def showPopup(self):  # noqa: N802 - Qt API
+        super().showPopup()
+        # Don't waste any UI on a single-row placeholder list (Loading… or
+        # the empty placeholder while we have no query).
+        if self._list_model.rowCount() <= 1:
+            return
+        self._install_search_overlay()
+
+    def hidePopup(self):  # noqa: N802 - Qt API
+        self._teardown_search_overlay()
+        super().hidePopup()
+
+    def _install_search_overlay(self):
+        view = self.view()
+        if view is None:
+            return
+        container = view.parentWidget()
+        if container is None:
+            return
+
+        if self._search_edit is None:
+            edit = QLineEdit(container)
+            edit.setObjectName(f"{self.objectName() or 'gw_async_combo'}_search")
+            edit.setPlaceholderText(self.tr("Type to filter…"))
+            edit.setClearButtonEnabled(True)
+            edit.textChanged.connect(self._apply_search_filter)
+            edit.installEventFilter(self)
+            self._search_edit = edit
+        else:
+            self._search_edit.setParent(container)
+
+        edit = self._search_edit
+        edit.blockSignals(True)
+        edit.clear()
+        edit.blockSignals(False)
+
+        # Capture the original view geometry *before* we touch the container,
+        # otherwise QComboBoxPrivateContainer's resizeEvent will have stretched
+        # the view to fill the larger container.
+        view_w = container.width()
+        view_h = view.height()
+        edit_h = edit.sizeHint().height()
+
+        container.resize(view_w, view_h + edit_h)
+        # The container resize triggered view->resize(0, 0, view_w, view_h + edit_h);
+        # restore the view to its original height and shift it below the edit.
+        view.setGeometry(0, edit_h, view_w, view_h)
+        edit.setGeometry(0, 0, view_w, edit_h)
+        edit.show()
+        edit.raise_()
+        edit.setFocus(Qt.FocusReason.PopupFocusReason)
+
+        # Make sure no row is hidden from a previous filter.
+        self._unhide_all_rows()
+        self._search_active = True
+
+    def _teardown_search_overlay(self):
+        if self._search_edit is None:
+            self._search_active = False
+            self._unhide_all_rows()
+            return
+        self._search_active = False
+        try:
+            self._search_edit.blockSignals(True)
+            self._search_edit.clear()
+            self._search_edit.blockSignals(False)
+            self._search_edit.hide()
+        except RuntimeError:
+            # Container may already be gone.
+            self._search_edit = None
+        self._unhide_all_rows()
+
+    def _apply_search_filter(self, text: str) -> None:
+        if not self._search_active:
+            return
+        view = self.view()
+        if view is None:
+            return
+        needle = (text or '').strip().lower()
+        rows = self._list_model.get_rows()
+
+        # Compute the new hidden set, then diff against the previous one to
+        # only call setRowHidden on rows that actually changed visibility.
+        new_hidden: set = set()
+        first_visible = -1
+        if needle:
+            for i, (_, idval) in enumerate(rows):
+                if needle in str(idval).lower():
+                    if first_visible < 0:
+                        first_visible = i
+                else:
+                    new_hidden.add(i)
+        elif rows:
+            first_visible = 0
+
+        view.setUpdatesEnabled(False)
+        try:
+            for i in self._hidden_rows - new_hidden:
+                view.setRowHidden(i, False)
+            for i in new_hidden - self._hidden_rows:
+                view.setRowHidden(i, True)
+        finally:
+            view.setUpdatesEnabled(True)
+        self._hidden_rows = new_hidden
+
+        if first_visible >= 0:
+            new_idx = self._list_model.index(first_visible, 0)
+            view.setCurrentIndex(new_idx)
+            view.scrollTo(new_idx)
+
+    def _unhide_all_rows(self) -> None:
+        view = self.view()
+        if view is None:
+            self._hidden_rows.clear()
+            return
+        if not self._hidden_rows:
+            return
+        view.setUpdatesEnabled(False)
+        try:
+            for i in self._hidden_rows:
+                view.setRowHidden(i, False)
+        finally:
+            view.setUpdatesEnabled(True)
+        self._hidden_rows.clear()
+
+    def _forward_navigation(self, event: QKeyEvent) -> None:
+        # QAbstractItemView.moveCursor already skips hidden rows during
+        # arrow / page navigation, so we just deliver the key event to the
+        # popup view as if it were focused.
+        view = self.view()
+        if view is None:
+            return
+        QApplication.sendEvent(view, event)
+
+    def _activate_highlighted(self) -> None:
+        view = self.view()
+        if view is None:
+            self.hidePopup()
+            return
+        idx = view.currentIndex()
+        if idx.isValid() and not view.isRowHidden(idx.row()):
+            self.setCurrentIndex(idx.row())
+        self.hidePopup()
+
+    def eventFilter(self, obj, event):  # noqa: N802 - Qt API
+        if obj is self._search_edit and event.type() == QEvent.Type.KeyPress:
+            assert isinstance(event, QKeyEvent)
+            key = event.key()
+            if key in (
+                Qt.Key.Key_Down,
+                Qt.Key.Key_Up,
+                Qt.Key.Key_PageDown,
+                Qt.Key.Key_PageUp,
+                Qt.Key.Key_Home,
+                Qt.Key.Key_End,
+            ):
+                self._forward_navigation(event)
+                return True
+            if key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+                self._activate_highlighted()
+                return True
+            if key == Qt.Key.Key_Escape:
+                self.hidePopup()
+                return True
+            if key == Qt.Key.Key_Tab:
+                # Close popup and let focus go to the next widget.
+                self.hidePopup()
+                QApplication.sendEvent(self, event)
+                return True
+        return super().eventFilter(obj, event)
     # endregion
 
     # region Internals
