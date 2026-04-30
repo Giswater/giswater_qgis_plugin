@@ -92,6 +92,14 @@ class _ComboListModel(QAbstractListModel):
     # endregion
 
 
+# Hard cap on how many rows are made visible in the popup at any one time.
+# Even with the custom list model and uniform item sizes, painting and scroll
+# math get noticeably slower past a few thousand rows; the user is expected
+# to narrow with the search box past this point. The model itself still
+# stores the full set so filtering uses every row.
+MAX_POPUP_VISIBLE_ROWS = 200
+
+
 class GwAsyncComboBox(QComboBox):
     """Non-editable combobox that loads its items asynchronously and lets the
     user type-to-filter inside the popup.
@@ -154,6 +162,16 @@ class GwAsyncComboBox(QComboBox):
         # widget — populating 15k+ rows must be a constant-cost operation.
         self._list_model = _ComboListModel(self)
         self.setModel(self._list_model)
+
+        # Uniform item sizes makes QListView::doItemsLayout O(1); without it
+        # Qt walks every row to compute layout bounds, which is the second
+        # big slowdown for 100k-row combos.
+        view = self.view()
+        if view is not None:
+            try:
+                view.setUniformItemSizes(True)
+            except AttributeError:
+                pass
 
         self._show_placeholder('')
 
@@ -271,6 +289,10 @@ class GwAsyncComboBox(QComboBox):
             idval = row[1] if len(row) > 1 and row[1] is not None else row_id
             items.append((row_id, str(idval)))
 
+        # New row set invalidates any hidden-rows bookkeeping from a
+        # previous model state.
+        self._hidden_rows = set()
+
         # Block signals across the model swap + selection so external
         # handlers don't fire intermediate `currentIndexChanged` events
         # while the combo is rebuilding.
@@ -345,16 +367,19 @@ class GwAsyncComboBox(QComboBox):
         edit.raise_()
         edit.setFocus(Qt.FocusReason.PopupFocusReason)
 
-        # Make sure no row is hidden from a previous filter.
-        self._unhide_all_rows()
         self._search_active = True
+        # Apply the visible-row cap immediately, even with no search text:
+        # this is what keeps an unfiltered 100k-row popup snappy.
+        self._apply_search_filter("")
 
     def _teardown_search_overlay(self):
-        if self._search_edit is None:
-            self._search_active = False
-            self._unhide_all_rows()
-            return
+        # We deliberately do NOT unhide rows here. The popup is going away
+        # anyway, and reopening it will call _apply_search_filter("") which
+        # diffs against the current hidden set — so re-opening the same combo
+        # is essentially free if nothing has changed.
         self._search_active = False
+        if self._search_edit is None:
+            return
         try:
             self._search_edit.blockSignals(True)
             self._search_edit.clear()
@@ -363,7 +388,6 @@ class GwAsyncComboBox(QComboBox):
         except RuntimeError:
             # Container may already be gone.
             self._search_edit = None
-        self._unhide_all_rows()
 
     def _apply_search_filter(self, text: str) -> None:
         if not self._search_active:
@@ -373,21 +397,29 @@ class GwAsyncComboBox(QComboBox):
             return
         needle = (text or '').strip().lower()
         rows = self._list_model.get_rows()
+        total = len(rows)
 
-        # Compute the new hidden set, then diff against the previous one to
-        # only call setRowHidden on rows that actually changed visibility.
+        # Walk the rows once: collect non-matches into the hidden set, and
+        # cap the number of *matches* we actually expose to the view. Excess
+        # matches go into the hidden set too — the user can narrow further.
         new_hidden: set = set()
         first_visible = -1
-        if needle:
-            for i, (_, idval) in enumerate(rows):
-                if needle in str(idval).lower():
-                    if first_visible < 0:
-                        first_visible = i
-                else:
-                    new_hidden.add(i)
-        elif rows:
-            first_visible = 0
+        visible_count = 0
+        match_count = 0
+        for i in range(total):
+            if needle and needle not in rows[i][1].lower():
+                new_hidden.add(i)
+                continue
+            match_count += 1
+            if visible_count >= MAX_POPUP_VISIBLE_ROWS:
+                new_hidden.add(i)
+                continue
+            if first_visible < 0:
+                first_visible = i
+            visible_count += 1
 
+        # Diff against the previous hidden set to only call setRowHidden on
+        # rows whose visibility actually changed.
         view.setUpdatesEnabled(False)
         try:
             for i in self._hidden_rows - new_hidden:
@@ -402,6 +434,33 @@ class GwAsyncComboBox(QComboBox):
             new_idx = self._list_model.index(first_visible, 0)
             view.setCurrentIndex(new_idx)
             view.scrollTo(new_idx)
+
+        self._update_search_status(match_count, visible_count, needle, total)
+
+    def _update_search_status(
+        self, match_count: int, visible_count: int, needle: str, total: int
+    ) -> None:
+        if self._search_edit is None:
+            return
+        if needle:
+            if match_count == 0:
+                tip = self.tr("No matches")
+            elif match_count > visible_count:
+                tip = self.tr("Showing {0} of {1} matches — keep typing…").format(
+                    visible_count, match_count
+                )
+            else:
+                tip = self.tr("{0} matches").format(match_count)
+        elif total > MAX_POPUP_VISIBLE_ROWS:
+            tip = self.tr("Type to filter ({0} of {1} shown)").format(
+                MAX_POPUP_VISIBLE_ROWS, total
+            )
+        else:
+            tip = self.tr("Type to filter…")
+        self._search_edit.setToolTip(tip)
+        # Placeholder is only visible while the line edit is empty, but
+        # showing the truncation hint there is exactly when it's most useful.
+        self._search_edit.setPlaceholderText(tip)
 
     def _unhide_all_rows(self) -> None:
         view = self.view()
