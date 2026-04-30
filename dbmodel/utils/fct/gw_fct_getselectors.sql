@@ -157,7 +157,7 @@ BEGIN
 	ELSE
 		v_query_tab = concat(' AND tabname = ', quote_literal(v_current_tab));
 	END IF;
-	
+
 	-- get if user has a role to show macroexploitation and macrosector tabs or not
 	v_selector_macro_tabs = (select selector_macro_tabs from cat_manager cm
 	where exists (select 1 from pg_roles r
@@ -170,9 +170,9 @@ BEGIN
 
 	v_query = concat(
 	'SELECT formname, tabname, label, tooltip, tabfunction, tabactions, value
-	 FROM (SELECT formname, tabname, f.label, f.tooltip, tabfunction, tabactions, unnest(device) AS device, value, orderby FROM config_form_tabs f, config_param_system
+	 FROM (SELECT formname, tabname, f.label, f.tooltip, tabfunction, tabactions, unnest(f.device) AS device, value, orderby FROM config_form_tabs f, config_param_system
 	 WHERE formname=',quote_literal(v_selector_type),' AND isenabled IS TRUE AND concat(''basic_selector_'', tabname) = parameter ',(v_query_tab),
-	'AND orderby >=',v_tab_network_signal,' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a 
+	'AND orderby >=',v_tab_network_signal,' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member'')))a
 	WHERE device = ',v_device, v_exclude_tab,' ORDER BY orderby');
 	v_debug_vars := json_build_object('v_selector_type', v_selector_type, 'v_query_tab', v_query_tab);
 	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
@@ -184,61 +184,61 @@ BEGIN
 		-- create temp tables related to expl x user variable
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"CREATE", "group":"SELECTOR"}}}$$)';
-	
+
 		-- create auxiliar table temp_aux_sector_muni
 		CREATE TEMP TABLE temp_muni_sector_expl AS
 		SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
 		UNION
 		SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0) sub
 		WHERE expl_id is not null;
-	
+
 		IF v_expl_x_user is false then
 			INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-			SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active 
-			FROM exploitation 
-			WHERE active 
-			AND expl_id > 0 
+			SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active
+			FROM exploitation
+			WHERE active
+			AND expl_id > 0
 			ORDER BY expl_id;
 
 			INSERT INTO temp_macroexploitation (macroexpl_id, code, name, descript, active)
-			SELECT macroexpl_id, code, name, descript, active 
-			FROM macroexploitation 
-			WHERE active 
-			AND macroexpl_id > 0 
+			SELECT macroexpl_id, code, name, descript, active
+			FROM macroexploitation
+			WHERE active
+			AND macroexpl_id > 0
 			ORDER BY macroexpl_id;
 
 			INSERT INTO temp_sector (sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active)
-			SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active 
-			FROM sector 
-			WHERE active 
-			AND sector_id >= 0 
+			SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active
+			FROM sector
+			WHERE active
+			AND sector_id >= 0
 			ORDER BY sector_id;
 
 			INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
-			SELECT macrosector_id, code, name, descript, expl_id, muni_id, active 
-			FROM macrosector 
-			WHERE active 
-			AND macrosector_id > 0 
+			SELECT macrosector_id, code, name, descript, expl_id, muni_id, active
+			FROM macrosector
+			WHERE active
+			AND macrosector_id > 0
 			ORDER BY macrosector_id;
 
 			INSERT INTO temp_municipality (muni_id, name, observ, active)
-			SELECT muni_id, name, observ, active 
-			FROM v_municipality 
-			WHERE active 
-			AND muni_id > 0 
+			SELECT muni_id, name, observ, active
+			FROM v_municipality
+			WHERE active
+			AND muni_id > 0
 			ORDER BY muni_id;
 
 			INSERT INTO temp_network (network_id, name, active)
-			SELECT id::integer AS network_id, idval AS name, true AS active 
-			FROM om_typevalue 
-			WHERE typevalue = 'network_type' 
+			SELECT id::integer AS network_id, idval AS name, true AS active
+			FROM om_typevalue
+			WHERE typevalue = 'network_type'
 			ORDER BY id;
 
 			IF v_project_type = 'WS' THEN
 				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
-				SELECT id, expl_id, macroexpl_id, muni_id, minsector_id 
-				FROM om_mincut 
-				WHERE id > 0 
+				SELECT id, expl_id, macroexpl_id, muni_id, minsector_id
+				FROM om_mincut
+				WHERE id > 0
 				ORDER BY id;
 			END IF;
 		ELSE
@@ -270,7 +270,7 @@ BEGIN
 			FROM temp_muni_sector_expl t
 			JOIN temp_exploitation e USING (expl_id)
 			JOIN sector s ON s.sector_id = t.sector_id
-			WHERE s.active AND s.sector_id >= 0 
+			WHERE s.active AND s.sector_id >= 0
 			ORDER BY s.sector_id
 			ON CONFLICT (sector_id) DO NOTHING;
 
@@ -315,7 +315,7 @@ BEGIN
 		IF v_selector_macro_tabs is null AND v_tab.tabname IN ('tab_macroexploitation', 'tab_macrosector') THEN
    			CONTINUE;
 		END IF;
-		
+
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
 		v_filter_from_input := (p_data ->> 'data')::json->> 'filterText';
