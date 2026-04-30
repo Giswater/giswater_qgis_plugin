@@ -2651,7 +2651,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
     ('txt_info', 'generic', 'psector_manager', 'tab_none', 'Informació:', 'Taula'),
     ('btn_close', 'generic', 'snapshot_view', 'tab_none', NULL, 'Tancar'),
     ('btn_grid', 'generic', 'snapshot_view', 'tab_none', NULL, ' '),
-    ('btn_run', 'generic', 'snapshot_view', 'tab_none', NULL, 'Corre'),
+    ('btn_run', 'generic', 'snapshot_view', 'tab_none', NULL, 'Executar'),
     ('chk_arc', 'generic', 'snapshot_view', 'tab_none', 'Arcs:', 'Arcs'),
     ('chk_connec', 'generic', 'snapshot_view', 'tab_none', 'Connexions:', 'Connecta'),
     ('chk_doc', 'generic', 'snapshot_view', 'tab_none', 'Documents:', 'Documents'),
