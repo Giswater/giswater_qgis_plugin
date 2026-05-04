@@ -9,6 +9,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
 	VALUES
 	(107, 'nodes orphans ready-to-export (epa_type & state_type). If they are actually orphan, you could change the epa_type to fix it''.', 'No nodes orphan found.', 'Node orphan (EPA)'),
     (228, NULL, NULL, 'Go2epa check orphan nodes'),
+    (233, 'dry nodes/connecs with demand which have been set to cero on the go2epa process.', 'No connecs dry with associated demand found', 'Dry node/connec with associated demand (go2epa)'),
     (292, NULL, NULL, 'EPANET pumps with more than two acs'),
     (377, 'value of roughness out of range acording headloss formula used.', 'Roughness values have been checked against head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.', 'Arc with less length than minimum configured (go2epa)'),
     (381, NULL, NULL, 'Check y0 on storage data'),
@@ -49,8 +50,11 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'virtualpumps with null values at least on mandatory column curve_id. virtualpumps with null values at least on mandatory column curve_id.', 'Virtualpumps checked. No mandatory values for curve_id missed. Virtualpumps checked. No mandatory values for curve_id missed.', 'Null values on virtualpump curve_id '),
     (637, NULL, NULL, 'Fluid type calculation	'),
     (638, 'nodes with flowregulators with different lengths and same to_arc.', 'All flow regulator elements with the same node_id and to_arc have the same length', 'Check that all flow regulator elements have the same length'),
+    (640, NULL, NULL, 'Dynamic omunit analysis'),
+    (642, NULL, NULL, 'Treatment type calculation	'),
     (644, 'gully which id is not an integer. Please, check your data before continue.', 'All gullies features with id integer.', 'Gully which id is not an integer'),
     (-1, NULL, NULL, 'There is'),
+    (-2, NULL, NULL, 'There are'),
     (101, NULL, NULL, 'Qgis project check'),
     (102, NULL, NULL, 'Schema data consistency'),
     (103, 'arcs with state=1 and without node_1 or node_2.', 'No arc''''s with state=1 and without node_1 or node_2 nodes found.', 'Arc without start-end nodes'),
@@ -146,7 +150,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (197, 'arcs with state=1 using extremals nodes with state = 2. Please, check your data before continue.', 'No arcs with state=1 using nodes with state=0 found.', 'Arcs with state=1 using nodes on state=2'),
     (198, 'tanks with null values at least on mandatory columns for tank (initlevel, minlevel, maxlevel, diameter, minvol).Take a look on temporal table to details.', 'Tanks checked. No mandatory values missed.', 'Tanks with null mandatory values'),
     (199, NULL, NULL, 'Mincut process'),
-    (-2, NULL, NULL, 'There are'),
     (200, NULL, NULL, 'Set to_arc values for graph delimiters'),
     (201, 'connecs customer code duplicated. Please, check your data before continue.', 'No connecs with customer code duplicated.', 'Connecs with duplicated customer_code'),
     (203, NULL, NULL, 'Final nodes with arc_id'),
@@ -177,7 +180,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (230, 'pipes with length less than configured minimum length.', 'Critical minimun length checked. No values less than configured minimum length found.', 'arcs less than 5 cm.'),
     (231, 'arcs disconnected from any outfall which have been removed on the go2epa process.', 'No arcs disconnected from any outfall found', 'Arc disconnected from any outfall (go2epa)'),
     (232, 'dry arcs because closed elements (go2epa).', 'No arcs dry because closed elements found', 'Dry arc because closed elements (go2epa)'),
-    (233, 'dry nodes/connecs with demand which have been set to cero on the go2epa process.', 'No connecs dry with associated demand found', 'Dry node/connec with associated demand (go2epa)'),
     (234, NULL, NULL, 'Import db prices'),
     (235, NULL, NULL, 'Import elements'),
     (236, NULL, NULL, 'Import addfields'),
@@ -226,9 +228,9 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (280, 'pumps with null values at least on mandatory column curve_id. virtualpumps with null values at least on mandatory column curve_id.', 'Pumps checked. No mandatory values for curve_id missed. Virtualpumps checked. No mandatory values for curve_id missed.', 'Null values on pump curve_id '),
     (281, 'additional pumps with null values at least on mandatory column curve_id.', 'Additional pumps checked. No mandatory values for curve_id missed.', 'Null values on additional pump curve_id '),
     (282, 'pipes with null values for roughness. Check roughness catalog columns (init_age,end_age,roughness) before continue.''.', 'Roughness catalog checked. No mandatory values missed.', 'Null values on roughness catalog '),
-    (283, 'registers on arc''s catalog with null values on dint column.''.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
+    (283, 'registers on arc''s catalog with null values on dint column.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
     (284, 'arcs without values on sys_elev1 or sys_elev2.', 'No arcs with null values on field elevation (sys_elev1 or sys_elev2) have been found.', 'Arcs without elevation'),
-    (285, 'raingages with null values at least on mandatory columns for rain type (form_type, intvl, scf, rgage_type).', 'Mandatory colums for raingage (form_type, intvl, scf, rgage_type) have been checked without any values missed.', 'Null values on raingage'),
+    (285, 'raingages with null values at least on mandatory columns for rain type (form_type, intvl, rgage_type).', 'Mandatory colums for raingage (form_type, intvl, rgage_type) have been checked without any values missed.', 'Null values on raingage'),
     (286, 'raingages with null values on the mandatory column for ''TIMESERIES'' raingage type.', 'Mandatory colums for ''TIMESERIES'' raingage type have been checked without any values missed.', 'Null values on raingage timeseries'),
     (287, 'raingages with null values at least on mandatory columns for ''FILE'' raingage type (fname, sta, units).', 'Mandatory colums (fname, sta, units) for ''FILE'' raingage type have been checked without any values missed.', 'Null values on raingage file'),
     (288, NULL, NULL, 'Store psector values for specific user'),
@@ -484,9 +486,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (633, NULL, NULL, 'Pump present in more than one enabled scenario'),
     (634, NULL, NULL, 'Weir present in more than one enabled scenario'),
     (635, NULL, NULL, 'Junction present in more than one enabled scenario'),
-    (636, 'nodes with ''DMA''  is on cat_feature_node.graph_delimiter array configured for unactive mapzone.', 'All nodes with cat_feature_node.graph_delimiter=''DMA'' are defined as nodeParent on dma.graphconfig', 'dma-nodeparent acording with graph_delimiter (unactive dma)'),
-    (640, 'node which id is not an integer. Please, check your data before continue.', 'All nodes features with id integer.', 'Node which id is not an integer'),
-    (642, 'connec which id is not an integer. Please, check your data before continue.', 'All connecs features with id integer.', 'Connec which id is not an integer')
+    (636, 'nodes with ''DMA''  is on cat_feature_node.graph_delimiter array configured for unactive mapzone.', 'All nodes with cat_feature_node.graph_delimiter=''DMA'' are defined as nodeParent on dma.graphconfig', 'dma-nodeparent acording with graph_delimiter (unactive dma)')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

@@ -9,6 +9,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
 	VALUES
 	(107, 'noduri orfane gata de export (epa_type & state_type). Dacă sunt într-adevăr orfane, ați putea modifica epa_type pentru a remedia problema".', 'Nu s-au găsit noduri orfane.', 'Nod orfan (EPA)'),
     (228, NULL, NULL, 'Go2epa verifică nodurile orfane'),
+    (233, 'dry nodes/connecs with demand which have been set to cero on the go2epa process.', 'No connecs dry with associated demand found', 'Dry node/connec with associated demand (go2epa)'),
     (292, NULL, NULL, 'Pompe EPANET cu mai mult de două acs'),
     (377, 'valoarea rugozității este în afara intervalului conform formulei utilizate pentru pierderea de sarcină.', 'Valorile rugozității au fost verificate în raport cu formula pierderilor de sarcină utilizând valorile minime și maxime din manualul de utilizare EPANET. Au fost detectate toate valorile ieșite din interval.', 'Arc cu o lungime mai mică decât cea minimă configurată (go2epa)'),
     (381, NULL, NULL, 'Verificați y0 pe datele de stocare'),
@@ -49,8 +50,11 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'pompe virtuale cu valori nule cel puțin pe coloana obligatorie curve_id. pompe virtuale cu valori nule cel puțin pe coloana obligatorie curve_id.', 'Pompele virtuale verificate. Nicio valoare obligatorie pentru curve_id ratată. Virtualpumps verificat. Nicio valoare obligatorie pentru curve_id nu a fost ratată.', 'Valori nule pe curba virtualpump_id'),
     (637, NULL, NULL, 'Calculul tipului de fluid'),
     (638, 'noduri cu regulatoare de debit cu lungimi diferite și același to_arc.', 'Toate elementele regulatorului de debit cu același node_id și to_arc au aceeași lungime', 'Verificați dacă toate elementele regulatorului de debit au aceeași lungime'),
+    (640, NULL, NULL, 'Dynamic omunit analysis'),
+    (642, NULL, NULL, 'Treatment type calculation	'),
     (644, 'gully al cărui id nu este un număr întreg. Vă rugăm să vă verificați datele înainte de a continua.', 'Toate caracteristicile gullies cu număr întreg de identificare.', 'Defileu al cărui id nu este un număr întreg'),
     (-1, NULL, NULL, 'Există'),
+    (-2, NULL, NULL, 'Există'),
     (101, NULL, NULL, 'Verificarea proiectului Qgis'),
     (102, NULL, NULL, 'Schema de coerență a datelor'),
     (103, 'arce cu stare=1 și fără nod_1 sau nod_2.', 'Nu a fost găsit niciun arc cu starea=1 și fără nodurile nod_1 sau nod_2.', 'Arc fără noduri de început și de sfârșit'),
@@ -146,7 +150,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (197, 'arce cu starea = 1 folosind noduri extremale cu starea = 2. Vă rugăm să vă verificați datele înainte de a continua.', 'Nu s-au găsit arce cu stare=1 care să folosească noduri cu stare=0.', 'Arce cu starea=1 folosind noduri cu starea=2'),
     (198, 'rezervoare cu valori nule cel puțin pe coloanele obligatorii pentru rezervor (initlevel, minlevel, maxlevel, diameter, minvol).Aruncați o privire pe tabelul temporal pentru detalii.', 'Rezervoare verificate. Nu s-a omis nicio valoare obligatorie.', 'Rezervoare cu valori obligatorii nule'),
     (199, NULL, NULL, 'Procesul Mincut'),
-    (-2, NULL, NULL, 'Există'),
     (200, NULL, NULL, 'Setați valorile to_arc pentru delimitatorii grafici'),
     (201, 'cod client connecs duplicat. Vă rugăm să vă verificați datele înainte de a continua.', 'Nu sunt duplicate conexiunile cu codul de client.', 'Conexiuni cu cod_client duplicat'),
     (203, NULL, NULL, 'Noduri finale cu arc_id'),
@@ -177,7 +180,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (230, 'țevi cu o lungime mai mică decât lungimea minimă configurată.', 'Lungimea minimă critică verificată. Nu s-au găsit valori mai mici decât lungimea minimă configurată.', 'arcuri mai mici de 5 cm.'),
     (231, 'arce deconectate de la orice emisar care au fost eliminate din procesul go2epa.', 'Nu s-au găsit arce deconectate de la nici un emisar', 'Arc deconectat de la orice emisar (go2epa)'),
     (232, 'arce uscate deoarece elemente închise (go2epa).', 'Nu există arcuri uscate deoarece s-au găsit elemente închise', 'Arc uscat deoarece elemente închise (go2epa)'),
-    (233, 'noduri/conecte uscate cu cerere care au fost setate la zero în procesul go2epa.', 'Nu s-au găsit conexiuni uscate cu cererea asociată', 'Nod uscat/conec cu cerere asociată (go2epa)'),
     (234, NULL, NULL, 'Prețurile db de import'),
     (235, NULL, NULL, 'Elemente de import'),
     (236, NULL, NULL, 'Importați câmpuri suplimentare'),
@@ -226,7 +228,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (280, 'pompe cu valori nule cel puțin pe coloana obligatorie curve_id. pompe virtuale cu valori nule cel puțin pe coloana obligatorie curve_id.', 'Pompe verificate. Nu a fost ratată nicio valoare obligatorie pentru curve_id. Virtualpumps verificat. Nu au lipsit valorile obligatorii pentru curve_id.', 'Valori nule pe pompa curve_id'),
     (281, 'pompe suplimentare cu valori nule cel puțin pe coloana obligatorie curve_id.', 'Pompe suplimentare verificate. Nu s-a omis nicio valoare obligatorie pentru curve_id.', 'Valori nule pe curba pompei suplimentare_id'),
     (282, 'conducte cu valori nule pentru rugozitate. Verificați coloanele catalogului de rugozitate (init_age, end_age, roughness) înainte de a continua.".', 'Catalogul rugozității verificat. Nu a fost omisă nicio valoare obligatorie.', 'Valori nule pe catalogul de rugozitate'),
-    (283, 'înregistrări în catalogul arcului cu valori nule pe coloana dint.".', 'Dint pentru catalogul arcului verificat. Nu s-au pierdut valori.', 'Valori nule în catalogul arcului - dint'),
+    (283, 'registers on arc''s catalog with null values on dint column.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
     (284, 'arce fără valori pe sys_elev1 sau sys_elev2.', 'Nu au fost găsite arce cu valori nule în câmpul elevație (sys_elev1 sau sys_elev2).', 'Arce fără elevație'),
     (285, 'raingaje cu valori nule cel puțin pe coloanele obligatorii pentru tipul de ploaie (form_type, intvl, rgage_type).', 'Coloanele obligatorii pentru raingage (form_type, intvl, rgage_type) au fost verificate fără să lipsească nicio valoare.', 'Valori nule pe raingage'),
     (286, 'raingaje cu valori nule pe coloana obligatorie pentru tipul de raingage "TIMESERIES".', 'Coloanele obligatorii pentru tipul de raingage "TIMESERIES" au fost verificate fără a se omite nicio valoare.', 'Valori nule pe seriile de timp ale raingajului'),
@@ -484,9 +486,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (633, NULL, NULL, 'Pompă prezentă în mai mult de un scenariu activat'),
     (634, NULL, NULL, 'Deversor prezent în mai mult de un scenariu activat'),
     (635, NULL, NULL, 'Joncțiune prezentă în mai mult de un scenariu activat'),
-    (636, 'noduri cu "DMA" este pe cat_feature_node.graph_delimiter array configurat pentru mapzone neactive.', 'Toate nodurile cu cat_feature_node.graph_delimiter=''DMA'' sunt definite ca nodeParent pe dma.graphconfig', 'dma-nodeparent în conformitate cu graph_delimiter (dma neactiv)'),
-    (640, 'nod al cărui id nu este un număr întreg. Vă rugăm să vă verificați datele înainte de a continua.', 'Toate caracteristicile nodurilor cu id întreg.', 'Nod al cărui id nu este un număr întreg'),
-    (642, 'conectare al cărei id nu este un număr întreg. Vă rugăm să vă verificați datele înainte de a continua.', 'Toate caracteristicile de conectare cu id întreg.', 'Conectare al cărei id nu este un număr întreg')
+    (636, 'noduri cu "DMA" este pe cat_feature_node.graph_delimiter array configurat pentru mapzone neactive.', 'Toate nodurile cu cat_feature_node.graph_delimiter=''DMA'' sunt definite ca nodeParent pe dma.graphconfig', 'dma-nodeparent în conformitate cu graph_delimiter (dma neactiv)')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

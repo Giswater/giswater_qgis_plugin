@@ -9,6 +9,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
 	VALUES
 	(107, 'Knoten verwaiste exportfertige Knoten (epa_type & state_type). Wenn sie tatsächlich verwaist sind, können Sie den epa_type ändern, um das Problem zu beheben".', 'Keine verwaisten Knoten gefunden.', 'Verwaister Knoten (EPA)'),
     (228, NULL, NULL, 'Go2epa prüft verwaiste Knoten'),
+    (233, 'dry nodes/connecs with demand which have been set to cero on the go2epa process.', 'No connecs dry with associated demand found', 'Dry node/connec with associated demand (go2epa)'),
     (292, NULL, NULL, 'EPANET-Pumpen mit mehr als zwei acs'),
     (377, 'Wert der Rauheit außerhalb des Bereichs der verwendeten Druckverlustformel.', 'Die Rauhigkeitswerte wurden anhand der Mindest- und Höchstwerte aus dem EPANET-Benutzerhandbuch mit der Formel für den Druckverlust verglichen. Alle Werte, die außerhalb des Bereichs liegen, wurden erkannt.', 'Bogen mit geringerer Länge als das konfigurierte Minimum (go2epa)'),
     (381, NULL, NULL, 'Überprüfung von y0 auf Speicherdaten'),
@@ -49,8 +50,11 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'virtualpumps mit Nullwerten mindestens in der Pflichtspalte curve_id. virtualpumps mit Nullwerten mindestens in der Pflichtspalte curve_id.', 'Virtualpumps überprüft. Keine obligatorischen Werte für curve_id fehlen. Virtualpumps geprüft. Keine obligatorischen Werte für curve_id fehlen.', 'Nullwerte für virtualpump curve_id'),
     (637, NULL, NULL, 'Berechnung des Flüssigkeitstyps'),
     (638, 'Knoten mit Durchflussreglern mit unterschiedlichen Längen und gleichem to_arc.', 'Alle Mengenreglerelemente mit der gleichen node_id und to_arc haben die gleiche Länge', 'Prüfen Sie, ob alle Durchflussregler-Elemente die gleiche Länge haben.'),
+    (640, NULL, NULL, 'Dynamic omunit analysis'),
+    (642, NULL, NULL, 'Treatment type calculation	'),
     (644, 'Gully, dessen ID keine ganze Zahl ist. Bitte überprüfen Sie Ihre Daten, bevor Sie fortfahren.', 'Alle Gullys sind mit einer ganzen Zahl versehen.', 'Gully, dessen ID keine ganze Zahl ist'),
     (-1, NULL, NULL, 'Es gibt'),
+    (-2, NULL, NULL, 'Es gibt'),
     (101, NULL, NULL, 'Qgis-Projektprüfung'),
     (102, NULL, NULL, 'Schema der Datenkonsistenz'),
     (103, 'Bögen mit Zustand=1 und ohne node_1 oder node_2.', 'Keine Bogen''''s mit Zustand=1 und ohne Knoten_1 oder Knoten_2 Knoten gefunden.', 'Bogen ohne Start-End-Knoten'),
@@ -146,7 +150,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (197, 'Bögen mit Zustand = 1 unter Verwendung von extremen Knoten mit Zustand = 2. Bitte überprüfen Sie Ihre Daten, bevor Sie fortfahren.', 'Es wurden keine Bögen mit Zustand=1 über Knoten mit Zustand=0 gefunden.', 'Bögen mit Zustand=1 mit Knoten auf Zustand=2'),
     (198, 'Tanks mit Nullwerten zumindest in den Pflichtspalten für Tanks (initlevel, minlevel, maxlevel, diameter, minvol), siehe dazu die zeitliche Tabelle.', 'Tanks überprüft. Keine obligatorischen Werte fehlen.', 'Tanks mit obligatorischen Nullwerten'),
     (199, NULL, NULL, 'Mincut-Verfahren'),
-    (-2, NULL, NULL, 'Es gibt'),
     (200, NULL, NULL, 'to_arc-Werte für Diagrammbegrenzer festlegen'),
     (201, 'connecs Kundencode dupliziert. Bitte überprüfen Sie Ihre Daten, bevor Sie fortfahren.', 'Keine Verbindungen mit doppeltem Kundencode.', 'Verbindungen mit doppeltem customer_code'),
     (203, NULL, NULL, 'Endknoten mit arc_id'),
@@ -177,7 +180,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (230, 'Rohre, deren Länge geringer ist als die konfigurierte Mindestlänge.', 'Kritische Minimallänge geprüft. Keine Werte unterhalb der konfigurierten Mindestlänge gefunden.', 'Bögen von weniger als 5 cm.'),
     (231, 'Bögen, die von einem Auslass abgetrennt wurden, der im Rahmen des go2epa-Prozesses entfernt wurde.', 'Keine von einem Abfluss getrennten Lichtbögen gefunden', 'Bogen, der von jedem Abfluss getrennt ist (go2epa)'),
     (232, 'trockene Bögen, weil geschlossene Elemente (go2epa).', 'Keine Bögen trocken, da geschlossene Elemente gefunden', 'Trockener Lichtbogen, da geschlossene Elemente (go2epa)'),
-    (233, 'trockene Knoten/Verbindungen mit Bedarf, die im go2epa-Prozess auf Null gesetzt wurden.', 'Keine trockenen Verbindungen mit zugehörigem Bedarf gefunden', 'Trockener Knoten/Verbund mit zugehörigem Bedarf (go2epa)'),
     (234, NULL, NULL, 'db-Preise importieren'),
     (235, NULL, NULL, 'Elemente importieren'),
     (236, NULL, NULL, 'Zusatzfelder importieren'),
@@ -226,7 +228,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (280, 'Pumpen mit Nullwerten in mindestens der Pflichtspalte curve_id. virtuelle Pumpen mit Nullwerten in mindestens der Pflichtspalte curve_id.', 'Pumpen geprüft. Keine obligatorischen Werte für curve_id fehlen. Virtuelle Pumpen geprüft. Keine obligatorischen Werte für curve_id fehlen.', 'Nullwerte auf der Pumpenkurve_id'),
     (281, 'zusätzliche Pumpen mit Nullwerten zumindest in der Pflichtspalte curve_id.', 'Zusätzliche Pumpen geprüft. Keine obligatorischen Werte für curve_id fehlen.', 'Nullwerte bei zusätzlichen Pumpenkurven_id'),
     (282, 'Rohre mit Nullwerten für Rauheit. Prüfen Sie die Rauheitskatalogspalten (init_age,end_age,roughness), bevor Sie fortfahren.''.', 'Rauhigkeitskatalog geprüft. Keine obligatorischen Werte fehlen.', 'Nullwerte im Rauhigkeitskatalog'),
-    (283, 'Register im Katalog von arc mit Nullwerten in der Spalte dint".', 'Dint für Arc''s Katalog überprüft. Keine Werte fehlen.', 'Nullwerte im Bogenkatalog - dint'),
+    (283, 'registers on arc''s catalog with null values on dint column.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
     (284, 'Bögen ohne Werte auf sys_elev1 oder sys_elev2.', 'Es wurden keine Bögen mit Nullwerten für das Feld Elevation (sys_elev1 oder sys_elev2) gefunden.', 'Bögen ohne Elevation'),
     (285, 'raingages mit Nullwerten zumindest in den Pflichtspalten für den Regentyp (form_type, intvl, rgage_type).', 'Die Pflichtspalten für Ragingage (form_type, intvl, rgage_type) wurden überprüft, und es wurden keine Werte übersehen.', 'Nullwerte bei der Ragingage'),
     (286, 'Ringe mit Nullwerten in der Pflichtspalte für den Ringtyp ''TIMESERIES''.', 'Die Pflichtspalten für den Ringtyp ''TIMESERIES'' wurden überprüft, ohne dass Werte fehlen.', 'Nullwerte in der Zeitreihe für die Rendite'),
@@ -484,9 +486,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (633, NULL, NULL, 'Pumpe in mehr als einem aktivierten Szenario vorhanden'),
     (634, NULL, NULL, 'Wehr in mehr als einem aktivierten Szenario vorhanden'),
     (635, NULL, NULL, 'Kreuzung in mehr als einem aktivierten Szenario vorhanden'),
-    (636, 'Knoten mit "DMA" ist auf cat_feature_node.graph_delimiter array für unactive mapzone konfiguriert.', 'Alle Knoten mit cat_feature_node.graph_delimiter=''DMA'' sind als nodeParent in dma.graphconfig definiert', 'dma-nodeparent gemäß graph_delimiter (nicht aktive dma)'),
-    (640, 'Knoten, dessen ID keine ganze Zahl ist. Bitte überprüfen Sie Ihre Daten, bevor Sie fortfahren.', 'Alle Knotenmerkmale mit id integer.', 'Knoten, dessen ID keine ganze Zahl ist'),
-    (642, 'Verbindung, deren ID keine ganze Zahl ist. Bitte überprüfen Sie Ihre Daten, bevor Sie fortfahren.', 'Alle Verbindungsmerkmale mit ganzzahliger ID.', 'Verbindung, deren ID keine ganze Zahl ist')
+    (636, 'Knoten mit "DMA" ist auf cat_feature_node.graph_delimiter array für unactive mapzone konfiguriert.', 'Alle Knoten mit cat_feature_node.graph_delimiter=''DMA'' sind als nodeParent in dma.graphconfig definiert', 'dma-nodeparent gemäß graph_delimiter (nicht aktive dma)')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 

@@ -9,6 +9,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
 	VALUES
 	(107, 'nodes orphans ready-to-export (epa_type & state_type). Jeśli faktycznie są osierocone, można zmienić epa_type, aby to naprawić".', 'Nie znaleziono osieroconych węzłów.', 'Węzeł sierocy (EPA)'),
     (228, NULL, NULL, 'Go2epa sprawdza osierocone węzły'),
+    (233, 'dry nodes/connecs with demand which have been set to cero on the go2epa process.', 'No connecs dry with associated demand found', 'Dry node/connec with associated demand (go2epa)'),
     (292, NULL, NULL, 'Pompy EPANET z więcej niż dwoma acs'),
     (377, 'wartość chropowatości poza zakresem zgodnie z zastosowanym wzorem na stratę głowy.', 'Wartości chropowatości zostały sprawdzone w odniesieniu do wzoru na utratę głowy przy użyciu minimalnych i maksymalnych wartości z podręcznika użytkownika EPANET. Wykryto wszelkie wartości poza zakresem.', 'Łuk o długości mniejszej niż skonfigurowane minimum (go2epa)'),
     (381, NULL, NULL, 'Sprawdź y0 na danych pamięci masowej'),
@@ -49,8 +50,11 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (601, 'virtualpumps z wartościami null przynajmniej w obowiązkowej kolumnie curve_id. virtualpumps z wartościami null przynajmniej w obowiązkowej kolumnie curve_id.', 'Pompy wirtualne sprawdzone. Brak obowiązkowych wartości dla curve_id. Pompy wirtualne sprawdzone. Brak obowiązkowych wartości dla curve_id.', 'Wartości null dla virtualpump curve_id'),
     (637, NULL, NULL, 'Obliczanie typu płynu'),
     (638, 'węzłów z regulatorami przepływu o różnych długościach i tym samym to_arc.', 'Wszystkie elementy regulatora przepływu z tym samym node_id i to_arc mają taką samą długość', 'Sprawdź, czy wszystkie elementy regulatora przepływu mają taką samą długość.'),
+    (640, NULL, NULL, 'Dynamic omunit analysis'),
+    (642, NULL, NULL, 'Treatment type calculation	'),
     (644, 'gully, którego id nie jest liczbą całkowitą. Przed kontynuowaniem sprawdź swoje dane.', 'Wszystkie cechy wpustów z identyfikatorem całkowitym.', 'Wpust, którego identyfikator nie jest liczbą całkowitą'),
     (-1, NULL, NULL, 'Jest'),
+    (-2, NULL, NULL, 'Istnieją'),
     (101, NULL, NULL, 'Kontrola projektu Qgis'),
     (102, NULL, NULL, 'Schemat spójności danych'),
     (103, 'łuków ze stanem=1 i bez węzła_1 lub węzła_2.', 'Nie znaleziono łuku ze stanem=1 i bez węzłów node_1 lub node_2.', 'Łuk bez węzłów początkowych i końcowych'),
@@ -146,7 +150,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (197, 'łuków ze stanem = 1 przy użyciu węzłów ekstremalnych ze stanem = 2. Przed kontynuowaniem sprawdź swoje dane.', 'Nie znaleziono łuków ze stanem=1 używających węzłów ze stanem=0.', 'Łuki ze stanem=1 używające węzłów ze stanem=2'),
     (198, 'zbiorniki z wartościami null przynajmniej w obowiązkowych kolumnach dla zbiornika (initlevel, minlevel, maxlevel, diameter, minvol). Spójrz na tabelę czasową, aby uzyskać szczegółowe informacje.', 'Zbiorniki sprawdzone. Nie pominięto żadnych obowiązkowych wartości.', 'Zbiorniki z wartościami obowiązkowymi null'),
     (199, NULL, NULL, 'Proces Mincut'),
-    (-2, NULL, NULL, 'Istnieją'),
     (200, NULL, NULL, 'Ustawienie wartości to_arc dla ograniczników wykresu'),
     (201, 'Kod klienta connecs został zduplikowany. Przed kontynuowaniem sprawdź swoje dane.', 'Brak zduplikowanych połączeń z kodem klienta.', 'Połączenia ze zduplikowanym kodem customer_code'),
     (203, NULL, NULL, 'Węzły końcowe z identyfikatorem arc_id'),
@@ -177,7 +180,6 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (230, 'rury o długości mniejszej niż skonfigurowana długość minimalna.', 'Sprawdzono krytyczną minimalną długość. Nie znaleziono wartości mniejszych niż skonfigurowana minimalna długość.', 'łuki mniejsze niż 5 cm.'),
     (231, 'łuki odłączone od dowolnego odpływu, które zostały usunięte w procesie go2epa.', 'Nie znaleziono łuków odłączonych od żadnego odpływu', 'Łuk odłączony od jakiegokolwiek odpływu (go2epa)'),
     (232, 'suche łuki, ponieważ elementy zamknięte (go2epa).', 'Brak suchych łuków, ponieważ znaleziono zamknięte elementy', 'Łuk suchy, ponieważ elementy zamknięte (go2epa)'),
-    (233, 'suche węzły/połączenia z zapotrzebowaniem, które zostały ustawione na zero w procesie go2epa.', 'Nie znaleziono połączeń suchych z powiązanym żądaniem', 'Suchy węzeł/połączenie z powiązanym zapotrzebowaniem (go2epa)'),
     (234, NULL, NULL, 'Ceny importowe db'),
     (235, NULL, NULL, 'Importuj elementy'),
     (236, NULL, NULL, 'Importuj pola dodatkowe'),
@@ -226,7 +228,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (280, 'pompy z wartościami null przynajmniej w obowiązkowej kolumnie curve_id. virtualpumps z wartościami null przynajmniej w obowiązkowej kolumnie curve_id.', 'Pompy sprawdzone. Brak obowiązkowych wartości dla curve_id. Pompy wirtualne sprawdzone. Nie pominięto żadnych obowiązkowych wartości dla curve_id.', 'Wartości null na krzywej_id pompy'),
     (281, 'dodatkowe pompy z wartościami null przynajmniej w obowiązkowej kolumnie curve_id.', 'Sprawdzono dodatkowe pompy. Nie pominięto żadnych obowiązkowych wartości dla curve_id.', 'Wartości Null dla dodatkowej krzywej pompy_id'),
     (282, 'rury z wartościami null dla chropowatości. Sprawdź kolumny katalogu chropowatości (init_age, end_age, roughness) przed kontynuowaniem.".', 'Sprawdzono katalog chropowatości. Nie pominięto żadnych obowiązkowych wartości.', 'Wartości zerowe w katalogu chropowatości'),
-    (283, 'rejestry w katalogu arc z wartościami null w kolumnie dint.".', 'Dint dla katalogu łuku sprawdzony. Nie pominięto żadnych wartości.', 'Wartości null w katalogu łuków - dint'),
+    (283, 'registers on arc''s catalog with null values on dint column.', 'Dint for arc''''s catalog checked. No values missed.', 'Null values on arc catalog - dint'),
     (284, 'łuków bez wartości na sys_elev1 lub sys_elev2.', 'Nie znaleziono łuków z zerowymi wartościami wysokości pola (sys_elev1 lub sys_elev2).', 'Łuki bez wzniesienia'),
     (285, 'raingages z wartościami null przynajmniej w obowiązkowych kolumnach dla typu rain (form_type, intvl, rgage_type).', 'Obowiązkowe kolumny dla raingage (form_type, intvl, rgage_type) zostały sprawdzone bez pominięcia żadnych wartości.', 'Wartości zerowe na raingage'),
     (286, 'raingages z wartościami null w kolumnie obowiązkowej dla typu raingage "TIMESERIES".', 'Obowiązkowe kolumny dla typu raingage "TIMESERIES" zostały sprawdzone bez pominięcia żadnych wartości.', 'Wartości zerowe w szeregach czasowych raingage'),
@@ -484,9 +486,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (633, NULL, NULL, 'Pompa obecna w więcej niż jednym włączonym scenariuszu'),
     (634, NULL, NULL, 'Jaz obecny w więcej niż jednym włączonym scenariuszu'),
     (635, NULL, NULL, 'Złącze obecne w więcej niż jednym włączonym scenariuszu'),
-    (636, 'węzłów z ''DMA'' znajduje się w tablicy cat_feature_node.graph_delimiter skonfigurowanej dla nieaktywnej strefy map.', 'Wszystkie węzły z cat_feature_node.graph_delimiter=''DMA'' są zdefiniowane jako nodeParent na dma.graphconfig', 'dma-nodeparent zgodnie z graph_delimiter (nieaktywny dma)'),
-    (640, 'node, którego id nie jest liczbą całkowitą. Przed kontynuowaniem sprawdź swoje dane.', 'Wszystkie węzły posiadają identyfikator integer.', 'Węzeł, którego identyfikator nie jest liczbą całkowitą'),
-    (642, 'connec, którego id nie jest liczbą całkowitą. Przed kontynuowaniem sprawdź swoje dane.', 'Wszystkie funkcje połączeń z identyfikatorem integer.', 'Połączenie, którego identyfikator nie jest liczbą całkowitą')
+    (636, 'węzłów z ''DMA'' znajduje się w tablicy cat_feature_node.graph_delimiter skonfigurowanej dla nieaktywnej strefy map.', 'Wszystkie węzły z cat_feature_node.graph_delimiter=''DMA'' są zdefiniowane jako nodeParent na dma.graphconfig', 'dma-nodeparent zgodnie z graph_delimiter (nieaktywny dma)')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 
