@@ -13,7 +13,6 @@ import argparse
 import json
 import os
 import re
-import stat
 import sys
 import tempfile
 import urllib.request
@@ -105,9 +104,14 @@ def render_xml(template: str, version: tuple[int, int, int], base_url: str) -> s
 
 
 class Uploader(Protocol):
-    def mkdir_p(self, remote_dir: str) -> None: ...
-    def put(self, local_path: str, remote_path: str) -> None: ...
-    def close(self) -> None: ...
+    def mkdir_p(self, remote_dir: str) -> None:
+        ...
+
+    def put(self, local_path: str, remote_path: str) -> None:
+        ...
+
+    def close(self) -> None:
+        ...
 
 
 class SFTPUploader:
