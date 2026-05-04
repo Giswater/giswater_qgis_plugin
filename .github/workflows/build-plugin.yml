@@ -1,0 +1,48 @@
+name: 📦 Build plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag or commit SHA to build (leave empty for default branch)"
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo with submodules
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+          submodules: recursive
+          path: ./giswater
+
+      - name: Resolve metadata
+        id: meta
+        run: |
+          cd giswater
+          BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "detached")
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          # Sanitise branch name for artifact naming
+          BRANCH_SAFE=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          echo "artifact_name=giswater-dev-${BRANCH_SAFE}-${SHA_SHORT}" >> "$GITHUB_OUTPUT"
+
+      - name: Create ZIP
+        run: |
+          zip -r giswater.zip giswater \
+            -x 'giswater/.git/*' \
+               'giswater/.github/*' \
+               'giswater/scripts/*' \
+               'giswater/.gitignore' \
+               'giswater/.gitmodules' \
+               '*__pycache__*' \
+               '*.pyc'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: giswater.zip
+          retention-days: 90
