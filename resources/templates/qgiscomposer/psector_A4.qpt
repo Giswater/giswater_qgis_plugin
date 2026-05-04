@@ -54,38 +54,6 @@
    <customproperties/>
   </LayoutObject>
  </LayoutItem>
- <LayoutItem positionOnPage="18.5098,248.929,mm" groupUuid="" frame="false" background="false" id="" valign="32" outlineWidthM="0.3,mm" referencePoint="0" htmlState="0" uuid="{beac8177-2158-4168-bf98-1c7c960e1d1b}" frameJoinStyle="miter" positionLock="false" marginY="0" marginX="0" halign="1" itemRotation="0" templateUuid="{beac8177-2158-4168-bf98-1c7c960e1d1b}" blendMode="0" type="65641" position="18.5098,248.929,mm" excludeFromExports="0" opacity="1" visibility="1" zValue="34" size="98.6069,5.60773,mm" labelText="Planified network:  [% &quot;plan_length&quot; %] m.">
-  <FrameColor red="0" green="0" alpha="255" blue="0"/>
-  <BackgroundColor red="255" green="255" alpha="255" blue="255"/>
-  <LayoutObject>
-   <dataDefinedProperties>
-    <Option type="Map">
-     <Option value="" name="name" type="QString"/>
-     <Option name="properties"/>
-     <Option value="collection" name="type" type="QString"/>
-    </Option>
-   </dataDefinedProperties>
-   <customproperties/>
-  </LayoutObject>
-  <LabelFont description="Arial,10,-1,5,50,1,0,0,0,0" style=""/>
-  <FontColor red="0" green="0" alpha="255" blue="0"/>
- </LayoutItem>
- <LayoutItem positionOnPage="18.5098,240.85,mm" groupUuid="" frame="false" background="false" id="" valign="32" outlineWidthM="0.3,mm" referencePoint="0" htmlState="0" uuid="{42fcc677-a640-438e-8112-c1dfc7c589f2}" frameJoinStyle="miter" positionLock="false" marginY="0" marginX="0" halign="1" itemRotation="0" templateUuid="{42fcc677-a640-438e-8112-c1dfc7c589f2}" blendMode="0" type="65641" position="18.5098,240.85,mm" excludeFromExports="0" opacity="1" visibility="1" zValue="33" size="98.6069,5.60773,mm" labelText="Affected network:  [% &quot;affec_length&quot; %] m.">
-  <FrameColor red="0" green="0" alpha="255" blue="0"/>
-  <BackgroundColor red="255" green="255" alpha="255" blue="255"/>
-  <LayoutObject>
-   <dataDefinedProperties>
-    <Option type="Map">
-     <Option value="" name="name" type="QString"/>
-     <Option name="properties"/>
-     <Option value="collection" name="type" type="QString"/>
-    </Option>
-   </dataDefinedProperties>
-   <customproperties/>
-  </LayoutObject>
-  <LabelFont description="Arial,10,-1,5,50,1,0,0,0,0" style=""/>
-  <FontColor red="0" green="0" alpha="255" blue="0"/>
- </LayoutItem>
  <LayoutItem positionOnPage="130.06,170.278,mm" groupUuid="" frame="false" background="false" id="" valign="32" outlineWidthM="0.3,mm" referencePoint="0" htmlState="0" uuid="{14b5623a-0dde-49b7-b996-37e4f8ffb3ac}" frameJoinStyle="miter" positionLock="false" marginY="0" marginX="0" halign="2" itemRotation="0" templateUuid="{14b5623a-0dde-49b7-b996-37e4f8ffb3ac}" blendMode="0" type="65641" position="130.06,170.278,mm" excludeFromExports="0" opacity="1" visibility="1" zValue="32" size="63.839,4.52331,mm" labelText="[% format_number ( &quot;total_other&quot; ,2)%]  €">
   <FrameColor red="0" green="0" alpha="255" blue="0"/>
   <BackgroundColor red="255" green="255" alpha="255" blue="255"/>
