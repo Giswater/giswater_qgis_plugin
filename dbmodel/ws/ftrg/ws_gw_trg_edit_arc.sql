@@ -37,6 +37,7 @@ v_childtable_name text;
 v_schemaname text;
 rec_param_link record;
 v_connecs text;
+v_sys_code_autofill boolean;
 
 BEGIN
 
@@ -54,6 +55,7 @@ BEGIN
 	ve_enable_arc_nodes_update = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_arc_enable nodes_update');
 	v_autoupdate_fluid = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_connect_autoupdate_fluid');
 	v_psector = (SELECT value::integer FROM config_param_user WHERE "parameter"='plan_psector_current' AND cur_user=current_user);
+	v_sys_code_autofill := (SELECT (value::json->>'arc')::text FROM config_param_system WHERE parameter = 'edit_sys_code_autofill');
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		IF NEW.arccat_id NOT IN (SELECT id FROM cat_arc WHERE arc_type = NEW.arc_type) AND NEW.arc_type IS NOT NULL THEN
@@ -331,6 +333,11 @@ BEGIN
 		--Copy id to code field
 		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
 			NEW.code=NEW.arc_id;
+		END IF;
+
+		--Sys_code
+		IF v_sys_code_autofill IS TRUE THEN
+			NEW.sys_code=gen_random_uuid();
 		END IF;
 
 		-- Workcat_id

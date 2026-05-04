@@ -72,6 +72,7 @@ v_gully_id text;
 v_childtable_name text;
 v_schemaname text;
 v_featureclass text;
+v_sys_code_autofill boolean;
 
 BEGIN
 
@@ -103,6 +104,8 @@ BEGIN
 	v_auto_streetvalues_status := (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+	v_sys_code_autofill := (SELECT (value::json->>'gully')::text FROM config_param_system WHERE parameter = 'edit_sys_code_autofill');
+
 
 	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 
@@ -425,6 +428,11 @@ BEGIN
 			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
 				NEW.code=NEW.gully_id;
 			END IF;
+		END IF;
+
+		--Sys_code
+		IF v_sys_code_autofill IS TRUE THEN
+			NEW.sys_code=gen_random_uuid();
 		END IF;
 
 		--Units

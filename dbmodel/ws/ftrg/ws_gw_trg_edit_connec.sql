@@ -56,6 +56,7 @@ v_code_prefix text;
 v_connec_id text;
 v_childtable_name text;
 v_schemaname text;
+v_sys_code_autofill boolean;
 
 BEGIN
 
@@ -80,6 +81,7 @@ BEGIN
 	v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
+	v_sys_code_autofill := (SELECT (value::json->>'connec')::text FROM config_param_system WHERE parameter = 'edit_sys_code_autofill');
 
 	SELECT value::boolean INTO v_connect2network FROM config_param_user WHERE parameter='edit_connec_automatic_link' AND cur_user=current_user;
 
@@ -347,6 +349,11 @@ BEGIN
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3036", "function":"1318","parameters":{"state_id":"'||v_sql::text||'"}}}$$);';
+		END IF;
+
+		--Sys_code
+		IF v_sys_code_autofill IS TRUE THEN
+			NEW.sys_code=gen_random_uuid();
 		END IF;
 
 		--Publish

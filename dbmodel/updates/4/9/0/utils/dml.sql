@@ -464,3 +464,9 @@ DELETE FROM sys_table WHERE id = 'samplepoint';
 DELETE FROM sys_table WHERE id = 've_samplepoint';
 DELETE FROM sys_function WHERE id = 1122; -- gw_trg_edit_samplepoint
 DROP FUNCTION IF EXISTS gw_trg_edit_samplepoint;
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
+VALUES('edit_sys_code_autofill', '{"node":false, "arc":true, "connec":false, "gully":false}',
+'Allow activate automatic update of sys_code for features. In case of true, the field will be filled with an UUID',
+'Auto sys_code:', NULL, NULL, true, 15, 'utils', false, false, 'json', 'linetext', true, true, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_system');
+

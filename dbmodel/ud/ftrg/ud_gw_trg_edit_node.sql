@@ -89,6 +89,7 @@ v_cur_quadrant TEXT;
 v_new_lab_position public.geometry;
 v_dist_sign numeric;
 v_label_dist numeric;
+v_sys_code_autofill boolean;
 
 BEGIN
 
@@ -120,6 +121,7 @@ BEGIN
 	v_auto_streetvalues_status := (SELECT (value::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_buffer := (SELECT (value::json->>'buffer')::integer FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
 	v_auto_streetvalues_field := (SELECT (value::json->>'field')::text FROM config_param_system WHERE parameter = 'edit_auto_streetvalues');
+	v_sys_code_autofill := (SELECT (value::json->>'node')::text FROM config_param_system WHERE parameter = 'edit_sys_code_autofill');
 
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -463,6 +465,11 @@ BEGIN
 			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
 				NEW.code=NEW.node_id;
 			END IF;
+		END IF;
+
+		--Sys_code
+		IF v_sys_code_autofill IS TRUE THEN
+			NEW.sys_code=gen_random_uuid();
 		END IF;
 
 		-- Workcat_id
