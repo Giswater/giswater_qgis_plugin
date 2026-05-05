@@ -3593,3 +3593,32 @@ FROM crmzone c
 LEFT JOIN macrocrmzone mc USING (macrocrmzone_id)
 WHERE c.crmzone_id > 0
 ORDER BY c.crmzone_id;
+
+-- 05/05/2026
+CREATE OR REPLACE VIEW ve_epa_connec
+AS SELECT inp_connec.connec_id,
+    inp_connec.demand,
+    inp_connec.pattern_id,
+    inp_connec.peak_factor,
+    inp_connec.emitter_coeff,
+    inp_connec.init_quality,
+    inp_connec.source_type,
+    inp_connec.source_quality,
+    inp_connec.source_pattern_id,
+    COALESCE(n1.result_id, n2.result_id) AS result_id,
+    COALESCE(n1.demand_max, n2.demand_max) AS demandmax,
+    COALESCE(n1.demand_min, n2.demand_min) AS demandmin,
+    COALESCE(n1.demand_avg, n2.demand_avg) AS demandavg,
+    COALESCE(n1.head_max, n2.head_max) AS headmax,
+    COALESCE(n1.head_min, n2.head_min) AS headmin,
+    COALESCE(n1.head_avg, n2.head_avg) AS headavg,
+    COALESCE(n1.press_max, n2.press_max) AS pressmax,
+    COALESCE(n1.press_min, n2.press_min) AS pressmin,
+    COALESCE(n1.press_avg, n2.press_avg) AS pressavg,
+    COALESCE(n1.quality_max, n2.quality_max) AS qualmax,
+    COALESCE(n1.quality_min, n2.quality_min) AS qualmin,
+    COALESCE(n1.quality_avg, n2.quality_avg) AS qualavg
+   FROM (((inp_connec
+     LEFT JOIN v_rpt_node_stats n1 ON (((inp_connec.connec_id)::text = (n1.node_id)::text)))
+     LEFT JOIN link ON ((link.feature_id = inp_connec.connec_id)))
+     LEFT JOIN v_rpt_node_stats n2 ON (((n2.node_id)::text = concat('VN', link.link_id))));
