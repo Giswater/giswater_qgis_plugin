@@ -61,7 +61,7 @@ WHERE formname ILIKE 've_connec%' AND formtype='form_feature' AND columnname='cr
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM cat_element WHERE active IS true'
 WHERE formname = 've_element' AND columnname = 'elementcat_id';
-	
+
 UPDATE config_form_fields t SET dv_querytext = a.dv_querytext FROM (
     SELECT CONCAT('SELECT id, id as idval FROM cat_element WHERE active IS true AND element_type = ', quote_literal(upper(split_part(formname, '_', 3)))) AS dv_querytext, formname
     FROM config_form_fields WHERE formname ilike 've_element_%' AND dv_querytext IS NOT NULL AND columnname = 'elementcat_id'
@@ -79,20 +79,20 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	 ('ve_connec_samplepoint','form_feature','tab_data','sector_id','lyt_bot_1',1,'integer','combo','Sector id:','Sector_id - Hydraulic sector identifier related to the primary key of sector table',NULL,false,false,true,false,NULL,'SELECT sector_id as id,name as idval FROM sector WHERE sector_id IS NOT NULL AND active IS TRUE ',true,false,NULL,NULL,'{"label":"color:blue; font-weight:bold;"}','{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,5),
 	 ('ve_connec_samplepoint','form_feature','tab_data','dma_id','lyt_bot_1',2,'integer','combo','Dma','Dma_id',NULL,false,false,true,false,NULL,'SELECT dma_id as id, name as idval FROM dma WHERE dma_id = 0 UNION SELECT dma_id as id, name as idval FROM dma WHERE dma_id IS NOT NULL AND active IS TRUE ',true,false,'expl_id',' AND dma.expl_id',NULL,'{"setMultiline": false, "labelPosition": "top", "valueRelation": {"layer": "ve_dma", "activated": true, "keyColumn": "dma_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}',NULL,NULL,false,6),
 	 ('ve_connec_samplepoint','form_feature','tab_data','state','lyt_bot_1',3,'integer','combo','State:','State - Domain value of connect''s state.',NULL,false,true,false,false,NULL,'WITH psector_value AS (
-  		SELECT value::integer AS psector_value 
-  		FROM config_param_user 
+  		SELECT value::integer AS psector_value
+  		FROM config_param_user
   		WHERE parameter = ''plan_psector_current'' AND cur_user = current_user),
 	 tg_op_value AS (
-  		SELECT value::text AS tg_op_value 
-  		FROM config_param_user 
-  		WHERE parameter = ''utils_transaction_mode'' AND cur_user = current_user)  
+  		SELECT value::text AS tg_op_value
+  		FROM config_param_user
+  		WHERE parameter = ''utils_transaction_mode'' AND cur_user = current_user)
 SELECT id::integer as id, name as idval
-FROM value_state 
-WHERE id IS NOT NULL 
-AND CASE 
+FROM value_state
+WHERE id IS NOT NULL
+AND CASE
   WHEN (SELECT tg_op_value FROM tg_op_value)!=''INSERT'' THEN id IN (0,1,2)
-  WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2 
-  ELSE id < 2 
+  WHEN (SELECT tg_op_value FROM tg_op_value) =''INSERT'' AND (SELECT psector_value FROM psector_value) IS NOT NULL THEN id = 2
+  ELSE id < 2
 END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,7),
 	 ('ve_connec_samplepoint','form_feature','tab_data','state_type','lyt_bot_1',4,'integer','combo','State type:','State_type - The state type of the element. It allows to obtain more detail of the state. To select from those available depending on the chosen state',NULL,false,false,true,false,NULL,'SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL',true,false,'state',' AND value_state_type.state',NULL,'{"setMultiline": false, "labelPosition": "top"}',NULL,NULL,false,8),
 	 ('ve_connec_samplepoint','form_feature','tab_data','code','lyt_data_1',1,'text','text','Code:','Code',NULL,false,false,true,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,false,9),
@@ -193,3 +193,18 @@ END',true,false,NULL,NULL,NULL,'{"setMultiline": false, "labelPosition": "top"}'
 	 ('ve_connec_samplepoint','form_feature','tab_data','adate',NULL,NULL,'text','text','Adate:','Adate',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,112),
 	 ('ve_connec_samplepoint','form_feature','tab_data','adescript',NULL,NULL,'text','text','Adescript:','Adescript',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,111),
 	 ('ve_connec_samplepoint','form_feature','tab_data','accessibility',NULL,NULL,'integer','text','Accessibility:','Accessibility - Acceso al elemento',NULL,false,false,false,false,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'{"setMultiline":false}',NULL,NULL,true,113);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_node_shutoff_valve', 'form_feature', 'tab_data', 'sector_visibility', 'lyt_data_2', 49, 'text', 'multiple_option', 'Sector id visibility:', 'Sector id visibility:', NULL, false, false, true, false, NULL, 'select sector_id AS id, name AS idval from ve_sector where sector_id > 0', NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "layer": "ve_sector",
+    "activated": true,
+    "keyColumn": "sector_id",
+    "nullValue": false,
+    "allowMulti": true,
+    "nofColumns": 2,
+    "valueColumn": "name",
+    "filterExpression": null
+  }
+}'::json, NULL, NULL, false, NULL);
