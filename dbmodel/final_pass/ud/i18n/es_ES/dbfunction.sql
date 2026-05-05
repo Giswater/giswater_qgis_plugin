@@ -349,7 +349,7 @@ UPDATE sys_function AS t SET descript = v.descript FROM (
     (3308, 'Función para crear sys_message de forma eficiente'),
     (3310, 'La función recupera datos GeoJSON para nodos y arcos basados en IDs de resultados seleccionados y los devuelve en un formato JSON estructurado.'),
     (3316, 'Función para transferir los valores de addfields'),
-    (3324, 'Función para obtener el diálogo de cambio de tipo de característica'),
+    (3324, 'Función para obtener el diálogo de cambio de tipo de objeto'),
     (3328, 'Trigger para insertar o actualizar elementos en la tabla v_ext_municipality.'),
     (3330, 'Función para crear tablas temporales para graphanalytics'),
     (3332, 'Función para crear tablas temporales para graphanalytics'),
@@ -418,11 +418,11 @@ UPDATE sys_function AS t SET descript = v.descript FROM (
     (3510, 'Función para obtener la matriz de ID de explotación'),
     (3512, NULL),
     (3514, 'Función para auto-actualizar vistas cm y tablas para que coincidan con sus definiciones padre.'),
-    (3516, 'Función para gestionar la inserción por lotes de características en varias tablas de relaciones (campaña, lote, psector, elemento, visita) basándose en el tipo de relación y el tipo de característica. Devuelve el número de características insertadas.'),
+    (3516, 'Función para gestionar inserciones masivas de entidades en varias tablas de relaciones (campaign, lot, psector, element, visit), en función del tipo de relación y del tipo de entidad. Devuelve el número de objetos insertados.'),
     (3518, 'Function to get the properties of a feature.'),
     (3520, 'Function to set hydrometers in the database.'),
-    (3522, 'Función para gestionar la inserción por lotes de características en varias tablas de relaciones (campaña, lote, psector, elemento, visita) basándose en el tipo de relación y el tipo de característica. Devuelve el número de características insertadas.'),
-    (3524, 'Función para gestionar la inserción por lotes de características en varias tablas de relaciones (campaña, lote, psector, elemento, visita) basándose en el tipo de relación y el tipo de característica. Devuelve el número de características insertadas.')
+    (3522, 'Función para generar tipos_de_tratamientos de arcos y nodos. Para el ratón sobre los textos para más información sobre los parámetros de inserción.'),
+    (3524, 'Función para transformar valores numéricos de precio al usuario configurado en admin_currency en config_param_system')
 ) AS v(id, descript)
 WHERE t.id = v.id;
 

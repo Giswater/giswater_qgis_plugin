@@ -165,7 +165,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (263, 'características con estado 0 sin valor de fecha final.', 'No hay características con estado 0 que no tengan fecha de finalización', 'Objeto state=0 sin fecha de finalización'),
     (264, 'objetos con fecha de finalización anterior a la fecha de construcción.', 'No hay elementos cuya fecha final sea anterior a la fecha de construcción', 'Objetos state=1 y fecha de fin antes de la fecha de inicio'),
     (265, 'se encontraronlinks automáticos con longitud fuera de rango.', 'No se encontraron enlaces automáticos con longitud fuera de rango.', 'Enlaces automáticos con más de 100 m'),
-    (266, 'features with duplicated ID value between arc, node, connec, gully features with duplicated ID values between arc, node, connec, gully.', 'Todas las características tienen un ID diferente para ser identificadas correctamente', 'ID duplicado entre arco, nodo, acometida, sumidero'),
+    (266, 'features with duplicated ID value between arc, node, connec, gully features with duplicated ID values between arc, node, connec, gully.', 'Todos los objetos tienen un ID diferente para ser identificadas correctamente', 'ID duplicado entre arco, nodo, acometida, sumidero'),
     (267, NULL, NULL, 'Cat_feature_node sin definición de delimitador gráfico'),
     (268, 'sectores en la tabla de sectores sin configurar graphconfig.', 'Todos los sectores tienen valores graphconfig no nulos.', 'Sectores sin graphconfig'),
     (269, 'dmas en la tabla dma sin configurar graphconfig.', 'Todos los dma tienen valores graphconfig no nulos.', 'DMA sin graphconfig'),
@@ -357,10 +357,10 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (533, 'NO obligatorio node2arcs con menos de dos arcos. Se transformará sobre la marcha utilizando un solo arco''.', 'No se han encontrado resultados para Node2arcs NO obligatorios con menos de dos arcos.', 'Nodarc no obligatorio con menos de dos arcos'),
     (534, 'válvulas con valores nulos en la columna "valv_type".', 'Columna "valv_type" de válvulas virtuales verificada. No faltan valores obligatorios.', 'Comprobar si los nodos definidos (nodeParent) existen en una base de datos'),
     (541, 'sumideros sin conexión o sumideros sobre arcos sin arco_id.', 'Todos los sumideros tienen conexiones o están sobre arcos con arco_id.', 'Sumidero sin enlace'),
-    (542, 'objetos cuyo id no es un entero. Por favor, verifique sus datos antes de continuar.', 'Todos los objetos con id entera.', 'Objetos cuyo id no es un entero'),
+    (542, 'objetos cuyo id no es un entero. Por favor, verifique sus datos antes de continuar.', 'Todos los objetos con id entero.', 'Objetos cuyo id no es un entero'),
     (543, 'conecs/gullys encadenados sin enlaces o gullys sobre arco sin arc_id.', 'Todas las conexiones y sumideros que están encadenados tienen el mismo arco_id.', 'Cadena de sumideros con arco_id diferente al del acometida/sumidero final'),
     (545, 'características con estado sin concordancia con tipo_estado. Por favor, compruebe sus datos antes de continuar features with state without concordance with state_type. Por favor, compruebe sus datos antes de continuar.', 'Ninguna característica sin concordancia con state y state_type.', 'Estado no conforme con state_type'),
-    (547, 'características con fluid_type no existe en om_typevalue dominio.', 'Todas las características tienen fluid_type informado en om_typevalue domain', 'Comprobar que los valores fluid_type existen en los valores de dominio om_typevalue'),
+    (547, 'características con fluid_type no existe en om_typevalue dominio.', 'Todos los objetos tienen fluid_type informado en om_typevalue domain', 'Comprobar que los valores fluid_type existen en los valores de dominio om_typevalue'),
     (548, 'connecs y gully con explotación diferente a la explotación del arco relacionado.', 'Todos connecs y gullys tienen la misma explotación que el arco relacionado.', 'Comprobar los elementos huérfanos'),
     (549, 'nodos huérfanos con isarcdivide=TRUE.', 'No hay nodos huérfanos con isarcdivide=TRUE', 'Nodo huérfano con isarcdivide=TRUE (OM)'),
     (550, 'objetos con function_type no existen en la tabla man_type_function.', 'Todos los objetos tienen function_type informado en la tabla man_type_function.', 'Comprobar que los valores de function_type existen en la tabla man_.'),
@@ -373,14 +373,14 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (557, 'características con fecha de construcción anterior a 1900.', 'Ningún elemento con fecha de construcción anterior a 1900.', 'Fecha de construcción anterior a 1900'),
     (558, 'objetos con category_type no existen en la tabla man_type_category.', 'Todos los objetos tienen category_type informado en la tabla man_type_category.', 'Comprobar que los valores de location_type existen en la tabla man_.'),
     (559, 'connecs planificadas sin link de referencia connecs o gullys planificados sin link de referencia.', 'Todas las  planificadas connecs o gullies tienen un enlace de referencia.', 'Conexiones planificadas sin enlace de referencia'),
-    (561, 'features with duplicated ID value between arc, node, connec, gully features with duplicated ID values between arc, node, connec, gully.', 'Todas las características tienen un ID diferente para ser identificadas correctamente', 'ID duplicado entre arco, nodo, acometida, sumidero'),
+    (561, 'features with duplicated ID value between arc, node, connec, gully features with duplicated ID values between arc, node, connec, gully.', 'Todos los objetos tienen un ID diferente para ser identificadas correctamente', 'ID duplicado entre arco, nodo, acometida, sumidero'),
     (562, 'objetos con fluid_type no existen en la tabla man_type_fluid.', 'Todos los objetos tienen fluid_type informado en la tabla man_type_fluid.', 'Objetos state=2 participan en psector'),
     (563, 'connecs con explotación diferente a la explotación del arco relacionado.', 'Todos los connecs o gullies tienen la misma explotación que el arco relacionado.', 'Acometida o sumidero con expl_id diferente al arco'),
     (564, 'objetos con location_type no existen en la tabla man_type_location.', 'Todos los objetos tienen location_type informado en la tabla man_type_location.', 'Comprobar los documentos huérfanos'),
     (565, 'nodos huérfanos con isarcdivide=FALSE.', 'No hay nodos huérfanos con isarcdivide=FALSE', 'Nodo huérfano con isarcdivide=FALSE (OM)'),
     (566, 'objetos con fecha de finalización anterior a la fecha de construcción.', 'No hay elementos cuya fecha final sea anterior a la fecha de construcción', 'Objetos state=1 y fecha de fin antes de la fecha de inicio'),
     (567, 'acometidas con sector_id= 0 o -1.', 'No hay acometidas con sector_id = 0 o -1.', 'Comprobar objetos sin sector_id definido'),
-    (568, 'connecs/gullies con sector_id 0 o -1.', 'No connecs/gullies con valor 0 o -1 en sector_id.', 'Comprobar si existen valores de category_type en la tabla man_.'),
+    (568, 'connecs/gullies con sector_id 0 o -1.', 'Todos los objetos tienen category_type informado en la tabla man_type_category', 'Comprobar si existen valores de category_type en la tabla man_.'),
     (569, 'arcos sin matcat_id informado.', 'Todos los arcos tienen matcat_id relleno.', 'Comprobar matcat null para arcos'),
     (571, 'tuberías con longitud inferior a la distancia de proximidad de nodos configurada.', 'Longitud mínima estándar comprobada. No se han configurado valores inferiores a la distancia de proximidad del nodo.', 'Arcos de menos de 20 cm.'),
     (572, 'documentos no relacionados con ninguna objetos.', 'Todos los documentos están relacionados con las objetos.', 'arcos inferiores a 5 cm.'),
@@ -486,7 +486,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (546, 'bombas con valores nulos al menos en la columna obligatoria curve_id. virtualpumps con valores nulos al menos en la columna obligatoria curve_id.', 'Se comprobaron Virtualpumps. No faltan valores obligatorios para curve_id.', NULL),
     (600, 'bombas virtuales con valores nulos en la columna tipo_bomba.', 'Bombas virtuales comprobadas. No se han omitido valores obligatorios para pump_type. Bombas virtuales comprobadas. No se han omitido valores obligatorios para pump_type.', 'Valores nulos en el tipo de bombas virtuales'),
     (601, 'virtualpumps con valores nulos al menos en la columna obligatoria curve_id.', 'Bombas virtuales comprobadas. No faltan valores obligatorios para curve_id. Bombas virtuales comprobadas. No se han omitido valores obligatorios para curve_id.', 'Valores nulos en virtualpump curve_id'),
-    (638, 'arco cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todas las características de los arcos con id entero.', 'Arco cuyo id no es un entero')
+    (638, 'arco cuyo id no es un entero. Por favor, compruebe sus datos antes de continuar.', 'Todos los objetos de tipo arco con id entero.', 'Arco cuyo id no es un entero')
 ) AS v(fid, except_msg, info_msg, fprocess_name)
 WHERE t.fid = v.fid;
 
