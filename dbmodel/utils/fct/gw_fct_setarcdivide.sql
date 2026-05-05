@@ -381,8 +381,8 @@ BEGIN
 						v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
 						IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
-							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux1.arc_id||''');';
-							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux2.arc_id||''');';
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux1.arc_id||''') ON CONFLICT DO NOTHING;';
+							EXECUTE 'INSERT INTO '||v_arc_childtable_name||' (arc_id) VALUES ('''||rec_aux2.arc_id||''') ON CONFLICT DO NOTHING;';
 
 
 							v_sql := 'SELECT column_name FROM information_schema.columns 
