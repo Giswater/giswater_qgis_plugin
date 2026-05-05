@@ -274,7 +274,6 @@ AS WITH typevalue AS (
     vf.p_state,
     n.uuid,
     n.treatment_type,
-    m.to_arc,
     sva.sector_visibility,
     mva.muni_visibility
   FROM node n
