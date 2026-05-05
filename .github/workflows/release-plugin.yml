@@ -28,13 +28,10 @@ jobs:
       - name: Create ZIP
         run: |
           zip -r giswater.zip giswater \
-            -x 'giswater/.git/*' \
-               'giswater/.github/*' \
-               'giswater/scripts/*' \
-               'giswater/.gitignore' \
-               'giswater/.gitmodules' \
-               '*__pycache__*' \
-               '*.pyc'
+            -x '*/.git/*' '*/.github/*' '*__pycache__*' '*.pyc' \
+               'giswater/scripts/*' 'giswater/test/*' \
+               'giswater/dbmodel/test/*' 'giswater/dbmodel/docker/*' \
+               'giswater/libs/tests/*'
 
       - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v2
