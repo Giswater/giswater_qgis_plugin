@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW vf_link AS 
+CREATE OR REPLACE VIEW vf_link AS
 SELECT l.link_id, COALESCE(pp.state, l.state) AS p_state
   FROM link l
   LEFT JOIN LATERAL ( SELECT p.psector_id
@@ -66,7 +66,7 @@ WHERE EXISTS (
 );
 
 CREATE OR REPLACE VIEW ve_inp_dscenario_pattern_value
-AS SELECT 
+AS SELECT
 	p.dscenario_id,
     p.pattern_id,
     p.observ,
@@ -103,14 +103,14 @@ WHERE EXISTS (
 	FROM selector_inp_dscenario s
 	WHERE s.dscenario_id = p.dscenario_id
 	AND s.cur_user = CURRENT_USER
-) AND EXISTS ( 
+) AND EXISTS (
 	SELECT 1
 	FROM selector_expl s
 	WHERE s.expl_id = p.expl_id
 	AND s.cur_user = CURRENT_USER
 );
-  
-  
+
+
 CREATE OR REPLACE VIEW ve_node
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
@@ -145,6 +145,15 @@ AS WITH typevalue AS (
             dwfzone.drainzone_id
            FROM dwfzone
              LEFT JOIN typevalue t ON t.id::text = dwfzone.dwfzone_type::text AND t.typevalue::text = 'dwfzone_type'::text
+        ), sector_visibility_agg AS (
+            SELECT node_id, array_agg(sector_id ORDER BY sector_id) AS sector_visibility
+            FROM node_x_sector_visibility
+            GROUP BY node_id
+        ),
+        muni_visibility_agg AS (
+            SELECT node_id, array_agg(muni_id ORDER BY muni_id) AS muni_visibility
+            FROM node_x_municipality_visibility
+            GROUP BY node_id
         )
  SELECT n.node_id,
     n.code,
@@ -264,7 +273,10 @@ AS WITH typevalue AS (
     n.the_geom,
     vf.p_state,
     n.uuid,
-    n.treatment_type
+    n.treatment_type,
+    m.to_arc,
+    sva.sector_visibility,
+    mva.muni_visibility
   FROM node n
   JOIN vf_node vf ON vf.node_id = n.node_id
   JOIN cat_node ON n.nodecat_id::text = cat_node.id::text
@@ -276,10 +288,12 @@ AS WITH typevalue AS (
   LEFT JOIN omzone_table ON omzone_table.omzone_id = n.omzone_id
   LEFT JOIN drainzone_table ON n.omzone_id = drainzone_table.drainzone_id
   LEFT JOIN dwfzone_table ON n.dwfzone_id = dwfzone_table.dwfzone_id
-  LEFT JOIN node_add ON node_add.node_id = n.node_id;
+  LEFT JOIN node_add ON node_add.node_id = n.node_id
+  LEFT JOIN sector_visibility_agg sva ON sva.node_id = n.node_id
+  LEFT JOIN muni_visibility_agg mva ON mva.node_id = n.node_id;
 
 
-CREATE OR REPLACE VIEW ve_arc AS 
+CREATE OR REPLACE VIEW ve_arc AS
 WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
@@ -634,12 +648,12 @@ AS WITH typevalue AS (
   LEFT JOIN dwfzone_table ON c.dwfzone_id = dwfzone_table.dwfzone_id;
 
 
-CREATE OR REPLACE VIEW vf_gully AS 
-SELECT 
-  g.gully_id, 
-  COALESCE(pp.state, g.state) AS p_state, 
-  COALESCE(pp.arc_id, g.arc_id) AS arc_id, 
-  COALESCE(pp.exit_id, g.pjoint_id) AS pjoint_id, 
+CREATE OR REPLACE VIEW vf_gully AS
+SELECT
+  g.gully_id,
+  COALESCE(pp.state, g.state) AS p_state,
+  COALESCE(pp.arc_id, g.arc_id) AS arc_id,
+  COALESCE(pp.exit_id, g.pjoint_id) AS pjoint_id,
   COALESCE(pp.exit_type, g.pjoint_type) AS pjoint_type
 FROM gully g
 LEFT JOIN LATERAL ( SELECT pp_1.state,
@@ -1283,9 +1297,9 @@ AS SELECT link_id,
     the_geom
    FROM ve_link
   WHERE feature_type::text = 'GULLY'::text;
-  
-  
-  
+
+
+
 CREATE OR REPLACE VIEW v_plan_arc
 AS SELECT arc_id,
     node_1,
@@ -1609,8 +1623,8 @@ AS SELECT arc_id,
                      JOIN cat_arc ON cat_arc.id::text = arc_1.arccat_id::text
                      LEFT JOIN v_price_compost ON cat_arc.connect_cost = v_price_compost.id::text
                   WHERE vf_gully_arc.arc_id = v_plan_aux_arc_cost.arc_id) v_plan_aux_arc_gully ON true) d;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_ui_node_x_connection_upstream
 AS SELECT row_number() OVER (ORDER BY ve_arc.node_2) + 1000000 AS rid,
     ve_arc.node_2 AS node_id,
@@ -1732,9 +1746,9 @@ UNION
      JOIN node ON gully.pjoint_id = node.node_id
      LEFT JOIN cat_connec ON ve_gully.connec_arccat_id::text = cat_connec.id::text
      JOIN value_state ON ve_gully.state = value_state.id;
-	 
-	 
-	 
+
+
+
 CREATE OR REPLACE VIEW v_plan_result_arc
 AS SELECT plan_rec_result_arc.arc_id,
     plan_rec_result_arc.node_1,
@@ -2158,8 +2172,8 @@ AS SELECT plan_psector.psector_id,
                   ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
           GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
   WHERE config_param_user.cur_user::text = "current_user"()::text AND config_param_user.parameter::text = 'plan_psector_vdefault'::text AND config_param_user.value::integer = plan_psector.psector_id;
-  
-  
+
+
 
 CREATE OR REPLACE VIEW v_plan_psector_budget
 AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
@@ -2196,8 +2210,8 @@ UNION
     ve_plan_psector_x_other.total_budget
    FROM ve_plan_psector_x_other
   ORDER BY 1, 2, 4;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_plan_psector_budget_arc
 AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
     plan_psector_x_arc.psector_id,
@@ -2221,9 +2235,9 @@ AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
   WHERE plan_psector_x_arc.doable = true
   ORDER BY plan_psector_x_arc.psector_id;
-  
-  
-  
+
+
+
 CREATE OR REPLACE VIEW v_plan_psector_budget_detail
 AS SELECT v_plan_arc.arc_id,
     plan_psector_x_arc.psector_id,
@@ -2457,9 +2471,9 @@ AS SELECT plan_psector.psector_id,
                      JOIN plan_psector plan_psector_1 ON plan_psector_1.psector_id = plan_psector_x_other.psector_id
                   ORDER BY plan_psector_x_other.psector_id) v_plan_psector_x_other
           GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id;
-		  
-		  
-		  
+
+
+
 CREATE OR REPLACE VIEW v_ui_plan_arc_cost
 AS WITH p AS (
          SELECT v_plan_arc.arc_id,
@@ -2817,8 +2831,8 @@ UNION
    FROM arc a
      JOIN links_node n ON a.node_1 = n.node_id
      JOIN ve_gully g ON g.gully_id = n.feature_id;
-	 
-	 
+
+
 CREATE OR REPLACE VIEW v_ui_workcat_x_feature_end
 AS SELECT row_number() OVER (ORDER BY ve_arc.arc_id) + 1000000 AS rid,
     'ARC'::character varying AS feature_type,
@@ -2879,8 +2893,8 @@ UNION
    FROM ve_gully
      JOIN exploitation ON exploitation.expl_id = ve_gully.expl_id
   WHERE ve_gully.state = 0;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_edit_connec
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
@@ -3236,7 +3250,7 @@ AS WITH typevalue AS (
     the_geom,
     diagonal
    FROM connec_selected;
-   
+
 CREATE or replace VIEW v_anl_node_massiveinterpolate
 AS SELECT
     n.id,
@@ -3250,7 +3264,7 @@ AS SELECT
     n.cur_user,
     the_geom
   FROM anl_node n
-    JOIN selector_expl s ON n.expl_id = s.expl_id 
+    JOIN selector_expl s ON n.expl_id = s.expl_id
   WHERE fid = 496 AND s.cur_user = current_user;
 
 create or replace VIEW v_anl_arc_massiveinterpolate
@@ -3263,14 +3277,14 @@ AS SELECT
     a.cur_user,
     the_geom
   FROM anl_arc a
-    JOIN selector_expl s ON a.expl_id = s.expl_id 
+    JOIN selector_expl s ON a.expl_id = s.expl_id
   WHERE fid = 496 AND s.cur_user = current_user;
 
 
 DROP VIEW IF EXISTS ve_epa_conduit;
 DROP VIEW IF EXISTS v_rpt_arcflow_sum;
 
-CREATE OR REPLACE VIEW v_rpt_arcflow_sum AS 
+CREATE OR REPLACE VIEW v_rpt_arcflow_sum AS
 SELECT rpt_inp_arc.id,
     rpt_inp_arc.arc_id,
     rpt_inp_arc.result_id,

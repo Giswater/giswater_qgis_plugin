@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW vf_link AS 
+CREATE OR REPLACE VIEW vf_link AS
  SELECT l.link_id, COALESCE(pp.state, l.state) AS p_state
    FROM link l
      LEFT JOIN LATERAL ( SELECT pp1.connec_id,
@@ -237,6 +237,15 @@ AS WITH typevalue AS (
             omzone.macroomzone_id
            FROM omzone
              LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type::text AND t.typevalue::text = 'omzone_type'::text
+        ), sector_visibility_agg AS (
+            SELECT node_id, array_agg(sector_id ORDER BY sector_id) AS sector_visibility
+            FROM node_x_sector_visibility
+            GROUP BY node_id
+        ),
+        muni_visibility_agg AS (
+            SELECT node_id, array_agg(muni_id ORDER BY muni_id) AS muni_visibility
+            FROM node_x_municipality_visibility
+            GROUP BY node_id
         )
  SELECT n.node_id,
     n.code,
@@ -371,7 +380,9 @@ AS WITH typevalue AS (
     n.uuid,
     n.uncertain,
     n.xyz_date,
-    m.to_arc
+    m.to_arc,
+    sva.sector_visibility,
+    mva.muni_visibility
   FROM node n
   JOIN vf_node vf on vf.node_id = n.node_id
   JOIN cat_node ON cat_node.id::text = n.nodecat_id::text
@@ -386,8 +397,10 @@ AS WITH typevalue AS (
   LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = n.supplyzone_id
   LEFT JOIN omzone_table ON omzone_table.omzone_id = n.omzone_id
   LEFT JOIN node_add ON node_add.node_id = n.node_id
-  LEFT JOIN man_valve m ON m.node_id = n.node_id;
- 
+  LEFT JOIN man_valve m ON m.node_id = n.node_id
+  LEFT JOIN sector_visibility_agg sva ON sva.node_id = n.node_id
+  LEFT JOIN muni_visibility_agg mva ON mva.node_id = n.node_id;
+
 CREATE OR REPLACE VIEW ve_inp_valve
 AS SELECT n.node_id,
     n.top_elev,
@@ -427,7 +440,7 @@ AS SELECT n.node_id,
 
 
 
-CREATE OR REPLACE VIEW ve_arc AS 
+CREATE OR REPLACE VIEW ve_arc AS
 WITH typevalue AS (
          SELECT edit_typevalue.typevalue,
             edit_typevalue.id,
@@ -1948,8 +1961,8 @@ AS SELECT arc_id,
                   WHERE vf_connec_arc.arc_id = v_plan_aux_arc_cost.arc_id
                   GROUP BY v_price_compost.price) v_plan_aux_arc_connec ON true) d
   WHERE arc_id IS NOT NULL;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_ui_plan_arc_cost
 AS WITH p AS (
          SELECT v_plan_arc.arc_id,
@@ -2716,7 +2729,7 @@ AS SELECT v_plan_arc.arc_id,
   WHERE plan_psector_x_arc.doable = true
   ORDER BY plan_psector_x_arc.psector_id, v_plan_arc.soilcat_id, v_plan_arc.arccat_id;
 
-  
+
 -- v_plan_psector_all source
 CREATE OR REPLACE VIEW v_plan_psector_all
 AS WITH sel_psector AS (
@@ -2925,8 +2938,8 @@ AS WITH sel_psector AS (
   WHERE (EXISTS ( SELECT 1
            FROM sel_psector
           WHERE sel_psector.psector_id = plan_psector.psector_id));
-		  
-		  
+
+
 CREATE OR REPLACE VIEW v_edit_connec
 AS WITH sel_state AS (
       	SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
@@ -3554,7 +3567,7 @@ AS SELECT inp_shortpipe.node_id,
     v_rpt_arc_stats.reaction_min,
     v_rpt_arc_stats.ffactor_max,
     v_rpt_arc_stats.ffactor_min,
-    v_rpt_arc_stats.arc_id as nodarc_id  
+    v_rpt_arc_stats.arc_id as nodarc_id
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN inp_shortpipe USING (node_id)

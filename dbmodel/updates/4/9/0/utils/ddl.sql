@@ -201,3 +201,35 @@ CREATE INDEX IF NOT EXISTS idx_connec_plot_id ON connec USING btree (plot_id);
 
 -- 30/04/2026
 ALTER TABLE config_param_system ADD device _int4 NULL;
+
+-- 05/05/2026
+CREATE TABLE IF NOT EXISTS node_x_sector_visibility (
+    node_id int4 NOT NULL,
+    sector_id int4 NOT NULL,
+    CONSTRAINT node_x_sector_visibility_pkey PRIMARY KEY (node_id, sector_id),
+    CONSTRAINT node_x_sector_visibility_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT node_x_sector_visibility_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS node_x_municipality_visibility (
+    node_id int4 NOT NULL,
+    muni_id int4 NOT NULL,
+    CONSTRAINT node_x_municipality_visibility_pkey PRIMARY KEY (node_id, muni_id),
+    CONSTRAINT node_x_municipality_visibility_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS TRUE THEN
+        ALTER TABLE node_x_municipality_visibility
+        ADD CONSTRAINT node_x_municipality_visibility_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON DELETE CASCADE ON UPDATE CASCADE;
+    ELSE
+        ALTER TABLE node_x_municipality_visibility
+        ADD CONSTRAINT node_x_municipality_visibility_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;

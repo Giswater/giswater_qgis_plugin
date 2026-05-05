@@ -82,6 +82,8 @@ v_dist_sign numeric;
 v_label_dist numeric;
 v_sys_code_autofill boolean;
 
+
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -385,7 +387,7 @@ BEGIN
 
 		-- use specific sequence for code when its name matches featurecat_code_seq
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||' 
+		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||'
         AND relkind = ''S'' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = '||quote_literal(v_schemaname)||');' INTO v_sql;
 
 
@@ -528,7 +530,7 @@ BEGIN
 			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
 				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1) LIMIT 1);
 		END IF;
-		
+
 		-- uuid random
 		IF NEW.uuid is null then
 			NEW.uuid = gen_random_uuid();
@@ -555,11 +557,21 @@ BEGIN
 		INSERT INTO node_add (node_id, demand_max, demand_min, demand_avg, press_max, press_min, press_avg, head_max, head_min, head_avg, quality_max, quality_min, quality_avg, result_id)
 		VALUES (NEW.node_id, NEW.demand_max, NEW.demand_min, NEW.demand_avg, NEW.press_max, NEW.press_min, NEW.press_avg, NEW.head_max, NEW.head_min, NEW.head_avg, NEW.quality_max, NEW.quality_min, NEW.quality_avg, NEW.result_id);
 
+		-- Insert into visibility tables
+		IF NEW.sector_visibility IS NOT NULL THEN
+		    INSERT INTO node_x_sector_visibility (node_id, sector_id)
+		    SELECT NEW.node_id, unnest(NEW.sector_visibility);
+		END IF;
+
+		IF NEW.muni_visibility IS NOT NULL THEN
+		    INSERT INTO node_x_municipality_visibility (node_id, muni_id)
+		    SELECT NEW.node_id, unnest(NEW.muni_visibility);
+		END IF;
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_node ON cat_feature.id=node_type where cat_node.id=NEW.nodecat_id;
 
-		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
+		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')
 		FROM cat_feature_node WHERE id='||quote_literal(v_featurecat_id)||''
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
@@ -977,6 +989,22 @@ BEGIN
 		quality_avg = NEW.quality_avg, result_id = NEW.result_id
 		WHERE node_id = OLD.node_id;
 
+		-- Update visibility tables
+		IF NEW.sector_visibility IS DISTINCT FROM OLD.sector_visibility THEN
+		    DELETE FROM node_x_sector_visibility WHERE node_id = OLD.node_id;
+		    IF NEW.sector_visibility IS NOT NULL THEN
+		        INSERT INTO node_x_sector_visibility (node_id, sector_id)
+		        SELECT NEW.node_id, unnest(NEW.sector_visibility);
+		    END IF;
+		END IF;
+
+		IF NEW.muni_visibility IS DISTINCT FROM OLD.muni_visibility THEN
+		    DELETE FROM node_x_municipality_visibility WHERE node_id = OLD.node_id;
+		    IF NEW.muni_visibility IS NOT NULL THEN
+		        INSERT INTO node_x_municipality_visibility (node_id, muni_id)
+		        SELECT NEW.node_id, unnest(NEW.muni_visibility);
+		    END IF;
+		END IF;
 
 		IF v_man_table ='man_junction' THEN
 			UPDATE man_junction SET node_id=NEW.node_id
@@ -1008,7 +1036,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter
-			SET real_press_max=NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code, 
+			SET real_press_max=NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code,
 			automated=NEW.automated, closed=NEW.closed, to_arc=NEW.to_arc, meter_type=NEW.meter_type, name=NEW.name, nominal_flowrate=NEW.nominal_flowrate
 			WHERE node_id=OLD.node_id;
 
@@ -1118,13 +1146,13 @@ BEGIN
 
 		-- set label_quadrant, label_x and label_y according to cat_feature
 		EXECUTE '
-		SELECT addparam->''labelPosition''->''dist''->>0  
-		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.node_type WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'					
+		SELECT addparam->''labelPosition''->''dist''->>0
+		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.node_type WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'
 		' INTO v_dist_xlab;
 
 		EXECUTE '
-		SELECT addparam->''labelPosition''->''dist''->>1  
-		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.node_type WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'					
+		SELECT addparam->''labelPosition''->''dist''->>1
+		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.node_type WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'
 		' INTO v_dist_ylab;
 
 		if new.label_x != old.label_x and new.label_y != old.label_y then
@@ -1191,7 +1219,7 @@ BEGIN
 			-- prev calc: current angle between node and label position
 			v_sql = '
 			with mec as (
-				SELECT 
+				SELECT
 				n.the_geom as vertex_point,
 				n.rotation as rotation_node,
 				$1 as point1,
@@ -1301,7 +1329,7 @@ BEGIN
 			-- prev calc: current angle between node and its label
 			v_sql = '
 			with mec as (
-				SELECT 
+				SELECT
 				n.the_geom as vertex_point,
 				n.rotation as rotation_node,
 				$1 as point1,
@@ -1396,4 +1424,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

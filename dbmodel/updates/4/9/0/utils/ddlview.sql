@@ -156,9 +156,11 @@ CREATE OR REPLACE VIEW vf_node AS
            FROM selector_state ss
           WHERE ss.state_id = COALESCE(pp.state, n.state) AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_sector ssec
-          WHERE ssec.sector_id = n.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+          WHERE (ssec.sector_id = n.sector_id OR EXISTS (SELECT 1 FROM node_x_sector_visibility sv WHERE sv.node_id = n.node_id AND sv.sector_id = ssec.sector_id))
+            AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_municipality sm
-          WHERE sm.muni_id = n.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+          WHERE (sm.muni_id = n.muni_id OR EXISTS (SELECT 1 FROM node_x_municipality_visibility mv WHERE mv.node_id = n.node_id AND mv.muni_id = sm.muni_id))
+            AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(n.expl_visibility::integer[], n.expl_id))) AND se.cur_user = CURRENT_USER));
 
