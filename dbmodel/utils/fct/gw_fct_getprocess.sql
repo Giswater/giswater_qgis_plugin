@@ -258,7 +258,8 @@ BEGIN
    				SELECT concat('ve_',epa_table), feature_type as type, 4 as c, active FROM sys_feature_epa_type
    				WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')
 			    UNION SELECT 've_inp_subcatchment', 'SUBCATCHMENT', 6, true as active
-			    UNION SELECT 've_raingage', 'RAINGAGE', 8, true as active ) t
+			    UNION SELECT 've_raingage', 'RAINGAGE', 8, true as active
+				UNION SELECT 've_inp_inflows', 'NODE', 8, true as active ) t
 			    WHERE type = UPPER(replace(v_value_element, '"', '')) AND active IS TRUE
 				ORDER BY c, tablename) a into v_response_array;
 				v_value_json = gw_fct_json_object_set_key(v_value_json, replace(v_value_element, '"', ''), v_response_array);

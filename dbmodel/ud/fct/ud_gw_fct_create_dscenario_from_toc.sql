@@ -142,7 +142,7 @@ BEGIN
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve';
 
 		ELSIF v_targettable = 'inp_dscenario_inflows' THEN
-			v_columns = v_scenarioid||', node_id, order_id, timser_id, format_type, mfactor, sfactor, base, pattern_id';
+			v_columns = v_scenarioid||', node_id, order_id, timser_id, sfactor, base, pattern_id';
 
 	 	ELSIF v_targettable = 'inp_dscenario_inflows_poll' THEN
 			v_columns = v_scenarioid||', poll_id,  node_id, timser_id, form_type, mfactor, factor, base, pattern_id';
