@@ -70,3 +70,7 @@ ALTER TABLE sector ENABLE TRIGGER gw_trg_edit_controls;
 ALTER TABLE dqa ENABLE TRIGGER gw_trg_edit_controls;
 
 UPDATE man_valve SET to_arc=null WHERE node_id = 1107;
+
+UPDATE cat_soil SET m2trenchl_cost=NULL,m3excess_cost=NULL,m3fill_cost=NULL,b=NULL,m3exc_cost=NULL,trenchlining=NULL,y_param=NULL;
+UPDATE cat_pavement SET m2_cost=NULL,thickness=NULL;
+UPDATE cat_arc SET z1=NULL,dint=NULL,m3protec_cost=NULL,z2=NULL,m2bottom_cost=NULL,dext=NULL,estimated_depth=NULL,"cost"=NULL,width=NULL,cost_unit=NULL,area=NULL;
