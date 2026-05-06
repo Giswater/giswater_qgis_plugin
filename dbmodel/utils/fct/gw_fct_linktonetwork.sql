@@ -116,6 +116,7 @@ v_linkcat_id text;
 v_linkcat_id_default text;
 v_link_type text;
 v_state_type integer;
+v_man_table text;
 
 BEGIN
 
@@ -517,9 +518,11 @@ BEGIN
 
 						-- creation of link
 						v_link.link_id = (SELECT nextval('urn_id_seq'));
-						SELECT cf.feature_class INTO v_link_type FROM cat_link c
+						SELECT cf.feature_class INTO v_man_table FROM cat_link c
 						JOIN cat_feature cf on cf.id=c.link_type
 						WHERE c.id = v_linkcat_id LIMIT 1;
+
+						SELECT link_type INTO v_link_type FROM cat_link WHERE id = v_linkcat_id LIMIT 1;
 
 						IF v_psector_current IS NOT NULL THEN
 							v_state_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_statetype_2_vdefault' AND cur_user = current_user);
@@ -542,14 +545,14 @@ BEGIN
 							CASE WHEN v_isoperative_psector THEN 2 ELSE v_connect.state END, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.omzone_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
 							v_linkcat_id, v_state_type);
 
-							EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
+							EXECUTE 'INSERT INTO man_'||v_man_table||' values ('||v_link.link_id||')';
 
 						ELSIF v_projecttype = 'UD' THEN
 							INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, omzone_id, fluid_type, muni_id, linkcat_id, link_type, state_type)
 							VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
 							CASE WHEN v_isoperative_psector THEN 2 ELSE v_connect.state END, v_arc.expl_id, v_arc.sector_id, v_arc.omzone_id, v_fluidtype_value::INTEGER, v_connect.muni_id, v_linkcat_id, v_link_type, v_state_type);
 
-							EXECUTE 'INSERT INTO man_'||v_link_type||' values ('||v_link.link_id||')';
+							EXECUTE 'INSERT INTO man_'||v_man_table||' values ('||v_link.link_id||')';
 
 						END IF;
 					ELSE
