@@ -9,7 +9,7 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 19/03/2026
-INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) 
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam)
 VALUES('inp_typevalue_dscenario', 'PATTERN', 'PATTERN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, "style", layermanager, actions) VALUES(3536, 'gw_fct_getmincutminsector', '{
@@ -64,7 +64,7 @@ INSERT INTO sys_table (id, descript, sys_role, "source")
 VALUES('v_province', 'View of provinces', 'role_edit', 'core');
 
 -- 26/03/2026
-INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) 
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam)
 VALUES('inp_typevalue_dscenario', 'CALIBRATION', 'CALIBRATION', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 
@@ -226,7 +226,7 @@ DELETE FROM sys_table WHERE id='rtc_hydrometer_x_connec';
 DELETE FROM sys_table WHERE id='rtc_hydrometer_x_node';
 
 -- 14/04/2026
-INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active) 
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam, except_level, except_msg, except_table, except_table_msg, query_text, info_msg, function_name, active)
 VALUES(712, 'Supply Zonification', 'ws', NULL, 'core', true, 'Function process', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, true) ON CONFLICT (fid) DO NOTHING;
 
 -- 15/04/2026
@@ -254,7 +254,7 @@ WHERE parameter = 'utils_graphanalytics_status';
 UPDATE config_param_system SET parameter= 'basic_search_v2_tab_psector', value = '{"sys_display_name":"concat(name,'' ('',text2,'')'')","sys_tablename":"ve_plan_psector","sys_pk":"psector_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}'
 WHERE parameter = 'basic_search_v2_tab_psector ';
 
-INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) 
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('qgis_mapzone_inundation_from_arc', 'false', 'If true, graph inundation starts by selecting an arc', 'Inundation from arc:', NULL, NULL, true, 18, 'utils', NULL, NULL, 'boolean', 'check', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_admin_other') ON CONFLICT DO NOTHING;
 
 
@@ -341,7 +341,7 @@ SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_orifice table''
 UNION
 SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_weir table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_weir JOIN arc a USING (arc_id) WHERE epa_type !=''WEIR''
 UNION
-SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_virtual table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_virtual JOIN arc a USING (arc_id) WHERE epa_type !=''VIRTUAL''' 
+SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, '' using inp_virtual table'') AS epa_table, a.expl_id, a.the_geom FROM t_inp_virtual JOIN arc a USING (arc_id) WHERE epa_type !=''VIRTUAL'''
 WHERE fid=295;
 
 UPDATE sys_fprocess SET except_table='anl_arc', query_text='SELECT  a.arc_id,  b.arccat_id, b.expl_id, b.the_geom from t_inp_weir a
@@ -457,7 +457,7 @@ DELETE FROM sys_table WHERE id = 'om_waterbalance_dma_graph';
 -- 28/04/2026
 INSERT INTO sys_feature_class (id, type, epa_default, man_table) VALUES ('SAMPLEPOINT', 'CONNEC', 'UNDEFINED', 'man_samplepoint');
 
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('man_samplepoint', 'Additional information for samplepoint management', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_table WHERE id = 'samplepoint';
@@ -470,3 +470,6 @@ VALUES('edit_sys_code_autofill', '{"node":false, "arc":true, "connec":false, "gu
 'Allow activate automatic update of sys_code for features. In case of true, the field will be filled with an UUID',
 'Auto sys_code:', NULL, NULL, true, 15, 'utils', false, false, 'json', 'linetext', true, true, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_system');
 
+-- 06/05/2026
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES(3540, 'gw_trg_update_element_mapzones', 'utils', 'trigger', NULL, NULL, 'Trigger function that update automatically the mapzones columns from feature', 'role_basic', NULL, 'core', NULL);

@@ -141,3 +141,16 @@ ON ve_om_visit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_om_visit('om_visit');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('parent');
+
+-- 06/05/2026
+CREATE TRIGGER gw_trg_update_element_mapzones AFTER INSERT ON element_x_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_update_element_mapzones('element_x_node');
+
+CREATE TRIGGER gw_trg_update_element_mapzones AFTER INSERT ON element_x_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_update_element_mapzones('element_x_arc');
+
+CREATE TRIGGER gw_trg_update_element_mapzones AFTER INSERT ON element_x_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_update_element_mapzones('element_x_connec');
+
+CREATE TRIGGER gw_trg_update_element_mapzones AFTER INSERT ON element_x_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_update_element_mapzones('element_x_link');
