@@ -473,3 +473,12 @@ VALUES('edit_sys_code_autofill', '{"node":false, "arc":true, "connec":false, "gu
 -- 06/05/2026
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
 VALUES(3540, 'gw_trg_update_element_mapzones', 'utils', 'trigger', NULL, NULL, 'Trigger function that update automatically the mapzones columns from feature', 'role_basic', NULL, 'core', NULL);
+
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('node_x_sector_visibility', 'Table to manage visibility of nodes in sectors', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('node_x_municipality_visibility', 'Table to manage visibility of nodes in municipalities', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('element_x_sector_visibility', 'Table to manage visibility of elements in sectors', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('element_x_municipality_visibility', 'Table to manage visibility of elements in municipalities', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
