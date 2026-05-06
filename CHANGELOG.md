@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New dscenario pattern and pattern value tables
 - New typevalue for dscenario type: CALIBRATION
 - New indexes on `anl_*` tables.
+- New tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
+- New trigger `gw_trg_update_element_mapzones` to update the mapzone columns for the element.
 
 ### Fixed
 
