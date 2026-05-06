@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ud_gw_trg_topocontrol_arc` trigger.
 - `gw_fct_psector_merge` function.
 - `ud_pg2epa` now export undefined nodes connected to not undefined arcs.
+- References from `ve_plan_psector` to `v_plan_psector` in `sys_table` and `sys_style` tables.
+- Logo image path in composer.
 
 ### Removed
 
