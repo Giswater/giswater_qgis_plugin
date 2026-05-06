@@ -22,8 +22,8 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 
-		INSERT INTO config_material_def (material)
-		VALUES (NEW.id)
+		INSERT INTO am.config_material_def (material, pleak, age_max, age_med, age_min, builtdate_vdef, compliance)
+		VALUES (NEW.id, 0.16, 58, 50, 42, 1964, 10)
 		ON CONFLICT (material) DO NOTHING;
 
 		RETURN NEW;
