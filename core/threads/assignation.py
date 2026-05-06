@@ -114,10 +114,10 @@ class GwAssignation(GwTask):
                 SELECT max(date)
                 FROM am.leaks)
             SELECT l.id AS leak_id,
-                l.diameter AS leak_diameter,
+                l.diameter::integer AS leak_diameter,
                 l.material AS leak_material,
                 a.arc_id AS arc_id,
-                a.dnom AS arc_diameter,
+                a.dnom::integer AS arc_diameter,
                 a.matcat_id AS arc_material,
                 ST_LENGTH(a.the_geom) AS arc_length,
                 ST_DISTANCE(l.the_geom, a.the_geom) AS distance,
@@ -255,12 +255,12 @@ class GwAssignation(GwTask):
                         WHERE arc_id = '{arc["id"]}'),
                     ordered_list AS (
                         SELECT a.arc_id, 
-                            a.arc_id = s.arc_id AS start, 
+                            a.arc_id = (select arc_id from start_pipe LIMIT 1) AS start, 
                             a.matcat_id,
                             a.dnom,
-                            a.the_geom <-> s.the_geom AS dist,
+                            a.the_geom <-> (select the_geom from start_pipe LIMIT 1) AS dist,
                             ST_LENGTH(a.the_geom) AS length
-                        FROM am.ext_arc_asset AS a, start_pipe AS s
+                        FROM am.ext_arc_asset AS a
                         {where_clause}
                         ORDER BY start DESC, dist ASC),
                     cum_list AS (
@@ -381,20 +381,20 @@ class GwAssignation(GwTask):
     def _where_clause(self):
         conditions = []
         if self.filter_material:
-            conditions.append("coalesce(a.matcat_id = s.matcat_id, true)")
+            conditions.append("coalesce(a.matcat_id = (select matcat_id from start_pipe LIMIT 1), true)")
         if self.diameter_range:
             conditions.append(
                 f"""
-                coalesce(a.dnom::numeric >= s.dnom::numeric * {self.diameter_range[0]}
-                AND a.dnom::numeric <= s.dnom::numeric * {self.diameter_range[1]},
+                coalesce(a.dnom::numeric >= (select dnom::numeric from start_pipe LIMIT 1) * {self.diameter_range[0]}
+                AND a.dnom::numeric <= (select dnom::numeric from start_pipe LIMIT 1) * {self.diameter_range[1]},
                 true)
                 """
             )
         if self.builtdate_range:
             conditions.append(
                 f"""
-                coalesce(a.builtdate >= s.builtdate - interval '{self.builtdate_range} year'
-                and a.builtdate <= s.builtdate + interval '{self.builtdate_range} year',
+                coalesce(a.builtdate >= (select builtdate from start_pipe LIMIT 1) - interval '{self.builtdate_range} year'
+                and a.builtdate <= (select builtdate from start_pipe LIMIT 1) + interval '{self.builtdate_range} year',
                 true)
                 """
             )
