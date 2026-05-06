@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Performance profiling in get_psector method when open existing one.
+- References from `ve_plan_psector` to `v_plan_psector` in `sys_table` and `sys_style` tables.
+- Logo image path in composer.
 
 ### Removed
 
