@@ -20,8 +20,8 @@ AS SELECT DISTINCT s.muni_id,
    FROM v_municipality m,
     selector_municipality s
   WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_streetaxis AS
 SELECT * FROM ext_streetaxis;
 
@@ -43,8 +43,8 @@ AS SELECT v_streetaxis.id,
    FROM selector_municipality,
     v_streetaxis
   WHERE v_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_address AS
 SELECT * FROM ext_address;
 
@@ -64,8 +64,8 @@ AS SELECT v_address.id,
     v_address
      LEFT JOIN v_streetaxis ON v_streetaxis.id::text = v_address.streetaxis_id::text
   WHERE v_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_plot AS
 SELECT * FROM ext_plot;
 
@@ -85,8 +85,8 @@ AS SELECT v_plot.id,
    FROM selector_municipality s,
     v_plot
   WHERE v_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-  
-  
+
+
 CREATE OR REPLACE VIEW v_raster_dem AS
 SELECT * FROM ext_raster_dem;
 
@@ -106,7 +106,7 @@ AS SELECT DISTINCT ON (r.id) r.id,
     v_raster_dem r
      JOIN ext_cat_raster c ON c.id = r.rastercat_id
   WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
-  
+
 CREATE OR REPLACE VIEW v_district AS
 SELECT * FROM ext_district;
 
@@ -122,7 +122,7 @@ SELECT * FROM ext_region;
 CREATE OR REPLACE VIEW v_province AS
 SELECT * FROM ext_province;
 
-CREATE OR REPLACE VIEW vf_arc AS 
+CREATE OR REPLACE VIEW vf_arc AS
  SELECT a.arc_id, COALESCE(pp.state, a.state) AS p_state
    FROM arc a
      LEFT JOIN LATERAL ( SELECT pp_1.state
@@ -141,8 +141,8 @@ CREATE OR REPLACE VIEW vf_arc AS
           WHERE sm.muni_id = a.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(a.expl_visibility::integer[], a.expl_id))) AND se.cur_user = CURRENT_USER));
-          
-CREATE OR REPLACE VIEW vf_node AS 
+
+CREATE OR REPLACE VIEW vf_node AS
  SELECT n.node_id, COALESCE(pp.state, n.state) AS p_state
    FROM node n
      LEFT JOIN LATERAL ( SELECT pp_1.state
@@ -164,12 +164,12 @@ CREATE OR REPLACE VIEW vf_node AS
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(n.expl_visibility::integer[], n.expl_id))) AND se.cur_user = CURRENT_USER));
 
-CREATE OR REPLACE VIEW vf_connec AS 
-SELECT 
-  c.connec_id, 
-  COALESCE(pp.state, c.state) AS p_state, 
-  COALESCE(pp.arc_id, c.arc_id) AS arc_id, 
-  COALESCE(pp.exit_id, c.pjoint_id) AS pjoint_id, 
+CREATE OR REPLACE VIEW vf_connec AS
+SELECT
+  c.connec_id,
+  COALESCE(pp.state, c.state) AS p_state,
+  COALESCE(pp.arc_id, c.arc_id) AS arc_id,
+  COALESCE(pp.exit_id, c.pjoint_id) AS pjoint_id,
   COALESCE(pp.exit_type, c.pjoint_type) AS pjoint_type
 FROM connec c
 LEFT JOIN LATERAL (SELECT pp_1.state,
@@ -193,23 +193,34 @@ LEFT JOIN LATERAL (SELECT pp_1.state,
            FROM selector_expl se
           WHERE (se.expl_id = ANY (array_append(c.expl_visibility::integer[], c.expl_id))) AND se.cur_user = CURRENT_USER));
 
- CREATE OR REPLACE VIEW vf_element AS 
+ CREATE OR REPLACE VIEW vf_element AS
  SELECT e.element_id
    FROM element e
   WHERE (EXISTS ( SELECT 1
            FROM selector_state ss
           WHERE ss.state_id = e.state AND ss.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
-           FROM selector_sector ssec
-          WHERE ssec.sector_id = e.sector_id AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
-           FROM selector_municipality sm
-          WHERE sm.muni_id = e.muni_id AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+            FROM selector_sector ssec
+            WHERE (ssec.sector_id = e.sector_id OR EXISTS (SELECT 1 FROM element_x_sector_visibility sv WHERE sv.element_id = e.element_id AND sv.sector_id = ssec.sector_id))
+            AND ssec.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
+            FROM selector_municipality sm
+            WHERE (sm.muni_id = e.muni_id OR EXISTS (SELECT 1 FROM element_x_municipality_visibility mv WHERE mv.element_id = e.element_id AND mv.muni_id = sm.muni_id))
+            AND sm.cur_user = CURRENT_USER)) AND (EXISTS ( SELECT 1
            FROM selector_expl se
-          WHERE (se.expl_id = ANY (array_append(e.expl_visibility::integer[], e.expl_id))) AND se.cur_user = CURRENT_USER));    
+          WHERE (se.expl_id = ANY (array_append(e.expl_visibility::integer[], e.expl_id))) AND se.cur_user = CURRENT_USER));
 
 
 CREATE OR REPLACE VIEW ve_element
-AS 
-SELECT 
+AS WITH sector_visibility_agg AS (
+    SELECT element_id, array_agg(sector_id ORDER BY sector_id) AS sector_visibility
+    FROM element_x_sector_visibility
+    GROUP BY element_id
+),
+muni_visibility_agg AS (
+    SELECT element_id, array_agg(muni_id ORDER BY muni_id) AS muni_visibility
+    FROM element_x_municipality_visibility
+    GROUP BY element_id
+)
+SELECT
   e.element_id,
   e.code,
   e.sys_code,
@@ -255,10 +266,14 @@ SELECT
   e.updated_at,
   e.updated_by,
   e.the_geom,
-  e.uuid
+  e.uuid,
+  sva.sector_visibility,
+  mva.muni_visibility
 FROM element e
 JOIN vf_element vf ON vf.element_id = e.element_id
-JOIN cat_element ON e.elementcat_id::text = cat_element.id::text;
+JOIN cat_element ON e.elementcat_id::text = cat_element.id::text
+LEFT JOIN sector_visibility_agg sva ON sva.element_id = e.element_id
+LEFT JOIN muni_visibility_agg mva ON mva.element_id = e.element_id;
 
 -- 22/04/2026
 DROP VIEW IF EXISTS ve_om_visit;

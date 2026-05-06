@@ -233,3 +233,35 @@ BEGIN
         ADD CONSTRAINT node_x_municipality_visibility_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE CASCADE ON UPDATE CASCADE;
     END IF;
 END $$;
+
+-- 06/05/2026
+CREATE TABLE IF NOT EXISTS element_x_sector_visibility (
+    element_id int4 NOT NULL,
+    sector_id int4 NOT NULL,
+    CONSTRAINT element_x_sector_visibility_pkey PRIMARY KEY (element_id, sector_id),
+    CONSTRAINT element_x_sector_visibility_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT element_x_sector_visibility_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS element_x_municipality_visibility (
+    element_id int4 NOT NULL,
+    muni_id int4 NOT NULL,
+    CONSTRAINT element_x_municipality_visibility_pkey PRIMARY KEY (element_id, muni_id),
+    CONSTRAINT element_x_municipality_visibility_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS TRUE THEN
+        ALTER TABLE element_x_municipality_visibility
+        ADD CONSTRAINT element_x_municipality_visibility_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON DELETE CASCADE ON UPDATE CASCADE;
+    ELSE
+        ALTER TABLE element_x_municipality_visibility
+        ADD CONSTRAINT element_x_municipality_visibility_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE CASCADE ON UPDATE CASCADE;
+    END IF;
+END $$;

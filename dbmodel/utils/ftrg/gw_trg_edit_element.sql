@@ -154,13 +154,13 @@ BEGIN
 		-- Cat element
 		IF (NEW.elementcat_id IS NULL) THEN
 			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-		
+
 			IF v_customfeature IS NOT NULL THEN
 				NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			ELSE
 				NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
-		
+
 		ELSE
 			SELECT element_type INTO v_customfeature FROM cat_element WHERE id = NEW.elementcat_id;
 		END IF;
@@ -305,6 +305,17 @@ BEGIN
 		NEW.publish, NEW.inventory, NEW.expl_id, upper(v_feature_type), NEW.top_elev, NEW.expl_visibility, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, /*NEW.asset_id,*/ NEW.datasource,
 		NEW.lock_level, NEW.the_geom, now(), CURRENT_USER, NEW.updated_at, NEW.updated_by, NEW.epa_type, NEW.omzone_id);
 
+		-- Insert into visibility tables
+		IF NEW.sector_visibility IS NOT NULL THEN
+		    INSERT INTO element_x_sector_visibility (element_id, sector_id)
+		    SELECT NEW.element_id, unnest(NEW.sector_visibility);
+		END IF;
+
+		IF NEW.muni_visibility IS NOT NULL THEN
+		    INSERT INTO element_x_municipality_visibility (element_id, muni_id)
+		    SELECT NEW.element_id, unnest(NEW.muni_visibility);
+		END IF;
+
 		-- MAN TABLE INSERT AND EPA_TYPE INSERT
 		IF v_man_table='man_frelem' THEN
 			INSERT INTO man_frelem (element_id, node_id, to_arc, flwreg_length)
@@ -318,7 +329,7 @@ BEGIN
 		-- EPA INSERT
 		IF (NEW.epa_type = 'FRPUMP') THEN
 		    INSERT INTO inp_frpump (element_id) VALUES (NEW.element_id);
-			
+
 		ELSIF (NEW.epa_type = 'FRVALVE') THEN
 		    INSERT INTO inp_frvalve (element_id) VALUES (NEW.element_id);
 
@@ -330,7 +341,7 @@ BEGIN
 
 		ELSIF (NEW.epa_type = 'FROUTLET') THEN
 		    INSERT INTO inp_froutlet (element_id) VALUES (NEW.element_id);
-		
+
 		ELSIF (NEW.epa_type = 'FRSHORTPIPE') THEN
 		    INSERT INTO inp_frshortpipe (element_id) VALUES (NEW.element_id);
 
@@ -350,10 +361,10 @@ BEGIN
 			END IF;
 
 			IF v_feature_id IS NOT NULL THEN
-				EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_feature_id_name||', element_id, '||v_uuid_column||') VALUES ('||v_feature_id||','||NEW.element_id||','||v_uuid_value||') ON CONFLICT 
+				EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_feature_id_name||', element_id, '||v_uuid_column||') VALUES ('||v_feature_id||','||NEW.element_id||','||v_uuid_value||') ON CONFLICT
 				('||v_tablefeature||'_id, element_id) DO NOTHING';
-			ELSE 
-				EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_feature_id_name||', element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
+			ELSE
+				EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_feature_id_name||', element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT
 				('||v_tablefeature||'_id, element_id) DO NOTHING';
 			END IF;
 		END IF;
@@ -369,18 +380,18 @@ BEGIN
 		END IF;
 
 		UPDATE element SET top_elev = NEW.top_elev WHERE element_id = NEW.element_id;
-	
+
 		-- childtable insert
 		IF v_customfeature IS NOT NULL THEN
-			
+
 			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND (feature_type='NODE' OR feature_type='ALL' OR feature_type='CHILD') AND active IS TRUE AND iseditable IS TRUE
 			LOOP
-				
+
 				EXECUTE 'SELECT $1."' ||v_addfields.param_name||'"'
 					USING NEW
 					INTO v_new_value_param;
-					
+
 				v_childtable_name := 'man_element_' || lower(v_customfeature);
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 					IF v_new_value_param IS NOT NULL THEN
@@ -458,6 +469,22 @@ BEGIN
 		lock_level=NEW.lock_level, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=now(), updated_by=CURRENT_USER, epa_type=NEW.epa_type, omzone_id=NEW.omzone_id
 		WHERE element_id=OLD.element_id;
 
+		-- Update visibility tables
+		IF NEW.sector_visibility IS DISTINCT FROM OLD.sector_visibility THEN
+		    DELETE FROM element_x_sector_visibility WHERE element_id = OLD.element_id;
+		    IF NEW.sector_visibility IS NOT NULL THEN
+		        INSERT INTO element_x_sector_visibility (element_id, sector_id)
+		        SELECT NEW.element_id, unnest(NEW.sector_visibility);
+		    END IF;
+		END IF;
+
+		IF NEW.muni_visibility IS DISTINCT FROM OLD.muni_visibility THEN
+		    DELETE FROM element_x_municipality_visibility WHERE element_id = OLD.element_id;
+		    IF NEW.muni_visibility IS NOT NULL THEN
+		        INSERT INTO element_x_municipality_visibility (element_id, muni_id)
+		        SELECT NEW.element_id, unnest(NEW.muni_visibility);
+		    END IF;
+		END IF;
 
 		IF v_man_table='man_frelem' THEN
 			UPDATE man_frelem SET element_id=NEW.element_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
@@ -609,8 +636,8 @@ BEGIN
 				END IF;
 			END IF;
 		END IF;
-	
-	
+
+
 		IF v_customfeature IS NOT NULL THEN
 			FOR v_addfields IN SELECT * FROM sys_addfields
 			WHERE (cat_feature_id = v_customfeature OR cat_feature_id is null) AND (feature_type='element' OR feature_type='ALL' OR feature_type='CHILD') AND active IS TRUE AND iseditable IS TRUE
@@ -638,8 +665,8 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;
-	
-	
+
+
 
 		RETURN NEW;
 
