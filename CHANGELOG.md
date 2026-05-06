@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve composer warning handling and correct coverage.
+
+### Changed
+
+- Performance profiling in get_psector method when open existing one.
+
+### Removed
+
+- Deprecated code on psector manager to improve performance.
+
 ## [4.8.1] - 2026-04-07
 
 ### Added
