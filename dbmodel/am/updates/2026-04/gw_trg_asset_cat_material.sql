@@ -5,10 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-------------
--- material
-------------
-
 SET search_path = am, public;
 
 CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_trg_asset_cat_material()  RETURNS trigger AS
@@ -22,8 +18,8 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 
-		INSERT INTO config_material_def (material)
-		VALUES (NEW.id)
+		INSERT INTO am.config_material_def (material, pleak, age_max, age_med, age_min, builtdate_vdef, compliance)
+		VALUES (NEW.id, 0.16, 58, 50, 42, 1964, 10)
 		ON CONFLICT (material) DO NOTHING;
 
 		RETURN NEW;
@@ -33,15 +29,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
--- trigger
-drop trigger if exists gw_trg_asset_cat_material on PARENT_SCHEMA.cat_material;
-CREATE TRIGGER gw_trg_asset_cat_material AFTER INSERT ON PARENT_SCHEMA.cat_material
-FOR EACH ROW EXECUTE PROCEDURE PARENT_SCHEMA.gw_trg_asset_cat_material();
-
--- fk
-ALTER TABLE config_material_def ADD CONSTRAINT config_material_def_fk FOREIGN KEY (material)
-REFERENCES PARENT_SCHEMA.cat_material (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-grant all on all functions in schema PARENT_SCHEMA to role_basic;
