@@ -63,8 +63,14 @@ BEGIN
 	IF v_utils IS true THEN
         ALTER TABLE raingage DROP CONSTRAINT IF EXISTS raingage_muni_id;
         ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE inp_subcatchment DROP CONSTRAINT IF EXISTS inp_subcatchment_muni_id;
+        ALTER TABLE inp_subcatchment ADD CONSTRAINT inp_subcatchment_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
     ELSE
         ALTER TABLE raingage DROP CONSTRAINT IF EXISTS raingage_muni_id;
         ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+        ALTER TABLE inp_subcatchment DROP CONSTRAINT IF EXISTS inp_subcatchment_muni_id;
+        ALTER TABLE inp_subcatchment ADD CONSTRAINT inp_subcatchment_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
     END IF;
 END; $$;
