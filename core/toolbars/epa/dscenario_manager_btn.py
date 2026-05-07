@@ -1246,7 +1246,7 @@ class GwDscenarioManagerButton(GwAction):
             return self._manage_insert_pump_additional(view)
 
         sql = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS " \
-              f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = '{self.table_name[len(f'{self.schema_name}.'):]}' " \
+              f"WHERE TABLE_SCHEMA = '{lib_vars.schema_name}' AND TABLE_NAME = 've_{self.table_name[len(f'{self.schema_name}.'):]}' " \
               f"ORDER BY ordinal_position;"
         rows = tools_db.get_rows(sql)
         if not rows:
@@ -1263,7 +1263,7 @@ class GwDscenarioManagerButton(GwAction):
                 sql += ", ''"
             sql += ");"
         else:
-            sql = f"INSERT INTO ve_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
+            sql = f"INSERT INTO ve_{view} VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
 
         # Refresh tableview
