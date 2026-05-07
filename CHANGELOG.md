@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix hardcoded logo.png path.
 - Improve psector manager performance.
 - Fix psector other_prices tab bug with ',' and '.' as decimal separator.
+- Fix problem with psector pca calculation.
 
 ### Changed
 
