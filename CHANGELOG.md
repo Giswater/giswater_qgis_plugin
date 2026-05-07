@@ -10,12 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Improve composer warning handling and correct coverage.
+- Fix ve_plan_psector and v_plan_psector references.
+- Fix hardcoded logo.png path.
+- Improve psector manager performance.
+- Fix psector other_prices tab bug with ',' and '.' as decimal separator.
 
 ### Changed
 
 - Performance profiling in get_psector method when open existing one.
 - References from `ve_plan_psector` to `v_plan_psector` in `sys_table` and `sys_style` tables.
-- Logo image path in composer.
 
 ### Removed
 
