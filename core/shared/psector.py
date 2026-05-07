@@ -403,7 +403,7 @@ class GwPsector:
     def load_psector(self, dialog, psector_id, list_coord=None, form_opened=False):
         """
         Loads data for an existing psector into the dialog.
-        
+
         Args:
             dialog (QDialog): Dialog to populate with psector data
             psector_id (int): ID of psector to load
@@ -762,6 +762,14 @@ class GwPsector:
         if dry_run:
             return True
 
+        # Filter atlas by the current psector_id
+        atlas = layout.atlas()
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+        previous_filter = atlas.filterExpression()
+        if psector_id not in (None, 'null', ''):
+            atlas.setFilterFeatures(True)
+            atlas.setFilterExpression(f"psector_id = {psector_id}")
+
         # Since qgis 3.4 cant do .setAtlasMode(QgsComposition.PreviewAtlas)
         # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
         # close the layout designer again (finally sentence)
@@ -792,6 +800,10 @@ class GwPsector:
             return False
         finally:
             designer_window.close()
+            # Restore previous atlas filter
+            atlas.setFilterExpression(previous_filter)
+            if not previous_filter:
+                atlas.setFilterFeatures(False)
 
         return True
 
@@ -2849,7 +2861,7 @@ class GwPsector:
     def _highlight_features_by_id(self, qtable, feature_type, field_id, rubber_band, width, state_value=1):
         """
         Highlight features by id based on their state
-        
+
         Args:
             state_value: 1 = operative (orange), 0 = obsolete (light blue)
         """
