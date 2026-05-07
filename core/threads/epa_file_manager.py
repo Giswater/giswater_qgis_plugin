@@ -511,6 +511,13 @@ class GwEpaFileManager(GwTask):
 
         status = False
         try:
+            row = tools_gw.get_config_value("inp_report_onlymaxmin_values")
+            print(f"row: {row}")
+            if row is not None and row[0] == 'true':
+                only_extrema = True
+            else:
+                only_extrema = False
+            print(f"only_extrema: {only_extrema}")
             # Call import function
             tools_log.log_info(f"Import simulation results into database")
             # Create connection
@@ -527,7 +534,8 @@ class GwEpaFileManager(GwTask):
                 to=he.ExportDataSource.DATABASE,
                 result_id=self.result_name,
                 client=dao,
-                giswater_version=3
+                giswater_version=3,
+                only_extrema=only_extrema,
             )
             tools_log.log_info(f"Import simulation results finished")
 
