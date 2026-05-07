@@ -202,7 +202,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.1...main
+[unreleased]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.4...main
+[4.8.4]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.3...v4.8.4
+[4.8.3]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.2...v4.8.3
+[4.8.2]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.1...v4.8.2
 [4.8.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.0...v4.8.1
 [4.8.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.7.1...v4.8.0
 [4.7.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.7.0...v4.7.1
