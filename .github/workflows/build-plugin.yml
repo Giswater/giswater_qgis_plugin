@@ -31,6 +31,7 @@ jobs:
 
       - name: Stage plugin files
         run: |
+          mkdir -p staging/giswater
           rsync -a --exclude='.git' --exclude='.github' \
                    --exclude='__pycache__' --exclude='*.pyc' \
                    --exclude='scripts' --exclude='test' \
