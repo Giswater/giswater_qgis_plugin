@@ -49,6 +49,8 @@ v_status text;
 v_message text;
 v_audit_result json;
 v_count integer;
+v_error_context text;
+
 BEGIN
 
 	-- search path
@@ -224,6 +226,12 @@ BEGIN
 				'"point":'||v_result_point||
 			'}}'||
 		'}')::json,2760, null, null, null);
+
+	-- Exception control
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', 2, 'text', SQLERRM), 'SQLSTATE', SQLSTATE,
+	'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
