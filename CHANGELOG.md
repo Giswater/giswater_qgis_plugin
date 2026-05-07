@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.8.4] - 2026-05-07
+
 ### Fixed
 
 - Improve composer warning handling and correct coverage.
@@ -26,6 +28,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Deprecated code on psector manager to improve performance.
 - Hide pump additional tab in dscenario manager.
+
+## [4.8.3] - 2026-05-05
+
+### Fixed
+
+- Fix `config_param_system` update epa_automatic_man2graph_values value
+
+## [4.8.2] - 2026-04-20
+
+### Changed
+
+- Removed dependency on chardet.
 
 ## [4.8.1] - 2026-04-07
 
