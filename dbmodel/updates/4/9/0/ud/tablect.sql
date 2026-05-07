@@ -51,6 +51,8 @@ ALTER TABLE node ADD CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES
 ALTER TABLE node DROP CONSTRAINT IF EXISTS node_omunit_id_fkey;
 ALTER TABLE node ADD CONSTRAINT node_omunit_id_fkey FOREIGN KEY (omunit_id) REFERENCES omunit(omunit_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE gully ADD CONSTRAINT gully_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
 DO $$
 DECLARE
     v_utils boolean;
