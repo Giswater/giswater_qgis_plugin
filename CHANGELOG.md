@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve psector manager performance.
 - Fix psector other_prices tab bug with ',' and '.' as decimal separator.
 - Fix problem with psector pca calculation.
+- Fix dscenario manager to check columns from views instead of tables.
 
 ### Changed
 
@@ -24,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Deprecated code on psector manager to improve performance.
+- Hide pump additional tab in dscenario manager.
 
 ## [4.8.1] - 2026-04-07
 
