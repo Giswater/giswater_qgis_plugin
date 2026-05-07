@@ -316,21 +316,21 @@ BEGIN
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'overflow',d.overflow) FROM inp_dscenario_tank d
 		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.overflow IS NOT NULL;
 
-		-- updating values for inlet (as inlet)
+		-- updating values for inlet (as tank)
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'initlevel',d.initlevel) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.initlevel IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.initlevel IS NOT NULL AND t.epa_type = 'TANK';
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minlevel',d.minlevel) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minlevel IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minlevel IS NOT NULL AND t.epa_type = 'TANK';
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'maxlevel',d.maxlevel) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.maxlevel IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.maxlevel IS NOT NULL AND t.epa_type = 'TANK';
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'diameter',d.diameter) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.diameter IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.diameter IS NOT NULL AND t.epa_type = 'TANK';
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'minvol',d.minvol) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minvol IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.minvol IS NOT NULL AND t.epa_type = 'TANK';
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL AND t.epa_type = 'TANK';
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'overflow',d.overflow) FROM inp_dscenario_inlet d
-		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.overflow IS NOT NULL AND t.epa_type = 'INLET';
+		WHERE t.node_id = d.node_id::text AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.overflow IS NOT NULL AND t.epa_type = 'TANK';
 
 		-- updating values for inlet (as reservoir)
 		UPDATE temp_t_node t SET pattern_id = d.pattern_id FROM inp_dscenario_inlet d
