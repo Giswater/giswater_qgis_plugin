@@ -699,7 +699,7 @@ class GwDscenarioManagerButton(GwAction):
         default_tab_idx = 0
         # Select all dscenario views
         sql = f"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{lib_vars.schema_name}' " \
-              f"AND table_name LIKE 'inp_dscenario%'" \
+              f"AND table_name LIKE 'inp_dscenario%' AND table_name <> 'inp_dscenario_pump_additional'" \
               f"ORDER BY table_name;"
         rows = tools_db.get_rows(sql)
         if rows:
