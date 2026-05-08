@@ -16,7 +16,7 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...libs import tools_db, tools_qt, lib_vars
+from ...libs import lib_vars, tools_db, tools_os, tools_qt
 
 
 def get_min_greater_than(iterable, value):
@@ -113,7 +113,7 @@ class GwCalculatePriority(GwTask):
 
     def run(self):
         try:
-            import pandas  # noqa: F401
+            tools_os.get_dep("pandas")
         except ImportError:
             self.exception = (
                 "Python package 'pandas' is not installed. "
@@ -620,7 +620,7 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
-        import pandas as pd
+        pd = tools_os.get_dep("pandas")
 
         self._emit_report(tools_qt.tr("Getting auxiliary data from DB") + " (1/4)...")
         self.setProgress(10)

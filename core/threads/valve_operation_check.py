@@ -12,7 +12,7 @@ from pathlib import Path
 from qgis.core import QgsTask
 
 from .task import GwTask
-from ...libs import tools_db, lib_vars
+from ...libs import lib_vars, tools_db, tools_os
 
 
 class GwValveOperationCheck(GwTask):
@@ -25,7 +25,10 @@ class GwValveOperationCheck(GwTask):
         file_name,
     ):
         super().__init__(description, QgsTask.Flag.CanCancel)
-        from wntr.epanet.util import to_si, FlowUnits, HydParam
+        wntr_epanet_util = tools_os.get_dep("wntr.epanet.util")
+        to_si = wntr_epanet_util.to_si
+        FlowUnits = wntr_epanet_util.FlowUnits
+        HydParam = wntr_epanet_util.HydParam
 
         self.input_network = network
         self.config = config
@@ -50,7 +53,7 @@ class GwValveOperationCheck(GwTask):
 
     def run(self):
         try:
-            import wntr  # noqa: F401
+            tools_os.get_dep("wntr")
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "
@@ -82,7 +85,8 @@ class GwValveOperationCheck(GwTask):
         self.log += message + "\n"
 
     def _prepare_network(self):
-        from wntr.metrics.hydraulic import average_expected_demand
+        wntr_metrics_hydraulic = tools_os.get_dep("wntr.metrics.hydraulic")
+        average_expected_demand = wntr_metrics_hydraulic.average_expected_demand
 
         self._add_log("Preparing network...")
         adjusted_demands = (
@@ -150,7 +154,8 @@ class GwValveOperationCheck(GwTask):
             infile.write("\n[SCENARIOS]\n")
 
     def _run_scenarios_simulations(self):
-        from wntr.network import LinkStatus
+        wntr_network = tools_os.get_dep("wntr.network")
+        LinkStatus = wntr_network.LinkStatus
 
         scenarios = self.config.scenarios.values()
         for index, scenario in enumerate(scenarios):
@@ -214,8 +219,9 @@ class GwValveOperationCheck(GwTask):
         return True
 
     def _run_simulation(self, network):
-        import wntr
-        from wntr.sim import EpanetSimulator
+        wntr = tools_os.get_dep("wntr")
+        wntr_sim = tools_os.get_dep("wntr.sim")
+        EpanetSimulator = wntr_sim.EpanetSimulator
 
         nodes = {}
         unserviced = 0

@@ -16,7 +16,7 @@ from qgis.core import Qgis
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...libs import tools_qgis, tools_log
+from ...libs import tools_log, tools_os, tools_qgis
 
 
 class GwComposerPages(GwTask):
@@ -168,7 +168,8 @@ class GwComposerPages(GwTask):
                 tools_qgis.show_warning(msg, parameter=path)
 
     def _merge_files(self):
-        from PyPDF2 import PdfFileMerger
+        py_pdf2 = tools_os.get_dep("PyPDF2")
+        PdfFileMerger = py_pdf2.PdfFileMerger
         merger = PdfFileMerger()
 
         # Get all the files that have to be merged

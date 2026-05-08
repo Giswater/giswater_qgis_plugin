@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ...libs import tools_qgis
+from ...libs import tools_os, tools_qgis
 
 
 def create_mpl_canvas(parent=None, width=5, height=4, dpi=100):
@@ -15,10 +15,12 @@ def create_mpl_canvas(parent=None, width=5, height=4, dpi=100):
     matplotlib is not installed.
     """
     try:
-        import matplotlib
+        matplotlib = tools_os.get_dep("matplotlib")
         matplotlib.use('Qt5Agg')
-        from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-        from matplotlib.figure import Figure
+        backend_qt5agg = tools_os.get_dep("matplotlib.backends.backend_qt5agg")
+        figure_module = tools_os.get_dep("matplotlib.figure")
+        FigureCanvasQTAgg = backend_qt5agg.FigureCanvasQTAgg
+        Figure = figure_module.Figure
     except ImportError:
         tools_qgis.show_critical(
             "Python package 'matplotlib' is not installed. "

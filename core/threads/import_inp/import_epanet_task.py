@@ -11,7 +11,7 @@ from typing import Any
 
 from qgis.PyQt.QtCore import pyqtSignal
 
-from ....libs import lib_vars, tools_db
+from ....libs import lib_vars, tools_db, tools_os
 from ...utils import tools_gw
 from ..task import GwTask
 from ...utils.import_inp import lerp_progress, batched, get_row, get_rows, execute_sql, toolsdb_execute_values
@@ -627,7 +627,7 @@ class GwImportInpTask(GwTask):
         from wntr.network.controls import Control, Rule, SimTimeCondition, TimeOfDayCondition, ValueCondition
         from wntr.network.model import Valve, Tank, Junction, Link
         from wntr.network.base import LinkStatus
-        import numpy as np
+        np = tools_os.get_dep("numpy")
         try:
             from wntr.network.controls import Comparison
         except ImportError:
