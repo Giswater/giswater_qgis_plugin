@@ -482,3 +482,28 @@ INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderb
 VALUES('element_x_sector_visibility', 'Table to manage visibility of elements in sectors', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('element_x_municipality_visibility', 'Table to manage visibility of elements in municipalities', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
+
+-- 08/05/2026
+UPDATE config_param_system
+SET value = jsonb_set(
+    value::jsonb,
+    '{sys_fct_tablename}',
+    '"ve_arc"'
+)
+WHERE parameter = 'basic_search_v2_tab_network_arc';
+
+UPDATE config_param_system
+SET value = jsonb_set(
+    value::jsonb,
+    '{sys_fct_tablename}',
+    '"ve_node"'
+)
+WHERE parameter = 'basic_search_v2_tab_network_node';
+
+UPDATE config_param_system
+SET value = jsonb_set(
+    value::jsonb,
+    '{sys_fct_tablename}',
+    '"ve_connec"'
+)
+WHERE parameter = 'basic_search_v2_tab_network_connec';

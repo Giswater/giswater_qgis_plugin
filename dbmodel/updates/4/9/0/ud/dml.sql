@@ -38,23 +38,23 @@ DROP TABLE IF EXISTS rtc_hydrometer_x_connec;
 
 INSERT INTO config_toolbox
 (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3248, 'Massive node interpolation', '{"featureType":[]}'::json, 
+VALUES(3248, 'Massive node interpolation', '{"featureType":[]}'::json,
 '[
   {"label": "type:", "value": null, "tooltip": "Process name", "comboIds": ["MASSIVE", "INIT", "FLOWEXIT"], "datatype": "text", "comboNames": ["MASSIVE", "INIT", "FLOWEXIT"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "type", "widgettype": "combo", "layoutorder": 1},
   {"label": "Min Ymax (INIT/FLOWEXIT):", "value": null, "tooltip": "Choose minimum ymax value", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "minYmax", "widgettype": "text", "layoutorder": 2},
   {"label": "Max Ymax (INIT/FLOWEXIT):", "value": null, "tooltip": "Choose maximum ynax value", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "maxYmax", "widgettype": "text", "layoutorder": 3},
-  {"label": "Min Slope (INIT/FLOWEXIT):", "value": null, "tooltip": "Choose minimum slope", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "minSlope", "widgettype": "text", "layoutorder": 4}, 
+  {"label": "Min Slope (INIT/FLOWEXIT):", "value": null, "tooltip": "Choose minimum slope", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "minSlope", "widgettype": "text", "layoutorder": 4},
   {"label": "Max Slope (INIT/FLOWEXIT):", "value": null, "tooltip": "Choose maximum slope", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "maxSlope", "widgettype": "text", "layoutorder": 5},
-  {"label": "node1 (FLOWEXIT):", "value": null, "tooltip": "Choose source node of your path", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "node1", "widgettype": "text", "layoutorder": 6}, 
+  {"label": "node1 (FLOWEXIT):", "value": null, "tooltip": "Choose source node of your path", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "node1", "widgettype": "text", "layoutorder": 6},
   {"label": "node2 (FLOWEXIT):", "value": null, "tooltip": "Choose target node of your path", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "node2", "widgettype": "text", "layoutorder": 7},
   {"label": "Profile Mode (FLOWEXIT):", "value": null, "tooltip": "Profile mode", "comboIds": ["SMOOTH", "SHALLOW", "DEEP", "CENTERED"], "datatype": "text", "comboNames": ["SMOOTH", "SHALLOW", "DEEP", "CENTERED"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "profileMode", "widgettype": "combo", "layoutorder": 8},
   {"label": "Smooth Factor (SMOOTH):", "value": null, "tooltip": "Choose smoothAlpha", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "smoothFactor", "widgettype": "text", "layoutorder": 9}
-  ]'::json, 
+  ]'::json,
 NULL, true, '{4}');
 
 
 UPDATE sys_function SET sys_role = 'role_edit', function_alias = 'Massive node interpolation' ,
-descript = 
+descript =
 'PURPOSE
 This function calculates node invert elevations using different strategies depending on the requested calculation type.
 
@@ -85,7 +85,7 @@ PROFILE MODES
 - SHALLOW: Selects the shallowest feasible solution.
 - CENTERED: Selects the midpoint between the lower and upper feasible envelopes.
 - SMOOTH: Starts from a centered feasible solution and applies internal smoothing. iterations while preserving feasibility and fixed anchors. SmoothFactor: Strength of each smoothing iteration. Lower values = rougher / more conservative.  Higher values = smoother / more aggressive.
-    
+
 BUSINESS RULES
 - custom_elev is only written where sys_elev IS NULL.
 - MASSIVE interpolates node by node using nearby known references.
@@ -148,7 +148,7 @@ UPDATE sys_function SET id = 2430, project_type = 'utils' WHERE function_name = 
 -- 28/04/2026
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('NETSAMPLEPOINT', 'NODE', 'JUNCTION', 'man_netsamplepoint');
 
-INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('man_netsamplepoint', 'Additional information for netsamplepoint management', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
 
 -- 28/04/2026
@@ -208,10 +208,10 @@ BEGIN
       IF v_has_exit THEN
         v_exit_is_arc := EXISTS (SELECT 1 FROM arc a WHERE a.arc_id = v_exit_id);
 
-        IF v_exit_is_arc IS FALSE THEN 
+        IF v_exit_is_arc IS FALSE THEN
           -- If exit_id refers to a node, find an arc that connects to this node
-          SELECT arc_id INTO v_exit_id 
-          FROM arc 
+          SELECT arc_id INTO v_exit_id
+          FROM arc
           WHERE node_1 = v_exit_id OR node_2 = v_exit_id
           LIMIT 1;
 
@@ -237,3 +237,12 @@ BEGIN
     RAISE NOTICE 'No samplepoints found, skipping...';
   END IF;
 END $$;
+
+-- 08/05/2026
+UPDATE config_param_system
+SET value = jsonb_set(
+    value::jsonb,
+    '{sys_fct_tablename}',
+    '"ve_gully"'
+)
+WHERE parameter = 'basic_search_v2_tab_network_gully';

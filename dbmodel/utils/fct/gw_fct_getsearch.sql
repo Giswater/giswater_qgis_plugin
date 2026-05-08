@@ -143,7 +143,7 @@ BEGIN
 			v_result = gw_fct_json_object_set_key (v_result, 'section', v_parameter);
 			v_result = gw_fct_json_object_set_key (v_result, 'alias', v_label);
 			v_result = gw_fct_json_object_set_key (v_result, 'execFunc', v_tab_params->>'sys_fct');
-			v_result = gw_fct_json_object_set_key (v_result, 'tableName', (v_tab_params->>'sys_tablename')::text);
+			v_result = gw_fct_json_object_set_key (v_result, 'tableName', (COALESCE(v_tab_params->>'sys_fct_tablename', v_tab_params->>'sys_tablename'))::text);
 			v_result = gw_fct_json_object_set_key (v_result, 'values', v_fields);
 			v_result_array := array_append(v_result_array, v_result);
 		END LOOP;

@@ -229,10 +229,10 @@ UPDATE sys_param_user SET dv_querytext = replace (dv_querytext, ' gully_type', '
 
 -- 2020/12/07
 UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WATERWELL", "SOURCE"]},
-"tank":{"distVirtualReservoir":0.01}, 
-"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, 
-"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 
-"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, 
+"tank":{"distVirtualReservoir":0.01},
+"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"},
+"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"},
+"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"},
 "PSV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}
 }'
 WHERE id = 'inp_options_buildup_supply';
@@ -329,3 +329,14 @@ INSERT INTO man_pipelink (link_id) SELECT link_id FROM link l;
 -- 01/10/2025
 UPDATE config_param_system SET value = '{"version": 6, "usePgrouting": true, "bufferType": 2, "geomParamUpdate":10}'
 WHERE parameter = 'om_mincut_config';
+
+-- 08/05/2026
+UPDATE config_param_system
+SET value='{"sys_pk": "arc_id", "sys_fct": "gw_fct_getinfofromid", "sys_geom": "the_geom", "sys_filter": "", "sys_tablename": "arc join vf_arc using (arc_id)", "sys_display_name": "concat(arc_id, '' : '', arccat_id)", "sys_fct_tablename": "ve_arc"}'
+WHERE "parameter"='basic_search_v2_tab_network_arc';
+UPDATE config_param_system
+SET value='{"sys_pk": "connec_id", "sys_fct": "gw_fct_getinfofromid", "sys_geom": "the_geom", "sys_filter": "", "sys_tablename": "connec join vf_connec vf using (connec_id)", "sys_search_name": "concat(connec_id, '' '', code)", "sys_display_name": "concat(connec_id, '' : finca-> '', code,'' (expl: '',expl_id,'')'')", "sys_fct_tablename": "ve_connec"}'
+WHERE "parameter"='basic_search_v2_tab_network_connec';
+UPDATE config_param_system
+SET value='{"sys_pk": "node_id", "sys_fct": "gw_fct_getinfofromid", "sys_geom": "the_geom", "sys_filter": "", "sys_tablename": "node join vf_node vf using (node_id)", "sys_search_name": "concat(node_id,'' '',code, '' '', nodecat_id,'' '',descript)", "sys_display_name": "concat(node_id,'' ('',code, ''  expl: '',expl_id, '') : '', nodecat_id,'' '',descript)", "sys_fct_tablename": "ve_node"}'
+WHERE "parameter"='basic_search_v2_tab_network_node';

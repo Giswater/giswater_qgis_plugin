@@ -172,8 +172,8 @@ BEGIN
 	end if;
 
 	if v_section ilike 'basic_search_v2_tab_network%' then
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
-		' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||v_table_name||
+		' WHERE '||v_filter_key||' = ('||quote_nullable(v_filter_value)||'))row'
 		INTO v_geometry;
 	elsif v_section = 'basic_search_v2_tab_address' and v_search_add = 'true' then
 
@@ -205,9 +205,9 @@ BEGIN
 		end if;
 	elsif v_section = 'basic_search_v2_tab_workcat' then
 
-		execute 'SELECT row_to_json(row) FROM (SELECT 
+		execute 'SELECT row_to_json(row) FROM (SELECT
 			CASE
-			WHEN st_geometrytype(st_concavehull(st_simplify(d.the_geom, 1), 0.99::double precision)) = ''ST_Polygon''::text 
+			WHEN st_geometrytype(st_concavehull(st_simplify(d.the_geom, 1), 0.99::double precision)) = ''ST_Polygon''::text
 			THEN st_astext(st_buffer(st_concavehull(st_simplify(d.the_geom, 1), 0.99::double precision), 10::double precision)::geometry(Polygon, '||v_srid||'))
 			ELSE st_astext(st_expand(st_buffer(d.the_geom, 10::double precision), 1::double precision)::geometry(Polygon, '||v_srid||'))
 			END AS st_astext
@@ -224,9 +224,9 @@ BEGIN
 					  SELECT arc.workcat_id_end AS workcat_id, arc.the_geom FROM arc WHERE arc.state = 0
 					UNION
 					 SELECT connec.workcat_id_end AS workcat_id,connec.the_geom FROM connec WHERE connec.state = 0
-					UNION  
-					 SELECT element.workcat_id_end AS workcat_id, element.the_geom FROM element WHERE element.state = 0) a GROUP BY a.workcat_id ) d 
-		
+					UNION
+					 SELECT element.workcat_id_end AS workcat_id, element.the_geom FROM element WHERE element.state = 0) a GROUP BY a.workcat_id ) d
+
 			JOIN cat_work AS b ON d.workcat_id = b.id WHERE b.id::text ILIKE '||quote_nullable(v_filter_value)||' LIMIT 10 )row'
 		into v_geometry;
 	elsif v_section = 'basic_search_v2_tab_coordinates' then
@@ -245,11 +245,11 @@ BEGIN
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted"' || ', "version":"'|| v_version ||'"'||
-		', "data":' || v_response ||      
+		', "data":' || v_response ||
 		'}')::json, 2618, null, null, null);
-	
+
 	-- exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
 	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 END;$BODY$
