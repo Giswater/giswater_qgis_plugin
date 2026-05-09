@@ -266,8 +266,6 @@ BEGIN
 	ALTER TABLE temp_anl_arc
 	ALTER COLUMN node_2 TYPE int4
 	USING node_2::int4;
-	CREATE INDEX IF NOT EXISTS temp_anl_arc_node1_idx ON temp_anl_arc USING btree (node_1);
-	CREATE INDEX IF NOT EXISTS temp_anl_arc_node2_idx ON temp_anl_arc USING btree (node_2);
 
 	CREATE TEMP TABLE temp_anl_node(LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	ALTER TABLE temp_anl_node
@@ -276,7 +274,6 @@ BEGIN
 	ALTER TABLE temp_anl_node
 	ALTER COLUMN arc_id TYPE int4
 	USING arc_id::int4;
-	CREATE INDEX IF NOT EXISTS temp_anl_node_arc_id_idx ON temp_anl_node USING btree (arc_id);
 
 	CREATE TEMP TABLE temp_ve_arc (LIKE SCHEMA_NAME.ve_arc INCLUDING ALL);
 

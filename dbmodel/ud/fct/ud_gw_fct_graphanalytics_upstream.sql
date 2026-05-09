@@ -130,8 +130,6 @@ BEGIN
 	ALTER TABLE t_anl_arc
 	ALTER COLUMN node_2 TYPE int4
 	USING node_2::int4;
-	CREATE INDEX IF NOT EXISTS t_anl_arc_node1_idx ON t_anl_arc USING btree (node_1);
-	CREATE INDEX IF NOT EXISTS t_anl_arc_node2_idx ON t_anl_arc USING btree (node_2);
 
 	CREATE TEMP TABLE t_anl_node (LIKE anl_node INCLUDING ALL);
 	ALTER TABLE t_anl_node
