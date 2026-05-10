@@ -2467,6 +2467,7 @@ BEGIN
 					FROM temp_pgr_mapzone t
 					WHERE c.dma_id = t.mapzone_id;
 				END IF;
+
 			ELSE -- v_netscenario
 
 				-- update arc
@@ -2741,7 +2742,7 @@ BEGIN
 						) t
 						WHERE ll.link_id = t.link_id
 						AND (ll.staticpressure1 IS DISTINCT FROM t.staticpressure1
-							OR ll.staticpressure2 IS DISTINCT FROM t.staticpressure2);
+						OR ll.staticpressure2 IS DISTINCT FROM t.staticpressure2);
 
 					ELSIF v_class = 'DMA' THEN
 
@@ -2761,6 +2762,66 @@ BEGIN
 					END IF; -- v_class
 					
 				ELSE -- v_project_type (UD)
+
+					-- dwfzone, drainzone
+					IF v_class = 'DWFZONE' THEN
+
+						-- update dwfzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.dwfzone_outfall = NULL)
+						WITH outfalls AS (
+							SELECT
+								d.node AS pgr_arc_id,
+								array_agg(DISTINCT ta.pgr_node_2 ORDER BY ta.pgr_node_2) AS dwfzone_outfall
+							FROM temp_pgr_drivingdistance d
+							JOIN temp_pgr_arc ta ON d.start_vid = ta.pgr_arc_id
+							WHERE EXISTS (
+								SELECT 1
+								FROM temp_pgr_mapzone m
+								WHERE cardinality(m.mapzone_ids) = 1
+								AND m.component = ta.component
+							)
+							GROUP BY d.node
+						)
+						UPDATE arc a SET dwfzone_outfall = o.dwfzone_outfall
+						FROM temp_pgr_arc pa
+						LEFT JOIN  outfalls o USING (pgr_arc_id)
+						WHERE a.arc_id = pa.pgr_arc_id
+						AND a.dwfzone_outfall IS DISTINCT FROM o.dwfzone_outfall;
+
+						UPDATE node n SET dwfzone_outfall = a.dwfzone_outfall
+						FROM arc a
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_node tn WHERE tn.pgr_node_id = n.node_id)
+						AND a.node_2 = n.node_id
+						AND n.dwfzone_outfall IS DISTINCT FROM a.dwfzone_outfall;
+
+						UPDATE connec c SET dwfzone_outfall = a.dwfzone_outfall
+						FROM arc a
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = c.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
+						AND c.arc_id = a.arc_id
+						AND c.dwfzone_outfall IS DISTINCT FROM a.dwfzone_outfall;
+
+						UPDATE gully g SET dwfzone_outfall = a.dwfzone_outfall
+						FROM arc a
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = g.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_gully t WHERE t.gully_id = g.gully_id)
+						AND g.arc_id = a.arc_id
+						AND g.dwfzone_outfall IS DISTINCT FROM a.dwfzone_outfall;
+
+						UPDATE link l SET dwfzone_outfall = c.dwfzone_outfall
+						FROM connec c
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = c.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
+						AND l.feature_id = c.connec_id
+						AND l.dwfzone_outfall IS DISTINCT FROM c.dwfzone_outfall;
+
+						UPDATE link l SET dwfzone_outfall = g.dwfzone_outfall
+						FROM gully g
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = g.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
+						AND l.feature_id = g.gully_id
+						AND l.dwfzone_outfall IS DISTINCT FROM g.dwfzone_outfall;
+
+					END IF;
 
 				END IF; -- v_project_type
 
