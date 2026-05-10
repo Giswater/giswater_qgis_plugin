@@ -2142,8 +2142,7 @@ BEGIN
 				array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_ids
 			FROM temp_pgr_arc ta
 			JOIN arc a ON a.arc_id = ta.pgr_arc_id 
-			WHERE a.expl_id > 0
-			AND ta.mapzone_id > 0
+			WHERE ta.mapzone_id > 0
 			GROUP BY ta.mapzone_id
 			) s
 			WHERE m.mapzone_id = s.mapzone_id;
@@ -2157,8 +2156,7 @@ BEGIN
 				array_agg(DISTINCT a.muni_id ORDER BY a.muni_id) AS muni_ids
 			FROM temp_pgr_arc ta
 			JOIN arc a ON a.arc_id = ta.pgr_arc_id
-			WHERE a.muni_id > 0
-			AND ta.mapzone_id > 0
+			WHERE ta.mapzone_id > 0
 			GROUP BY ta.mapzone_id
 			) s
 			WHERE m.mapzone_id = s.mapzone_id;
@@ -2173,8 +2171,7 @@ BEGIN
 					array_agg(DISTINCT a.sector_id ORDER BY a.sector_id) AS sector_ids
 				FROM temp_pgr_arc ta
 				JOIN arc a ON a.arc_id = ta.pgr_arc_id
-				WHERE a.sector_id > 0
-				AND ta.mapzone_id > 0
+				WHERE ta.mapzone_id > 0
 				GROUP BY ta.mapzone_id
 				) s
 				WHERE m.mapzone_id = s.mapzone_id;
@@ -2246,7 +2243,6 @@ BEGIN
 						SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
 					)
 					AND g.graph_type = 'use'
-					AND a.expl_id > 0
 					GROUP BY g.mapzone_id
 				) t
 				WHERE m.%I = t.mapzone_id
@@ -2267,7 +2263,6 @@ BEGIN
 						SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
 					)
 					AND g.graph_type = 'use'
-					AND a.muni_id > 0
 					GROUP BY g.mapzone_id
 				) t
 				WHERE m.%I = t.mapzone_id
@@ -2298,7 +2293,6 @@ BEGIN
 							SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
 						)
 						AND g.graph_type = 'use'
-						AND a.sector_id > 0
 						GROUP BY g.mapzone_id
 					) t
 					WHERE m.%I = t.mapzone_id
