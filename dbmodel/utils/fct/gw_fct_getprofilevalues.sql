@@ -348,7 +348,7 @@ BEGIN
 					node_2 AS target,
 					(%s) AS cost
 			FROM ve_arc
-			WHERE is_operatiu
+			WHERE is_operative
 			AND node_1 IS NOT NULL
 			AND node_2 IS NOT NULL;
 		$sql$, v_cost_string);
@@ -360,7 +360,7 @@ BEGIN
 			SELECT via.nid
 			FROM via
 			LEFT JOIN ve_arc a
-				ON a.is_operatiu
+				ON a.is_operative
 				AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL
 				AND (a.node_1 = via.nid OR a.node_2 = via.nid)
 			GROUP BY via.nid
