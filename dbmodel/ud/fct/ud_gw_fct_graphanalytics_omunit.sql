@@ -415,65 +415,6 @@ BEGIN
     FROM macroomunit_end oe
     WHERE o.macroomunit_id = oe.macromapzone_id;
 
-    -- update geometry of omunits
-    v_query_text = '
-        UPDATE temp_pgr_omunit o SET the_geom = b.the_geom
-        FROM (
-            SELECT t.mapzone_id AS omunit_id, ST_LineMerge(ST_Union(v.the_geom)) AS the_geom
-            FROM temp_pgr_arc t
-            JOIN arc v ON v.arc_id = t.pgr_arc_id 
-            GROUP BY t.mapzone_id
-        ) b 
-        WHERE b.omunit_id = o.omunit_id;
-    ';
-    EXECUTE v_query_text;
-
-    -- update geometry of macroomunits
-    v_query_text = '
-        UPDATE temp_pgr_macroomunit mo SET the_geom = b.the_geom
-        FROM (
-            SELECT o.macroomunit_id, ST_LineMerge(ST_Union(o.the_geom)) AS the_geom
-            FROM temp_pgr_omunit o
-            GROUP BY o.macroomunit_id
-        ) b 
-        WHERE b.macroomunit_id = mo.macroomunit_id;
-    ';
-    EXECUTE v_query_text;
-
-    -- Update omunit expl_id, muni_id, sector_id
-    UPDATE temp_pgr_omunit o
-    SET expl_id = sub.expl_id_arr,
-        muni_id = sub.muni_id_arr,
-        sector_id = sub.sector_id_arr
-    FROM (
-        SELECT
-            ta.mapzone_id AS omunit_id,
-            array_agg(DISTINCT va.expl_id) AS expl_id_arr,
-            array_agg(DISTINCT va.muni_id) AS muni_id_arr,
-            array_agg(DISTINCT va.sector_id) AS sector_id_arr
-        FROM temp_pgr_arc ta
-        JOIN arc va ON va.arc_id = ta.pgr_arc_id
-        GROUP BY ta.mapzone_id
-    ) sub
-    WHERE sub.omunit_id = o.omunit_id;
-
-    -- Update macroomunit expl_id, muni_id, sector_id
-     UPDATE temp_pgr_macroomunit mo
-    SET expl_id = sub.expl_id_arr,
-        muni_id = sub.muni_id_arr,
-        sector_id = sub.sector_id_arr
-    FROM (
-        SELECT
-            ta.macromapzone_id AS macroomunit_id,
-            array_agg(DISTINCT va.expl_id) AS expl_id_arr,
-            array_agg(DISTINCT va.muni_id) AS muni_id_arr,
-            array_agg(DISTINCT va.sector_id) AS sector_id_arr
-        FROM temp_pgr_arc ta
-        JOIN arc va ON va.arc_id = ta.pgr_arc_id
-        GROUP BY ta.macromapzone_id
-    ) sub
-    WHERE sub.macroomunit_id = mo.macroomunit_id;
-
     -- MACROOMUNITS: CATCHMENT_NODE AND ORDER SECTION
     --==================================
 
@@ -534,6 +475,247 @@ BEGIN
     WHERE m.macroomunit_id = o.macroomunit_id;
 
     -- ENDSECTION
+
+    -- UPDATE SECTION IF v_commit_changes
+	-- =======================
+    IF v_commitchanges IS FALSE THEN
+        -- Polygons
+        EXECUTE 'SELECT jsonb_build_object(
+                ''type'', ''FeatureCollection'',
+                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb),
+                ''layerName'', ''Temp Omunit''
+            )
+        FROM (
+            SELECT jsonb_build_object(
+                ''type'',       ''Feature'',
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+                ''properties'', to_jsonb(row) - ''the_geom''
+            ) AS feature
+            FROM (
+                SELECT 
+                    o.omunit_id, o.macroomunit_id, o.the_geom, ''ve_omunit'' AS layer 
+                FROM temp_pgr_omunit o
+            ) row
+        ) features' INTO v_result;
+
+        v_result_polygon := v_result;
+
+        v_visible_layer = NULL;
+
+        -- Message
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001", "is_process":true}}$$)';
+
+    ELSE
+
+        RAISE NOTICE 'Creating geometry of mapzones';
+        -- SECTION: Creating geometry of mapzones
+
+        -- update geometry of omunits
+        v_query_text = '
+            UPDATE temp_pgr_omunit o SET the_geom = b.the_geom
+            FROM (
+                SELECT t.mapzone_id AS omunit_id, ST_LineMerge(ST_Union(v.the_geom)) AS the_geom
+                FROM temp_pgr_arc t
+                JOIN arc v ON v.arc_id = t.pgr_arc_id 
+                GROUP BY t.mapzone_id
+            ) b 
+            WHERE b.omunit_id = o.omunit_id;
+        ';
+        EXECUTE v_query_text;
+
+        -- update geometry of macroomunits
+        v_query_text = '
+            UPDATE temp_pgr_macroomunit mo SET the_geom = b.the_geom
+            FROM (
+                SELECT o.macroomunit_id, ST_LineMerge(ST_Union(o.the_geom)) AS the_geom
+                FROM temp_pgr_omunit o
+                GROUP BY o.macroomunit_id
+            ) b 
+            WHERE b.macroomunit_id = mo.macroomunit_id;
+        ';
+        EXECUTE v_query_text;
+
+         -- Update omunit expl_id, muni_id, sector_id
+        UPDATE temp_pgr_omunit o
+        SET expl_id = sub.expl_id_arr,
+            muni_id = sub.muni_id_arr,
+            sector_id = sub.sector_id_arr
+        FROM (
+            SELECT
+                ta.mapzone_id AS omunit_id,
+                array_agg(DISTINCT va.expl_id ORDER BY va.expl_id) AS expl_id_arr,
+                array_agg(DISTINCT va.muni_id ORDER BY va.muni_id) AS muni_id_arr,
+                array_agg(DISTINCT va.sector_id ORDER BY va.sector_id) AS sector_id_arr
+            FROM temp_pgr_arc ta
+            JOIN arc va ON va.arc_id = ta.pgr_arc_id
+            GROUP BY ta.mapzone_id
+        ) sub
+        WHERE sub.omunit_id = o.omunit_id;
+
+        -- Update macroomunit expl_id, muni_id, sector_id
+        UPDATE temp_pgr_macroomunit mo
+        SET expl_id = sub.expl_id_arr,
+            muni_id = sub.muni_id_arr,
+            sector_id = sub.sector_id_arr
+        FROM (
+            SELECT
+                ta.macromapzone_id AS macroomunit_id,
+                array_agg(DISTINCT va.expl_id ORDER BY va.expl_id) AS expl_id_arr,
+                array_agg(DISTINCT va.muni_id ORDER BY va.muni_id) AS muni_id_arr,
+                array_agg(DISTINCT va.sector_id ORDER BY va.sector_id) AS sector_id_arr
+            FROM temp_pgr_arc ta
+            JOIN arc va ON va.arc_id = ta.pgr_arc_id
+            GROUP BY ta.macromapzone_id
+        ) sub
+        WHERE sub.macroomunit_id = mo.macroomunit_id;   
+
+        -- update TABLES
+        -----------------
+
+        -- First, SET omunit_id = 0 when the values don't exist anymore
+        UPDATE arc a SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE a.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_arc ta 
+            WHERE ta.pgr_arc_id = a.arc_id
+        )
+        AND a.omunit_id IS DISTINCT FROM 0;
+
+        UPDATE node n SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE n.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_node tn
+            WHERE tn.pgr_node_id = n.node_id
+        )
+        AND n.omunit_id IS DISTINCT FROM 0;
+
+        UPDATE connec c SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE c.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_connec tc
+            WHERE tc.pgr_connec_id = c.connec_id
+        )
+        AND c.omunit_id IS DISTINCT FROM 0;
+
+        UPDATE link l SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE l.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_connec t
+            WHERE t.pgr_connec_id = l.feature_id
+        )
+        AND l.omunit_id IS DISTINCT FROM 0;
+
+        UPDATE gully g SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE g.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_gully tg
+            WHERE tg.pgr_gully_id = g.gully_id
+        )
+        AND g.omunit_id IS DISTINCT FROM 0;
+
+        UPDATE link l SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE l.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_gully t
+            WHERE t.pgr_gully_id = l.feature_id
+        )
+        AND l.omunit_id IS DISTINCT FROM 0;
+
+        -- Second, delete the omunits that don't exist anymore;
+        DELETE FROM omunit m
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone mo
+            WHERE m.omunit_id = mo.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_omunit tpo
+            WHERE m.omunit_id = tpo.omunit_id
+        );
+
+        -- Insert new omunits
+        INSERT INTO omunit (omunit_id)
+        SELECT tpo.omunit_id
+        FROM temp_pgr_omunit tpo
+        WHERE NOT EXISTS (
+            SELECT 1 
+            FROM omunit m 
+            WHERE tpo.omunit_id = m.omunit_id
+        );
+
+        -- update omunits
+        UPDATE omunit o
+        SET node_1 = tpo.node_1,
+            node_2 = tpo.node_2,
+            is_way_in = tpo.is_way_in,
+            is_way_out = tpo.is_way_out,
+            order_number = tpo.order_number,
+            the_geom = tpo.the_geom,
+            expl_id = tpo.expl_id,
+            muni_id = tpo.muni_id,
+            sector_id = tpo.sector_id
+        FROM temp_pgr_omunit tpo
+        WHERE tpo.omunit_id = o.omunit_id;
+
+        -- update arc, node, connec, gully, link
+        UPDATE arc a
+        SET omunit_id = t.mapzone_id
+        FROM temp_pgr_arc t
+        WHERE a.arc_id = t.pgr_arc_id
+        AND a.omunit_id IS DISTINCT FROM t.mapzone_id;
+
+        UPDATE node n 
+        SET omunit_id = t.mapzone_id
+        FROM temp_pgr_node t
+        WHERE n.node_id = t.pgr_node_id
+        AND n.omunit_id IS DISTINCT FROM t.mapzone_id;
+
+        UPDATE connec c
+        SET omunit_id = t.mapzone_id
+        FROM temp_pgr_connec t
+        WHERE c.connec_id = t.pgr_connec_id
+        AND c.omunit_id IS DISTINCT FROM t.mapzone_id;
+
+        UPDATE link l
+        SET omunit_id = t.mapzone_id
+        FROM temp_pgr_connec t
+        WHERE l.feature_id = t.pgr_connec_id 
+        AND l.omunit_id IS DISTINCT FROM t.mapzone_id;
+
+        UPDATE gully g
+        SET omunit_id = t.mapzone_id
+        FROM temp_pgr_gully t
+        WHERE g.gully_id = t.pgr_gully_id
+        AND g.omunit_id IS DISTINCT FROM t.mapzone_id;
+
+        UPDATE link l
+        SET omunit_id = t.mapzone_id
+        FROM temp_pgr_gully t
+        WHERE l.feature_id = t.pgr_gully_id 
+        AND l.omunit_id IS DISTINCT FROM t.mapzone_id;
+
+        --v_visible_layer = '"ve_omunit"';
+        v_visible_layer = NULL;
+    END IF;
+
+    -- ENDSECTION UPDATE
 
     v_result := COALESCE(v_result, '{}');
     v_result_info := CONCAT('{"values":', v_result, '}');
