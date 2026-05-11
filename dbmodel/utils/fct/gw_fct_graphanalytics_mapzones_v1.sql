@@ -1377,6 +1377,20 @@ BEGIN
 			FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 		);
 
+		-- extra flood for DWFZONE for calculating later the drainzone_outfall
+		-- put again cost/reverse_cost 1 from initoverflowpath
+		IF v_class = 'DWFZONE' THEN
+			UPDATE temp_pgr_arc_linegraph t
+			SET cost = 1, reverse_cost = 1
+			WHERE graph_delimiter = 'initoverflowpath';
+
+			INSERT INTO temp_pgr_drivingdistance_initoverflowpath (seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
+			(
+				SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
+				FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
+			);
+		END IF;
+
 		-- group the mapzones; add connections between toArc(WS)/inletArc(UD) for pgr_root_vids 
 		v_query_text := '
 			WITH edges AS (
@@ -1548,7 +1562,7 @@ BEGIN
 
 			UPDATE temp_pgr_mapzone m 
 			SET drainzone_id = m.component
-			WHERE m.drainzone_id = 0;
+			WHERE COALESCE(m.drainzone_id, 0) = 0;
 		END IF;
 
 		-- end update temp_pgr_mapzone
@@ -2767,6 +2781,7 @@ BEGIN
 					IF v_class = 'DWFZONE' THEN
 
 						-- update dwfzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.dwfzone_outfall = NULL)
+						
 						WITH outfalls AS (
 							SELECT
 								d.node AS pgr_arc_id,
@@ -2820,6 +2835,67 @@ BEGIN
 						AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
 						AND l.feature_id = g.gully_id
 						AND l.dwfzone_outfall IS DISTINCT FROM g.dwfzone_outfall;
+
+						-- update drainzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.drainzone_outfall = NULL)
+						WITH outfalls AS (
+							SELECT
+								d.node AS pgr_arc_id,
+								array_agg(DISTINCT ta.pgr_node_2 ORDER BY ta.pgr_node_2) AS drainzone_outfall
+							FROM temp_pgr_drivingdistance_initoverflowpath d
+							JOIN temp_pgr_arc ta ON d.start_vid = ta.pgr_arc_id
+							WHERE EXISTS (
+								SELECT 1
+								FROM temp_pgr_mapzone m
+								WHERE cardinality(m.mapzone_ids) = 1
+								AND m.component = ta.component
+							)
+							AND NOT EXISTS (
+								SELECT 1
+								FROM temp_pgr_drivingdistance dd
+								WHERE dd.node = d.node
+								AND dd.start_vid = d.start_vid
+							)
+							GROUP BY d.node
+						)
+						UPDATE arc a SET drainzone_outfall = o.drainzone_outfall
+						FROM temp_pgr_arc pa
+						LEFT JOIN  outfalls o USING (pgr_arc_id)
+						WHERE a.arc_id = pa.pgr_arc_id
+						AND a.drainzone_outfall IS DISTINCT FROM o.drainzone_outfall;
+
+						UPDATE node n SET drainzone_outfall = a.drainzone_outfall
+						FROM arc a
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_node tn WHERE tn.pgr_node_id = n.node_id)
+						AND a.node_2 = n.node_id
+						AND n.drainzone_outfall IS DISTINCT FROM a.drainzone_outfall;
+
+						UPDATE connec c SET drainzone_outfall = a.drainzone_outfall
+						FROM arc a
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = c.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_connec t WHERE t.connec_id = c.connec_id)
+						AND c.arc_id = a.arc_id
+						AND c.drainzone_outfall IS DISTINCT FROM a.drainzone_outfall;
+
+						UPDATE gully g SET drainzone_outfall = a.drainzone_outfall
+						FROM arc a
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = g.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_gully t WHERE t.gully_id = g.gully_id)
+						AND g.arc_id = a.arc_id
+						AND g.drainzone_outfall IS DISTINCT FROM a.drainzone_outfall;
+
+						UPDATE link l SET drainzone_outfall = c.drainzone_outfall
+						FROM connec c
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = c.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_link_connec t WHERE t.link_id = l.link_id)
+						AND l.feature_id = c.connec_id
+						AND l.drainzone_outfall IS DISTINCT FROM c.drainzone_outfall;
+
+						UPDATE link l SET drainzone_outfall = g.drainzone_outfall
+						FROM gully g
+						WHERE EXISTS (SELECT 1 FROM temp_pgr_arc t WHERE t.pgr_arc_id = g.arc_id)
+						AND EXISTS (SELECT 1 FROM v_temp_link_gully t WHERE t.link_id = l.link_id)
+						AND l.feature_id = g.gully_id
+						AND l.drainzone_outfall IS DISTINCT FROM g.drainzone_outfall;
 
 					END IF;
 
