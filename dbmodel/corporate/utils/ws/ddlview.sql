@@ -48,3 +48,6 @@ SELECT * FROM utils.region;
 
 CREATE OR REPLACE VIEW v_province AS
 SELECT * FROM utils.province;
+
+CREATE OR REPLACE VIEW v_type_street AS
+SELECT * FROM utils.type_street;

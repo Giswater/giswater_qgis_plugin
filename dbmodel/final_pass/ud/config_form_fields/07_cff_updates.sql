@@ -15,6 +15,7 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_address'
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_region', 'v_region') WHERE dv_querytext LIKE '%ext_region%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') WHERE dv_querytext LIKE '%ext_province%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') WHERE dv_querytext LIKE '%ext_district%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_type_street', 'v_type_street') WHERE dv_querytext LIKE '%ext_type_street%';
 
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_ext_municipality', 've_municipality')::json WHERE widgetcontrols::text LIKE '%v_ext_municipality%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_ext_streetaxis', 've_streetaxis')::json WHERE widgetcontrols::text LIKE '%v_ext_streetaxis%';
@@ -24,6 +25,7 @@ UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ex
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_region', 'v_region')::json WHERE widgetcontrols::text LIKE '%ext_region%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_province', 'v_province')::json WHERE widgetcontrols::text LIKE '%ext_province%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_district', 'v_district')::json WHERE widgetcontrols::text LIKE '%ext_district%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_type_street', 'v_type_street')::json WHERE widgetcontrols::text LIKE '%ext_type_street%';
 
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_node_%' and columnname = 'state';
 UPDATE config_form_fields SET iseditable = false where formname ilike 've_arc_%' and columnname = 'state';

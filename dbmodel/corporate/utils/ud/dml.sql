@@ -25,5 +25,3 @@ delete from sys_table where id ='ext_region';
 delete from sys_table where id ='ext_region_x_province';
 delete from sys_table where id ='ext_province';
 delete from sys_table where id ='ext_type_street';
-
-UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_type_street', 'type_street') WHERE dv_querytext LIKE '%ext_type_street%';

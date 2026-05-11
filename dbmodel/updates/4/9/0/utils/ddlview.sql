@@ -122,6 +122,9 @@ SELECT * FROM ext_region;
 CREATE OR REPLACE VIEW v_province AS
 SELECT * FROM ext_province;
 
+CREATE OR REPLACE VIEW v_type_street AS
+SELECT * FROM ext_type_street;
+
 CREATE OR REPLACE VIEW vf_arc AS
  SELECT a.arc_id, COALESCE(pp.state, a.state) AS p_state
    FROM arc a

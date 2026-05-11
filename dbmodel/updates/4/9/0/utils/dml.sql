@@ -63,6 +63,9 @@ VALUES('v_region', 'View of regions', 'role_edit', 'core');
 INSERT INTO sys_table (id, descript, sys_role, "source")
 VALUES('v_province', 'View of provinces', 'role_edit', 'core');
 
+INSERT INTO sys_table (id, descript, sys_role, "source")
+VALUES('v_type_street', 'View of type of street', 'role_edit', 'core');
+
 -- 26/03/2026
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam)
 VALUES('inp_typevalue_dscenario', 'CALIBRATION', 'CALIBRATION', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
@@ -135,6 +138,7 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_address'
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_region', 'v_region') WHERE dv_querytext LIKE '%ext_region%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') WHERE dv_querytext LIKE '%ext_province%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') WHERE dv_querytext LIKE '%ext_district%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'ext_type_street', 'v_type_street') WHERE dv_querytext LIKE '%ext_type_street%';
 
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_ext_municipality', 've_municipality')::json WHERE widgetcontrols::text LIKE '%v_ext_municipality%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'v_ext_streetaxis', 've_streetaxis')::json WHERE widgetcontrols::text LIKE '%v_ext_streetaxis%';
@@ -144,6 +148,7 @@ UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ex
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_region', 'v_region')::json WHERE widgetcontrols::text LIKE '%ext_region%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_province', 'v_province')::json WHERE widgetcontrols::text LIKE '%ext_province%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_district', 'v_district')::json WHERE widgetcontrols::text LIKE '%ext_district%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'ext_type_street', 'v_type_street')::json WHERE widgetcontrols::text LIKE '%ext_type_street%';
 
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'v_ext_municipality', 've_municipality') WHERE dv_querytext LIKE '%v_ext_municipality%';
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'v_ext_streetaxis', 've_streetaxis') WHERE dv_querytext LIKE '%v_ext_streetaxis%';
@@ -153,6 +158,7 @@ UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'ext_address', 'v
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'ext_region', 'v_region') WHERE dv_querytext LIKE '%ext_region%';
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'ext_province', 'v_province') WHERE dv_querytext LIKE '%ext_province%';
 UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'ext_district', 'v_district') WHERE dv_querytext LIKE '%ext_district%';
+UPDATE sys_param_user SET dv_querytext = replace(dv_querytext, 'ext_type_street', 'v_type_street') WHERE dv_querytext LIKE '%ext_type_street%';
 
 UPDATE config_param_system SET value = replace(value, 'v_ext_municipality', 've_municipality') WHERE value LIKE '%v_ext_municipality%';
 UPDATE config_param_system SET value = replace(value, 'v_ext_streetaxis', 've_streetaxis') WHERE value LIKE '%v_ext_streetaxis%';
@@ -162,6 +168,7 @@ UPDATE config_param_system SET value = replace(value, 'v_ext_address', 've_addre
 UPDATE config_param_system SET value = replace(value, 'ext_region', 'v_region') WHERE value LIKE '%ext_region%';
 UPDATE config_param_system SET value = replace(value, 'ext_province', 'v_province') WHERE value LIKE '%ext_province%';
 UPDATE config_param_system SET value = replace(value, 'ext_district', 'v_district') WHERE value LIKE '%ext_district%';
+UPDATE config_param_system SET value = replace(value, 'ext_type_street', 'v_type_street') WHERE value LIKE '%ext_type_street%';
 
 UPDATE config_form_fields SET formname='ve_streetaxis' WHERE formname = 'v_ext_streetaxis';
 DELETE FROM config_form_fields WHERE formname='ve_streetaxis' AND columnname='expl_id';
