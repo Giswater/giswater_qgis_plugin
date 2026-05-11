@@ -377,6 +377,14 @@ BEGIN
 				IF v_count = 1 THEN
 					NEW.muni_id = (SELECT muni_id FROM v_municipality WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001)
 					AND active IS TRUE LIMIT 1);
+				ELSIF v_count > 1 THEN
+					SELECT array_agg(muni_id ORDER BY ST_Distance(NEW.the_geom, v_municipality.the_geom), muni_id)
+					INTO NEW.muni_visibility
+					FROM v_municipality
+					WHERE ST_DWithin(NEW.the_geom, v_municipality.the_geom,0.001) AND active IS TRUE;
+
+					NEW.muni_id := NEW.muni_visibility[1];
+					NEW.muni_visibility := NEW.muni_visibility[2:array_length(NEW.muni_visibility, 1)];
 				ELSE
 					NEW.muni_id =(SELECT muni_id FROM ve_arc WHERE ST_DWithin(NEW.the_geom, ve_arc.the_geom, v_proximity_buffer)
 					order by ST_Distance (NEW.the_geom, ve_arc.the_geom) LIMIT 1);
