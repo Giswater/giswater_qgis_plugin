@@ -143,7 +143,6 @@ BEGIN
 				FROM ve_arc a
 				WHERE a.node_1 IS NOT NULL
 				AND a.node_2 IS NOT NULL
-				AND a.state > 0
 				AND a.is_operative = TRUE
 			)
 		SELECT
@@ -177,7 +176,6 @@ BEGIN
 				FROM ve_arc a
 				WHERE a.node_1 IS NOT NULL
 				AND a.node_2 IS NOT NULL
-				AND a.state > 0
 				AND a.is_operative = TRUE
 				AND a.initoverflowpath IS DISTINCT FROM TRUE
 				AND EXISTS (
@@ -244,13 +242,11 @@ BEGIN
 				UNION
 				SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' as feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
 				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id = a.arc_id
-				WHERE c.state > 0
-				AND c.is_operative = TRUE
+				WHERE c.is_operative = TRUE
 				UNION
 				SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' as feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
 				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id = a.arc_id
-				WHERE g.state > 0
-				AND g.is_operative = TRUE) row
+				WHERE g.is_operative = TRUE) row
 			) features
 		), '[]'::jsonb)
 	)::text;
