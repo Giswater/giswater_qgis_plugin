@@ -839,10 +839,10 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (
-		SELECT arc_id, arccat_id, NULLIF(descript, '')::jsonb,expl_id, the_geom, 'ARC' as feature_type
+		SELECT arc_id, arccat_id, NULLIF(descript, '') as descript, expl_id, the_geom, 'ARC' as feature_type
 		FROM  temp_anl_arc
 		UNION ALL
-		SELECT l.link_id, linkcat_id, NULLIF(descript, '')::jsonb, expl_id, the_geom, 'LINK' as feature_type
+		SELECT l.link_id, linkcat_id, NULLIF(descript, '') as descript, expl_id, the_geom, 'LINK' as feature_type
 		FROM link l
 		JOIN temp_link_x_arc la ON l.link_id = la.link_id) row) features;
 
@@ -863,16 +863,16 @@ BEGIN
 				'properties', to_jsonb(row) - 'the_geom'
 			) AS feature
 		FROM (
-			SELECT node_id, nodecat_id, NULLIF(descript, '')::jsonb,expl_id, the_geom, 'NODE' as feature_type
+			SELECT node_id, nodecat_id, NULLIF(descript, '') as descript, expl_id, the_geom, 'NODE' as feature_type
 			FROM temp_anl_node
 			WHERE nodecat_id!='VNODE'
 			UNION ALL
-			SELECT c.connec_id, conneccat_id, NULLIF(c.descript, '')::jsonb, c.expl_id, c.the_geom, 'CONNEC' as feature_type
+			SELECT c.connec_id, conneccat_id, NULLIF(c.descript, '') as descript, c.expl_id, c.the_geom, 'CONNEC' as feature_type
 			FROM connec c
 			JOIN link l ON c.connec_id = l.feature_id
 			JOIN temp_link_x_arc la ON l.link_id = la.link_id
 			UNION ALL
-			SELECT g.gully_id, gullycat_id, NULLIF(g.descript, '')::jsonb, g.expl_id, g.the_geom, 'GULLY' as feature_type
+			SELECT g.gully_id, gullycat_id, NULLIF(g.descript, '') as descript, g.expl_id, g.the_geom, 'GULLY' as feature_type
 			FROM gully g
 			JOIN link l ON g.gully_id = l.feature_id
 			JOIN temp_link_x_arc la ON l.link_id = la.link_id
