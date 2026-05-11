@@ -37,7 +37,7 @@ ALTER TABLE connec DROP CONSTRAINT connec_muni_id_fkey;
 ALTER TABLE connec ADD CONSTRAINT connec_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE gully DROP CONSTRAINT gully_muni_id_fkey;
 ALTER TABLE gully ADD CONSTRAINT gully_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE raingage DROP CONSTRAINT raingage_muni_id;
+ALTER TABLE raingage DROP CONSTRAINT raingage_muni_id_fkey;
 ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES utils.municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE node DROP CONSTRAINT node_streetaxis_id_fkey;
 ALTER TABLE node ADD CONSTRAINT node_streetaxis_id_fkey FOREIGN KEY (muni_id, streetaxis_id) REFERENCES utils.streetaxis(muni_id, id) ON UPDATE CASCADE ON DELETE RESTRICT;
