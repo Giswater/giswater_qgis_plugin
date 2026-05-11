@@ -230,21 +230,19 @@ BEGIN
                 CREATE INDEX IF NOT EXISTS temp_pgr_gully_component_idx ON temp_pgr_gully USING btree (component);
             END IF;
 
+            CREATE TABLE IF NOT EXISTS temp_pgr_mapzone_graph (
+                node_id int4 NOT NULL,
+                netscenario_id int4 NULL,
+                mapzone_id int4 NOT NULL,
+                mapzone_type text NOT NULL,
+                flow_sign int2 NULL,
+                CONSTRAINT temp_pgr_mapzone_graph_pkey PRIMARY KEY (node_id, mapzone_id)
+            );
+            CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_mapzone_id_idx ON temp_pgr_mapzone_graph USING btree (mapzone_id);
+            CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_netscenario_id_idx ON temp_pgr_mapzone_graph USING btree (netscenario_id);
+            CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_id_idx ON temp_pgr_mapzone_graph USING btree (node_id);
+
         END IF;
-
-
-        CREATE TABLE IF NOT EXISTS temp_pgr_mapzone_graph (
-            node_id int4 NOT NULL,
-            netscenario_id int4 NULL,
-            mapzone_id int4 NOT NULL,
-            mapzone_type text NOT NULL,
-            flow_sign int2 NULL,
-            CONSTRAINT temp_pgr_mapzone_graph_pkey PRIMARY KEY (node_id, mapzone_id)
-        );
-        CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_mapzone_id_idx ON temp_pgr_mapzone_graph USING btree (mapzone_id);
-        CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_netscenario_id_idx ON temp_pgr_mapzone_graph USING btree (netscenario_id);
-        CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_graph_node_id_idx ON temp_pgr_mapzone_graph USING btree (node_id);
-
 
         IF v_project_type = 'WS' THEN
 
