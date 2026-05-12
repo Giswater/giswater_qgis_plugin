@@ -45,7 +45,9 @@ v_sum_result numeric;
 v_filter text;
 v_lot_list text;
 v_campaign_name text;
-
+v_count_done integer;
+v_count_to_do integer;
+v_count_result numeric;
 
 
 -- Return
@@ -75,7 +77,7 @@ BEGIN
 
 	-- calculate length of arcs for campaign
 	execute 'select round(sum(st_length(c.the_geom)::numeric)/1000, 2) from cm.om_campaign_lot_x_arc join cm.om_campaign_lot ocl using (lot_id)
-				join cm.om_campaign_x_arc c using (arc_id) WHERE ocl.campaign_id = '||v_campaign_id||' and action is not null' INTO v_sum;
+				join cm.om_campaign_x_arc c using (arc_id) WHERE ocl.campaign_id = '||v_campaign_id||' and action in (1,2)' INTO v_sum;
 	execute 'select round(sum(st_length(c.the_geom)::numeric)/1000, 2) from cm.om_campaign_lot_x_arc join cm.om_campaign_lot ocl using (lot_id)
 				join cm.om_campaign_x_arc c using (arc_id) WHERE ocl.campaign_id = '||v_campaign_id||' and arc_id > 0' INTO v_sum_total;
 
@@ -83,10 +85,33 @@ BEGIN
 
 
    	-- Report results
-   	INSERT INTO t_audit_check_data (fid, criticity, error_message) SELECT v_fid, 2, CONCAT('Km de red hechos: ', v_sum, '.'); 
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) SELECT v_fid, 2, CONCAT('Km de red en el inicio de la campaña: ', v_sum_total, '.'); 
+   	INSERT INTO t_audit_check_data (fid, criticity, error_message) 
+	SELECT v_fid, 2, CONCAT('Km de red hechos: ', v_sum, ' (Aquellos que han sido insertados o revisados. No se tienen en cuenta los eliminados).'); 
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) 
+	SELECT v_fid, 2, CONCAT('Km de red en el inicio de la campaña: ', v_sum_total, ' (Aquellos que había al inicio de la campaña, su identificador es positivo).'); 
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) SELECT v_fid, 1, '';
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) SELECT v_fid, 1, concat('En km de red, el progreso de la campaña ', v_campaign_id, ' es del ', v_sum_result, ' %.');
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) 
+	SELECT v_fid, 1, concat('El progreso de la campaña ', v_campaign_id, ' es del ', v_sum_result, ' %.');
+
+
+	-- calculate percentage of executed nodes
+	execute 'select count(*) from cm.om_campaign_lot_x_node a join cm.om_campaign_lot b using (lot_id)
+	join cm.om_campaign_x_node c using (node_id) where b.campaign_id = '||v_campaign_id||' and "action" <> 3 and a.status = 3' into v_count_done;
+	
+	execute 'select count(*) from cm.om_campaign_lot_x_node a join cm.om_campaign_lot b using (lot_id)
+	join cm.om_campaign_x_node c using (node_id) where b.campaign_id = '||v_campaign_id||' and "action" <> 3 and a.status in (1,2,4)' into v_count_to_do;
+	
+	v_count_result = round((v_count_done::numeric / (v_count_done + v_count_to_do)) * 100, 2);
+	
+	-- Report results
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) SELECT v_fid, 1, '';
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) 
+	SELECT v_fid, 2, CONCAT('Nodos hechos: ', v_count_done, '.'); 
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) 
+	SELECT v_fid, 2, CONCAT('Nodos pendientes: ', v_count_to_do, ' (Aquellos con estado pendiente o para repetir).'); 
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) SELECT v_fid, 1, '';
+	INSERT INTO t_audit_check_data (fid, criticity, error_message) 
+	SELECT v_fid, 1, concat('El progreso de la campaña ', v_campaign_id, ' es del ', v_count_result, ' % en relación con los nodos.');
 
 
    	-- Return results
