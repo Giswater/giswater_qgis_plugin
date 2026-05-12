@@ -117,6 +117,13 @@ BEGIN
         CREATE INDEX IF NOT EXISTS temp_pgr_connec_pgr_arc_id_idx ON temp_pgr_connec USING btree (pgr_arc_id);
         CREATE INDEX IF NOT EXISTS temp_pgr_connec_mapzone_id_idx ON temp_pgr_connec USING btree (mapzone_id);
 
+        CREATE TEMP TABLE IF NOT EXISTS temp_pgr_element (
+            pgr_element_id INTEGER NOT NULL,
+            mapzone_id INTEGER DEFAULT 0,
+            CONSTRAINT temp_pgr_element_pkey PRIMARY KEY (pgr_element_id)
+        );
+        CREATE INDEX IF NOT EXISTS temp_pgr_element_mapzone_id_idx ON temp_pgr_element USING btree (mapzone_id);
+
         IF v_project_type = 'UD' THEN
             CREATE TEMP TABLE IF NOT EXISTS temp_pgr_gully (
                 pgr_gully_id INTEGER NOT NULL,
@@ -173,7 +180,7 @@ BEGIN
         );
         CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_component_idx ON temp_pgr_connectedcomponents USING btree (component);
         CREATE INDEX IF NOT EXISTS temp_pgr_connectedcomponents_node_idx ON temp_pgr_connectedcomponents USING btree (node);
-        
+
         -- Create temporary tables depending on the project type
         IF v_fct_type = 'MAPZONE' THEN
 
@@ -188,7 +195,7 @@ BEGIN
             CREATE INDEX IF NOT EXISTS idx_temp_pgr_graphconfig_mapzone_id ON temp_pgr_graphconfig USING btree (mapzone_id);
             CREATE INDEX IF NOT EXISTS idx_temp_pgr_graphconfig_pgr_node_id ON temp_pgr_graphconfig USING btree (pgr_node_id);
             CREATE INDEX IF NOT EXISTS idx_temp_pgr_graphconfig_pgr_arc_id ON temp_pgr_graphconfig USING btree (pgr_arc_id);
-            
+
             EXECUTE format(
                 'CREATE TEMP TABLE IF NOT EXISTS temp_pgr_mapzone (LIKE %I.%I INCLUDING ALL)',
                 'SCHEMA_NAME',
@@ -207,11 +214,11 @@ BEGIN
             CREATE INDEX IF NOT EXISTS temp_pgr_mapzone_mapzone_id_idx ON temp_pgr_mapzone USING btree (mapzone_id);
             ALTER TABLE temp_pgr_mapzone ALTER COLUMN expl_id SET DEFAULT ARRAY[0]::integer[];
             ALTER TABLE temp_pgr_mapzone ALTER COLUMN muni_id SET DEFAULT ARRAY[0]::integer[];
-            
+
             IF v_fct_name <> 'SECTOR' THEN
                 ALTER TABLE temp_pgr_mapzone ALTER COLUMN sector_id SET DEFAULT ARRAY[0]::integer[];
             END IF;
-            
+
 
             ALTER TABLE temp_pgr_node ADD COLUMN IF NOT EXISTS component INTEGER DEFAULT 0;
             CREATE INDEX IF NOT EXISTS temp_pgr_node_component_idx ON temp_pgr_node USING btree (component);
@@ -224,7 +231,7 @@ BEGIN
 
             ALTER TABLE temp_pgr_connec ADD COLUMN IF NOT EXISTS component INTEGER DEFAULT 0;
             CREATE INDEX IF NOT EXISTS temp_pgr_connec_component_idx ON temp_pgr_connec USING btree (component);
-            
+
             IF v_project_type = 'UD' THEN
                 ALTER TABLE temp_pgr_gully ADD COLUMN IF NOT EXISTS component INTEGER DEFAULT 0;
                 CREATE INDEX IF NOT EXISTS temp_pgr_gully_component_idx ON temp_pgr_gully USING btree (component);
@@ -251,8 +258,8 @@ BEGIN
 
             -- for specific functions
 
-            IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN  
-                
+            IF v_fct_name IN ('MINCUT', 'MINSECTOR') THEN
+
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_node_minsector (LIKE temp_pgr_node INCLUDING ALL);
 
                 ALTER TABLE temp_pgr_arc_linegraph ADD COLUMN IF NOT EXISTS adjacent_mincut_id INTEGER DEFAULT 0;
@@ -270,9 +277,9 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_minsector_mincut_valve (LIKE SCHEMA_NAME.minsector_mincut_valve INCLUDING ALL);
             END IF;
 
-        ELSE 
+        ELSE
             IF v_fct_name = 'DWFZONE' THEN
-               
+
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_drivingdistance_initoverflowpath (
                     seq INTEGER NOT NULL,
                     "depth" INTEGER NULL,
@@ -292,7 +299,7 @@ BEGIN
             IF v_fct_name = 'OMUNIT' THEN
                 ALTER TABLE temp_pgr_arc ADD COLUMN  IF NOT EXISTS macromapzone_id INTEGER DEFAULT 0;
                 CREATE INDEX IF NOT EXISTS temp_pgr_arc_macromapzone_id_idx ON temp_pgr_arc USING btree ("macromapzone_id");
-                
+
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_omunit (LIKE SCHEMA_NAME.omunit INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_pgr_macroomunit (LIKE SCHEMA_NAME.macroomunit INCLUDING ALL);
 
@@ -393,6 +400,21 @@ BEGIN
                 AND vst.is_operative = TRUE
                 AND e.active = TRUE;
             $sql$, v_mapzone_field);
+
+            -- in psector mode elements does not change.
+            EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_element AS
+                SELECT
+                    e.element_id,
+                    e.expl_id,
+                    e.the_geom
+                FROM element e
+                JOIN exploitation ex ON ex.expl_id = e.expl_id
+                JOIN value_state_type vst ON vst.id = e.state_type
+                WHERE e.state = 1
+                AND vst.is_operative = TRUE
+                AND ex.active = TRUE;
+            $sql$);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
@@ -563,6 +585,20 @@ BEGIN
             $sql$, v_mapzone_field);
 
             EXECUTE format($sql$
+                CREATE OR REPLACE TEMPORARY VIEW v_temp_element AS
+                SELECT
+                    e.element_id,
+                    e.expl_id,
+                    e.the_geom
+                FROM element e
+                JOIN exploitation ex ON ex.expl_id = e.expl_id
+                JOIN value_state_type vst ON vst.id = e.state_type
+                WHERE e.state = 1
+                AND vst.is_operative = TRUE
+                AND ex.active = TRUE;
+            $sql$);
+
+            EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
                 SELECT
                     l.link_id,
@@ -622,7 +658,7 @@ BEGIN
 
             END IF;
 
-        END IF; 
+        END IF;
 
         -- CHECKS - TODO
         -- =======================
@@ -644,6 +680,7 @@ BEGIN
         DROP VIEW IF EXISTS v_temp_node;
         DROP VIEW IF EXISTS v_temp_arc;
         DROP VIEW IF EXISTS v_temp_connec;
+        DROP VIEW IF EXISTS v_temp_element;
         DROP VIEW IF EXISTS v_temp_gully;
         DROP VIEW IF EXISTS v_temp_link_connec;
         DROP VIEW IF EXISTS v_temp_link_gully;
@@ -655,6 +692,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_pgr_node;
         DROP TABLE IF EXISTS temp_pgr_arc;
         DROP TABLE IF EXISTS temp_pgr_connec;
+        DROP TABLE IF EXISTS temp_pgr_element;
         DROP TABLE IF EXISTS temp_pgr_gully;
         DROP TABLE IF EXISTS temp_audit_check_data;
         DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
@@ -707,4 +745,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-

@@ -17,7 +17,7 @@ $BODY$
 /* Example usage:
 
 - temp_pgr_node and pgr_temp_arc - temporary table
-- v_temp_arc, v_temp_node, v_temp_connec, v_temp_gully, v_temp_link_connec, v_temp_link_gully 
+- v_temp_arc, v_temp_node, v_temp_connec, v_temp_gully, v_temp_link_connec, v_temp_link_gully
 are temporary views for active explotation and for is_operatiu = TRUE, with psectors or not, depending of usePlanPsector
 - Use the views for building temporary table;
 - Use the tables node, arc, connec, gully or link to get the_geom, are faster then the views
@@ -355,6 +355,74 @@ BEGIN
 		JOIN temp_pgr_arc a ON a.pgr_arc_id = g.arc_id;
 	END IF;
 
+	IF v_class = 'SECTOR' THEN
+		INSERT INTO temp_pgr_element (pgr_element_id)
+		SELECT element_id
+		FROM v_temp_element e
+		WHERE EXISTS (
+			SELECT 1
+			FROM element_x_arc exa
+			JOIN temp_pgr_arc a ON a.pgr_arc_id = exa.arc_id
+			WHERE exa.element_id = e.element_id
+		) ON CONFLICT DO NOTHING;
+
+		INSERT INTO temp_pgr_element (pgr_element_id)
+		SELECT element_id
+		FROM v_temp_element e
+		WHERE EXISTS (
+			SELECT 1
+			FROM element_x_node exn
+			JOIN temp_pgr_node n ON n.pgr_node_id = exn.node_id
+			WHERE exn.element_id = e.element_id
+		) ON CONFLICT DO NOTHING;
+
+		INSERT INTO temp_pgr_element (pgr_element_id)
+		SELECT element_id
+		FROM v_temp_element e
+		WHERE EXISTS (
+			SELECT 1
+			FROM element_x_connec exc
+			JOIN temp_pgr_connec c ON c.pgr_connec_id = exc.connec_id
+			WHERE exc.element_id = e.element_id
+		) ON CONFLICT DO NOTHING;
+
+		INSERT INTO temp_pgr_element (pgr_element_id)
+		SELECT element_id
+		FROM v_temp_element e
+		WHERE EXISTS (
+			SELECT 1
+			FROM element_x_link exl
+			JOIN link l ON l.link_id = exl.link_id
+			JOIN temp_pgr_connec c ON l.feature_id = c.pgr_connec_id
+			WHERE l.feature_type = 'CONNEC'
+			AND exl.element_id = e.element_id
+		) ON CONFLICT DO NOTHING;
+
+		IF v_project_type = 'UD' THEN
+    		INSERT INTO temp_pgr_element (pgr_element_id)
+    		SELECT element_id
+    		FROM v_temp_element e
+    		WHERE EXISTS (
+    			SELECT 1
+    			FROM element_x_gully exg
+    			JOIN temp_pgr_gully g ON g.pgr_gully_id = exg.gully_id
+    			WHERE exg.element_id = e.element_id
+    		) ON CONFLICT DO NOTHING;
+
+    		INSERT INTO temp_pgr_element (pgr_element_id)
+    		SELECT element_id
+    		FROM v_temp_element e
+    		WHERE EXISTS (
+    			SELECT 1
+    			FROM element_x_link exl
+    			JOIN link l ON l.link_id = exl.link_id
+    			JOIN temp_pgr_gully g ON l.feature_id = g.pgr_gully_id
+    			WHERE l.feature_type = 'GULLY'
+                AND exl.element_id = e.element_id
+    		) ON CONFLICT DO NOTHING;
+		END IF;
+	END IF;
+
 	EXECUTE format(
 		'INSERT INTO temp_pgr_old_mapzone (mapzone_id)
 		SELECT DISTINCT a.%I
@@ -378,13 +446,13 @@ BEGIN
 			)
 		$sql$, v_mapzone_table, v_mapzone_field, v_mapzone_field)
 		INTO v_mapzone_count;
-		
+
 		IF v_mapzone_count > 0 AND v_commit_changes = TRUE THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 	        "data":{"message":"4346", "function":"3508","parameters":{"mapzone_name":"'|| v_class ||'"}, "is_process":true}}$$)';
 		END IF;
 	END IF;
-	
+
 	-- CREATE MAPZONES
 	-- =======================
 
@@ -397,11 +465,11 @@ BEGIN
 		SET graph_delimiter = 'MINSECTOR'
 		FROM v_temp_node n
 		JOIN man_valve m ON n.node_id = m.node_id
-		WHERE 'MINSECTOR' = ANY (n.graph_delimiter) 
-		AND t.pgr_node_id = n.node_id; 
+		WHERE 'MINSECTOR' = ANY (n.graph_delimiter)
+		AND t.pgr_node_id = n.node_id;
 
 		-- MAPZONES (graphconfig)
-		IF v_from_zero THEN	
+		IF v_from_zero THEN
 
 			-- update graph_delimiter for nodeParent
 			UPDATE temp_pgr_node t
@@ -422,9 +490,9 @@ BEGIN
 			JOIN meter_pump_valve m ON m.node_id = n.pgr_node_id
 			WHERE n.graph_delimiter = 'nodeParent'
 			AND t.pgr_arc_id = m.to_arc
-			AND m.to_arc IS NOT NULL;	
+			AND m.to_arc IS NOT NULL;
 
-			-- set node_parent for arcs connected to graph_delimiter water_facility	
+			-- set node_parent for arcs connected to graph_delimiter water_facility
 			WITH water_facility AS (
 				SELECT node_id, inlet_arc FROM man_tank
 				UNION ALL SELECT node_id, inlet_arc FROM man_source
@@ -445,7 +513,7 @@ BEGIN
 					w.inlet_arc IS NULL
 					OR NOT (t.pgr_arc_id = ANY (w.inlet_arc))
 				)
-			);	
+			);
 
 			-- check if there are graph_delimiter nodes without at least one to_arc
 			SELECT count(*)
@@ -455,14 +523,14 @@ BEGIN
 			AND NOT EXISTS (
 				SELECT 1 FROM temp_pgr_arc a
 				WHERE a.node_parent = n.pgr_node_id
-			);		
+			);
 
 		ELSE -- v_from_zero
 
 			-- netscenario query
 			IF v_netscenario IS NOT NULL THEN
 				v_query_text_aux := ' AND netscenario_id = ' || v_netscenario;
-			ELSE 
+			ELSE
 				v_query_text_aux := '';
 			END IF;
 
@@ -580,11 +648,11 @@ BEGIN
 		UPDATE temp_pgr_arc t
         SET graph_delimiter = 'initoverflowpath'
         FROM arc v
-        WHERE v.arc_id = t.pgr_arc_id 
+        WHERE v.arc_id = t.pgr_arc_id
 		AND v.initoverflowpath;
 
 		-- MAPZONES (graphconfig)
-		IF v_from_zero THEN	
+		IF v_from_zero THEN
 			-- nodeParent
 			UPDATE temp_pgr_node t
 			SET graph_delimiter = 'nodeParent'
@@ -744,7 +812,7 @@ BEGIN
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
-			
+
 			-- Check if there are any nodes set in more than one mapzone - IN use, forceClosed or ignore
 			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
 			INTO message
@@ -791,8 +859,8 @@ BEGIN
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ',g.pgr_node_id,', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
 				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
-				WHERE g.graph_type = 'use' 
-				AND g.pgr_node_id NOT IN (a.node_1, a.node_2) 
+				WHERE g.graph_type = 'use'
+				AND g.pgr_node_id NOT IN (a.node_1, a.node_2)
 				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
 
@@ -808,8 +876,8 @@ BEGIN
 			FROM (
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
-				WHERE g.graph_type = 'use' 
-				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
+				WHERE g.graph_type = 'use'
+				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL)
 				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
 
@@ -819,22 +887,22 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			IF v_use_plan_psector = FALSE THEN 
+			IF v_use_plan_psector = FALSE THEN
 				-- Check if there are pump/meter/valve nodeParent where its to_arc is not the same as in its man_table
 				SELECT string_agg(sub.mapzone_arcs, '')
 				INTO message
 				FROM (
-					WITH 
+					WITH
 					meter_pump_valve AS (
 						SELECT node_id, to_arc FROM man_meter
-						UNION ALL 
+						UNION ALL
 						SELECT node_id, to_arc FROM man_pump
-						UNION ALL 
-						SELECT node_id, to_arc FROM man_valve		
+						UNION ALL
+						SELECT node_id, to_arc FROM man_valve
 					)
 					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 					FROM temp_pgr_graphconfig g
-					WHERE g.graph_type = 'use' 
+					WHERE g.graph_type = 'use'
 					AND EXISTS (
 						SELECT 1 FROM meter_pump_valve m
 						WHERE m.node_id = g.pgr_node_id
@@ -862,7 +930,7 @@ BEGIN
 					)
 					SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 					FROM temp_pgr_graphconfig g
-					WHERE g.graph_type = 'use' 
+					WHERE g.graph_type = 'use'
 					AND EXISTS (
 						SELECT 1 FROM inlet i
 						WHERE i.node_id = g.pgr_node_id
@@ -876,8 +944,8 @@ BEGIN
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4506", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 				END IF;
-				
-				-- check if there are arcs for nodeParents that are not toArc, neither inlet_arc 
+
+				-- check if there are arcs for nodeParents that are not toArc, neither inlet_arc
 				SELECT string_agg(sub.mapzone_arcs, '')
 				INTO message
 				FROM (
@@ -889,12 +957,12 @@ BEGIN
 						)
 					SELECT
 						concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', a.arc_id, ')\n') AS mapzone_arcs
-					FROM v_temp_node n 
+					FROM v_temp_node n
 					JOIN temp_pgr_graphconfig g ON g.pgr_node_id = n.node_id
 					JOIN v_temp_arc a ON n.node_id IN (a.node_1, a.node_2)
 					WHERE g.graph_type = 'use' -- nodeParent
 					AND EXISTS (
-						SELECT 1 
+						SELECT 1
 						FROM inlet i
 						WHERE i.node_id = n.node_id
 					)
@@ -913,7 +981,7 @@ BEGIN
 					)
 					ORDER BY g.mapzone_id,  g.pgr_node_id
 				) sub;
-				
+
 				IF message IS NOT NULL THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_checks_fid||'}}$$);';
 				ELSE
@@ -1006,15 +1074,15 @@ BEGIN
 			END IF;
 
 			/* TO DO ARNAU
-			
+
 			-- Check if nodeParent or toArc is null
 			SELECT string_agg(sub.mapzone_arcs, '')
 			INTO message
 			FROM (
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
-				WHERE g.graph_type = 'use' 
-				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL) 
+				WHERE g.graph_type = 'use'
+				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL)
 				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
 
@@ -1070,7 +1138,7 @@ BEGIN
 		) AS lg
 		WHERE lg.source <> lg.target;
 
-		-- PREPARE temp_pgr_arc_linegraph 
+		-- PREPARE temp_pgr_arc_linegraph
 		-- ==============================
 
 		IF v_project_type = 'WS' THEN
@@ -1103,28 +1171,28 @@ BEGIN
 			-- update aditional fields for valves (MINSECTOR)
 			-- valves from the network
 			UPDATE temp_pgr_arc_linegraph t
-			SET 
+			SET
 				closed = m.closed,
 				broken = m.broken,
 				to_arc = m.to_arc
 			FROM man_valve m
 			WHERE t.graph_delimiter = 'MINSECTOR'
-			AND t.pgr_node_id = m.node_id; 
+			AND t.pgr_node_id = m.node_id;
 
 			-- closed valves
-			UPDATE temp_pgr_arc_linegraph t 
+			UPDATE temp_pgr_arc_linegraph t
 			SET graph_delimiter = 'closedValve'
 			WHERE t.closed = TRUE;
 
 			-- check valves
-			UPDATE temp_pgr_arc_linegraph t 
+			UPDATE temp_pgr_arc_linegraph t
 			SET graph_delimiter = 'checkValve'
-			WHERE t.closed = FALSE 
+			WHERE t.closed = FALSE
 			AND t.broken = FALSE
 			AND t.to_arc IS NOT NULL;
 
 			-- open valves
-			UPDATE temp_pgr_arc_linegraph t 
+			UPDATE temp_pgr_arc_linegraph t
 			SET graph_delimiter = 'openValve'
 			WHERE t.graph_delimiter = 'MINSECTOR';
 
@@ -1132,7 +1200,7 @@ BEGIN
 			-- ======================================
 			IF v_netscenario IS NOT NULL THEN
 				-- closed valves
-				UPDATE temp_pgr_arc_linegraph t 
+				UPDATE temp_pgr_arc_linegraph t
 				SET graph_delimiter = 'netscenClosedValve',
 					closed = TRUE,
 					broken = FALSE
@@ -1168,13 +1236,13 @@ BEGIN
 
 			-- checkvalves
 			UPDATE temp_pgr_arc_linegraph t
-			SET 
+			SET
 				cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN 1 ELSE -1 END,
 				reverse_cost = CASE WHEN t.to_arc = t.pgr_node_2 THEN -1 ELSE 1 END
 			WHERE t.graph_delimiter = 'checkValve';
 
 			-- inlet arcs of water utilities behave as checkvalves
-			WITH 
+			WITH
 				water_facility AS (
 					SELECT node_id, inlet_arc FROM man_tank
 					UNION ALL SELECT node_id, inlet_arc FROM man_source
@@ -1182,10 +1250,10 @@ BEGIN
 					UNION ALL SELECT node_id, inlet_arc FROM man_wtp
 				)
 			UPDATE temp_pgr_arc_linegraph t
-			SET 
+			SET
 				cost = CASE WHEN t.pgr_node_2 = ANY (w.inlet_arc) THEN -1 ELSE 1 END,
 				reverse_cost = CASE WHEN t.pgr_node_1 = ANY (w.inlet_arc) THEN -1 ELSE 1 END
-			FROM water_facility w 
+			FROM water_facility w
 			WHERE t.graph_delimiter IN ('SECTOR', 'nodeParent')
 			AND t.pgr_node_id = w.node_id;
 
@@ -1200,7 +1268,7 @@ BEGIN
 			WHERE graph_delimiter = 'forceOpen';
 
 		ELSE -- v_project_type (UD)
-	
+
 			-- UPDATE pgr_node_id for nodes head of mapzones ('nodeParent')
 			--checking node_1 for arc_1
 			UPDATE temp_pgr_arc_linegraph t
@@ -1256,13 +1324,13 @@ BEGIN
 
 		v_pgr_distance := (SELECT count(*)::int FROM temp_pgr_arc_linegraph);
 
-		-- Compute to_arc and assign arc node_parent (v_missing_to_arc > 0) 
+		-- Compute to_arc and assign arc node_parent (v_missing_to_arc > 0)
 		-- =================================================================
 
 		IF v_project_type = 'WS' AND v_from_zero AND v_missing_to_arc > 0 THEN
 
 			-- root_vids = toArcs of the water facilities
-			WITH 
+			WITH
 				water_facility AS (
 					SELECT node_id, inlet_arc FROM man_tank
 					UNION ALL SELECT node_id, inlet_arc FROM man_source
@@ -1271,17 +1339,17 @@ BEGIN
 				)
 			SELECT array_agg(DISTINCT a.pgr_arc_id)::int[]
 			INTO v_pgr_root_vids
-			FROM temp_pgr_arc a 
+			FROM temp_pgr_arc a
 			JOIN temp_pgr_node n ON n.pgr_node_id IN  (a.pgr_node_1, a.pgr_node_2)
 			WHERE n.graph_delimiter IN ('SECTOR', 'nodeParent')
 			AND EXISTS (
-				SELECT 1 
-				FROM water_facility w 
+				SELECT 1
+				FROM water_facility w
 				WHERE w.node_id = n.pgr_node_id
 			);
 
 			v_query_text := format($sql$
-				WITH 
+				WITH
 				water_facility AS (
 					SELECT node_id FROM man_tank
 					UNION ALL SELECT node_id FROM man_source
@@ -1295,7 +1363,7 @@ BEGIN
 					a.cost,
 					a.reverse_cost
 				FROM temp_pgr_arc_linegraph a
-				WHERE a.pgr_node_id IS NULL 
+				WHERE a.pgr_node_id IS NULL
 				OR NOT EXISTS (
 					SELECT 1 FROM water_facility w
 					WHERE a.graph_delimiter IN ('SECTOR', 'nodeParent')
@@ -1310,8 +1378,8 @@ BEGIN
 				FROM pgr_drivingdistance(v_query_text, v_pgr_root_vids, v_pgr_distance)
 			);
 
-			-- set arc - node_parent for arcs without node_parent that exists in pgr_drivingdistance		
-			WITH 
+			-- set arc - node_parent for arcs without node_parent that exists in pgr_drivingdistance
+			WITH
 				best_dd AS (
 					SELECT DISTINCT ON (edge) edge, node
 					FROM temp_pgr_drivingdistance
@@ -1332,7 +1400,7 @@ BEGIN
 
 		END IF; -- v_missing_to_arc
 
-		-- FLOOD THE LINEGRAPH 
+		-- FLOOD THE LINEGRAPH
 		-- ====================
 
 		-- for WS - from source to target for UD - INVERTED FLOOD, from target to source
@@ -1391,7 +1459,7 @@ BEGIN
 			);
 		END IF;
 
-		-- group the mapzones; add connections between toArc(WS)/inletArc(UD) for pgr_root_vids 
+		-- group the mapzones; add connections between toArc(WS)/inletArc(UD) for pgr_root_vids
 		v_query_text := '
 			WITH edges AS (
 				SELECT
@@ -1442,7 +1510,7 @@ BEGIN
 		FROM temp_pgr_connectedcomponents c
 		WHERE c.node = t.pgr_arc_id;
 
-		-- update mapzone_ids, mapzone_id, name for temp_pgr_mapzone 
+		-- update mapzone_ids, mapzone_id, name for temp_pgr_mapzone
 		IF v_from_zero = TRUE THEN
 
 			IF v_commit_changes THEN
@@ -1471,7 +1539,7 @@ BEGIN
 			UPDATE temp_pgr_node t
 			SET mapzone_id = tn.mapzone_id
 			FROM (
-				SELECT 
+				SELECT
 					a.node_parent,
 					MIN(a.mapzone_id) AS mapzone_id
 				FROM temp_pgr_arc a
@@ -1485,7 +1553,7 @@ BEGIN
 			-- mapzone_id
 			UPDATE temp_pgr_mapzone m
 			SET mapzone_ids = c.mapzone_ids,
-				mapzone_id  = 
+				mapzone_id  =
 				CASE
 					WHEN cardinality(c.mapzone_ids) = 1 THEN c.mapzone_ids[1]
 					ELSE -1
@@ -1510,7 +1578,7 @@ BEGIN
 					$sql$,
 					v_mapzone_table,
 					v_mapzone_field
-				);				
+				);
 			END IF;
 
 			EXECUTE format($sql$
@@ -1555,12 +1623,12 @@ BEGIN
 			SELECT seq,component, node
 			FROM pgr_connectedComponents(v_query_text);
 
-			UPDATE temp_pgr_mapzone m 
+			UPDATE temp_pgr_mapzone m
 			SET drainzone_id = c.component
 			FROM temp_pgr_connectedcomponents c
 			WHERE m.component = c.node;
 
-			UPDATE temp_pgr_mapzone m 
+			UPDATE temp_pgr_mapzone m
 			SET drainzone_id = m.component
 			WHERE COALESCE(m.drainzone_id, 0) = 0;
 		END IF;
@@ -1570,15 +1638,15 @@ BEGIN
 		-- update mapzone_id for arcs
 		UPDATE temp_pgr_arc t
 		SET mapzone_id = m.mapzone_id
-		FROM temp_pgr_mapzone m 
+		FROM temp_pgr_mapzone m
 		WHERE m.component = t.component;
 
 		-- update mapzone_id for nodeParents if fromZero
-		IF v_from_zero THEN 
+		IF v_from_zero THEN
 			UPDATE temp_pgr_node t
 			SET mapzone_id = tn.mapzone_id
 			FROM (
-				SELECT 
+				SELECT
 					a.node_parent,
 					MIN(a.mapzone_id) AS mapzone_id
 				FROM temp_pgr_arc a
@@ -1591,23 +1659,23 @@ BEGIN
 
 		-- EXCEPTION
 		-- NodeParent self-conflict: the arcs toArc and the ones that are not have the same mapzone_id
-		-- set mapzone_id = -1 
-		
-		WITH 
+		-- set mapzone_id = -1
+
+		WITH
 			selfconflict AS (
 			SELECT DISTINCT l.pgr_node_id, n.mapzone_id
 			FROM temp_pgr_arc a
 			JOIN temp_pgr_arc_linegraph l ON a.pgr_arc_id IN (l.pgr_node_1, l.pgr_node_2)
 			JOIN temp_pgr_node n ON l.pgr_node_id = n.pgr_node_id
 			WHERE l.graph_delimiter = 'nodeParent'
-			AND a.mapzone_id > 0 
+			AND a.mapzone_id > 0
 			AND a.mapzone_id = n.mapzone_id
 			AND a.node_parent IS DISTINCT FROM l.pgr_node_id
 		)
 		UPDATE temp_pgr_mapzone m
 		SET mapzone_id = -1, name = 'SelfConflict'
 		WHERE EXISTS (
-			SELECT 1 
+			SELECT 1
 			FROM selfconflict s
 			WHERE s.mapzone_id = m.mapzone_id
 		);
@@ -1653,7 +1721,7 @@ BEGIN
 							ELSE t.component      -- keep existing (typically 0)
 						END
 		FROM (
-			SELECT 
+			SELECT
 				a.node_parent,
 				MIN (a.component) AS component,
 				MIN(a.mapzone_id) AS mapzone_id,
@@ -1667,18 +1735,61 @@ BEGIN
 
 		-- update connec
 		UPDATE temp_pgr_connec t
-		SET component = a.component, 
+		SET component = a.component,
 			mapzone_id = a.mapzone_id
-		FROM temp_pgr_arc a 
+		FROM temp_pgr_arc a
 		WHERE t.pgr_arc_id = a.pgr_arc_id;
 
 		IF v_project_type = 'UD' THEN
 			-- update gully
 			UPDATE temp_pgr_gully t
-			SET component = a.component, 
+			SET component = a.component,
 				mapzone_id = a.mapzone_id
-			FROM temp_pgr_arc a 
+			FROM temp_pgr_arc a
 			WHERE t.pgr_arc_id = a.pgr_arc_id;
+		END IF;
+
+		-- update elements
+		IF v_class = 'SECTOR' THEN
+			UPDATE temp_pgr_element t
+			SET mapzone_id = a.mapzone_id
+			FROM element_x_arc exa
+			JOIN temp_pgr_arc a ON a.pgr_arc_id = exa.arc_id
+			WHERE t.pgr_element_id = exa.element_id;
+
+			UPDATE temp_pgr_element t
+			SET mapzone_id = n.mapzone_id
+			FROM element_x_node exn
+			JOIN temp_pgr_node n ON n.pgr_node_id = exn.node_id
+			WHERE t.pgr_element_id = exn.element_id;
+
+			UPDATE temp_pgr_element t
+			SET mapzone_id = c.mapzone_id
+			FROM element_x_connec exc
+			JOIN temp_pgr_connec c ON c.pgr_connec_id = exc.connec_id
+			WHERE t.pgr_element_id = exc.element_id;
+
+			UPDATE temp_pgr_element t
+			SET mapzone_id = c.mapzone_id
+			FROM element_x_link exl
+			JOIN link l ON l.link_id = exl.link_id
+			JOIN temp_pgr_connec c ON l.feature_id = c.pgr_connec_id
+			WHERE t.pgr_element_id = exl.element_id;
+
+			IF v_project_type = 'UD' THEN
+				UPDATE temp_pgr_element t
+				SET mapzone_id = g.mapzone_id
+				FROM element_x_gully exg
+				JOIN temp_pgr_gully g ON g.pgr_gully_id = exg.gully_id
+				WHERE t.pgr_element_id = exg.element_id;
+
+				UPDATE temp_pgr_element t
+				SET mapzone_id = g.mapzone_id
+				FROM element_x_link exl
+				JOIN link l ON l.link_id = exl.link_id
+				JOIN temp_pgr_gully g ON l.feature_id = g.pgr_gully_id
+				WHERE t.pgr_element_id = exl.element_id;
+			END IF;
 		END IF;
 
 		-- CONFLICT COUNTS
@@ -1803,7 +1914,7 @@ BEGIN
 		IF v_from_zero = TRUE THEN
 
 			IF v_project_type = 'WS' THEN
-				
+
 				-- insert into temp_pgr_graphconfig
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
 				SELECT
@@ -1820,7 +1931,7 @@ BEGIN
 				SELECT DISTINCT ON (n.pgr_node_id)
 					m.mapzone_ids[1] AS mapzone_id,
 					'forceClosed' AS graph_type,
-					n.pgr_node_id		
+					n.pgr_node_id
 				FROM temp_pgr_node n
 				JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 				JOIN temp_pgr_mapzone m ON a.component = m.component
@@ -1832,7 +1943,7 @@ BEGIN
 				SELECT
 					m.mapzone_ids[1] AS mapzone_id,
 					'forceOpen' AS graph_type,
-					n.pgr_node_id		
+					n.pgr_node_id
 				FROM temp_pgr_node n
 				JOIN temp_pgr_mapzone m ON n.component = m.component
 				WHERE n.graph_delimiter = 'forceOpen'
@@ -1918,19 +2029,19 @@ BEGIN
 				AND a.mapzone_id > 0;
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
-				SELECT 
+				SELECT
 					a.mapzone_id,
 					'forceClosed' AS graph_type,
-					a.pgr_arc_id AS pgr_arc_id	
+					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
 				WHERE a.graph_delimiter = 'forceClosed'
 				AND a.mapzone_id > 0;
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
-				SELECT 
+				SELECT
 					a.mapzone_id,
 					'forceOpen' AS graph_type,
-					a.pgr_arc_id AS pgr_arc_id			
+					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
 				WHERE a.graph_delimiter = 'forceOpen'
 				AND a.mapzone_id > 0;
@@ -1954,7 +2065,7 @@ BEGIN
 						SELECT DISTINCT
 							mapzone_id,
 							pgr_node_id
-						FROM temp_pgr_graphconfig 
+						FROM temp_pgr_graphconfig
 						WHERE graph_type = 'use'
 					) g
 					GROUP BY g.mapzone_id
@@ -1972,7 +2083,7 @@ BEGIN
 				SELECT
 					mapzone_id,
 					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS forceclosed_json
-				FROM temp_pgr_graphconfig 
+				FROM temp_pgr_graphconfig
 				WHERE graph_type = 'forceClosed'
 				GROUP BY mapzone_id
 				) t
@@ -1989,14 +2100,14 @@ BEGIN
 				SELECT
 					mapzone_id,
 					json_agg(pgr_arc_id ORDER BY pgr_arc_id) AS ignore_json
-				FROM temp_pgr_graphconfig 
+				FROM temp_pgr_graphconfig
 				WHERE graph_type = 'forceOpen'
 				GROUP BY mapzone_id
 				) t
 				WHERE mz.mapzone_id = t.mapzone_id;
 
 			END IF; -- v_project_type
-		
+
 		END IF; -- v_from_zero
 
 		IF v_commit_changes IS TRUE THEN
@@ -2155,7 +2266,7 @@ BEGIN
 				ta.mapzone_id,
 				array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_ids
 			FROM temp_pgr_arc ta
-			JOIN arc a ON a.arc_id = ta.pgr_arc_id 
+			JOIN arc a ON a.arc_id = ta.pgr_arc_id
 			WHERE ta.mapzone_id > 0
 			GROUP BY ta.mapzone_id
 			) s
@@ -2208,13 +2319,13 @@ BEGIN
 			WHERE s.mapzone_id = m.mapzone_id;
 
 			-- UPDATE mapzone_graph
-			IF v_project_type = 'WS' AND v_netscenario IS NULL THEN 
+			IF v_project_type = 'WS' AND v_netscenario IS NULL THEN
 				-- TODO
 			END IF;
 
 			-- UPDATE TABLES
 			-- ======================
-			
+
 			-- mapzone
 			IF v_from_zero = TRUE THEN
 				-- insert the new mapzones
@@ -2312,32 +2423,32 @@ BEGIN
 					WHERE m.%I = t.mapzone_id
 					$sql$
 				, v_mapzone_table, v_mapzone_field);
-			
-			ELSE 
+
+			ELSE
 				-- Synchronize selector_sector with the sectors that match muni_id and expl_id
 				DELETE FROM selector_sector ss
 				WHERE NOT EXISTS (
-					SELECT 1 
+					SELECT 1
 					FROM sector s
 					JOIN selector_municipality sm ON sm.muni_id = ANY(s.muni_id)
 					WHERE s.active
 						AND EXISTS (
 							SELECT 1
-							FROM selector_expl se 
+							FROM selector_expl se
 							WHERE se.expl_id = ANY(s.expl_id) AND se.cur_user = sm.cur_user
 						)
 						AND ss.sector_id = s.sector_id
 						AND ss.cur_user = sm.cur_user
 				);
-				
+
 				INSERT INTO selector_sector (sector_id, cur_user)
 				SELECT DISTINCT s.sector_id, sm.cur_user
 				FROM sector s
 				JOIN selector_municipality sm ON sm.muni_id = ANY(s.muni_id)
 				WHERE s.active
 				AND EXISTS (
-					SELECT 1 
-					FROM selector_expl se 
+					SELECT 1
+					FROM selector_expl se
 					WHERE se.expl_id = ANY(s.expl_id) AND se.cur_user = sm.cur_user
 				)
 				AND NOT EXISTS (
@@ -2392,9 +2503,9 @@ BEGIN
 					FROM temp_pgr_node t
 					JOIN node n ON n.node_id = t.pgr_node_id
 					WHERE EXISTS (
-						SELECT 1 
-						FROM temp_pgr_arc ta 
-						WHERE ta.mapzone_id > 0 
+						SELECT 1
+						FROM temp_pgr_arc ta
+						WHERE ta.mapzone_id > 0
 						AND t.pgr_node_id IN (ta.pgr_node_1, ta.pgr_node_2)
 					)
 					$sql$
@@ -2449,8 +2560,8 @@ BEGIN
 							pc.connec_id,
 							CASE
 								WHEN pc.%I > 0 THEN
-								(p.head 
-								- c.top_elev 
+								(p.head
+								- c.top_elev
 								+ COALESCE(c.depth, 0)
 								)::numeric(12,3)
 								ELSE NULL
@@ -2503,6 +2614,106 @@ BEGIN
 					AND n.%I IS DISTINCT FROM tn.mapzone_id
 					$sql$
 				, v_mapzone_field, v_mapzone_field);
+
+				IF v_class = 'SECTOR' THEN
+    				UPDATE element e
+    				SET sector_id = te.mapzone_id
+    				FROM temp_pgr_element te
+    				WHERE e.element_id = te.pgr_element_id
+    				    AND e.sector_id IS DISTINCT FROM te.mapzone_id;
+				
+	                INSERT INTO node_x_sector_visibility (node_id, sector_id)
+					SELECT n.pgr_node_id, a.mapzone_id
+                    FROM temp_pgr_node n
+                    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
+                    WHERE n.graph_delimiter <> 'NONE'
+                    AND n.mapzone_id = 0
+                    AND a.mapzone_id > 0
+                    ON CONFLICT DO NOTHING;
+
+	                INSERT INTO node_x_sector_visibility (node_id, sector_id)
+					SELECT n.pgr_node_id, a.mapzone_id
+					FROM temp_pgr_node n
+                    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
+                    WHERE n.graph_delimiter = 'nodeParent'
+                    AND n.mapzone_id > 0
+                    AND a.mapzone_id > 0
+                    AND a.mapzone_id <> n.mapzone_id
+                    ON CONFLICT DO NOTHING;
+
+                    DELETE FROM node_x_sector_visibility nxsv
+                    WHERE NOT EXISTS (
+                        SELECT 1
+                        FROM temp_pgr_node n
+                        JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
+                        WHERE n.graph_delimiter <> 'NONE'
+                        AND nxsv.node_id = n.pgr_node_id
+                        AND nxsv.sector_id = a.mapzone_id
+                    );
+
+					v_query_text_aux := '';
+					IF v_project_type = 'UD' THEN
+						v_query_text_aux := format($sql$
+							SELECT exg.element_id, exg.gully_id AS feature_id, tg.mapzone_id
+							FROM element_x_gully exg
+							JOIN temp_pgr_element te ON te.pgr_element_id = exg.element_id
+							JOIN temp_pgr_gully tg ON tg.pgr_gully_id = exg.gully_id
+							UNION ALL
+							SELECT exl.element_id, exl.link_id AS feature_id, te.mapzone_id
+							FROM element_x_link exl
+							JOIN temp_pgr_element te ON te.pgr_element_id = exl.element_id
+							JOIN link l ON l.link_id = exl.link_id
+							JOIN temp_pgr_gully tg ON l.feature_id = tg.pgr_gully_id
+							WHERE l.feature_type = 'GULLY'
+						$sql$
+						);
+					END IF;
+
+					v_query_text := format($sql$
+						SELECT exa.element_id, exa.arc_id AS feature_id, ta.mapzone_id
+						FROM element_x_arc exa
+						JOIN temp_pgr_element te ON te.pgr_element_id = exa.element_id
+						JOIN temp_pgr_arc ta ON ta.pgr_arc_id = exa.arc_id
+						UNION ALL
+						SELECT exn.element_id, exn.node_id AS feature_id, tn.mapzone_id
+						FROM element_x_node exn
+						JOIN temp_pgr_element te ON te.pgr_element_id = exn.element_id
+						JOIN temp_pgr_node tn ON tn.pgr_node_id = exn.node_id
+						UNION ALL
+						SELECT exc.element_id, exc.connec_id AS feature_id, tc.mapzone_id
+						FROM element_x_connec exc
+						JOIN temp_pgr_element te ON te.pgr_element_id = exc.element_id
+						JOIN temp_pgr_connec tc ON tc.pgr_connec_id = exc.connec_id
+						UNION ALL
+						SELECT exl.element_id, exl.link_id AS feature_id, te.mapzone_id
+						FROM element_x_link exl
+						JOIN temp_pgr_element te ON te.pgr_element_id = exl.element_id
+						JOIN link l ON l.link_id = exl.link_id
+						JOIN temp_pgr_connec tc ON l.feature_id = tc.pgr_connec_id
+						WHERE l.feature_type = 'CONNEC'
+						%s
+					$sql$, v_query_text_aux);
+
+					EXECUTE format($sql$
+						INSERT INTO element_x_sector_visibility (element_id, sector_id)
+						SELECT t.element_id, t.mapzone_id FROM (
+							%s
+						) t
+						JOIN temp_pgr_element te ON te.pgr_element_id = t.element_id
+						WHERE te.mapzone_id <> t.mapzone_id
+						ON CONFLICT DO NOTHING;
+					$sql$, v_query_text);
+
+					EXECUTE format($sql$
+						DELETE FROM element_x_sector_visibility exsv
+						WHERE NOT EXISTS (
+							SELECT 1
+							FROM (%s) t
+							WHERE t.element_id = exsv.element_id
+							AND t.mapzone_id = exsv.sector_id
+						)
+					$sql$, v_query_text);
+				END IF;
 
 				-- connec
 				EXECUTE format($sql$
@@ -2575,6 +2786,33 @@ BEGIN
 						$sql$
 					, v_mapzone_field, v_query_text_aux, v_mapzone_field, v_mapzone_field);
 
+					IF v_class = 'SECTOR' THEN
+						UPDATE element e
+						SET sector_id = 0
+						WHERE exists (
+							SELECT 1 FROM temp_pgr_old_mapzone tm WHERE tm.mapzone_id = e.sector_id
+						)
+						AND NOT EXISTS (
+							SELECT 1 FROM temp_pgr_element te WHERE te.pgr_element_id = e.element_id
+						);
+
+    					DELETE FROM node_x_sector_visibility nxsv
+                        WHERE EXISTS (
+							SELECT 1 FROM temp_pgr_old_mapzone tm WHERE tm.mapzone_id = nxsv.sector_id
+						)
+						AND NOT EXISTS (
+							SELECT 1 FROM temp_pgr_node tn WHERE tn.pgr_node_id = nxsv.node_id
+						);
+
+						DELETE FROM element_x_sector_visibility exsv
+						WHERE EXISTS (
+							SELECT 1 FROM temp_pgr_old_mapzone tm WHERE tm.mapzone_id = exsv.sector_id
+						)
+						AND NOT EXISTS (
+							SELECT 1 FROM temp_pgr_element te WHERE te.pgr_element_id = exsv.element_id
+						);
+					END IF;
+
 					EXECUTE format($sql$
 						UPDATE connec c
 						SET %I = 0
@@ -2606,8 +2844,8 @@ BEGIN
 							)
 							AND g.%I IS DISTINCT FROM 0
 							$sql$
-						, v_mapzone_field, v_query_text_aux, v_mapzone_field, v_mapzone_field);			
-					END IF; 
+						, v_mapzone_field, v_query_text_aux, v_mapzone_field, v_mapzone_field);
+					END IF;
 
 					-- arcs, links
 					IF v_class = 'PRESSZONE' THEN
@@ -2662,14 +2900,14 @@ BEGIN
 								AND l.%I IS DISTINCT FROM 0
 							$sql$
 						, v_mapzone_field, v_query_text_aux, v_mapzone_field, v_mapzone_field);
-					END IF; 
+					END IF;
 
 				END IF; -- exists in temp_pgr_old_mapzone
 
 				-- -- Mapzone-specific updates
 				-- ==============================
 
-				IF v_project_type = 'WS' THEN 
+				IF v_project_type = 'WS' THEN
 
 					-- update to_arc for METER, PUMP if to_arc IS NULL
 					UPDATE man_meter m
@@ -2717,7 +2955,7 @@ BEGIN
 						WHERE cc.connec_id = t.connec_id
 						AND cc.staticpressure IS DISTINCT FROM t.staticpressure;
 
-						-- arc 
+						-- arc
 						UPDATE arc aa
 						SET staticpressure1 = t.staticpressure1,
 							staticpressure2 = t.staticpressure2
@@ -2760,21 +2998,21 @@ BEGIN
 
 					ELSIF v_class = 'DMA' THEN
 
-						
+
 
 						-- todo work in progress
-						/* 
+						/*
 						FOR rec IN SELECT DISTINCT expl_id FROM v_temp_arc
 						LOOP
-							
+
 							EXECUTE 'SELECT gw_fct_getdmagraph($${"client":{"device":4, "infoType":1, "lang":"ES"},
 							"feature":{},"data":{"parameters":{"explId":"'||rec.expl_id||'", "searchDistRouting":999}}}$$)';
-							
+
 						END LOOP;
 						*/
-						
+
 					END IF; -- v_class
-					
+
 				ELSE -- v_project_type (UD)
 
 					-- dwfzone, drainzone
@@ -2905,13 +3143,13 @@ BEGIN
 
 			RAISE NOTICE 'Filling temp_pgr_mapzone_graph ';
 
-			-- it's SELECT DISTINCT in case the graph_delimiter is a source with 2 toArc with the same DMA 
+			-- it's SELECT DISTINCT in case the graph_delimiter is a source with 2 toArc with the same DMA
 			-- restriction unicity: mapzone_id, node_id
 			INSERT INTO temp_pgr_mapzone_graph (node_id, netscenario_id, mapzone_id, mapzone_type, flow_sign)
 			SELECT DISTINCT n.pgr_node_id, v_netscenario, a.mapzone_id, v_class,
 			CASE WHEN a.node_parent IS NOT NULL THEN 1
 			ELSE -1
-			END 
+			END
 			FROM temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
 			WHERE n.graph_delimiter = 'nodeParent'
@@ -2953,7 +3191,7 @@ BEGIN
 	END IF;
 
 	INSERT INTO temp_audit_check_data (fid,  criticity, error_message)
-	SELECT v_fid, criticity, error_message 
+	SELECT v_fid, criticity, error_message
 	FROM t_audit_check_data
 	where fid = v_fid or fid = v_checks_fid;
 
@@ -2966,9 +3204,9 @@ BEGIN
 	-- Get Info for the audit
 	SELECT json_agg(row_to_json(t)) INTO v_result
 	FROM (
-		SELECT id, error_message AS message 
-		FROM temp_audit_check_data 
-		WHERE cur_user = current_user AND fid = v_fid 
+		SELECT id, error_message AS message
+		FROM temp_audit_check_data
+		WHERE cur_user = current_user AND fid = v_fid
 		ORDER BY criticity DESC, id ASC
 	) t;
 	v_result := COALESCE(v_result, '{}');
@@ -2994,8 +3232,8 @@ BEGIN
 				'properties', to_jsonb(r) - 'the_geom'
 				) AS feature
 				FROM (
-				SELECT  
-					n.node_id AS feature_id, 
+				SELECT
+					n.node_id AS feature_id,
 					tn.graph_delimiter AS graph_type,
 					tn.mapzone_id AS %I,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
@@ -3013,26 +3251,26 @@ BEGIN
 						'netscenOpenedValve'
 					)
 				UNION ALL
-				SELECT 
-					a.arc_id AS feature_id, 
+				SELECT
+					a.arc_id AS feature_id,
 					'toArc' AS graph_type,
 					ta.mapzone_id AS %I,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
-					CASE WHEN ta.pgr_node_1 = ta.node_parent THEN 
+					CASE WHEN ta.pgr_node_1 = ta.node_parent THEN
 						ST_StartPoint(a.the_geom)
-					ELSE 
-						ST_EndPoint (a.the_geom) 
+					ELSE
+						ST_EndPoint (a.the_geom)
 					END AS the_geom,
 					CASE WHEN ta.pgr_node_1 = ta.node_parent  THEN
 						st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28
 					ELSE
 						st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.99), st_lineinterpolatepoint(a.the_geom, 0.98))*400/6.28
 					END AS rotation
-				FROM temp_pgr_arc ta 
+				FROM temp_pgr_arc ta
 				JOIN arc a ON ta.pgr_arc_id = a.arc_id
 				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
 				AND ta.node_parent IS NOT NULL
-				
+
 				) r
 			) f
 			$sql$, v_mapzone_field, v_mapzone_field
@@ -3053,8 +3291,8 @@ BEGIN
 				'properties', to_jsonb(r) - 'the_geom'
 				) AS feature
 				FROM (
-				SELECT  
-					n.node_id AS feature_id, 
+				SELECT
+					n.node_id AS feature_id,
 					tn.graph_delimiter AS graph_type,
 					tn.mapzone_id AS %I,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
@@ -3064,42 +3302,42 @@ BEGIN
 					JOIN node n ON n.node_id = tn.pgr_node_id
 					JOIN temp_pgr_mapzone mz ON mz.component = tn.component
 					WHERE tn.graph_delimiter = 'nodeParent'
-				UNION ALL 
-				SELECT 
-					a.arc_id AS feature_id, 
+				UNION ALL
+				SELECT
+					a.arc_id AS feature_id,
 					'toArc' AS graph_type,
 					ta.mapzone_id AS %I,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
 					ST_EndPoint (a.the_geom) AS the_geom,
 					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.99), st_lineinterpolatepoint(a.the_geom, 0.98))*400/6.28 AS rotation
-				FROM temp_pgr_arc ta 
+				FROM temp_pgr_arc ta
 				JOIN arc a ON ta.pgr_arc_id = a.arc_id
 				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
 				AND ta.node_parent IS NOT NULL
-				UNION ALL 
-				SELECT 
-					a.arc_id AS feature_id, 
+				UNION ALL
+				SELECT
+					a.arc_id AS feature_id,
 					ta.graph_delimiter AS graph_type,
 					ta.mapzone_id AS %I,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
 					ST_StartPoint (a.the_geom) AS the_geom,
 					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28 AS rotation
-				FROM temp_pgr_arc ta 
+				FROM temp_pgr_arc ta
 				JOIN arc a ON ta.pgr_arc_id = a.arc_id
 				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
 				AND ta.graph_delimiter = 'initoverflopath'
-				UNION ALL 
-				SELECT 
-					a.arc_id AS feature_id, 
+				UNION ALL
+				SELECT
+					a.arc_id AS feature_id,
 					ta.graph_delimiter AS graph_type,
 					ta.mapzone_id AS %I,
 					mz.name || '(' || array_to_string(mz.mapzone_ids, ',') || ')' AS name,
 					ST_StartPoint (a.the_geom) AS the_geom,
 					st_azimuth(st_lineinterpolatepoint(a.the_geom, 0.01), st_lineinterpolatepoint(a.the_geom, 0.02))*400/6.28 AS rotation
-				FROM temp_pgr_arc ta 
+				FROM temp_pgr_arc ta
 				JOIN arc a ON ta.pgr_arc_id = a.arc_id
 				JOIN temp_pgr_mapzone mz ON mz.component = ta.component
-				AND ta.graph_delimiter IN ('forceClosed', 'forceOpen') 
+				AND ta.graph_delimiter IN ('forceClosed', 'forceOpen')
 				) r
 			) f
 			$sql$, v_mapzone_field, v_mapzone_field, v_mapzone_field, v_mapzone_field
@@ -3187,7 +3425,7 @@ BEGIN
 			%s
 			) r
 		) f
-		$sql$, 
+		$sql$,
 		v_mapzone_field, v_mapzone_field, 'old_' || v_mapzone_field, v_query_text_aux
 	) INTO v_result;
 
@@ -3328,7 +3566,7 @@ BEGIN
 	v_result_point := jsonb_build_array(
 		v_result_graphconfig,
 		v_result_point_valid,
-		v_result_point_invalid	
+		v_result_point_invalid
 	)::json;
 
 	-- drop temp tables
@@ -3349,18 +3587,18 @@ BEGIN
 
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
-		"status":"'||v_status||'", 
+		"status":"'||v_status||'",
 		"message":{
-			"level":'||v_level||', 
+			"level":'||v_level||',
 			"text":"'||v_message||'"
-		}, 
+		},
 		"version":"'||v_version||'",
 		"body":{
-			"form":{}, 
+			"form":{},
 			"data":{
-				"graphClass": "'||v_class||'", 
-				"netscenarioId": "'||v_netscenario::text||'", 
-				"hasConflicts": '||v_has_conflicts||', 
+				"graphClass": "'||v_class||'",
+				"netscenarioId": "'||v_netscenario::text||'",
+				"hasConflicts": '||v_has_conflicts||',
 				"info":'||v_result_info||',
 				"point":'||v_result_point||',
 				"line":'||v_result_line||'
