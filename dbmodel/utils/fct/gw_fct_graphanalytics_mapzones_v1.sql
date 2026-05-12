@@ -2685,23 +2685,14 @@ BEGIN
     				WHERE e.element_id = te.pgr_element_id
     				    AND e.sector_id IS DISTINCT FROM te.mapzone_id;
 
+					-- node_x_sector_visibility for borders (nodes for ws, arcs for ud) and for the Heads of the mapzones
 	                INSERT INTO node_x_sector_visibility (node_id, sector_id)
 					SELECT n.pgr_node_id, a.mapzone_id
                     FROM temp_pgr_node n
                     JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
-                    WHERE n.graph_delimiter <> 'NONE'
-                    AND n.mapzone_id = 0
+                    WHERE n.mapzone_id >= 0
                     AND a.mapzone_id > 0
-                    ON CONFLICT DO NOTHING;
-
-	                INSERT INTO node_x_sector_visibility (node_id, sector_id)
-					SELECT n.pgr_node_id, a.mapzone_id
-					FROM temp_pgr_node n
-                    JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
-                    WHERE n.graph_delimiter = 'nodeParent'
-                    AND n.mapzone_id > 0
-                    AND a.mapzone_id > 0
-                    AND a.mapzone_id <> n.mapzone_id
+					AND a.mapzone_id <> n.mapzone_id
                     ON CONFLICT DO NOTHING;
 
                     DELETE FROM node_x_sector_visibility nxsv
@@ -2709,8 +2700,7 @@ BEGIN
                         SELECT 1
                         FROM temp_pgr_node n
                         JOIN temp_pgr_arc a ON n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2
-                        WHERE n.graph_delimiter <> 'NONE'
-                        AND nxsv.node_id = n.pgr_node_id
+                        WHERE nxsv.node_id = n.pgr_node_id
                         AND nxsv.sector_id = a.mapzone_id
                     );
 
