@@ -2404,7 +2404,8 @@ BEGIN
 				FROM (
 					SELECT mapzone_id,
 						drainzone_id,
-						max(CARDINALITY(mapzone_ids)) over(PARTITION BY drainzone_id) AS max_dwfzones
+						max(CARDINALITY(mapzone_ids)) over(PARTITION BY drainzone_id) AS max_dwfzones,
+						mapzone_ids
 					FROM temp_pgr_mapzone
 				) m
 				WHERE d.dwfzone_id = ANY(m.mapzone_ids);
@@ -2683,7 +2684,7 @@ BEGIN
     				FROM temp_pgr_element te
     				WHERE e.element_id = te.pgr_element_id
     				    AND e.sector_id IS DISTINCT FROM te.mapzone_id;
-				
+
 	                INSERT INTO node_x_sector_visibility (node_id, sector_id)
 					SELECT n.pgr_node_id, a.mapzone_id
                     FROM temp_pgr_node n
@@ -3081,7 +3082,7 @@ BEGIN
 					IF v_class = 'DWFZONE' THEN
 
 						-- update dwfzone_outfall (in one querry are updated DISCONNECTED and CONFLICT too - o.dwfzone_outfall = NULL)
-						
+
 						WITH outfalls AS (
 							SELECT
 								d.node AS pgr_arc_id,
@@ -3247,9 +3248,9 @@ BEGIN
 			IF v_class = 'DWFZONE' THEN
 				WITH
 					temp_dwfzone AS (
-						SELECT d.dwfzone_id, d.drainzone_id, d.the_geom, expl_id, muni_id, sector_id
+						SELECT d.dwfzone_id, d.drainzone_id, d.the_geom, d.expl_id, d.muni_id, d.sector_id
 						FROM temp_pgr_mapzone m
-						JOIN dwfzone d ON d.dwfzone_id = m.mapzone_id[1]
+						JOIN dwfzone d ON d.dwfzone_id = m.mapzone_ids[1]
 						WHERE d.drainzone_id > 0
 					),
 					geom AS (
@@ -3292,7 +3293,7 @@ BEGIN
 				WHERE d.drainzone_id = g.drainzone_id;
 			ELSE
 				IF v_recalculate_macromapzones THEN
-					
+					-- TODO: recalculate macromapzones
 				END IF;
 			END IF;
 
