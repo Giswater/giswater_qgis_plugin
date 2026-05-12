@@ -73,6 +73,7 @@ DECLARE
 	v_use_plan_psector boolean;
 	v_commit_changes boolean;
 	v_netscenario integer;
+	v_recalculate_macromapzones boolean;
 	v_reverse_cost INTEGER;
 	v_reverse_cost_new_arcs INTEGER;
 
@@ -151,6 +152,7 @@ BEGIN
 	v_use_plan_psector := p_data->'data'->'parameters'->>'usePlanPsector';
 	v_commit_changes := p_data->'data'->'parameters'->>'commitChanges';
 	v_netscenario := p_data->'data'->'parameters'->>'netscenario';
+	v_recalculate_macromapzones := p_data->'data'->'parameters'->>'recalculateMacromapzones';
 
 	-- fromZero: sent as text "true"/"false" by client; default FALSE when absent (keeps v1 behavior)
 	v_from_zero := COALESCE(
@@ -2354,6 +2356,66 @@ BEGIN
 				, v_mapzone_table, v_mapzone_field);
 			END IF;
 
+
+			IF v_class = 'DWFZONE' THEN
+				INSERT INTO drainzone (drainzone_id, code, name, created_at, created_by)
+				SELECT m.drainzone_id, m.drainzone_id, concat('drainzone',m.drainzone_id), now(), current_user
+				FROM temp_pgr_mapzone m
+				GROUP BY m.drainzone_id
+				HAVING max(CARDINALITY(m.mapzone_ids)) = 1
+				AND NOT EXISTS (SELECT 1 FROM drainzone d WHERE d.drainzone_id = m.drainzone_id);
+
+				-- clear geometries of drainzones that are not assigned before updating dwfzone.drainzone_id
+				UPDATE drainzone d SET the_geom = NULL,
+				updated_at = now(),
+				updated_by = current_user
+				WHERE EXISTS (
+					SELECT 1
+					FROM temp_pgr_old_mapzone m
+					JOIN dwfzone dw ON m.mapzone_id = dw.dwfzone_id
+					WHERE d.drainzone_id = dw.drainzone_id
+				)
+				AND NOT EXISTS (
+					SELECT 1 FROM temp_pgr_mapzone m
+					WHERE m.drainzone_id = d.drainzone_id
+				);
+
+				-- clear the geometries of drainzones that have at least on dwfzone in conflict in dwfzone
+				UPDATE drainzone d SET the_geom = NULL,
+				updated_at = now(),
+				updated_by = current_user
+				WHERE EXISTS (
+					SELECT 1
+					FROM (
+						SELECT drainzone_id from temp_pgr_mapzone
+						GROUP BY drainzone_id
+						HAVING max(CARDINALITY(mapzone_ids)) > 1
+					) m
+					WHERE m.drainzone_id = d.drainzone_id
+				);
+
+				UPDATE dwfzone d SET drainzone_id =
+					CASE
+						WHEN m.max_dwfzones = 1 then m.drainzone_id
+						ELSE -1
+					END,
+					updated_at = now(),
+					updated_by = current_user
+				FROM (
+					SELECT mapzone_id,
+						drainzone_id,
+						max(CARDINALITY(mapzone_ids)) over(PARTITION BY drainzone_id) AS max_dwfzones
+					FROM temp_pgr_mapzone
+				) m
+				WHERE d.dwfzone_id = ANY(m.mapzone_ids);
+
+				UPDATE dwfzone d SET drainzone_id = 0,
+					updated_at = now(),
+					updated_by = current_user
+				WHERE NOT EXISTS (SELECT 1 FROM temp_pgr_mapzone m WHERE d.dwfzone_id = ANY(m.mapzone_ids))
+				AND EXISTS (SELECT 1 FROM temp_pgr_mapzone m WHERE d.drainzone_id = m.drainzone_id);
+			END IF;
+
 			-- update expl_id for the mapzones with conflict
 			EXECUTE format($sql$
 				UPDATE %I m
@@ -3179,6 +3241,59 @@ BEGIN
 			ELSE
 				INSERT INTO mapzone_graph (node_id, mapzone_id, mapzone_type, flow_sign)
 				SELECT node_id, mapzone_id, mapzone_type, flow_sign FROM temp_pgr_mapzone_graph;
+			END IF;
+
+			-- update macromapzones
+			IF v_class = 'DWFZONE' THEN
+				WITH
+					temp_dwfzone AS (
+						SELECT d.dwfzone_id, d.drainzone_id, d.the_geom, expl_id, muni_id, sector_id
+						FROM temp_pgr_mapzone m
+						JOIN dwfzone d ON d.dwfzone_id = m.mapzone_id[1]
+						WHERE d.drainzone_id > 0
+					),
+					geom AS (
+						SELECT drainzone_id, ST_Multi(ST_CollectionExtract(ST_Collect(the_geom), 3)) AS the_geom
+						FROM temp_dwfzone
+						GROUP BY drainzone_id
+					),
+					expl AS (
+						SELECT a.drainzone_id, array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_id
+						FROM (
+							SELECT drainzone_id, unnest(expl_id) AS expl_id FROM temp_dwfzone
+						) a
+						GROUP BY a.drainzone_id
+					),
+					muni AS (
+						SELECT a.drainzone_id, array_agg(DISTINCT a.muni_id ORDER BY a.muni_id) AS muni_id
+						FROM (
+							SELECT drainzone_id, unnest(muni_id) AS muni_id FROM temp_dwfzone
+						) a
+						GROUP BY a.drainzone_id
+					),
+					sector AS (
+						SELECT a.drainzone_id, array_agg(DISTINCT a.sector_id ORDER BY a.sector_id) AS sector_id
+						FROM (
+							SELECT drainzone_id, unnest(sector_id) AS sector_id FROM temp_dwfzone
+						) a
+						GROUP BY a.drainzone_id
+					)
+				UPDATE drainzone d
+				SET the_geom = g.the_geom,
+					expl_id = e.expl_id,
+					muni_id =m.muni_id,
+					sector_id = s.sector_id,
+					updated_at = now(),
+					updated_by = current_user
+				FROM geom g
+				JOIN expl e USING(drainzone_id)
+				JOIN muni m USING(drainzone_id)
+				JOIN sector s USING(drainzone_id)
+				WHERE d.drainzone_id = g.drainzone_id;
+			ELSE
+				IF v_recalculate_macromapzones THEN
+					
+				END IF;
 			END IF;
 
 		END IF; -- v_commit_changes

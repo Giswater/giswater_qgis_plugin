@@ -40,6 +40,7 @@ DECLARE
 	v_flood_only_mapzone text;
 	v_commit_changes boolean;
 	v_from_zero boolean;
+	v_recalculate_macromapzones boolean;
 
 	-- system variables
 	v_mapzones_version integer;
@@ -70,6 +71,7 @@ BEGIN
 	v_flood_only_mapzone := p_data->'data'->'parameters'->>'floodOnlyMapzone';
 	v_commit_changes := p_data->'data'->'parameters'->>'commitChanges';
 	v_from_zero := p_data->'data'->'parameters'->>'fromZero';
+	v_recalculate_macromapzones := p_data->'data'->'parameters'->>'recalculateMacromapzones';
 
 	SELECT (value::json->>'version')::int2 INTO v_mapzones_version FROM config_param_system WHERE parameter='mapzones_config';
 
@@ -84,6 +86,7 @@ BEGIN
 	IF v_flood_only_mapzone IS NULL THEN v_flood_only_mapzone = ''; END IF;
 	IF v_commit_changes IS NULL THEN v_commit_changes = FALSE ; END IF;
 	IF v_from_zero IS NULL THEN v_from_zero = FALSE ; END IF;
+	IF v_recalculate_macromapzones IS NULL THEN v_recalculate_macromapzones = FALSE ; END IF;
 
 	v_data := json_build_object(
 		'data', json_build_object(
@@ -102,7 +105,8 @@ BEGIN
 				'floodOnlyMapzone', v_flood_only_mapzone,
 				'commitChanges', v_commit_changes,
 				'netscenario', v_netscenario,
-				'fromZero', v_from_zero
+				'fromZero', v_from_zero,
+				'recalculateMacromapzones', v_recalculate_macromapzones
 			)
 		)
 	);
