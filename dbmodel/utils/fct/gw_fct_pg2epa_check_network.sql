@@ -79,8 +79,8 @@ BEGIN
 		UPDATE temp_t_pgr_go2epa_arc SET dma_id = -2;
 	END IF;
 
-	UPDATE temp_t_pgr_go2epa_node n SET sector_id = 0, omzone_id=0;
-	UPDATE temp_t_pgr_go2epa_arc SET sector_id = 0, omzone_id=0;
+	UPDATE temp_t_pgr_go2epa_node n SET sector_id = -2, omzone_id=0;
+	UPDATE temp_t_pgr_go2epa_arc SET sector_id = -2, omzone_id=0;
 
 
 	-- update graph for disconnected (139)
@@ -94,7 +94,7 @@ BEGIN
     WHERE n.id::int = c.node;
 
 	-- setting those node with sectors without inlet to sector_id = 0
-	UPDATE temp_t_pgr_go2epa_node SET sector_id = 0 WHERE sector_id NOT IN
+	UPDATE temp_t_pgr_go2epa_node SET sector_id = -2 WHERE sector_id NOT IN
 	(SELECT DISTINCT sector_id FROM (SELECT DISTINCT sector_id, epa_type FROM temp_t_pgr_go2epa_node WHERE epa_type IN ('INLET', 'RESERVOIR', 'TANK', 'OUTFALL'))a);
 
 	-- update arc graph
@@ -158,10 +158,10 @@ BEGIN
 	-- remove disconnected network
 	IF v_deldisconnetwork THEN
 
-		UPDATE temp_t_arc a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_arc t WHERE t.sector_id = 0 AND t.arc_id = a.arc_id;
-		UPDATE temp_t_node a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_node t WHERE t.sector_id = 0 AND t.node_id = a.node_id;
-		DELETE FROM temp_t_arc WHERE sector_id = 0;
-		DELETE FROM temp_t_node WHERE sector_id = 0;
+		UPDATE temp_t_arc a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_arc t WHERE t.sector_id = -2 AND t.arc_id = a.arc_id;
+		UPDATE temp_t_node a SET sector_id = t.sector_id FROM temp_t_pgr_go2epa_node t WHERE t.sector_id = -2 AND t.node_id = a.node_id;
+
+		DELETE FROM temp_t_arc WHERE sector_id = -2;
 		GET DIAGNOSTICS v_count = row_count;
 
 		IF v_count > 0 THEN
@@ -171,7 +171,20 @@ BEGIN
 		ELSE
 			INSERT INTO t_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 1,
-			concat('INFO: {delDisconnectNetwork} is enabled but nothing have been removed.'));
+			concat('INFO: {delDisconnectNetwork} is enabled but no arcs have been removed.'));
+		END IF;
+
+		DELETE FROM temp_t_node WHERE sector_id = -2;
+		GET DIAGNOSTICS v_count = row_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO t_audit_check_data (fid, criticity, error_message)
+			VALUES (v_fid, 2,
+			concat('WARNING-227: {delDisconnectNetwork} is enabled and ',v_count,' nodes have been removed.'));
+		ELSE
+			INSERT INTO t_audit_check_data (fid, criticity, error_message)
+			VALUES (v_fid, 1,
+			concat('INFO: {delDisconnectNetwork} is enabled but no nodes have been removed.'));
 		END IF;
 	END IF;
 
@@ -180,8 +193,8 @@ BEGIN
 
 		UPDATE temp_t_arc a SET dma_id = t.dma_id FROM temp_t_pgr_go2epa_arc t WHERE t.dma_id = -2 AND t.arc_id = a.arc_id;
 		UPDATE temp_t_node a SET dma_id = t.dma_id FROM temp_t_pgr_go2epa_node t WHERE t.dma_id = -2 AND t.node_id = a.node_id;
+		
 		DELETE FROM temp_t_arc WHERE dma_id = -2;
-		DELETE FROM temp_t_node WHERE dma_id = -2;
 		GET DIAGNOSTICS v_count = row_count;
 
 		IF v_count > 0 THEN
@@ -191,7 +204,20 @@ BEGIN
 		ELSE
 			INSERT INTO t_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 1,
-			concat('INFO: {delDryNetwork} is enabled but nothing have been removed.'));
+			concat('INFO: {delDryNetwork} is enabled but no arcs have been removed.'));
+		END IF;
+
+		DELETE FROM temp_t_node WHERE dma_id = -2;
+		GET DIAGNOSTICS v_count = row_count;
+
+		IF v_count > 0 THEN
+			INSERT INTO t_audit_check_data (fid, criticity, error_message)
+			VALUES (v_fid, 2,
+			concat('WARNING-227: {delDryNetwork} is enabled and ',v_count,' nodes have been removed.'));
+		ELSE
+			INSERT INTO t_audit_check_data (fid, criticity, error_message)
+			VALUES (v_fid, 1,
+			concat('INFO: {delDryNetwork} is enabled but no nodes have been removed.'));
 		END IF;
 	END IF;
 
