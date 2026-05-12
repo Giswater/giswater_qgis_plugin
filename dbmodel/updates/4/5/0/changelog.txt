@@ -1,0 +1,8 @@
+4.5.0
+*************
+- Modify trg_om_visit_multievent to allow insert using uuid
+- Update v_plan_netscenario views to filter by selector_expl.expl_id for current user + current_netscenario
+- Improve mincut algorithm
+    - Add new om_mincut_conlfict table
+    - Unify logic in setmincut + mincut_core
+    - Add new mincut_class 4 for conflict mincuts.

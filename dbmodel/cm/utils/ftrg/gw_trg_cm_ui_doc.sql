@@ -1,0 +1,64 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+SET search_path = cm, public, pg_catalog;
+
+CREATE OR REPLACE FUNCTION cm.gw_trg_ui_doc()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $function$
+DECLARE
+    feature_type text;
+    feature_column text;
+    doc_table text;
+    v_sql_insert text;
+    v_sql text;
+    v_new_value int;
+    v_old_value int;
+    v_new_data jsonb;
+    feature_uuid_column text;
+    feature_uuid_value uuid;
+    v_feature_id int;
+    v_featurecat_id text;
+BEGIN
+    EXECUTE 'SET search_path TO ' || quote_literal(TG_TABLE_SCHEMA) || ', public';
+    feature_type := TG_ARGV[0];
+    v_featurecat_id := TG_ARGV[1];
+    v_new_data := to_jsonb(NEW);
+    doc_table := 'doc_x_' || feature_type;
+    feature_column := feature_type || '_id';
+    feature_uuid_column := feature_type || '_uuid';
+    feature_uuid_value := v_new_data->>feature_uuid_column;
+
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO doc(path, name, doc_type, observ)
+        VALUES (NEW.path, NEW.name, NEW.doc_type, NEW.observ)
+        RETURNING id INTO NEW.doc_id;
+
+        EXECUTE 'INSERT INTO ' || doc_table || ' (doc_id, ' || feature_uuid_column || ', featurecat_id) VALUES ($1, $2, $3)'
+        USING NEW.doc_id, feature_uuid_value, v_featurecat_id;
+
+        RETURN NEW;
+
+    ELSIF TG_OP = 'UPDATE' THEN
+        RETURN NEW;
+
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Get UUID from OLD row (primary key is doc_id + feature_uuid)
+        feature_uuid_value := (to_jsonb(OLD)->>feature_uuid_column)::uuid;
+
+        -- Delete using primary key (doc_id, feature_uuid) for precision
+        EXECUTE format('DELETE FROM %I WHERE doc_id = $1 AND %I = $2', doc_table, feature_uuid_column)
+        USING OLD.doc_id, feature_uuid_value;
+
+        RETURN NULL;
+    END IF;
+END;
+$function$
+;
+
+

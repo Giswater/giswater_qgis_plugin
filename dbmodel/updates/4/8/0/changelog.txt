@@ -1,0 +1,12 @@
+4.8.0
+*************
+- refactor(doc): convert doc_id to integer
+- feat(graphanalytics): improve fluid_type and treatment_type temporal layers
+- feat(graphanalytics): show warning when commitchange and use psector are true
+- refactor(pg2epa_check_result): use sys_fprocess logic to execute ud epa result checks
+- feat(setmincut): don't allow deleting mincut if it's not planified
+- feat(cm): new function to build topology of a selected Lot
+- feat(gettoolbox): create cm group on toolbox
+- feat(cm): wip new function massive arc divide
+- feat(epa): export valve and shortpipe as reservoir or junction
+- enhan (go2epa): Enhan performance

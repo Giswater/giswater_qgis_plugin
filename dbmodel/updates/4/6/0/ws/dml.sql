@@ -1,0 +1,376 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+-- 28/10/2025
+UPDATE config_toolbox SET inputparams='[
+{"label": "Create mapzones for netscenario:", "value": null, "tooltip": "Create mapzone for a selected netscenario", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "netscenario", "widgettype": "combo", "dvQueryText": "select netscenario_id as id, name as idval from plan_netscenario  order by name", "isNullValue": "true", "layoutorder": 1},
+{"label": "Exploitation:", "value": null, "tooltip": "Choose exploitation to work with", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "exploitation", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "layoutorder": 2},
+{"label": "Force open nodes: (*)", "value": null, "tooltip": "Optative node id(s) to temporary open closed node(s) in order to force algorithm to continue there", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceOpen", "widgettype": "linetext", "isMandatory": false, "layoutorder": 5, "placeholder": "1015,2231,3123"},
+{"label": "Force closed nodes: (*)", "value": null, "tooltip": "Optative node id(s) to temporary close open node(s) to force algorithm to stop there", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "forceClosed", "widgettype": "text", "isMandatory": false, "layoutorder": 6, "placeholder": "1015,2231,3123"},
+{"label": "Use selected psectors:", "value": null, "tooltip": "If true, use selected psectors. If false ignore selected psectors and only works with on-service network", "datatype": "boolean", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "usePlanPsector", "widgettype": "check", "layoutorder": 8},
+{"label": "Mapzone constructor method:", "value": null, "comboIds": [0, 1, 2, 3, 4], "datatype": "integer", "comboNames": ["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER", "LINK & PIPE BUFFER"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 9},
+{"label": "Pipe buffer", "value": null, "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "datatype": "float", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 10, "placeholder": "5-30"},
+{"label": "Commit changes:", "value": null, "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 11},
+{"label": "Mapzones from zero:", "value": null, "tooltip": "If true, mapzones are calculated automatically from zero", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "fromZero", "widgettype": "check", "layoutorder": 12}
+]'::json WHERE id=3256;
+
+INSERT INTO sys_param_user (id,formname,descript,sys_role,"label",isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,layoutname,iseditable,"source")
+VALUES ('plan_psector_auto_insert_connec','config','Automatic insertion of connected connecs when inserting an arc','role_plan','Automatic connec insertion:',true,12,'utils',false,false,'boolean','check',false,'lyt_masterplan',true,'core');
+
+-- 06/11/2025
+UPDATE sys_fprocess
+	SET except_msg='dry nodes/connecs with demand which have been set to zero on the go2epa process.'
+	WHERE fid=233;
+
+-- 07/11/2025
+UPDATE config_form_list
+SET query_text='SELECT id,  work_order, state, class, mincut_type, received_date, exploitation, municipality, postcode, streetaxis, postnumber, anl_cause, anl_tstamp, anl_user, anl_descript, anl_feature_id, anl_feature_type, forecast_start, forecast_end, assigned_to, exec_start, exec_end, exec_user, exec_descript, exec_from_plot, exec_depth, exec_appropiate, chlorine, turbidity, notified, reagent_lot, equipment_code FROM v_ui_mincut WHERE id IS NOT NULL '
+WHERE listname='tbl_mincut_manager' AND device=5;
+
+-- 19/11/2025
+UPDATE config_form_fields SET dv_isnullvalue=true WHERE formname='ve_epa_pump' AND formtype='form_feature' AND columnname='energy_pattern_id' AND tabname='tab_epa';
+
+
+UPDATE config_toolbox SET alias='Análisis de Mapzones', functionparams='{"featureType":[]}'::json, inputparams='[{"label": "Graph class:", "tooltip": "Graphanalytics method used", "comboIds": ["PRESSZONE", "DQA", "DMA", "SECTOR"], "datatype": "text", "comboNames": ["Zonificación de la presión (PRESSZONE)", "Áreas de calidad de distrito (DQA)", "Áreas de medición de distrito (DMA)", "Sectorización de la entrada (SECTOR-ALTO / SECTOR- BAJO)"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "graphClass", "widgettype": "combo", "layoutorder": 1}, {"label": "Exploitation:", "tooltip": "Choose exploitation to work with", "datatype": "text", "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "exploitation", "widgettype": "combo", "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC", "layoutorder": 2}, {"label": "Forzar nodos abiertos: (*)", "value": null, "tooltip": "Id de nodo(s) optativo(s) para abrir temporalmente nodo(s) cerrado(s) con el fin de forzar al algoritmo a continuar allí.", "datatype": "text", "layoutname": "grl_option_parameters", "widgetname": "forceOpen", "widgettype": "linetext", "isMandatory": false, "layoutorder": 5, "placeholder": "1015,2231,3123"}, {"label": "Forzar nodos cerrados: (*)", "value": null, "tooltip": "Id de nodo(s) optativo(s) para cerrar temporalmente nodo(s) abierto(s) para forzar que el algoritmo se detenga allí.", "datatype": "text", "layoutname": "grl_option_parameters", "widgetname": "forceClosed", "widgettype": "text", "isMandatory": false, "layoutorder": 6, "placeholder": "1015,2231,3123"}, {"label": "Use selected psectors:", "value": null, "tooltip": "If true, use selected psectors. If false ignore selected psectors and only works with on-service network", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "usePlanPsector", "widgettype": "check", "layoutorder": 7}, {"label": "Commit changes:", "value": null, "tooltip": "If true, changes will be applied to DB. If false, algorithm results will be saved in anl tables", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "commitChanges", "widgettype": "check", "layoutorder": 8}, {"label": "Mapzone constructor method:", "comboIds": [0, 1, 2, 3, 4], "datatype": "integer", "comboNames": ["NINGUNO", "POLÍGONO CÓNCAVO", "BÚFER DE TUBERÍA", "BÚFER DE PARCELA Y TUBERÍA", "BÚFER DE ENLACE Y TUBERÍA"], "layoutname": "grl_option_parameters", "selectedId": null, "widgetname": "updateMapZone", "widgettype": "combo", "layoutorder": 10}, {"label": "Pipe buffer", "value": null, "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "datatype": "float", "layoutname": "grl_option_parameters", "widgetname": "geomParamUpdate", "widgettype": "text", "isMandatory": false, "layoutorder": 11, "placeholder": "5-30"}, {"label": "Mapzones desde cero:", "value": null, "tooltip": "Si es cierto, las zonas del mapa se calculan automáticamente desde cero.", "datatype": "boolean", "layoutname": "grl_option_parameters", "widgetname": "fromZero", "widgettype": "check", "layoutorder": 12}]'::json, observ=NULL, active=true, device='{4}' WHERE id=2768;
+
+UPDATE config_param_system SET value = '{"version": 6, "usePgrouting": true, "bufferType": 2, "geomParamUpdate":10}'
+WHERE parameter = 'om_mincut_config';
+
+
+UPDATE config_param_system
+SET value = (value::jsonb || '{"bufferType": 0}' || '{"geomParamUpdate":10}')::text
+WHERE "parameter" = 'om_mincut_config';
+
+
+-- 09/12/2025
+-- 09/12/2025
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+        -- ve_dqa
+        UPDATE config_form_fields SET widgettype = 'multiple_option', dv_querytext = 'select expl_id AS id, name AS idval from ve_exploitation where expl_id > 0', widgetcontrols = (COALESCE(widgetcontrols::jsonb, '{}'::jsonb) || '{"valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "nofColumns": 2, "filterExpression": null, "allowMulti": true}}'::jsonb)::json WHERE formname = 've_dqa' AND columnname = 'expl_id';
+        UPDATE config_form_fields SET widgettype = 'multiple_option', dv_querytext = 'select muni_id AS id, name AS idval from utils.ext_municipality where muni_id > 0', widgetcontrols = (COALESCE(widgetcontrols::jsonb, '{}'::jsonb) || '{"valueRelation":{"nullValue":false, "layer": "utils.ext_municipality", "activated": true, "keyColumn": "muni_id", "valueColumn": "name", "nofColumns": 2, "filterExpression": null, "allowMulti": true}}'::jsonb)::json WHERE formname = 've_dqa' AND columnname = 'muni_id';
+        UPDATE config_form_fields SET widgettype = 'multiple_option', dv_querytext = 'select sector_id AS id, name AS idval from ve_sector where sector_id > 0', widgetcontrols = (COALESCE(widgetcontrols::jsonb, '{}'::jsonb) || '{"valueRelation":{"nullValue":false, "layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "nofColumns": 2, "filterExpression": null, "allowMulti": true}}'::jsonb)::json WHERE formname = 've_dqa' AND columnname = 'sector_id';
+        
+    ELSE    
+        -- ve_dqa
+        UPDATE config_form_fields SET widgettype = 'multiple_option', dv_querytext = 'select expl_id AS id, name AS idval from ve_exploitation where expl_id > 0', widgetcontrols = (COALESCE(widgetcontrols::jsonb, '{}'::jsonb) || '{"valueRelation":{"nullValue":false, "layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "nofColumns": 2, "filterExpression": null, "allowMulti": true}}'::jsonb)::json WHERE formname = 've_dqa' AND columnname = 'expl_id';
+        UPDATE config_form_fields SET widgettype = 'multiple_option', dv_querytext = 'select muni_id AS id, name AS idval from v_ext_municipality where muni_id > 0', widgetcontrols = (COALESCE(widgetcontrols::jsonb, '{}'::jsonb) || '{"valueRelation":{"nullValue":false, "layer": "v_ext_municipality", "activated": true, "keyColumn": "muni_id", "valueColumn": "name", "nofColumns": 2, "filterExpression": null, "allowMulti": true}}'::jsonb)::json WHERE formname = 've_dqa' AND columnname = 'muni_id';
+        UPDATE config_form_fields SET widgettype = 'multiple_option', dv_querytext = 'select sector_id AS id, name AS idval from ve_sector where sector_id > 0', widgetcontrols = (COALESCE(widgetcontrols::jsonb, '{}'::jsonb) || '{"valueRelation":{"nullValue":false, "layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "nofColumns": 2, "filterExpression": null, "allowMulti": true}}'::jsonb)::json WHERE formname = 've_dqa' AND columnname = 'sector_id';
+        
+    END IF;
+END;
+$$;
+
+-- 11/12/2025
+-- sys_parama_user
+UPDATE sys_param_user
+	SET layoutorder=3
+	WHERE id='inp_options_demandtype';
+UPDATE sys_param_user
+	SET layoutname='lyt_general_2',layoutorder=1
+	WHERE id='inp_options_selecteddma';
+UPDATE sys_param_user
+	SET layoutorder=2
+	WHERE id='inp_options_patternmethod';
+UPDATE sys_param_user
+	SET layoutorder=4
+	WHERE id='inp_options_units';
+UPDATE sys_param_user
+	SET layoutorder=5
+	WHERE id='inp_options_demand_multiplier';
+UPDATE sys_param_user
+	SET layoutorder=6
+	WHERE id='inp_options_demand_model';
+UPDATE sys_param_user
+	SET layoutorder=7
+	WHERE id='inp_options_buildup_mode';
+UPDATE sys_param_user
+	SET layoutorder=8
+	WHERE id='inp_options_required_pressure';
+UPDATE sys_param_user
+	SET layoutorder=9
+	WHERE id='inp_options_quality_mode';
+UPDATE sys_param_user
+	SET layoutorder=3
+	WHERE id='inp_options_nodarc_length';
+UPDATE sys_param_user
+	SET layoutorder=4
+	WHERE id='inp_options_rtc_period_id';
+UPDATE sys_param_user
+	SET layoutorder=2
+	WHERE id='inp_options_pattern';
+UPDATE sys_param_user
+	SET layoutorder=5
+	WHERE id='inp_options_headloss';
+UPDATE sys_param_user
+	SET layoutorder=6
+	WHERE id='inp_options_dscenario_priority';
+UPDATE sys_param_user
+	SET layoutorder=7
+	WHERE id='inp_options_minimum_pressure';
+UPDATE sys_param_user
+	SET layoutorder=8
+	WHERE id='inp_options_pressure_exponent';
+UPDATE sys_param_user
+	SET layoutorder=10, layoutname='lyt_general_1'
+	WHERE id='inp_options_node_id';
+
+-- Confi_form_fields
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_fountain' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_greentap' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_tap' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_vconnec' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_connec_wjoin' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_adaptation' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_air_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_bypass_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_check_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_clorinathor' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_control_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_curve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_endline' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_expantank' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_filter' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_fl_contr_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_flexunion' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_flowmeter' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_gen_purp_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_green_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_hydrant' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_junction' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_manhole' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_netelement' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_netsamplepoint' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_outfall_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pr_break_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pr_reduc_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pr_susta_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pressure_meter' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_pump' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_reduction' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_shutoff_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_source' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_t' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_tank' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_throttle_valve' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_valve_register' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_water_connection' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_waterwell' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET "label"='Nominal diameter:',tooltip='cat_dnom - Nominal diameter of the element in mm. It cannot be refilled. The one with the dnom field in the corresponding catalog is used'
+	WHERE formname='ve_node_x' AND formtype='form_feature' AND columnname='cat_dnom' AND tabname='tab_data';
+
+UPDATE config_form_fields
+	SET "label"='Scale:',tooltip='Scale'
+	WHERE formname='print' AND formtype='form_print' AND columnname='scale' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET tooltip='Scale'
+	WHERE formname='ve_plan_psector' AND formtype='form_feature' AND columnname='scale' AND tabname='tab_none';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('inp_dscenario_shortpipe', 'form_feature', 'tab_none', 'to_arc', NULL, 5, 'integer', 'text', 'To arc:', 'To arc:', NULL, false, false, true, false, false, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('inp_dscenario_valve', 'form_feature', 'tab_none', 'to_arc', NULL, 5, 'integer', 'text', 'To arc:', 'To arc:', NULL, false, false, true, false, false, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL) ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_fluid', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_fluid', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_category', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_category', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_function', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_function', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_location', 'form_feature', 'tab_none', 'feature_type', NULL, NULL, 'string', 'list', 'Feature type:', 'Feature type', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "sys_feature_type",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('man_type_location', 'form_feature', 'tab_none', 'featurecat_id', NULL, NULL, 'string', 'list', 'Featurecat id:', 'Featurecat id', NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "valueRelation": {
+    "nullValue": false,
+    "layer": "cat_feature",
+    "keyColumn": "id",
+    "valueColumn": "id",
+    "nofColumns": 2,
+    "filterExpression": null,
+    "allowMulti": true
+  }
+}'::json, NULL, NULL, false, NULL);

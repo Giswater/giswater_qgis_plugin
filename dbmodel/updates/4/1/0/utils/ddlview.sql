@@ -1,0 +1,988 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+DROP VIEW IF EXISTS vp_basic_arc;
+DROP VIEW IF EXISTS vp_basic_node;
+DROP VIEW IF EXISTS vp_basic_connec;
+DROP VIEW IF EXISTS vp_basic_gully;
+
+DROP VIEW IF EXISTS v_edit_exploitation;
+DROP VIEW IF EXISTS v_edit_macrodqa;
+DROP VIEW IF EXISTS v_edit_macrodma;
+DROP VIEW IF EXISTS v_edit_macrosector;
+DROP VIEW IF EXISTS v_edit_sector;
+DROP VIEW IF EXISTS v_ui_sector;
+
+DROP VIEW IF EXISTS v_state_element;
+DROP VIEW IF EXISTS v_state_arc;
+DROP VIEW IF EXISTS v_state_node;
+DROP VIEW IF EXISTS v_state_connec;
+DROP VIEW IF EXISTS v_state_link;
+DROP VIEW IF EXISTS v_state_link_connec;
+
+DROP VIEW IF EXISTS v_edit_flwreg CASCADE;
+DROP VIEW IF EXISTS v_edit_inp_frpump CASCADE;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump CASCADE;
+
+DROP VIEW IF EXISTS vu_dma;
+DROP VIEW IF EXISTS vu_link;
+DROP VIEW IF EXISTS vu_arc;
+DROP VIEW IF EXISTS vu_node;
+DROP VIEW IF EXISTS vu_connec;
+
+DROP VIEW IF EXISTS v_edit_plan_psector;;
+DROP VIEW IF EXISTS v_ui_plan_psector;
+
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_other
+AS SELECT plan_psector_x_other.id,
+    plan_psector_x_other.psector_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    rpad(v_price_compost.descript::text, 125) AS price_descript,
+    v_price_compost.price,
+    plan_psector_x_other.measurement,
+    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+    plan_psector_x_other.observ,
+    plan_psector.atlas_id,
+    plan_psector_x_other.the_geom
+   FROM plan_psector_x_other
+     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
+  ORDER BY plan_psector_x_other.psector_id;
+
+CREATE OR REPLACE VIEW v_edit_cat_feature_link
+AS SELECT cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature.code_autofill,
+    cat_feature.shortcut_key,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_link USING (id);
+
+
+  CREATE OR REPLACE VIEW v_edit_cat_feature_element
+AS SELECT
+	cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature_element.epa_default,
+    cat_feature.code_autofill,
+    cat_feature.shortcut_key ,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_element USING (id);
+
+
+-- ====================
+CREATE OR REPLACE VIEW ve_element
+AS WITH sel_state AS (
+    SELECT selector_state.state_id FROM selector_state WHERE selector_state.cur_user = CURRENT_USER
+), sel_sector AS (
+    SELECT selector_sector.sector_id FROM selector_sector WHERE selector_sector.cur_user = CURRENT_USER
+), sel_expl AS (
+    SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER
+), sel_muni AS (
+    SELECT selector_municipality.muni_id FROM selector_municipality WHERE selector_municipality.cur_user = CURRENT_USER
+), element_selector AS (
+    SELECT
+        e.element_id,
+        e.code,
+        e.sys_code,
+        e.top_elev,
+        e.elementcat_id,
+        e.num_elements,
+        e.epa_type,
+        e.state,
+        e.state_type,
+        e.expl_id,
+        e.muni_id,
+        e.sector_id,
+        e.omzone_id,
+        e.function_type,
+        e.category_type,
+        e.location_type,
+        e.observ,
+        e.comment,
+        e.workcat_id,
+        e.workcat_id_end,
+        e.builtdate,
+        e.enddate,
+        e.ownercat_id,
+        e.brand_id,
+        e.model_id,
+        e.serial_number,
+        e.asset_id,
+        e.verified,
+        e.datasource,
+        e.label_x,
+        e.label_y,
+        e.label_rotation,
+        e.rotation,
+        e.inventory,
+        e.publish,
+        e.trace_featuregeom,
+        e.lock_level,
+        e.expl_visibility,
+        e.created_at,
+        e.created_by,
+        e.updated_at,
+        e.updated_by,
+        e.the_geom
+    FROM element e
+    WHERE EXISTS (SELECT 1 FROM sel_sector s WHERE s.sector_id = e.sector_id)
+    AND EXISTS (SELECT 1 FROM sel_expl e WHERE e.expl_id = e.expl_id)
+    AND EXISTS (SELECT 1 FROM sel_state s WHERE s.state_id = e.state)
+    AND EXISTS (SELECT 1 FROM sel_muni m WHERE m.muni_id = e.muni_id)
+), element_selected AS (
+    SELECT
+        e.element_id,
+        e.code,
+        e.sys_code,
+        e.top_elev,
+        cat_element.element_type,
+        e.elementcat_id,
+        e.num_elements,
+        e.epa_type,
+        e.state,
+        e.state_type,
+        e.expl_id,
+        e.muni_id,
+        e.sector_id,
+        e.omzone_id,
+        e.function_type,
+        e.category_type,
+        e.location_type,
+        e.observ,
+        e.comment,
+        cat_element.link,
+        e.workcat_id,
+        e.workcat_id_end,
+        e.builtdate,
+        e.enddate,
+        e.ownercat_id,
+        e.brand_id,
+        e.model_id,
+        e.serial_number,
+        e.asset_id,
+        e.verified,
+        e.datasource,
+        e.label_x,
+        e.label_y,
+        e.label_rotation,
+        e.rotation,
+        e.inventory,
+        e.publish,
+        e.trace_featuregeom,
+        e.lock_level,
+        e.expl_visibility,
+        e.created_at,
+        e.created_by,
+        e.updated_at,
+        e.updated_by,
+        e.the_geom
+    FROM element_selector e
+    JOIN cat_element ON e.elementcat_id::text = cat_element.id::text
+)
+SELECT * FROM element_selected;
+
+CREATE OR REPLACE VIEW ve_frelem AS
+  SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    man_frelem.node_id,
+    man_frelem.order_id,
+    concat (man_frelem.node_id,'_FR', man_frelem.order_id) AS nodarc_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length,
+    st_x(st_endpoint(st_setsrid(st_makeline(ve_element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_x,
+    st_y(st_endpoint(st_setsrid(st_makeline(ve_element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_y,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+    ve_element.the_geom
+    FROM ve_element
+    JOIN man_frelem ON ve_element.element_id = man_frelem.element_id
+	  JOIN arc a ON arc_id = to_arc;
+
+
+CREATE OR REPLACE VIEW ve_genelem AS
+SELECT ve_element.element_id,
+    ve_element.code,
+    ve_element.sys_code,
+    ve_element.top_elev,
+    ve_element.element_type,
+    ve_element.elementcat_id,
+    ve_element.num_elements,
+    ve_element.epa_type,
+    ve_element.state,
+    ve_element.state_type,
+    ve_element.expl_id,
+    ve_element.muni_id,
+    ve_element.sector_id,
+    ve_element.omzone_id,
+    ve_element.function_type,
+    ve_element.category_type,
+    ve_element.location_type,
+    ve_element.observ,
+    ve_element.comment,
+    ve_element.link,
+    ve_element.workcat_id,
+    ve_element.workcat_id_end,
+    ve_element.builtdate,
+    ve_element.enddate,
+    ve_element.ownercat_id,
+    ve_element.brand_id,
+    ve_element.model_id,
+    ve_element.serial_number,
+    ve_element.asset_id,
+    ve_element.verified,
+    ve_element.datasource,
+    ve_element.label_x,
+    ve_element.label_y,
+    ve_element.label_rotation,
+    ve_element.rotation,
+    ve_element.inventory,
+    ve_element.publish,
+    ve_element.trace_featuregeom,
+    ve_element.lock_level,
+    ve_element.expl_visibility,
+    ve_element.created_at,
+    ve_element.created_by,
+    ve_element.updated_at,
+    ve_element.updated_by,
+    ve_element.the_geom
+   FROM ve_element
+   JOIN man_genelem ON ve_element.element_id = man_genelem.element_id;
+
+CREATE OR REPLACE VIEW v_ext_raster_dem
+AS
+SELECT DISTINCT ON (r.id)
+    r.id,
+    c.code,
+    c.alias,
+    c.raster_type,
+    c.descript,
+    c.source,
+    c.provider,
+    c.year,
+    r.rast,
+    r.rastercat_id,
+    r.envelope
+FROM ext_raster_dem r
+JOIN ext_cat_raster c ON c.id = r.rastercat_id
+JOIN v_ext_municipality a ON st_dwithin(r.envelope, a.the_geom, 0::double precision);
+
+
+CREATE OR REPLACE VIEW ve_pol_element
+AS SELECT p.pol_id,
+    e.element_id,
+    p.the_geom,
+    p.trace_featuregeom
+    FROM element e
+    JOIN polygon p ON p.feature_id = e.element_id;
+
+CREATE OR REPLACE VIEW ve_pol_connec
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN connec ON polygon.feature_id = connec.connec_id
+    LEFT JOIN plan_psector_x_connec pp ON polygon.feature_id = pp.connec_id
+    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = ANY(connec.expl_visibility))
+    JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
+    JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+    JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id;
+
+CREATE OR REPLACE VIEW ve_pol_node
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    LEFT JOIN plan_psector_x_node pp ON polygon.feature_id = pp.node_id
+    JOIN node ON polygon.feature_id = node.node_id
+    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user =current_user and se.expl_id = ANY(node.expl_visibility))
+    JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
+    JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+    JOIN selector_state ss ON ss.cur_user = current_user AND node.state = ss.state_id;
+
+
+CREATE OR REPLACE VIEW v_ui_element_x_link
+AS SELECT
+    element_x_link.link_id,
+    element_x_link.element_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_link
+     JOIN element ON element.element_id::text = element_x_link.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
+
+CREATE OR REPLACE VIEW v_ui_element_x_node
+AS SELECT element_x_node.node_id,
+    element_x_node.element_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_node
+     JOIN element ON element.element_id::text = element_x_node.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
+
+CREATE OR REPLACE VIEW v_ui_element_x_connec
+AS SELECT element_x_connec.connec_id,
+    element_x_connec.element_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_connec
+     JOIN element ON element.element_id::text = element_x_connec.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::TEXT
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
+
+CREATE OR REPLACE VIEW v_ui_element_x_arc
+AS SELECT element_x_arc.arc_id,
+    element_x_arc.element_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_arc
+     JOIN element ON element.element_id::text = element_x_arc.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
+
+-- PSECTORS
+CREATE OR REPLACE VIEW v_plan_psector_node
+AS SELECT row_number() OVER () AS rid,
+    node.node_id,
+    plan_psector_x_node.psector_id,
+    node.code,
+    node.nodecat_id,
+    cat_node.node_type,
+    cat_feature.feature_class,
+    node.state AS original_state,
+    node.state_type AS original_state_type,
+    plan_psector_x_node.state AS plan_state,
+    plan_psector_x_node.doable,
+    plan_psector.priority AS psector_priority,
+    node.the_geom
+   FROM selector_psector,
+    node
+     JOIN plan_psector_x_node USING (node_id)
+     JOIN plan_psector USING (psector_id)
+     JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
+  WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+  CREATE OR REPLACE VIEW v_plan_psector_connec
+AS SELECT row_number() OVER () AS rid,
+    connec.connec_id,
+    plan_psector_x_connec.psector_id,
+    connec.code,
+    connec.conneccat_id,
+    cat_connec.connec_type,
+    cat_feature.feature_class,
+    connec.state AS original_state,
+    connec.state_type AS original_state_type,
+    plan_psector_x_connec.state AS plan_state,
+    plan_psector_x_connec.doable,
+    plan_psector.priority AS psector_priority,
+    connec.the_geom
+   FROM selector_psector,
+    connec
+     JOIN plan_psector_x_connec USING (connec_id)
+     JOIN plan_psector USING (psector_id)
+     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_plan_psector_arc
+AS SELECT row_number() OVER () AS rid,
+    arc.arc_id,
+    plan_psector_x_arc.psector_id,
+    arc.code,
+    arc.arccat_id,
+    cat_arc.arc_type,
+    cat_feature.feature_class,
+    arc.state AS original_state,
+    arc.state_type AS original_state_type,
+    plan_psector_x_arc.state AS plan_state,
+    plan_psector_x_arc.doable,
+    plan_psector_x_arc.addparam::text AS addparam,
+    plan_psector.priority AS psector_priority,
+    arc.the_geom
+   FROM selector_psector,
+    arc
+     JOIN plan_psector_x_arc USING (arc_id)
+     JOIN plan_psector USING (psector_id)
+     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
+  WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ui_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.ext_code,
+    plan_psector.name,
+    plan_psector.descript,
+    p.idval AS priority,
+    s.idval AS status,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.expl_id,
+    t.idval AS psector_type,
+    plan_psector.active,
+    plan_psector.archived,
+    plan_psector.workcat_id,
+    plan_psector.parent_id
+   FROM selector_expl,
+    plan_psector
+     JOIN exploitation USING (expl_id)
+     LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typevalue = 'value_priority'::text
+     LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
+     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW v_ui_om_visit
+AS SELECT om_visit.id,
+    om_visit_cat.name AS visit_catalog,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    exploitation.name AS exploitation,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.visit_type
+   FROM om_visit
+     LEFT JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+     LEFT JOIN exploitation ON exploitation.expl_id = om_visit.expl_id;
+
+CREATE OR REPLACE VIEW ve_pol_connec
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN connec ON polygon.feature_id::text = connec.connec_id::text
+    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = connec.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(connec.expl_visibility))
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = connec.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = connec.muni_id);
+
+CREATE OR REPLACE VIEW ve_pol_node
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN node ON polygon.feature_id::text = node.node_id::text
+    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = node.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(node.expl_visibility))
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = node.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = node.muni_id);
+
+CREATE OR REPLACE VIEW ve_pol_element
+AS SELECT polygon.pol_id,
+    element.element_id,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN element ON polygon.feature_id::text = element.element_id::text
+    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = element.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(element.expl_visibility))
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = element.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = element.muni_id);
+
+CREATE OR REPLACE VIEW v_ui_element
+AS SELECT element.element_id,
+    element.code,
+    element.sys_code,
+    element.top_elev,
+    element.feature_type,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
+    element.num_elements,
+    element.state,
+    element.state_type,
+    element.expl_id,
+    element.muni_id,
+    element.sector_id,
+    element.omzone_id,
+    element.function_type,
+    element.category_type,
+    element.location_type,
+    element.observ,
+    element.comment,
+    element.link,
+    element.workcat_id,
+    element.workcat_id_end,
+    element.builtdate,
+    element.enddate,
+    element.ownercat_id,
+    element.brand_id,
+    element.model_id,
+    element.serial_number,
+    element.asset_id,
+    element.verified,
+    element.datasource,
+    element.label_x,
+    element.label_y,
+    element.rotation,
+    element.label_rotation,
+    element.inventory,
+    element.publish,
+    element.trace_featuregeom,
+    element.lock_level,
+    element.expl_visibility,
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by,
+    element.the_geom
+   FROM element
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
+
+CREATE OR REPLACE VIEW v_state_arc
+AS WITH p AS (
+         SELECT plan_psector_x_arc.arc_id,
+            plan_psector_x_arc.psector_id,
+            plan_psector_x_arc.state
+           FROM plan_psector_x_arc
+          WHERE plan_psector_x_arc.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), s AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), a AS (
+         SELECT arc.arc_id,
+            arc.state
+           FROM arc
+        )
+(
+         SELECT arc.arc_id
+           FROM selector_state,
+            arc
+          WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.arc_id
+           FROM s,
+            p
+          WHERE p.psector_id = s.psector_id AND p.state = 0
+) UNION ALL
+ SELECT DISTINCT p.arc_id
+   FROM s,
+    p
+  WHERE p.psector_id = s.psector_id AND p.state = 1;
+
+CREATE OR REPLACE VIEW v_state_node
+AS WITH p AS (
+         SELECT plan_psector_x_node.node_id,
+            plan_psector_x_node.psector_id,
+            plan_psector_x_node.state
+           FROM plan_psector_x_node
+          WHERE plan_psector_x_node.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), s AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), n AS (
+         SELECT node.node_id,
+            node.state
+           FROM node
+        )
+(
+         SELECT n.node_id
+           FROM selector_state,
+            n
+          WHERE n.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.node_id
+           FROM s,
+            p,
+            cf
+          WHERE p.psector_id = s.psector_id AND p.state = 0 AND cf.value IS TRUE
+) UNION ALL
+ SELECT DISTINCT p.node_id
+   FROM s,
+    p,
+    cf
+  WHERE p.psector_id = s.psector_id AND p.state = 1 AND cf.value IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_state_link
+AS WITH p AS (
+         SELECT plan_psector_x_connec.connec_id,
+            plan_psector_x_connec.psector_id,
+            plan_psector_x_connec.state,
+            plan_psector_x_connec.link_id
+           FROM plan_psector_x_connec
+          WHERE plan_psector_x_connec.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), sp AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), se AS (
+         SELECT selector_expl.expl_id,
+            selector_expl.cur_user
+           FROM selector_expl
+          WHERE selector_expl.cur_user = CURRENT_USER
+        ), l AS (
+         SELECT link.link_id,
+            link.state,
+            link.expl_id,
+            link.expl_visibility
+           FROM link
+        )
+        (
+         SELECT l.link_id
+           FROM selector_state,
+            se,
+            l
+          WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id = ANY(l.expl_visibility)) AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.link_id
+           FROM cf,
+            sp,
+            se,
+            p
+             JOIN l USING (link_id)
+          WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 0 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE
+        ) UNION ALL
+        SELECT p.link_id
+          FROM cf,
+            sp,
+            se,
+            p
+            JOIN l USING (link_id)
+          WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE;
+
+CREATE OR REPLACE VIEW v_state_element
+AS SELECT element.element_id
+   FROM selector_state,
+    element
+  WHERE element.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER;
+
+
+CREATE OR REPLACE VIEW v_state_connec
+AS WITH p AS (
+         SELECT plan_psector_x_connec.connec_id,
+            plan_psector_x_connec.psector_id,
+            plan_psector_x_connec.state,
+            plan_psector_x_connec.arc_id
+           FROM plan_psector_x_connec
+          WHERE plan_psector_x_connec.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), s AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), c AS (
+         SELECT connec.connec_id,
+            connec.state,
+            connec.arc_id
+           FROM connec
+        )
+(
+         SELECT c.connec_id,
+            c.arc_id
+           FROM selector_state,
+            c
+          WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.connec_id,
+            p.arc_id
+           FROM cf,
+            s,
+            p
+          WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0 AND cf.value IS TRUE
+) UNION ALL
+ SELECT DISTINCT ON (p.connec_id) p.connec_id,
+    p.arc_id
+   FROM cf,
+    s,
+    p
+  WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1 AND cf.value IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_ui_doc_x_element
+AS SELECT doc_x_element.doc_id,
+  doc_x_element.element_id,
+  doc.name as doc_name,
+  doc.doc_type,
+  doc.path,
+  doc.observ,
+  doc.date,
+  doc.user_name
+FROM doc_x_element
+  JOIN doc ON doc.id::text = doc_x_element.doc_id::text;
+
+CREATE OR REPLACE VIEW v_edit_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.descript,
+    plan_psector.priority,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.atlas_id,
+    plan_psector.gexpenses,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.the_geom,
+    plan_psector.expl_id,
+    plan_psector.psector_type,
+    plan_psector.active,
+    plan_psector.archived,
+    plan_psector.ext_code,
+    plan_psector.status,
+    plan_psector.text3,
+    plan_psector.text4,
+    plan_psector.text5,
+    plan_psector.text6,
+    plan_psector.num_value,
+    plan_psector.workcat_id,
+    plan_psector.parent_id,
+    plan_psector.creation_date
+   FROM selector_expl,
+    plan_psector
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ui_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.ext_code,
+    plan_psector.name,
+    plan_psector.descript,
+    p.idval AS priority,
+    s.idval AS status,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.expl_id,
+    t.idval AS psector_type,
+    plan_psector.active,
+    plan_psector.archived,
+    plan_psector.workcat_id,
+    plan_psector.parent_id,
+    plan_psector.creation_date
+   FROM selector_expl,
+    plan_psector
+     JOIN exploitation USING (expl_id)
+     LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typevalue = 'value_priority'::text
+     LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
+     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW vcv_emitters AS
+  SELECT DISTINCT node_id, sum(length/10000) as coef
+    FROM selector_inp_result r,rpt_inp_arc a
+    JOIN rpt_inp_node n USING(result_id)
+    WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) and r.result_id = n.result_id
+    AND r.cur_user = "current_user"()::text
+    GROUP BY node_id;
+
+
+CREATE OR REPLACE VIEW v_edit_dimensions
+AS SELECT dimensions.id,
+    dimensions.distance,
+    dimensions.depth,
+    dimensions.the_geom,
+    dimensions.x_label,
+    dimensions.y_label,
+    dimensions.rotation_label,
+    dimensions.offset_label,
+    dimensions.direction_arrow,
+    dimensions.x_symbol,
+    dimensions.y_symbol,
+    dimensions.feature_id,
+    dimensions.feature_type,
+    dimensions.state,
+    dimensions.expl_id,
+    dimensions.observ,
+    dimensions.comment,
+    dimensions.sector_id,
+    dimensions.muni_id
+   FROM selector_expl,
+    dimensions
+     JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
+     LEFT JOIN selector_municipality m USING (muni_id)
+     JOIN selector_sector s USING (sector_id)
+  WHERE (m.cur_user = CURRENT_USER::text OR dimensions.muni_id IS NULL) AND s.cur_user = CURRENT_USER::text AND dimensions.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+-- 23/06/2025
+CREATE OR REPLACE VIEW v_ui_om_event
+AS SELECT id,
+    event_code,
+    visit_id,
+    position_id,
+    position_value,
+    parameter_id,
+    value,
+    value1,
+    value2,
+    geom1,
+    geom2,
+    geom3,
+    xcoord,
+    ycoord,
+    compass,
+    tstamp,
+    text,
+    index_val,
+    is_last
+   FROM om_visit_event;
