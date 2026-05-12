@@ -144,7 +144,6 @@ BEGIN
 				FROM ve_arc a
 				WHERE a.node_1 IS NOT NULL
 				AND a.node_2 IS NOT NULL
-				AND a.is_operative = TRUE
 			)
 		SELECT
 			arc_id::bigint AS id,
@@ -179,7 +178,6 @@ BEGIN
 				FROM ve_arc a
 				WHERE a.node_1 IS NOT NULL
 				AND a.node_2 IS NOT NULL
-				AND a.is_operative = TRUE
 				AND a.initoverflowpath IS DISTINCT FROM TRUE
 				AND EXISTS (
 					SELECT 1 FROM t_anl_node an
@@ -225,8 +223,10 @@ BEGIN
 					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 					'properties', to_jsonb(row) - 'the_geom'
 				) AS feature
-				FROM (SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, omunit_id, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
-				FROM t_anl_arc) row
+				FROM (
+					SELECT v_context as context, expl_id, arc_id, state, arccat_id as arc_type, 'ARC' AS feature_type, drainzone_id, addparam as stream_type, omunit_id, st_length(the_geom) as length, ST_Transform(the_geom, 4326) as the_geom
+					FROM t_anl_arc
+				) row
 			) features
 		), '[]'::jsonb)
 	)::text;
@@ -242,16 +242,16 @@ BEGIN
 					'geometry',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
 					'properties', to_jsonb(row) - 'the_geom'
 				) AS feature
-				FROM (SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id AS node_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, ST_Transform(the_geom, 4326) as the_geom
-				FROM  t_anl_node
-				UNION
-				SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
-				FROM t_anl_arc a JOIN ve_connec c ON c.arc_id = a.arc_id
-				WHERE c.is_operative = TRUE
-				UNION
-				SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
-				FROM t_anl_arc a JOIN ve_gully g ON g.arc_id = a.arc_id
-				WHERE g.is_operative = TRUE) row
+				FROM (
+					SELECT v_context as context, expl_id, node_id as feature_id, state, nodecat_id AS node_type, 'NODE' AS feature_type, drainzone_id, addparam as stream_type, ST_Transform(the_geom, 4326) as the_geom
+					FROM  t_anl_node
+					UNION
+					SELECT v_context as context, c.expl_id, c.connec_id, c.state, c.connec_type, 'CONNEC' AS feature_type, c.drainzone_id, a.addparam as stream_type, ST_Transform(c.the_geom, 4326) as the_geom
+					FROM t_anl_arc a JOIN ve_connec c ON c.arc_id = a.arc_id
+					UNION
+					SELECT v_context as context, g.expl_id, g.gully_id, g.state, g.gully_type, 'GULLY' AS feature_type, g.drainzone_id, a.addparam as stream_type, ST_Transform(g.the_geom, 4326) as the_geom
+					FROM t_anl_arc a JOIN ve_gully g ON g.arc_id = a.arc_id
+				) row
 			) features
 		), '[]'::jsonb)
 	)::text;
