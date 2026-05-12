@@ -21,7 +21,7 @@ SELECT columns_are(
     'sys_table',
     ARRAY[
         'id', 'descript', 'sys_role', 'project_template', 'context', 'orderby', 'alias', 'notify_action', 
-        'isaudit', 'keepauditdays', 'source', 'addparam'
+        'isaudit', 'keepauditdays', 'source', 'addparam', 'provider_config'
     ],
     'Table sys_table should have the correct columns'
 );
@@ -42,6 +42,7 @@ SELECT col_type_is('sys_table', 'isaudit', 'boolean', 'Column isaudit should be 
 SELECT col_type_is('sys_table', 'keepauditdays', 'integer', 'Column keepauditdays should be integer');
 SELECT col_type_is('sys_table', 'source', 'text', 'Column source should be text');
 SELECT col_type_is('sys_table', 'addparam', 'json', 'Column addparam should be json');
+SELECT col_type_is('sys_table', 'provider_config', 'jsonb', 'Column provider_config should be jsonb');
 
 -- Check constraints
 SELECT col_not_null('sys_table', 'id', 'Column id should be NOT NULL');

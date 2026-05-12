@@ -265,3 +265,6 @@ BEGIN
         ADD CONSTRAINT element_x_municipality_visibility_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE CASCADE ON UPDATE CASCADE;
     END IF;
 END $$;
+
+-- 12/05/2026
+ALTER TABLE sys_table ADD COLUMN IF NOT EXISTS provider_config jsonb NULL;

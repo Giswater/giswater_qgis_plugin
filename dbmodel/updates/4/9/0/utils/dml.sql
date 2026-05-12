@@ -514,3 +514,6 @@ SET value = jsonb_set(
     '"ve_connec"'
 )
 WHERE parameter = 'basic_search_v2_tab_network_connec';
+
+-- 12/05/2026
+UPDATE sys_table SET provider_config = jsonb_set(provider_config, '{provider_key}', '"postgres"') WHERE provider_config IS NULL;
