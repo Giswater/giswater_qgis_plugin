@@ -686,7 +686,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (4458, 'No se puede restaurar el sector psector archivado debido a errores de topología.', 'Corrija los errores de topología antes de restaurar el psector. Consulte el registro para obtener más detalles.'),
     (4460, 'Used plan psectors: %v_psectors%', NULL),
     (4462, 'Commit changes: %v_commit_changes%', NULL),
-    (4464, 'The selected catalog is not available for the feature type selected', 'Select another catalog'),
+    (4464, 'El catálogo seleccionado no esta disponible para el tipo de objeto seleccioando', 'Select another catalog'),
     (4480, 'The following nodes don''t exist in the operative network: %node_list%', 'Check nodes in graphconfigs'),
     (4482, 'All nodes in graphconfigs exist in the operative network', NULL),
     (4484, 'The following to_arcs don''t exist in the operative network: %arc_list%', 'Check arcs in graphconfigs'),

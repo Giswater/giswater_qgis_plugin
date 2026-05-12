@@ -276,7 +276,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
 ('asset_id', '%_node%', 'form_feature', 'tab_data', 'Asset id:', 'Asset id:'),
 ('brand_id', '%_node%', 'form_feature', 'tab_data', 'Marca:', 'Marca_id'),
 ('builtdate', '%_node%', 'form_feature', 'tab_data', 'Fecha de construcción:', 'Fecha de construcción'),
-('category_type', '%_node%', 'form_feature', 'tab_data', 'Category type:', 'Category_type - Id of the category type related to node.'),
+('category_type', '%_node%', 'form_feature', 'tab_data', 'Tipo de categoría:', 'Tipo_categoría - id del tipo de categoría relacionada con el nodo.'),
 ('code', '%_node%', 'form_feature', 'tab_data', 'Código:', 'Código'),
 ('comment', '%_node%', 'form_feature', 'tab_data', 'Anotación:', 'Comment - anotación'),
 ('custom_top_elev', '%_node%', 'form_feature', 'tab_data', 'Max elev personalizada:', 'Custom_top_elev'),

@@ -238,7 +238,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_gully', NULL, 'Vedere auxiliară pentru gully'),
     ('v_link_gully', NULL, 'Vizualizare filtrată a legăturilor de tip conectare'),
     ('v_man_gully', NULL, 'Afișează informații editabile despre gestionarea rigolelor'),
-    ('v_plan_psector', NULL, 'Vizualizare pentru a afișa sectoarele planificate'),
+    ('v_plan_psector', 'Plan psector', 'Vizualizare pentru a afișa sectoarele planificate'),
     ('v_plan_psector_gully', 'Plan psector gully', 'Vizualizare pentru a arăta rigolele legate de psectoare. Util pentru a afișa rigolele care vor fi învechite în psectoare'),
     ('v_plan_result_arc', NULL, 'Vizualizare referitoare la rezultatele costului pentru arcuri'),
     ('v_plan_result_node', NULL, 'Vezi rezultate legate de costuri pentru nod'),

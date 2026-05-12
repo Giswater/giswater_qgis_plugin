@@ -238,7 +238,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_gully', NULL, 'Vista auxiliar per a embornal'),
     ('v_link_gully', NULL, 'Vista filtrada d''enllaços tipus connexió'),
     ('v_man_gully', NULL, 'Mostra informació editable sobre la gestió d''embornals'),
-    ('v_plan_psector', NULL, 'Vista Per Mostrar Sectors Planificats'),
+    ('v_plan_psector', 'Plan psector', 'Vista Per Mostrar Sectors Planificats'),
     ('v_plan_psector_gully', 'Pla psector embornal', 'Vista per mostrar embornals relacionats amb psectors. Útil per mostrar embornals que seran obsolets en psectors'),
     ('v_plan_result_arc', NULL, 'Vista Relacionada Amb Resultats De Cost Per Arcs'),
     ('v_plan_result_node', NULL, 'Vista Relacionada Amb Resultats De Cost Per Node'),

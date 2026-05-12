@@ -238,7 +238,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_gully', NULL, 'Vista auxiliar para sumidero'),
     ('v_link_gully', NULL, 'Vista filtrada de los enlaces tipo connec'),
     ('v_man_gully', NULL, 'Muestra información editable sobre la gestión de los sumideros'),
-    ('v_plan_psector', NULL, 'Vista para mostrar sectores planificados'),
+    ('v_plan_psector', 'Plan psector', 'Vista para mostrar sectores planificados'),
     ('v_plan_psector_gully', 'Plan psector para sumideros', 'Vista para mostrar sumideros relacionados con psectores. Útil para mostrar sumideros que quedarán obsoletos en los psectores.'),
     ('v_plan_result_arc', NULL, 'Vista relacionada con los resultados de costes de los arcos'),
     ('v_plan_result_node', NULL, 'Vista relacionada con los resultados de costes para el nodo'),

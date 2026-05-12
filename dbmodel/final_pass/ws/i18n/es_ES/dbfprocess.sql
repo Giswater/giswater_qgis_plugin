@@ -353,7 +353,7 @@ UPDATE sys_fprocess AS t SET except_msg = v.except_msg, info_msg = v.info_msg, f
     (518, NULL, NULL, 'Fijar característica final'),
     (520, NULL, NULL, 'Fusión de sectores'),
     (521, NULL, NULL, 'Set reparación psector'),
-    (532, NULL, NULL, 'Análisis dinámico del macrominsector'),
+    (532, 'gullys sin arc_id o arc_id incorrecto.', NULL, 'Análisis dinámico del macrominsector'),
     (533, 'NO obligatorio node2arcs con menos de dos arcos. Se transformará sobre la marcha utilizando un solo arco''.', 'No se han encontrado resultados para Node2arcs NO obligatorios con menos de dos arcos.', 'Nodarc no obligatorio con menos de dos arcos'),
     (534, 'válvulas con valores nulos en la columna "valv_type".', 'Columna "valv_type" de válvulas virtuales verificada. No faltan valores obligatorios.', 'Comprobar si los nodos definidos (nodeParent) existen en una base de datos'),
     (541, 'sumideros sin conexión o sumideros sobre arcos sin arco_id.', 'Todos los sumideros tienen conexiones o están sobre arcos con arco_id.', 'Sumidero sin enlace'),

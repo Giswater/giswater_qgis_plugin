@@ -191,12 +191,14 @@ UPDATE config_toolbox
     "comboIds": [
       "MACROSECTOR",
       "MACROOMZONE",
-      "MACRODMA"
+      "MACRODMA",
+      "MACRODQA"
     ],
     "comboNames": [
       "MACROSECTOR",
       "MACROOMZONE",
-       "MACRODMA"
+       "MACRODMA",
+       "MACRODQA"
     ],
     "selectedId": null
   },

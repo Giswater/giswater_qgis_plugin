@@ -575,7 +575,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_plan_netscenario_arc', 'Netszenario-Bogen', 'Ansicht zur Visualisierung von Bögen in Bezug auf das ausgewählte Netzszenario'),
     ('v_plan_netscenario_connec', 'Netscenario verbindet', 'Ansicht zur Visualisierung von Verbindungen im Zusammenhang mit dem ausgewählten Netzszenario'),
     ('v_plan_netscenario_node', 'Netszenario-Knoten', 'Ansicht zur Visualisierung von Knoten in Bezug auf das ausgewählte Netzszenario'),
-    ('v_plan_psector', NULL, 'Ansicht zur Anzeige der geplanten Sektoren'),
+    ('v_plan_psector', 'Plan psector', 'Ansicht zur Anzeige der geplanten Sektoren'),
     ('v_plan_result_arc', NULL, 'Zeigt das Ergebnis der Bogenkosten'),
     ('v_plan_result_node', NULL, 'Zeigt das Ergebnis der Knotenkosten'),
     ('v_rpt_arc', 'Bogenwerte', 'Zeigt die Ergebnisse der Bogensimulation'),

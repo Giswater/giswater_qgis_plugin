@@ -763,3 +763,4 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('vu_element_x_node', NULL, 'vu_element_x_node')
 ) AS v(id, alias, descript)
 WHERE t.id = v.id;
+

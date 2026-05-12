@@ -246,3 +246,83 @@ SET value = jsonb_set(
     '"ve_gully"'
 )
 WHERE parameter = 'basic_search_v2_tab_network_gully';
+
+-- 12/05/2026
+UPDATE config_toolbox
+	SET inputparams='[
+  {
+    "widgetname": "graphClass",
+    "label": "Graph class:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Graphanalytics method used",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 1,
+    "comboIds": [
+      "MACROSECTOR",
+      "MACROOMZONE"
+    ],
+    "comboNames": [
+      "MACROSECTOR",
+      "MACROOMZONE"
+    ],
+    "selectedId": null
+  },
+  {
+    "widgetname": "exploitation",
+    "label": "Exploitation:",
+    "widgettype": "combo",
+    "datatype": "text",
+    "tooltip": "Choose exploitation to work with",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 2,
+    "dvQueryText": "SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC",
+    "selectedId": null
+  },
+  {
+    "widgetname": "commitChanges",
+    "label": "Commit changes:",
+    "widgettype": "check",
+    "datatype": "boolean",
+    "tooltip": "If True, changes will be applied to DB. If False, algorithm results will be saved in a temporal layer",
+    "layoutname": "grl_option_parameters",
+    "layoutorder": 8,
+    "value": null
+  },
+  {
+    "label": "Mapzone constructor method:",
+    "comboIds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "datatype": "integer",
+    "comboNames": [
+      "NONE",
+      "CONCAVE POLYGON",
+      "PIPE BUFFER",
+      "PLOT & PIPE BUFFER",
+      "LINK & PIPE BUFFER"
+    ],
+    "layoutname": "grl_option_parameters",
+    "selectedId": null,
+    "widgetname": "updateMapZone",
+    "widgettype": "combo",
+    "layoutorder": 9
+  },
+  {
+    "label": "Pipe buffer",
+    "value": null,
+    "tooltip": "Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.",
+    "datatype": "float",
+    "layoutname": "grl_option_parameters",
+    "widgetname": "geomParamUpdate",
+    "widgettype": "text",
+    "isMandatory": false,
+    "layoutorder": 10,
+    "placeholder": "5-30"
+  }
+]'::json
+	WHERE id=3482;

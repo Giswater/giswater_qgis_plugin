@@ -238,7 +238,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_gully', NULL, 'Hilfssicht für Gully'),
     ('v_link_gully', NULL, 'Gefilterte Ansicht der Links vom Typ connec'),
     ('v_man_gully', NULL, 'Zeigt editierbare Informationen zum Gully-Management'),
-    ('v_plan_psector', NULL, 'Ansicht zur Anzeige von Sektorenplänen'),
+    ('v_plan_psector', 'Plan psector', 'Ansicht zur Anzeige von Sektorenplänen'),
     ('v_plan_psector_gully', 'Plan psector gully', 'Ansicht zur Anzeige von Gullys in Verbindung mit Psektoren. Nützlich, um Gullys anzuzeigen, die in Psektoren veraltet sein werden'),
     ('v_plan_result_arc', NULL, 'Ansicht in Bezug auf die Kostenergebnisse für Bögen'),
     ('v_plan_result_node', NULL, 'Ansicht in Bezug auf die Kostenergebnisse für Knoten'),

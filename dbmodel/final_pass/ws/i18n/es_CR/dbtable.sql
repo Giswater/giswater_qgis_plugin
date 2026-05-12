@@ -575,7 +575,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_plan_netscenario_arc', 'Netscenario arc', 'Vista para visualizar los arcos relacionados con el escenario de red seleccionado'),
     ('v_plan_netscenario_connec', 'Netscenario connec', 'Vista para visualizar las conexiones relacionadas con el escenario de red seleccionado'),
     ('v_plan_netscenario_node', 'Netscenario node', 'Vista para visualizar los nodos relacionados con el escenario de red seleccionado'),
-    ('v_plan_psector', NULL, 'Vista para mostrar sectores planificados'),
+    ('v_plan_psector', 'Plan psector', 'Vista para mostrar sectores planificados'),
     ('v_plan_result_arc', NULL, 'Muestra el resultado del coste del arco'),
     ('v_plan_result_node', NULL, 'Muestra el resultado del coste del nodo'),
     ('v_rpt_arc', 'Valores del arco', 'Muestra los resultados de la simulación de arcos'),

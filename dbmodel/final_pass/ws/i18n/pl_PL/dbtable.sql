@@ -575,7 +575,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_plan_netscenario_arc', 'Netscenario arc', 'Widok do wizualizacji łuków związanych z wybranym scenariuszem sieciowym'),
     ('v_plan_netscenario_connec', 'Połączenie Netscenario', 'Widok do wizualizacji połączeń związanych z wybranym scenariuszem sieciowym'),
     ('v_plan_netscenario_node', 'Węzeł Netscenario', 'Widok do wizualizacji węzłów powiązanych z wybranym scenariuszem sieciowym'),
-    ('v_plan_psector', NULL, 'Widok przedstawiający zaplanowane sektory'),
+    ('v_plan_psector', 'Plan psector', 'Widok przedstawiający zaplanowane sektory'),
     ('v_plan_result_arc', NULL, 'Pokazuje wynik kosztu łuku'),
     ('v_plan_result_node', NULL, 'Pokazuje wynik kosztu węzła'),
     ('v_rpt_arc', 'Wartości łuku', 'Pokazuje wyniki symulacji łuków'),

@@ -238,7 +238,7 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('v_gully', NULL, 'Widok pomocniczy dla wpustu'),
     ('v_link_gully', NULL, 'Filtrowany widok połączeń typu link'),
     ('v_man_gully', NULL, 'Wyświetla edytowalne informacje o zarządzaniu wpustami'),
-    ('v_plan_psector', NULL, 'Widok, aby wyświetlić zaplanowane sektory'),
+    ('v_plan_psector', 'Plan psector', 'Widok, aby wyświetlić zaplanowane sektory'),
     ('v_plan_psector_gully', 'Wpust sektora planu', 'Widok pokazujący wpusty powiązane z sektorami. Przydatne do wyświetlania wpustów, które będą przestarzałe w psektorach.'),
     ('v_plan_result_arc', NULL, 'Widok powiązany z wynikami kosztów dla łuków'),
     ('v_plan_result_node', NULL, 'Widok powiązany z wynikami kosztów dla węzła'),

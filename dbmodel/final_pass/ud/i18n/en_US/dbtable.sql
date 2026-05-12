@@ -901,3 +901,4 @@ UPDATE sys_table AS t SET alias = v.alias, descript = v.descript FROM (
     ('vu_om_mincut', NULL, 'View of all mincuts related to user')
 ) AS v(id, alias, descript)
 WHERE t.id = v.id;
+
