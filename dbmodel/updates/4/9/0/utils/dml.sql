@@ -517,3 +517,47 @@ WHERE parameter = 'basic_search_v2_tab_network_connec';
 
 -- 12/05/2026
 UPDATE sys_table SET provider_config = jsonb_set(provider_config, '{provider_key}', '"postgres"') WHERE provider_config IS NULL;
+
+
+UPDATE sys_fprocess SET query_text='SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, t1.node_1, t1.node_2, t1.expl_id, t1.the_geom 
+ FROM ve_arc AS t1 JOIN ve_arc AS t2 USING(the_geom)
+ WHERE t1.arc_id != t2.arc_id AND t1.state > 0 AND t2.state>0' 
+WHERE fid=479;
+ 
+UPDATE sys_fprocess SET query_text='SELECT node_id, nodecat_id, the_geom, n.expl_id FROM t_node n JOIN value_state_type s ON id=state_type WHERE n.state > 0 AND s.is_operative IS FALSE AND verified <> 2'
+WHERE fid=187;
+
+UPDATE sys_fprocess SET query_text='SELECT a.arc_id, arccat_id, a.the_geom, expl_id FROM t_arc a WHERE slope < 0 AND state > 0 AND inverted_slope IS FALSE'
+WHERE fid=251;
+
+UPDATE sys_fprocess SET query_text='SELECT c.connec_id, c.conneccat_id, c.the_geom, c.expl_id, l.feature_type, link_id FROM t_arc a, t_link l 
+JOIN t_connec c ON l.feature_id = c.connec_id WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01) AND exit_type = ''ARC'' 
+AND (a.arc_id <> c.arc_id or c.arc_id is null)   AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1 and l.state=1 EXCEPT 
+SELECT c.connec_id, c.conneccat_id, c.the_geom, c.expl_id, l.feature_type, link_id  FROM t_node n, t_link l JOIN t_connec c ON l.feature_id = c.connec_id 
+WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01) AND exit_type IN (''NODE'', ''ARC'')  AND l.feature_type = ''CONNEC'' AND n.state=1 and c.state = 1 
+and l.state=1 ORDER BY feature_type, link_id'
+WHERE fid=257;
+
+UPDATE sys_fprocess SET query_text='with a as (SELECT arc_id, node_1, node_2, arccat_id, expl_id, state, the_geom FROM t_arc WHERE state = 1),
+n1 as (SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM t_node node, t_arc arc
+WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
+), 
+n2 as (	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_endpoint(arc.the_geom))) as d FROM t_node node, t_arc arc
+WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_endpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
+)
+select a.* from a 
+left join n1 on a.arc_id = n1.arc_id
+left join n2 on a.arc_id = n2.arc_id 
+where (a.node_1 != n1.node_id) or (a.node_2 != n2.node_id)'
+WHERE fid=372;
+
+UPDATE sys_fprocess SET query_text='SELECT  * FROM t_node a JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.node_type WHERE a.state>0 AND isarcdivide=false AND arc_id IS NULL'
+WHERE fid=443;
+
+UPDATE sys_fprocess SET query_text='SELECT connec_id, conneccat_id, the_geom, expl_id FROM t_connec WHERE state > 0 
+AND (sector_id=0 OR sector_id=-1)'
+WHERE fid=478;
+
+UPDATE sys_fprocess SET query_text='SELECT connec_id, conneccat_id, the_geom, expl_id FROM t_connec WHERE connec_id IN 
+(SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)'
+WHERE fid=480;
