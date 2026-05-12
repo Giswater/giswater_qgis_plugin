@@ -1,0 +1,10 @@
+4.5.1
+*************
+- Fix psector merge
+- Fix psector duplicate
+- Fix psector topology when duplicated nodes are found
+- Fix psignals on psector_manager and play/pause button
+- Fix some rows on sys_message
+- Fix selector_psector, add new messages to be more clear
+- Fix adding connecs into a psector without arc_id
+- Fix log order on audit_check_data
