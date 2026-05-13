@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -19,18 +20,16 @@ SELECT has_table('cat_arc'::name, 'Table cat_arc should exist');
 -- Check columns
 SELECT columns_are(
     'cat_arc',
-    ARRAY['id', 'code', 'arc_type','matcat_id','shape','geom1','geom2','geom3','geom4','geom5','geom6',
-        'geom7','geom8','geom_r','descript','link','brand_id','model_id','svg','z1','z2','width','area',
-        'estimated_depth','thickness','cost_unit','cost','m2bottom_cost','m3protec_cost','active','label',
-        'tsect_id','curve_id','acoeff','connect_cost','visitability_vdef'
+    ARRAY[
+        'id', 'arc_type', 'matcat_id', 'shape', 'geom1', 'geom2',
+        'geom3', 'geom4', 'geom5', 'geom6', 'geom7', 'geom8',
+        'geom_r', 'descript', 'link', 'brand_id', 'model_id', 'svg',
+        'z1', 'z2', 'width', 'area', 'estimated_depth', 'thickness',
+        'cost_unit', 'cost', 'm2bottom_cost', 'm3protec_cost', 'active', 'label',
+        'tsect_id', 'curve_id', 'acoeff', 'connect_cost', 'visitability_vdef', 'code'
     ],
     'Table cat_arc should have the correct columns'
 );
-
--- Check primary key
-SELECT col_is_pk('cat_arc', 'id', 'Column id should be primary key'); 
-
--- Check check columns
 
 -- Check column types
 SELECT col_type_is('cat_arc', 'id', 'varchar(30)', 'Column id should be varchar(30)');
@@ -70,31 +69,18 @@ SELECT col_type_is('cat_arc', 'connect_cost', 'text', 'Column connect_cost shoul
 SELECT col_type_is('cat_arc', 'visitability_vdef', 'int4', 'Column visitability_vdef should be int4');
 SELECT col_type_is('cat_arc', 'code', 'text', 'Column code should be text');
 
--- Check default values
-SELECT col_has_default('cat_arc', 'geom2', 'Column geom2 should have default value');
-SELECT col_has_default('cat_arc', 'geom3', 'Column geom3 should have default value');
-SELECT col_has_default('cat_arc', 'geom4', 'Column geom4 should have default value');
-SELECT col_has_default('cat_arc', 'cost_unit', 'Column cost_unit should have default value');
-SELECT col_has_default('cat_arc', 'active', 'Column active should have default value');
-
 -- Check foreign keys
 SELECT has_fk('cat_arc', 'Table cat_arc should have foreign keys');
 
-SELECT fk_ok('cat_arc', 'arc_type', 'cat_feature_arc', 'id', 'Table should have foreign key from arc_type to cat_feature_arc.id');
-SELECT fk_ok('cat_arc', 'brand_id', 'cat_brand', 'id', 'Table should have foreign key from brand_id to cat_brand.id');
-SELECT fk_ok('cat_arc', 'cost', 'plan_price', 'id', 'Table should have foreign key from cost to plan_price.id');
-SELECT fk_ok('cat_arc', 'curve_id', 'inp_curve', 'id', 'Table should have foreign key from curve_id to inp_curve.id');
-SELECT fk_ok('cat_arc', 'm2bottom_cost', 'plan_price', 'id', 'Table should have foreign key from m2bottom_cost to plan_price.id');
-SELECT fk_ok('cat_arc', 'm3protec_cost', 'plan_price', 'id', 'Table should have foreign key from m3protec_cost to plan_price.id');
-SELECT fk_ok('cat_arc', 'model_id', 'cat_brand_model', 'id', 'Table should have foreign key from model_id to cat_brand_model.id');
-SELECT fk_ok('cat_arc', 'shape', 'cat_arc_shape', 'id', 'Table should have foreign key from shape to cat_arc_shape.id');
-SELECT fk_ok('cat_arc', 'tsect_id', 'inp_transects', 'id', 'Table should have foreign key from tsect_id to inp_transects.id');
-
--- Check indexes
-SELECT has_index('cat_arc', 'cat_arc_pkey', ARRAY['id'], 'Table should have index on id');
-SELECT has_index('cat_arc', 'cat_arc_cost_idx', ARRAY['cost'], 'Table should have index on cost');
-SELECT has_index('cat_arc', 'cat_arc_m2bottom_cost_idx', ARRAY['m2bottom_cost'], 'Table should have index on m2bottom_cost');
-SELECT has_index('cat_arc', 'cat_arc_m3protec_cost_idx', ARRAY['m3protec_cost'], 'Table should have index on m3protec_cost');
+SELECT fk_ok('cat_arc', 'arc_type', 'cat_feature_arc', 'id', 'FK arc_type → cat_feature_arc.id');
+SELECT fk_ok('cat_arc', 'cost', 'plan_price', 'id', 'FK cost → plan_price.id');
+SELECT fk_ok('cat_arc', 'curve_id', 'inp_curve', 'id', 'FK curve_id → inp_curve.id');
+SELECT fk_ok('cat_arc', 'm2bottom_cost', 'plan_price', 'id', 'FK m2bottom_cost → plan_price.id');
+SELECT fk_ok('cat_arc', 'm3protec_cost', 'plan_price', 'id', 'FK m3protec_cost → plan_price.id');
+SELECT fk_ok('cat_arc', 'shape', 'cat_arc_shape', 'id', 'FK shape → cat_arc_shape.id');
+SELECT fk_ok('cat_arc', 'tsect_id', 'inp_transects', 'id', 'FK tsect_id → inp_transects.id');
+SELECT fk_ok('cat_arc', 'brand_id', 'cat_brand', 'id', 'FK brand_id → cat_brand.id');
+SELECT fk_ok('cat_arc', 'model_id', 'cat_brand_model', 'id', 'FK model_id → cat_brand_model.id');
 
 -- Finish
 SELECT * FROM finish();

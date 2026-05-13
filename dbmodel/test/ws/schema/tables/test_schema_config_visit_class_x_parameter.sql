@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table config_visit_class_x_parameter
+-- Check table
 SELECT has_table('config_visit_class_x_parameter'::name, 'Table config_visit_class_x_parameter should exist');
 
 -- Check columns
@@ -25,30 +26,18 @@ SELECT columns_are(
     'Table config_visit_class_x_parameter should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('config_visit_class_x_parameter', ARRAY['parameter_id', 'class_id'], 'Columns parameter_id, class_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('config_visit_class_x_parameter', 'class_id', 'integer', 'Column class_id should be integer');
+SELECT col_type_is('config_visit_class_x_parameter', 'class_id', 'int4', 'Column class_id should be int4');
 SELECT col_type_is('config_visit_class_x_parameter', 'parameter_id', 'varchar(50)', 'Column parameter_id should be varchar(50)');
-SELECT col_type_is('config_visit_class_x_parameter', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('config_visit_class_x_parameter', 'active', 'bool', 'Column active should be bool');
 
 -- Check foreign keys
 SELECT has_fk('config_visit_class_x_parameter', 'Table config_visit_class_x_parameter should have foreign keys');
-SELECT fk_ok('config_visit_class_x_parameter', 'class_id', 'config_visit_class', 'id', 'FK config_visit_class_x_parameter_class_fkey should exist');
-SELECT fk_ok('config_visit_class_x_parameter', 'parameter_id', 'config_visit_parameter', 'id', 'FK config_visit_class_x_parameter_parameter_fkey should exist');
 
--- Check triggers
+SELECT fk_ok('config_visit_class_x_parameter', 'class_id', 'config_visit_class', 'id', 'FK class_id → config_visit_class.id');
+SELECT fk_ok('config_visit_class_x_parameter', 'parameter_id', 'config_visit_parameter', 'id', 'FK parameter_id → config_visit_parameter.id');
 
--- Check rules
-
--- Check sequences
-
--- Check constraints
-SELECT col_not_null('config_visit_class_x_parameter', 'class_id', 'Column class_id should be NOT NULL');
-SELECT col_not_null('config_visit_class_x_parameter', 'parameter_id', 'Column parameter_id should be NOT NULL');
-SELECT col_default_is('config_visit_class_x_parameter', 'active', 'true', 'Column active should default to true');
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

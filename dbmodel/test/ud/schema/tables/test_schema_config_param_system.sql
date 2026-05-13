@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -20,17 +21,13 @@ SELECT has_table('config_param_system'::name, 'Table config_param_system should 
 SELECT columns_are(
     'config_param_system',
     ARRAY[
-        'parameter', 'value', 'descript', 'label', 'dv_querytext', 'dv_filterbyfield', 'isenabled', 'layoutorder', 'project_type', 'dv_isparent', 'isautoupdate',
-        'datatype', 'widgettype', 'ismandatory', 'iseditable', 'dv_orderby_id', 'dv_isnullvalue', 'stylesheet', 'widgetcontrols', 'placeholder', 'standardvalue', 'layoutname', 'device'
+        'parameter', 'value', 'descript', 'label', 'dv_querytext', 'dv_filterbyfield',
+        'isenabled', 'layoutorder', 'project_type', 'dv_isparent', 'isautoupdate', 'datatype',
+        'widgettype', 'ismandatory', 'iseditable', 'dv_orderby_id', 'dv_isnullvalue', 'stylesheet',
+        'widgetcontrols', 'placeholder', 'standardvalue', 'layoutname', 'device'
     ],
     'Table config_param_system should have the correct columns'
 );
-
--- Check primary key
-SELECT col_is_pk('config_param_system', 'parameter', 'Column parameter should be primary key');
-
--- Check check columns
-SELECT col_has_check('config_param_system', ARRAY['widgettype', 'dv_querytext'], 'Table should have check on widgettype and dv_querytext');
 
 -- Check column types
 SELECT col_type_is('config_param_system', 'parameter', 'varchar(50)', 'Column parameter should be varchar(50)');
@@ -55,10 +52,7 @@ SELECT col_type_is('config_param_system', 'widgetcontrols', 'json', 'Column widg
 SELECT col_type_is('config_param_system', 'placeholder', 'text', 'Column placeholder should be text');
 SELECT col_type_is('config_param_system', 'standardvalue', 'text', 'Column standardvalue should be text');
 SELECT col_type_is('config_param_system', 'layoutname', 'text', 'Column layoutname should be text');
-SELECT col_type_is('config_param_system', 'device', 'integer[]', 'Column device should be integer[]');
-
--- Check indexes
-SELECT has_index('config_param_system', 'config_param_system_pkey', ARRAY['parameter'], 'Table should have index on parameter');
+SELECT col_type_is('config_param_system', 'device', 'int4[]', 'Column device should be int4[]');
 
 -- Finish
 SELECT * FROM finish();

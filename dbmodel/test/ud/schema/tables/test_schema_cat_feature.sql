@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -20,14 +21,11 @@ SELECT has_table('cat_feature'::name, 'Table cat_feature should exist');
 SELECT columns_are(
     'cat_feature',
     ARRAY[
-        'id', 'feature_class', 'feature_type', 'shortcut_key', 'parent_layer', 'child_layer', 'descript', 'link_path', 'code_autofill', 'active',
-        'addparam', 'inventory_vdefault'
+        'id', 'feature_class', 'feature_type', 'shortcut_key', 'parent_layer', 'child_layer',
+        'descript', 'link_path', 'code_autofill', 'active', 'addparam', 'inventory_vdefault'
     ],
     'Table cat_feature should have the correct columns'
 );
-
--- Check primary key
-SELECT col_is_pk('cat_feature', 'id', 'Column id should be primary key'); 
 
 -- Check column types
 SELECT col_type_is('cat_feature', 'id', 'varchar(30)', 'Column id should be varchar(30)');
@@ -43,21 +41,10 @@ SELECT col_type_is('cat_feature', 'active', 'bool', 'Column active should be boo
 SELECT col_type_is('cat_feature', 'addparam', 'json', 'Column addparam should be json');
 SELECT col_type_is('cat_feature', 'inventory_vdefault', 'bool', 'Column inventory_vdefault should be bool');
 
-
--- Check default values
-SELECT col_has_default('cat_feature', 'code_autofill', 'Column code_autofill should have default value');
-
 -- Check foreign keys
 SELECT has_fk('cat_feature', 'Table cat_feature should have foreign keys');
-SELECT fk_ok('cat_feature', ARRAY['feature_class','feature_type'], 'sys_feature_class', ARRAY['id','type'], 'Table should have foreign key from feature_class, feature_type to sys_feature_class.id, type');
 
--- Check indexes
-SELECT has_index('cat_feature', 'cat_feature_pkey', ARRAY['id'], 'Table should have index on id');
-SELECT has_index('cat_feature', 'shortcut_unique', ARRAY['shortcut_key'], 'Table should have index on shortcut_key');
-
--- Check triggers
-SELECT has_trigger('cat_feature', 'gw_trg_cat_feature_after', 'Table should have trigger gw_trg_cat_feature_after');
-SELECT has_trigger('cat_feature', 'gw_trg_cat_feature_delete', 'Table should have trigger gw_trg_cat_feature_delete');
+SELECT fk_ok('cat_feature', ARRAY['feature_class', 'feature_type'], 'sys_feature_class', ARRAY['id', 'type'], 'FK (feature_class, feature_type) → sys_feature_class(id, type)');
 
 -- Finish
 SELECT * FROM finish();

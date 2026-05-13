@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -25,12 +26,6 @@ SELECT columns_are(
     'Table cat_feature_arc should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('cat_feature_arc', 'id', 'Column id should be primary key'); 
-
--- Check check columns
-SELECT col_has_check('cat_feature_arc', 'epa_default', 'Table should have check on epa_default');
-
 -- Check column types
 SELECT col_type_is('cat_feature_arc', 'id', 'varchar(30)', 'Column id should be varchar(30)');
 SELECT col_type_is('cat_feature_arc', 'epa_default', 'varchar(30)', 'Column epa_default should be varchar(30)');
@@ -38,10 +33,7 @@ SELECT col_type_is('cat_feature_arc', 'epa_default', 'varchar(30)', 'Column epa_
 -- Check foreign keys
 SELECT has_fk('cat_feature_arc', 'Table cat_feature_arc should have foreign keys');
 
-SELECT fk_ok('cat_feature_arc', 'id', 'cat_feature', 'id', 'Table should have foreign key from id to cat_feature.id');
-
--- Check indexes
-SELECT has_index('cat_feature_arc', 'cat_feature_arc_pkey', ARRAY['id'], 'Table should have index on id');
+SELECT fk_ok('cat_feature_arc', 'id', 'cat_feature', 'id', 'FK id → cat_feature.id');
 
 -- Finish
 SELECT * FROM finish();

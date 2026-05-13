@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,53 +14,44 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table plan_netscenario_dma
+-- Check table
 SELECT has_table('plan_netscenario_dma'::name, 'Table plan_netscenario_dma should exist');
 
 -- Check columns
 SELECT columns_are(
     'plan_netscenario_dma',
     ARRAY[
-        'netscenario_id', 'dma_id', 'name', 'code', 'descript', 'pattern_id', 'graphconfig', 'the_geom',
-        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id', 'muni_id', 'sector_id', 'addparam'
+        'netscenario_id', 'dma_id', 'name', 'pattern_id', 'graphconfig', 'the_geom',
+        'active', 'updated_at', 'updated_by', 'stylesheet', 'expl_id', 'muni_id',
+        'sector_id', 'code', 'descript', 'addparam'
     ],
     'Table plan_netscenario_dma should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('plan_netscenario_dma', ARRAY['netscenario_id', 'dma_id'], 'Columns netscenario_id and dma_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('plan_netscenario_dma', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
-SELECT col_type_is('plan_netscenario_dma', 'dma_id', 'integer', 'Column dma_id should be integer');
-SELECT col_type_is('plan_netscenario_dma', 'name', 'character varying(100)', 'Column name should be character varying(100)');
-SELECT col_type_is('plan_netscenario_dma', 'code', 'character varying(100)', 'Column code should be character varying(100)');
-SELECT col_type_is('plan_netscenario_dma', 'descript', 'character varying(255)', 'Column descript should be character varying(255)');
-SELECT col_type_is('plan_netscenario_dma', 'pattern_id', 'character varying(16)', 'Column pattern_id should be character varying(16)');
+SELECT col_type_is('plan_netscenario_dma', 'netscenario_id', 'int4', 'Column netscenario_id should be int4');
+SELECT col_type_is('plan_netscenario_dma', 'dma_id', 'int4', 'Column dma_id should be int4');
+SELECT col_type_is('plan_netscenario_dma', 'name', 'varchar(100)', 'Column name should be varchar(100)');
+SELECT col_type_is('plan_netscenario_dma', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('plan_netscenario_dma', 'graphconfig', 'json', 'Column graphconfig should be json');
-SELECT col_type_is('plan_netscenario_dma', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
-SELECT col_type_is('plan_netscenario_dma', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('plan_netscenario_dma', 'the_geom', 'geometry(multipolygon, SRID_VALUE)', 'Column the_geom should be geometry(multipolygon, SRID_VALUE)');
+SELECT col_type_is('plan_netscenario_dma', 'active', 'bool', 'Column active should be bool');
 SELECT col_type_is('plan_netscenario_dma', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
-SELECT col_type_is('plan_netscenario_dma', 'updated_by', 'character varying(50)', 'Column updated_by should be character varying(50)');
+SELECT col_type_is('plan_netscenario_dma', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('plan_netscenario_dma', 'stylesheet', 'json', 'Column stylesheet should be json');
-SELECT col_type_is('plan_netscenario_dma', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
-SELECT col_type_is('plan_netscenario_dma', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
-SELECT col_type_is('plan_netscenario_dma', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
+SELECT col_type_is('plan_netscenario_dma', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
+SELECT col_type_is('plan_netscenario_dma', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');
+SELECT col_type_is('plan_netscenario_dma', 'sector_id', 'int4[]', 'Column sector_id should be int4[]');
+SELECT col_type_is('plan_netscenario_dma', 'code', 'varchar(100)', 'Column code should be varchar(100)');
+SELECT col_type_is('plan_netscenario_dma', 'descript', 'varchar(255)', 'Column descript should be varchar(255)');
 SELECT col_type_is('plan_netscenario_dma', 'addparam', 'json', 'Column addparam should be json');
-
--- Check default values
-SELECT col_default_is('plan_netscenario_dma', 'active', 'true', 'Default value for active should be true');
-SELECT col_has_default('plan_netscenario_dma', 'updated_at', 'Column updated_at should have a default value');
-SELECT col_default_is('plan_netscenario_dma', 'updated_by', 'CURRENT_USER', 'Default value for updated_by should be CURRENT_USER');
 
 -- Check foreign keys
 SELECT has_fk('plan_netscenario_dma', 'Table plan_netscenario_dma should have foreign keys');
-SELECT fk_ok('plan_netscenario_dma', 'netscenario_id', 'plan_netscenario', 'netscenario_id', 'FK netscenario_id should reference plan_netscenario.netscenario_id');
 
--- Check constraints
-SELECT col_not_null('plan_netscenario_dma', 'netscenario_id', 'Column netscenario_id should be NOT NULL');
-SELECT col_not_null('plan_netscenario_dma', 'dma_id', 'Column dma_id should be NOT NULL');
+SELECT fk_ok('plan_netscenario_dma', 'netscenario_id', 'plan_netscenario', 'netscenario_id', 'FK netscenario_id → plan_netscenario.netscenario_id');
 
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

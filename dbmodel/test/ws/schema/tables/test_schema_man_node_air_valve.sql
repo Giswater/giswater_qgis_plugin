@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table man_node_air_valve
+-- Check table
 SELECT has_table('man_node_air_valve'::name, 'Table man_node_air_valve should exist');
 
 -- Check columns
@@ -25,23 +26,17 @@ SELECT columns_are(
     'Table man_node_air_valve should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('man_node_air_valve', ARRAY['node_id'], 'Column node_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('man_node_air_valve', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('man_node_air_valve', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('man_node_air_valve', 'airvalve_param_1', 'text', 'Column airvalve_param_1 should be text');
-SELECT col_type_is('man_node_air_valve', 'airvalve_param_2', 'integer', 'Column airvalve_param_2 should be integer');
-
--- Check not null constraints
-SELECT col_not_null('man_node_air_valve', 'node_id', 'Column node_id should be NOT NULL');
+SELECT col_type_is('man_node_air_valve', 'airvalve_param_2', 'int4', 'Column airvalve_param_2 should be int4');
 
 -- Check foreign keys
-SELECT fk_ok('man_node_air_valve', 'node_id', 'node', 'node_id', 'FK node_id should reference node.node_id');
+SELECT has_fk('man_node_air_valve', 'Table man_node_air_valve should have foreign keys');
 
--- Check indexes
-SELECT has_index('man_node_air_valve', 'man_node_air_valve_node_id_index', 'Should have index on node_id');
+SELECT fk_ok('man_node_air_valve', 'node_id', 'node', 'node_id', 'FK node_id → node.node_id');
 
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

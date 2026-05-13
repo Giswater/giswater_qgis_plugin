@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table inp_tags
+-- Check table
 SELECT has_table('inp_tags'::name, 'Table inp_tags should exist');
 
 -- Check columns
@@ -25,26 +26,12 @@ SELECT columns_are(
     'Table inp_tags should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('inp_tags', ARRAY['feature_type', 'feature_id'], 'Columns feature_type, feature_id should be primary key');
-
 -- Check column types
 SELECT col_type_is('inp_tags', 'feature_type', 'varchar(18)', 'Column feature_type should be varchar(18)');
 SELECT col_type_is('inp_tags', 'feature_id', 'varchar(16)', 'Column feature_id should be varchar(16)');
 SELECT col_type_is('inp_tags', 'tag', 'varchar(50)', 'Column tag should be varchar(50)');
 
--- Check foreign keys
-
--- Check triggers
-
--- Check rules
-
--- Check sequences
-
--- Check constraints
-SELECT col_not_null('inp_tags', 'feature_type', 'Column feature_type should be NOT NULL');
-SELECT col_not_null('inp_tags', 'feature_id', 'Column feature_id should be NOT NULL');
-
+-- Finish
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

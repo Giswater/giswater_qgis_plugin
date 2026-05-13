@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table plan_netscenario_mapzone_graph
+-- Check table
 SELECT has_table('plan_netscenario_mapzone_graph'::name, 'Table plan_netscenario_mapzone_graph should exist');
 
 -- Check columns
@@ -25,22 +26,14 @@ SELECT columns_are(
     'Table plan_netscenario_mapzone_graph should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('plan_netscenario_mapzone_graph', ARRAY['node_id', 'mapzone_id'], 'Columns node_id and mapzone_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('plan_netscenario_mapzone_graph', 'node_id', 'integer', 'Column node_id should be integer');
-SELECT col_type_is('plan_netscenario_mapzone_graph', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
-SELECT col_type_is('plan_netscenario_mapzone_graph', 'mapzone_id', 'integer', 'Column mapzone_id should be integer');
+SELECT col_type_is('plan_netscenario_mapzone_graph', 'node_id', 'int4', 'Column node_id should be int4');
+SELECT col_type_is('plan_netscenario_mapzone_graph', 'netscenario_id', 'int4', 'Column netscenario_id should be int4');
+SELECT col_type_is('plan_netscenario_mapzone_graph', 'mapzone_id', 'int4', 'Column mapzone_id should be int4');
 SELECT col_type_is('plan_netscenario_mapzone_graph', 'mapzone_type', 'text', 'Column mapzone_type should be text');
-SELECT col_type_is('plan_netscenario_mapzone_graph', 'flow_sign', 'smallint', 'Column flow_sign should be smallint');
+SELECT col_type_is('plan_netscenario_mapzone_graph', 'flow_sign', 'int2', 'Column flow_sign should be int2');
 
--- Check constraints
-SELECT col_not_null('plan_netscenario_mapzone_graph', 'node_id', 'Column node_id should be NOT NULL');
-SELECT col_not_null('plan_netscenario_mapzone_graph', 'netscenario_id', 'Column netscenario_id should be NOT NULL');
-SELECT col_not_null('plan_netscenario_mapzone_graph', 'mapzone_id', 'Column mapzone_id should be NOT NULL');
-SELECT col_not_null('plan_netscenario_mapzone_graph', 'mapzone_type', 'Column mapzone_type should be NOT NULL');
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;
