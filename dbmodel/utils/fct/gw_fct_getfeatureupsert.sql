@@ -1135,6 +1135,23 @@ BEGIN
 					END IF;
 				END IF;
 
+				-- Apply default also on UPDATE for filter combos (their value is not persisted)
+				IF COALESCE((aux_json->>'isfilter')::boolean, false) = TRUE
+				   AND (field_value IS NULL OR field_value = '') THEN
+					IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
+						IF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+							IF (aux_json->>'widgetcontrols')::json->>'vdefault_value'::text in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								field_value = (aux_json->>'widgetcontrols')::json->>'vdefault_value';
+							END IF;
+						ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+							EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext'::text INTO vdefault_querytext;
+							IF vdefault_querytext in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								field_value = vdefault_querytext;
+							END IF;
+						END IF;
+					END IF;
+				END IF;
+
 				--check if selected id is on combo list
 				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) AND field_value IS NOT NULL then
 					--find dvquerytext for combo
