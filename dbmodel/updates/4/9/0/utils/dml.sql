@@ -561,3 +561,14 @@ WHERE fid=478;
 UPDATE sys_fprocess SET query_text='SELECT connec_id, conneccat_id, the_geom, expl_id FROM t_connec WHERE connec_id IN 
 (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)'
 WHERE fid=480;
+
+-- 13/05/2026
+INSERT INTO config_form_tableview
+(location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam)
+VALUES('visitmanager_form', 'utils', 'tbl_visit_manager', 'id', 0, true, NULL, NULL, NULL, '{
+  "header": "visit_id",
+  "accessorKey": "id"
+}'::json);
+
+DELETE FROM config_param_system
+	WHERE "parameter"='basic_search_v2_tab_hydrometer';

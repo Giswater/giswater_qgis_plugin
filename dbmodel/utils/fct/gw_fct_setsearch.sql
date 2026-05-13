@@ -189,20 +189,6 @@ BEGIN
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
 		' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
 		INTO v_geometry;
-	elsif v_section = 'basic_search_v2_tab_hydrometer' then
-		EXECUTE 'SELECT feature_id FROM '||quote_ident(v_table_name)||
-		' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||')'
-		INTO v_result;
-
-		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM ve_connec
-		WHERE connec_id = ('||quote_nullable(v_result)||'))row'
-		INTO v_geometry;
-
-		if v_geometry is null then
-			EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM ve_node
-			WHERE node_id = ('||quote_nullable(v_result)||'))row'
-			INTO v_geometry;
-		end if;
 	elsif v_section = 'basic_search_v2_tab_workcat' then
 
 		execute 'SELECT row_to_json(row) FROM (SELECT
