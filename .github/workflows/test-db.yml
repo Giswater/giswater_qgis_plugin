@@ -1,17 +1,17 @@
-name: CI Test WS database
+name: 🐘 PostgreSQL Tests
 
 on:
   push:
-    branches: [main, release/**, feature/**]
+    branches: [main, release/**, feature/**, refactor/**]
     tags: [v*]
     paths:
       - 'dbmodel/**'
-      - '.github/workflows/dbmodel-ci-test-ws-db.yml'
+      - '.github/workflows/test-db.yml'
   pull_request:
-    branches: [main, release/**, feature/**]
+    branches: [main, release/**, feature/**, refactor/**]
     paths:
       - 'dbmodel/**'
-      - '.github/workflows/dbmodel-ci-test-ws-db.yml'
+      - '.github/workflows/test-db.yml'
   workflow_dispatch:
     inputs:
       tests:
@@ -32,23 +32,25 @@ defaults:
     working-directory: dbmodel
 
 jobs:
-  ci_test_ws_db:
+  ci_test_db:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        project: [ud, ws]
         pg_version: [16, 17]
 
     env:
       # PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       PGPASSWORD: postgres
+      GW_SCHEMA: ${{ format('{0}_40', matrix.project) }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show which PG version we're testing
-        run: echo "Testing on PostgreSQL version ${{ matrix.pg_version }}"
+      - name: Show matrix
+        run: echo "Testing ${{ matrix.project }} on PostgreSQL ${{ matrix.pg_version }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -85,26 +87,22 @@ jobs:
 
       - name: Create & start PG cluster
         run: |
-          # Choose a port based on matrix.pg_version and workflow type (WS)
           if [ "${{ matrix.pg_version }}" = "16" ]; then
             PORT=55432
           else
             PORT=55433
           fi
 
-          # Ensure any existing cluster is stopped before creating new one
           sudo pg_dropcluster --stop ${{ matrix.pg_version }} main || true
 
           sudo pg_createcluster ${{ matrix.pg_version }} main --port=$PORT
           sudo pg_ctlcluster ${{ matrix.pg_version }} main start
 
-          # Make the port visible to subsequent steps
           echo "PORT=$PORT" >> $GITHUB_ENV
 
       - name: Show running clusters
         run: sudo pg_lsclusters
 
-      # Use the secret password here
       - name: Set postgres password
         run: |
           sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
@@ -122,38 +120,39 @@ jobs:
           psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgtap;'
 
       - name: Replace variables in SQL files
-        run: python test/replace_vars.py ws
+        run: python test/replace_vars.py ${{ matrix.project }}
 
       - name: Create Sample Schema
-        run: python test/execute_sql_files.py ws
+        run: python test/execute_sql_files.py ${{ matrix.project }}
 
       - name: Run all SQL tests in sequence
         run: |
           TEST_GROUPS="${{ github.event.inputs.tests || 'all' }}"
+          PT="${{ matrix.project }}"
           EXIT_CODE=0
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"schema"* ]]; then
             echo "Running SCHEMA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/schema/{tables,views}/*.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/schema/tables"/*.sql "test/${PT}/schema/views"/*.sql || EXIT_CODE=1
           fi
 
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"security"* ]]; then
             echo "Running SECURITY tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/security/*.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/security"/*.sql || EXIT_CODE=1
           fi
 
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"function"* ]]; then
             echo "Running FUNCTION tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/function/*.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/function"/*.sql || EXIT_CODE=1
           fi
 
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"data"* ]]; then
             echo "Running DATA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/data/*.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/data"/*.sql || EXIT_CODE=1
           fi
 
           if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"performance"* ]]; then
             echo "Running PERFORMANCE tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/performance/*.sql || EXIT_CODE=1
+            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/performance"/*.sql || EXIT_CODE=1
           fi
 
           exit $EXIT_CODE
@@ -170,7 +169,8 @@ jobs:
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
         run: |
           /usr/lib/postgresql/${{ matrix.pg_version }}/bin/pg_dump \
-            -h localhost -p ${{ env.PORT }} -U postgres -n ws_40 -Fc -f gw_ws.dump gw_db
+            -h localhost -p ${{ env.PORT }} -U postgres -n ${{ env.GW_SCHEMA }} -Fc -f gw_${{ matrix.project }}.dump gw_db
+
       - name: Log in to GHCR
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
         uses: docker/login-action@v3
@@ -186,7 +186,7 @@ jobs:
           context: dbmodel
           file: dbmodel/docker/gw-db/Dockerfile
           push: true
-          tags: ghcr.io/giswater/gw-db:${{ env.IMAGE_TAG }}-pg${{ matrix.pg_version }}-ws
+          tags: ghcr.io/giswater/gw-db:${{ env.IMAGE_TAG }}-pg${{ matrix.pg_version }}-${{ matrix.project }}
           build-args: |
-            GW_DUMP=gw_ws.dump
+            GW_DUMP=gw_${{ matrix.project }}.dump
             PG_MAJOR=${{ matrix.pg_version }}
