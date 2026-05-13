@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New indexes on `anl_*` tables.
 - New tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
 - New trigger `gw_trg_update_element_mapzones` to update the mapzone columns for the element.
+- Added `has_treatment` column to `ve_node`, `ve_connec`, and `ve_gully` views in `ud` projects.
 
 ### Fixed
 
