@@ -1083,8 +1083,9 @@ BEGIN
 
 			END IF;
 
-			-- set the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
-			-- TANKS, SOURCE, WATERWELL, WTP
+			-- set arcs connected to WATER SECTOR (TANKS, SOURCE, WATERWELL, WTP):
+			--   - 'INLET'  -> if the arc is an inlet_arc
+			--   - 'SECTOR' -> otherwise
 			WITH
 				water AS (
 					SELECT node_id, inlet_arc FROM man_tank
@@ -1102,17 +1103,21 @@ BEGIN
 					WHERE 'SECTOR' = ANY (n.graph_delimiter)
 				)
 			UPDATE temp_pgr_arc a
-			SET graph_delimiter = 'SECTOR'
+			SET graph_delimiter =
+			CASE
+				WHEN EXISTS (
+					SELECT 1
+					FROM sector_water s
+					WHERE (s.node_id = a.pgr_node_1 OR s.node_id = a.pgr_node_2)
+					AND a.pgr_arc_id = ANY (COALESCE(s.inlet_arc, ARRAY[]::int[]))
+				)
+				THEN 'INLET'
+				ELSE 'SECTOR'
+			END
 			WHERE EXISTS (
 				SELECT 1
 				FROM sector_water s
 				WHERE (s.node_id = a.pgr_node_1 OR s.node_id = a.pgr_node_2)
-        		AND a.pgr_arc_id <> ALL(COALESCE(s.inlet_arc, ARRAY[]::int[]))
-			)
-			AND EXISTS (
-				SELECT 1
-				FROM temp_pgr_node n
-				WHERE (n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2)
 			);
 
 			-- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
@@ -1155,6 +1160,18 @@ BEGIN
 			WHERE n.graph_delimiter = 'MINSECTOR'
 			AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
 			AND ta.pgr_arc_id = t.pgr_arc_id;
+
+			-- force cost_mincut = -1 for adjacent 'SECTOR'/'INLET' arcs to limit the mincut network;
+			-- water sources always act as network boundaries
+			UPDATE temp_pgr_arc_linegraph t
+			SET graph_delimiter = 'SECTOR',
+				cost_mincut = -1
+			FROM temp_pgr_arc_linegraph ta
+			JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
+			JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
+			WHERE a1.graph_delimiter IN ('INLET', 'SECTOR') 
+			AND  a2.graph_delimiter IN ('INLET', 'SECTOR')
+			AND t.pgr_arc_id = ta.pgr_arc_id;
 
 			-- Generate the minsectors
 			--------------------------
