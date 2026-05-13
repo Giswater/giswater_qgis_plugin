@@ -2299,6 +2299,7 @@ BEGIN
 				FROM temp_pgr_arc ta
 				JOIN arc a ON a.arc_id = ta.pgr_arc_id
 				WHERE ta.mapzone_id > 0
+				AND a.sector_id > 0
 				GROUP BY ta.mapzone_id
 				) s
 				WHERE m.mapzone_id = s.mapzone_id;
