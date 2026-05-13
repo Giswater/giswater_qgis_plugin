@@ -44,7 +44,7 @@ v_exists boolean;
 -- Return and sys params
 v_version text;
 v_srid integer;
-v_parent_schema text = 'ap';
+v_parent_schema text = 'PARENT_SCHEMA';
 v_project_type TEXT = 'ws'; -- NOTE: WS is mandatory to create temp tables
 v_function_id INT = 3556;
 v_fid int = 999;
@@ -54,14 +54,22 @@ v_result_point json;
 v_result_line json;
 v_check_sum numeric;
 
+v_max_distance numeric;
+v_feature_table text;
+v_feature_geom public.geometry;
+v_distance_m numeric;
+v_doc_mismatch_count integer := 0;
+v_node_id integer;
+v_doc_hash_existing_feature_count integer := 0;
+
 
 
 
 BEGIN
 
-    --SET search_path = "cm","ap",public;
+    --SET search_path = "cm","PARENT_SCHEMA",public;
 	-- Search path (transaction-local)
-	PERFORM set_config('search_path', 'cm,ap,public', true);
+	PERFORM set_config('search_path', 'cm,PARENT_SCHEMA,public', true);
 
 
 	-- Init params
@@ -71,15 +79,19 @@ BEGIN
     v_percent_data := coalesce((p_data ->'data' ->'parameters'->>'percentData'), 50::text)::numeric;
     v_commit_changes := (p_data ->'data' ->'parameters'->>'commitChanges')::boolean;
 	v_excluded_features := (p_data ->'data' ->'parameters'->>'excludedFeatures')::text;
+	v_max_distance := (p_data ->'data' ->'parameters'->>'docGeomMismatch')::text;
+
 
 	v_sql_excluded_features = 'SELECT concat('||quote_literal(v_parent_schema)||', ''_'', trim(lower(val))) 
 	FROM regexp_split_to_table('||quote_literal(v_excluded_features)||', '','') AS val'; 
 
-	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('om_state_mpicture', 0, 0.2, NULL, CURRENT_USER, NULL) ON CONFLICT DO NOTHING;
-	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('node_proximity', 0.1, 0.2, NULL, CURRENT_USER, 'Sus unidades son metros y expresa el valor máximo que consideramemos nodos cercanos. El valor mínimo es de sistema (0.1). Por debajo de esta medida se considera nodos duplicados. A más distancia menos qindex.') ON CONFLICT DO NOTHING;
-	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('arc_diam_jump', 50, 0.2, NULL, CURRENT_USER, 'Sus unidades son milimetros y expresa la diferencia los diametres de las dos tuberías que le llegan al nodo. A más diferencia más qindex') ON CONFLICT DO NOTHING;
-	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('valve_dn_wrong', 30, 0.2, NULL, CURRENT_USER, 'Sus unidades son milimetros y expresa la diferencia de los diametros de las tuberias que le llegan en comparación de la propia de la valvula. A más diferencia más qindex') ON CONFLICT DO NOTHING;
-	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('elev_inconsistency', 50, 0.2, NULL, CURRENT_USER, 'Se expresa en metros y el umbral expresa la diferencia entre la cota gps y la cota dem a partir de la cual es sospechoso. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('om_state_mpicture', 0, 0.14285714285714285, NULL, CURRENT_USER, NULL) ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('node_proximity', 0.1, 0.14285714285714285, NULL, CURRENT_USER, 'Sus unidades son metros y expresa el valor máximo que consideramemos nodos cercanos. El valor mínimo es de sistema (0.1). Por debajo de esta medida se considera nodos duplicados. A más distancia menos qindex.') ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('arc_diam_jump', 50, 0.14285714285714285, NULL, CURRENT_USER, 'Sus unidades son milimetros y expresa la diferencia los diametres de las dos tuberías que le llegan al nodo. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('valve_dn_wrong', 30, 0.14285714285714285, NULL, CURRENT_USER, 'Sus unidades son milimetros y expresa la diferencia de los diametros de las tuberias que le llegan en comparación de la propia de la valvula. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('elev_inconsistency', 50, 0.14285714285714285, NULL, CURRENT_USER, 'Se expresa en metros y el umbral expresa la diferencia entre la cota gps y la cota dem a partir de la cual es sospechoso. A más diferencia más qindex') ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('doc_geom_mismatch', 5, 0.14285714285714285, NULL, CURRENT_USER, 'Distancia máxima en metros permitida entre la geometría del documento y la geometría de la feature vinculada.') ON CONFLICT DO NOTHING;
+	INSERT INTO config_qindex_suspicious (param_name, threshold, weight, addparam, cur_user, tooltip) VALUES('doc_hash_duplicated', 5, 0.14285714285714285, NULL, CURRENT_USER, NULL) ON CONFLICT DO NOTHING;
 
 
 	
@@ -92,7 +104,7 @@ BEGIN
 
 
 
-	SELECT sum(weight) INTO v_check_sum FROM cm.config_qindex_suspicious
+	SELECT round(sum(weight)) INTO v_check_sum FROM cm.config_qindex_suspicious
 	WHERE cur_user = current_user;
 
 	--raise exception '%', v_check_sum;
@@ -103,12 +115,9 @@ BEGIN
 	 	"data":{"message":"4588", "function":"3556","parameters":null, "is_process":true}}$$)';
 */
 
-		RAISE EXCEPTION 'La suma de los pesos es diferente a 1';
+		RAISE EXCEPTION 'The sum of the weights is different from 1';
 
 	END IF;
-
-
-
 
 	alter table t_anl_node add column delta numeric;
 	alter table t_anl_node add column param_name text;
@@ -135,7 +144,7 @@ BEGIN
 
 
 	execute '
-	select STRING_AGG(''SELECT uuid, node_id, node_type, top_elev, nodecat_id, om_state, conserv_state, the_geom, '' || quote_literal(concat('||quote_literal(v_parent_schema)||', ''_'', lower(id))) || '' as child_table FROM '' || concat(''cm.ap'', ''_'', lower(id)) || '' WHERE the_geom IS NOT NULL'', '' UNION '')
+	select STRING_AGG(''SELECT uuid, node_id, node_type, top_elev, nodecat_id, om_state, conserv_state, the_geom, '' || quote_literal(concat('||quote_literal(v_parent_schema)||', ''_'', lower(id))) || '' as child_table FROM '' || concat(''cm.PARENT_SCHEMA'', ''_'', lower(id)) || '' WHERE the_geom IS NOT NULL'', '' UNION '')
 	from PARENT_SCHEMA.cat_feature where feature_type = ''NODE'''
 	into v_sql_node;
 
@@ -190,7 +199,7 @@ BEGIN
 
 	execute'
 	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	select 999, 1, concat(''Hay '', count(*), '' nodos en la capa '', child_table, '' cuya elevación se distancia más de '', '||v_threshold||', '' metros.'') from ('||v_sql_result||')
+	select 999, 1, concat(''There are '', count(*), '' nodes in the layer '', child_table, '' whose elevation is more than '', '||v_threshold||', '' meters.'') from ('||v_sql_result||')
 	GROUP BY child_table
 	';
 
@@ -220,7 +229,7 @@ BEGIN
 
 	execute '
 	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	select 999, 1, concat(''Hay '', count(*), '' nodos en la capa '', child_table, '' que tienen estado de conservación y estado funcional, pero no tienen foto.'') from ('||v_sql_result||')
+	select 999, 1, concat(''There are '', count(*), '' nodes in the layer '', child_table, '' that have conservation state and functional state, but do not have picture.'') from ('||v_sql_result||')
 	GROUP BY child_table
 	';
 
@@ -239,7 +248,7 @@ BEGIN
 		JOIN nods b using (node_id)
     )
     SELECT a.node_id, a.nodecat_id, string_agg(b.node_id::text, '','') AS node_id_duplicated, a.the_geom, a.child_table,
-	concat(''Nodos cercanos entre 0.1 m y '', %L, '' m.'') as descript,
+	concat(''Near nodes between 0.1 m y '', %L, '' m.'') as descript,
 	(1/st_distance(a.the_geom, b.the_geom)) as delta
     FROM mec a 
 	LEFT JOIN mec b ON st_dwithin(a.the_geom, b.the_geom, %L) 
@@ -261,7 +270,7 @@ BEGIN
 
 	execute '
 	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	select 999, 1, concat(''Hay '', count(*), '' nodos en la capa '', child_table, '' a menos de '', '||v_threshold||', '' metros.'') from ('||v_sql_result||')
+	select 999, 1, concat(''There are '', count(*), '' nodes in the layer '', child_table, '' less than '', '||v_threshold||', '' meters.'') from ('||v_sql_result||')
 	GROUP BY child_table
 	';
 
@@ -305,7 +314,7 @@ BEGIN
 
 	execute '
 	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	select 999, 1, concat(''Hay '', count(*), '' cambio(s) de diametro sin razón aparente. '') from ('||v_sql_result||')
+	select 999, 1, concat(''There are '', count(*), '' diameter change(s) without apparent reason.'') from ('||v_sql_result||')
 	';
 
 
@@ -349,11 +358,190 @@ BEGIN
 
 	execute '
 	INSERT INTO t_audit_check_data (fid, criticity, error_message)
-	select 999, 1, concat(''Hay '', count(*), '' válvulas cuyo diametro no coincide con sus tramos adyacentes.'') from ('||v_sql_result||')
+	select 999, 1, concat(''There are '', count(*), '' valves whose diameter does not match its adjacent arcs.'') from ('||v_sql_result||')
 	';
 
+	-- NOTE: doc_geom_mismatch (distance between doc geom and linked feature geom)
+	SELECT param_name, COALESCE(v_max_distance, threshold) INTO v_param_name, v_max_distance FROM cm.config_qindex_suspicious
+	WHERE param_name = 'doc_geom_mismatch' and cur_user = current_user LIMIT 1;
+	
+	FOR rec IN (
+		SELECT d.id AS doc_id, dxn.node_uuid AS feature_uuid, dxn.featurecat_id::text, d.the_geom AS doc_geom, 'node' as feature_type
+		FROM cm.doc d
+		JOIN cm.doc_x_node dxn ON dxn.doc_id = d.id
+		WHERE d.the_geom IS NOT NULL
+		UNION ALL
+		SELECT d.id AS doc_id, dxn.arc_uuid AS feature_uuid, dxn.featurecat_id::text, d.the_geom AS doc_geom, 'arc' as feature_type
+		FROM cm.doc d
+		JOIN cm.doc_x_arc dxn ON dxn.doc_id = d.id
+		WHERE d.the_geom IS NOT NULL
+	)
+	LOOP
 
+		v_feature_table := NULL;
+		v_feature_geom := NULL;
+		v_distance_m := NULL;
 
+		SELECT lower(table_name) AS table_name
+		INTO v_feature_table
+		FROM (
+			SELECT lower(concat('PARENT_SCHEMA_', rec.featurecat_id)) AS table_name
+		) AS t
+		WHERE EXISTS (
+			SELECT 1
+			FROM information_schema.columns
+			WHERE table_schema = 'cm' AND table_name = t.table_name AND column_name = 'uuid'
+		) AND EXISTS (
+			SELECT 1
+			FROM information_schema.columns
+			WHERE table_schema = 'cm' AND table_name = t.table_name AND column_name = 'the_geom'
+		)
+		LIMIT 1;
+
+		IF v_feature_table IS NOT NULL THEN
+			EXECUTE
+				format('SELECT %I, the_geom FROM cm.%I WHERE lot_id IN (%s) AND uuid = $1 LIMIT 1',
+				concat(rec.feature_type, '_id'),
+				v_feature_table,
+				(SELECT string_agg(lot_id::text, ',') FROM cm.om_campaign_lot WHERE campaign_id = v_campaign_id))
+			INTO v_node_id, v_feature_geom
+			USING rec.feature_uuid;
+		END IF;
+
+		IF v_feature_geom IS NOT NULL THEN
+			v_distance_m := ST_Distance(rec.doc_geom, v_feature_geom);
+		END IF;
+
+		IF v_distance_m IS NOT NULL AND v_distance_m >= v_max_distance THEN
+			IF rec.feature_type = 'node' THEN
+				INSERT INTO t_anl_node (node_id, nodecat_id, fid, descript, the_geom, delta, param_name)
+				VALUES (
+					v_node_id,
+					rec.featurecat_id,
+					999,
+					concat('Node with geometry mismatch with its document (', round(v_distance_m::numeric, 2), ' m).'),
+					v_feature_geom,
+					v_distance_m,
+					v_param_name
+				);
+			ELSE
+				INSERT INTO t_anl_arc (arc_id, arccat_id, fid, descript, the_geom, delta, param_name)
+				VALUES (
+					v_node_id,
+					rec.featurecat_id,
+					999,
+					concat('Arc with geometry mismatch with its document (', round(v_distance_m::numeric, 2), ' m).'),
+					v_feature_geom,
+					v_distance_m,
+					v_param_name
+				);
+			END IF;
+
+			v_doc_mismatch_count := v_doc_mismatch_count + 1;
+		END IF;
+	END LOOP;
+
+	IF v_doc_mismatch_count > 0 THEN
+		INSERT INTO t_audit_check_data (fid, criticity, error_message)
+		VALUES (
+			999,
+			1,
+			concat('There are ', v_doc_mismatch_count, ' object(s) of type NODE/ARC with distance >= ', v_max_distance, ' m with its associated document.')
+		);
+	END IF;
+
+	
+
+	-- NOTE: duplicate document hashes linked to existing features
+	SELECT param_name, threshold INTO v_param_name, v_max_distance FROM cm.config_qindex_suspicious
+	WHERE param_name = 'doc_hash_duplicated' and cur_user = current_user LIMIT 1;
+
+	SELECT concat('
+		WITH duplicated_hashes AS (
+			SELECT hash
+			FROM cm.doc
+			WHERE hash IS NOT NULL
+			GROUP BY hash
+			HAVING count(*) > 1
+		),
+		related_features AS (
+			SELECT *
+			FROM (
+				SELECT
+				d.hash,
+				''node''::text AS feature_type,
+				dxn.featurecat_id::text AS featurecat_id,
+				dxn.node_uuid AS feature_uuid,
+				COALESCE(',
+				string_agg(concat('PARENT_SCHEMA_', lower(featurecat_id), '.the_geom'), ','),
+				') as feature_geom,
+				COALESCE(',
+				string_agg(concat('PARENT_SCHEMA_', lower(featurecat_id), '.node_id'), ','),
+				') as feature_id
+				FROM cm.doc d
+				JOIN cm.doc_x_node dxn ON dxn.doc_id = d.id ',
+				string_agg(concat('LEFT JOIN cm.PARENT_SCHEMA_', lower(featurecat_id), ' ON dxn.node_uuid = PARENT_SCHEMA_', lower(featurecat_id), '.uuid'), ' '),
+				' WHERE EXISTS (
+				SELECT 1 FROM duplicated_hashes h WHERE h.hash = d.hash
+				)
+				UNION ALL
+				SELECT
+				d.hash,
+				''arc''::text AS feature_type,
+				dxa.featurecat_id::text AS featurecat_id,
+				dxa.arc_uuid AS feature_uuid,
+				PARENT_SCHEMA_tuberia.the_geom AS feature_geom,
+				PARENT_SCHEMA_tuberia.arc_id
+				FROM cm.doc d
+				JOIN cm.doc_x_arc dxa ON dxa.doc_id = d.id
+				LEFT JOIN cm.PARENT_SCHEMA_tuberia ON PARENT_SCHEMA_tuberia.uuid = dxa.arc_uuid
+				WHERE EXISTS (
+					SELECT 1 FROM duplicated_hashes h WHERE h.hash = d.hash
+				)
+			) subq
+		),
+		real_duplicated_hashes AS (
+			SELECT hash
+			FROM related_features
+			WHERE feature_id IS NOT NULL
+			GROUP BY hash
+			HAVING count(*) > 1
+		)
+		SELECT DISTINCT
+			feature_type,
+			featurecat_id,
+			feature_id,
+			feature_geom AS the_geom,
+			''Elemento con documento de hash duplicado'' AS descript,
+			1 AS delta
+		FROM related_features
+		WHERE
+			feature_id IS NOT NULL
+			AND hash IN (SELECT hash FROM real_duplicated_hashes)'
+	) INTO v_sql_result
+	FROM (
+	SELECT DISTINCT (featurecat_id)
+	FROM cm.doc_x_node) subq;
+
+	EXECUTE '
+	INSERT INTO t_anl_node (node_id, nodecat_id, fid, descript, the_geom, delta, param_name)
+	SELECT feature_id, featurecat_id, 999, descript, the_geom, delta, '||quote_literal(v_param_name)||'
+	FROM ('||v_sql_result||') q
+	WHERE feature_type = ''node''
+	';
+
+	EXECUTE '
+	INSERT INTO t_anl_arc (arc_id, arccat_id, fid, descript, the_geom, delta, param_name)
+	SELECT feature_id, featurecat_id, 999, descript, the_geom, delta, '||quote_literal(v_param_name)||'
+	FROM ('||v_sql_result||') q
+	WHERE feature_type = ''arc''
+	';
+
+	EXECUTE '
+	INSERT INTO t_audit_check_data (fid, criticity, error_message)
+		SELECT 999, 1, concat(''There are '', count(*), '' nodes/arcs with duplicated document hash.'')
+		FROM ('||v_sql_result||')
+	';
 
     -- return results
     -- info
