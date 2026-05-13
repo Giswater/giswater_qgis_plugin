@@ -402,13 +402,16 @@ raise notice '%', v_result;
 			insert into %s (uuid, campaign_id, %s, status, created_at, created_by, the_geom)
 			select gen_random_uuid(), %s as campaign_id, %s::int as feature_id, 0 as status, 
 			now() as created_at, current_user as created_by, the_geom
-			from %s
-			WHERE campaign_id = %s',
+			from %s a
+			join %s c USING (%s)
+			WHERE campaign_id = %s and a.status != 1 and c.action <> 3',
 			'cm.om_campaign_qc_' || rec_feature_type, -- INSERT INTO cm.om_campaign_qc_node 
 			rec_feature_type || '_id', --node_id
 			v_campaign_id,
 			rec_feature_type || '_id', --node_id
-			'cm.om_campaign_x_' || rec_feature_type, -- FROM cm.om_campaign_qc_node 
+			'cm.om_campaign_x_' || rec_feature_type, -- FROM cm.om_campaign_x_node
+			'cm.om_campaign_lot_x_' || rec_feature_type, -- FROM cm.om_campaign_lot_x_node
+			rec_feature_type || '_id', --node_id
 			v_campaign_id
 			);
 
