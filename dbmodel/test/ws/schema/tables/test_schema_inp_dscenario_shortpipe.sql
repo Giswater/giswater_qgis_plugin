@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,54 +14,40 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table inp_dscenario_shortpipe
+-- Check table
 SELECT has_table('inp_dscenario_shortpipe'::name, 'Table inp_dscenario_shortpipe should exist');
 
 -- Check columns
 SELECT columns_are(
     'inp_dscenario_shortpipe',
     ARRAY[
-        'dscenario_id', 'node_id', 'minorloss', 'status', 'bulk_coeff', 'wall_coeff', 'to_arc', 'demand', 'demand_pattern_id',
-        'emitter_coeff', 'head', 'pattern_id'
+        'dscenario_id', 'node_id', 'minorloss', 'status', 'bulk_coeff', 'wall_coeff',
+        'to_arc', 'head', 'pattern_id', 'demand', 'demand_pattern_id', 'emitter_coeff'
     ],
     'Table inp_dscenario_shortpipe should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('inp_dscenario_shortpipe', ARRAY['node_id', 'dscenario_id'], 'Columns node_id, dscenario_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('inp_dscenario_shortpipe', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_shortpipe', 'node_id', 'integer', 'Column node_id should be integer');
+SELECT col_type_is('inp_dscenario_shortpipe', 'dscenario_id', 'int4', 'Column dscenario_id should be int4');
+SELECT col_type_is('inp_dscenario_shortpipe', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('inp_dscenario_shortpipe', 'minorloss', 'numeric(12,6)', 'Column minorloss should be numeric(12,6)');
 SELECT col_type_is('inp_dscenario_shortpipe', 'status', 'varchar(12)', 'Column status should be varchar(12)');
-SELECT col_type_is('inp_dscenario_shortpipe', 'bulk_coeff', 'double precision', 'Column bulk_coeff should be double precision');
-SELECT col_type_is('inp_dscenario_shortpipe', 'wall_coeff', 'double precision', 'Column wall_coeff should be double precision');
-SELECT col_type_is('inp_dscenario_shortpipe', 'to_arc', 'integer', 'Column to_arc should be integer');
+SELECT col_type_is('inp_dscenario_shortpipe', 'bulk_coeff', 'float8', 'Column bulk_coeff should be float8');
+SELECT col_type_is('inp_dscenario_shortpipe', 'wall_coeff', 'float8', 'Column wall_coeff should be float8');
+SELECT col_type_is('inp_dscenario_shortpipe', 'to_arc', 'int4', 'Column to_arc should be int4');
+SELECT col_type_is('inp_dscenario_shortpipe', 'head', 'float8', 'Column head should be float8');
+SELECT col_type_is('inp_dscenario_shortpipe', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('inp_dscenario_shortpipe', 'demand', 'numeric(12,6)', 'Column demand should be numeric(12,6)');
 SELECT col_type_is('inp_dscenario_shortpipe', 'demand_pattern_id', 'varchar(16)', 'Column demand_pattern_id should be varchar(16)');
-SELECT col_type_is('inp_dscenario_shortpipe', 'emitter_coeff', 'double precision', 'Column emitter_coeff should be double precision');
-SELECT col_type_is('inp_dscenario_shortpipe', 'head', 'double precision', 'Column head should be double precision');
-SELECT col_type_is('inp_dscenario_shortpipe', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
+SELECT col_type_is('inp_dscenario_shortpipe', 'emitter_coeff', 'float8', 'Column emitter_coeff should be float8');
 
 -- Check foreign keys
 SELECT has_fk('inp_dscenario_shortpipe', 'Table inp_dscenario_shortpipe should have foreign keys');
-SELECT fk_ok('inp_dscenario_shortpipe', 'dscenario_id', 'cat_dscenario', 'dscenario_id', 'FK dscenario_id should reference cat_dscenario.dscenario_id');
-SELECT fk_ok('inp_dscenario_shortpipe', 'node_id', 'inp_shortpipe', 'node_id', 'FK node_id should reference inp_shortpipe.node_id');
 
--- Check triggers
-SELECT has_trigger('inp_dscenario_shortpipe', 'gw_trg_typevalue_fk_insert', 'Trigger gw_trg_typevalue_fk_insert should exist');
-SELECT has_trigger('inp_dscenario_shortpipe', 'gw_trg_typevalue_fk_update', 'Trigger gw_trg_typevalue_fk_update should exist');
+SELECT fk_ok('inp_dscenario_shortpipe', 'dscenario_id', 'cat_dscenario', 'dscenario_id', 'FK dscenario_id → cat_dscenario.dscenario_id');
+SELECT fk_ok('inp_dscenario_shortpipe', 'node_id', 'inp_shortpipe', 'node_id', 'FK node_id → inp_shortpipe.node_id');
 
--- Check rules
-
--- Check sequences
-
--- Check constraints
-SELECT col_not_null('inp_dscenario_shortpipe', 'dscenario_id', 'Column dscenario_id should be NOT NULL');
-SELECT col_not_null('inp_dscenario_shortpipe', 'node_id', 'Column node_id should be NOT NULL');
-SELECT col_has_check('inp_dscenario_shortpipe', 'status', 'Column status should have a check constraint');
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

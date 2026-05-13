@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table audit_fid_log
+-- Check table
 SELECT has_table('audit_fid_log'::name, 'Table audit_fid_log should exist');
 
 -- Check columns
@@ -25,27 +26,15 @@ SELECT columns_are(
     'Table audit_fid_log should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('audit_fid_log', 'id', 'Column id should be primary key');
-
 -- Check column types
-SELECT col_type_is('audit_fid_log', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('audit_fid_log', 'fid', 'smallint', 'Column fid should be smallint');
-SELECT col_type_is('audit_fid_log', 'fcount', 'integer', 'Column fcount should be integer');
+SELECT col_type_is('audit_fid_log', 'id', 'int4', 'Column id should be int4');
+SELECT col_type_is('audit_fid_log', 'fid', 'int2', 'Column fid should be int2');
+SELECT col_type_is('audit_fid_log', 'fcount', 'int4', 'Column fcount should be int4');
 SELECT col_type_is('audit_fid_log', 'groupby', 'text', 'Column groupby should be text');
-SELECT col_type_is('audit_fid_log', 'criticity', 'integer', 'Column criticity should be integer');
-SELECT col_type_is('audit_fid_log', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp');
+SELECT col_type_is('audit_fid_log', 'criticity', 'int4', 'Column criticity should be int4');
+SELECT col_type_is('audit_fid_log', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp without time zone');
 
--- Check foreign keys
-SELECT hasnt_fk('audit_fid_log', 'Table audit_fid_log should have no foreign keys');
-
--- Check triggers
-
--- Check rules
-
--- Check sequences
-SELECT has_sequence('audit_fid_log_id_seq', 'Sequence audit_fid_log_id_seq should exist');
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

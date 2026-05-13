@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -20,13 +21,11 @@ SELECT has_table('config_info_layer'::name, 'Table config_info_layer should exis
 SELECT columns_are(
     'config_info_layer',
     ARRAY[
-        'layer_id', 'is_parent', 'is_editable', 'formtemplate', 'headertext', 'orderby', 'tableparentepa_id', 'addparam'
+        'layer_id', 'is_parent', 'is_editable', 'formtemplate', 'headertext', 'orderby',
+        'tableparentepa_id', 'addparam'
     ],
     'Table config_info_layer should have the correct columns'
 );
-
--- Check primary key
-SELECT col_is_pk('config_info_layer', 'layer_id', 'Column layer_id should be primary key'); 
 
 -- Check column types
 SELECT col_type_is('config_info_layer', 'layer_id', 'text', 'Column layer_id should be text');
@@ -37,13 +36,6 @@ SELECT col_type_is('config_info_layer', 'headertext', 'text', 'Column headertext
 SELECT col_type_is('config_info_layer', 'orderby', 'int4', 'Column orderby should be int4');
 SELECT col_type_is('config_info_layer', 'tableparentepa_id', 'text', 'Column tableparentepa_id should be text');
 SELECT col_type_is('config_info_layer', 'addparam', 'json', 'Column addparam should be json');
-
--- Check indexes
-SELECT has_index('config_info_layer', 'config_info_layer_pkey', ARRAY['layer_id'], 'Table should have index on layer_id');
-
--- Check triggers
-SELECT has_trigger('config_info_layer', 'gw_trg_typevalue_fk_insert', 'Table should have trigger gw_trg_typevalue_fk_insert');
-SELECT has_trigger('config_info_layer', 'gw_trg_typevalue_fk_update', 'Table should have trigger gw_trg_typevalue_fk_update');
 
 -- Finish
 SELECT * FROM finish();

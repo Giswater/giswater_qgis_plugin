@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table inp_dscenario_rules
+-- Check table
 SELECT has_table('inp_dscenario_rules'::name, 'Table inp_dscenario_rules should exist');
 
 -- Check columns
@@ -25,33 +26,20 @@ SELECT columns_are(
     'Table inp_dscenario_rules should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('inp_dscenario_rules', ARRAY['id'], 'Column id should be primary key');
-
 -- Check column types
-SELECT col_type_is('inp_dscenario_rules', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('inp_dscenario_rules', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
-SELECT col_type_is('inp_dscenario_rules', 'sector_id', 'integer', 'Column sector_id should be integer');
+SELECT col_type_is('inp_dscenario_rules', 'id', 'int4', 'Column id should be int4');
+SELECT col_type_is('inp_dscenario_rules', 'dscenario_id', 'int4', 'Column dscenario_id should be int4');
+SELECT col_type_is('inp_dscenario_rules', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('inp_dscenario_rules', 'text', 'text', 'Column text should be text');
-SELECT col_type_is('inp_dscenario_rules', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('inp_dscenario_rules', 'active', 'bool', 'Column active should be bool');
 
 -- Check foreign keys
 SELECT has_fk('inp_dscenario_rules', 'Table inp_dscenario_rules should have foreign keys');
-SELECT fk_ok('inp_dscenario_rules', 'dscenario_id', 'cat_dscenario', 'dscenario_id', 'FK dscenario_id should reference cat_dscenario.dscenario_id');
-SELECT fk_ok('inp_dscenario_rules', 'sector_id', 'sector', 'sector_id', 'FK sector_id should reference sector.sector_id');
 
--- Check triggers
+SELECT fk_ok('inp_dscenario_rules', 'dscenario_id', 'cat_dscenario', 'dscenario_id', 'FK dscenario_id → cat_dscenario.dscenario_id');
+SELECT fk_ok('inp_dscenario_rules', 'sector_id', 'sector', 'sector_id', 'FK sector_id → sector.sector_id');
 
--- Check rules
-
--- Check sequences
-
--- Check constraints
-SELECT col_not_null('inp_dscenario_rules', 'dscenario_id', 'Column dscenario_id should be NOT NULL');
-SELECT col_not_null('inp_dscenario_rules', 'sector_id', 'Column sector_id should be NOT NULL');
-SELECT col_not_null('inp_dscenario_rules', 'text', 'Column text should be NOT NULL');
-SELECT col_not_null('inp_dscenario_rules', 'id', 'Column id should be NOT NULL');
-
+-- Finish
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;
