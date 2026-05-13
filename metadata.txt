@@ -8,8 +8,13 @@ version=4.9.0
 author=David Erill, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Lia Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez, Nico Pérez, Pablo Marques, Arnau Torret, Namrata Karki, Arnau Urgeles, Oscar Pueyo
 
 Changelog=Version 4.9.0
-    - Search migrated to QGIS Locator (prefix gws), deprecated button search removed from basic toolbar, and gw_fct_getsearch/gw_fct_setsearch unified to v2 response logic for device 4 (QGIS).
-    - Feature replace updated to support keep_sys_code and keep_customer_code flags in gw_fct_setfeaturereplace, with UI visibility for customer code restricted to connec and node/netwjoin.
+    - Search via QGIS Locator (prefix gws); toolbar search removed; getsearch/setsearch unified to v2 on QGIS.
+    - Feature replace: keep_sys_code / keep_customer_code in setfeaturereplace; customer code UI limited to connec and node/netwjoin.
+    - DB 4.9.0: dscenario patterns, CALIBRATION typevalue, visibility link tables, element mapzone trigger, UD has_treatment, sys_table.provider_config, v_type_street, CSO mapping, inp_subcatchment FKs; inp_dscenario_demand column order fixed.
+    - Graph mapzones: drainzone/dwf outfalls, v_recalculate_macromapzones, sector/muni/expl arrays, skip sector_id 0 aggregates, temp_pgr_mapzone_graph scoped to mapzones, element temp DDL, drainzone addparam/results, WS/UD visibility fixes.
+    - EPA: pg2epa_check_network sector/dma on disconnected nets; dscenario tanks at inlets; getprofilevalues descript casting; composer logo path.
+    - Tools: setelevfromdem error detail; upstream/downstream without is_operative gate; mincut SQL + address autofill; CM checks (data_context QC filter, check_progress %, setcheckproject GeoJSON); om_check_data via t_tables; lot/campaign ON CONFLICT.
+    - UI: getfeatureupsert combo defaults; i18n + sys_style fluid lines; config_toolbox graph/exploitation params; optional imports via get_dep; asset manager sys_version SRID from schema.
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org

@@ -9,17 +9,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- New dscenario pattern and pattern value tables
-- New typevalue for dscenario type: CALIBRATION
-- New tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
-- New trigger `gw_trg_update_element_mapzones` to update the mapzone columns for the element.
-- Added `has_treatment` column to `ve_node`, `ve_connec`, and `ve_gully` views in `ud` projects.
+- New dscenario pattern and pattern value tables (`inp_dscenario_pattern`, `inp_dscenario_pattern_value`).
+- New typevalue for dscenario type: CALIBRATION.
+- New visibility tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
+- New trigger `gw_trg_update_element_mapzones` to update mapzone columns on `element`.
+- `has_treatment` column on UD `node`, `connec`, and `gully` tables, related triggers, and `ve_node`, `ve_connec`, and `ve_gully` views.
+- `drainzone_outfall` calculation and updates to `dwfzone_outfall` in graph analytics mapzones.
+- `v_recalculate_macromapzones` parameter and related macro mapzone logic in `gw_fct_graphanalytics_mapzones`.
+- Temporary table and view for element management inside graph analytics.
+- Drainzone handling in graph analytics extended so `addfields` / `addparam.drainzone` receive aggregated results where applicable.
+- `provider_config` column on `sys_table` plus related catalogue checks.
+- View `v_type_street` and updated `config_form_fields` references for street types.
+- CSO overflow mapping table for storm overflow workflows.
+
+### Changed
+
+- Config toolbox: SQL input parameters for graph class and exploitation options.
+- `sys_style`: improved line symbology for fluid types.
+- Municipality assignment for nodes when several municipalities lie nearby (selection logic refined).
+- Upstream/downstream analysis: traverse network regardless of `is_operative` on elements.
+- `fct_cm_check_progress`: exposes percentage of executed nodes per campaign.
+- Network mincut: streamlined SQL queries and address autofill usable from web and desktop.
+- Multiple SQL functions: `sector_id` conditions normalized for clearer integrity rules.
+- i18n: labels, tooltips, and descriptions (graph tools, exploitation, and general wording).
+- Optional dependencies resolved via `tools_os.get_dep` instead of bare imports.
 
 ### Fixed
 
-- Moved `id` column from `inp_dscenario_demand` table to first position.
-- Logo image path in composer.
-- Add drainzone insert on `gw_fct_graphanalytics_mapzones_v1`.
+- `inp_dscenario_demand`: move `id` column to first position for stable column ordering.
+- Composer: logo image path resolution.
+- `gw_fct_graphanalytics_mapzones_v1`: drainzone insert/update; correct `expl_id[]`, `muni_id[]`, `sector_id[]` arrays for mapzones; ignore `sector_id = 0` when aggregating sectors; create `temp_pgr_mapzone_graph` only when running graphanalytics mapzones.
+- Graph analytics visibility: WS/UD compatibility for `node_x_sector_visibility`-related flows.
+- `gw_fct_getfeatureupsert`: default value handling for filter combo widgets when updating features in Info.
+- `gw_fct_cm_setcheckproject`: GeoJSON payload handling for check results.
+- `gw_fct_cm_check_data_context`: expanded checks and clearer error texts; QC output limited to rows with `status = 1` and `action <> 3`.
+- `gw_fct_pg2epa_check_network`: `sector_id` and `dma_id` behaviour on disconnected networks.
+- `gw_fct_pg2epa_export` WS dscenario path: tank parameters updated correctly on inlet links.
+- `gw_fct_getsearch`: optional JSON key to target a specific layer in the search call.
+- `gw_fct_setelevfromdem`: propagate detailed errors back to the client on failure.
+- `om_check_data`: use catalogued `t_tables` instead of ad hoc target tables.
+- Asset Manager: insert into `sys_version` uses schema SRID (`SCHEMA_SRID`) for EPSG.
+- `gw_fct_getprofilevalues`: cast JSON `descript` through text for stable typing.
+- Lot/campaign selectors: `ON CONFLICT` handling for campaign/lot selectors to avoid duplicate key failures.
+- `inp_subcatchment`: enforce foreign keys referencing municipality where defined in utils/tablect DDL.
+- `temp_anl_arc` / `temp_anl_node`: drop redundant duplicate index DDL where the index already existed.
 
 ## [4.8.4] - 2026-05-07
 
