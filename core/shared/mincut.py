@@ -94,10 +94,10 @@ class GwMincut:
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
-        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_streetaxis.name AS street_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name,"
+               f" om_mincut.streetaxis_id AS street_name"
                f" FROM om_mincut"
                f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
-               f" LEFT JOIN v_streetaxis ON v_streetaxis.id = om_mincut.streetaxis_id"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -147,6 +147,8 @@ class GwMincut:
             tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, combo_clear=False)
 
         tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
+
+        self._sync_address_widgets_from_mincut(result_mincut_id)
 
         # Update table 'selector_mincut_result'
         self._update_result_selector(result_mincut_id)
@@ -670,10 +672,9 @@ class GwMincut:
             return
 
         sql = (
-            f"SELECT om.muni_id, om.postnumber, vs.name AS street_name "
-            f"FROM om_mincut om "
-            f"LEFT JOIN v_streetaxis vs ON vs.id = om.streetaxis_id "
-            f"WHERE om.id = '{result_mincut_id}'"
+            f"SELECT muni_id, postnumber, streetaxis_id AS street_name "
+            f"FROM om_mincut "
+            f"WHERE id = '{result_mincut_id}'"
         )
         row = tools_db.get_row(sql)
         if not row:
@@ -1135,8 +1136,8 @@ class GwMincut:
         # Manage address
         if municipality != -1:
             sql += f", muni_id = '{municipality}'"
-        if street:
-            sql += f", streetaxis_id = '{street}'"
+        if street not in (None, "", "null"):
+            sql += f", streetaxis_id = $${street}$$"
         if postnumber:
             sql += f", postnumber = '{postnumber}'"
 
