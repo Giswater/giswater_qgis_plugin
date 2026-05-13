@@ -9,37 +9,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- This changelog file
 - New dscenario pattern and pattern value tables
 - New typevalue for dscenario type: CALIBRATION
-- New indexes on `anl_*` tables.
 - New tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
 - New trigger `gw_trg_update_element_mapzones` to update the mapzone columns for the element.
 - Added `has_treatment` column to `ve_node`, `ve_connec`, and `ve_gully` views in `ud` projects.
 
 ### Fixed
 
-- `gw_trg_arc_node_values` trigger on ws schemas.
-- `gw_fct_graphanalytics_macromapzones` streamline temporary table management.
-- `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
-- `gw_fct_graphanalytics_mapzones_v1` function.
-- Performance of dscenario views for ws and ud 
 - Moved `id` column from `inp_dscenario_demand` table to first position.
-- `gw_trg_gully_proximity`, `gw_trg_connec_proximity` triggers to use `ve_gully` and `ve_connec` tables instead of `gully` and `connec` tables.
-- `gw_fct_getfeatureupsert` function to use `ve_node`, `ve_connec` and `ve_gully` tables instead of `node`, `connec` and `gully` tables.
-- Recreated `ve_connec` and `ve_gully` views.
-- Improved `inp_family` table and `result_families` function.
-- `gw_fct_setfeaturereplaceplan` function.
-- `ud_gw_trg_topocontrol_node` trigger.
-- `ud_gw_trg_topocontrol_arc` trigger.
-- `gw_fct_psector_merge` function.
-- `ud_pg2epa` now export undefined nodes connected to not undefined arcs.
-- References from `ve_plan_psector` to `v_plan_psector` in `sys_table` and `sys_style` tables.
 - Logo image path in composer.
+- Add drainzone insert on `gw_fct_graphanalytics_mapzones_v1`.
+
+## [4.8.4] - 2026-05-07
+
+### Fixed
+
+- Improve composer warning handling and correct coverage.
+- Fix ve_plan_psector and v_plan_psector references.
+- Fix hardcoded logo.png path.
+- Improve psector manager performance.
+- Fix psector other_prices tab bug with ',' and '.' as decimal separator.
+- Fix problem with psector pca calculation.
+- Fix dscenario manager to check columns from views instead of tables.
+
+### Changed
+
+- Performance profiling in get_psector method when open existing one.
+- References from `ve_plan_psector` to `v_plan_psector` in `sys_table` and `sys_style` tables.
 
 ### Removed
 
-- Losses dscenario.
+- Deprecated code on psector manager to improve performance.
+- Hide pump additional tab in dscenario manager.
+
+## [4.8.3] - 2026-05-05
+
+### Fixed
+
+- Fix `config_param_system` update epa_automatic_man2graph_values value
+
+## [4.8.2] - 2026-04-20
+
+### Changed
+
+- Removed dependency on chardet.
 
 ## [4.8.1] - 2026-04-07
 
