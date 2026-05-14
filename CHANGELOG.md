@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - child-layer menu, temporal and snapshot layers, mincut/psector overlap layers, EPA dscenario/netscenario removal, Go2Iber imports, ValueRelation layers in HIDDEN, and backend query layers updated for the new TOC APIs.
 
+### Fixed
+
+- Fix functions and triggers to use `v_raster_dem` instead of `ext_raster_dem`.
+
 ## [4.9.0] - 2026-05-14
 
 ### Added
