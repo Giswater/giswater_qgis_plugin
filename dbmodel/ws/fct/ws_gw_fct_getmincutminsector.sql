@@ -91,7 +91,7 @@ BEGIN
 	    AND mm.mincut_minsector_id = va.minsector_id
 	)', v_minsector_id);
 
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Arcs", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Mincut offline result arc", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
 	INTO v_result_line;
 	
 	
@@ -108,7 +108,7 @@ BEGIN
 	    AND mm.mincut_minsector_id = vc.minsector_id
 	)', v_minsector_id);
 	
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Connecs","queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Mincut offline result connec","queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
 	INTO v_result_connecs;
 	
 	-- valves
@@ -128,7 +128,7 @@ BEGIN
 	v_minsector_id);
 
 
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Valves", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Mincut offline result valve", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
 	INTO v_result_valves;
 
 	v_result_point := jsonb_build_array(

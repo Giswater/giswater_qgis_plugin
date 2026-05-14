@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix functions and triggers to use `v_raster_dem` instead of `ext_raster_dem`.
+- Fix mincut offline result layer names and styles.
 
 ## [4.9.0] - 2026-05-14
 
