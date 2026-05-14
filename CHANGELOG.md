@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - stable `gw_id` custom map layer property when adding layers to the TOC so lookup and removal do not rely on the layer display name alone.
 - `add_layer_provider` with URI builders (WMS, WFS, OAPIF, XYZ, GeoJSON) for loading non-PostGIS layers from `providerConfig`.
 - `gw_fct_getaddlayervalues`: return `providerConfig` from `sys_table` for add-layer value lists.
+- Add `basic_search_v2_tab_visit` in config_param_system for web and desktop search
 
 ### Changed
 
