@@ -225,7 +225,7 @@ def split_changelog_link_block(changelog: str) -> tuple[str, str]:
     match = re.search(r"\n\[unreleased\]: .*\Z", changelog, re.S | re.I)
     if not match:
         raise ReleaseError("CHANGELOG.md has no [unreleased] link block")
-    return changelog[: match.start()].rstrip() + "\n", changelog[match.start() + 1 :]
+    return changelog[:match.start()].rstrip() + "\n", changelog[match.start() + 1:]
 
 
 def rebuild_changelog_links(
@@ -285,7 +285,7 @@ def close_unreleased_section(
 
     prefix = body[:unreleased_start]
     unreleased_content = body[
-        unreleased_start + len(header_match.group(0)) : next_heading_start
+        unreleased_start + len(header_match.group(0)):next_heading_start
     ].strip()
     suffix = body[next_heading_start:].lstrip("\n")
 
@@ -315,9 +315,9 @@ def extract_release_section(changelog: str, version: Version) -> str:
     match = pattern.search(body)
     if not match:
         raise ReleaseError(f"Could not find CHANGELOG.md section for {version.text}")
-    next_match = re.search(r"^## \[", body[match.end() :], re.M)
+    next_match = re.search(r"^## \[", body[match.end():], re.M)
     end = match.end() + next_match.start() if next_match else len(body)
-    section = body[match.end() : end].strip()
+    section = body[match.end():end].strip()
     if not section:
         raise ReleaseError(f"CHANGELOG.md section for {version.text} is empty")
     return section
@@ -332,6 +332,16 @@ def release_notes(changelog: str, version: Version, previous: Version) -> str:
         "### \U0001f4c3 Check the official documentation here: "
         f"[\u26d3\ufe0f\u200d\U0001f4a5 Giswater Documentation ]({DOCS_URL})\n"
     )
+
+
+def previous_release_for(changelog: str, version: Version) -> Version:
+    versions = release_versions_from_headings(changelog)
+    for idx, current in enumerate(versions):
+        if current == version:
+            if idx + 1 >= len(versions):
+                raise ReleaseError(f"No previous changelog version found for {version.text}")
+            return versions[idx + 1]
+    raise ReleaseError(f"CHANGELOG.md has no section for {version.text}")
 
 
 def update_metadata_version(metadata: str, version: Version) -> str:
@@ -791,6 +801,17 @@ def prepare_patch_release(args: argparse.Namespace, root: Path, version: Version
         create_github_release(root, version=version, notes=release_body, execute=True)
 
 
+def create_release_only(args: argparse.Namespace, root: Path, version: Version) -> None:
+    changelog = read_text(root / "CHANGELOG.md")
+    previous = previous_release_for(changelog, version)
+    notes = release_notes(changelog, version, previous)
+
+    if args.execute and not ref_exists(root, f"refs/tags/{version.tag}"):
+        raise ReleaseError(f"Local tag {version.tag} does not exist")
+
+    create_github_release(root, version=version, notes=notes, execute=args.execute)
+
+
 def print_patch_commands(args: argparse.Namespace, version: Version) -> None:
     print("== Commands dry-run ==")
     git(repo_root(), "fetch", args.remote, "--tags", execute=False)
@@ -849,6 +870,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Create a published GitHub Release using gh.",
     )
     parser.add_argument(
+        "--github-release-only",
+        action="store_true",
+        help="Only create the GitHub Release from the existing CHANGELOG.md section.",
+    )
+    parser.add_argument(
         "--skip-libs-tag",
         action="store_true",
         help="Do not create/push the matching tag in libs.",
@@ -876,6 +902,9 @@ def main() -> int:
     root = repo_root()
     try:
         version = parse_version(args.version)
+        if args.github_release_only:
+            create_release_only(args, root, version)
+            return 0
         if version.is_minor_release:
             prepare_minor_release(args, root, version)
         else:
