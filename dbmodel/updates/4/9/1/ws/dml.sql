@@ -332,8 +332,12 @@ UPDATE config_param_system
   "exec_appropiate": "false",
   "received_date": "now()",
   "forecast_start": "now()",
-  "forecast_end": "now() + interval ''1 hour''",
+  "forecast_end": "now()",
   "anl_cause": "1",
   "assigned_to": "current_user"
 }'
     WHERE "parameter"='om_mincut_vdefault';
+
+UPDATE config_form_list
+	SET vdefault='{"orderBy":"1", "orderType": "ASC"}'::json
+	WHERE listname='tbl_mincut_manager' AND device=5;
