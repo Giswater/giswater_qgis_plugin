@@ -419,7 +419,7 @@ BEGIN
 					v_node_id,
 					rec.featurecat_id,
 					999,
-					concat('Node with geometry mismatch with its document (', round(v_distance_m::numeric, 2), ' m).'),
+					concat('Node with geometry mismatch with its document (doc_id: ', rec.doc_id, ') (', round(v_distance_m::numeric, 2), ' m).'),
 					v_feature_geom,
 					v_distance_m,
 					v_param_name
@@ -430,8 +430,18 @@ BEGIN
 					v_node_id,
 					rec.featurecat_id,
 					999,
-					concat('Arc with geometry mismatch with its document (', round(v_distance_m::numeric, 2), ' m).'),
+					concat('Arc with geometry mismatch with its document (doc_id: ', rec.doc_id, ') (', round(v_distance_m::numeric, 2), ' m).'),
 					v_feature_geom,
+					v_distance_m,
+					v_param_name
+				);
+				INSERT INTO t_anl_node (node_id, nodecat_id, fid, descript, the_geom, delta, param_name)
+				VALUES (
+					rec.doc_id,
+					'DOC',
+					999,
+					concat('Document with geometry mismatch with its feature (feature_id: ', v_node_id, ') (', round(v_distance_m::numeric, 2), ' m).'),
+					rec.doc_geom,
 					v_distance_m,
 					v_param_name
 				);
@@ -473,14 +483,17 @@ BEGIN
 				dxn.featurecat_id::text AS featurecat_id,
 				dxn.node_uuid AS feature_uuid,
 				COALESCE(',
-				string_agg(concat('PARENT_SCHEMA_', lower(featurecat_id), '.the_geom'), ','),
+				string_agg(concat('ap_', lower(featurecat_id), '.the_geom'), ','),
 				') as feature_geom,
 				COALESCE(',
-				string_agg(concat('PARENT_SCHEMA_', lower(featurecat_id), '.node_id'), ','),
-				') as feature_id
+				string_agg(concat('ap_', lower(featurecat_id), '.node_id'), ','),
+				') as feature_id,
+				COALESCE(',
+				string_agg(concat('ap_', lower(featurecat_id), '.lot_id'), ','),
+				') as lot_id
 				FROM cm.doc d
 				JOIN cm.doc_x_node dxn ON dxn.doc_id = d.id ',
-				string_agg(concat('LEFT JOIN cm.PARENT_SCHEMA_', lower(featurecat_id), ' ON dxn.node_uuid = PARENT_SCHEMA_', lower(featurecat_id), '.uuid'), ' '),
+				string_agg(concat('LEFT JOIN cm.ap_', lower(featurecat_id), ' ON dxn.node_uuid = ap_', lower(featurecat_id), '.uuid'), ' '),
 				' WHERE EXISTS (
 				SELECT 1 FROM duplicated_hashes h WHERE h.hash = d.hash
 				)
@@ -490,11 +503,12 @@ BEGIN
 				''arc''::text AS feature_type,
 				dxa.featurecat_id::text AS featurecat_id,
 				dxa.arc_uuid AS feature_uuid,
-				PARENT_SCHEMA_tuberia.the_geom AS feature_geom,
-				PARENT_SCHEMA_tuberia.arc_id
+				ap_tuberia.the_geom AS feature_geom,
+				ap_tuberia.arc_id,
+				ap_tuberia.lot_id
 				FROM cm.doc d
 				JOIN cm.doc_x_arc dxa ON dxa.doc_id = d.id
-				LEFT JOIN cm.PARENT_SCHEMA_tuberia ON PARENT_SCHEMA_tuberia.uuid = dxa.arc_uuid
+				LEFT JOIN cm.ap_tuberia ON ap_tuberia.uuid = dxa.arc_uuid
 				WHERE EXISTS (
 					SELECT 1 FROM duplicated_hashes h WHERE h.hash = d.hash
 				)
@@ -505,17 +519,17 @@ BEGIN
 			FROM related_features
 			WHERE feature_id IS NOT NULL
 			GROUP BY hash
-			HAVING count(*) > 1
+			HAVING count(DISTINCT feature_uuid) > 1
 		)
 		SELECT DISTINCT
 			feature_type,
 			featurecat_id,
 			feature_id,
 			feature_geom AS the_geom,
-			''Elemento con documento de hash duplicado'' AS descript,
+			concat(''Feature with duplicated document hash ('', (SELECT string_agg(DISTINCT feature_id::text, '','') FROM related_features rf WHERE rf.hash = related_features.hash), '').'') AS descript,
 			1 AS delta
 		FROM related_features
-		WHERE
+		WHERE lot_id IN (SELECT lot_id FROM cm.om_campaign_lot WHERE campaign_id =', v_campaign_id, ') AND
 			feature_id IS NOT NULL
 			AND hash IN (SELECT hash FROM real_duplicated_hashes)'
 	) INTO v_sql_result
