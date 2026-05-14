@@ -315,3 +315,13 @@ UPDATE config_function
   }
 }'::json
 	WHERE id=3536;
+
+UPDATE config_form_fields
+	SET columnname='muni_id'
+	WHERE formname='mincut' AND formtype='form_mincut' AND layoutorder='1' AND tabname='tab_mincut' AND layoutname='lyt_plan_address';
+UPDATE config_form_fields
+	SET columnname='streetaxis_id'
+	WHERE formname='mincut' AND formtype='form_mincut' AND layoutorder='2' AND tabname='tab_mincut' AND layoutname='lyt_plan_address';
+UPDATE config_form_fields
+	SET columnname='postnumber'
+	WHERE formname='mincut' AND formtype='form_mincut' AND layoutorder='3' AND tabname='tab_mincut' AND layoutname='lyt_plan_address';
