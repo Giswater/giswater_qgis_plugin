@@ -73,8 +73,7 @@ BEGIN
 	 	SELECT node_id FROM mec JOIN cm.om_campaign_lot_x_node USING (node_id) WHERE lot_id IN (%s)
 	 )
 	 SELECT a.node_id, b.nodecat_id, b.the_geom FROM cm.om_campaign_lot_x_node a 
-	 LEFT JOIN cm.om_campaign_x_node b using (node_id) 
-	 LEFT JOIN PARENT_SCHEMA.cat_feature_node c on c.id = b.nodecat_id
+	 LEFT JOIN cm.om_campaign_x_node b using (node_id)
 	 LEFT JOIN PARENT_SCHEMA.cat_feature_node cfn ON cfn.id = b.node_type
 	 WHERE a.lot_id IN (%s)
 	 AND a.node_id NOT IN (SELECT node_id FROM moc)
