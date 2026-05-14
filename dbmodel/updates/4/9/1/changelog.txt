@@ -1,3 +1,4 @@
 4.9.1
 *************
 - Fix functions and triggers to use `v_raster_dem` instead of `ext_raster_dem`.
+- Fix mincut offline result layer names and styles.
