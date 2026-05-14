@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.0] - 2026-05-14
+
 ### Added
 
 - New dscenario pattern and pattern value tables (`inp_dscenario_pattern`, `inp_dscenario_pattern_value`).
@@ -249,16 +251,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.4...main
-[4.8.4]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.3...v4.8.4
-[4.8.3]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.2...v4.8.3
-[4.8.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.1...v4.8.2
-[4.8.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.7.1...v4.8.0
-[4.7.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.7.0...v4.7.1
-[4.7.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.6.0...v4.7.0
-[4.6.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.4...v4.6.0
-[4.5.4]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.3...v4.5.4
-[4.5.3]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.2...v4.5.3
-[4.5.2]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.1...v4.5.2
-[4.5.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.0...v4.5.1
-[4.5.0]: https://github.com/giswater/giswater_qgis_plugin/releases/tag/v4.5.0
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...main
+[4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0
+[4.8.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.3...v4.8.4
+[4.8.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.2...v4.8.3
+[4.8.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.1...v4.8.2
+[4.8.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.0...v4.8.1
+[4.8.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.7.1...v4.8.0
+[4.7.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.7.0...v4.7.1
+[4.7.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.6.0...v4.7.0
+[4.6.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.4...v4.6.0
+[4.5.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.3...v4.5.4
+[4.5.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.2...v4.5.3
+[4.5.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.1...v4.5.2
+[4.5.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.0...v4.5.1
+[4.5.0]: https://github.com/Giswater/giswater_qgis_plugin/releases/tag/v4.5.0
