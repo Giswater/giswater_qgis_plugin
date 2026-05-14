@@ -325,3 +325,15 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET columnname='postnumber'
 	WHERE formname='mincut' AND formtype='form_mincut' AND layoutorder='3' AND tabname='tab_mincut' AND layoutname='lyt_plan_address';
+
+UPDATE config_param_system
+    SET value='{
+  "mincut_type": "(SELECT id FROM om_mincut_cat_type ORDER BY id ASC LIMIT 1)",
+  "exec_appropiate": "false",
+  "received_date": "now()",
+  "forecast_start": "now()",
+  "forecast_end": "now() + interval ''1 hour''",
+  "anl_cause": "1",
+  "assigned_to": "current_user"
+}'
+    WHERE "parameter"='om_mincut_vdefault';
