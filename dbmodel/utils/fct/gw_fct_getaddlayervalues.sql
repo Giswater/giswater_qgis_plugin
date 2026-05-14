@@ -70,7 +70,8 @@ BEGIN
 		CASE
 			WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 			ELSE st.addparam->>'pkey'
-		END AS "tableId"
+		END AS "tableId",
+		st.provider_config as "providerConfig"
 		FROM sys_table st
 		join config_typevalue ct ON ct.id= context
 		left join geomtable c ON st.id =c.table_name

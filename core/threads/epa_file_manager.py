@@ -459,7 +459,7 @@ class GwEpaFileManager(GwTask):
                                 style_id = lib_vars.project_vars['current_style']
 
                             tools_gw.add_layer_database(layer_name, the_geom, geom_field, group, sub_group,
-                                                      style_id=style_id, alias=alias, force_create_group=True)
+                                                      alias=alias, force_create_group=True)
 
         return True
 

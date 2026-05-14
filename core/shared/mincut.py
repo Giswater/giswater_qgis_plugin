@@ -75,7 +75,7 @@ class GwMincut:
         self.col2 = "hydrometer_customer_code"
         self.lbl1 = "Connec customer code:"
         self.lbl2 = "Hydrometer customer code:"
-        
+
         # Cursor management for setmincut function
         self.mincut_aux_conn = None
         self.mincut_cursor = None
@@ -349,9 +349,9 @@ class GwMincut:
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self._init_mincut_canvas()
-        tools_qgis.remove_layer_from_toc('Overlap affected arcs', 'GW Temporal Layers')
-        tools_qgis.remove_layer_from_toc('Other mincuts which overlaps', 'GW Temporal Layers')
-        tools_qgis.remove_layer_from_toc('Overlap affected connecs', 'GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": 'Overlap affected arcs'}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": 'Other mincuts which overlaps'}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": 'Overlap affected connecs'}, group_name='GW Temporal Layers')
 
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.btn_cancel_task.hide()
@@ -467,7 +467,7 @@ class GwMincut:
 
         # Fill ComboBox municipality
         sql = ("SELECT muni_id, name "
-               "FROM v_municipality " 
+               "FROM v_municipality "
                "WHERE active is True and muni_id > 0 "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
@@ -908,7 +908,7 @@ class GwMincut:
             tools_gw.disconnect_signal('mincut')
             self._remove_selection()
             tools_qgis.refresh_map_canvas()
-            
+
             # Close cursor and auxiliary connection
             self._close_mincut_cursor()
 
@@ -1209,16 +1209,16 @@ class GwMincut:
 
     def _create_mincut_cursor(self):
         """ Create auxiliary connection and cursor for setmincut function """
-        
+
         try:
             # Close existing cursor and connection if they exist
             self._close_mincut_cursor()
-            
+
             # Create new auxiliary connection
             self.mincut_aux_conn = tools_db.dao.get_aux_conn()
             if not self.mincut_aux_conn:
                 return
-            
+
             # Get cursor from the connection
             self.mincut_cursor = tools_db.dao.get_cursor(self.mincut_aux_conn)
             if self.mincut_cursor and tools_db.dao.set_search_path:
@@ -1232,7 +1232,7 @@ class GwMincut:
 
     def _close_mincut_cursor(self):
         """ Close cursor and auxiliary connection for setmincut function """
-        
+
         try:
             if self.mincut_cursor:
                 self.mincut_cursor.close()
@@ -1247,11 +1247,11 @@ class GwMincut:
 
     def _execute_setmincut_with_cursor(self, body, commit=True):
         """ Execute gw_fct_setmincut function using the stored cursor """
-        
+
         if not self.mincut_cursor or not self.mincut_aux_conn:
             tools_log.log_warning("Mincut cursor not available, using regular execution")
             return tools_gw.execute_procedure('gw_fct_setmincut', body, commit=commit)
-        
+
         try:
             # Build SQL similar to execute_procedure
             schema_name = lib_vars.schema_name
@@ -1259,29 +1259,29 @@ class GwMincut:
                 sql = f"SELECT {schema_name}.gw_fct_setmincut("
             else:
                 sql = "SELECT gw_fct_setmincut("
-            
+
             if body:
                 sql += f"{body}"
             sql += ");"
-            
+
             # Log SQL if enabled (similar to execute_procedure)
             if sql:
                 tools_log.log_db(sql, bold='b', stack_level_increase=2)
-            
+
             # Execute using the stored cursor
             self.mincut_cursor.execute(sql)
             row = self.mincut_cursor.fetchone()
-            
+
             if commit:
                 self.mincut_aux_conn.commit()
-            
+
             if not row or not row[0]:
                 tools_log.log_warning("Function error: gw_fct_setmincut")
                 tools_log.log_warning(sql)
                 return None
 
             json_result = row[0]
-            
+
             # Log SQL if enabled
             if tools_gw.get_config_parser('log', 'log_sql', "user", "init", False) == "True":
                 tools_log.log_db(json_result, header="SERVER RESPONSE")
@@ -1289,22 +1289,22 @@ class GwMincut:
             if 'status' not in json_result:
                 tools_gw.manage_json_exception(json_result, sql, is_thread=False)
                 return False
-            
+
             # If failed, manage exception (but don't rollback - commit already happened)
             if json_result.get('status') == 'Failed':
                 tools_gw.manage_json_exception(json_result, sql, is_thread=False)
                 return json_result
-            
+
             # Manage geometry transformation if needed
             try:
                 if json_result.get("body", {}).get("feature", {}).get("geometry") and lib_vars.data_epsg != lib_vars.project_epsg:
                     json_result = tools_gw.manage_json_geometry(json_result)
             except Exception:
                 pass
-            
+
             tools_gw.manage_json_response(json_result, sql, None)
             return json_result
-            
+
         except Exception as e:
             msg = "Error executing setmincut with cursor: {0}"
             msg_params = (str(e),)
@@ -2754,7 +2754,7 @@ class GwMincut:
             comp_view.setName(str(self.template))
             layout_manager = project.layoutManager()
             layout_manager.addLayout(comp_view)
-            
+
             # Get layout from manager to ensure correct ownership
             comp_view = layout_manager.layoutByName(str(self.template))
             if comp_view is None:
@@ -2802,7 +2802,7 @@ class GwMincut:
         else:
             missing_items.append("Mapa")
             tools_log.log_warning("Map item 'Mapa' not found in template. Template may be empty or use different item IDs.")
-        
+
         profile_title = layout.itemById('title')
         if profile_title is not None:
             profile_title.setText(str(title))

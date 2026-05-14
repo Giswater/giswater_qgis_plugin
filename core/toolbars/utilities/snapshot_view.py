@@ -243,7 +243,7 @@ def add_layers_temp(layers, group):
         layer_group = layer.get('group', '')  # Get the subgroup name from the layer
 
         # Remove existing layer with the same name from the group
-        tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+        tools_qgis.remove_layer(custom_properties={"gw_id": aux_layer_name}, group_name=group)
 
         # Create a new memory layer
         v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{lib_vars.data_epsg}", aux_layer_name, 'memory')
@@ -284,16 +284,8 @@ def add_layers_temp(layers, group):
 
         v_layer.commitChanges()
 
-        # Add the layer to the project under the main group
-        QgsProject.instance().addMapLayer(v_layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-
-        # Ensure the main group exists
-        main_group = root.findGroup(group) or root.insertGroup(0, group)
-
-        # Check if the subgroup exists under the main group, if not, create it
-        subgroup = main_group.findGroup(layer_group) or main_group.insertGroup(0, layer_group)
-        subgroup.insertLayer(i, v_layer)
+        # Add the layer to the project
+        tools_qgis.add_layer_to_toc(v_layer, group=group, sub_group=layer_group, create_groups=True, custom_properties={"gw_id": aux_layer_name})
 
         # Apply rule-based style
         apply_layer_style(v_layer, layer_group, aux_layer_name)

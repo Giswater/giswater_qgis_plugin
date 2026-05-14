@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- stable `gw_id` custom map layer property when adding layers to the TOC so lookup and removal do not rely on the layer display name alone.
+- `add_layer_provider` with URI builders (WMS, WFS, OAPIF, XYZ, GeoJSON) for loading non-PostGIS layers from `providerConfig`.
+- `gw_fct_getaddlayervalues`: return `providerConfig` from `sys_table` for add-layer value lists.
+
+### Changed
+
+- child-layer menu, temporal and snapshot layers, mincut/psector overlap layers, EPA dscenario/netscenario removal, Go2Iber imports, ValueRelation layers in HIDDEN, and backend query layers updated for the new TOC APIs.
+
 ## [4.9.0] - 2026-05-14
 
 ### Added
@@ -103,7 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `gw_fct_graphanalytics_macromapzones` streamline temporary table management.
 - `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
 - `gw_fct_graphanalytics_mapzones_v1` function.
-- Performance of dscenario views for ws and ud 
+- Performance of dscenario views for ws and ud
 - `gw_trg_gully_proximity`, `gw_trg_connec_proximity` triggers to use `ve_gully` and `ve_connec` tables instead of `gully` and `connec` tables.
 - `gw_fct_getfeatureupsert` function to use `ve_node`, `ve_connec` and `ve_gully` tables instead of `node`, `connec` and `gully` tables.
 - Recreated `ve_connec` and `ve_gully` views.
