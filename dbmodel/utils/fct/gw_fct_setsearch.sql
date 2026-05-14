@@ -189,6 +189,10 @@ BEGIN
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
 		' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
 		INTO v_geometry;
+	elsif v_section = 'basic_search_v2_tab_visit' then
+		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
+		' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||') AND the_geom IS NOT NULL)row'
+		INTO v_geometry;
 	elsif v_section = 'basic_search_v2_tab_workcat' then
 
 		execute 'SELECT row_to_json(row) FROM (SELECT
