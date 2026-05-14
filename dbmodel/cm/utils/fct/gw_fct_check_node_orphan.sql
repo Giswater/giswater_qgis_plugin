@@ -35,6 +35,7 @@ v_campaign_id integer;
 v_sql_result TEXT;
 v_count int = 0;
 v_lot_id_array integer[];
+v_buffer numeric = 0.05;
 
 
 
@@ -72,12 +73,16 @@ BEGIN
 	 	SELECT node_id FROM mec JOIN cm.om_campaign_lot_x_node USING (node_id) WHERE lot_id IN (%s)
 	 )
 	 SELECT a.node_id, b.nodecat_id, b.the_geom FROM cm.om_campaign_lot_x_node a 
-	 left join cm.om_campaign_x_node b using (node_id) 
-	 left join PARENT_SCHEMA.cat_feature_node c on c.id = b.nodecat_id
+	 LEFT JOIN cm.om_campaign_x_node b using (node_id) 
+	 LEFT JOIN PARENT_SCHEMA.cat_feature_node c on c.id = b.nodecat_id
+	 LEFT JOIN PARENT_SCHEMA.cat_feature_node cfn ON cfn.id = b.node_type
 	 WHERE a.lot_id IN (%s)
-	 AND a.node_id NOT IN (SELECT node_id FROM moc)',
-	array_to_string(v_lot_id_array, ','),
-	array_to_string(v_lot_id_array, ',')
+	 AND a.node_id NOT IN (SELECT node_id FROM moc)
+	 AND (action <> 3 OR action IS NULL)
+	 AND (cfn.isarcdivide IS TRUE OR (cfn.isarcdivide IS FALSE AND NOT EXISTS(SELECT 1 FROM cm.om_campaign_x_arc arc WHERE ST_DWithin(arc.the_geom, b.the_geom, %s))))',
+	array_to_string(v_lot_id_array, ','),    
+    array_to_string(v_lot_id_array, ','),
+    v_buffer
     );
 
    	EXECUTE 'select count(*) from ('||v_sql_result||')' INTO v_count;
@@ -88,7 +93,7 @@ BEGIN
 
    	-- Return results
 	-- temporal table for nodes
-	execute FORMAT(
+	EXECUTE FORMAT(
 		'SELECT jsonb_build_object(
 		    ''type'', ''FeatureCollection'',
 		    ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb)
