@@ -17,16 +17,101 @@
 
 ## Table of Contents
 
-1. [Requirements](#requirements)
-2. [Installation](#installation)
-3. [Testing](#testing)
-4. [Deployment](#deployment)
-5. [Wiki](#wiki)
-6. [FAQ](#faqs)
-7. [Repositories](#repositories)
-8. [Versioning](#versioning)
-9. [License](#license)
-10. [Acknowledgements](#acknowledgements)
+1. [Schemas and layout](#schemas-and-layout)
+2. [Requirements](#requirements)
+3. [Installation](#installation)
+4. [Testing](#testing)
+5. [Deployment](#deployment)
+6. [Wiki](#wiki)
+7. [FAQ](#faqs)
+8. [Repositories](#repositories)
+9. [Versioning](#versioning)
+10. [License](#license)
+11. [Acknowledgements](#acknowledgements)
+
+## Schemas and layout
+
+Giswater creates six PostgreSQL schemas. Each one owns a dedicated
+folder under [`schemas/`](./schemas/) that bundles its base SQL **and**
+its semver-versioned `updates/` tree, so per-schema changelogs are
+self-contained.
+
+| Schema  | Type      | Base folder                                     | Updates root (semver `<M>/<m>/<p>/*.sql`)        |
+|---------|-----------|-------------------------------------------------|--------------------------------------------------|
+| `ws`    | project   | [`schemas/network/ws/`](./schemas/network/ws/)  | `schemas/network/common/updates/` + `schemas/network/ws/updates/` (per-version interleaved) |
+| `ud`    | project   | [`schemas/network/ud/`](./schemas/network/ud/)  | `schemas/network/common/updates/` + `schemas/network/ud/updates/` (per-version interleaved) |
+| `utils` | singleton | [`schemas/utils/`](./schemas/utils/)            | `schemas/utils/updates/` (flat)                  |
+| `am`    | singleton | [`schemas/am/`](./schemas/am/)                  | `schemas/am/updates/` (flat)                     |
+| `cm`    | singleton | [`schemas/cm/`](./schemas/cm/)                  | `schemas/cm/updates/` (flat)                     |
+| `audit` | singleton | [`schemas/audit/`](./schemas/audit/)            | (no semver updates; uses `structure`/`activate`) |
+
+[`schemas/network/common/`](./schemas/network/common/) holds the SQL
+that **runs into both the ws and ud schemas** at create and upgrade
+time (DDL/functions/triggers shared by both project schemas). It is
+**not** a schema of its own.
+
+[`schemas/network/sample/`](./schemas/network/sample/) (renamed from
+the legacy `example/`) hosts the per-project-type seed datasets
+(`user/`, `inv/`, `dev/`) referenced by the `load_sample`/`load_inv`/
+`load_dev` phases of the ws/ud manifests.
+
+### Updates tree convention
+
+For singleton schemas (am, cm, utils, audit):
+
+```
+dbmodel/schemas/<kind>/updates/<major>/<minor>/<patch>/*.sql   # flat, no subdir
+```
+
+For the network schemas (ws, ud) the engine consumes **two parallel
+roots** per build, interleaved per version (common first, then the
+project-type):
+
+```
+dbmodel/schemas/network/common/updates/<M>/<m>/<p>/*.sql
+dbmodel/schemas/network/ws/updates/<M>/<m>/<p>/*.sql
+dbmodel/schemas/network/ud/updates/<M>/<m>/<p>/*.sql
+```
+
+The `version_walk` phase in [`manifests/`](./manifests/) declares this
+with either `root:` (singletons) or `roots: [...]` (ws/ud, where the
+list order defines the apply order for a given version). The engine
+filters patches by the schema's `sys_version.giswater`
+(`project_version`) and the CLI's `--plugin-version`:
+
+- **new project**: walk every patch `v <= plugin_version`
+- **upgrade**:     walk patches `project_version < v <= plugin_version`
+
+Changelogs (`changelog.txt`) live next to each version folder:
+
+```
+schemas/network/common/updates/<v>/changelog.txt   # historical mixed changes
+schemas/network/ws/updates/<v>/changelog.txt       # ws-only changes
+schemas/network/ud/updates/<v>/changelog.txt       # ud-only changes
+schemas/<kind>/updates/<v>/changelog.txt           # singleton changes
+```
+
+Historical changelogs from the old unified `dbmodel/updates/<v>/`
+tree were consolidated under `schemas/network/common/updates/<v>/`.
+
+### AM legacy patches
+
+`am` used to live under `am/updates/<YYYY-MM>/` (calendar buckets). All
+historical content was collapsed into
+`dbmodel/schemas/am/updates/0/0/0/` with filenames prefixed by the
+original date for chronological ordering. New am patches go under
+regular semver folders alongside ws/ud/utils.
+
+### CM parent_schema gap
+
+`cm.yaml` references
+`schemas/cm/parent_schema/<parent_type>/{ddl,trg}.sql`, but only
+`parent_type=ud` has content in this tree today. Both the CLI
+(`giswater_admin create --kind cm`) and the admin UI explicitly block
+`parent_type=ws` with a missing-file error rather than silently
+creating an incomplete cm schema. To enable ws parents, populate
+`schemas/cm/parent_schema/ws/` with the equivalent of the existing
+`schemas/cm/parent_schema/ud/` content.
 
 ## Requirements
 

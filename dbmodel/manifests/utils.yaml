@@ -1,0 +1,78 @@
+# utils (satellite) schema manifest.
+#
+# Mirrors admin_btn `_load_base_utils` + `_update_utils_schema` +
+# project_schema_utils_create.GwCreateSchemaUtilsTask:
+#
+#   load_base_utils -> [updates] -> fk_ws -> fk_ud -> role_perms ->
+#   bump_version -> final_pass
+#
+# The first phase walks `schemas/utils/{utils,ws,ud}` with per-step
+# SCHEMA_NAME overrides because each subfolder targets a different
+# schema (utils itself, the ws_schema, the ud_schema).
+
+kind: utils
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base_utils
+    type: sql_dir
+    description: "Bootstrap utils tables/fcts/trg + utils/ws/ud DDL."
+    steps:
+      - { source: "schemas/utils/utils",     recursive: false,
+          schema_override: "{{ schema_name }}", aux_override: "{{ ws_schema }}" }
+      - { source: "schemas/utils/utils/fct", recursive: false,
+          schema_override: "{{ schema_name }}" }
+      - { source: "schemas/utils/ws",        recursive: false,
+          schema_override: "{{ ws_schema }}" }
+      - { source: "schemas/utils/ud",        recursive: false,
+          schema_override: "{{ ud_schema }}" }
+
+  - id: updates
+    type: version_walk
+    optional: true
+    description: "Apply utils-specific update patches (flat, M/m/p/*.sql)."
+    root: "schemas/utils/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: fk_ws
+    type: sql_inline
+    description: "Wire utils foreign keys into the ws schema."
+    sql: "SELECT {{ ws_schema }}.gw_fct_admin_schema_utils_fk();"
+
+  - id: fk_ud
+    type: sql_inline
+    description: "Wire utils foreign keys into the ud schema."
+    sql: "SELECT {{ ud_schema }}.gw_fct_admin_schema_utils_fk();"
+
+  - id: role_perms
+    type: sql_inline
+    description: "Re-grant role permissions across the ws schema (ws drives roles)."
+    sql: "SELECT {{ ws_schema }}.gw_fct_admin_role_permissions();"
+
+  - id: bump_version
+    type: sql_inline
+    description: "Pin utils version into config_param_system."
+    sql: >
+      INSERT INTO {{ schema_name }}.config_param_system (id, parameter, value, data_type, descript)
+      VALUES (10, 'utils_version', '{{ main_project_version }}', 'text', 'UTILS')
+      ON CONFLICT (id) DO UPDATE SET value = EXCLUDED.value;
+
+  - id: final_pass
+    type: sql_dir
+    optional: true
+    description: "Final-pass for utils: form fields + i18n; falls back to en_US."
+    steps:
+      - source: "schemas/utils/final_pass/config_form_fields"
+        recursive: false
+      - source: "schemas/utils/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/utils/final_pass/i18n/en_US"
+        recursive: false
+
+profiles:
+  empty:
+    phases: [load_base_utils, fk_ws, fk_ud, role_perms, bump_version, final_pass]
+  update:
+    phases: [updates, fk_ws, fk_ud, role_perms, bump_version, final_pass]
