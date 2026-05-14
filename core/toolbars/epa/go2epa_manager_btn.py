@@ -10,7 +10,7 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QRegularExpression
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu, QPushButton, QHeaderView
 from qgis.PyQt.QtGui import QRegularExpressionValidator, QStandardItemModel, QCursor
 
 from ..dialog import GwAction
@@ -125,7 +125,7 @@ class GwGo2EpaManagerButton(GwAction):
             self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, fields)
 
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.EditTrigger.NoEditTriggers)
+        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.EditTrigger.NoEditTriggers, section_resize_mode=QHeaderView.ResizeMode.Interactive)
 
         return complet_list
 
