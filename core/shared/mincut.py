@@ -511,6 +511,8 @@ class GwMincut:
         # Get current time
         current_time = QTime.currentTime()
         self.dlg_mincut.cbx_recieved_time.setTime(current_time)
+        self.dlg_mincut.cbx_hours_start_predict.setTime(current_time)
+        self.dlg_mincut.cbx_hours_end_predict.setTime(current_time)
 
         # Enable/Disable widget depending state
         self._enable_widgets('0')
