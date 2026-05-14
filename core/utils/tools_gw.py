@@ -25,7 +25,6 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 from datetime import datetime
-from urllib.parse import urlencode
 
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, \
     QItemSelectionModel, QTimer

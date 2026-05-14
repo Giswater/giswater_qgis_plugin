@@ -165,8 +165,6 @@ class GwAddChildLayerButton(GwAction):
         if state == 2:
             layer = tools_qgis.get_layer(custom_properties={"gw_id": tablename}, tablename=tablename)
             if layer is None:
-                if lib_vars.project_vars['current_style'] is not None:
-                    style_id = lib_vars.project_vars['current_style']
                 schema = None
                 if group == "AM" or group == "CM":
                     schema = "am" if group == "AM" else "cm"
