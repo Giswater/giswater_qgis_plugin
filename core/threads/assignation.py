@@ -145,6 +145,9 @@ class GwAssignation(GwTask):
         self.setProgress(40)
 
         leaks = {}
+        if not rows:
+            self._emit_report(tools_qt.tr("No pipes were found near any leak within the specified time period."))
+            return False
         for row in rows:
             (
                 leak_id,
