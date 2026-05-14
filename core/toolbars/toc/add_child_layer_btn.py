@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt, lib_vars, tools_db
+from ....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwAddChildLayerButton(GwAction):
@@ -161,7 +161,6 @@ class GwAddChildLayerButton(GwAction):
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
 
-        style_id: str = "-1"
         if state == 2:
             layer = tools_qgis.get_layer(custom_properties={"gw_id": tablename}, tablename=tablename)
             if layer is None:
