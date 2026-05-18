@@ -1056,10 +1056,10 @@ def build_uri(gw_id: str, provider: str, cfg: dict) -> Optional[str]:
         return raw_uri
 
     builders = {
-        "wms": build_generic_network_uri,
-        "wfs": build_generic_network_uri,
-        "oapif": partial(build_generic_network_uri, qgis_style=True),
-        "xyz": build_generic_network_uri,
+        "wms": partial(build_network_uri, encoding="query"),
+        "wfs": partial(build_network_uri, encoding="query"),
+        "xyz": partial(build_network_uri, encoding="query"),
+        "oapif": partial(build_network_uri, encoding="qgis"),
         "geojson": partial(build_geojson_uri, gw_id=gw_id)
     }
 
@@ -1135,12 +1135,19 @@ def build_geojson_uri(gw_id: str, cfg: dict) -> Optional[str]:
     return None
 
 
-def build_generic_network_uri(cfg: dict, qgis_style: bool = False) -> str:
+def build_network_uri(cfg: dict, encoding: str = "query") -> str:
     """
-    Build a network URI from a provider configuration
-        :param cfg: Provider configuration (dict)
-        :param qgis_style: If True, return the URI in QGIS style (Boolean)
-        :return: URI (String)
+    Build a network URI from a provider configuration.
+
+    This function normalizes a configuration dictionary into either:
+    - a plain query-string style URI (encoding="query")
+    - a QGIS-style URI using QgsDataSourceUri (encoding="qgis")
+
+    :param cfg: Provider configuration dictionary.
+    :param encoding: Output encoding format:
+        - "query": returns a simple key=value&key=value string
+        - "qgis": returns a QGIS-encoded URI using QgsDataSourceUri
+    :return: URI string
         
     Examples of supported formats:
 
@@ -1181,7 +1188,6 @@ def build_generic_network_uri(cfg: dict, qgis_style: bool = False) -> str:
 
     source = cfg.get("source", {})
     uri_params = cfg.get("uri_params", {}).copy()
-
     network = cfg.get("network", {})
 
     # merge source
@@ -1200,21 +1206,23 @@ def build_generic_network_uri(cfg: dict, qgis_style: bool = False) -> str:
 
     uri = QgsDataSourceUri()
 
-    for key, value in uri_params.items():
-        if value is None:
-            continue
+    if encoding == "query":
+        return "&".join(
+            f"{k}={v}"
+            for k, v in uri_params.items()
+        )
 
-        uri.setParam(str(key), str(value))
+    if encoding == "qgis":
+        uri = QgsDataSourceUri()
 
-    if qgis_style:
+        for key, value in uri_params.items():
+            uri.setParam(key, value)
+
         return uri.uri(False)
 
-    encoded_uri = uri.encodedUri()
-
-    if isinstance(encoded_uri, (bytes, bytearray)):
-        return encoded_uri.decode()
-
-    return str(encoded_uri)
+    raise ValueError(
+        f"Unsupported URI encoding: {encoding}"
+    )
 
 
 def refresh_categorized_layer_symbology_classes(layer, addparam=None):
