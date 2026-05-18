@@ -433,7 +433,7 @@ class GwProfileButton(GwAction):
                 self.initNode = element_id
                 self.first_node = False
                 msg = "Node 1 selected"
-                tools_qgis.show_info(msg, parameter=element_id)
+                tools_qgis.show_info(msg, parameter=self.element_id)
             else:
                 if self.element_id == str(self.initNode) or self.element_id == str(self.endNode) \
                         or self.element_id in [str(x) for x in self.add_points_list]:
@@ -457,10 +457,15 @@ class GwProfileButton(GwAction):
                         if result is None:
                             self.add_points_list.pop()
                             return
-                        self._update_profile_ui(result, roll_back_on_error=True)
+                        updated = self._update_profile_ui(result, roll_back_on_error=True)
+                        # Turn off snapping until user clicks add point again (reactivates picking)
+                        if updated:
+                            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                            tools_gw.disconnect_signal('profile')
                         # Stay in add_points mode so the user can keep adding mid-features
                     else:
                         self.endNode = element_id
+                        tools_qgis.show_info("Node 2 selected", parameter=self.element_id)
                         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
                         tools_gw.disconnect_signal('profile')
                         self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
@@ -500,7 +505,7 @@ class GwProfileButton(GwAction):
             if result['message']['level'] != 3:
                 if roll_back_on_error and self.add_points_list:
                     self.add_points_list.pop()
-                return
+                return False
 
         self._remove_selection()
         self.dlg_draw_profile.tbl_list_arc.clear()
@@ -513,6 +518,7 @@ class GwProfileButton(GwAction):
             it = self.layer_arc.getFeatures(QgsFeatureRequest(QgsExpression(expr_filter)))
             self.id_list = [i.id() for i in it]
             self.layer_arc.selectByIds(self.id_list)
+        return True
 
     def _action_pan(self):
         if self.first_node:
