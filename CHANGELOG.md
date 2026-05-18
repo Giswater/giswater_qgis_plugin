@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - child-layer menu, temporal and snapshot layers, mincut/psector overlap layers, EPA dscenario/netscenario removal, Go2Iber imports, ValueRelation layers in HIDDEN, and backend query layers updated for the new TOC APIs.
+- Profile algorithm: now accept mid features (arcs) in addition to nodes.
 
 ### Fixed
 

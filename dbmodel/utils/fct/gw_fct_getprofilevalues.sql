@@ -151,7 +151,7 @@ BEGIN
 
 	--  Get input data
 	v_init = (p_data->>'data')::json->>'initNode';
-	v_mid = (p_data->>'data')::json->>'midNodes';
+	v_mid = (p_data->>'data')::json->>'midFeatures';
 	v_end = (p_data->>'data')::json->>'endNode';
 	v_hs = ((p_data->>'data')::json->>'scale')::json->>'eh';
 	v_vs = ((p_data->>'data')::json->>'scale')::json->>'ev';
