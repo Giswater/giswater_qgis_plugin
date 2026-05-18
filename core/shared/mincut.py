@@ -82,6 +82,17 @@ class GwMincut:
         self.search_rubber_band = tools_gw.create_rubberband(self.canvas)
         self.geom_by_source = {"street": {}, "postnumber": {}}
 
+    def reset_mincut_canvas_snapping(self, action_pan=False):
+        """Disconnect mincut map-tool snapping and sync tools_gw signal registry.
+
+        disconnect_snapping() clears every xyCoordinates connection on the canvas; if
+        active_signals still lists mincut / mincut_offline, connect_signal() will skip
+        reconnecting and preview snapping never comes back.
+        """
+        tools_qgis.disconnect_snapping(action_pan, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut_offline')
+        tools_gw.disconnect_signal('mincut')
+
     def manage_mincuts(self, dialog):
         """ Button 12: Mincut management """
 
@@ -529,6 +540,7 @@ class GwMincut:
     def start_offline_mincut(self):
         """Start offline mincut snapping directly on arc layer."""
 
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.mincut_mode = 'offline'
         self.user_current_layer = self.iface.activeLayer()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -829,8 +841,7 @@ class GwMincut:
         tools_qgis.reset_rubber_band(self.search_rubber_band)
 
         # Disconnect snapping
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=True)
 
         # Delete from DB (including conflicts)
         mincut_conflict_state = 5
@@ -906,8 +917,7 @@ class GwMincut:
             # Close dialog, save dialog position, and disconnect snapping
             tools_gw.close_dialog(self.dlg_mincut)
 
-            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=True)
             self._remove_selection()
             tools_qgis.refresh_map_canvas()
 
@@ -1005,6 +1015,7 @@ class GwMincut:
 
     def _set_real_location(self):
 
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.snapper_manager = GwSnapManager(self.iface)
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -1180,8 +1191,7 @@ class GwMincut:
             tools_qgis.show_warning(message)
 
         # Close dialog and disconnect snapping
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=True)
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
@@ -2077,11 +2087,11 @@ class GwMincut:
         """ B1-126: Automatic mincut analysis """
 
         if is_checked is False:
-            # Disconnect snapping and related signals
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             # Recover snapping options, refresh canvas & set visible layers
             return
+
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
         self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -2186,8 +2196,7 @@ class GwMincut:
 
         if btn == Qt.MouseButton.RightButton:
             self.action_mincut.setChecked(False)
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             return
 
         # Get coordinates
@@ -2225,8 +2234,7 @@ class GwMincut:
         """Offline mincut snapping on arc layer without opening the mincut dialog."""
 
         if btn == Qt.MouseButton.RightButton:
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut_offline')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             self._remove_selection()
             self._restore_active_layer_after_offline_mincut()
             self.iface.actionPan().trigger()
@@ -2253,8 +2261,7 @@ class GwMincut:
 
         self._offline_mincut_execute(element_id)
 
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut_offline')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self._remove_selection()
         self._restore_active_layer_after_offline_mincut()
         self.iface.actionPan().trigger()
@@ -2312,8 +2319,7 @@ class GwMincut:
         """ Cancel GwAutoMincutTask """
 
         self.action_mincut.setChecked(False)
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.mincut_task.cancel()
 
     # noinspection PyUnusedLocal
@@ -2336,8 +2342,7 @@ class GwMincut:
         # Snapping
         result = self.snapper_manager.snap_to_project_config_layers(event_point)
 
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.iface.actionPan().trigger()
 
         if not result.isValid():
@@ -2430,8 +2435,7 @@ class GwMincut:
             tools_qgis.refresh_map_canvas()
 
         # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.set_visible_mincut_layers()
         self._remove_selection()
         self.action_mincut.setChecked(False)
@@ -2531,8 +2535,7 @@ class GwMincut:
             tools_qgis.refresh_map_canvas()
 
         # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.set_visible_mincut_layers()
         self._remove_selection()
 
@@ -2546,15 +2549,12 @@ class GwMincut:
         self.snapper = self.snapper_manager.get_snapper()
 
         if is_checked is False:
-            # Disconnect snapping and related signals
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             # Recover snapping options, refresh canvas & set visible layers
             return
 
         # Disconnect other snapping and signals in case wrong user clicks
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
         # Set vertex marker propierties
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2586,8 +2586,7 @@ class GwMincut:
         if btn == Qt.MouseButton.RightButton:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
-            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=True)
             global_vars.iface.actionPan().trigger()
             return
 
@@ -2635,8 +2634,7 @@ class GwMincut:
                 tools_qgis.show_message(msg, level)
 
         # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
     def _remove_selection(self):
         """ Remove selected features of all layers """
@@ -2960,11 +2958,11 @@ class GwMincut:
         """ Change status of selected valve. Execute function gw_fct_setchangevalvestatus """
 
         if is_checked is False:
-            # Disconnect snapping and related signals
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             # Recover snapping options, refresh canvas & set visible layers
             return
+
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
         # Declare snapper_manager and emit_point
         self.emit_point = QgsMapToolEmitPoint(self.canvas)

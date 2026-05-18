@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Align mincut plan address fields in `config_form_fields` (`muni_id`, `streetaxis_id`, `postnumber` on `lyt_plan_address`).
 - Update mincut default JSON in `config_param_system` add `forecast_start/end`.
 - Set default list sorting for `tbl_mincut_manager` in `config_form_list` (device 5).
+- Fix mincut snapping and related signals on mincut buttons.
 
 ## [4.9.0] - 2026-05-14
 
