@@ -12,7 +12,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtCore import QDate, QTimer
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression, Qgis
@@ -466,19 +466,23 @@ class GwProfileButton(GwAction):
                     else:
                         self.endNode = element_id
                         tools_qgis.show_info("Node 2 selected", parameter=self.element_id)
-                        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-                        tools_gw.disconnect_signal('profile')
-                        self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
-                        self.dlg_draw_profile.btn_save_profile.setEnabled(True)
+                        # Defer DB + UI so messageBar paints (Qt handles paint after this event returns)
+                        QTimer.singleShot(50, self._on_node2_selected_continue)
 
-                        result = self._execute_profile_query()
-                        if result is None:
-                            return
-                        self._update_profile_ui(result, roll_back_on_error=False)
-                        self.action_add_point.setDisabled(False)
+    def _on_node2_selected_continue(self):
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('profile')
+        self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
+        self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
-                        # Next profile will be done from scratch
-                        self.first_node = True
+        result = self._execute_profile_query()
+        if result is None:
+            return
+        self._update_profile_ui(result, roll_back_on_error=False)
+        self.action_add_point.setDisabled(False)
+
+        # Next profile will be done from scratch
+        self.first_node = True
 
     def _execute_profile_query(self):
         """ Build extras and call gw_fct_getprofilevalues. Returns the result dict or None on failure. """
