@@ -730,3 +730,8 @@ WHERE "parameter"='basic_search_v2_tab_network_node';
 UPDATE config_param_system
 SET value='{"sys_pk": "gully_id", "sys_fct": "gw_fct_getinfofromid", "sys_geom": "the_geom", "sys_filter": "", "sys_tablename": "gully join vf_gully using(gully_id)", "sys_display_name": "concat(gully_id, '' : '', gullycat_id)", "sys_fct_tablename": "ve_gully"}'
 WHERE "parameter"='basic_search_v2_tab_network_gully';
+
+-- 18/05/2026
+INSERT INTO sys_table
+(id, descript, sys_role, project_template, context, orderby, alias, "source", provider_config)
+VALUES('xyz_openstreetmap', 'Open Street Map', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}', '1', 2, 'Open Street Map', 'core', '{"source": {"url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"}, "provider": "wms", "layer_type": "raster", "uri_params": {"type": "xyz", "zmax": 19, "zmin": 0, "tilePixelRatio": 1}}'::jsonb);

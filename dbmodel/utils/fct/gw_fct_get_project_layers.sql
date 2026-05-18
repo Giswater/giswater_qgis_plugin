@@ -64,7 +64,8 @@ BEGIN
 				"tableName",
 				"tableSchema",
 				"geomField",
-				"tableId"
+				"tableId",
+				"providerConfig"
 			FROM (
 				-- Base layers from main schema
 				SELECT
@@ -83,7 +84,8 @@ BEGIN
 					CASE
 						WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 						ELSE st.addparam->>'pkey'
-					END AS "tableId"
+					END AS "tableId",
+					st.provider_config AS "providerConfig"
 				FROM sys_table st
 				JOIN config_typevalue ct ON ct.id = st.context
 				LEFT JOIN (
@@ -119,7 +121,8 @@ BEGIN
 					CASE
 						WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 						ELSE st.addparam->>'pkey'
-					END AS "tableId"
+					END AS "tableId",
+					NULL::jsonb AS "providerConfig"
 				FROM cm.sys_table st
 				JOIN cm.sys_typevalue t ON t.id = st.context
 				LEFT JOIN (
@@ -162,7 +165,8 @@ BEGIN
 					WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 					ELSE st.addparam->>'pkey'
 				END AS "tableId",
-				st.addparam
+				st.addparam,
+				st.provider_config AS "providerConfig"
 			FROM sys_table st
 			JOIN config_typevalue ct ON ct.id = st.context
 			LEFT JOIN (
