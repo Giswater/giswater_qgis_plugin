@@ -156,11 +156,11 @@ BEGIN
 	SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
 	UNION
 	SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0)
-	WHERE expl_id is not null;
+	WHERE expl_id IS NOT NULL;
 	
 	IF v_expl_x_user is false THEN
-		INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-		SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active 
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+		SELECT expl_id, code, name, descript, macroexpl_id, active 
 		FROM exploitation 
 		WHERE active 
 		AND expl_id > 0 
@@ -209,8 +209,8 @@ BEGIN
 		END IF;
 	ELSE	
 		-- populate temp_exploitation with the cat_manager configuration
-		INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-		SELECT e.expl_id, e.code, e.name, e.descript, e.sector_id, e.muni_id, e.macroexpl_id, e.active
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+		SELECT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
 		FROM exploitation e WHERE e.active AND e.expl_id > 0
 		AND EXISTS (SELECT 1 FROM cat_manager cm
 		WHERE e.expl_id = ANY (cm.expl_id)

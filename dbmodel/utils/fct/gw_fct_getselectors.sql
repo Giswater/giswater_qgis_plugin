@@ -193,8 +193,8 @@ BEGIN
 		WHERE expl_id is not null;
 
 		IF v_expl_x_user is false then
-			INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-			SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active
+			INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+			SELECT expl_id, code, name, descript, macroexpl_id, active
 			FROM exploitation
 			WHERE active
 			AND expl_id > 0
@@ -242,8 +242,8 @@ BEGIN
 				ORDER BY id;
 			END IF;
 		ELSE
-			INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-			SELECT e.expl_id, e.code, e.name, e.descript, e.sector_id, e.muni_id, e.macroexpl_id, e.active
+			INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+			SELECT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
 			FROM exploitation e WHERE e.active AND e.expl_id > 0
 			AND EXISTS (SELECT 1 FROM cat_manager cm
 			WHERE e.expl_id = ANY (cm.expl_id)

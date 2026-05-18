@@ -1,0 +1,3 @@
+4.11.0
+*************
+- Remove sector_id and muni_id from exploitation table.
