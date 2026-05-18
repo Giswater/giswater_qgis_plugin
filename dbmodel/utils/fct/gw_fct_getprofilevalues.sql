@@ -335,17 +335,17 @@ BEGIN
 			v_slope := 'CASE WHEN d.pred = a.node_1 THEN a.slope ELSE -a.slope END';
 			v_z1 := 'CASE WHEN d.pred = a.node_1 THEN a.z1  ELSE a.z2 END';
 			v_z2 := 'CASE WHEN d.pred = a.node_1 THEN a.z2  ELSE a.z1 END';
-			v_y1 := 'CASE WHEN d.pred = a.node_1 THEN a.y1  ELSE a.y2 END';
-			v_y2 := 'CASE WHEN d.pred = a.node_1 THEN a.y2  ELSE a.y1 END';
-			v_elev1 := 'CASE WHEN d.pred = a.node_1 THEN a.elev1  ELSE a.elev2 END';
-			v_elev2 := 'CASE WHEN d.pred = a.node_1 THEN a.elev2  ELSE a.elev1 END';
+			v_y1 := 'CASE WHEN d.pred = a.node_1 THEN a.sys_y1  ELSE a.sys_y2 END';
+			v_y2 := 'CASE WHEN d.pred = a.node_1 THEN a.sys_y2  ELSE a.sys_y1 END';
+			v_elev1 := 'CASE WHEN d.pred = a.node_1 THEN a.sys_elev1  ELSE a.sys_elev2 END';
+			v_elev2 := 'CASE WHEN d.pred = a.node_1 THEN a.sys_elev2  ELSE a.sys_elev1 END';
 
 		ELSIF v_project_type = 'WS' THEN
 			v_cat_geom1 := 'a.cat_dnom::float * 0.001';
 			v_slope := '
 				CASE 
-				WHEN d.pred = a.node_1 THEN 100*(a.elevation1 - a.depth1 - a.elevation2 + a.depth2)/a.gis_length 
-				ELSE 100*(a.elevation2 - a.depth2 - a.elevation1 + a.depth1)/a.gis_length 
+				WHEN d.pred = a.node_1 THEN 100*(a.elevation2 - a.depth2 - a.elevation1 + a.depth1)/a.gis_length 
+				ELSE 100*(a.elevation1 - a.depth1 - a.elevation2 + a.depth2)/a.gis_length
 				END';
 			v_z1 := '0::integer';
 			v_z2 := '0::integer';
