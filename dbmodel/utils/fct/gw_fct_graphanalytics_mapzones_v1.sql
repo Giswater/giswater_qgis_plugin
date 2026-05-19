@@ -815,7 +815,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4486", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if there are any nodes set in more than one mapzone - IN use, forceClosed or ignore
+			-- Check if there are any nodes set in more than one mapzone (only for connected networks) - IN use, forceClosed or ignore
 			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
@@ -823,7 +823,13 @@ BEGIN
 					g.pgr_node_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig) g
-				WHERE EXISTS (SELECT 1 FROM v_temp_node n WHERE g.pgr_node_id = n.node_id)
+				WHERE EXISTS (
+					SELECT 1 
+					FROM v_temp_node n 
+					JOIN temp_pgr_node t ON n.node_id = t.pgr_node_id 
+					WHERE g.pgr_node_id = n.node_id 
+					AND t.mapzone_id <> 0
+				)
 				GROUP BY g.pgr_node_id
 				HAVING  count(g.mapzone_id) > 1
 				ORDER BY g.pgr_node_id
@@ -835,7 +841,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4490", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if there are any arcs set in more than one nodeParent
+			-- Check if there are any arcs set in more than one nodeParent (only for connected networks)
 			SELECT string_agg(concat('arc_id: ', sub.arc_id, ' - ', sub.pair_block, '\n'), '')
 			INTO message
 			FROM (
@@ -843,7 +849,11 @@ BEGIN
 					g.pgr_arc_id AS arc_id,
 					string_agg(concat('[mapzone_id: ', g.mapzone_id, ', node_id: ', g.pgr_node_id, ']'), ' ' ORDER BY g.mapzone_id) AS pair_block
 				FROM temp_pgr_graphconfig g
-				WHERE EXISTS (SELECT 1 FROM v_temp_arc a WHERE g.pgr_arc_id = a.arc_id)
+				WHERE EXISTS (
+					SELECT 1 
+					FROM v_temp_arc a
+					JOIN temp_pgr_arc t ON a.arc_id = t.pgr_arc_id
+				 	WHERE g.pgr_arc_id = a.arc_id)
 				GROUP BY g.pgr_arc_id
 				HAVING COUNT(*) > 1
 			) sub;
@@ -854,13 +864,14 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4494", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if there are any to_arcs not connected to its nodeParent
+			-- Check if there are any to_arcs not connected to its nodeParent (only for connected networks)
 			SELECT string_agg(sub.mapzone_arcs, '')
 			INTO message
 			FROM (
 				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ',g.pgr_node_id,', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
 				JOIN v_temp_arc a ON g.pgr_arc_id = a.arc_id
+				JOIN temp_pgr_arc t ON a.arc_id = t.pgr_arc_id
 				WHERE g.graph_type = 'use'
 				AND g.pgr_node_id NOT IN (a.node_1, a.node_2)
 				ORDER BY g.mapzone_id,  g.pgr_node_id
@@ -1003,7 +1014,10 @@ BEGIN
 					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id)
 					AS mapzone_block
 				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig WHERE graph_type = 'use') g
-				WHERE NOT EXISTS (SELECT 1 FROM v_temp_node n WHERE g.pgr_node_id = n.node_id)
+				WHERE NOT EXISTS (
+					SELECT 1 FROM v_temp_node n 
+					WHERE g.pgr_node_id = n.node_id
+				)
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -1023,7 +1037,11 @@ BEGIN
 					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
 				WHERE g.graph_type IN ('forceClosed', 'forceOpen')
-				AND NOT EXISTS (SELECT 1 FROM v_temp_arc a WHERE g.pgr_arc_id = a.arc_id)
+				AND NOT EXISTS (
+					SELECT 1 
+					FROM v_temp_arc a
+					WHERE g.pgr_arc_id = a.arc_id
+				)
 				GROUP BY g.mapzone_id
 				ORDER BY g.mapzone_id
 			) sub;
@@ -1034,7 +1052,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4518", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if there are any nodeParents set in more than one mapzone
+			-- Check if there are any nodeParents set in more than one mapzone (only for connected networks)
 			SELECT string_agg(concat('node_id: ', sub.pgr_node_id, ' - mapzone_ids: ', sub.mapzone_block, '\n'), '')
 			INTO message
 			FROM (
@@ -1042,7 +1060,12 @@ BEGIN
 					g.pgr_node_id,
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig WHERE graph_type = 'use') g
-				WHERE EXISTS (SELECT 1 FROM v_temp_node n WHERE g.pgr_node_id = n.node_id)
+				WHERE EXISTS (
+					SELECT 1 
+					FROM v_temp_node n
+					JOIN temp_pgr_node t ON n.node_id = t.pgr_node_id
+					WHERE g.pgr_node_id = n.node_id
+				)
 				GROUP BY g.pgr_node_id
 				HAVING  count(*) > 1
 				ORDER BY g.pgr_node_id
@@ -1054,7 +1077,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4522", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if there are any forceClosed/forceOpen set in more than one mapzone
+			-- Check if there are any forceClosed/forceOpen set in more than one mapzone (only for connected networks)
 			SELECT string_agg(concat('arc_id: ', sub.pgr_arc_id, ' - mapzone_ids: ', sub.mapzone_block, '\n'), '')
 			INTO message
 			FROM (
@@ -1063,7 +1086,12 @@ BEGIN
 					string_agg(g.mapzone_id::text, ', ' ORDER BY g.mapzone_id) AS mapzone_block
 				FROM temp_pgr_graphconfig g
 				WHERE g.graph_type IN ('forceClosed', 'forceOpen')
-				AND EXISTS (SELECT 1 FROM v_temp_arc a WHERE g.pgr_arc_id = a.arc_id)
+				AND EXISTS (
+					SELECT 1 
+					FROM v_temp_arc a
+					JOIN temp_pgr_arc t ON a.arc_id = t.pgr_arc_id
+					WHERE g.pgr_arc_id = a.arc_id
+				)
 				GROUP BY g.pgr_arc_id
 				HAVING  count(*) > 1
 				ORDER BY g.pgr_arc_id
