@@ -92,7 +92,7 @@ def test_utils_update_in_place(adapter, parent_schemas):
         with adapter.raw.cursor() as cur:
             cur.execute(
                 "SELECT value FROM utils.config_param_system "
-                "WHERE parameter = 'utils_version' ORDER BY id DESC LIMIT 1"
+                "WHERE parameter = 'utils_version'"
             )
             row = cur.fetchone()
         assert row is not None

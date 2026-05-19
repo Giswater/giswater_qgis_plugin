@@ -472,7 +472,7 @@ Sobre todos los objetos de la campaña, se marcan como candidatos a sospechoso u
 ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 
-VALUES(3558, 'gw_fct_cm_update_geom', 'ws', 'function', 'json', 'json', 'Función para actualizar la geometría de lotes y campañas', 'role_cm', NULL, 'cm', NULL)
+VALUES(3558, 'gw_fct_cm_update_geom', 'ws', 'function', 'json', 'json', 'Función para actualizar la geometría de lotes y campañas', 'role_om', NULL, 'cm', NULL)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) 

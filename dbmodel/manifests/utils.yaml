@@ -56,9 +56,9 @@ phases:
     type: sql_inline
     description: "Pin utils version into config_param_system."
     sql: >
-      INSERT INTO {{ schema_name }}.config_param_system (id, parameter, value, data_type, descript)
-      VALUES (10, 'utils_version', '{{ main_project_version }}', 'text', 'UTILS')
-      ON CONFLICT (id) DO UPDATE SET value = EXCLUDED.value;
+      INSERT INTO {{ schema_name }}.config_param_system (parameter, value, descript)
+      VALUES ('utils_version', '{{ main_project_version }}', 'UTILS')
+      ON CONFLICT (parameter) DO UPDATE SET value = EXCLUDED.value;
 
   - id: final_pass
     type: sql_dir
