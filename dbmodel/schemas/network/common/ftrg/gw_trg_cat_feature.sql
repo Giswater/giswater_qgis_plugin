@@ -298,6 +298,7 @@ BEGIN
 			"form":{}, 	"feature":{"catFeature":"'||NEW.id||'"},
 			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'",
 			"feature_type":"'||lower(NEW.feature_type)||'" }}$$);';
+			PERFORM gw_fct_admin_role_permissions();
 
 			--manage tab hydrometer on netwjoin
 			IF  v_projecttype = 'WS' and OLD.feature_class = 'NETWJOIN' THEN

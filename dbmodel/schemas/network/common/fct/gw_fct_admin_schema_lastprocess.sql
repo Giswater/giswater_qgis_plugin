@@ -63,6 +63,12 @@ rec_feature record;
 
 rec_mapzone text;
 v_mapzone_arr text[];
+v_profile_timing boolean;
+v_prof_started timestamptz;
+v_prof_step timestamptz;
+v_profile_steps jsonb := '[]'::jsonb;
+v_step_ms bigint;
+v_child_views_json json;
 
 BEGIN
 	-- search path
@@ -81,6 +87,17 @@ BEGIN
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
+
+	v_profile_timing := lower(coalesce((p_data -> 'data')::json->>'profileTiming', 'false'))
+		IN ('true', '1', 't', 'yes');
+	v_prof_started := clock_timestamp();
+	v_prof_step := v_prof_started;
+	IF v_profile_timing THEN
+		v_step_ms := 0;
+		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'start', 'ms', v_step_ms));
+		RAISE NOTICE 'lastprocess_timing: % +% ms', 'start', v_step_ms;
+		v_prof_step := clock_timestamp();
+	END IF;
 
 	--reset sequences for a new project or for a sample
 	IF  v_issample IS TRUE THEN
@@ -130,6 +147,13 @@ BEGIN
 		-- create notifications triggers
 		PERFORM gw_fct_admin_manage_triggers('notify',null);
 
+		IF v_profile_timing THEN
+			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_manage_triggers', 'ms', v_step_ms));
+			RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_manage_triggers', v_step_ms;
+			v_prof_step := clock_timestamp();
+		END IF;
+
 		-- update cat feature triggering default values and others
 		UPDATE cat_feature SET id=id;
 
@@ -153,6 +177,13 @@ BEGIN
 			LOOP
 				EXECUTE 'DROP TABLE IF EXISTS '||v_tablename.table_name||' CASCADE';
 			END LOOP;
+
+			IF v_profile_timing THEN
+				v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+				v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'isnew_sys_version_and_drop_tables', 'ms', v_step_ms));
+				RAISE NOTICE 'lastprocess_timing: % +% ms', 'isnew_sys_version_and_drop_tables', v_step_ms;
+				v_prof_step := clock_timestamp();
+			END IF;
 
 			-- enable triggers
 			ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
@@ -234,6 +265,13 @@ BEGIN
 				DROP VIEW IF EXISTS ve_man_wwtp_pol;
 			END IF;
 
+			IF v_profile_timing THEN
+				v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+				v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'isnew_drop_views', 'ms', v_step_ms));
+				RAISE NOTICE 'lastprocess_timing: % +% ms', 'isnew_drop_views', v_step_ms;
+				v_prof_step := clock_timestamp();
+			END IF;
+
 			-- drop deprecated columns
 			IF v_projecttype = 'WS' THEN
 				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_19;
@@ -286,6 +324,13 @@ BEGIN
 				ALTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
 				ALTER TABLE gully DROP COLUMN IF EXISTS _gratecat2_id;
 				ALTER TABLE link DROP COLUMN IF EXISTS _expl_id2;
+			END IF;
+
+			IF v_profile_timing THEN
+				v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+				v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'isnew_alter_columns', 'ms', v_step_ms));
+				RAISE NOTICE 'lastprocess_timing: % +% ms', 'isnew_alter_columns', v_step_ms;
+				v_prof_step := clock_timestamp();
 			END IF;
 
 			-- inserting on config_param_system table
@@ -392,6 +437,13 @@ BEGIN
 			'{"sys_table_id":"ve_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gullycat_id","orderby":"3","search_type":"gully"}'
 			WHERE  parameter = 'basic_search_network_gully';
 
+			IF v_profile_timing THEN
+				v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+				v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'isnew_config_dml', 'ms', v_step_ms));
+				RAISE NOTICE 'lastprocess_timing: % +% ms', 'isnew_config_dml', v_step_ms;
+				v_prof_step := clock_timestamp();
+			END IF;
+
 		ELSIF v_isnew IS FALSE THEN
 
 			-- fix i18n
@@ -461,6 +513,13 @@ BEGIN
 
 			PERFORM setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true); --into v_next_val;
 
+			IF v_profile_timing THEN
+				v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+				v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'upgrade_cleanup', 'ms', v_step_ms));
+				RAISE NOTICE 'lastprocess_timing: % +% ms', 'upgrade_cleanup', v_step_ms;
+				v_prof_step := clock_timestamp();
+			END IF;
+
 		END IF;
 
         -- delete all functions not related to project type
@@ -470,13 +529,42 @@ BEGIN
             DELETE FROM sys_function WHERE lower(project_type) = 'ws';
         END IF;
 
+		IF v_profile_timing THEN
+			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_delete_sys_function', 'ms', v_step_ms));
+			RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_delete_sys_function', v_step_ms;
+			v_prof_step := clock_timestamp();
+		END IF;
+
 		--reset sequences and id of anl, temp and audit tables
 		PERFORM gw_fct_admin_reset_sequences();
+
+		IF v_profile_timing THEN
+			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_reset_sequences', 'ms', v_step_ms));
+			RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_reset_sequences', v_step_ms;
+			v_prof_step := clock_timestamp();
+		END IF;
 
 		-- last process
 		UPDATE config_param_system SET value = v_gwversion WHERE parameter = 'admin_version';
 		PERFORM gw_fct_admin_role_permissions();
+
+		IF v_profile_timing THEN
+			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_role_permissions', 'ms', v_step_ms));
+			RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_role_permissions', v_step_ms;
+			v_prof_step := clock_timestamp();
+		END IF;
+
 		PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
+
+		IF v_profile_timing THEN
+			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_setowner', 'ms', v_step_ms));
+			RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_setowner', v_step_ms;
+			v_prof_step := clock_timestamp();
+		END IF;
 
 		--build return with log table
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
@@ -514,18 +602,52 @@ BEGIN
 
 	END IF;
 
+	IF v_profile_timing THEN
+		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_mapzone_defaults', 'ms', v_step_ms));
+		RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_mapzone_defaults', v_step_ms;
+		v_prof_step := clock_timestamp();
+	END IF;
 
     -- recreate views
-    PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
+	IF v_profile_timing THEN
+		SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE", "profileTiming": true}}$$)::json
+		INTO v_child_views_json;
+		v_profile_steps := v_profile_steps || COALESCE(
+			(v_child_views_json -> 'body' -> 'data' -> 'profileSteps')::jsonb,
+			'[]'::jsonb
+		);
+		v_prof_step := clock_timestamp();
+	ELSE
+		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
+	END IF;
 
     -- set to_arc no editable for valves
     UPDATE config_form_fields SET iseditable=false WHERE columnname='to_arc';
+
+	IF v_profile_timing THEN
+		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
+		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'after_manage_child_views', 'ms', v_step_ms));
+		RAISE NOTICE 'lastprocess_timing: % +% ms', 'after_manage_child_views', v_step_ms;
+		v_prof_step := clock_timestamp();
+	END IF;
 
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"values":',v_result_info, '}');
 
 	-- Return
+	IF v_profile_timing THEN
+		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_started)) * 1000)::bigint;
+		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object('step', 'total', 'ms', v_step_ms));
+		RETURN ('{"status":"Accepted", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}'||
+			',"body":{"form":{}'||
+			',"data":{"info":'||v_result_info||
+			',"profileSteps":'||v_profile_steps::text||
+			'}}}');
+	END IF;
+
 	RETURN ('{"status":"Accepted", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}'||
 		',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||
