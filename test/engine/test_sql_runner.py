@@ -66,6 +66,7 @@ def test_execute_file_subs_and_commits(tmp_path: Path):
     conn = _RecConn()
     fx = execute_file(conn, str(p), {"SCHEMA_NAME": "ws_x", "SRID_VALUE": "25831"}, commit=True)
     assert fx.ok
+    assert fx.duration_ms >= 0
     assert conn.commits == 1
     sent, _ = conn.executed[0]
     assert sent == "INSERT INTO ws_x.t VALUES (25831);"
@@ -91,6 +92,7 @@ def test_execute_function_call_wraps_payload_as_jsonb():
         conn, "ws.gw_fct_admin_schema_lastprocess", {"a": 1, "b": "x"}
     )
     assert fx.ok
+    assert fx.duration_ms >= 0
     sent, _ = conn.executed[0]
     assert sent.startswith("SELECT ws.gw_fct_admin_schema_lastprocess(")
     assert '"a": 1' in sent and '"b": "x"' in sent
@@ -100,3 +102,19 @@ def test_execute_inline_simple():
     conn = _RecConn()
     fx = execute_inline(conn, "DROP SCHEMA IF EXISTS x CASCADE;", label="drop", commit=True)
     assert fx.ok and conn.commits == 1
+    assert fx.duration_ms >= 0
+
+
+def test_execute_file_records_duration_with_slow_conn(tmp_path: Path):
+    import time
+
+    class _SlowConn(_RecConn):
+        def execute(self, sql: str, *, filepath: str | None = None) -> bool:
+            time.sleep(0.02)
+            return super().execute(sql, filepath=filepath)
+
+    p = tmp_path / "s.sql"
+    p.write_text("SELECT 1;", encoding="utf-8")
+    fx = execute_file(_SlowConn(), str(p), {})
+    assert fx.ok
+    assert fx.duration_ms >= 15

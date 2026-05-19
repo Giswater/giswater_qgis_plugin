@@ -11,7 +11,7 @@ import datetime as _dt
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from . import sql_runner
 from .cancel import CancelToken
@@ -21,7 +21,19 @@ from .templating import apply_subs, render
 logger = logging.getLogger(__name__)
 
 
-ProgressCb = Callable[[int, int, str], None]  # (current, total, label)
+ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
+
+
+def _inject_profile_timing(payload: Any) -> Any:
+    """Add ``profileTiming: true`` to a lastprocess JSON payload."""
+    if not isinstance(payload, dict):
+        return payload
+    data = payload.get("data")
+    if isinstance(data, dict):
+        merged = dict(data)
+        merged["profileTiming"] = True
+        return {**payload, "data": merged}
+    return {**payload, "data": {"profileTiming": True}}
 
 
 @dataclass
@@ -54,6 +66,9 @@ class BuildParams:
 
     # Cooperative cancel.
     cancel_token: CancelToken = field(default_factory=CancelToken)
+
+    # When True, lastprocess payload gets profileTiming (PL/pgSQL RAISE NOTICE).
+    profile_lastprocess: bool = False
 
     def __post_init__(self) -> None:
         if not self.today:
@@ -145,7 +160,7 @@ class SchemaBuilder:
         self.conn = conn
         self.manifest = manifest
         self.params = params
-        self.progress_cb: ProgressCb = progress_cb or (lambda *_: None)
+        self.progress_cb: ProgressCb = progress_cb or (lambda *_a, **_k: None)
         self.commit_each_file = commit_each_file
         self._ctx = params.as_ctx()
         # Manifest-level substitutions are layered on top of the engine's
@@ -167,7 +182,7 @@ class SchemaBuilder:
             if self._is_cancelled():
                 result.cancelled = True
                 break
-            self.progress_cb(seen, total, f"phase:{phase.id}")
+            self.progress_cb(seen, total, f"phase:{phase.id}", None)
             pr = self._run_phase(phase, seen, total)
             result.phases.append(pr)
             seen += count
@@ -176,7 +191,7 @@ class SchemaBuilder:
 
         if self._is_cancelled() and not result.cancelled:
             result.cancelled = True
-        self.progress_cb(seen, total, "done")
+        self.progress_cb(seen, total, "done", None)
         return result
 
     # ----------------------------------------------------------------- planning
@@ -246,9 +261,9 @@ class SchemaBuilder:
                 if self._is_cancelled():
                     return pr
                 seen += 1
-                self.progress_cb(seen, total, path)
                 fx = sql_runner.execute_file(self.conn, path, subs, self.commit_each_file)
                 pr.files.append(fx)
+                self.progress_cb(seen, total, path, fx)
                 if not fx.ok:
                     return pr
         if not any_file and phase.optional:
@@ -268,9 +283,9 @@ class SchemaBuilder:
                             return pr
                         any_file = True
                         seen += 1
-                        self.progress_cb(seen, total, path)
                         fx = sql_runner.execute_file(self.conn, path, self._subs, self.commit_each_file)
                         pr.files.append(fx)
+                        self.progress_cb(seen, total, path, fx)
                         if not fx.ok:
                             return pr
         if not any_file and phase.optional:
@@ -288,9 +303,9 @@ class SchemaBuilder:
                     return pr
                 any_file = True
                 seen += 1
-                self.progress_cb(seen, total, path)
                 fx = sql_runner.execute_file(self.conn, path, self._subs, self.commit_each_file)
                 pr.files.append(fx)
+                self.progress_cb(seen, total, path, fx)
                 if not fx.ok:
                     return pr
         if not any_file and phase.optional:
@@ -318,10 +333,10 @@ class SchemaBuilder:
             if self._is_cancelled():
                 return pr
             seen += 1
-            self.progress_cb(seen, total, path)
             subs = self._step_subs(step)
             fx = sql_runner.execute_file(self.conn, path, subs, self.commit_each_file)
             pr.files.append(fx)
+            self.progress_cb(seen, total, path, fx)
             if not fx.ok:
                 return pr
         return pr
@@ -329,15 +344,26 @@ class SchemaBuilder:
     def _run_sql_function(self, phase: Phase, seen: int, total: int) -> PhaseResult:
         pr = PhaseResult(phase_id=phase.id)
         fn = render(phase.function, self._ctx)
-        self.progress_cb(seen + 1, total, f"<fn:{fn}>")
         payload = render(phase.payload, self._ctx)
-        fx = sql_runner.execute_function_call(self.conn, fn, payload, self.commit_each_file)
+        profile_fn = self.params.profile_lastprocess and phase.id in (
+            "lastprocess",
+            "lastprocess_upgrade",
+        )
+        if profile_fn:
+            payload = _inject_profile_timing(payload)
+        fx = sql_runner.execute_function_call(
+            self.conn,
+            fn,
+            payload,
+            self.commit_each_file,
+            fetch_result=profile_fn,
+        )
         pr.files.append(fx)
+        self.progress_cb(seen + 1, total, f"<fn:{fn}>", fx)
         return pr
 
     def _run_sql_inline(self, phase: Phase, seen: int, total: int) -> PhaseResult:
         pr = PhaseResult(phase_id=phase.id)
-        self.progress_cb(seen + 1, total, f"<inline:{phase.id}>")
         # Inline SQL goes through both the manifest-level {{ var }} renderer
         # and the file-content substitution layer, so authors can use either.
         sql = apply_subs(render(phase.sql, self._ctx), self._subs)
@@ -345,6 +371,7 @@ class SchemaBuilder:
             self.conn, sql, label=f"phase:{phase.id}", commit=self.commit_each_file
         )
         pr.files.append(fx)
+        self.progress_cb(seen + 1, total, f"<inline:{phase.id}>", fx)
         return pr
 
     # ---------------------------------------------------------- filesystem util

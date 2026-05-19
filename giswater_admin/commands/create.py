@@ -41,7 +41,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
     parent_version = ""
     conn = None
     if h.needs_connection(args) and not args.check:
-        conn = h.open_conn(args)
+        conn = h.open_conn(args, out)
 
     # cm parent_type auto-detect
     if args.kind == "cm":
@@ -98,6 +98,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         parent_type=parent_type,
         am_target=am_target,
         main_project_version=main_version,
+        profile_lastprocess=getattr(args, "profile_lastprocess", False),
     )
 
     if args.check:
@@ -105,7 +106,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
 
     assert conn is not None
     try:
-        builder = SchemaBuilder(conn, manifest, params, progress_cb=h.build_progress_cb(out))
+        builder = SchemaBuilder(conn, manifest, params, progress_cb=h.progress_cb_for_args(out, args))
         result = builder.run()
         if result.ok:
             conn.commit()

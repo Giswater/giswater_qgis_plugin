@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from dataclasses import dataclass, field
 from typing import Any, Mapping, Protocol
 
@@ -39,6 +40,7 @@ class FileExec:
     ok: bool = False
     error: str = ""
     duration_ms: int = 0
+    profile_steps: list[dict[str, Any]] = field(default_factory=list)
 
 
 class ConnectionLike(Protocol):
@@ -97,6 +99,7 @@ def execute_file(
     log.debug("execute_file path=%s sql_preview=%s", path, _preview_sql(sql))
 
     fx = FileExec(path=path)
+    t0 = time.perf_counter()
     try:
         fx.ok = conn.execute(sql, filepath=path)
         if not fx.ok:
@@ -106,6 +109,8 @@ def execute_file(
     except Exception as e:  # noqa: BLE001 - boundary
         fx.ok = False
         fx.error = f"{type(e).__name__}: {e}"
+    finally:
+        fx.duration_ms = int((time.perf_counter() - t0) * 1000)
     return fx
 
 
@@ -118,6 +123,7 @@ def execute_inline(
 ) -> FileExec:
     log.debug("execute_inline label=%s sql_preview=%s", label, _preview_sql(sql))
     fx = FileExec(path=f"<{label}>")
+    t0 = time.perf_counter()
     try:
         fx.ok = conn.execute(sql)
         if not fx.ok:
@@ -127,7 +133,39 @@ def execute_inline(
     except Exception as e:  # noqa: BLE001
         fx.ok = False
         fx.error = f"{type(e).__name__}: {e}"
+    finally:
+        fx.duration_ms = int((time.perf_counter() - t0) * 1000)
     return fx
+
+
+def _parse_profile_steps(raw: Any) -> list[dict[str, Any]]:
+    if raw is None:
+        return []
+    if isinstance(raw, (bytes, bytearray)):
+        raw = raw.decode("utf-8", errors="replace")
+    if isinstance(raw, str):
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            return []
+    elif isinstance(raw, dict):
+        data = raw
+    else:
+        return []
+    steps = data.get("body", {}).get("data", {}).get("profileSteps")
+    if steps is None:
+        steps = data.get("profileSteps")
+    if not isinstance(steps, list):
+        return []
+    out: list[dict[str, Any]] = []
+    for item in steps:
+        if isinstance(item, dict) and "step" in item and "ms" in item:
+            out.append({"step": item["step"], "ms": item["ms"]})
+        elif isinstance(item, list):
+            for sub in item:
+                if isinstance(sub, dict) and "step" in sub and "ms" in sub:
+                    out.append({"step": sub["step"], "ms": sub["ms"]})
+    return out
 
 
 def execute_function_call(
@@ -135,6 +173,8 @@ def execute_function_call(
     function: str,
     payload: Any,
     commit: bool = False,
+    *,
+    fetch_result: bool = False,
 ) -> FileExec:
     """
     Execute a Giswater-style server-side function call.
@@ -148,13 +188,23 @@ def execute_function_call(
     sql = f"SELECT {function}($${body_json}$$);"
     log.debug("execute_function_call fn=%s sql_preview=%s", function, _preview_sql(sql))
     fx = FileExec(path=f"<fn:{function}>")
+    t0 = time.perf_counter()
     try:
-        fx.ok = conn.execute(sql)
-        if not fx.ok:
-            fx.error = conn.last_error() or "function returned False"
-        elif commit:
+        if fetch_result and hasattr(conn, "execute_scalar"):
+            raw, fx.ok = conn.execute_scalar(sql, filepath=f"<fn:{function}>")  # type: ignore[attr-defined]
+            if not fx.ok:
+                fx.error = conn.last_error() or "function returned False"
+            else:
+                fx.profile_steps = _parse_profile_steps(raw)
+        else:
+            fx.ok = conn.execute(sql)
+            if not fx.ok:
+                fx.error = conn.last_error() or "function returned False"
+        if fx.ok and commit:
             conn.commit()
     except Exception as e:  # noqa: BLE001
         fx.ok = False
         fx.error = f"{type(e).__name__}: {e}"
+    finally:
+        fx.duration_ms = int((time.perf_counter() - t0) * 1000)
     return fx

@@ -13,6 +13,8 @@ import json
 import sys
 from typing import Any
 
+from .log_format import LogStyle, default_log_style, format_file, format_timing_summary
+
 
 class Out:
     def __init__(
@@ -22,17 +24,22 @@ class Out:
         *,
         verbose: bool = False,
         debug: bool = False,
+        timing: bool = False,
+        log_style: LogStyle | None = None,
+        sql_root: str = "",
     ) -> None:
         self.json_mode = json_mode
         self.quiet = quiet
         # --debug implies per-file logging behaviour like verbose.
         self.verbose = bool(verbose or debug)
         self.debug = bool(debug)
+        self.timing = bool(timing)
+        self.style = log_style or default_log_style(sql_root=sql_root, timing=timing)
 
     def info(self, msg: str) -> None:
         if self.quiet:
             return
-        print(f"info: {msg}", file=sys.stderr)
+        print(msg, file=sys.stderr)
 
     def warn(self, msg: str) -> None:
         print(f"warning: {msg}", file=sys.stderr)
@@ -43,13 +50,30 @@ class Out:
     def progress(self, msg: str) -> None:
         if self.quiet:
             return
-        print(msg, file=sys.stderr)
+        print(msg, file=sys.stderr, flush=True)
 
-    def exec_file(self, seen: int, total: int, path: str) -> None:
-        """Per-SQL file trace (QGIS-terminal parity). Respects ``quiet``."""
+    def exec_file(
+        self,
+        seen: int,
+        total: int,
+        path: str,
+        *,
+        duration_ms: int | None = None,
+    ) -> None:
+        """Per-SQL file trace. Respects ``quiet`` and ``verbose``."""
         if self.quiet or not self.verbose:
             return
-        print(f"exec: [{seen}/{total}] {path}", file=sys.stderr, flush=True)
+        ms = duration_ms if self.timing else None
+        self.progress(
+            format_file(seen, total, path, ms=ms, style=self.style)
+        )
+
+    def timing_summary(self, summary: dict[str, Any]) -> None:
+        """Human-readable timing rollup on stderr (``--timing``)."""
+        if self.quiet:
+            return
+        for line in format_timing_summary(summary, style=self.style):
+            print(line, file=sys.stderr)
 
     def result(self, payload: Any) -> None:
         """Final machine-or-human payload. Writes ONCE to stdout."""

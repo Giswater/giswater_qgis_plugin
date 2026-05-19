@@ -12,7 +12,7 @@ from . import _helpers as h
 def run(args: argparse.Namespace, out: Out) -> int:
     conn = None
     if not args.check:
-        conn = h.open_conn(args)
+        conn = h.open_conn(args, out)
 
     # Infer kind + project_version from sys_version unless overridden.
     kind = args.kind
@@ -53,6 +53,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         profile="update",
         db_user=_safe_user(args),
         sql_root=args.dbmodel_path,
+        profile_lastprocess=getattr(args, "profile_lastprocess", False),
     )
 
     if args.check:
@@ -74,7 +75,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
 
     assert conn is not None
     try:
-        builder = SchemaBuilder(conn, manifest, params, progress_cb=h.build_progress_cb(out))
+        builder = SchemaBuilder(conn, manifest, params, progress_cb=h.progress_cb_for_args(out, args))
         result = builder.run()
         if result.ok:
             conn.commit()

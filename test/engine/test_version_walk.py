@@ -43,6 +43,36 @@ class _FakeConn:
     def close(self): pass
 
 
+def test_new_project_empty_applies_all_versions_up_to_plugin(tmp_path: Path):
+    _make_tree(tmp_path, [(3, 6, 1), (4, 2, 0), (4, 9, 0)])
+    manifest = Manifest(
+        kind="ws",
+        engine_version=1,
+        substitutions={},
+        phases=(
+            Phase(
+                id="updates",
+                type="version_walk",
+                root="updates",
+                subdirs=("ws",),
+                range={"mode": "{{ run_mode }}"},
+            ),
+        ),
+        profiles={"empty": Profile(name="empty", phases=("updates",))},
+    )
+    params = BuildParams(
+        schema_name="ws_demo",
+        sql_root=str(tmp_path),
+        plugin_version="4.9.0",
+        project_version="0.0.0",
+        run_mode="new_project",
+        profile="empty",
+    )
+    b = SchemaBuilder(_FakeConn(), manifest, params)
+    [(_phase, count)] = b.plan()
+    assert count == 3  # 3.6.1, 4.2.0, 4.9.0
+
+
 def test_new_project_includes_all_le_plugin(tmp_path: Path):
     _make_tree(tmp_path, [(3, 6, 1), (4, 0, 0), (4, 9, 0), (5, 0, 0)])
     params = BuildParams(

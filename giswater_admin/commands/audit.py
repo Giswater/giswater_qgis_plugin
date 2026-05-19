@@ -54,7 +54,7 @@ def run_drop(args: argparse.Namespace, out: Out) -> int:
     if args.check:
         out.result({"ok": True, "mode": "check", "sql": "DROP SCHEMA IF EXISTS audit CASCADE;"})
         return 0
-    conn = h.open_conn(args)
+    conn = h.open_conn(args, out)
     try:
         fx = drop_schema(conn, "audit", cascade=True, commit=True)
         if not fx.ok:
@@ -82,9 +82,9 @@ def _execute(args: argparse.Namespace, out: Out, manifest, params: BuildParams) 
         )
         return 0
 
-    conn = h.open_conn(args)
+    conn = h.open_conn(args, out)
     try:
-        builder = SchemaBuilder(conn, manifest, params, progress_cb=h.build_progress_cb(out))
+        builder = SchemaBuilder(conn, manifest, params, progress_cb=h.progress_cb_for_args(out, args))
         result = builder.run()
         if result.ok:
             conn.commit()
