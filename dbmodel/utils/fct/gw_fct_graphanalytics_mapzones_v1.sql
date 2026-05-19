@@ -776,7 +776,7 @@ BEGIN
 				SELECT
 					g.mapzone_id,
 					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id) AS mapzone_block
-				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig) g
+				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig WHERE pgr_arc_id IS NOT NULL) g
 				WHERE NOT EXISTS (
 					SELECT 1
 					FROM v_temp_node n
@@ -792,7 +792,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4482", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if there are any arcs in the graphconfig that are not in the network
+			-- Check if there are any arcs in the graphconfig that are not in the operative network
 			SELECT string_agg(concat('mapzone_id: ', sub.mapzone_id, ' - arc_ids: ', mapzone_block, '\n'), '')
 			INTO message
 			FROM (
