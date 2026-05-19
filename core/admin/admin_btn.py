@@ -372,7 +372,7 @@ class GwAdminButton:
 
         return None
 
-    def execute_last_process(self, new_project: bool = False, schema_name: Union[str, None] = None, schema_type: str = '', locale: bool = False, srid: Union[str, None] = None):
+    def execute_last_process(self, new_project: bool = False, schema_name: Union[str, None] = None, schema_type: str = '', locale: bool = False, srid: Union[str, None] = None, aux_conn=None, is_thread: bool = False):
         """ 
         Execute last process function
         
@@ -381,6 +381,8 @@ class GwAdminButton:
         :param schema_type: The type of the schema to use.
         :param locale: Whether to use the locale.
         :param srid: The SRID to use.
+        :param aux_conn: Auxiliar database connection used by threads.
+        :param is_thread: Whether the call is made from a worker thread.
         :return bool: True if all relevant folders were processed successfully, False otherwise.
         """
 
@@ -410,7 +412,9 @@ class GwAdminButton:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False)
+        result = tools_gw.execute_procedure(
+            'gw_fct_admin_schema_lastprocess', body, self.schema_name,
+            commit=False, aux_conn=aux_conn, is_thread=is_thread)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
@@ -447,6 +451,94 @@ class GwAdminButton:
             if not isdeleted(task):
                 task.cancel()
 
+    def _get_active_admin_task(self):
+        """Return the first active admin background task, if any."""
+
+        for task_name in ('task_update_schema', 'task_create_schema', 'task_create_cm_schema'):
+            if hasattr(self, task_name):
+                task = getattr(self, task_name)
+                if task is not None and not isdeleted(task):
+                    return task
+        return None
+
+    def _set_admin_task_progress(self, task, value):
+        """Update progress on an admin background task."""
+
+        if task is None or isdeleted(task):
+            return
+        if hasattr(task, 'set_progress'):
+            task.set_progress(value)
+        else:
+            task.setProgress(value)
+
+    def _update_file_progress(self, active_task):
+        """Update per-file progress for the active admin background task."""
+
+        if active_task is None or isdeleted(active_task) or self.total_sql_files <= 0:
+            return
+        self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
+        self.progress_value = int(self.progress_value * self.progress_ratio)
+        self._set_admin_task_progress(active_task, self.progress_value)
+
+    def count_pending_update_sql_files(self, project_type: Union[str, None] = None) -> int:
+        """Count SQL files in update patches pending to be applied."""
+
+        folder_updates = self.folder_updates
+        if not os.path.exists(folder_updates):
+            return 0
+
+        if project_type is None:
+            project_type = self.project_type_selected
+
+        version_folders = []
+        for root, _, _ in os.walk(folder_updates):
+            rel_path = os.path.relpath(root, folder_updates)
+            if rel_path == '.':
+                continue
+
+            parts = rel_path.split(os.sep)
+            if len(parts) != 3:
+                continue
+
+            try:
+                version_folders.append((int(parts[0]), int(parts[1]), int(parts[2]), root))
+            except ValueError:
+                continue
+
+        project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
+        plugin_tuple = tuple(int(x) for x in str(self.plugin_version).split('.'))
+        total = 0
+
+        for major, minor, patch, folder_path in version_folders:
+            current_tuple = (major, minor, patch)
+            if not (current_tuple > project_tuple and current_tuple <= plugin_tuple):
+                continue
+
+            for subfolder in ('utils', project_type):
+                path = os.path.join(folder_path, subfolder)
+                if not os.path.isdir(path):
+                    continue
+                for _, _, files in os.walk(path):
+                    total += sum(1 for file_name in files if file_name.endswith('.sql'))
+
+        return total
+
+    def count_load_updates_sql_files(self, project_type: Union[str, None] = None) -> int:
+        """Count SQL files executed during load_updates()."""
+
+        total = self.count_pending_update_sql_files(project_type=project_type)
+        for folder in (
+            os.path.join(self.folder_utils, self.file_pattern_fct),
+            os.path.join(self.folder_utils, self.file_pattern_ftrg),
+            os.path.join(self.folder_software, self.file_pattern_fct),
+            os.path.join(self.folder_software, self.file_pattern_ftrg),
+        ):
+            if not os.path.isdir(folder):
+                continue
+            for _, _, files in os.walk(folder):
+                total += sum(1 for file_name in files if file_name.endswith('.sql'))
+        return total
+
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
         """"""
@@ -481,13 +573,15 @@ class GwAdminButton:
             QgsApplication.taskManager().addTask(self.task_update_schema)
             QgsApplication.taskManager().triggerTask(self.task_update_schema)
 
-    def load_updates(self, project_type: Union[str, None] = None, update_changelog: bool = False, schema_name: Union[str, None] = None) -> bool:
+    def load_updates(self, project_type: Union[str, None] = None, update_changelog: bool = False, schema_name: Union[str, None] = None, progress_task=None, aux_conn=None) -> bool:
         """
         Load updates for a given project type.
 
         :param project_type: The project type to use. If None, uses self.project_type_selected.
         :param update_changelog: Whether to update the changelog.
         :param schema_name: The name of the schema to use. If None, uses self._get_schema_name().
+        :param progress_task: Optional QgsTask to report progress. When omitted, a dummy task is created.
+        :param aux_conn: Auxiliar database connection used by threads.
 
         :return bool: True if all updates were loaded successfully, False otherwise.
         """
@@ -499,18 +593,28 @@ class GwAdminButton:
         self.schema = schema_name
         self.locale = self.project_language
 
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
+        if progress_task is None:
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
+            progress_task = self.task1
+
+        is_thread = aux_conn is not None
+
+        def _set_progress(value):
+            self._set_admin_task_progress(progress_task, value)
+
+        _set_progress(0)
         status = self._load_fct_ftrg()
-        self.task1.setProgress(20)
-        self.task1.setProgress(40)
+        _set_progress(20)
+        _set_progress(40)
         if status:
             status = self.update_dict_folders(False, project_type=project_type, folder_updates=self.folder_updates)
-        self.task1.setProgress(60)
+        _set_progress(60)
         if status:
-            status = self.execute_last_process(schema_name=schema_name, locale=True, schema_type=project_type)
-        self.task1.setProgress(100)
+            status = self.execute_last_process(
+                schema_name=schema_name, locale=True, schema_type=project_type,
+                aux_conn=aux_conn, is_thread=is_thread)
+        _set_progress(100)
 
         if update_changelog is False:
             status = (self.error_count == 0)
@@ -708,7 +812,10 @@ class GwAdminButton:
 
         if not os.path.exists(folder_updates):
             msg = "The update folder was not found in sql folder"
-            tools_qgis.show_message(msg)
+            if len(lib_vars.session_vars['threads']) > 0:
+                tools_log.log_warning(msg)
+            else:
+                tools_qgis.show_message(msg)
             self.error_count = self.error_count + 1
             return False
 
@@ -2183,7 +2290,10 @@ class GwAdminButton:
             self.project_epsg = str(self.project_epsg).replace('"', '')
         else:
             msg = "There is no project selected or it is not valid. Please check the first tab..."
-            tools_qgis.show_warning(msg)
+            if len(lib_vars.session_vars['threads']) > 0:
+                tools_log.log_warning(msg)
+            else:
+                tools_qgis.show_warning(msg)
 
         # Manage files
         for file in filelist:
@@ -2202,16 +2312,15 @@ class GwAdminButton:
 
         status = False
         f = None
+        active_task = self._get_active_admin_task()
+        aux_conn = getattr(active_task, 'aux_conn', None) if active_task else None
         try:
 
             # Manage progress bar
-            if set_progress_bar:
-                if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
-                    self.progress_value = int(self.progress_value * self.progress_ratio)
-                    self.task_create_schema.set_progress(self.progress_value)
+            if set_progress_bar and active_task:
+                self._update_file_progress(active_task)
 
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
+            if active_task and active_task.isCanceled():
                 return False
 
             filepath = os.path.join(filedir, file)
@@ -2222,7 +2331,9 @@ class GwAdminButton:
                     f_to_read = f_to_read.replace("AUX_SCHEMA_NAME", aux_schema_name)
                 f_to_read = f_to_read.replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg)
 
-                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
+                status = tools_db.execute_sql(
+                    str(f_to_read), filepath=filepath, commit=self.dev_commit,
+                    is_thread=True, aux_conn=aux_conn)
                 if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
                     msg = "{0} error {1}"
@@ -2232,11 +2343,11 @@ class GwAdminButton:
                     tools_log.log_info(msg, parameter=lib_vars.session_vars['last_error'])
                     self.message_infolog = f"_read_execute_file error {filepath}\nMessage: {lib_vars.session_vars['last_error']}"
                     if tools_os.set_boolean(self.dev_commit, False) is False:
-                        tools_db.dao.rollback()
+                        tools_db.dao.rollback(aux_conn)
 
-                    if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                        self.task_create_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
-                        self.task_create_schema.cancel()
+                    if active_task and not isdeleted(active_task):
+                        active_task.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        active_task.cancel()
 
                     return False
 
@@ -2248,9 +2359,9 @@ class GwAdminButton:
             tools_log.log_info(str(e))
             self.message_infolog = f"_read_execute_file exception: {file}\n {str(e)}"
             if tools_os.set_boolean(self.dev_commit, False) is False:
-                tools_db.dao.rollback()
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                self.task_create_schema.cancel()
+                tools_db.dao.rollback(aux_conn)
+            if active_task and not isdeleted(active_task):
+                active_task.cancel()
             status = False
 
         finally:
@@ -2304,9 +2415,10 @@ class GwAdminButton:
             # Manage progress bar
             if set_progress_bar:
                 if hasattr(self, 'task_create_cm_schema') and not isdeleted(self.task_create_cm_schema):
-                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
-                    self.progress_value = int(self.progress_value * self.progress_ratio)
-                    self.task_create_cm_schema.set_progress(self.progress_value)
+                    if self.total_sql_files > 0:
+                        self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
+                        self.progress_value = int(self.progress_value * self.progress_ratio)
+                        self.task_create_cm_schema.set_progress(self.progress_value)
 
             if hasattr(self, 'task_create_cm_schema') and not isdeleted(
                     self.task_create_cm_schema) and self.task_create_cm_schema.isCanceled():
@@ -2416,6 +2528,8 @@ class GwAdminButton:
 
         status = False
         f = None
+        active_task = self._get_active_admin_task()
+        aux_conn = getattr(active_task, 'aux_conn', None) if active_task else None
 
         PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         SCHEMA_SRID = str(self.project_epsg)
@@ -2425,27 +2539,26 @@ class GwAdminButton:
 
         try:
             # Manage progress bar
-            if set_progress_bar:
-                if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
-                    self.progress_value = int(self.progress_value * self.progress_ratio)
-                    self.task_create_schema.set_progress(self.progress_value)
+            if set_progress_bar and active_task:
+                self._update_file_progress(active_task)
 
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
+            if active_task and active_task.isCanceled():
                 return False
 
             f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SCHEMA_SRID", SCHEMA_SRID).replace("PARENT_SCHEMA", PARENT_SCHEMA))
-                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
+                status = tools_db.execute_sql(
+                    str(f_to_read), filepath=filepath, commit=self.dev_commit,
+                    is_thread=True, aux_conn=aux_conn)
                 if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
                     if tools_os.set_boolean(self.dev_commit, False) is False:
-                        tools_db.dao.rollback()
+                        tools_db.dao.rollback(aux_conn)
 
-                    if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                        self.task_create_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
-                        self.task_create_schema.cancel()
+                    if active_task and not isdeleted(active_task):
+                        active_task.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        active_task.cancel()
 
                     return False
 
@@ -2457,9 +2570,9 @@ class GwAdminButton:
             tools_log.log_info(str(e))
             self.message_infolog = f"_read_execute_file exception: {filepath}\n {str(e)}"
             if tools_os.set_boolean(self.dev_commit, False) is False:
-                tools_db.dao.rollback()
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                self.task_create_schema.cancel()
+                tools_db.dao.rollback(aux_conn)
+            if active_task and not isdeleted(active_task):
+                active_task.cancel()
             status = False
 
         finally:
