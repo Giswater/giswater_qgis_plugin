@@ -18,6 +18,7 @@ UPDATE arc SET sector_id = expl_id;
 UPDATE node SET sector_id = expl_id;
 UPDATE connec SET sector_id = expl_id;
 UPDATE link SET sector_id = expl_id;
+UPDATE element SET sector_id = expl_id;
 
 DELETE FROM inp_rules;
 DELETE FROM inp_controls;
