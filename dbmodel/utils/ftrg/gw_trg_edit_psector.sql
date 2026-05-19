@@ -185,15 +185,15 @@ BEGIN
 
 					END IF;
 
-					-- set on service features where psector_x_* state is 1
-					EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 1, workcat_id = '||quote_literal(NEW.workcat_id)||', workcat_id_plan = '||quote_nullable(NEW.workcat_id_plan)||
-					', state_type = '||v_statetype_onservice||'	FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
-					AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type<>'||v_state_obsolete_planified||';';
-
 					-- set obsolete features where psector_x_* state is 0
 					EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 0, workcat_id_end = '||quote_literal(NEW.workcat_id)||', state_type = '||v_statetype_obsolete||' 
 					FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
 					AND p.state = 0 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''';';
+
+					-- set on service features where psector_x_* state is 1
+					EXECUTE 'UPDATE '||lower(rec_type.id)||' n SET state = 1, workcat_id = '||quote_literal(NEW.workcat_id)||', workcat_id_plan = '||quote_nullable(NEW.workcat_id_plan)||
+					', state_type = '||v_statetype_onservice||'	FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE n.'||lower(rec_type.id)||'_id = p.'||lower(rec_type.id)||'_id 
+					AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND n.'||lower(rec_type.id)||'_id = '''||rec.id||''' AND n.state_type<>'||v_state_obsolete_planified||';';
 
 					IF lower(rec_type.id) IN ('connec', 'gully') THEN
 
