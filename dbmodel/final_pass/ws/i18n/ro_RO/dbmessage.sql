@@ -389,7 +389,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Elemente legate de caracteristică: %v_element%', NULL),
     (3520, 'Vizite legate de caracteristică: %v_visit%', NULL),
     (3522, 'Documente legate de caracteristică: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectors connected with the feature: %v_psector%', NULL),
     (3526, 'IMPORTANT: Activați psector înainte de a șterge caracteristicile.', NULL),
     (3528, 'Arcuri reparate: arc_id --> %arc_ids%', NULL),
     (3562, 'Nu au fost selectate arce', NULL),

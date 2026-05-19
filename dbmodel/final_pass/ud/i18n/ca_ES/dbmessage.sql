@@ -477,7 +477,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Elements connectats amb l''element: %v_element%', NULL),
     (3520, 'Visites connectades amb l''element: %v_visit%', NULL),
     (3522, 'Documents connectats amb l''element: %v_doc%', NULL),
-    (3524, 'Psectors connectats amb l’element: %,v_psector%', NULL),
+    (3524, 'Psectors connectats amb l’element: %v_psector%', NULL),
     (3526, 'IMPORTANT: Activeu psector abans d''eliminar elements.', NULL),
     (3528, 'Arcs reparats: arc_id --> %arc_ids%', NULL),
     (3562, 'No s''ha seleccionat cap arc', NULL),

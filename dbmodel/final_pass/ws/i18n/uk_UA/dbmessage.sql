@@ -389,7 +389,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Елементи, пов’язані з елементом: %v_element%', NULL),
     (3520, 'Відвідування, пов’язані з елементом: %v_visit%', NULL),
     (3522, 'Документи, пов’язані з елементом: %v_doc%', NULL),
-    (3524, 'Psectors, підключені до елемента: %,v_psector%', NULL),
+    (3524, 'Psectors, підключені до елемента: %v_psector%', NULL),
     (3526, 'ВАЖЛИВО: Активуйте psector перед видаленням елементів.', NULL),
     (3528, 'Відновлені дуги: arc_id --> %arc_ids%', NULL),
     (3562, 'Жодна дуга не була обрана', NULL),

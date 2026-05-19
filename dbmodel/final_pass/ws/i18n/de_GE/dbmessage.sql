@@ -389,7 +389,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Mit dem Merkmal verbundene Elemente: %v_element%', NULL),
     (3520, 'Besuche im Zusammenhang mit dem Merkmal: %v_visit%', NULL),
     (3522, 'Mit dem Merkmal verbundene Dokumente: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectors connected with the feature: %v_psector%', NULL),
     (3526, 'WICHTIG: Aktivieren Sie psector vor dem Löschen von Features.', NULL),
     (3528, 'Reparierte Bögen: arc_id --> %arc_ids%', NULL),
     (3562, 'Es wurden keine Bögen ausgewählt', NULL),
