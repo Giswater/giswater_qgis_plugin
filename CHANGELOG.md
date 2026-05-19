@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `sector_id` and `muni_id` from `exploitation` table.
 
+### Fixed
+
+- `gw_trg_edit_psector` trigger to set obsolete features where psector_x_* state is 0 before setting on service features.
+- `gw_fct_graphanalytics_mapzones_v1` check if there are any nodes/arcs in the graphconfig that are not in the operative network (only for connected networks).
+
 ## [4.10.0] - 2026-05-18
 
 ### Added
