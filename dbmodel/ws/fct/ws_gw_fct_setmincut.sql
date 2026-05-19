@@ -327,10 +327,16 @@ BEGIN
 		RETURN v_response;
 	
 	ELSE
+		-- Keep anl_the_geom on refresh/recompute; only (re)position on explicit click or first arc bind
 		UPDATE om_mincut SET
 			anl_feature_id = v_arc_id,
 			anl_feature_type = 'ARC',
-			anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
+			anl_the_geom = CASE
+				WHEN v_point IS NOT NULL THEN v_point
+				WHEN anl_the_geom IS NULL OR anl_feature_id IS DISTINCT FROM v_arc_id THEN
+					(SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
+				ELSE anl_the_geom
+			END
 		WHERE id = v_mincut_id;
 	END IF;
 
