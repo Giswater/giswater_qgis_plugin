@@ -1,0 +1,3 @@
+4.10.1
+*************
+- Fix config_form_fields `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
