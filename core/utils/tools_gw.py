@@ -885,8 +885,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
 
-    auth_id = tools_db.get_srid(tablename if schema_name == "am" else "ve_node", schema_name) if auth_id is None else auth_id
-    extent = _get_extent_parameters(schema_name, tablename if schema_name == "am" else "node") if extent is None else extent
+    auth_id = tools_db.get_srid("ext_arc_asset" if schema_name == "am" else "ve_node", schema_name) if auth_id is None else auth_id
+    extent = _get_extent_parameters(schema_name, "ext_arc_asset" if schema_name == "am" else "node") if extent is None else extent
 
     field_id = field_id.replace(" ", "")
     uri, status = tools_db.get_uri(tablename, the_geom, schema_name)
