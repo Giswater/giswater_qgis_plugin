@@ -477,7 +477,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Elementy powiązane z funkcją: %v_element%', NULL),
     (3520, 'Wizyty związane z funkcją: %v_visit%', NULL),
     (3522, 'Dokumenty związane z funkcją: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectors connected with the feature: %v_psector%', NULL),
     (3526, 'WAŻNE: Aktywuj psector przed usunięciem funkcji.', NULL),
     (3528, 'Naprawione łuki: arc_id --> %arc_ids%', NULL),
     (3562, 'Nie wybrano żadnych łuków', NULL),

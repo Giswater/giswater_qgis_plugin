@@ -389,7 +389,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Elementos relacionados con la característica: %v_element%', NULL),
     (3520, 'Visitas relacionadas con la función: %v_visit%', NULL),
     (3522, 'Documentos relacionados con la función: %v_doc%', NULL),
-    (3524, 'Psectores conectados con el elemento: %,v_psector%', NULL),
+    (3524, 'Psectores conectados con el elemento: %v_psector%', NULL),
     (3526, 'IMPORTANTE: Active el psector antes de borrar las funciones.', NULL),
     (3528, 'Arcos reparados: arc_id --> %arc_ids%', NULL),
     (3562, 'No se ha seleccionado ningún arco', NULL),
