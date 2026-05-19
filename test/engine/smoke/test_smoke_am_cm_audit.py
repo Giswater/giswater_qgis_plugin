@@ -13,11 +13,31 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", 
 DBMODEL = os.path.join(REPO_ROOT, "dbmodel")
 
 
-def test_am_empty(adapter, temp_schema_name):
+@pytest.fixture()
+def parent_ws_for_am(adapter, temp_schema_name):
+    """ws parent for am tests (am SQL references PARENT_SCHEMA.ve_*)."""
+    ws = f"{temp_schema_name}_ws"
+    manifest = load_manifest(os.path.join(DBMODEL, "manifests", "ws.yaml"))
+    params = BuildParams(
+        schema_name=ws, srid="25831",
+        plugin_version="4.9.0", profile="empty",
+        sql_root=DBMODEL,
+    )
+    try:
+        r = SchemaBuilder(adapter, manifest, params).run()
+        assert r.ok, f"ws build: {r.first_failure()}"
+        adapter.commit()
+        yield ws
+    finally:
+        drop_schema(adapter, ws, cascade=True, commit=True)
+
+
+def test_am_empty(adapter, temp_schema_name, parent_ws_for_am):
     manifest = load_manifest(os.path.join(DBMODEL, "manifests", "am.yaml"))
     params = BuildParams(
         schema_name=temp_schema_name, srid="25831",
         plugin_version="4.9.0", profile="empty",
+        parent_schema=parent_ws_for_am, parent_type="ws",
         sql_root=DBMODEL,
     )
     try:
@@ -28,7 +48,7 @@ def test_am_empty(adapter, temp_schema_name):
         drop_schema(adapter, temp_schema_name, cascade=True, commit=True)
 
 
-def test_am_update_replays_no_legacy_patches(adapter, temp_schema_name):
+def test_am_update_replays_no_legacy_patches(adapter, temp_schema_name, parent_ws_for_am):
     """
     Create am pretending to be at 4.0.0, then upgrade to 4.9.0. The
     legacy date-collapsed patch at updates/0/0/0/am/ MUST NOT be
@@ -38,6 +58,7 @@ def test_am_update_replays_no_legacy_patches(adapter, temp_schema_name):
     create_params = BuildParams(
         schema_name=temp_schema_name, srid="25831",
         plugin_version="4.0.0", profile="empty",
+        parent_schema=parent_ws_for_am, parent_type="ws",
         sql_root=DBMODEL,
     )
     try:
@@ -49,6 +70,7 @@ def test_am_update_replays_no_legacy_patches(adapter, temp_schema_name):
             schema_name=temp_schema_name, srid="0",
             plugin_version="4.9.0", project_version="4.0.0",
             run_mode="upgrade", profile="update",
+            parent_schema=parent_ws_for_am, parent_type="ws",
             sql_root=DBMODEL,
         )
         r2 = SchemaBuilder(adapter, manifest, upgrade_params).run()
@@ -72,6 +94,7 @@ def test_audit_structure(adapter):
     params = BuildParams(
         schema_name="audit", srid="25831",
         plugin_version="4.9.0", profile="structure",
+        parent_schema="audit",
         sql_root=DBMODEL,
     )
     try:

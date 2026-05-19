@@ -72,6 +72,21 @@ def test_execute_file_subs_and_commits(tmp_path: Path):
     assert sent == "INSERT INTO ws_x.t VALUES (25831);"
 
 
+def test_execute_file_schema_srid_alias(tmp_path: Path):
+    p = tmp_path / "geom.sql"
+    p.write_text(
+        "CREATE TABLE t (g geometry(Point,SCHEMA_SRID));",
+        encoding="utf-8",
+    )
+    conn = _RecConn()
+    fx = execute_file(
+        conn, str(p), {"SCHEMA_SRID": "25831", "SRID_VALUE": "25831"}, commit=True
+    )
+    assert fx.ok
+    sent, _ = conn.executed[0]
+    assert sent == "CREATE TABLE t (g geometry(Point,25831));"
+
+
 def test_execute_file_returns_error_on_failure(tmp_path: Path):
     p = tmp_path / "s.sql"
     p.write_text("BROKEN", encoding="utf-8")

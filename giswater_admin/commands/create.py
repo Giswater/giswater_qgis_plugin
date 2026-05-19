@@ -26,6 +26,11 @@ def run(args: argparse.Namespace, out: Out) -> int:
     if args.kind == "cm" and not args.parent_schema:
         out.error("kind=cm requires --parent-schema.")
         return 1
+    if args.kind == "am" and not args.parent_schema:
+        out.error(
+            "kind=am requires --parent-schema (ws network schema with ve_arc/ve_node)."
+        )
+        return 1
 
     target_repr = h.safe_target_repr(args)
     if target_repr:
@@ -43,7 +48,15 @@ def run(args: argparse.Namespace, out: Out) -> int:
     if h.needs_connection(args) and not args.check:
         conn = h.open_conn(args, out)
 
-    # cm parent_type auto-detect
+    # am / cm parent_type auto-detect
+    if args.kind == "am":
+        parent_type = (args.parent_type or "ws").lower()
+        if conn is not None and not args.parent_type:
+            detected = h.detect_project_type(conn, args.parent_schema)
+            if detected:
+                parent_type = detected
+                out.info(f"parent_type auto-detected: {parent_type}")
+
     if args.kind == "cm":
         if args.parent_type:
             parent_type = args.parent_type.lower()

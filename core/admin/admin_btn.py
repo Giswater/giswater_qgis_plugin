@@ -311,12 +311,23 @@ class GwAdminButton:
         `audit_activation`) to a manifest kind + profile.
         """
         if process_name == "am":
+            parent_schema = self._get_schema_name() or ""
+            parent_type = (
+                tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or "ws"
+            ).lower()
+            if not parent_schema:
+                tools_qgis.show_warning(
+                    "Select a ws project schema before creating the am schema."
+                )
+                return
             bp = BuildParams(
                 schema_name="am",
                 srid=str(self.project_epsg or "25831"),
                 locale=self.locale,
                 plugin_version=str(self.plugin_version),
                 profile="empty",
+                parent_schema=parent_schema,
+                parent_type=parent_type,
                 sql_root=self.sql_dir,
             )
             self._submit_builder("am", bp,
@@ -325,15 +336,23 @@ class GwAdminButton:
         elif process_name in ("audit", "audit_activation"):
             profile = "structure" if process_name == "audit" else "activate"
             schema_name = "audit"
+            parent_schema = "audit"
+            parent_type = ""
             if process_name == "audit_activation":
                 # Triggers attach to the currently-selected ws/ud schema.
                 schema_name = self._get_schema_name() or "audit"
+                parent_schema = schema_name
+                parent_type = (
+                    tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or ""
+                ).lower()
             bp = BuildParams(
                 schema_name=schema_name,
                 srid=str(self.project_epsg or "25831"),
                 locale=self.locale,
                 plugin_version=str(self.plugin_version),
                 profile=profile,
+                parent_schema=parent_schema,
+                parent_type=parent_type,
                 sql_root=self.sql_dir,
             )
             self._submit_builder("audit", bp,
@@ -770,7 +789,7 @@ class GwAdminButton:
 
         # Declare cm db folders
         self.sql_cm_dir = os.path.join(self.sql_dir, 'schemas', 'cm')
-        self.folder_cm_utils = os.path.join(self.sql_cm_dir, self.file_pattern_utils)
+        self.folder_cm_common = os.path.join(self.sql_cm_dir, "common")
         self.folder_cm_locale = os.path.join(self.sql_cm_dir, self.file_pattern_i18n, self.locale)
         self.folder_cm_base = os.path.join(self.sql_cm_dir, 'base')
         self.folder_cm_parent_schema = os.path.join(self.sql_cm_dir, 'parent_schema')
@@ -3276,6 +3295,16 @@ class GwAdminButton:
         )
         current_version = row[0] if row and row[0] else "0.0.0"
 
+        parent_schema = self._get_schema_name() or ""
+        parent_type = (
+            tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or "ws"
+        ).lower()
+        if not parent_schema:
+            tools_qgis.show_warning(
+                "Select the ws project schema linked to am before updating."
+            )
+            return
+
         bp = BuildParams(
             schema_name='am',
             srid="0",
@@ -3284,6 +3313,8 @@ class GwAdminButton:
             project_version=str(current_version),
             profile='update',
             run_mode='upgrade',
+            parent_schema=parent_schema,
+            parent_type=parent_type,
             sql_root=self.sql_dir,
         )
         self._submit_builder('am', bp,

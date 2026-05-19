@@ -10,7 +10,7 @@ Two distinct substitution layers, both intentionally tiny:
 
 - ``apply_subs(text, subs)``: file-content substitution mirroring the
   legacy ``_read_execute_file`` behaviour, i.e. literal string replace
-  of ``SCHEMA_NAME`` / ``SRID_VALUE`` / ``AUX_SCHEMA_NAME`` and a few
+  of ``SCHEMA_NAME`` / ``SRID_VALUE`` / ``SCHEMA_SRID`` / ``AUX_SCHEMA_NAME`` and a few
   others. ``BD_NAME`` is replaced case-insensitively because legacy SQL
   uses both ``BD_NAME`` and ``bd_name``.
 """

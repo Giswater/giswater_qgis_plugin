@@ -229,7 +229,7 @@ python3 -m giswater_admin create --kind ws --schema ws_demo --srid 25831 --profi
 | **ud** | igual que ws | Red de saneamiento. Updates en `dbmodel/schemas/network/{common,ud}/updates/M/m/p/` (per-version: common -> ud). |
 | **utils** | `empty`, `update` | **`--ws-schema`** y **`--ud-schema`** en `create`. Updates flat en `dbmodel/schemas/utils/updates/M/m/p/*.sql`. |
 | **am** | `empty`, `update` | Singleton `am`. Updates flat en `dbmodel/schemas/am/updates/M/m/p/*.sql`. Histórico colapsado en `dbmodel/schemas/am/updates/0/0/0/`. |
-| **cm** | `empty`, `with_sample`, `update` | **`--parent-schema`**. `parent_type` (ws/ud) se **auto-detecta** vía `sys_version` o **`--parent-type`**. Updates flat en `dbmodel/schemas/cm/updates/M/m/p/*.sql`. Hoy solo `parent_type=ud` está soportado. |
+| **cm** | `empty`, `with_sample`, `update` | **`--parent-schema`**. `parent_type` ws/ud. `cm/common` + `cm/base`; luego `parent_schema/*` sobre el parent. |
 | **audit** | subcomandos `structure`, `activate`, … | **Estructura** una vez; **activate** por esquema ws/ud objetivo. Sin árbol semver de updates. |
 
 Los detalles exactos están en `dbmodel/manifests/<kind>.yaml`.

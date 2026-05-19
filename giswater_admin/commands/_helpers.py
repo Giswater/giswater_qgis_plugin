@@ -263,8 +263,8 @@ def report_result(
 def cm_parent_supported(dbmodel_path: str, parent_type: str) -> bool:
     """
     Return ``True`` when `dbmodel/schemas/cm/parent_schema/<parent_type>/ddl.sql`
-    exists. ``cm`` schema setup only ships content for `parent_type=ud`
-    today; ws support requires populating the parallel tree first.
+    exists. WS uses cm/base + parent_schema/utils; UD adds gully SQL under
+    parent_schema/ud/.
     """
     if not parent_type:
         return False

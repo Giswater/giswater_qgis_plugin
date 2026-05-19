@@ -105,6 +105,7 @@ class BuildParams:
         return {
             "SCHEMA_NAME": self.schema_name,
             "SRID_VALUE": str(self.srid),
+            "SCHEMA_SRID": str(self.srid),
             "AUX_SCHEMA_NAME": self.aux_schema_name or "",
             "PARENT_SCHEMA": self.parent_schema or "",
             "PARENT_TYPE": self.parent_type or "",

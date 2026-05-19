@@ -1,5 +1,8 @@
 # Campaign-management schema manifest.
 #
+# `schemas/cm/common/` = shared CM SQL (like `network/common` for ws/ud).
+# Not the satellite `utils` schema (`kind: utils` in manifests/utils.yaml).
+#
 # cm attaches to a parent ws OR ud schema. The CLI / plugin auto-detects
 # `parent_type` from the parent's sys_version.project_type and passes
 # it via BuildParams so {{ parent_type }} resolves to "ws" or "ud".
@@ -17,12 +20,12 @@ substitutions: {}
 phases:
   - id: load_base_schema
     type: sql_dir
-    description: "Bootstrap cm schema: utils ddl/fct/ftrg + cm base."
+    description: "Bootstrap cm schema: common ddl/fct/ftrg + cm base."
     steps:
-      - { source: "schemas/cm/utils/ddl",  recursive: false }
-      - { source: "schemas/cm/utils/fct",  recursive: false }
-      - { source: "schemas/cm/utils/ftrg", recursive: false }
-      - { source: "schemas/cm/base",       recursive: false }
+      - { source: "schemas/cm/common/ddl",  recursive: false }
+      - { source: "schemas/cm/common/fct",  recursive: false }
+      - { source: "schemas/cm/common/ftrg", recursive: false }
+      - { source: "schemas/cm/base",        recursive: false }
 
   - id: load_parent_schema
     type: sql_dir

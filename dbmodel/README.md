@@ -102,16 +102,18 @@ historical content was collapsed into
 original date for chronological ordering. New am patches go under
 regular semver folders alongside ws/ud/utils.
 
-### CM parent_schema gap
+### CM layout (parallel to network ws/ud)
 
-`cm.yaml` references
-`schemas/cm/parent_schema/<parent_type>/{ddl,trg}.sql`, but only
-`parent_type=ud` has content in this tree today. Both the CLI
-(`giswater_admin create --kind cm`) and the admin UI explicitly block
-`parent_type=ws` with a missing-file error rather than silently
-creating an incomplete cm schema. To enable ws parents, populate
-`schemas/cm/parent_schema/ws/` with the equivalent of the existing
-`schemas/cm/parent_schema/ud/` content.
+| Path | Role |
+|------|------|
+| `schemas/cm/common/` | Shared CM DDL/fct/ftrg (legacy folder name was `utils`; not the satellite `utils` schema) |
+| `schemas/cm/base/` | Core `cm` tables (campaign, lot, arc/node/connec, …) |
+| `schemas/cm/parent_schema/utils/` | Parent-link views/triggers (`PARENT_SCHEMA` override; ws+ud) |
+| `schemas/cm/parent_schema/ws\|ud/` | Type-specific hooks (ws stubs; ud gully tables) |
+
+Prerequisite: parent ws/ud project already created (`network/common` + kind).
+
+`parent_type=ud`: adds gully SQL under `parent_schema/ud/`.
 
 ## Requirements
 
