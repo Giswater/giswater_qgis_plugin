@@ -46,6 +46,7 @@ from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema
+from ...giswater_admin.log_format import format_failure, format_progress_status, shorten_path
 from ._qt_db_adapter import QtDbAdapter
 
 
@@ -79,6 +80,7 @@ class GwAdminButton:
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
         self.progress_ratio = 0.8   # Ratio to apply to 'progress_value'
         self.is_cm_project = False
+        self.schema_build_progress_hint = ""
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
         """ Button 100: Execute SQL. Info show info """
@@ -217,8 +219,33 @@ class GwAdminButton:
     # and pytest all share one engine.
     # ------------------------------------------------------------------
 
+    def _open_schema_build_message_log(self) -> None:
+        """Show the Giswater PY log tab (same UX as schema update)."""
+        message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+        if message_log is not None:
+            message_log.setVisible(True)
+        QgsMessageLog.logMessage(
+            "",
+            f"{lib_vars.plugin_name.capitalize()} PY",
+            Qgis.MessageLevel.Info,
+        )
+
+    def _active_schema_build_task(self):
+        """Return the running engine task, if any."""
+        for attr in (
+            "task_create_schema",
+            "task_update_schema",
+            "task_create_cm_schema",
+        ):
+            task = getattr(self, attr, None)
+            if task is not None and not isdeleted(task):
+                return task
+        return None
+
     def _submit_builder(self, kind, params, *, description=None, on_done=None, dlg_for_timer=None):
         """Build manifest + task and queue it on the QGIS task manager."""
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
         self.error_count = 0
         self.t0 = time()
         self.timer = QTimer()
@@ -380,6 +407,8 @@ class GwAdminButton:
             db_name=self._get_current_db_name() or "",
         )
 
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
         self.error_count = 0
         self.cm_error_count = 0
         self.t0 = time()
@@ -3300,7 +3329,22 @@ class GwAdminButton:
 
         tf = time()  # Final time
         td = tf - self.t0  # Delta time
-        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+        text = f"Exec. time: {timedelta(seconds=round(td))}"
+        hint = getattr(self, "schema_build_progress_hint", "") or ""
+        if not hint:
+            task = self._active_schema_build_task()
+            if task is not None:
+                label = getattr(task, "_last_progress_label", "") or ""
+                sql_root = getattr(getattr(task, "params", None), "sql_root", "") or ""
+                seen = getattr(self, "current_sql_file", 0)
+                total = getattr(self, "total_sql_files", 0)
+                if label:
+                    hint = format_progress_status(
+                        seen, total, label, sql_root=sql_root
+                    )
+        if hint:
+            text = f"{text}  |  {hint}"
+        self._update_time_elapsed(text, dialog)
 
     def _update_time_elapsed(self, text, dialog):
 
