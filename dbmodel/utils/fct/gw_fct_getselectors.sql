@@ -235,8 +235,8 @@ BEGIN
 			ORDER BY id;
 
 			IF v_project_type = 'WS' THEN
-				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
-				SELECT id, expl_id, macroexpl_id, muni_id, minsector_id
+				INSERT INTO temp_t_mincut (id, work_order, expl_id, macroexpl_id, muni_id, minsector_id, forecast_start, forecast_end)
+				SELECT id, work_order, expl_id, macroexpl_id, muni_id, minsector_id, forecast_start, forecast_end
 				FROM om_mincut
 				WHERE id > 0
 				ORDER BY id;
@@ -294,8 +294,8 @@ BEGIN
 			ON CONFLICT (muni_id) DO NOTHING;
 
 			IF v_project_type = 'WS' THEN
-				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
-				SELECT DISTINCT ON (m.id) m.id, m.expl_id, m.macroexpl_id, m.muni_id, m.minsector_id
+				INSERT INTO temp_t_mincut (id, work_order, expl_id, macroexpl_id, muni_id, minsector_id, forecast_start, forecast_end)
+				SELECT DISTINCT ON (m.id) m.id, m.work_order, m.expl_id, m.macroexpl_id, m.muni_id, m.minsector_id, m.forecast_start, m.forecast_end
 				FROM om_mincut m
 				WHERE m.id > 0 AND EXISTS (SELECT 1 FROM cat_manager cm
 				WHERE m.expl_id = ANY (cm.expl_id)
