@@ -776,7 +776,7 @@ BEGIN
 				SELECT
 					g.mapzone_id,
 					string_agg(g.pgr_node_id::TEXT, ', ' ORDER BY g.pgr_node_id) AS mapzone_block
-				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig WHERE pgr_arc_id IS NOT NULL) g
+				FROM (SELECT DISTINCT pgr_node_id, mapzone_id FROM temp_pgr_graphconfig) g
 				WHERE NOT EXISTS (
 					SELECT 1
 					FROM v_temp_node n
@@ -799,7 +799,7 @@ BEGIN
 				SELECT
 					g.mapzone_id,
 					string_agg(g.pgr_arc_id::TEXT, ', ' ORDER BY g.pgr_arc_id) AS mapzone_block
-				FROM (SELECT DISTINCT pgr_arc_id, mapzone_id FROM temp_pgr_graphconfig) g
+				FROM (SELECT DISTINCT pgr_arc_id, mapzone_id FROM temp_pgr_graphconfig  WHERE pgr_arc_id IS NOT NULL) g
 				WHERE NOT EXISTS (
 					SELECT 1
 					FROM v_temp_arc a
