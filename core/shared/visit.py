@@ -258,8 +258,8 @@ class GwVisit(QObject):
 
         # Open the dialog
         if open_dlg:
-            # If the new visit dont come from info emit signal
-            if is_new_from_cf is False:
+            # Reset combo only for new visit from toolbar (not info, not manager edit)
+            if self.it_is_new_visit and not is_new_from_cf:
                 self.cmb_feature_type.currentIndexChanged.emit(0)
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
@@ -530,7 +530,6 @@ class GwVisit(QObject):
 
     def _set_locked_relation(self):
         """ Set feature_type and listed feature_id in @table_name to lock it """
-
         # Enable tab
         index = self._tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
@@ -546,25 +545,36 @@ class GwVisit(QObject):
         else:
             self.cmb_feature_type.currentIndexChanged.emit(feature_type_index)
 
-        # Load feature if in @table_name. Select list of related features
-        # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
-            expr_filter = f""""{self.feature_type}_id" IN ('{self.locked_feature_id}')"""
-            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
-            if not is_valid:
-                return
+            self._ensure_locked_feature_relation()
 
-            # do selection allowing @table_name to be linked to canvas selectionChanged
-            widget_name = f'tbl_visit_x_{self.feature_type}'
-            widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
-            tools_qgis.disconnect_signal_selection_changed()
-            tools_gw.disconnect_signal('visit')
-            tools_gw.connect_signal(global_vars.canvas.selectionChanged,
-                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, GwSelectionMode.VISIT),
-                                    'visit', 'set_locked_relation_canvas_selectionChanged')
-            tools_qgis.select_features_by_ids(self.feature_type, expr, self.rel_layers)
-            tools_qgis.disconnect_signal_selection_changed()
-            tools_gw.disconnect_signal('visit')
+    def _ensure_locked_feature_relation(self):
+        """ Persist and show the feature that opened the visit (info dialog). """
+        if not self.locked_feature_id or not self.locked_feature_type:
+            return
+
+        feature_type = self.locked_feature_type.lower()
+        visit_id = self.visit_id.text()
+        if not visit_id:
+            return
+
+        self.feature_type = feature_type
+        self.rel_feature_type = feature_type
+        locked_id = str(self.locked_feature_id)
+
+        table_name = f"om_visit_x_{feature_type}"
+        sql = (f"SELECT 1 FROM {table_name} "
+               f"WHERE visit_id = '{visit_id}' AND {feature_type}_id = '{locked_id}' LIMIT 1")
+        if not tools_db.get_row(sql, log_info=False):
+            self._manage_leave_visit_tab()
+            tools_gw._insert_feature(self.dlg_add_visit, visit_id, 'visit', feature_type, [locked_id])
+
+        tools_gw.load_tableview_visit(self.dlg_add_visit, visit_id, feature_type)
+
+        expr_filter = f'"{feature_type}_id" IN (\'{locked_id}\')'
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
+        if is_valid:
+            tools_qgis.select_features_by_ids(feature_type, expr, self.rel_layers)
 
     def _manage_accepted(self):
         """ Do all action when closed the dialog with Ok.
@@ -856,13 +866,17 @@ class GwVisit(QObject):
         # tab Visit
         if self.current_tab_index == self._tab_index('tab_visit'):
             self._manage_leave_visit_tab()
-            # need to create the relation record that is done only
-            # changing tab
+            # need to create the relation record that is done only changing tab
             if self.locked_feature_type:
+                self._ensure_locked_feature_relation()
+            else:
                 self._update_relations(dialog)
 
         # manage arriving tab
         self.current_tab_index = index
+
+        if self.tabs.widget(index).objectName() == 'tab_relations' and self.locked_feature_id:
+            self._ensure_locked_feature_relation()
 
         # Set user devault parameter
         parameter_id = tools_gw.get_config_value('om_visit_parameter_vdefault')
@@ -1083,15 +1097,11 @@ class GwVisit(QObject):
             widget_name = f'tbl_visit_x_{feature_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
-        # Do selection allowing @widget_table to be linked to canvas selectionChanged
+        # Highlight related features on map without triggering insert dialog
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.disconnect_signal('visit')
-        tools_gw.connect_signal(global_vars.canvas.selectionChanged,
-                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, GwSelectionMode.VISIT),
-                                'visit', 'get_features_visit_feature_type_canvas_selectionChanged')
         tools_qgis.select_features_by_ids(feature_type, expr, self.rel_layers)
         tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.disconnect_signal('visit')
 
     def _filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
         """ Filter om_visit in self.dlg_visit_manager.tbl_visit based on (id AND text AND between dates) """
@@ -1867,9 +1877,14 @@ class GwVisit(QObject):
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")
-        tools_gw.selection_changed(self, dialog, widget_table, GwSelectionMode.VISIT, self.lazy_widget, self.lazy_init_function)
 
-        tools_gw.load_tableview_visit(dialog, self.visit_id.text(), self.rel_feature_type)
+        if self.locked_feature_id and self.locked_feature_type.lower() == self.rel_feature_type:
+            self._ensure_locked_feature_relation()
+        elif not self.it_is_new_visit:
+            tools_gw.load_tableview_visit(dialog, self.visit_id.text(), self.rel_feature_type)
+        else:
+            tools_gw.selection_changed(self, dialog, 'visit', GwSelectionMode.VISIT, self.lazy_widget, self.lazy_init_function)
+            tools_gw.load_tableview_visit(dialog, self.visit_id.text(), self.rel_feature_type)
 
         try:
             self.iface.actionPan().trigger()
