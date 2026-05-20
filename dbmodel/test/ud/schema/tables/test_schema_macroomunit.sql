@@ -33,7 +33,7 @@ SELECT col_type_is('macroomunit', 'node_1', 'int4', 'Column node_1 should be int
 SELECT col_type_is('macroomunit', 'node_2', 'int4', 'Column node_2 should be int4');
 SELECT col_type_is('macroomunit', 'is_way_in', 'bool', 'Column is_way_in should be bool');
 SELECT col_type_is('macroomunit', 'is_way_out', 'bool', 'Column is_way_out should be bool');
-SELECT col_type_is('macroomunit', 'the_geom', 'geometry(multilinestring, SRID_VALUE)', 'Column the_geom should be geometry(multilinestring, SRID_VALUE)');
+SELECT col_type_is('macroomunit', 'the_geom', 'geometry(multipolygon, SRID_VALUE)', 'Column the_geom should be geometry(multipolygon, SRID_VALUE)');
 SELECT col_type_is('macroomunit', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
 SELECT col_type_is('macroomunit', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');
 SELECT col_type_is('macroomunit', 'sector_id', 'int4[]', 'Column sector_id should be int4[]');
