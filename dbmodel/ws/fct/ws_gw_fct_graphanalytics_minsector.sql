@@ -494,12 +494,12 @@ BEGIN
     FROM (
         SELECT
             ta.mapzone_id AS minsector_id,
-            array_agg(DISTINCT va.expl_id) AS expl_id_arr,
-            array_agg(DISTINCT va.dma_id) AS dma_id_arr,
-            array_agg(DISTINCT va.dqa_id) AS dqa_id_arr,
-            array_agg(DISTINCT va.muni_id) AS muni_id_arr,
-            array_agg(DISTINCT va.sector_id) AS sector_id_arr,
-            array_agg(DISTINCT va.supplyzone_id) AS supplyzone_id_arr
+            array_agg(DISTINCT va.expl_id ORDER BY va.expl_id) AS expl_id_arr,
+            array_agg(DISTINCT va.dma_id ORDER BY va.dma_id) AS dma_id_arr,
+            array_agg(DISTINCT va.dqa_id ORDER BY va.dqa_id) AS dqa_id_arr,
+            array_agg(DISTINCT va.muni_id ORDER BY va.muni_id) AS muni_id_arr,
+            array_agg(DISTINCT va.sector_id ORDER BY va.sector_id) AS sector_id_arr,
+            array_agg(DISTINCT va.supplyzone_id ORDER BY va.supplyzone_id) AS supplyzone_id_arr
         FROM temp_pgr_arc ta
         JOIN arc va ON va.arc_id = ta.pgr_arc_id
         GROUP BY ta.mapzone_id
