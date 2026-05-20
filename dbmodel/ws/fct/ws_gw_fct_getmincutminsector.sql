@@ -82,13 +82,14 @@ BEGIN
 	-- pipes
 	v_sql := FORMAT('SELECT 
     va.arc_id,
-    va.minsector_id,
-    va.the_geom
-	FROM ve_arc va
+    a.minsector_id,
+    a.the_geom
+	FROM vf_arc va
+	JOIN arc a USING (arc_id)
 	WHERE EXISTS (
 	    SELECT 1 FROM minsector_mincut mm 
 	    WHERE mm.minsector_id = %s
-	    AND mm.mincut_minsector_id = va.minsector_id
+	    AND mm.mincut_minsector_id = a.minsector_id
 	)', v_minsector_id);
 
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Mincut offline result arc", "queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
@@ -98,14 +99,15 @@ BEGIN
 	-- connecs
 	v_sql := FORMAT('SELECT
 	    vc.connec_id,
-	    vc.customer_code,
-	    vc.minsector_id,
-	    vc.the_geom
-	FROM ve_connec vc
+	    c.customer_code,
+	    c.minsector_id,
+	    c.the_geom
+	FROM vf_connec vc
+	JOIN connec c USING (connec_id)
 	WHERE EXISTS (
 	    SELECT 1 FROM minsector_mincut mm 
 	    WHERE mm.minsector_id = %s
-	    AND mm.mincut_minsector_id = vc.minsector_id
+	    AND mm.mincut_minsector_id = c.minsector_id
 	)', v_minsector_id);
 	
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"custom", "layerName":"Mincut offline result connec","queryText":"'||regexp_replace(v_sql, '\s+', ' ', 'g')||'"}}}$$)' 
@@ -120,10 +122,10 @@ BEGIN
 	    mv.proposed,
 	    mv.unaccess,
 	    mv.changestatus,
-	    vn.the_geom,
-	    vn.minsector_id
+	    n.the_geom,
+	    n.minsector_id
 	FROM minsector_mincut_valve mv
-	JOIN ve_node vn USING (node_id) 
+	JOIN node n USING (node_id) 
 	WHERE mv.minsector_id = %s',
 	v_minsector_id);
 
