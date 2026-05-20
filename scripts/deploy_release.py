@@ -2,7 +2,8 @@
 """Deploy a QGIS plugin release to an SFTP server with versioned XML pointers.
 
 Generates three giswater.xml files (patch, minor, major) and uploads them
-along with the ZIP to the correct version-path structure on the server.
+along with the plugin icon and ZIP to the correct version-path structure
+on the server.
 Pointer XMLs never downgrade: they always point to the highest published
 version in their scope.
 """
@@ -174,6 +175,7 @@ def deploy(
     version_str: str,
     zip_path: str,
     template_path: str,
+    icon_path: str,
     base_url: str,
     sftp_base: str,
     all_versions: list[tuple[int, int, int]],
@@ -190,6 +192,10 @@ def deploy(
 
     pointers = compute_pointers(current, all_versions)
     template = Path(template_path).read_text(encoding="utf-8")
+    icon_file = Path(icon_path)
+    if not icon_file.is_file():
+        print(f"ERROR: icon not found at '{icon_path}'", file=sys.stderr)
+        sys.exit(1)
     major, minor, patch = current
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -221,6 +227,15 @@ def deploy(
         print(f"Uploading major XML to {major_dir}/giswater.xml")
         uploader.put(xml_files["major"], f"{major_dir}/giswater.xml")
 
+        icon_name = icon_file.name
+        for label, remote_dir in (
+            ("patch", patch_dir),
+            ("minor", minor_dir),
+            ("major", major_dir),
+        ):
+            print(f"Uploading icon to {remote_dir}/{icon_name}")
+            uploader.put(str(icon_file), f"{remote_dir}/{icon_name}")
+
     uploader.close()
     print(f"Deploy of {version_str} complete.")
 
@@ -235,6 +250,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--version", required=True, help="Version to deploy (X.Y.Z)")
     p.add_argument("--zip", required=True, help="Path to the plugin ZIP file")
     p.add_argument("--template", required=True, help="Path to plugin_template.xml")
+    p.add_argument(
+        "--icon",
+        help="Path to plugin icon PNG (default: giswater.png next to template)",
+    )
     p.add_argument("--gh-repo", required=True, help="GitHub repo (owner/name)")
     p.add_argument("--gh-token", required=True, help="GitHub token for API access")
     p.add_argument("--sftp-host", required=True, help="SFTP server hostname")
@@ -266,10 +285,13 @@ def main() -> None:
             args.sftp_host, args.sftp_user, args.sftp_password, args.sftp_port
         )
 
+    icon_path = args.icon or str(Path(args.template).parent / "giswater.png")
+
     deploy(
         version_str=args.version,
         zip_path=args.zip,
         template_path=args.template,
+        icon_path=icon_path,
         base_url=args.base_url,
         sftp_base=args.sftp_base,
         all_versions=all_versions,
