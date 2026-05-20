@@ -58,7 +58,8 @@ DECLARE
     v_result_info JSON;
     v_result_point JSON;
     v_result_line JSON;
-    v_result_polygon JSON;
+    v_result_polygon_omunit JSON;
+    v_result_polygon_macroomunit JSON;
     v_result TEXT;
 
 	-- LOCK LEVEL LOGIC
@@ -474,47 +475,18 @@ BEGIN
     FROM ordered o
     WHERE m.macroomunit_id = o.macroomunit_id;
 
-    -- ENDSECTION
+    -- update geometry of mapzones
+    IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
+        -- do nothing
 
-    -- UPDATE SECTION IF v_commit_changes
-	-- =======================
-    IF v_commitchanges IS FALSE THEN
-        -- Polygons
-        EXECUTE 'SELECT jsonb_build_object(
-                ''type'', ''FeatureCollection'',
-                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb),
-                ''layerName'', ''Temp Omunit''
-            )
-        FROM (
-            SELECT jsonb_build_object(
-                ''type'',       ''Feature'',
-                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
-                ''properties'', to_jsonb(row) - ''the_geom''
-            ) AS feature
-            FROM (
-                SELECT 
-                    o.omunit_id, o.macroomunit_id, o.the_geom, ''ve_omunit'' AS layer 
-                FROM temp_pgr_omunit o
-            ) row
-        ) features' INTO v_result;
+    ELSIF  v_updatemapzgeom = 2 THEN
 
-        v_result_polygon := v_result;
-
-        v_visible_layer = NULL;
-
-        -- Message
-        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001", "is_process":true}}$$)';
-
-    ELSE
-
-        RAISE NOTICE 'Creating geometry of mapzones';
-        -- SECTION: Creating geometry of mapzones
-
+        -- pipe buffer
         -- update geometry of omunits
         v_query_text = '
-            UPDATE temp_pgr_omunit o SET the_geom = b.the_geom
+            UPDATE temp_pgr_omunit o SET the_geom = ST_Multi(b.geom) 
             FROM (
-                SELECT t.mapzone_id AS omunit_id, ST_LineMerge(ST_Union(v.the_geom)) AS the_geom
+                SELECT t.mapzone_id AS omunit_id, (ST_Buffer(ST_Collect(v.the_geom),'||v_geomparamupdate||')) AS geom
                 FROM temp_pgr_arc t
                 JOIN arc v ON v.arc_id = t.pgr_arc_id 
                 GROUP BY t.mapzone_id
@@ -525,9 +497,9 @@ BEGIN
 
         -- update geometry of macroomunits
         v_query_text = '
-            UPDATE temp_pgr_macroomunit mo SET the_geom = b.the_geom
+            UPDATE temp_pgr_macroomunit mo SET the_geom = ST_Multi(b.geom)
             FROM (
-                SELECT o.macroomunit_id, ST_LineMerge(ST_Union(o.the_geom)) AS the_geom
+                SELECT o.macroomunit_id, ST_CollectionExtract(ST_Collect(o.the_geom), 3) AS geom
                 FROM temp_pgr_omunit o
                 GROUP BY o.macroomunit_id
             ) b 
@@ -535,7 +507,13 @@ BEGIN
         ';
         EXECUTE v_query_text;
 
-         -- Update omunit expl_id, muni_id, sector_id
+    ELSIF  v_updatemapzgeom = 4 THEN
+
+        -- use link and pipe buffer
+       -- TODO
+    END IF;
+
+    -- Update omunit expl_id, muni_id, sector_id
         UPDATE temp_pgr_omunit o
         SET expl_id = sub.expl_id_arr,
             muni_id = sub.muni_id_arr,
@@ -552,22 +530,78 @@ BEGIN
         ) sub
         WHERE sub.omunit_id = o.omunit_id;
 
-        -- Update macroomunit expl_id, muni_id, sector_id
-        UPDATE temp_pgr_macroomunit mo
-        SET expl_id = sub.expl_id_arr,
-            muni_id = sub.muni_id_arr,
-            sector_id = sub.sector_id_arr
+    -- update macroomunits
+    UPDATE temp_pgr_macroomunit mo
+    SET expl_id = sub.expl_id_arr,
+        muni_id = sub.muni_id_arr,
+        sector_id = sub.sector_id_arr
+    FROM (
+        SELECT
+            o.macroomunit_id,
+            array_agg(DISTINCT e ORDER BY e) AS expl_id_arr,
+            array_agg(DISTINCT m ORDER BY m) AS muni_id_arr,
+            array_agg(DISTINCT s ORDER BY s) AS sector_id_arr
+        FROM temp_pgr_omunit o
+        LEFT JOIN LATERAL unnest(o.expl_id) AS e ON TRUE
+        LEFT JOIN LATERAL unnest(o.muni_id) AS m ON TRUE
+        LEFT JOIN LATERAL unnest(o.sector_id) AS s ON TRUE
+        GROUP BY o.macroomunit_id
+    ) sub
+    WHERE sub.macroomunit_id = mo.macroomunit_id;
+
+    -- END UPDATE SECTION
+
+	-- SECTION[epic=mapzones]: Creating temporal layers
+	-- =================================================
+
+    IF v_commitchanges IS FALSE THEN
+        -- Polygons
+        EXECUTE 'SELECT jsonb_build_object(
+                ''type'', ''FeatureCollection'',
+                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb),
+                ''layerName'', ''Temp Omunit''
+            )
         FROM (
-            SELECT
-                ta.macromapzone_id AS macroomunit_id,
-                array_agg(DISTINCT va.expl_id ORDER BY va.expl_id) AS expl_id_arr,
-                array_agg(DISTINCT va.muni_id ORDER BY va.muni_id) AS muni_id_arr,
-                array_agg(DISTINCT va.sector_id ORDER BY va.sector_id) AS sector_id_arr
-            FROM temp_pgr_arc ta
-            JOIN arc va ON va.arc_id = ta.pgr_arc_id
-            GROUP BY ta.macromapzone_id
-        ) sub
-        WHERE sub.macroomunit_id = mo.macroomunit_id;   
+            SELECT jsonb_build_object(
+                ''type'',       ''Feature'',
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+                ''properties'', to_jsonb(row) - ''the_geom''
+            ) AS feature
+            FROM (
+                SELECT 
+                    o.omunit_id, o.node_1, o.node_2, o.is_way_in, o.is_way_out, o.macroomunit_id, o.order_number, o.the_geom,  ''ve_omunit'' AS layer 
+                FROM temp_pgr_omunit o
+            ) row
+        ) features' INTO v_result;
+
+        v_result_polygon_omunit := v_result;
+
+        EXECUTE 'SELECT jsonb_build_object(
+                ''type'', ''FeatureCollection'',
+                ''features'', COALESCE(jsonb_agg(features.feature), ''[]''::jsonb),
+                ''layerName'', ''Temp MacroOmunit''
+            )
+        FROM (
+            SELECT jsonb_build_object(
+                ''type'',       ''Feature'',
+                ''geometry'',   ST_AsGeoJSON(ST_Transform(the_geom, 4326))::jsonb,
+                ''properties'', to_jsonb(row) - ''the_geom''
+            ) AS feature
+            FROM (
+                SELECT 
+                    mo.macroomunit_id, mo.node_1, mo.node_2, mo.is_way_in, mo.is_way_out, mo.catchment_node, mo.order_number, mo.the_geom,  ''ve_macroomunit'' AS layer 
+                FROM temp_pgr_macroomunit mo
+            ) row
+        ) features' INTO v_result;
+
+        v_result_polygon_macroomunit := v_result;
+
+        v_visible_layer = NULL;
+
+        -- Message
+        EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4020", "function":"2706", "fid":"'||v_fid||'", "prefix_id": "1001", "is_process":true}}$$)';
+
+    ELSE 
 
         -- update TABLES
         -----------------
@@ -724,7 +758,8 @@ BEGIN
     v_result_info := COALESCE(v_result_info, '{}');
     v_result_point := COALESCE(v_result_point, '{}');
     v_result_line := COALESCE(v_result_line, '{}');
-    v_result_polygon := COALESCE(v_result_polygon, '{}');
+    v_result_polygon_omunit := COALESCE(v_result_polygon_omunit, '{}');
+    v_result_polygon_macroomunit := COALESCE(v_result_polygon_macroomunit, '{}');
 
 	-- Restore original disable lock level
     UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
@@ -736,7 +771,7 @@ BEGIN
         ',"data":{"info":' || v_result_info || ',' ||
         '"point":' || v_result_point || ',' ||
         '"line":' || v_result_line || ',' ||
-        '"polygon":' || v_result_polygon || '}' ||
+        '"polygon":' || v_result_polygon_macroomunit || '}' ||
         '}' ||
         '}')::json, 3492, NULL, ('{"visible": [' || v_visible_layer || ']}')::json, NULL
     );
