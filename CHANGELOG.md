@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `config_form_fields` `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
+- `visit` insert correctly the records on `om_visit_x_*` tables.
+- correct signal for rejected visit dialog.
 
 ## [4.10.0] - 2026-05-18
 

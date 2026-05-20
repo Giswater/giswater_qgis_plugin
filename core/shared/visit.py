@@ -147,7 +147,7 @@ class GwVisit(QObject):
 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
-        self.dlg_add_visit.btn_accept.clicked.connect(self._manage_accepted)
+        self.dlg_add_visit.btn_accept.clicked.connect(self.dlg_add_visit.accept)
         self.dlg_add_visit.btn_cancel.clicked.connect(self.dlg_add_visit.reject)
         if visit_id is None:
             self.dlg_add_visit.btn_accept.setEnabled(False)
@@ -603,7 +603,6 @@ class GwVisit(QObject):
         if layer:
             layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
-        self.dlg_add_visit.close()
 
     def _execute_pgfunction(self):
         """ Execute function 'gw_fct_om_visit_multiplier' """
@@ -830,17 +829,22 @@ class GwVisit(QObject):
             db_record = GwOmVisitXLink()
 
         if db_record:
+            col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
+            if col_idx is None or col_idx < 0:
+                msg = "Column not found in table: {0}"
+                msg_params = (column_name,)
+                tools_log.log_info(msg, msg_params=msg_params)
+                return
+
             for row in range(widget.model().rowCount()):
-                # get modelIndex to get data
-                index = widget.model().index(row, 0)
+                feature_id = widget.model().data(widget.model().index(row, col_idx))
+                if feature_id in (None, ''):
+                    continue
 
                 # set common fields
                 db_record.id = db_record.max_pk() + 1
                 db_record.visit_id = int(self.visit_id.text())
-
-                # set value for column <feature_type>_id
-                # db_record.column_name = index.data()
-                setattr(db_record, column_name, index.data())
+                setattr(db_record, column_name, feature_id)
 
                 # than save the showed records
                 db_record.upsert()
