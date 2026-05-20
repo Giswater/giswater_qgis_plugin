@@ -15,7 +15,6 @@ import os
 from typing import Any, Callable
 
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.PyQt.sip import isdeleted
 
 from ...giswater_admin.engine import (
     BuildParams,
@@ -36,7 +35,7 @@ from ...giswater_admin.log_format import (
     format_progress_status,
     format_timing_summary,
 )
-from ...libs import lib_vars, tools_db, tools_log
+from ...libs import lib_vars, tools_log
 from ..admin._qt_db_adapter import QtDbAdapter
 from .task import GwTask
 

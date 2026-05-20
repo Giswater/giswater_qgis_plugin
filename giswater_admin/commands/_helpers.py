@@ -9,7 +9,7 @@ from collections import defaultdict
 from typing import Any, Optional
 
 from .. import conn as conn_mod
-from ..engine import BuildParams, Manifest, SchemaBuilder, load_manifest
+from ..engine import BuildParams, Manifest, load_manifest
 from ..engine.builder import ProgressCb
 from ..engine.sql_runner import ConnectionLike, FileExec
 from ..engine.timing_report import all_files, summarize_build
@@ -70,10 +70,6 @@ def detect_project_type(conn: Any, schema: str) -> str:
     of ``schema`` based on its ``sys_version`` row, or empty if not
     detectable. ``conn`` is a Psycopg2Adapter (has ``.raw``).
     """
-    sql = (
-        "SELECT project_type FROM information_schema.tables "
-        "WHERE table_schema = %s AND table_name = 'sys_version' LIMIT 1"
-    )
     try:
         with conn.raw.cursor() as cur:  # type: ignore[attr-defined]
             cur.execute(

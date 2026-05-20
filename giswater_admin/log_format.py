@@ -58,7 +58,7 @@ def shorten_path(path: str, sql_root: str = "") -> str:
     p = path.replace("\\", "/")
     root = (sql_root or "").replace("\\", "/").rstrip("/")
     if root and p.startswith(root + "/"):
-        p = p[len(root) + 1 :]
+        p = p[len(root) + 1:]
     elif root and p == root:
         p = ""
     for prefix in (
@@ -67,7 +67,7 @@ def shorten_path(path: str, sql_root: str = "") -> str:
         "schemas/network/",
     ):
         if p.startswith(prefix):
-            p = p[len(prefix) :]
+            p = p[len(prefix):]
             break
     return p or os.path.basename(path.replace("\\", "/"))
 
@@ -137,7 +137,7 @@ def format_file(
     style = style or LogStyle()
     short = shorten_path(path, style.sql_root)
     if len(short) > style.width_path:
-        short = "…" + short[-(style.width_path - 1) :]
+        short = "…" + short[-(style.width_path - 1):]
     dur = ""
     if style.show_timing_ms or (ms is not None and ms > 0):
         dur = _format_duration_ms(ms)

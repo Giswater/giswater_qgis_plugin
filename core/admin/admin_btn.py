@@ -15,7 +15,7 @@ from time import time
 from datetime import timedelta
 from typing import Union
 
-from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
+from qgis.PyQt.QtCore import QSettings, Qt, QTimer
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
@@ -46,7 +46,7 @@ from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema
-from ...giswater_admin.log_format import format_failure, format_progress_status, shorten_path
+from ...giswater_admin.log_format import format_progress_status
 from ._qt_db_adapter import QtDbAdapter
 
 

@@ -84,7 +84,6 @@ def run(args: argparse.Namespace, out: Out) -> int:
     finally:
         conn.close()
 
-    payload_extra = {"from_version": project_version, "to_version": target_version}
     code = h.report_result(args, out, manifest, params, result)
     # Inject extras into stdout when in JSON mode by re-using report_result is overkill;
     # surfacing the version pair via stderr is sufficient for the CLI contract.

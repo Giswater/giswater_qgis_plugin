@@ -43,7 +43,6 @@ def run(args: argparse.Namespace, out: Out) -> int:
         out.warn("--am-target is deprecated; AM now uses --plugin-version (semver).")
 
     parent_type = ""
-    parent_version = ""
     conn = None
     if h.needs_connection(args) and not args.check:
         conn = h.open_conn(args, out)
