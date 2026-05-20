@@ -35,7 +35,7 @@ SELECT col_type_is('omunit', 'is_way_in', 'bool', 'Column is_way_in should be bo
 SELECT col_type_is('omunit', 'is_way_out', 'bool', 'Column is_way_out should be bool');
 SELECT col_type_is('omunit', 'macroomunit_id', 'int4', 'Column macroomunit_id should be int4');
 SELECT col_type_is('omunit', 'order_number', 'int4', 'Column order_number should be int4');
-SELECT col_type_is('omunit', 'the_geom', 'geometry(multilinestring, SRID_VALUE)', 'Column the_geom should be geometry(multilinestring, SRID_VALUE)');
+SELECT col_type_is('omunit', 'the_geom', 'geometry(multipolygon, SRID_VALUE)', 'Column the_geom should be geometry(multipolygon, SRID_VALUE)');
 SELECT col_type_is('omunit', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
 SELECT col_type_is('omunit', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');
 SELECT col_type_is('omunit', 'sector_id', 'int4[]', 'Column sector_id should be int4[]');
