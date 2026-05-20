@@ -2775,7 +2775,7 @@
 		</message>
 		<message>
 			<source>Generating result stats</source>
-			<translation>Generador d&apos;estadístiques del resultat</translation>
+			<translation>Generant estadístiques del resultat</translation>
 		</message>
 		<message>
 			<source>Generation of atlas uses v_edit_plan_psector as coverage layer ordered by atlas_id column. Please update the atlas&apos; coverage layer before continuing.</source>
@@ -3787,7 +3787,8 @@
 		</message>
 		<message>
 			<source>No results found. Please check values set on selector of state and exploitation</source>
-			<translation>No s&apos;han trobat resultats. Si us plau, comproveu els valors establerts al selector d&apos;estat i explotació
+			<translation>No s&apos;han trobat resultats. Si us plau, comproveu els valors establerts al selector d&apos;estat i explotació
+
 </translation>
 		</message>
 		<message>
@@ -5299,8 +5300,10 @@
 			<translation>El camp &quot;Camí&quot; és obligatori per importar dades INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>El procediment eliminarà elements de xaraxa en la base de dades a menys que sigui un node que no divideix l&apos;arc. \ N Assegureu-vos que els elements de la xarxa no tinguin un valor de recuperació vertader.\ NPer altra banda, ha de saber que la traçabilitat emmagatzemarà informació precedent.</translation>
 		</message>
