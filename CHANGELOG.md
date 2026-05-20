@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - correct signal for rejected visit dialog.
 - recreate the triggers for the mapzones when the utility scheme is activated.
 - fix visit dialog to show the correct features when the dialog is accepted.
+- fix update of omunit and macroomunit geometry type to multipolygon.
 
 ## [4.10.0] - 2026-05-18
 
