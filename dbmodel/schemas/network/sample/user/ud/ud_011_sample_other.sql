@@ -730,3 +730,42 @@ WHERE "parameter"='basic_search_v2_tab_network_node';
 UPDATE config_param_system
 SET value='{"sys_pk": "gully_id", "sys_fct": "gw_fct_getinfofromid", "sys_geom": "the_geom", "sys_filter": "", "sys_tablename": "gully join vf_gully using(gully_id)", "sys_display_name": "concat(gully_id, '' : '', gullycat_id)", "sys_fct_tablename": "ve_gully"}'
 WHERE "parameter"='basic_search_v2_tab_network_gully';
+
+-- 18/05/2026
+INSERT INTO sys_table
+(id, descript, sys_role, project_template, context, orderby, alias, "source", provider_config)
+VALUES('xyz_openstreetmap', 'Open Street Map', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}', '1', 2, 'Open Street Map', 'core', '{"source": {"url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"}, "provider": "wms", "layer_type": "raster", "uri_params": {"type": "xyz", "zmax": 19, "zmin": 0, "tilePixelRatio": 1}}'::jsonb);
+
+INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue)
+VALUES ('xyz_openstreetmap', 101, 'qml', '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
+<qgis version="3.40.12-Bratislava" styleCategories="Rendering" hasScaleBasedVisibilityFlag="0" autoRefreshTime="0" maxScale="0" minScale="1e+08" autoRefreshMode="Disabled">
+  <pipe-data-defined-properties>
+    <Option type="Map">
+      <Option type="QString" name="name" value=""/>
+      <Option name="properties"/>
+      <Option type="QString" name="type" value="collection"/>
+    </Option>
+  </pipe-data-defined-properties>
+  <pipe>
+    <provider>
+      <resampling zoomedOutResamplingMethod="nearestNeighbour" maxOversampling="2" enabled="false" zoomedInResamplingMethod="nearestNeighbour"/>
+    </provider>
+    <rasterrenderer type="singlebandcolordata" opacity="0.4" alphaBand="-1" nodataColor="" band="1">
+      <rasterTransparency/>
+      <minMaxOrigin>
+        <limits>None</limits>
+        <extent>WholeRaster</extent>
+        <statAccuracy>Estimated</statAccuracy>
+        <cumulativeCutLower>0.02</cumulativeCutLower>
+        <cumulativeCutUpper>0.98</cumulativeCutUpper>
+        <stdDevFactor>2</stdDevFactor>
+      </minMaxOrigin>
+    </rasterrenderer>
+    <brightnesscontrast contrast="0" gamma="1" brightness="0"/>
+    <huesaturation grayscaleMode="0" saturation="0" colorizeBlue="128" colorizeGreen="128" colorizeRed="255" colorizeStrength="100" invertColors="0" colorizeOn="0"/>
+    <rasterresampler maxOversampling="2"/>
+    <resamplingStage>resamplingFilter</resamplingStage>
+  </pipe>
+  <blendMode>0</blendMode>
+</qgis>
+') ON CONFLICT (layername, styleconfig_id) DO NOTHING;

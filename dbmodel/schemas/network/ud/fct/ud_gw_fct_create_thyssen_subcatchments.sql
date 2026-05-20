@@ -107,7 +107,7 @@ BEGIN
 		WITH ext_raster_slope AS (
 			SELECT ST_Clip(r.rast, g.the_geom, NULL::double precision, true) as rast
 			FROM (
-				SELECT ST_Slope(rast, 1, ''32BF'', ''PERCENT'') AS rast FROM ext_raster_dem
+				SELECT ST_Slope(rast, 1, ''32BF'', ''PERCENT'') AS rast FROM v_raster_dem
 			) r
 			JOIN '||v_clip_table||' g
 			ON ST_Intersects(r.rast, g.the_geom)

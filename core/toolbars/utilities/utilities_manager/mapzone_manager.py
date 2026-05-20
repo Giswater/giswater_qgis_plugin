@@ -354,7 +354,7 @@ class GwMapzoneManager:
             expr += " and active is true"
         self._fill_mapzone_table(expr=expr)
 
-    def _manage_current_changed(self):
+    def _manage_current_changed(self, clear_text=True):
         """ Manages tab changes """
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
@@ -362,9 +362,6 @@ class GwMapzoneManager:
             return
         # Get the state of the "show inactive" checkbox
         show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
-
-        # Refresh txt_feature_id
-        tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
 
         # Reset rubberband
         tools_gw.reset_rubberband(self.rubber_band)
@@ -404,6 +401,12 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_execute.setEnabled(is_enabled_from_config)
         can_enable_flood = is_enabled_from_config and mapzone_type in self.flood_enabled_mapzones
         self.mapzone_mng_dlg.btn_flood.setEnabled(can_enable_flood and self._flood_enabled_by_tab.get(mapzone_type, False))
+
+        # Refresh txt_feature_id
+        if clear_text:
+            tools_qt.set_widget_text(self.mapzone_mng_dlg, self.mapzone_mng_dlg.txt_name, '')
+        else:
+            self.mapzone_mng_dlg.txt_name.textChanged.emit(self.mapzone_mng_dlg.txt_name.text())
 
     def _is_readonly_mapzone(self, dialog=None, mapzone_type=None):
         if dialog is None:
@@ -518,6 +521,7 @@ class GwMapzoneManager:
         widget_table = dialog.main_tab.currentWidget()
 
         show_inactive = self._is_show_inactive_checked(dialog, active)
+        mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
 
         search_text = dialog.txt_name.text()
         expr = "" if show_inactive else "active is true"
@@ -525,7 +529,8 @@ class GwMapzoneManager:
         if search_text:
             if expr:
                 expr += " and "
-            expr += f"name ilike '%{search_text}%'"
+            expr = f"(name ilike '%{search_text}%' or code ilike '%{search_text}%' or {mapzone_type}_id::text ilike '%{search_text}%')"
+
         # Refresh model with selected filter
         widget_table.model().setFilter(expr)
         widget_table.model().select()
@@ -1642,7 +1647,7 @@ class GwMapzoneManager:
             tools_db.execute_sql(sql)
 
         # Refresh tableview
-        self._manage_current_changed()
+        self._manage_current_changed(clear_text=False)
 
     def manage_create(self, dialog=None, tableview=None, *args, **kwargs):
         if dialog is None:

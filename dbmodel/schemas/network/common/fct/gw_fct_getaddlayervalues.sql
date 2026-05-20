@@ -12,8 +12,60 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getaddlayervalues(p_data json)
   RETURNS json AS
 $BODY$
 
-/*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getaddlayervalues($${"client":{}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text
+/*
+
+EXAMPLE — call function:
+SELECT SCHEMA_NAME.gw_fct_getaddlayervalues($${"client":{}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text;
+
+EXAMPLE — insert provider layer (WMS) on sys_table:
+INSERT INTO SCHEMA_NAME.sys_table (id, descript, sys_role, context, alias, provider_config)
+VALUES (
+	'wms_example',
+	'Example WMS layer',
+	'role_basic',
+	1,
+	'WMS example',
+	'{
+		"source": {
+			"url": "https://example.com/wms"
+		},
+		"provider": "wms",
+		"layer_type": "raster",
+		"uri_params": {
+			"format": "image/png",
+			"layers": "example_layer",
+			"styles": "",
+			"dpiMode": 7,
+			"featureCount": 10,
+			"contextualWMSLegend": "0"
+		}
+	}'::jsonb
+);
+
+EXAMPLE — insert provider layer (OAPIF) on sys_table:
+INSERT INTO SCHEMA_NAME.sys_table (id, descript, sys_role, context, alias, provider_config)
+VALUES (
+	'oapif_example',
+	'Example OGC API Features layer',
+	'role_basic',
+	1,
+	'OAPIF example',
+	'{
+		"source": {
+			"url": "https://example.com/oapif"
+		},
+		"provider": "oapif",
+		"layer_type": "vector",
+		"uri_params": {
+			"srsname": "OGC:CRS84",
+			"version": "auto",
+			"typename": "example_collection",
+			"pagingEnabled": "default",
+			"restrictToRequestBBOX": "1",
+			"preferCoordinatesForWfsT11": "false"
+		}
+	}'::jsonb
+);
 
 */
 
@@ -70,7 +122,8 @@ BEGIN
 		CASE
 			WHEN st.addparam->>'pkey' IS NULL THEN i.column_name
 			ELSE st.addparam->>'pkey'
-		END AS "tableId"
+		END AS "tableId",
+		st.provider_config as "providerConfig"
 		FROM sys_table st
 		join config_typevalue ct ON ct.id= context
 		left join geomtable c ON st.id =c.table_name

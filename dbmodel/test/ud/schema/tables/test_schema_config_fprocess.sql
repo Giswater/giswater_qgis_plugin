@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,21 +14,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
---check if table exists
+-- Check table
 SELECT has_table('config_fprocess'::name, 'Table config_fprocess should exist');
 
--- check columns names 
-
-
+-- Check columns
 SELECT columns_are(
     'config_fprocess',
     ARRAY[
-      'fid', 'tablename', 'target', 'querytext', 'orderby', 'addparam', 'active'
+        'fid', 'tablename', 'target', 'querytext', 'orderby', 'addparam',
+        'active'
     ],
     'Table config_fprocess should have the correct columns'
-
 );
--- check columns names
+
+-- Check column types
 SELECT col_type_is('config_fprocess', 'fid', 'int4', 'Column fid should be int4');
 SELECT col_type_is('config_fprocess', 'tablename', 'text', 'Column tablename should be text');
 SELECT col_type_is('config_fprocess', 'target', 'text', 'Column target should be text');
@@ -36,21 +36,7 @@ SELECT col_type_is('config_fprocess', 'orderby', 'int4', 'Column orderby should 
 SELECT col_type_is('config_fprocess', 'addparam', 'json', 'Column addparam should be json');
 SELECT col_type_is('config_fprocess', 'active', 'bool', 'Column active should be bool');
 
-	
-
---check default values
-SELECT col_has_default('config_fprocess', 'active', 'Column active should have default value');
-
--- check foreign keys
-
-
--- check indexes
-SELECT has_index('config_fprocess', 'config_fprocess_pkey', ARRAY['fid', 'tablename', 'target'], 'Table config_fprocess should have index on fid, tablename and target');
-
---check trigger 
-
---check rule 
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

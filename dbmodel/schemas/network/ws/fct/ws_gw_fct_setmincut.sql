@@ -327,114 +327,17 @@ BEGIN
 		RETURN v_response;
 	
 	ELSE
+		-- Keep anl_the_geom on refresh/recompute; only (re)position on explicit click or first arc bind
 		UPDATE om_mincut SET
 			anl_feature_id = v_arc_id,
 			anl_feature_type = 'ARC',
-			anl_the_geom = (SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
+			anl_the_geom = CASE
+				WHEN v_point IS NOT NULL THEN v_point
+				WHEN anl_the_geom IS NULL OR anl_feature_id IS DISTINCT FROM v_arc_id THEN
+					(SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
+				ELSE anl_the_geom
+			END
 		WHERE id = v_mincut_id;
-	END IF;
-
-	-- Address auto-fill for network mincut (null-safe):
-	-- 1) ve_address (street + number + muni)
-	-- 2) ve_streetaxis (street + muni)
-	-- 3) mun / v_municipality (muni)
-	IF v_action IN ('mincutNetwork', 'mincutRefresh') THEN
-
-		IF v_point IS NULL THEN
-			SELECT anl_the_geom INTO v_point
-			FROM om_mincut
-			WHERE id = v_mincut_id;
-		END IF;
-
-		IF v_point IS NOT NULL THEN
-
-			v_muni_id := NULL;
-			v_streetaxis_id := NULL;
-			v_postnumber := NULL;
-			v_street_name := NULL;
-			v_has_address_match := FALSE;
-
-			-- Primary source: closest address
-			SELECT
-				CASE
-					WHEN a.muni_id::text ~ '^[0-9]+$' THEN a.muni_id::integer
-					ELSE NULL
-				END,
-				a.name,
-				a.postnumber
-			INTO v_muni_id, v_street_name, v_postnumber
-			FROM ve_address a
-			ORDER BY a.the_geom <-> v_point
-			LIMIT 1;
-			v_has_address_match := FOUND;
-
-			-- Resolve streetaxis from address street
-			IF v_street_name IS NOT NULL THEN
-				SELECT s.id
-				INTO v_streetaxis_id
-				FROM ve_streetaxis s
-				WHERE s.name = v_street_name
-				AND (v_muni_id IS NULL OR s.muni_id = v_muni_id)
-				ORDER BY s.the_geom <-> v_point
-				LIMIT 1;
-			END IF;
-
-			-- Fallback street/muni from closest streetaxis
-			IF v_street_name IS NULL OR v_muni_id IS NULL OR v_streetaxis_id IS NULL THEN
-				SELECT
-					COALESCE(v_muni_id, s.muni_id),
-					COALESCE(v_streetaxis_id, s.id),
-					COALESCE(v_street_name, s.name)
-				INTO v_muni_id, v_streetaxis_id, v_street_name
-				FROM ve_streetaxis s
-				ORDER BY s.the_geom <-> v_point
-				LIMIT 1;
-			END IF;
-
-			-- Municipality fallback from mun table, if present
-			IF v_muni_id IS NULL AND to_regclass('mun') IS NOT NULL THEN
-				EXECUTE 'SELECT muni_id FROM mun WHERE ST_Intersects(the_geom, $1) ORDER BY ST_Area(the_geom) ASC LIMIT 1'
-				INTO v_muni_id
-				USING v_point;
-
-				IF v_muni_id IS NULL THEN
-					EXECUTE 'SELECT muni_id FROM mun ORDER BY the_geom <-> $1 LIMIT 1'
-					INTO v_muni_id
-					USING v_point;
-				END IF;
-			END IF;
-
-			-- Final municipality fallback from view
-			IF v_muni_id IS NULL AND to_regclass('v_municipality') IS NOT NULL THEN
-				SELECT m.muni_id
-				INTO v_muni_id
-				FROM v_municipality m
-				WHERE m.active IS TRUE
-					AND ST_Intersects(m.the_geom, v_point)
-				ORDER BY ST_Area(m.the_geom) ASC
-				LIMIT 1;
-
-				IF v_muni_id IS NULL THEN
-					SELECT m.muni_id
-					INTO v_muni_id
-					FROM v_municipality m
-					WHERE m.active IS TRUE
-					ORDER BY m.the_geom <-> v_point
-					LIMIT 1;
-				END IF;
-			END IF;
-
-			UPDATE om_mincut
-			SET muni_id = COALESCE(v_muni_id, om_mincut.muni_id),
-				streetaxis_id = COALESCE(v_streetaxis_id, om_mincut.streetaxis_id),
-				postnumber = CASE
-					WHEN v_has_address_match THEN v_postnumber
-					WHEN v_streetaxis_id IS NOT NULL THEN NULL
-					ELSE om_mincut.postnumber
-				END
-			WHERE id = v_mincut_id;
-
-		END IF;
 	END IF;
 
 	-- check if there is at least one operative node, if not - exit
@@ -982,6 +885,81 @@ BEGIN
 		RETURN v_response;
 	END IF;
 
+	-- Address auto-fill for network mincut (null-safe):
+	-- 1) ve_address (street + number + muni)
+	-- 2) ve_streetaxis (street + muni)
+	-- 3) mun / v_municipality (muni)
+	IF v_action IN ('mincutNetwork', 'mincutRefresh') THEN
+	    IF v_point IS NULL THEN
+	        SELECT anl_the_geom INTO v_point
+	        FROM om_mincut
+	        WHERE id = v_mincut_id;
+	    END IF;
+	    IF v_point IS NOT NULL THEN
+	        -- Primary source: nearest address (street name + number + muni)
+	        SELECT
+	            CASE
+	                WHEN a.muni_id::text ~ '^[0-9]+$' THEN a.muni_id::integer
+	                ELSE NULL
+	            END,
+	            NULLIF(trim(COALESCE(sa.name, a.streetaxis_id::text)), ''),
+	            NULLIF(trim(a.postnumber), '')
+	        INTO v_muni_id, v_street_name, v_postnumber
+	        FROM ve_address a
+	        LEFT JOIN ve_streetaxis sa ON sa.id = a.streetaxis_id
+	        ORDER BY a.the_geom <-> v_point
+	        LIMIT 1;
+	        v_has_address_match := FOUND;
+	        -- Fallback: nearest streetaxis (name + muni)
+	        IF v_street_name IS NULL OR v_muni_id IS NULL THEN
+	            SELECT
+	                COALESCE(v_muni_id, s.muni_id),
+	                COALESCE(v_street_name, NULLIF(trim(s.name), ''))
+	            INTO v_muni_id, v_street_name
+	            FROM ve_streetaxis s
+	            ORDER BY s.the_geom <-> v_point
+	            LIMIT 1;
+	        END IF;
+	        -- Municipality fallback from mun table, if present
+	        IF v_muni_id IS NULL AND to_regclass('mun') IS NOT NULL THEN
+	            EXECUTE 'SELECT muni_id FROM mun WHERE ST_Intersects(the_geom, $1) ORDER BY ST_Area(the_geom) ASC LIMIT 1'
+	            INTO v_muni_id
+	            USING v_point;
+	            IF v_muni_id IS NULL THEN
+	                EXECUTE 'SELECT muni_id FROM mun ORDER BY the_geom <-> $1 LIMIT 1'
+	                INTO v_muni_id
+	                USING v_point;
+	            END IF;
+	        END IF;
+	        -- Final municipality fallback from view
+	        IF v_muni_id IS NULL AND to_regclass('v_municipality') IS NOT NULL THEN
+	            SELECT m.muni_id
+	            INTO v_muni_id
+	            FROM v_municipality m
+	            WHERE m.active IS TRUE
+	              AND ST_Intersects(m.the_geom, v_point)
+	            ORDER BY ST_Area(m.the_geom) ASC
+	            LIMIT 1;
+	            IF v_muni_id IS NULL THEN
+	                SELECT m.muni_id
+	                INTO v_muni_id
+	                FROM v_municipality m
+	                WHERE m.active IS TRUE
+	                ORDER BY m.the_geom <-> v_point
+	                LIMIT 1;
+	            END IF;
+	        END IF;
+	        UPDATE om_mincut
+	        SET muni_id       = COALESCE(v_muni_id, om_mincut.muni_id),
+	            streetaxis_id = COALESCE(v_street_name, om_mincut.streetaxis_id),
+	            postnumber    = CASE
+	                WHEN v_has_address_match THEN COALESCE(v_postnumber, om_mincut.postnumber)
+	                ELSE om_mincut.postnumber
+	            END
+	        WHERE id = v_mincut_id;
+	    END IF;
+	END IF;
+
 	-- CORE MINCUT CODE
 	IF v_init_mincut THEN
 		-- Initialize process
@@ -1111,8 +1089,9 @@ BEGIN
 
 			END IF;
 
-			-- set the arcs that connect with WATER SECTOR and are not inlet_arcs; they will have graph_delimiter = 'SECTOR'
-			-- TANKS, SOURCE, WATERWELL, WTP
+			-- set arcs connected to WATER SECTOR (TANKS, SOURCE, WATERWELL, WTP):
+			--   - 'INLET'  -> if the arc is an inlet_arc
+			--   - 'SECTOR' -> otherwise
 			WITH
 				water AS (
 					SELECT node_id, inlet_arc FROM man_tank
@@ -1130,17 +1109,21 @@ BEGIN
 					WHERE 'SECTOR' = ANY (n.graph_delimiter)
 				)
 			UPDATE temp_pgr_arc a
-			SET graph_delimiter = 'SECTOR'
+			SET graph_delimiter =
+			CASE
+				WHEN EXISTS (
+					SELECT 1
+					FROM sector_water s
+					WHERE (s.node_id = a.pgr_node_1 OR s.node_id = a.pgr_node_2)
+					AND a.pgr_arc_id = ANY (COALESCE(s.inlet_arc, ARRAY[]::int[]))
+				)
+				THEN 'INLET'
+				ELSE 'SECTOR'
+			END
 			WHERE EXISTS (
 				SELECT 1
 				FROM sector_water s
 				WHERE (s.node_id = a.pgr_node_1 OR s.node_id = a.pgr_node_2)
-        		AND a.pgr_arc_id <> ALL(COALESCE(s.inlet_arc, ARRAY[]::int[]))
-			)
-			AND EXISTS (
-				SELECT 1
-				FROM temp_pgr_node n
-				WHERE (n.pgr_node_id = a.pgr_node_1 OR n.pgr_node_id = a.pgr_node_2)
 			);
 
 			-- generate lineGraph (pgr_node_1 and pgr_node_2 are arc_id)
@@ -1183,6 +1166,18 @@ BEGIN
 			WHERE n.graph_delimiter = 'MINSECTOR'
 			AND a1.pgr_node_2 IN (a2.pgr_node_1, a2.pgr_node_2)
 			AND ta.pgr_arc_id = t.pgr_arc_id;
+
+			-- force cost_mincut = -1 for adjacent 'SECTOR'/'INLET' arcs to limit the mincut network;
+			-- water sources always act as network boundaries
+			UPDATE temp_pgr_arc_linegraph t
+			SET graph_delimiter = 'SECTOR',
+				cost_mincut = -1
+			FROM temp_pgr_arc_linegraph ta
+			JOIN temp_pgr_arc a1 ON ta.pgr_node_1 = a1.pgr_arc_id
+			JOIN temp_pgr_arc a2 ON ta.pgr_node_2 = a2.pgr_arc_id
+			WHERE a1.graph_delimiter IN ('INLET', 'SECTOR') 
+			AND  a2.graph_delimiter IN ('INLET', 'SECTOR')
+			AND t.pgr_arc_id = ta.pgr_arc_id;
 
 			-- Generate the minsectors
 			--------------------------

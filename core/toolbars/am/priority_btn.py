@@ -41,8 +41,10 @@ class GwConfigCatalogButton:
     def __init__(self, data, key="arccat_id"):
         self._data = {}
         for entry in sorted(data, key=lambda i: i["dnom"]):
-            if entry[key] in self._data:
-                raise ValueError(f"Key {key} is not unique in the config catalog.")
+            if key in self._data:
+                raise ValueError(
+                    f"Key ({key}) is not unique in the config catalog."
+                )
             self._data[entry[key]] = entry
 
     def arccat_ids(self):
@@ -58,6 +60,7 @@ class GwConfigCatalogButton:
             tools_qt.tr("Replacement cost"),
             tools_qt.tr("Repair cost"),
             tools_qt.tr("Compliance Grade"),
+            tools_qt.tr("Material"),
         ]
         table_widget.setColumnCount(len(headers))
         table_widget.setHorizontalHeaderLabels(headers)
@@ -68,6 +71,7 @@ class GwConfigCatalogButton:
             table_widget.setItem(r, 2, QTableWidgetItem(str(row["cost_constr"])))
             table_widget.setItem(r, 3, QTableWidgetItem(str(row["cost_repmain"])))
             table_widget.setItem(r, 4, QTableWidgetItem(str(row["compliance"])))
+            table_widget.setItem(r, 5, QTableWidgetItem(str(row["matcat_id"])))
 
     def get_compliance(self, key):
         return self._data[key]["compliance"]
@@ -114,6 +118,7 @@ def configcatalog_from_tablewidget(table_widget, key="arccat_id"):
                 "cost_constr": float(table_widget.item(r, 2).text()),
                 "cost_repmain": float(table_widget.item(r, 3).text()),
                 "compliance": int(table_widget.item(r, 4).text()),
+                "matcat_id": table_widget.item(r, 5).text(),
             }
         )
     return GwConfigCatalogButton(data, key)
@@ -393,12 +398,16 @@ class CalculatePriority:
         self.qtbl_catalog.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.qtbl_catalog.setSortingEnabled(True)
         if self.mode == "new":
-            sql = "select * from am.config_catalog_def"
+            sql = "select d.*, cat_arc.matcat_id from am.config_catalog_def d JOIN cat_arc ON d.arccat_id = cat_arc.id"
         else:
-            sql = f"select * from am.config_catalog_def where id = {self.result['id']}"
-        key = "arccat_id" if self.config.method == "WM" else "dnom"
+            sql = f"select d.*, cat_arc.matcat_id from am.config_catalog_def d JOIN cat_arc ON d.arccat_id = cat_arc.id where d.id = {self.result['id']}"
+        key = "arccat_id"
 
-        configcatalog = GwConfigCatalogButton(tools_db.get_rows(sql), key)
+        try:
+            configcatalog = GwConfigCatalogButton(tools_db.get_rows(sql), key)
+        except ValueError as e:
+            tools_qgis.show_warning(str(e))
+            return None
         configcatalog.fill_table_widget(self.qtbl_catalog)
         self.qtbl_catalog.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
@@ -406,8 +415,6 @@ class CalculatePriority:
         if self.config.method == "WM":
             self.qtbl_catalog.hideColumn(1)
             self.qtbl_catalog.hideColumn(3)
-        if self.config.method == "SH":
-            self.qtbl_catalog.hideColumn(0)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -1060,7 +1067,7 @@ class CalculatePriority:
             tools_qt.show_info_box(msg, msg_params=msg_params)
             return
         try:
-            key = "dnom" if self.config.method == "SH" else "arccat_id"
+            key = "arccat_id"
             config_catalog = configcatalog_from_tablewidget(self.qtbl_catalog, key)
         except ValueError as e:
             tools_qt.show_info_box(e)

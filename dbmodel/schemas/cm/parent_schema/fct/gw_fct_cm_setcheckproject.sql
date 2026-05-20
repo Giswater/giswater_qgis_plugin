@@ -55,6 +55,7 @@ DECLARE
 	v_result_point json;
 	v_result_line json;
 	v_result_polygon json;
+	v_result_geojson json;
 
 	v_uservalues json;
 	v_missing_layers json;
@@ -238,7 +239,7 @@ BEGIN
     IF EXISTS (SELECT 1 FROM cm.config_outlayers) THEN
         v_outlier_rules_checked := 0;
 
-        FOR v_rec IN SELECT * FROM cm.config_outlayers
+        FOR v_rec IN SELECT unnest(feature_type) as feature_type, column_name, min_value, max_value, except_error, except_message FROM cm.config_outlayers
 	LOOP
             -- Use feature_type directly as text (not array)
             v_feature_type_item := v_rec.feature_type;
@@ -282,7 +283,7 @@ BEGIN
 							v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
 					END IF;
 				ELSE
-					EXECUTE format('SELECT %I FROM PARENT_SCHEMA.%I WHERE %I IS NOT NULL LIMIT 1', 
+					EXECUTE format('SELECT %I FROM SCHEMA_NAME.%I WHERE %I IS NOT NULL LIMIT 1', 
 						v_rec.column_name, v_feature_type_item, v_rec.column_name) INTO v_sample_value;
 				END IF;
 		EXCEPTION
@@ -400,7 +401,7 @@ BEGIN
 			ELSE
 				-- For other feature types, no filtering
 				v_querytext := format(
-					'SELECT %I FROM PARENT_SCHEMA.%I WHERE %s',
+					'SELECT %I FROM SCHEMA_NAME.%I WHERE %s',
 					v_rec.column_name, v_feature_type_item, array_to_string(v_conditions, ' OR ')
 				);
 			END IF;
@@ -1440,6 +1441,13 @@ BEGIN
 			v_result_point := '{}';
 	END;
 
+	BEGIN
+		EXECUTE 'SELECT cm.gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"geojson"}}}$$::json)' INTO v_result_geojson;
+	EXCEPTION
+		WHEN OTHERS THEN
+			v_result_geojson := '{"type":"FeatureCollection","features":[]}';
+	END;
+
 	--EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 	--EXECUTE 'SELECT gw_fct_cm_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
 	-- ENDSECTION
@@ -1452,6 +1460,7 @@ BEGIN
 	v_result_point:=COALESCE(v_result_point,'{}');
 	v_result_line:=COALESCE(v_result_line,'{}');
 	v_result_polygon:=COALESCE(v_result_polygon,'{}');
+	v_result_geojson:=COALESCE(v_result_geojson,'{"type":"FeatureCollection","features":[]}');
 	v_missing_layers:=COALESCE(v_missing_layers,'{}');
 	v_qgis_layers_setpropierties:=COALESCE(v_qgis_layers_setpropierties,true);
 	v_qgis_init_guide_map:=COALESCE(v_qgis_init_guide_map,true);
@@ -1465,6 +1474,7 @@ BEGIN
 					'"point":'||v_result_point||','||
 					'"line":'||v_result_line||','||
 					'"polygon":'||v_result_polygon||','||
+					'"geojson":'||v_result_geojson||','||
 					'"missingLayers":'||v_missing_layers||'}'||
 			', "variables":{"setQgisLayers":' || v_qgis_layers_setpropierties||', "useGuideMap":'||v_qgis_init_guide_map||'}}}')::json;
 	--  Return

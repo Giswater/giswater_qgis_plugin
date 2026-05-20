@@ -1,0 +1,65 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+BEGIN;
+
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT * FROM no_plan();
+
+-- Check table
+SELECT has_table('rpt_inp_node'::name, 'Table rpt_inp_node should exist');
+
+-- Check columns
+SELECT columns_are(
+    'rpt_inp_node',
+    ARRAY[
+        'id', 'result_id', 'node_id', 'top_elev', 'ymax', 'elev',
+        'node_type', 'nodecat_id', 'epa_type', 'sector_id', 'state', 'state_type',
+        'annotation', 'y0', 'ysur', 'apond', 'the_geom', 'expl_id',
+        'addparam', 'parent', 'arcposition', 'fusioned_node', 'age'
+    ],
+    'Table rpt_inp_node should have the correct columns'
+);
+
+-- Check column types
+SELECT col_type_is('rpt_inp_node', 'id', 'int4', 'Column id should be int4');
+SELECT col_type_is('rpt_inp_node', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
+SELECT col_type_is('rpt_inp_node', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
+SELECT col_type_is('rpt_inp_node', 'top_elev', 'numeric(12,3)', 'Column top_elev should be numeric(12,3)');
+SELECT col_type_is('rpt_inp_node', 'ymax', 'numeric(12,3)', 'Column ymax should be numeric(12,3)');
+SELECT col_type_is('rpt_inp_node', 'elev', 'numeric(12,3)', 'Column elev should be numeric(12,3)');
+SELECT col_type_is('rpt_inp_node', 'node_type', 'varchar(30)', 'Column node_type should be varchar(30)');
+SELECT col_type_is('rpt_inp_node', 'nodecat_id', 'varchar(30)', 'Column nodecat_id should be varchar(30)');
+SELECT col_type_is('rpt_inp_node', 'epa_type', 'varchar(16)', 'Column epa_type should be varchar(16)');
+SELECT col_type_is('rpt_inp_node', 'sector_id', 'int4', 'Column sector_id should be int4');
+SELECT col_type_is('rpt_inp_node', 'state', 'int2', 'Column state should be int2');
+SELECT col_type_is('rpt_inp_node', 'state_type', 'int2', 'Column state_type should be int2');
+SELECT col_type_is('rpt_inp_node', 'annotation', 'varchar(254)', 'Column annotation should be varchar(254)');
+SELECT col_type_is('rpt_inp_node', 'y0', 'numeric(12,4)', 'Column y0 should be numeric(12,4)');
+SELECT col_type_is('rpt_inp_node', 'ysur', 'numeric(12,4)', 'Column ysur should be numeric(12,4)');
+SELECT col_type_is('rpt_inp_node', 'apond', 'numeric(12,4)', 'Column apond should be numeric(12,4)');
+SELECT col_type_is('rpt_inp_node', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column the_geom should be geometry(point, SRID_VALUE)');
+SELECT col_type_is('rpt_inp_node', 'expl_id', 'int4', 'Column expl_id should be int4');
+SELECT col_type_is('rpt_inp_node', 'addparam', 'text', 'Column addparam should be text');
+SELECT col_type_is('rpt_inp_node', 'parent', 'varchar(16)', 'Column parent should be varchar(16)');
+SELECT col_type_is('rpt_inp_node', 'arcposition', 'int2', 'Column arcposition should be int2');
+SELECT col_type_is('rpt_inp_node', 'fusioned_node', 'text', 'Column fusioned_node should be text');
+SELECT col_type_is('rpt_inp_node', 'age', 'int4', 'Column age should be int4');
+
+-- Check foreign keys
+SELECT has_fk('rpt_inp_node', 'Table rpt_inp_node should have foreign keys');
+
+SELECT fk_ok('rpt_inp_node', 'result_id', 'rpt_cat_result', 'result_id', 'FK result_id → rpt_cat_result.result_id');
+
+-- Finish
+SELECT * FROM finish();
+
+ROLLBACK;

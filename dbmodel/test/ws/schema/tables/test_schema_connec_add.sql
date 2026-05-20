@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,25 +14,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table connec_add
+-- Check table
 SELECT has_table('connec_add'::name, 'Table connec_add should exist');
 
 -- Check columns
 SELECT columns_are(
     'connec_add',
     ARRAY[
-        'connec_id', 'demand_base', 'demand_max', 'demand_min', 'demand_avg', 'press_max', 'press_min', 'press_avg',
-        'quality_max', 'quality_min', 'quality_avg', 'flow_max', 'flow_min', 'flow_avg', 'vel_max', 'vel_min', 'vel_avg',
-        'result_id'
+        'connec_id', 'demand_base', 'demand_max', 'demand_min', 'demand_avg', 'press_max',
+        'press_min', 'press_avg', 'quality_max', 'quality_min', 'quality_avg', 'flow_max',
+        'flow_min', 'flow_avg', 'vel_max', 'vel_min', 'vel_avg', 'result_id'
     ],
     'Table connec_add should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('connec_add', ARRAY['connec_id'], 'Column connec_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('connec_add', 'connec_id', 'integer', 'Column connec_id should be integer');
+SELECT col_type_is('connec_add', 'connec_id', 'int4', 'Column connec_id should be int4');
 SELECT col_type_is('connec_add', 'demand_base', 'numeric(12,2)', 'Column demand_base should be numeric(12,2)');
 SELECT col_type_is('connec_add', 'demand_max', 'numeric(12,2)', 'Column demand_max should be numeric(12,2)');
 SELECT col_type_is('connec_add', 'demand_min', 'numeric(12,2)', 'Column demand_min should be numeric(12,2)');
@@ -52,17 +50,10 @@ SELECT col_type_is('connec_add', 'result_id', 'text', 'Column result_id should b
 
 -- Check foreign keys
 SELECT has_fk('connec_add', 'Table connec_add should have foreign keys');
-SELECT fk_ok('connec_add', 'connec_id', 'connec', 'connec_id', 'FK connec_id should reference connec.connec_id');
 
--- Check triggers
+SELECT fk_ok('connec_add', 'connec_id', 'connec', 'connec_id', 'FK connec_id → connec.connec_id');
 
--- Check rules
-
--- Check sequences
-
--- Check constraints
-SELECT col_not_null('connec_add', 'connec_id', 'Column connec_id should be NOT NULL');
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

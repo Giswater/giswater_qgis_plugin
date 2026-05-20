@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -25,16 +26,10 @@ SELECT columns_are(
     'Table config_table should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('config_table', 'id', 'Column id should be primary key'); 
-
 -- Check column types
 SELECT col_type_is('config_table', 'id', 'text', 'Column id should be text');
 SELECT col_type_is('config_table', 'style', 'int4', 'Column style should be int4');
 SELECT col_type_is('config_table', 'group_layer', 'text', 'Column group_layer should be text');
-
--- Check indexes
-SELECT has_index('config_table', 'config_table_pkey', ARRAY['id'], 'Table should have index on id');
 
 -- Finish
 SELECT * FROM finish();

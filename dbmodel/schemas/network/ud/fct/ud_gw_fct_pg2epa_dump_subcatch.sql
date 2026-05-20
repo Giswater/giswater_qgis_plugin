@@ -25,6 +25,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_dump_subcatch($${"client":{"device":4, "infoTyp
 DECLARE
 subcatchment_polygon public.geometry;
 row_id varchar(16);
+v_hydrology_id int4;
 index_point integer;
 point_aux public.geometry;
 v_client_epsg integer;
@@ -41,11 +42,11 @@ BEGIN
 	DELETE FROM temp_t_table WHERE fid = v_fid;
 
 	-- Dump node coordinates for every polygon
-	FOR row_id, hydrology_id IN SELECT subc_id, hydrology_id FROM ve_inp_subcatchment
+	FOR row_id, v_hydrology_id IN SELECT subc_id, hydrology_id FROM ve_inp_subcatchment
 	LOOP
 
 		-- Get the geom and remain fields
-		SELECT INTO subcatchment_polygon the_geom FROM inp_subcatchment WHERE subc_id = row_id AND hydrology_id = hydrology_id;
+		SELECT INTO subcatchment_polygon the_geom FROM inp_subcatchment WHERE subc_id = row_id AND hydrology_id = v_hydrology_id;
 
 		-- Loop for nodes
 		index_point := 1;

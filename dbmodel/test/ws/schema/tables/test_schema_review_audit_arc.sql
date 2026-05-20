@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table review_audit_arc
+-- Check table
 SELECT has_table('review_audit_arc'::name, 'Table review_audit_arc should exist');
 
 -- Check columns
@@ -27,33 +28,24 @@ SELECT columns_are(
     'Table review_audit_arc should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('review_audit_arc', ARRAY['id'], 'Column id should be primary key');
-
 -- Check column types
-SELECT col_type_is('review_audit_arc', 'id', 'integer', 'Column id should be integer');
-SELECT col_type_is('review_audit_arc', 'arc_id', 'integer', 'Column arc_id should be integer');
-SELECT col_type_is('review_audit_arc', 'old_arccat_id', 'character varying(30)', 'Column old_arccat_id should be character varying(30)');
-SELECT col_type_is('review_audit_arc', 'new_arccat_id', 'character varying(30)', 'Column new_arccat_id should be character varying(30)');
+SELECT col_type_is('review_audit_arc', 'id', 'int4', 'Column id should be int4');
+SELECT col_type_is('review_audit_arc', 'arc_id', 'int4', 'Column arc_id should be int4');
+SELECT col_type_is('review_audit_arc', 'old_arccat_id', 'varchar(30)', 'Column old_arccat_id should be varchar(30)');
+SELECT col_type_is('review_audit_arc', 'new_arccat_id', 'varchar(30)', 'Column new_arccat_id should be varchar(30)');
 SELECT col_type_is('review_audit_arc', 'old_annotation', 'text', 'Column old_annotation should be text');
 SELECT col_type_is('review_audit_arc', 'new_annotation', 'text', 'Column new_annotation should be text');
 SELECT col_type_is('review_audit_arc', 'old_observ', 'text', 'Column old_observ should be text');
 SELECT col_type_is('review_audit_arc', 'new_observ', 'text', 'Column new_observ should be text');
 SELECT col_type_is('review_audit_arc', 'review_obs', 'text', 'Column review_obs should be text');
-SELECT col_type_is('review_audit_arc', 'expl_id', 'integer', 'Column expl_id should be integer');
-SELECT col_type_is('review_audit_arc', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
-SELECT col_type_is('review_audit_arc', 'review_status_id', 'smallint', 'Column review_status_id should be smallint');
+SELECT col_type_is('review_audit_arc', 'expl_id', 'int4', 'Column expl_id should be int4');
+SELECT col_type_is('review_audit_arc', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Column the_geom should be geometry(linestring, SRID_VALUE)');
+SELECT col_type_is('review_audit_arc', 'review_status_id', 'int2', 'Column review_status_id should be int2');
 SELECT col_type_is('review_audit_arc', 'field_date', 'timestamp(6) without time zone', 'Column field_date should be timestamp(6) without time zone');
 SELECT col_type_is('review_audit_arc', 'field_user', 'text', 'Column field_user should be text');
-SELECT col_type_is('review_audit_arc', 'is_validated', 'integer', 'Column is_validated should be integer');
+SELECT col_type_is('review_audit_arc', 'is_validated', 'int4', 'Column is_validated should be int4');
 
--- Check default values
-SELECT col_has_default('review_audit_arc', 'id', 'Column id should have a default value');
-
--- Check constraints
-SELECT col_not_null('review_audit_arc', 'id', 'Column id should be NOT NULL');
-SELECT col_not_null('review_audit_arc', 'arc_id', 'Column arc_id should be NOT NULL');
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

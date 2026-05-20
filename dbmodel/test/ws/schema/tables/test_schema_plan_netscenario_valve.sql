@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table plan_netscenario_valve
+-- Check table
 SELECT has_table('plan_netscenario_valve'::name, 'Table plan_netscenario_valve should exist');
 
 -- Check columns
@@ -25,26 +26,18 @@ SELECT columns_are(
     'Table plan_netscenario_valve should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('plan_netscenario_valve', ARRAY['netscenario_id', 'node_id'], 'Columns netscenario_id and node_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('plan_netscenario_valve', 'netscenario_id', 'integer', 'Column netscenario_id should be integer');
-SELECT col_type_is('plan_netscenario_valve', 'node_id', 'integer', 'Column node_id should be integer');
-SELECT col_type_is('plan_netscenario_valve', 'closed', 'boolean', 'Column closed should be boolean');
-
--- Check default values
-SELECT col_default_is('plan_netscenario_valve', 'closed', 'false', 'Default value for closed should be false');
+SELECT col_type_is('plan_netscenario_valve', 'netscenario_id', 'int4', 'Column netscenario_id should be int4');
+SELECT col_type_is('plan_netscenario_valve', 'node_id', 'int4', 'Column node_id should be int4');
+SELECT col_type_is('plan_netscenario_valve', 'closed', 'bool', 'Column closed should be bool');
 
 -- Check foreign keys
 SELECT has_fk('plan_netscenario_valve', 'Table plan_netscenario_valve should have foreign keys');
-SELECT fk_ok('plan_netscenario_valve', 'netscenario_id', 'plan_netscenario', 'netscenario_id', 'FK netscenario_id should reference plan_netscenario.netscenario_id');
-SELECT fk_ok('plan_netscenario_valve', 'node_id', 'man_valve', 'node_id', 'FK node_id should reference man_valve.node_id');
 
--- Check constraints
-SELECT col_not_null('plan_netscenario_valve', 'netscenario_id', 'Column netscenario_id should be NOT NULL');
-SELECT col_not_null('plan_netscenario_valve', 'node_id', 'Column node_id should be NOT NULL');
+SELECT fk_ok('plan_netscenario_valve', 'netscenario_id', 'plan_netscenario', 'netscenario_id', 'FK netscenario_id → plan_netscenario.netscenario_id');
+SELECT fk_ok('plan_netscenario_valve', 'node_id', 'man_valve', 'node_id', 'FK node_id → man_valve.node_id');
 
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

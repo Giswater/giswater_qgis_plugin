@@ -50,6 +50,20 @@ from ...giswater_admin.log_format import format_failure, format_progress_status,
 from ._qt_db_adapter import QtDbAdapter
 
 
+def _admin_version_tuple(version) -> tuple:
+    """Major.minor.patch as ints for ordering; 4+ segments use first 3 (same as UI truncation)."""
+    parts = str(version).split('.')
+    if len(parts) >= 4:
+        parts = parts[:3]
+    nums = []
+    for p in parts:
+        try:
+            nums.append(int(p))
+        except ValueError:
+            nums.append(0)
+    return tuple(nums) if nums else (0,)
+
+
 class GwAdminButton:
 
     def __init__(self):
@@ -1068,25 +1082,8 @@ class GwAdminButton:
             self.form_enabled = False
 
         elif self.form_enabled:
-            plugin_version = self.plugin_version
-            project_version = self.project_version
-            # Only get the x.y.zzz, not x.y.zzz.n
-            try:
-                plugin_version_l = str(self.plugin_version).split('.')
-                if len(plugin_version_l) >= 4:
-                    plugin_version = f'{plugin_version_l[0]}'
-                    for i in range(1, 3):
-                        plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
-            except Exception:
-                pass
-            try:
-                project_version_l = str(self.project_version).split('.')
-                if len(project_version_l) >= 4:
-                    project_version = f'{project_version_l[0]}'
-                    for i in range(1, 3):
-                        project_version = f"{project_version}.{project_version_l[i]}"
-            except Exception:
-                pass
+            plugin_tuple = _admin_version_tuple(self.plugin_version)
+            project_tuple = _admin_version_tuple(self.project_version)
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
             if any(x in str(tools_db.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
@@ -1094,16 +1091,16 @@ class GwAdminButton:
             if schema_name == 'null':
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
-            elif str(plugin_version) > str(project_version):
+            elif plugin_tuple > project_tuple:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 msg = '(Schema version is lower than plugin version, please update schema)'
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
                 self.dlg_readsql.btn_info.setEnabled(True)
-            elif str(plugin_version) < str(project_version):
+            elif plugin_tuple < project_tuple:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 msg = '(Schema version is higher than plugin version, please update plugin)'
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-                self.dlg_readsql.btn_info.setEnabled(True)
+                self.dlg_readsql.btn_info.setEnabled(False)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
@@ -1535,38 +1532,21 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
         else:
-            plugin_version = self.plugin_version
-            project_version = self.project_version
-            # Only get the x.y.zzz, not x.y.zzz.n
-            try:
-                plugin_version_l = str(self.plugin_version).split('.')
-                if len(plugin_version_l) >= 4:
-                    plugin_version = f'{plugin_version_l[0]}'
-                    for i in range(1, 3):
-                        plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
-            except Exception:
-                pass
-            try:
-                project_version_l = str(self.project_version).split('.')
-                if len(project_version_l) >= 4:
-                    project_version = f'{project_version_l[0]}'
-                    for i in range(1, 3):
-                        project_version = f"{project_version}.{project_version_l[i]}"
-            except Exception:
-                pass
+            plugin_tuple = _admin_version_tuple(self.plugin_version)
+            project_tuple = _admin_version_tuple(self.project_version)
             if any(x in str(credentials['db']) for x in ('.', ',')):
                 message = 'Database name contains special characters that are not supported'
                 self.form_enabled = False
-            elif str(plugin_version) > str(project_version):
+            elif plugin_tuple > project_tuple:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 msg = '(Schema version is lower than plugin version, please update schema)'
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
                 self.dlg_readsql.btn_info.setEnabled(True)
-            elif str(plugin_version) < str(project_version):
+            elif plugin_tuple < project_tuple:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 msg = '(Schema version is higher than plugin version, please update plugin)'
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-                self.dlg_readsql.btn_info.setEnabled(True)
+                self.dlg_readsql.btn_info.setEnabled(False)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
@@ -1837,37 +1817,20 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        plugin_version = self.plugin_version
-        project_version = self.project_version
-        # Only get the x.y.zzz, not x.y.zzz.n
-        try:
-            plugin_version_l = str(self.plugin_version).split('.')
-            if len(plugin_version_l) >= 4:
-                plugin_version = f'{plugin_version_l[0]}'
-                for i in range(1, 3):
-                    plugin_version = f"{plugin_version}.{plugin_version_l[i]}"
-        except Exception:
-            pass
-        try:
-            project_version_l = str(self.project_version).split('.')
-            if len(project_version_l) >= 4:
-                project_version = f'{project_version_l[0]}'
-                for i in range(1, 3):
-                    project_version = f"{project_version}.{project_version_l[i]}"
-        except Exception:
-            pass
+        plugin_tuple = _admin_version_tuple(self.plugin_version)
+        project_tuple = _admin_version_tuple(self.project_version)
 
         if schema_name == 'null' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
 
-        elif str(plugin_version) > str(project_version) and self.form_enabled:
+        elif plugin_tuple > project_tuple and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             msg = '(Schema version is lower than plugin version, please update schema)'
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
             self.dlg_readsql.btn_info.setEnabled(True)
 
-        elif str(plugin_version) < str(project_version) and self.form_enabled:
+        elif plugin_tuple < project_tuple and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             msg = '(Schema version is higher than plugin version, please update plugin)'
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
@@ -2092,7 +2055,7 @@ class GwAdminButton:
         """"""
 
         # Open rename if schema is updated
-        if str(self.plugin_version) != str(self.project_version):
+        if _admin_version_tuple(self.plugin_version) != _admin_version_tuple(self.project_version):
             msg = "The schema version has to be updated to make rename"
             tools_qt.show_info_box(msg, "Info")
             return
@@ -2594,7 +2557,7 @@ class GwAdminButton:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
-        if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
+        if _admin_version_tuple(self.project_version) < _admin_version_tuple(self.plugin_version):
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             self.dlg_readsql.cmb_formname_fields.clear()
             return

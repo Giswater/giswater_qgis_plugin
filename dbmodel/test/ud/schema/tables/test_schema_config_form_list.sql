@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,21 +14,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
---check if table exists
+-- Check table
 SELECT has_table('config_form_list'::name, 'Table config_form_list should exist');
 
--- check columns names 
-
-
+-- Check columns
 SELECT columns_are(
     'config_form_list',
     ARRAY[
-      'listname', 'query_text', 'device', 'listtype', 'listclass', 'vdefault', 'addparam'
+        'listname', 'query_text', 'device', 'listtype', 'listclass', 'vdefault',
+        'addparam'
     ],
     'Table config_form_list should have the correct columns'
-
 );
--- check columns names
+
+-- Check column types
 SELECT col_type_is('config_form_list', 'listname', 'varchar(50)', 'Column listname should be varchar(50)');
 SELECT col_type_is('config_form_list', 'query_text', 'text', 'Column query_text should be text');
 SELECT col_type_is('config_form_list', 'device', 'int2', 'Column device should be int2');
@@ -36,24 +36,7 @@ SELECT col_type_is('config_form_list', 'listclass', 'varchar(30)', 'Column listc
 SELECT col_type_is('config_form_list', 'vdefault', 'json', 'Column vdefault should be json');
 SELECT col_type_is('config_form_list', 'addparam', 'json', 'Column addparam should be json');
 
-
-
-
---check default values
-
-
--- check foreign keys
-
-
--- check indexes
-SELECT has_index('config_form_list', 'config_form_list_pkey', ARRAY['listname', 'device'], 'Table config_form_list should have index on listname and device');
-
-
-
---check trigger 
-
---check rule 
-
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

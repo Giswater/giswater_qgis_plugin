@@ -477,7 +477,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3518, 'Elements connected with the feature: %v_element%', NULL),
     (3520, 'Visits connected with the feature: %v_visit%', NULL),
     (3522, 'Documents connected with the feature: %v_doc%', NULL),
-    (3524, 'Psectors connected with the feature: %,v_psector%', NULL),
+    (3524, 'Psectors connected with the feature: %v_psector%', NULL),
     (3526, 'IMPORTANT: Activate psector before deleting features.', NULL),
     (3528, 'Repaired arcs: arc_id --> %arc_ids%', NULL),
     (3562, 'No arcs have been selected', NULL),

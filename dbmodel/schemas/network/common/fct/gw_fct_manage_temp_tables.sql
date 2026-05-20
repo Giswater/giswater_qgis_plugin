@@ -171,8 +171,6 @@ BEGIN
                 code varchar(100) NULL,
                 name varchar(100) NULL,
                 descript varchar(255) NULL,
-                sector_id int4[] NULL,
-                muni_id int4[] NULL,
                 macroexpl_id int4 NULL,
                 active bool NULL,
                 CONSTRAINT temp_exploitation_pkey PRIMARY KEY (expl_id)

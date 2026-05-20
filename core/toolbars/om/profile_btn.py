@@ -12,7 +12,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtCore import QDate, QTimer
 from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression, Qgis
@@ -86,8 +86,9 @@ class GwProfileButton(GwAction):
         # Declare composer path widget
         self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
-        # Set layer_node
+        # Set layers used for snapping
         self.layer_node = tools_qgis.get_layer_by_tablename('ve_node', show_warning_=False)
+        self.layer_arc = tools_qgis.get_layer_by_tablename('ve_arc', show_warning_=False)
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
@@ -180,7 +181,7 @@ class GwProfileButton(GwAction):
                  f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
         if self.add_points_list:
             points_list = str(self.add_points_list).replace("'", "")
-            extras += f', "midNodes":{points_list}'
+            extras += f', "midFeatures":{points_list}'
 
         body = tools_gw.create_body(extras=extras)
 
@@ -242,7 +243,7 @@ class GwProfileButton(GwAction):
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
         # Create variable with all the content of the form
-        extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", "midNodes":"{self.add_points_list}", ' \
+        extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", "midFeatures":"{self.add_points_list}", ' \
             f'"endNode":"{self.endNode}", ' \
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, ' \
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
@@ -297,7 +298,7 @@ class GwProfileButton(GwAction):
             if profile['profile_id'] == profile_id:
                 # Get data
                 self.initNode = profile['values']['initNode']
-                self.add_points_list = profile['values']['midNodes']
+                self.add_points_list = profile['values']['midFeatures']
                 self.endNode = profile['values']['endNode']
 
                 # Populate list arcs
@@ -308,7 +309,7 @@ class GwProfileButton(GwAction):
                 f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
                 if self.add_points_list:
                     points_list = str(self.add_points_list).replace("'", "")
-                    extras += f', "midNodes":{points_list}'
+                    extras += f', "midFeatures":{points_list}'
                 body = tools_gw.create_body(extras=extras)
                 result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
 
@@ -386,120 +387,142 @@ class GwProfileButton(GwAction):
 
         event_point = self.snapper_manager.get_event_point(point=point)
 
-        # Snapping
+        # Snapping – always try node layer (active layer)
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            if layer == self.layer_node:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
-        else:
-            self.vertex_marker.hide()
+        if result.isValid() and self.snapper_manager.get_snapped_layer(result) == self.layer_node:
+            self.snapper_manager.add_marker(result, self.vertex_marker)
+            return
+
+        # In add_points mode also accept arc layer as fallback
+        if self.add_points and self.layer_arc:
+            self.iface.setActiveLayer(self.layer_arc)
+            result_arc = self.snapper_manager.snap_to_current_layer(event_point)
+            self.iface.setActiveLayer(self.layer_node)
+            if result_arc.isValid() and self.snapper_manager.get_snapped_layer(result_arc) == self.layer_arc:
+                self.snapper_manager.add_marker(result_arc, self.vertex_marker)
+                return
+
+        self.vertex_marker.hide()
 
     def _snapping_node(self, point):   # @UnusedVariable
 
         # Get clicked point
         event_point = self.snapper_manager.get_event_point(point=point)
 
-        # Snapping
+        # Snapping – always try node layer (active layer) first
         result = self.snapper_manager.snap_to_current_layer(event_point)
+        snapped_node = result.isValid() and self.snapper_manager.get_snapped_layer(result) == self.layer_node
 
-        if result.isValid():
-            # Check feature
-            layer = self.snapper_manager.get_snapped_layer(result)
-            if layer == self.layer_node:
-                # Get the point
-                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        # In add_points mode also try arc layer if node didn't snap
+        snapped_arc = False
+        if self.add_points and not snapped_node and self.layer_arc:
+            self.iface.setActiveLayer(self.layer_arc)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
+            self.iface.setActiveLayer(self.layer_node)
+            snapped_arc = result.isValid() and self.snapper_manager.get_snapped_layer(result) == self.layer_arc
+
+        if snapped_node or snapped_arc:
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            if snapped_node:
                 element_id = snapped_feat.attribute('node_id')
-                self.element_id = str(element_id)
+            else:
+                element_id = snapped_feat.attribute('arc_id')
+            self.element_id = str(element_id)
 
-                if self.first_node and not self.add_points:
-                    self.initNode = element_id
-                    self.first_node = False
-                    msg = "Node 1 selected"
-                    tools_qgis.show_info(msg, parameter=element_id)
-                else:
-                    if self.element_id == self.initNode or self.element_id == self.endNode \
-                            or self.element_id in self.add_points_list:
-                        msg = "Node already selected"
-                        param = element_id
-                        tools_qgis.show_warning(msg, parameter=param)
-                        if not self.add_points:
-                            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-                            tools_gw.disconnect_signal('profile')
-                            self.dlg_draw_profile.btn_save_profile.setEnabled(False)
-                            self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
-                            self.action_add_point.setDisabled(True)
-                            # Clear old list arcs
-                            self.dlg_draw_profile.tbl_list_arc.clear()
-
-                            self._remove_selection()
-                    else:
-                        if self.add_points:
-                            self.add_points_list.append(element_id)
-                        else:
-                            self.endNode = element_id
+            if self.first_node and not self.add_points:
+                self.initNode = element_id
+                self.first_node = False
+                msg = "Node 1 selected"
+                tools_qgis.show_info(msg, parameter=self.element_id)
+            else:
+                if self.element_id == str(self.initNode) or self.element_id == str(self.endNode) \
+                        or self.element_id in [str(x) for x in self.add_points_list]:
+                    msg = "Node already selected" if snapped_node else "Arc already selected"
+                    param = element_id
+                    tools_qgis.show_warning(msg, parameter=param)
+                    if not self.add_points:
                         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
                         tools_gw.disconnect_signal('profile')
-                        self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
-                        self.dlg_draw_profile.btn_save_profile.setEnabled(True)
-
-                        # Populate list arcs
-                        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
-                        if links_distance in ("", "None", None):
-                            links_distance = 1
-                        extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
-                        f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
-                        if self.add_points and self.add_points_list:
-                            points_list = str(self.add_points_list).replace("'", "")
-                            extras += f', "midNodes":{points_list}'
-                        body = tools_gw.create_body(extras=extras)
-                        result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-                        if result is None or result['status'] == 'Failed':
-                            # Roll back last mid-node on failed query
-                            if self.add_points and self.add_points_list:
-                                self.add_points_list.pop()
-                            return
-                        self.layer_arc = tools_qgis.get_layer_by_tablename("ve_arc")
-
-                        # Manage level and message from query result
-                        if result['message']:
-                            level = int(result['message']['level'])
-                            msg = result['message']['text']
-                            level = Qgis.MessageLevel(level)
-                            tools_qgis.show_message(msg, level)
-                            if result['message']['level'] != 3:
-                                # If error while adding mid-nodes, roll back last selection
-                                if self.add_points and self.add_points_list:
-                                    # Drop last added mid-node (the one just selected)
-                                    self.add_points_list.pop()
-                                return
+                        self.dlg_draw_profile.btn_save_profile.setEnabled(False)
+                        self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
+                        self.action_add_point.setDisabled(True)
+                        # Clear old list arcs
+                        self.dlg_draw_profile.tbl_list_arc.clear()
 
                         self._remove_selection()
-                        list_arcs = []
-                        # Clear old list arcs only after successful query
-                        self.dlg_draw_profile.tbl_list_arc.clear()
-                        for arc in result['body']['data']['arc']:
-                            item_arc = QListWidgetItem(str(arc['arc_id']))
-                            self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
-                            list_arcs.append(arc['arc_id'])
-
-                        expr_filter = "\"arc_id\" IN ("
-                        for arc in result['body']['data']['arc']:
-                            expr_filter += f"'{arc['arc_id']}', "
-                        expr_filter = expr_filter[:-2] + ")"
-                        expr = QgsExpression(expr_filter)
-                        # Get a featureIterator from this expression:
-                        it = self.layer_arc.getFeatures(QgsFeatureRequest(expr))
-
-                        self.id_list = [i.id() for i in it]
-                        self.layer_arc.selectByIds(self.id_list)
-
-                        self.action_add_point.setDisabled(False)
-
-                    # Next profile will be done from scratch
-                    self.first_node = True
+                else:
                     if self.add_points:
-                        self.add_points = False
+                        self.add_points_list.append(element_id)
+                        result = self._execute_profile_query()
+                        if result is None:
+                            self.add_points_list.pop()
+                            return
+                        updated = self._update_profile_ui(result, roll_back_on_error=True)
+                        # Turn off snapping until user clicks add point again (reactivates picking)
+                        if updated:
+                            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                            tools_gw.disconnect_signal('profile')
+                        # Stay in add_points mode so the user can keep adding mid-features
+                    else:
+                        self.endNode = element_id
+                        tools_qgis.show_info("Node 2 selected", parameter=self.element_id)
+                        # Defer DB + UI so messageBar paints (Qt handles paint after this event returns)
+                        QTimer.singleShot(50, self._on_node2_selected_continue)
+
+    def _on_node2_selected_continue(self):
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('profile')
+        self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
+        self.dlg_draw_profile.btn_save_profile.setEnabled(True)
+
+        result = self._execute_profile_query()
+        if result is None:
+            return
+        self._update_profile_ui(result, roll_back_on_error=False)
+        self.action_add_point.setDisabled(False)
+
+        # Next profile will be done from scratch
+        self.first_node = True
+
+    def _execute_profile_query(self):
+        """ Build extras and call gw_fct_getprofilevalues. Returns the result dict or None on failure. """
+        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
+        if links_distance in ("", "None", None):
+            links_distance = 1
+        extras = (f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", '
+                  f'"linksDistance":{links_distance}, "scale":{{"eh":1000, "ev":1000}}')
+        if self.add_points_list:
+            points_list = str(self.add_points_list).replace("'", "")
+            extras += f', "midFeatures":{points_list}'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
+        if result is None or result['status'] == 'Failed':
+            return None
+        return result
+
+    def _update_profile_ui(self, result, roll_back_on_error=False):
+        """ Populate tbl_list_arc and highlight arcs from a gw_fct_getprofilevalues result. """
+        if result['message']:
+            level = int(result['message']['level'])
+            msg = result['message']['text']
+            tools_qgis.show_message(msg, Qgis.MessageLevel(level))
+            if result['message']['level'] != 3:
+                if roll_back_on_error and self.add_points_list:
+                    self.add_points_list.pop()
+                return False
+
+        self._remove_selection()
+        self.dlg_draw_profile.tbl_list_arc.clear()
+        for arc in result['body']['data']['arc']:
+            self.dlg_draw_profile.tbl_list_arc.addItem(QListWidgetItem(str(arc['arc_id'])))
+
+        arc_ids = [arc['arc_id'] for arc in result['body']['data']['arc']]
+        if arc_ids:
+            expr_filter = '"arc_id" IN (' + ', '.join(f"'{a}'" for a in arc_ids) + ')'
+            it = self.layer_arc.getFeatures(QgsFeatureRequest(QgsExpression(expr_filter)))
+            self.id_list = [i.id() for i in it]
+            self.layer_arc.selectByIds(self.id_list)
+        return True
 
     def _action_pan(self):
         if self.first_node:

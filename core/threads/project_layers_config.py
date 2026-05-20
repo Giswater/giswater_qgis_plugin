@@ -60,7 +60,8 @@ class GwProjectLayersConfig(GwTask):
 
         # Add ValueRelation layers to TOC (HIDDEN group)
         for layer in self.vr_layers_to_add or []:
-            tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True)
+            gw_id = tools_qgis.get_layer_source_table_name(layer) or layer.name()
+            tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True, custom_properties={"gw_id": gw_id})
 
         # Hide hidden group
         root = QgsProject.instance().layerTreeRoot()

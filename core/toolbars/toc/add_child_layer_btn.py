@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt, lib_vars, tools_db
+from ....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwAddChildLayerButton(GwAction):
@@ -43,7 +43,10 @@ class GwAddChildLayerButton(GwAction):
         layer_list = []
 
         for layer in QgsProject.instance().mapLayers().values():
-            layer_list.append(tools_qgis.get_layer_source_table_name(layer))
+            if layer.customProperty("gw_id") is not None:
+                layer_list.append(layer.customProperty("gw_id"))
+            else:
+                layer_list.append(tools_qgis.get_layer_source_table_name(layer))
 
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure('gw_fct_getaddlayervalues', body)
@@ -58,6 +61,8 @@ class GwAddChildLayerButton(GwAction):
                 level_1, level_2, level_3 = tools_gw.get_context_menu_levels(field['context'])
                 if not level_1 or not level_2:
                     continue
+
+                provider_config = field['providerConfig'] if field.get('providerConfig', None) is not None else None
 
                 # Check if schema exists for am and cm
                 if level_1 == "AM" or level_1 == "CM":
@@ -125,15 +130,15 @@ class GwAddChildLayerButton(GwAction):
                     the_geom = field['geomField']
                 geom_field = field['tableId']
                 # If layer is configured but it doesn't exist in schema, ignore it
-                if not geom_field:
+                if geom_field is None and provider_config is None:
                     continue
-                geom_field = geom_field.replace(" ", "")
+                geom_field = geom_field.replace(" ", "") if geom_field is not None else None
                 group = level_1
                 sub_group = level_2
                 sub_sub_group = level_3
                 widgetAction.defaultWidget().stateChanged.connect(
                     partial(self._check_action_ischecked, layer_name, the_geom, geom_field, group, sub_group,
-                            sub_sub_group, alias.strip()))
+                            sub_sub_group, alias.strip(), provider_config=provider_config))
 
         main_menu.exec(click_point)
 
@@ -145,7 +150,8 @@ class GwAddChildLayerButton(GwAction):
                     child.defaultWidget().setChecked(True)
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
-                                sub_group=None, sub_sub_group=None, alias=None, state=None):
+                                sub_group=None, sub_sub_group=None, alias=None, state=None,
+                                provider_config=None):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -155,23 +161,23 @@ class GwAddChildLayerButton(GwAction):
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
 
-        style_id: str = "-1"
         if state == 2:
-            layer = tools_qgis.get_layer_by_tablename(tablename)
+            layer = tools_qgis.get_layer(custom_properties={"gw_id": tablename}, tablename=tablename)
             if layer is None:
-                if lib_vars.project_vars['current_style'] is not None:
-                    style_id = lib_vars.project_vars['current_style']
                 schema = None
                 if group == "AM" or group == "CM":
                     schema = "am" if group == "AM" else "cm"
-                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id=style_id, alias=alias, sub_sub_group=sub_sub_group, schema=schema)
+                if provider_config:
+                    tools_gw.add_layer_provider(tablename, provider_config, group, sub_group, alias=alias, sub_sub_group=sub_sub_group, schema=schema)
+                else:
+                    tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, alias=alias, sub_sub_group=sub_sub_group, schema=schema)
         elif state == 0:
-            layer = tools_qgis.get_layer_by_tablename(tablename)
+            layer = tools_qgis.get_layer(custom_properties={"gw_id": tablename}, tablename=tablename)
             if layer is not None:
                 msg = "Remove layer from project?"
                 title = "Warning"
                 answer = tools_qt.show_question(msg, title, parameter=f"'{layer.name()}'", force_action=True)
                 if answer:
-                    tools_qgis.remove_layer_from_toc(layer.name(), group, sub_group)
+                    tools_qgis.remove_layer(custom_properties={"gw_id": tablename}, tablename=tablename, group_name=group, sub_group=sub_group)
 
     # endregion

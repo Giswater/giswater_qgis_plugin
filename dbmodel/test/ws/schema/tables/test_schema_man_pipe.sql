@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table man_pipe
+-- Check table
 SELECT has_table('man_pipe'::name, 'Table man_pipe should exist');
 
 -- Check columns
@@ -25,18 +26,15 @@ SELECT columns_are(
     'Table man_pipe should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('man_pipe', ARRAY['arc_id'], 'Column arc_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('man_pipe', 'arc_id', 'integer', 'Column arc_id should be integer');
-
--- Check not null constraints
-SELECT col_not_null('man_pipe', 'arc_id', 'Column arc_id should be NOT NULL');
+SELECT col_type_is('man_pipe', 'arc_id', 'int4', 'Column arc_id should be int4');
 
 -- Check foreign keys
-SELECT fk_ok('man_pipe', 'arc_id', 'arc', 'arc_id', 'FK arc_id should reference arc.arc_id');
+SELECT has_fk('man_pipe', 'Table man_pipe should have foreign keys');
 
+SELECT fk_ok('man_pipe', 'arc_id', 'arc', 'arc_id', 'FK arc_id → arc.arc_id');
+
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

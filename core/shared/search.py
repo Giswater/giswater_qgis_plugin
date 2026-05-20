@@ -10,6 +10,7 @@ from qgis.core import QgsLocatorFilter, QgsLocatorResult, QgsPointXY
 
 from .info import GwInfo
 from .psector import GwPsector
+from .visit import GwVisit
 from .workcat import GwWorkcat
 from ..utils import tools_gw
 from ... import global_vars
@@ -131,6 +132,9 @@ class GwSearchLocatorFilter(QgsLocatorFilter):
         elif section == "basic_search_v2_tab_hydrometer" and table_name and feature_id is not None:
             custom_form = GwInfo(tab_type="data")
             custom_form.get_info_from_id(table_name, tab_type="data", feature_id=feature_id, is_add_schema=False)
+        elif section == "basic_search_v2_tab_visit" and feature_id is not None:
+            manage_visit = GwVisit()
+            manage_visit.get_visit(visit_id=int(feature_id), tag='info')
 
     def _parse_query(self, query, context):
         text = (query or "").strip()

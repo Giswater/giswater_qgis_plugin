@@ -1349,7 +1349,9 @@ AS SELECT om_mincut.id,
   WHERE om_mincut.id > 0;
 
 
+SELECT gw_fct_admin_manage_child_views($${"data":{"action":"MULTI-DELETE"}, "feature":{"parentLayer":"ve_link"}}$$);
 DROP VIEW IF EXISTS ve_link;
+
 CREATE OR REPLACE VIEW ve_link
 AS WITH typevalue AS (
          SELECT edit_typevalue.typevalue,

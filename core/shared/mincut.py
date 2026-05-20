@@ -75,12 +75,23 @@ class GwMincut:
         self.col2 = "hydrometer_customer_code"
         self.lbl1 = "Connec customer code:"
         self.lbl2 = "Hydrometer customer code:"
-        
+
         # Cursor management for setmincut function
         self.mincut_aux_conn = None
         self.mincut_cursor = None
         self.search_rubber_band = tools_gw.create_rubberband(self.canvas)
         self.geom_by_source = {"street": {}, "postnumber": {}}
+
+    def reset_mincut_canvas_snapping(self, action_pan=False):
+        """Disconnect mincut map-tool snapping and sync tools_gw signal registry.
+
+        disconnect_snapping() clears every xyCoordinates connection on the canvas; if
+        active_signals still lists mincut / mincut_offline, connect_signal() will skip
+        reconnecting and preview snapping never comes back.
+        """
+        tools_qgis.disconnect_snapping(action_pan, self.emit_point, self.vertex_marker)
+        tools_gw.disconnect_signal('mincut_offline')
+        tools_gw.disconnect_signal('mincut')
 
     def manage_mincuts(self, dialog):
         """ Button 12: Mincut management """
@@ -94,10 +105,10 @@ class GwMincut:
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
-        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_streetaxis.name AS street_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name,"
+               f" om_mincut.streetaxis_id AS street_name"
                f" FROM om_mincut"
                f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
-               f" LEFT JOIN v_streetaxis ON v_streetaxis.id = om_mincut.streetaxis_id"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -147,6 +158,8 @@ class GwMincut:
             tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, combo_clear=False)
 
         tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
+
+        self._sync_address_widgets_from_mincut(result_mincut_id)
 
         # Update table 'selector_mincut_result'
         self._update_result_selector(result_mincut_id)
@@ -347,9 +360,9 @@ class GwMincut:
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self._init_mincut_canvas()
-        tools_qgis.remove_layer_from_toc('Overlap affected arcs', 'GW Temporal Layers')
-        tools_qgis.remove_layer_from_toc('Other mincuts which overlaps', 'GW Temporal Layers')
-        tools_qgis.remove_layer_from_toc('Overlap affected connecs', 'GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": 'Overlap affected arcs'}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": 'Other mincuts which overlaps'}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": 'Overlap affected connecs'}, group_name='GW Temporal Layers')
 
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.btn_cancel_task.hide()
@@ -465,7 +478,7 @@ class GwMincut:
 
         # Fill ComboBox municipality
         sql = ("SELECT muni_id, name "
-               "FROM v_municipality " 
+               "FROM v_municipality "
                "WHERE active is True and muni_id > 0 "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
@@ -509,6 +522,8 @@ class GwMincut:
         # Get current time
         current_time = QTime.currentTime()
         self.dlg_mincut.cbx_recieved_time.setTime(current_time)
+        self.dlg_mincut.cbx_hours_start_predict.setTime(current_time)
+        self.dlg_mincut.cbx_hours_end_predict.setTime(current_time)
 
         # Enable/Disable widget depending state
         self._enable_widgets('0')
@@ -525,6 +540,7 @@ class GwMincut:
     def start_offline_mincut(self):
         """Start offline mincut snapping directly on arc layer."""
 
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.mincut_mode = 'offline'
         self.user_current_layer = self.iface.activeLayer()
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -670,10 +686,9 @@ class GwMincut:
             return
 
         sql = (
-            f"SELECT om.muni_id, om.postnumber, vs.name AS street_name "
-            f"FROM om_mincut om "
-            f"LEFT JOIN v_streetaxis vs ON vs.id = om.streetaxis_id "
-            f"WHERE om.id = '{result_mincut_id}'"
+            f"SELECT muni_id, postnumber, streetaxis_id AS street_name "
+            f"FROM om_mincut "
+            f"WHERE id = '{result_mincut_id}'"
         )
         row = tools_db.get_row(sql)
         if not row:
@@ -826,8 +841,7 @@ class GwMincut:
         tools_qgis.reset_rubber_band(self.search_rubber_band)
 
         # Disconnect snapping
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=True)
 
         # Delete from DB (including conflicts)
         mincut_conflict_state = 5
@@ -903,11 +917,10 @@ class GwMincut:
             # Close dialog, save dialog position, and disconnect snapping
             tools_gw.close_dialog(self.dlg_mincut)
 
-            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=True)
             self._remove_selection()
             tools_qgis.refresh_map_canvas()
-            
+
             # Close cursor and auxiliary connection
             self._close_mincut_cursor()
 
@@ -1002,6 +1015,7 @@ class GwMincut:
 
     def _set_real_location(self):
 
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.snapper_manager = GwSnapManager(self.iface)
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
@@ -1135,8 +1149,8 @@ class GwMincut:
         # Manage address
         if municipality != -1:
             sql += f", muni_id = '{municipality}'"
-        if street:
-            sql += f", streetaxis_id = '{street}'"
+        if street not in (None, "", "null"):
+            sql += f", streetaxis_id = $${street}$$"
         if postnumber:
             sql += f", postnumber = '{postnumber}'"
 
@@ -1177,8 +1191,7 @@ class GwMincut:
             tools_qgis.show_warning(message)
 
         # Close dialog and disconnect snapping
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=True)
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
@@ -1208,16 +1221,16 @@ class GwMincut:
 
     def _create_mincut_cursor(self):
         """ Create auxiliary connection and cursor for setmincut function """
-        
+
         try:
             # Close existing cursor and connection if they exist
             self._close_mincut_cursor()
-            
+
             # Create new auxiliary connection
             self.mincut_aux_conn = tools_db.dao.get_aux_conn()
             if not self.mincut_aux_conn:
                 return
-            
+
             # Get cursor from the connection
             self.mincut_cursor = tools_db.dao.get_cursor(self.mincut_aux_conn)
             if self.mincut_cursor and tools_db.dao.set_search_path:
@@ -1231,7 +1244,7 @@ class GwMincut:
 
     def _close_mincut_cursor(self):
         """ Close cursor and auxiliary connection for setmincut function """
-        
+
         try:
             if self.mincut_cursor:
                 self.mincut_cursor.close()
@@ -1246,11 +1259,11 @@ class GwMincut:
 
     def _execute_setmincut_with_cursor(self, body, commit=True):
         """ Execute gw_fct_setmincut function using the stored cursor """
-        
+
         if not self.mincut_cursor or not self.mincut_aux_conn:
             tools_log.log_warning("Mincut cursor not available, using regular execution")
             return tools_gw.execute_procedure('gw_fct_setmincut', body, commit=commit)
-        
+
         try:
             # Build SQL similar to execute_procedure
             schema_name = lib_vars.schema_name
@@ -1258,29 +1271,29 @@ class GwMincut:
                 sql = f"SELECT {schema_name}.gw_fct_setmincut("
             else:
                 sql = "SELECT gw_fct_setmincut("
-            
+
             if body:
                 sql += f"{body}"
             sql += ");"
-            
+
             # Log SQL if enabled (similar to execute_procedure)
             if sql:
                 tools_log.log_db(sql, bold='b', stack_level_increase=2)
-            
+
             # Execute using the stored cursor
             self.mincut_cursor.execute(sql)
             row = self.mincut_cursor.fetchone()
-            
+
             if commit:
                 self.mincut_aux_conn.commit()
-            
+
             if not row or not row[0]:
                 tools_log.log_warning("Function error: gw_fct_setmincut")
                 tools_log.log_warning(sql)
                 return None
 
             json_result = row[0]
-            
+
             # Log SQL if enabled
             if tools_gw.get_config_parser('log', 'log_sql', "user", "init", False) == "True":
                 tools_log.log_db(json_result, header="SERVER RESPONSE")
@@ -1288,22 +1301,22 @@ class GwMincut:
             if 'status' not in json_result:
                 tools_gw.manage_json_exception(json_result, sql, is_thread=False)
                 return False
-            
+
             # If failed, manage exception (but don't rollback - commit already happened)
             if json_result.get('status') == 'Failed':
                 tools_gw.manage_json_exception(json_result, sql, is_thread=False)
                 return json_result
-            
+
             # Manage geometry transformation if needed
             try:
                 if json_result.get("body", {}).get("feature", {}).get("geometry") and lib_vars.data_epsg != lib_vars.project_epsg:
                     json_result = tools_gw.manage_json_geometry(json_result)
             except Exception:
                 pass
-            
+
             tools_gw.manage_json_response(json_result, sql, None)
             return json_result
-            
+
         except Exception as e:
             msg = "Error executing setmincut with cursor: {0}"
             msg_params = (str(e),)
@@ -2074,11 +2087,11 @@ class GwMincut:
         """ B1-126: Automatic mincut analysis """
 
         if is_checked is False:
-            # Disconnect snapping and related signals
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             # Recover snapping options, refresh canvas & set visible layers
             return
+
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
         self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -2183,8 +2196,7 @@ class GwMincut:
 
         if btn == Qt.MouseButton.RightButton:
             self.action_mincut.setChecked(False)
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             return
 
         # Get coordinates
@@ -2222,8 +2234,7 @@ class GwMincut:
         """Offline mincut snapping on arc layer without opening the mincut dialog."""
 
         if btn == Qt.MouseButton.RightButton:
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut_offline')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             self._remove_selection()
             self._restore_active_layer_after_offline_mincut()
             self.iface.actionPan().trigger()
@@ -2250,8 +2261,7 @@ class GwMincut:
 
         self._offline_mincut_execute(element_id)
 
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut_offline')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self._remove_selection()
         self._restore_active_layer_after_offline_mincut()
         self.iface.actionPan().trigger()
@@ -2309,8 +2319,7 @@ class GwMincut:
         """ Cancel GwAutoMincutTask """
 
         self.action_mincut.setChecked(False)
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.mincut_task.cancel()
 
     # noinspection PyUnusedLocal
@@ -2333,8 +2342,7 @@ class GwMincut:
         # Snapping
         result = self.snapper_manager.snap_to_project_config_layers(event_point)
 
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.iface.actionPan().trigger()
 
         if not result.isValid():
@@ -2427,8 +2435,7 @@ class GwMincut:
             tools_qgis.refresh_map_canvas()
 
         # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.set_visible_mincut_layers()
         self._remove_selection()
         self.action_mincut.setChecked(False)
@@ -2528,8 +2535,7 @@ class GwMincut:
             tools_qgis.refresh_map_canvas()
 
         # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
         self.set_visible_mincut_layers()
         self._remove_selection()
 
@@ -2543,15 +2549,12 @@ class GwMincut:
         self.snapper = self.snapper_manager.get_snapper()
 
         if is_checked is False:
-            # Disconnect snapping and related signals
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             # Recover snapping options, refresh canvas & set visible layers
             return
 
         # Disconnect other snapping and signals in case wrong user clicks
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
         # Set vertex marker propierties
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -2583,8 +2586,7 @@ class GwMincut:
         if btn == Qt.MouseButton.RightButton:
             self.action_custom_mincut.setChecked(False)
             self.action_change_valve_status.setChecked(False)
-            tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=True)
             global_vars.iface.actionPan().trigger()
             return
 
@@ -2632,8 +2634,7 @@ class GwMincut:
                 tools_qgis.show_message(msg, level)
 
         # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        tools_gw.disconnect_signal('mincut')
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
     def _remove_selection(self):
         """ Remove selected features of all layers """
@@ -2753,7 +2754,7 @@ class GwMincut:
             comp_view.setName(str(self.template))
             layout_manager = project.layoutManager()
             layout_manager.addLayout(comp_view)
-            
+
             # Get layout from manager to ensure correct ownership
             comp_view = layout_manager.layoutByName(str(self.template))
             if comp_view is None:
@@ -2801,7 +2802,7 @@ class GwMincut:
         else:
             missing_items.append("Mapa")
             tools_log.log_warning("Map item 'Mapa' not found in template. Template may be empty or use different item IDs.")
-        
+
         profile_title = layout.itemById('title')
         if profile_title is not None:
             profile_title.setText(str(title))
@@ -2957,11 +2958,11 @@ class GwMincut:
         """ Change status of selected valve. Execute function gw_fct_setchangevalvestatus """
 
         if is_checked is False:
-            # Disconnect snapping and related signals
-            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-            tools_gw.disconnect_signal('mincut')
+            self.reset_mincut_canvas_snapping(action_pan=False)
             # Recover snapping options, refresh canvas & set visible layers
             return
+
+        self.reset_mincut_canvas_snapping(action_pan=False)
 
         # Declare snapper_manager and emit_point
         self.emit_point = QgsMapToolEmitPoint(self.canvas)

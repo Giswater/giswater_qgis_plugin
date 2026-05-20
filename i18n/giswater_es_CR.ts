@@ -2775,7 +2775,7 @@
 		</message>
 		<message>
 			<source>Generating result stats</source>
-			<translation>Generando de estadísticas del resultado</translation>
+			<translation>Generando estadísticas del resultado</translation>
 		</message>
 		<message>
 			<source>Generation of atlas uses v_edit_plan_psector as coverage layer ordered by atlas_id column. Please update the atlas&apos; coverage layer before continuing.</source>
@@ -5298,11 +5298,15 @@
 			<translation>El campo &apos;Ruta&apos; es obligatorio para importar datos INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
-Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
+
+Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero.\ N
+
 Por otro lado, debe saber que la tabla de trazabilidad almacenará información precedente.</translation>
 		</message>
 		<message>
@@ -21257,7 +21261,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>Seleccione las características del lienzo</translation>
+			<translation>Seleccione las entidades del lienzo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
@@ -21313,7 +21317,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>grb_selection</source>
-			<translation>Selección de características</translation>
+			<translation>Selección de entidades</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_selection</source>

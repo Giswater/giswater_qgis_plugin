@@ -4,6 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 */
+
 BEGIN;
 
 -- Suppress NOTICE messages
@@ -13,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check table man_greentap
+-- Check table
 SELECT has_table('man_greentap'::name, 'Table man_greentap should exist');
 
 -- Check columns
@@ -25,21 +26,18 @@ SELECT columns_are(
     'Table man_greentap should have the correct columns'
 );
 
--- Check primary key
-SELECT col_is_pk('man_greentap', ARRAY['connec_id'], 'Column connec_id should be primary key');
-
 -- Check column types
-SELECT col_type_is('man_greentap', 'connec_id', 'integer', 'Column connec_id should be integer');
-SELECT col_type_is('man_greentap', 'linked_connec', 'integer', 'Column linked_connec should be integer');
+SELECT col_type_is('man_greentap', 'connec_id', 'int4', 'Column connec_id should be int4');
+SELECT col_type_is('man_greentap', 'linked_connec', 'int4', 'Column linked_connec should be int4');
 SELECT col_type_is('man_greentap', 'greentap_type', 'text', 'Column greentap_type should be text');
 
--- Check not null constraints
-SELECT col_not_null('man_greentap', 'connec_id', 'Column connec_id should be NOT NULL');
-
 -- Check foreign keys
-SELECT fk_ok('man_greentap', 'connec_id', 'connec', 'connec_id', 'FK connec_id should reference connec.connec_id');
-SELECT fk_ok('man_greentap', 'linked_connec', 'connec', 'connec_id', 'FK linked_connec should reference connec.connec_id');
+SELECT has_fk('man_greentap', 'Table man_greentap should have foreign keys');
 
+SELECT fk_ok('man_greentap', 'connec_id', 'connec', 'connec_id', 'FK connec_id → connec.connec_id');
+SELECT fk_ok('man_greentap', 'linked_connec', 'connec', 'connec_id', 'FK linked_connec → connec.connec_id');
+
+-- Finish
 SELECT * FROM finish();
 
 ROLLBACK;

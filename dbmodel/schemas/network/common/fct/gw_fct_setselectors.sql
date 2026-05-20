@@ -156,11 +156,11 @@ BEGIN
 	SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
 	UNION
 	SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0)
-	WHERE expl_id is not null;
+	WHERE expl_id IS NOT NULL;
 	
 	IF v_expl_x_user is false THEN
-		INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-		SELECT expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active 
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+		SELECT expl_id, code, name, descript, macroexpl_id, active 
 		FROM exploitation 
 		WHERE active 
 		AND expl_id > 0 
@@ -177,7 +177,7 @@ BEGIN
 		SELECT sector_id, code, name, descript, expl_id, muni_id, macrosector_id, parent_id, active 
 		FROM sector 
 		WHERE active 
-		AND sector_id >= 0 
+		AND sector_id > 0 
 		ORDER BY sector_id;
 
 		INSERT INTO temp_macrosector (macrosector_id, code, name, descript, expl_id, muni_id, active)
@@ -209,8 +209,8 @@ BEGIN
 		END IF;
 	ELSE	
 		-- populate temp_exploitation with the cat_manager configuration
-		INSERT INTO temp_exploitation (expl_id, code, name, descript, sector_id, muni_id, macroexpl_id, active)
-		SELECT e.expl_id, e.code, e.name, e.descript, e.sector_id, e.muni_id, e.macroexpl_id, e.active
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+		SELECT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
 		FROM exploitation e WHERE e.active AND e.expl_id > 0
 		AND EXISTS (SELECT 1 FROM cat_manager cm
 		WHERE e.expl_id = ANY (cm.expl_id)
@@ -526,6 +526,7 @@ BEGIN
 			FROM temp_muni_sector_expl
 			JOIN selector_sector USING (sector_id)
  		    WHERE cur_user = current_user
+			AND selector_sector.sector_id > 0
 			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 			-- muni
@@ -535,6 +536,7 @@ BEGIN
 			FROM temp_muni_sector_expl
 			JOIN selector_sector USING (sector_id)
  		    WHERE cur_user = current_user
+			AND selector_sector.sector_id > 0
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
@@ -634,7 +636,7 @@ BEGIN
 		DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
 		-- sector
-		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id >= 0;
+		DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 		IF v_sector_is_expl_is_muni THEN			
 			INSERT INTO selector_sector SELECT expl_id, current_user FROM SCHEMA_NAME.selector_expl WHERE cur_user = current_user AND expl_id 
 			IN (SELECT sector_id FROM sector WHERE active);
@@ -706,7 +708,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id >= 0;
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
@@ -772,7 +774,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 	
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id >= 0;
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
@@ -841,6 +843,7 @@ BEGIN
 	-- force 0 
 	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
 	INSERT INTO selector_expl VALUES (0, current_user) ON CONFLICT (expl_id, cur_user) DO NOTHING;
+	INSERT INTO selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 	-- warn the user that in the selected psectors, there is a connec connected to different arcs
 	WITH mec AS (

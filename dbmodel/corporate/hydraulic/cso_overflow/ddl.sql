@@ -144,6 +144,15 @@ CREATE TABLE cso_inp_wwtp (
 	CONSTRAINT cso_inp_wwtp_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE cso_rpt_object (
+	featurecat_id text NOT NULL,
+	column_id text NOT NULL,
+	parameter_id text NULL,
+	active bool NULL DEFAULT true,
+	CONSTRAINT cso_rpt_object_pkey PRIMARY KEY (featurecat_id, column_id),
+	CONSTRAINT featurecat_id_fkey FOREIGN KEY (featurecat_id) REFERENCES cat_feature(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 
 -- ANCHOR Foreign keys
 ALTER TABLE cso_calibration ADD CONSTRAINT cso_calibration_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;

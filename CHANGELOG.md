@@ -7,38 +7,129 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+### Removed
 
-- This changelog file
-- New dscenario pattern and pattern value tables
-- New typevalue for dscenario type: CALIBRATION
-- New indexes on `anl_*` tables.
-- New tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
-- New trigger `gw_trg_update_element_mapzones` to update the mapzone columns for the element.
+- `sector_id` and `muni_id` from `exploitation` table.
+- `psector_status` typevalue `4` (EXECUTED).
 
 ### Fixed
 
-- `gw_trg_arc_node_values` trigger on ws schemas.
-- `gw_fct_graphanalytics_macromapzones` streamline temporary table management.
-- `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
-- `gw_fct_graphanalytics_mapzones_v1` function.
-- Performance of dscenario views for ws and ud 
-- Moved `id` column from `inp_dscenario_demand` table to first position.
-- `gw_trg_gully_proximity`, `gw_trg_connec_proximity` triggers to use `ve_gully` and `ve_connec` tables instead of `gully` and `connec` tables.
-- `gw_fct_getfeatureupsert` function to use `ve_node`, `ve_connec` and `ve_gully` tables instead of `node`, `connec` and `gully` tables.
-- Recreated `ve_connec` and `ve_gully` views.
-- Improved `inp_family` table and `result_families` function.
-- `gw_fct_setfeaturereplaceplan` function.
-- `ud_gw_trg_topocontrol_node` trigger.
-- `ud_gw_trg_topocontrol_arc` trigger.
-- `gw_fct_psector_merge` function.
-- `ud_pg2epa` now export undefined nodes connected to not undefined arcs.
+- `gw_trg_edit_psector` trigger to set obsolete features where psector_x_* state is 0 before setting on service features.
+- `gw_fct_graphanalytics_mapzones_v1` check if there are any nodes/arcs in the graphconfig that are not in the operative network (only for connected networks).
+- `config_form_fields` `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
+- `visit` insert correctly the records on `om_visit_x_*` tables.
+- correct signal for rejected visit dialog.
+- recreate the triggers for the mapzones when the utility scheme is activated.
+- fix visit dialog to show the correct features when the dialog is accepted.
+- fix update of omunit and macroomunit geometry type to multipolygon.
+
+## [4.10.0] - 2026-05-18
+
+### Added
+
+- stable `gw_id` custom map layer property when adding layers to the TOC so lookup and removal do not rely on the layer display name alone.
+- `add_layer_provider` with URI builders (WMS, WFS, OAPIF, XYZ, GeoJSON) for loading non-PostGIS layers from `providerConfig`.
+- `gw_fct_getaddlayervalues`: return `providerConfig` from `sys_table` for add-layer value lists.
+- Add `basic_search_v2_tab_visit` in config_param_system for web and desktop search
+
+### Changed
+
+- child-layer menu, temporal and snapshot layers, mincut/psector overlap layers, EPA dscenario/netscenario removal, Go2Iber imports, ValueRelation layers in HIDDEN, and backend query layers updated for the new TOC APIs.
+- Profile algorithm: now accept mid features (arcs) in addition to nodes.
+
+## [4.9.1] - 2026-05-18
+
+### Fixed
+
+- Fix functions and triggers to use `v_raster_dem` instead of `ext_raster_dem`.
+- Fix mincut offline result layer names and styles.
+- Align mincut plan address fields in `config_form_fields` (`muni_id`, `streetaxis_id`, `postnumber` on `lyt_plan_address`).
+- Update mincut default JSON in `config_param_system` add `forecast_start/end`.
+- Set default list sorting for `tbl_mincut_manager` in `config_form_list` (device 5).
+- Fix mincut snapping and related signals on mincut buttons.
+
+## [4.9.0] - 2026-05-14
+
+### Added
+
+- New dscenario pattern and pattern value tables (`inp_dscenario_pattern`, `inp_dscenario_pattern_value`).
+- New typevalue for dscenario type: CALIBRATION.
+- New visibility tables `node_x_sector_visibility`, `node_x_municipality_visibility`, `element_x_sector_visibility`, `element_x_municipality_visibility`.
+- New trigger `gw_trg_update_element_mapzones` to update mapzone columns on `element`.
+- `has_treatment` column on UD `node`, `connec`, and `gully` tables, related triggers, and `ve_node`, `ve_connec`, and `ve_gully` views.
+- `drainzone_outfall` calculation and updates to `dwfzone_outfall` in graph analytics mapzones.
+- `v_recalculate_macromapzones` parameter and related macro mapzone logic in `gw_fct_graphanalytics_mapzones`.
+- Temporary table and view for element management inside graph analytics.
+- Drainzone handling in graph analytics extended so `addfields` / `addparam.drainzone` receive aggregated results where applicable.
+- `provider_config` column on `sys_table` plus related catalogue checks.
+- View `v_type_street` and updated `config_form_fields` references for street types.
+- CSO overflow mapping table for storm overflow workflows.
+
+### Changed
+
+- Config toolbox: SQL input parameters for graph class and exploitation options.
+- `sys_style`: improved line symbology for fluid types.
+- Municipality assignment for nodes when several municipalities lie nearby (selection logic refined).
+- Upstream/downstream analysis: traverse network regardless of `is_operative` on elements.
+- `fct_cm_check_progress`: exposes percentage of executed nodes per campaign.
+- Network mincut: streamlined SQL queries and address autofill usable from web and desktop.
+- Multiple SQL functions: `sector_id` conditions normalized for clearer integrity rules.
+- i18n: labels, tooltips, and descriptions (graph tools, exploitation, and general wording).
+- Optional dependencies resolved via `tools_os.get_dep` instead of bare imports.
+
+### Fixed
+
+- `inp_dscenario_demand`: move `id` column to first position for stable column ordering.
+- Composer: logo image path resolution.
+- `gw_fct_graphanalytics_mapzones_v1`: drainzone insert/update; correct `expl_id[]`, `muni_id[]`, `sector_id[]` arrays for mapzones; ignore `sector_id = 0` when aggregating sectors; create `temp_pgr_mapzone_graph` only when running graphanalytics mapzones.
+- Graph analytics visibility: WS/UD compatibility for `node_x_sector_visibility`-related flows.
+- `gw_fct_getfeatureupsert`: default value handling for filter combo widgets when updating features in Info.
+- `gw_fct_cm_setcheckproject`: GeoJSON payload handling for check results.
+- `gw_fct_cm_check_data_context`: expanded checks and clearer error texts; QC output limited to rows with `status = 1` and `action <> 3`.
+- `gw_fct_pg2epa_check_network`: `sector_id` and `dma_id` behaviour on disconnected networks.
+- `gw_fct_pg2epa_export` WS dscenario path: tank parameters updated correctly on inlet links.
+- `gw_fct_getsearch`: optional JSON key to target a specific layer in the search call.
+- `gw_fct_setelevfromdem`: propagate detailed errors back to the client on failure.
+- `om_check_data`: use catalogued `t_tables` instead of ad hoc target tables.
+- Asset Manager: insert into `sys_version` uses schema SRID (`SCHEMA_SRID`) for EPSG.
+- `gw_fct_getprofilevalues`: cast JSON `descript` through text for stable typing.
+- Lot/campaign selectors: `ON CONFLICT` handling for campaign/lot selectors to avoid duplicate key failures.
+- `inp_subcatchment`: enforce foreign keys referencing municipality where defined in utils/tablect DDL.
+- `temp_anl_arc` / `temp_anl_node`: drop redundant duplicate index DDL where the index already existed.
+
+## [4.8.4] - 2026-05-07
+
+### Fixed
+
+- Improve composer warning handling and correct coverage.
+- Fix ve_plan_psector and v_plan_psector references.
+- Fix hardcoded logo.png path.
+- Improve psector manager performance.
+- Fix psector other_prices tab bug with ',' and '.' as decimal separator.
+- Fix problem with psector pca calculation.
+- Fix dscenario manager to check columns from views instead of tables.
+
+### Changed
+
+- Performance profiling in get_psector method when open existing one.
 - References from `ve_plan_psector` to `v_plan_psector` in `sys_table` and `sys_style` tables.
-- Logo image path in composer.
 
 ### Removed
 
-- Losses dscenario.
+- Deprecated code on psector manager to improve performance.
+- Hide pump additional tab in dscenario manager.
+
+## [4.8.3] - 2026-05-05
+
+### Fixed
+
+- Fix `config_param_system` update epa_automatic_man2graph_values value
+
+## [4.8.2] - 2026-04-20
+
+### Changed
+
+- Removed dependency on chardet.
 
 ## [4.8.1] - 2026-04-07
 
@@ -53,7 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `gw_fct_graphanalytics_macromapzones` streamline temporary table management.
 - `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.
 - `gw_fct_graphanalytics_mapzones_v1` function.
-- Performance of dscenario views for ws and ud 
+- Performance of dscenario views for ws and ud
 - `gw_trg_gully_proximity`, `gw_trg_connec_proximity` triggers to use `ve_gully` and `ve_connec` tables instead of `gully` and `connec` tables.
 - `gw_fct_getfeatureupsert` function to use `ve_node`, `ve_connec` and `ve_gully` tables instead of `node`, `connec` and `gully` tables.
 - Recreated `ve_connec` and `ve_gully` views.
@@ -201,14 +292,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.1...main
-[4.8.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.8.0...v4.8.1
-[4.8.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.7.1...v4.8.0
-[4.7.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.7.0...v4.7.1
-[4.7.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.6.0...v4.7.0
-[4.6.0]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.4...v4.6.0
-[4.5.4]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.3...v4.5.4
-[4.5.3]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.2...v4.5.3
-[4.5.2]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.1...v4.5.2
-[4.5.1]: https://github.com/giswater/giswater_qgis_plugin/compare/v4.5.0...v4.5.1
-[4.5.0]: https://github.com/giswater/giswater_qgis_plugin/releases/tag/v4.5.0
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...main
+[4.10.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...v4.10.0
+[4.9.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...v4.9.1
+[4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0
+[4.8.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.3...v4.8.4
+[4.8.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.2...v4.8.3
+[4.8.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.1...v4.8.2
+[4.8.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.0...v4.8.1
+[4.8.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.7.1...v4.8.0
+[4.7.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.7.0...v4.7.1
+[4.7.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.6.0...v4.7.0
+[4.6.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.4...v4.6.0
+[4.5.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.3...v4.5.4
+[4.5.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.2...v4.5.3
+[4.5.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.1...v4.5.2
+[4.5.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.0...v4.5.1
+[4.5.0]: https://github.com/Giswater/giswater_qgis_plugin/releases/tag/v4.5.0

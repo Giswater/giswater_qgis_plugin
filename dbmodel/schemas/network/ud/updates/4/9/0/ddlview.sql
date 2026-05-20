@@ -274,6 +274,7 @@ AS WITH typevalue AS (
     vf.p_state,
     n.uuid,
     n.treatment_type,
+    n.has_treatment,
     sva.sector_visibility,
     mva.muni_visibility
   FROM node n
@@ -633,7 +634,8 @@ AS WITH typevalue AS (
     vf.p_state,
     c.uuid,
     c.treatment_type,
-    c.xyz_date
+    c.xyz_date,
+    c.has_treatment
   FROM connec c
   JOIN vf_connec vf on vf.connec_id = c.connec_id
   JOIN cat_connec ON cat_connec.id::text = c.conneccat_id::text
@@ -832,7 +834,8 @@ AS WITH typevalue AS (
     vf.p_state,
     gully.uuid,
     gully.treatment_type,
-    gully.xyz_date
+    gully.xyz_date,
+    gully.has_treatment
   FROM gully
   JOIN vf_gully vf ON vf.gully_id = gully.gully_id
   JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text

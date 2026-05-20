@@ -1357,9 +1357,9 @@ class GwPsector:
 
         tools_qt.set_widget_enabled(self.dlg_infolog, 'btn_repair', False)
         # Remove temporal layers
-        tools_qgis.remove_layer_from_toc("line", "GW Temporal Layers")
-        tools_qgis.remove_layer_from_toc("point", "GW Temporal Layers")
-        tools_qgis.remove_layer_from_toc("polygon", "GW Temporal Layers")
+        tools_qgis.remove_layer(custom_properties={"gw_id": "line"}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": "point"}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": "polygon"}, group_name='GW Temporal Layers')
         tools_qgis.clean_layer_group_from_toc("GW Temporal Layers")
 
         # Refresh canvas
@@ -2288,7 +2288,7 @@ class GwPsector:
     def _load_layer_to_project(self, tablename, geom_field, field_id):
         """Loads a specified database layer yo load ve_plan_psector."""
 
-        tools_gw.add_layer_database(tablename=tablename, the_geom=geom_field, field_id=field_id, style_id=None)
+        tools_gw.add_layer_database(tablename=tablename, the_geom=geom_field, field_id=field_id)
 
     def _activate_layer(self, layer):
         """Makes the layer and its parent groups visible and sets it as active."""
@@ -2750,7 +2750,7 @@ class GwPsector:
 
     def _manage_tab_feature_buttons(self):
         """ Update rel_feature_type when tab changes to ensure buttons work on all tabs """
-        
+
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
         tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
                     'tab_elem': 'element', 'tab_link': 'link'}

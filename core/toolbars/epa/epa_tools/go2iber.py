@@ -254,7 +254,7 @@ class Go2Iber:
                     tools_qgis.show_warning(msg)
                 else:
                     layer.loadNamedStyle(qml_path)
-                tools_qgis.add_layer_to_toc(layer, group=f'IBERGIS - {os.path.basename(file_path)}', sub_group=group_name, create_groups=True)
+                tools_qgis.add_layer_to_toc(layer, group=f'IBERGIS - {os.path.basename(file_path)}', sub_group=group_name, create_groups=True, custom_properties={"gw_id": layer_name})
 
         # Save project path
         relative_path = os.path.relpath(file_path, QgsProject.instance().absolutePath())

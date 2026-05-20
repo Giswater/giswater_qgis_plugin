@@ -563,18 +563,96 @@ BEGIN
 
 	END IF; -- FINISH DSENARIO INFLOWS
 
-/*
 	-- update inventory fields with the results
 	FOR rec in select * from cso_rpt_object -- table of mapping between algorithm and inventory addfields
 	LOOP
 		 EXECUTE '
 		 UPDATE man_node_'||lower(rec.featurecat_id)||' t SET '||rec.column_id||' = a.'||rec.parameter_id||' FROM (
-		 	SELECT a.outfall_id, a.efficiency, b.qmax FROM v_cso_drainzone a
+		 	SELECT a.outfall_id, a.efficiency, b.qmax, b.vmax as vret FROM v_cso_drainzone a
 			LEFT JOIN cso_inp_weir b ON a.outfall_id = b.node_id
 		 )a WHERE t.node_id = a.outfall_id';
 	
 	END LOOP;
-*/
+
+	-- UPDATE addparam.drainzone with the calculated data
+
+	-- areatotal (total_area.v_cso_drainzone)
+	UPDATE drainzone t SET addparam = a.new_addparam FROM (
+		WITH mec AS (
+			SELECT drainzone_id, round(thyssen_plv_area, 2) AS thyssen_plv_area, addparam FROM ud.cso_inp_system_subc ciss JOIN drainzone USING (drainzone_id)
+		)
+		SELECT drainzone_id,
+		jsonb_set(COALESCE(addparam, '{}')::jsonb, '{areaTotal}', to_jsonb(thyssen_plv_area), TRUE) AS new_addparam
+		FROM mec
+	)a WHERE t.drainzone_id = a.drainzone_id;
+
+	-- areaImperv (imperv_area.v_cso_drainzone)
+	UPDATE ud.drainzone t SET addparam = a.new_addparam FROM (
+		SELECT drainzone_id,
+		jsonb_set(COALESCE(addparam, '{}')::jsonb, '{areaImperv}', to_jsonb(round(imperv_area, 2)), true) AS new_addparam
+		FROM ud.drainzone
+		JOIN ud.cso_inp_system_subc USING (drainzone_id)
+	)a WHERE t.drainzone_id = a.drainzone_id;
+	
+	-- kmlength
+	UPDATE ud.drainzone t SET addparam = a.new_addparam FROM (
+			WITH mec AS (
+			SELECT drainzone_id, round(sum(st_length(arc.the_geom))::numeric, 2) AS sum_len
+			FROM ud.arc
+			WHERE drainzone_id IS NOT NULL AND state=1
+			GROUP BY drainzone_id
+		)
+		SELECT mec.drainzone_id, jsonb_set(COALESCE(addparam, '{}')::jsonb, '{kmLength}', to_jsonb(sum_len), TRUE) AS new_addparam FROM mec 
+		LEFT JOIN drainzone USING (drainzone_id)
+	)a WHERE t.drainzone_id = a.drainzone_id;
+	
+	-- connec number
+	UPDATE ud.drainzone t SET addparam = a.new_addparam FROM (
+		WITH mec AS (
+			SELECT drainzone_id, count(*) AS n_connec FROM ud.connec WHERE state=1 GROUP BY drainzone_id
+		)
+		SELECT mec.drainzone_id, 
+		jsonb_set(COALESCE(addparam, '{}')::jsonb, '{connecNumber}', to_jsonb(n_connec), TRUE) AS new_addparam
+		FROM mec
+		LEFT JOIN drainzone USING (drainzone_id)
+	)a WHERE t.drainzone_id = a.drainzone_id;
+	
+	
+	-- factor calibrado de escorrentía (calib_runoffc.v_cso_drainzone)
+	UPDATE drainzone t SET addparam = a.new_addparam FROM (
+		WITH mec AS (
+		SELECT drainzone_id, 
+		 CASE
+		    WHEN cc.calib_imperv_area IS NOT NULL THEN (cc.calib_imperv_area / cso.thyssen_plv_area)::numeric(12,3)
+		    ELSE cso.mean_coef_runoff::numeric(12,3)
+		END AS calib_runoffc,
+		addparam
+		FROM ud.cso_inp_system_subc cso
+		LEFT JOIN ud.cso_calibration cc USING (drainzone_id)
+		LEFT JOIN ud.drainzone USING (drainzone_id)
+		)
+		SELECT drainzone_id,
+		jsonb_set(COALESCE(addparam, '{}')::jsonb, '{calibrRunoff}', to_jsonb(calib_runoffc), TRUE) AS new_addparam
+		FROM mec
+	)a WHERE t.drainzone_id = a.drainzone_id;
+	
+	
+	-- caudal residual que llega a ese punto (dwf_pd80_percent.v_cso_drainzone)
+	UPDATE drainzone t SET addparam = a.new_addparam FROM (
+		WITH mec AS (
+			SELECT drainzone_id,
+				CASE
+		            WHEN sum(cov.vol_residual) > sum(cov.vol_runoff) THEN 100::numeric
+		            ELSE (sum(cov.vol_residual) / sum(cov.vol_runoff) * 100::numeric)::numeric
+		        END AS dwf_p80_percent
+		        FROM ud.cso_out_vol cov 
+				WHERE vol_residual IS NOT null
+				GROUP BY drainzone_id
+			)
+			SELECT mec.drainzone_id,
+		jsonb_set(COALESCE(addparam, '{}')::jsonb, '{dwfFlow}', to_jsonb(round(dwf_p80_percent, 2)), TRUE) AS new_addparam
+		FROM mec JOIN ud.drainzone USING (drainzone_id)
+	)a WHERE t.drainzone_id = a.drainzone_id;
 	
 	DELETE FROM audit_check_data WHERE fid = 990 AND cur_user = current_user;
 

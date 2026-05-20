@@ -717,8 +717,8 @@ BEGIN
 
 		-- Dem elevation
 		IF v_sys_raster_dem AND ve_insert_elevation_from_dem AND v_idname IN ('node_id', 'connec_id', 'gully_id') THEN
-			v_elevation = (SELECT ST_Value(rast,1, v_reduced_geometry, true) FROM ext_raster_dem WHERE id =
-			(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, v_reduced_geometry, 1) LIMIT 1) limit 1);
+			v_elevation = (SELECT ST_Value(rast,1, v_reduced_geometry, true) FROM v_raster_dem WHERE id =
+			(SELECT id FROM v_raster_dem WHERE st_dwithin (envelope, v_reduced_geometry, 1) LIMIT 1) limit 1);
 		END IF;
 
 		-- plot code from connecs
@@ -1131,6 +1131,23 @@ BEGIN
 							IF vdefault_querytext in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
 								field_value = vdefault_querytext;
 							END iF;
+						END IF;
+					END IF;
+				END IF;
+
+				-- Apply default also on UPDATE for filter combos (their value is not persisted)
+				IF COALESCE((aux_json->>'isfilter')::boolean, false) = TRUE
+				   AND (field_value IS NULL OR field_value = '') THEN
+					IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
+						IF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+							IF (aux_json->>'widgetcontrols')::json->>'vdefault_value'::text in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								field_value = (aux_json->>'widgetcontrols')::json->>'vdefault_value';
+							END IF;
+						ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+							EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext'::text INTO vdefault_querytext;
+							IF vdefault_querytext in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								field_value = vdefault_querytext;
+							END IF;
 						END IF;
 					END IF;
 				END IF;
