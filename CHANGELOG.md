@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - `sector_id` and `muni_id` from `exploitation` table.
+- `psector_status` typevalue `4` (EXECUTED).
 
 ### Fixed
 
