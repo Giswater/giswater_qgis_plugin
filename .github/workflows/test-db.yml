@@ -94,11 +94,6 @@ jobs:
         pg_version: [16, 17, 18]
         test_group: [schema, security, function, data, performance]
 
-    if: >-
-      github.event_name != 'workflow_dispatch' ||
-      github.event.inputs.tests == 'all' ||
-      github.event.inputs.tests == matrix.test_group
-
     env:
       PG_MAJOR: ${{ matrix.pg_version }}
       PG_PROVE_JOBS: "4"
@@ -111,24 +106,46 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # matrix.* is not allowed in job-level if: — filter here for workflow_dispatch
+      - name: Filter test group
+        id: filter
+        run: |
+          active=true
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            req="${{ github.event.inputs.tests }}"
+            if [[ "${req}" != "all" && "${req}" != "${{ matrix.test_group }}" ]]; then
+              active=false
+            fi
+          fi
+          echo "active=${active}" >> "${GITHUB_OUTPUT}"
+
+      - name: Skip test group (not requested)
+        if: steps.filter.outputs.active != 'true'
+        run: echo "Skipping ${{ matrix.test_group }} (workflow_dispatch tests=${{ github.event.inputs.tests }})"
+
       - name: Show matrix
+        if: steps.filter.outputs.active == 'true'
         run: echo "pgTAP ${{ matrix.test_group }} — ${{ matrix.project }} PostgreSQL ${{ matrix.pg_version }}"
 
       - name: Download schema dump
+        if: steps.filter.outputs.active == 'true'
         uses: actions/download-artifact@v4
         with:
           name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
           path: dbmodel
 
       - name: Build Docker images
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml build --quiet postgres runner
 
       - name: Start Postgres
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml up -d postgres --wait
 
       - name: Restore schema from dump
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: |
           chmod +x test/*.sh
@@ -136,13 +153,14 @@ jobs:
             bash /workspace/dbmodel/test/restore_inner.sh ${{ matrix.project }}
 
       - name: Run pgTAP (${{ matrix.test_group }})
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: |
           docker compose -f docker-compose.test.yml run --rm -T runner \
             bash /workspace/dbmodel/test/prove_inner.sh ${{ matrix.project }}
 
       - name: Stop Postgres
-        if: always()
+        if: always() && steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml down
 
