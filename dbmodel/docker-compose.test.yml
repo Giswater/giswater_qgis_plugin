@@ -30,7 +30,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ..:/workspace
+      # :z relabels for SELinux (podman on Fedora); harmless on Docker without SELinux
+      - ..:/workspace:z
     working_dir: /workspace/dbmodel
     environment:
       PYTHONPATH: /workspace

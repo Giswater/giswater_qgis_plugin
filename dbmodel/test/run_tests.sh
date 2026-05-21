@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Host orchestrator: Postgres in Docker, bootstrap + pg_prove in runner (no host port).
+# Host orchestrator: Postgres in Docker/Podman, bootstrap + pg_prove in runner (no host port).
 # Usage: ./test/run_tests.sh ws|ud
+#   GW_COMPOSE=podman|docker  force backend (default: docker, or podman if docker is a podman alias)
 #   PG_MAJOR=16|17|18
 #   TEST_GROUPS=all|schema|security|function|data|performance
 #   PG_PROVE_JOBS=4
@@ -40,19 +41,51 @@ fi
 
 chmod +x "${SCRIPT_DIR}"/*.sh
 
-echo "==> PostgreSQL ${PG_MAJOR} (PostGIS ${POSTGIS_VERSION}) project ${PROJECT}"
-docker compose -f docker-compose.test.yml build --quiet postgres runner
+if [[ "${GW_COMPOSE:-}" == podman ]]; then
+  COMPOSE=(podman compose)
+elif [[ "${GW_COMPOSE:-}" == docker ]]; then
+  COMPOSE=(docker compose)
+elif command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1 \
+    && ! docker version 2>/dev/null | grep -q 'Podman Engine'; then
+  COMPOSE=(docker compose)
+elif command -v podman >/dev/null 2>&1 && podman compose version >/dev/null 2>&1; then
+  COMPOSE=(podman compose)
+else
+  echo "ERROR: need docker compose or podman compose" >&2
+  exit 1
+fi
 
-docker compose -f docker-compose.test.yml up -d postgres --wait
+compose() { "${COMPOSE[@]}" -f docker-compose.test.yml "$@"; }
+
+echo "==> PostgreSQL ${PG_MAJOR} (PostGIS ${POSTGIS_VERSION}) project ${PROJECT} (${COMPOSE[*]})"
+compose build postgres runner
+
+echo "==> starting postgres..."
+if compose up --help 2>&1 | grep -qE '(^|[[:space:]])--wait([[:space:],]|$)'; then
+  compose up -d postgres --wait
+else
+  compose up -d postgres
+  for i in $(seq 1 120); do
+    compose ps 2>/dev/null | grep -qE '\(healthy\)' && break
+    if [[ "${i}" -eq 120 ]]; then
+      echo "ERROR: postgres not healthy after 120s" >&2
+      compose ps >&2 || true
+      exit 1
+    fi
+    sleep 1
+  done
+fi
+echo "==> postgres ready"
 
 EXIT_CODE=0
-docker compose -f docker-compose.test.yml run --rm -T runner \
+compose run --rm -T runner \
   bash /workspace/dbmodel/test/run_tests_inner.sh "${PROJECT}" || EXIT_CODE=$?
 
+# runner is ephemeral (compose run --rm); stop postgres only (avoids podman-compose runner errors)
 if [[ -n "${GW_CLEAN:-}" ]]; then
-  docker compose -f docker-compose.test.yml down -v
+  compose rm -sfv postgres >/dev/null 2>&1 || true
 else
-  docker compose -f docker-compose.test.yml down
+  compose stop postgres >/dev/null 2>&1 || true
 fi
 
 exit "${EXIT_CODE}"
