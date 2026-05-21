@@ -53,7 +53,6 @@ def run(args: argparse.Namespace, out: Out) -> int:
         profile="update",
         db_user=_safe_user(args),
         sql_root=args.dbmodel_path,
-        profile_lastprocess=getattr(args, "profile_lastprocess", False),
     )
 
     if args.check:

@@ -64,24 +64,12 @@ v_newcolumn text;
 v_query json;
 v_sys_feature_class text;
 v_parent text;
-v_profile_timing boolean;
-v_prof_started timestamptz;
-v_prof_step timestamptz;
-v_profile_steps jsonb := '[]'::jsonb;
-v_step_ms bigint;
-v_view_result json;
-v_iter_start timestamptz;
 
 
 BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
-
-	v_profile_timing := lower(coalesce((p_data -> 'data')::json->>'profileTiming', 'false'))
-		IN ('true', '1', 't', 'yes');
-	v_prof_started := clock_timestamp();
-	v_prof_step := v_prof_started;
 
 	-- get project type
  	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'inp_storage') IS NOT NULL THEN
@@ -203,16 +191,7 @@ BEGIN
 
 		v_querytext = 'SELECT cat_feature.* FROM cat_feature ORDER BY id';
 
-		IF v_profile_timing THEN
-			v_step_ms := 0;
-			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-				'step', 'multi_create_start', 'ms', v_step_ms));
-			v_prof_step := clock_timestamp();
-		END IF;
-
 		FOR rec IN EXECUTE v_querytext LOOP
-
-			v_iter_start := clock_timestamp();
 
 			--get the system type and feature_class of the feature and view name
 			v_feature_type = lower(rec.feature_type);
@@ -238,50 +217,20 @@ BEGIN
 				EXECUTE 'DROP VIEW IF EXISTS '||v_viewname;
 			END IF;
 
-			IF v_profile_timing THEN
-				v_data_view = '{
-				"schema":"'||v_schemaname ||'",
-				"profileTiming":true,
-				"body":{"viewname":"'||v_viewname||'",
-					"feature_type":"'||v_feature_type||'",
-					"parent_layer":"'||v_parent_layer||'",
-					"feature_class":"'||v_feature_class||'",
-					"feature_cat":"'||v_cat_feature||'",
-					"feature_childtable_name":"'||v_feature_childtable_name||'"
-					}
-				}';
-				SELECT gw_fct_admin_manage_child_views_view(v_data_view::json) INTO v_view_result;
-				v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_iter_start)) * 1000)::bigint;
-				v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-					'step', 'multi_create:' || rec.id, 'ms', v_step_ms));
-				IF v_view_result IS NOT NULL THEN
-					v_profile_steps := v_profile_steps || COALESCE(
-						(v_view_result -> 'body' -> 'data' -> 'profileSteps')::jsonb,
-						'[]'::jsonb
-					);
-				END IF;
-			ELSE
-				v_data_view = '{
-				"schema":"'||v_schemaname ||'",
-				"body":{"viewname":"'||v_viewname||'",
-					"feature_type":"'||v_feature_type||'",
-					"parent_layer":"'||v_parent_layer||'",
-					"feature_class":"'||v_feature_class||'",
-					"feature_cat":"'||v_cat_feature||'",
-					"feature_childtable_name":"'||v_feature_childtable_name||'"
-					}
-				}';
-				SELECT gw_fct_admin_manage_child_views_view(v_data_view) INTO v_return_status, v_return_msg;
-			END IF;
+			v_data_view = '{
+			"schema":"'||v_schemaname ||'",
+			"body":{"viewname":"'||v_viewname||'",
+				"feature_type":"'||v_feature_type||'",
+				"parent_layer":"'||v_parent_layer||'",
+				"feature_class":"'||v_feature_class||'",
+				"feature_cat":"'||v_cat_feature||'",
+				"feature_childtable_name":"'||v_feature_childtable_name||'"
+				}
+			}';
+
+			SELECT gw_fct_admin_manage_child_views_view(v_data_view) INTO v_return_status, v_return_msg;
 
 		END LOOP;
-
-		IF v_profile_timing THEN
-			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-				'step', 'multi_create_loop_total', 'ms', v_step_ms));
-			v_prof_step := clock_timestamp();
-		END IF;
 
 		v_return_status = 'Accepted';
 		v_return_msg = 'Multi-create view successfully';
@@ -347,29 +296,9 @@ BEGIN
 	-- manage permissions
     IF v_action <> 'MULTI-DELETE' THEN
         PERFORM gw_fct_admin_role_permissions();
-		IF v_profile_timing THEN
-			v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-			v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-				'step', 'role_permissions', 'ms', v_step_ms));
-			v_prof_step := clock_timestamp();
-		END IF;
     END IF;
 
 	--  Return
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_started)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', 'total', 'ms', v_step_ms));
-		RETURN json_build_object(
-			'status', v_return_status,
-			'message', json_build_object('level', 0, 'text', v_return_msg),
-			'body', json_build_object(
-				'form', json_build_object(),
-				'data', json_build_object('profileSteps', v_profile_steps)
-			)
-		)::json;
-	END IF;
-
 	RETURN ('{"status":"'||v_return_status||'", "message":{"level":0, "text":"'||v_return_msg||'"},"body":{"form":{}'||',"data":{}}'||'}')::json;
 
 

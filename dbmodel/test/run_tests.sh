@@ -10,7 +10,6 @@
 #   GW_TIMING=1         phase/file timings; with GW_VERBOSE, ms on each line
 #   GW_TIMING_TOP=30    slowest files in summary (default 20)
 #   GW_DEBUG=1          verbose + SQL preview (-d)
-#   GW_PROFILE_LASTPROCESS=1  gw_fct_admin_schema_lastprocess step timings
 set -euo pipefail
 
 PROJECT="${1:?Usage: $0 ws|ud}"
@@ -30,7 +29,6 @@ export PG_MAJOR POSTGIS_VERSION TEST_GROUPS PG_PROVE_JOBS GW_DUMP_PATH="${GW_DUM
 export GW_VERBOSE="${GW_VERBOSE:-}" GW_DEBUG="${GW_DEBUG:-}" GW_TIMING="${GW_TIMING:-}"
 export GW_TIMING_TOP="${GW_TIMING_TOP:-}" GW_TIMING_THRESHOLD_MS="${GW_TIMING_THRESHOLD_MS:-}"
 export GW_TIMING_DETAIL="${GW_TIMING_DETAIL:-}"
-export GW_PROFILE_LASTPROCESS="${GW_PROFILE_LASTPROCESS:-}" GW_PROFILE_SUMMARY="${GW_PROFILE_SUMMARY:-}"
 export GW_SCHEMA_DUMP="${GW_SCHEMA_DUMP:-}"
 
 cd "${DBMODEL_DIR}"

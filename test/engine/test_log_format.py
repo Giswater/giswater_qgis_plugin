@@ -7,7 +7,6 @@ from giswater_admin.log_format import (
     format_build_header,
     format_file,
     format_phase,
-    format_profile_block,
     format_progress_status,
     format_timing_summary,
     shorten_path,
@@ -58,14 +57,6 @@ def test_format_timing_summary_includes_done_header():
     assert any("Done" in ln for ln in lines)
     assert any("updates" in ln for ln in lines)
     assert any("Slowest:" in ln for ln in lines)
-
-
-def test_format_profile_block():
-    rows = [("cff_introspect", 2, 20, 10)]
-    lines = format_profile_block("child_config_timing", rows)
-    assert lines[0].startswith("── Profile:")
-    assert "cff_introspect" in lines[1]
-    assert "n=2" in lines[1]
 
 
 def test_format_progress_status_file():

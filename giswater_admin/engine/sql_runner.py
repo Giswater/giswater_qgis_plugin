@@ -40,7 +40,6 @@ class FileExec:
     ok: bool = False
     error: str = ""
     duration_ms: int = 0
-    profile_steps: list[dict[str, Any]] = field(default_factory=list)
 
 
 class ConnectionLike(Protocol):
@@ -141,43 +140,11 @@ def execute_inline(
     return fx
 
 
-def _parse_profile_steps(raw: Any) -> list[dict[str, Any]]:
-    if raw is None:
-        return []
-    if isinstance(raw, (bytes, bytearray)):
-        raw = raw.decode("utf-8", errors="replace")
-    if isinstance(raw, str):
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError:
-            return []
-    elif isinstance(raw, dict):
-        data = raw
-    else:
-        return []
-    steps = data.get("body", {}).get("data", {}).get("profileSteps")
-    if steps is None:
-        steps = data.get("profileSteps")
-    if not isinstance(steps, list):
-        return []
-    out: list[dict[str, Any]] = []
-    for item in steps:
-        if isinstance(item, dict) and "step" in item and "ms" in item:
-            out.append({"step": item["step"], "ms": item["ms"]})
-        elif isinstance(item, list):
-            for sub in item:
-                if isinstance(sub, dict) and "step" in sub and "ms" in sub:
-                    out.append({"step": sub["step"], "ms": sub["ms"]})
-    return out
-
-
 def execute_function_call(
     conn: ConnectionLike,
     function: str,
     payload: Any,
     commit: bool = False,
-    *,
-    fetch_result: bool = False,
 ) -> FileExec:
     """
     Execute a Giswater-style server-side function call.
@@ -193,16 +160,9 @@ def execute_function_call(
     fx = FileExec(path=f"<fn:{function}>")
     t0 = time.perf_counter()
     try:
-        if fetch_result and hasattr(conn, "execute_scalar"):
-            raw, fx.ok = conn.execute_scalar(sql, filepath=f"<fn:{function}>")  # type: ignore[attr-defined]
-            if not fx.ok:
-                fx.error = conn.last_error() or "function returned False"
-            else:
-                fx.profile_steps = _parse_profile_steps(raw)
-        else:
-            fx.ok = conn.execute(sql)
-            if not fx.ok:
-                fx.error = conn.last_error() or "function returned False"
+        fx.ok = conn.execute(sql)
+        if not fx.ok:
+            fx.error = conn.last_error() or "function returned False"
         if fx.ok and commit:
             conn.commit()
     except Exception as e:  # noqa: BLE001

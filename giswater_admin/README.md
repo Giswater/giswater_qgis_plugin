@@ -169,23 +169,11 @@ Disponibles en cualquier subcomando que incluya el parser padre (`create`, `upda
 | `--timing-threshold-ms N` | Con `-v --timing`, solo lista archivos con duración ≥ N ms. |
 | `--timing-top K` | Cuántos archivos más lentos incluir en el resumen (default: 20). |
 | `--timing-detail` | Con `--json --timing`, incluye el listado completo de archivos en el payload. |
-| `--profile-lastprocess` | Pasos de `gw_fct_admin_schema_lastprocess` en stderr (líneas `+Nms`). |
-| `--profile-summary` | Bloques `── Profile: … ──` agregados por tipo de paso. |
 | `--dbmodel-path DIR` | Raíz del árbol `dbmodel` (por defecto: repo del plugin). |
 
-Ejemplo para perfilar la creación de un schema (**siempre desde cero**):
+Ejemplo para medir tiempos de creación (por fichero SQL):
 
 ```bash
-# Recomendado: schema auto + drop + resumen agregado al final
-python3 -m giswater_admin profile-create \
-  --kind ws --drop-if-exists --conn "$CONN" \
-  --plugin-version 4.9.0 2>&1 | grep "── Profile:"
-
-# Mismo create manual (schema fijo):
-python3 -m giswater_admin create \
-  --kind ws --schema gw_ws_test --profile empty --conn "$CONN" \
-  --profile-lastprocess --profile-summary 2>&1 | grep "── Profile:"
-
 # SQL files lentos (resumen por fase + top updates por versión M.m.p):
 python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
   --timing --timing-top 30 -v --timing-threshold-ms 30 \
@@ -195,13 +183,6 @@ python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
 python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
   --timing --timing-detail --json --conn "$CONN" 2>/dev/null | \
   jq '.timing.updates_by_version[:20], .timing.slowest_by_phase.updates[:20]'
-
-# Una sola cat_feature tras crear (debug puntual):
-python3 -m giswater_admin profile-child-config \
-  --schema gw_ws_prof_20260519120000 --cat-feature PUMP --conn "$CONN" \
-  2>&1 | grep "cff_introspect"
-
-# Evitar: profile-child-views en schema existente (re-ejecuta MULTI-CREATE, no mide el create real)
 ```
 
 ---
@@ -250,8 +231,6 @@ Antes (depuración):
 info: [581/723] phase:updates
 exec: [581/723] 1155ms dbmodel/schemas/network/ws/updates/4/2/0/dml.sql
 timing: total 10.4s (723 files)
-profile_summary child_config_timing:
-profile_summary   cff_introspect  n=2  total_ms=20  avg_ms=10
 ```
 
 Ahora (`giswater_admin/log_format.py`):
@@ -264,8 +243,6 @@ Ahora (`giswater_admin/log_format.py`):
   updates              7.1s  (612 files, 68.0%)
 Slowest:
    3241ms  updates  ws/updates/4/2/0/dml.sql
-── Profile: child config ──
-  cff_introspect                          n=2  total=20ms  avg=10ms
 ```
 
 Las rutas se acortan con `--dbmodel-path` (CLI) o `BuildParams.sql_root` (QGIS).

@@ -174,7 +174,7 @@ Other options:
 TEST_GROUPS=function ./dbmodel/test/run_tests.sh ws
 GW_CLEAN=1 ./dbmodel/test/run_tests.sh ws   # reset Docker DB volume
 GW_VERBOSE=1 GW_TIMING=1 PG_MAJOR=17 ./dbmodel/test/run_tests.sh ws
-GW_VERBOSE=1 GW_TIMING=1 GW_TIMING_TOP=50 GW_PROFILE_LASTPROCESS=1 ./dbmodel/test/run_tests.sh ws
+GW_VERBOSE=1 GW_TIMING=1 GW_TIMING_TOP=50 ./dbmodel/test/run_tests.sh ws
 GW_DEBUG=1 ./dbmodel/test/run_tests.sh ws   # SQL previews
 ```
 

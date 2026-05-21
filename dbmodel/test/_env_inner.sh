@@ -31,8 +31,6 @@ GW_ADMIN_FLAGS=()
 [[ -n "${GW_TIMING_TOP:-}" ]] && GW_ADMIN_FLAGS+=(--timing-top "${GW_TIMING_TOP}")
 [[ -n "${GW_TIMING_THRESHOLD_MS:-}" ]] && GW_ADMIN_FLAGS+=(--timing-threshold-ms "${GW_TIMING_THRESHOLD_MS}")
 [[ -n "${GW_TIMING_DETAIL:-}" ]] && GW_ADMIN_FLAGS+=(--timing-detail)
-[[ -n "${GW_PROFILE_LASTPROCESS:-}" ]] && GW_ADMIN_FLAGS+=(--profile-lastprocess)
-[[ -n "${GW_PROFILE_SUMMARY:-}" ]] && GW_ADMIN_FLAGS+=(--profile-summary)
 export GW_ADMIN_FLAGS
 
 gw_psql() {

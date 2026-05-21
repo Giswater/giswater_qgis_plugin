@@ -110,7 +110,6 @@ def run(args: argparse.Namespace, out: Out) -> int:
         parent_type=parent_type,
         am_target=am_target,
         main_project_version=main_version,
-        profile_lastprocess=getattr(args, "profile_lastprocess", False),
     )
 
     if args.check:

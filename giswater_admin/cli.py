@@ -20,9 +20,6 @@ from .commands import drop as cmd_drop
 from .commands import init_db as cmd_init_db
 from .commands import manifest as cmd_manifest
 from .commands import status as cmd_status
-from .commands import profile_child_config as cmd_profile_child_config
-from .commands import profile_child_views as cmd_profile_child_views
-from .commands import profile_create as cmd_profile_create
 from .commands import update as cmd_update
 from .output import Out, configure_stderr_logging
 
@@ -49,10 +46,6 @@ def _global_parent() -> argparse.ArgumentParser:
                         help="Number of slowest files in timing summary (default: 20).")
     parent.add_argument("--timing-detail", action="store_true",
                         help="With --json --timing, include per-file timings in output.")
-    parent.add_argument("--profile-lastprocess", action="store_true",
-                        help="NOTICE per-block timings from gw_fct_admin_schema_lastprocess.")
-    parent.add_argument("--profile-summary", action="store_true",
-                        help="With --profile-lastprocess, aggregate step timings at end.")
     parent.add_argument("--dbmodel-path", default=DEFAULT_DBMODEL,
                         help=f"dbmodel root (default: {DEFAULT_DBMODEL}).")
     return parent
@@ -168,69 +161,6 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Print SQL only; do not connect.")
     _add_conn_args(sp)
     sp.set_defaults(func=cmd_init_db.run)
-
-    # profile-create ---------------------------------------------------------
-    sp = sub.add_parser(
-        "profile-create",
-        help="Create empty schema from scratch with lastprocess/child-view profiling.",
-        parents=[parent],
-    )
-    sp.add_argument("--kind", required=True, choices=["ws", "ud", "utils", "am", "cm"])
-    sp.add_argument(
-        "--schema",
-        default=None,
-        help="Target schema (default: auto gw_<kind>_prof_<timestamp>).",
-    )
-    sp.add_argument("--srid", default="25831", help="EPSG code (default 25831).")
-    sp.add_argument("--profile", default="empty",
-                    help="Manifest profile (default: empty).")
-    sp.add_argument("--locale", default="en_US")
-    sp.add_argument("--plugin-version", default="4.9.0")
-    sp.add_argument("--db-user", default=None)
-    sp.add_argument("--ws-schema", default=None)
-    sp.add_argument("--ud-schema", default=None)
-    sp.add_argument("--parent-schema", default=None)
-    sp.add_argument("--parent-type", default=None, choices=["ws", "ud"])
-    sp.add_argument("--main-version", default=None)
-    sp.add_argument(
-        "--drop-if-exists",
-        action="store_true",
-        help="DROP SCHEMA CASCADE before create (recommended for repeatable runs).",
-    )
-    sp.add_argument("--check", action="store_true", help="Plan only.")
-    _add_conn_args(sp)
-    sp.set_defaults(func=cmd_profile_create.run)
-
-    # profile-child-views ----------------------------------------------------
-    sp = sub.add_parser(
-        "profile-child-views",
-        help=(
-            "Re-run MULTI-CREATE on an existing schema (not the create path). "
-            "Prefer profile-create for timings from zero."
-        ),
-        parents=[parent],
-    )
-    sp.add_argument("--schema", required=True)
-    sp.add_argument("--locale", default="en_US")
-    sp.add_argument("--dry-run", action="store_true",
-                    help="Run but ROLLBACK (no persistent changes).")
-    _add_conn_args(sp)
-    sp.set_defaults(func=cmd_profile_child_views.run)
-
-    sp = sub.add_parser(
-        "profile-child-config",
-        help="Profile gw_fct_admin_manage_child_config for one cat_feature.",
-        parents=[parent],
-    )
-    sp.add_argument("--schema", required=True)
-    sp.add_argument("--cat-feature", required=True, metavar="ID",
-                    help="cat_feature.id (e.g. PUMP, SHUTOFF_VALVE).")
-    sp.add_argument("--feature-type", default=None,
-                    help="Override feature_type (node, arc, connec, element, link).")
-    sp.add_argument("--dry-run", action="store_true",
-                    help="Run but ROLLBACK.")
-    _add_conn_args(sp)
-    sp.set_defaults(func=cmd_profile_child_config.run)
 
     # audit ------------------------------------------------------------------
     sp = sub.add_parser("audit", help="Audit lifecycle.", parents=[parent])

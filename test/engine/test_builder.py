@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from giswater_admin.engine.builder import BuildParams, SchemaBuilder, _inject_profile_timing
-from giswater_admin.engine.sql_runner import _parse_profile_steps
+from giswater_admin.engine.builder import BuildParams, SchemaBuilder
 from giswater_admin.engine.cancel import CancelToken
 from giswater_admin.engine.manifest import Manifest, Phase, Profile, Step
 
@@ -124,32 +123,6 @@ def test_cancel_token_stops_engine(tmp_path: Path):
     result = SchemaBuilder(conn, _manifest(), params).run()
     assert result.cancelled
     assert not result.ok
-
-
-def test_parse_profile_steps_root_profile_steps():
-    raw = '{"profileSteps":[{"step":"ve_node_pump:copy_parent_cff","ms":120}]}'
-    steps = _parse_profile_steps(raw)
-    assert len(steps) == 1
-    assert steps[0]["step"] == "ve_node_pump:copy_parent_cff"
-
-
-def test_parse_profile_steps_from_function_json():
-    raw = (
-        '{"status":"Accepted","body":{"data":{"profileSteps":['
-        '{"step":"after_reset_sequences","ms":4200},{"step":"total","ms":9500}'
-        "]}}}"
-    )
-    steps = _parse_profile_steps(raw)
-    assert len(steps) == 2
-    assert steps[0]["step"] == "after_reset_sequences"
-    assert steps[0]["ms"] == 4200
-
-
-def test_inject_profile_timing():
-    payload = {"client": {"lang": "en_US"}, "data": {"isNewProject": "TRUE"}}
-    out = _inject_profile_timing(payload)
-    assert out["data"]["profileTiming"] is True
-    assert out["data"]["isNewProject"] == "TRUE"
 
 
 def test_substitutions_applied_in_file_content(tmp_path: Path):

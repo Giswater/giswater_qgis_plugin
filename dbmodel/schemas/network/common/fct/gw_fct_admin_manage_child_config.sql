@@ -9,7 +9,7 @@ or (at your option) any later version.
 
 --drop function SCHEMA_NAME.gw_fct_admin_manage_child_views(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_child_config(p_data json)
-  RETURNS json AS
+  RETURNS void AS
 $BODY$
 
 /*
@@ -41,43 +41,16 @@ v_datatype text;
 v_widgettype text;
 v_formname text;
 
-v_profile_timing boolean;
-v_prof_started timestamptz;
-v_prof_step timestamptz;
-v_profile_steps jsonb := '[]'::jsonb;
-v_step_ms bigint;
-v_profile_label text;
-
 BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-	v_profile_timing := lower(coalesce(
-		p_data ->> 'profileTiming',
-		(p_data -> 'data')::json ->> 'profileTiming',
-		'false'
-	)) IN ('true', '1', 't', 'yes');
-	v_prof_started := clock_timestamp();
-	v_prof_step := v_prof_started;
-	v_profile_label := coalesce(
-		(p_data -> 'data')::json ->> 'view_name',
-		((p_data ->> 'feature')::json ->> 'catFeature'),
-		'unknown'
-	);
-
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- dissable temporary trigger to manage control_config
 	UPDATE config_param_system SET value = 'FALSE'  WHERE parameter='admin_config_control_trigger';
-
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':disable_cff_trigger', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
 
 	-- get input parameters
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
@@ -94,13 +67,6 @@ BEGIN
 		concat('Custom editable view for ',v_cat_feature), 'role_edit') ON CONFLICT (id) DO NOTHING;
 	END IF;
 
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':sys_table_insert', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
-
 	--manage tab hydrometer on netwjoin
 	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_class = 'netwjoin' THEN
 		INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
@@ -111,13 +77,6 @@ BEGIN
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
 		INSERT INTO config_info_layer_x_type(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,1,v_view_name)
 		ON CONFLICT (tableinfo_id, infotype_id) DO NOTHING;
-	END IF;
-
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':layer_metadata', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
 	END IF;
 
 	--select list of fields different than id from config_form_fields
@@ -132,25 +91,11 @@ BEGIN
 	AND column_name not in (''id'', ''formname'', ''formtype'') ORDER BY ordinal_position)a;'
 	INTO v_insert_fields;
 
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':cff_introspect', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
-
 	--insert configuration copied from the parent view config
 	EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
 	SELECT '''||v_view_name||''', ''form_feature'', '||v_insert_fields||' FROM config_form_fields
 	WHERE formname='''||v_formname||'''
 	ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING';
-
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':copy_parent_cff', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
 
 	--update configuration of man_type fields setting featurecat related to the view
 	IF v_project_type = 'WS' THEN
@@ -177,13 +122,6 @@ BEGIN
 
 	EXECUTE 'UPDATE config_form_fields SET dv_querytext = ''SELECT id, id as idval FROM cat_brand_model WHERE '''||quote_literal(upper(v_cat_feature))||''' = ANY(featurecat_id::text[])''
 	WHERE formname = '''||v_view_name||''' AND columnname =''model_id'';';
-
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':update_dv_queries', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
 
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
@@ -227,13 +165,6 @@ BEGIN
 
 	END LOOP;
 
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':man_fields_loop', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
-
 	--select all already created addfields
 	v_man_addfields = 'SELECT * FROM sys_addfields WHERE active = TRUE AND (cat_feature_id IS NULL OR cat_feature_id='''||v_cat_feature||''');';
 
@@ -266,27 +197,8 @@ BEGIN
 
 	END LOOP;
 
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':addfields_loop', 'ms', v_step_ms));
-		v_prof_step := clock_timestamp();
-	END IF;
-
 	-- enable trigger to manage control_config
 	UPDATE config_param_system SET value = 'TRUE'  WHERE parameter='admin_config_control_trigger';
-
-	IF v_profile_timing THEN
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':enable_cff_trigger', 'ms', v_step_ms));
-		v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_started)) * 1000)::bigint;
-		v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-			'step', v_profile_label || ':total', 'ms', v_step_ms));
-		RETURN json_build_object('profileSteps', v_profile_steps)::json;
-	END IF;
-
-	RETURN '{}'::json;
 
 END;
 $BODY$

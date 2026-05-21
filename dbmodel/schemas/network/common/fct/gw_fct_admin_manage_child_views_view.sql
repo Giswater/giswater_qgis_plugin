@@ -30,19 +30,7 @@ DECLARE
 	v_has_add_extra boolean := false;
 
 	v_sql text;
-	v_config_result json;
-	v_config_payload json;
-	v_profile_timing boolean;
-	v_prof_started timestamptz;
-	v_prof_step timestamptz;
-	v_profile_steps jsonb := '[]'::jsonb;
-	v_step_ms bigint;
 BEGIN
-  v_profile_timing := lower(coalesce(p_data ->> 'profileTiming', 'false'))
-    IN ('true', '1', 't', 'yes');
-  v_prof_started := clock_timestamp();
-  v_prof_step := v_prof_started;
-
   -- Set search_path to the target schema
   EXECUTE format('SET search_path = %I, public;', v_schemaname);
 
@@ -137,13 +125,6 @@ BEGIN
     v_add_cols      := NULL;
   END IF;
 
-  IF v_profile_timing THEN
-    v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-    v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-      'step', 'view:' || v_viewname || ':metadata', 'ms', v_step_ms));
-    v_prof_step := clock_timestamp();
-  END IF;
-
   -- Build final SELECT
   v_sql := 'CREATE OR REPLACE VIEW ' || quote_ident(v_viewname) || ' AS ' ||
            'SELECT ' || v_parent_cols;
@@ -168,14 +149,6 @@ BEGIN
           ' = ' || quote_literal(v_feature_cat) || ';';
 
   EXECUTE v_sql;
-
-  IF v_profile_timing THEN
-    v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-    v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-      'step', 'view:' || v_viewname || ':create_view', 'ms', v_step_ms));
-    v_prof_step := clock_timestamp();
-  END IF;
-
   RAISE NOTICE 'View % created in %', v_viewname, v_schemaname;
 
   --create trigger on view
@@ -200,54 +173,17 @@ BEGIN
   );
   RAISE NOTICE 'Trigger % created in %', v_viewname, v_schemaname;
 
-  IF v_profile_timing THEN
-    v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-    v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-      'step', 'view:' || v_viewname || ':triggers', 'ms', v_step_ms));
-    v_prof_step := clock_timestamp();
-  END IF;
-
-  IF v_profile_timing THEN
-    v_config_payload := json_build_object(
-      'profileTiming', true,
+  EXECUTE format(
+    'SELECT gw_fct_admin_manage_child_config(%L);',
+    json_build_object(
       'feature', json_build_object('catFeature', v_feature_cat),
       'data', json_build_object(
         'view_name', v_viewname,
         'feature_type', v_feature_type
       )
-    );
-    SELECT gw_fct_admin_manage_child_config(v_config_payload) INTO v_config_result;
-    v_profile_steps := v_profile_steps || COALESCE(
-      (v_config_result -> 'profileSteps')::jsonb,
-      '[]'::jsonb
-    );
-    v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_step)) * 1000)::bigint;
-    v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-      'step', 'view:' || v_viewname || ':child_config', 'ms', v_step_ms));
-  ELSE
-    EXECUTE format(
-      'SELECT gw_fct_admin_manage_child_config(%L);',
-      json_build_object(
-        'feature', json_build_object('catFeature', v_feature_cat),
-        'data', json_build_object(
-          'view_name', v_viewname,
-          'feature_type', v_feature_type
-        )
-      )::text
-    );
-  END IF;
+    )::text
+  );
   RAISE NOTICE 'Config % created in %', v_viewname, v_schemaname;
-
-  IF v_profile_timing THEN
-    v_step_ms := (EXTRACT(EPOCH FROM (clock_timestamp() - v_prof_started)) * 1000)::bigint;
-    v_profile_steps := v_profile_steps || jsonb_build_array(jsonb_build_object(
-      'step', 'view:' || v_viewname || ':total', 'ms', v_step_ms));
-    RETURN json_build_object(
-      'status', 'Accepted',
-      'message', 'View created successfully',
-      'body', json_build_object('data', json_build_object('profileSteps', v_profile_steps))
-    )::json;
-  END IF;
 
   RETURN json_build_object('status', 'Accepted', 'message', 'View created successfully')::json;
 

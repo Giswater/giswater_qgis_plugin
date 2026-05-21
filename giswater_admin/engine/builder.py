@@ -24,18 +24,6 @@ logger = logging.getLogger(__name__)
 ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
 
 
-def _inject_profile_timing(payload: Any) -> Any:
-    """Add ``profileTiming: true`` to a lastprocess JSON payload."""
-    if not isinstance(payload, dict):
-        return payload
-    data = payload.get("data")
-    if isinstance(data, dict):
-        merged = dict(data)
-        merged["profileTiming"] = True
-        return {**payload, "data": merged}
-    return {**payload, "data": {"profileTiming": True}}
-
-
 @dataclass
 class BuildParams:
     """Runtime inputs. Drives substitutions, version filtering, and dir walks."""
@@ -66,9 +54,6 @@ class BuildParams:
 
     # Cooperative cancel.
     cancel_token: CancelToken = field(default_factory=CancelToken)
-
-    # When True, lastprocess payload gets profileTiming (PL/pgSQL RAISE NOTICE).
-    profile_lastprocess: bool = False
 
     def __post_init__(self) -> None:
         if not self.today:
@@ -346,18 +331,11 @@ class SchemaBuilder:
         pr = PhaseResult(phase_id=phase.id)
         fn = render(phase.function, self._ctx)
         payload = render(phase.payload, self._ctx)
-        profile_fn = self.params.profile_lastprocess and phase.id in (
-            "lastprocess",
-            "lastprocess_upgrade",
-        )
-        if profile_fn:
-            payload = _inject_profile_timing(payload)
         fx = sql_runner.execute_function_call(
             self.conn,
             fn,
             payload,
             self.commit_each_file,
-            fetch_result=profile_fn,
         )
         pr.files.append(fx)
         self.progress_cb(seen + 1, total, f"<fn:{fn}>", fx)

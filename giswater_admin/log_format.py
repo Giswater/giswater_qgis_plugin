@@ -1,9 +1,8 @@
 """
 Shared formatting for schema-build progress logs (CLI stderr and QGIS Message Log).
 
-Keeps path shortening, column alignment, phase banners, timing rollups, and SQL
-profile blocks consistent across ``Out``, ``build_progress_cb``, and
-``GwSchemaBuilderTask``.
+Keeps path shortening, column alignment, phase banners, and timing rollups
+consistent across ``Out``, ``build_progress_cb``, and ``GwSchemaBuilderTask``.
 """
 
 from __future__ import annotations
@@ -11,13 +10,7 @@ from __future__ import annotations
 import os
 import sys
 from dataclasses import dataclass
-from typing import Any, Iterable
-
-_PROFILE_TITLES = {
-    "lastprocess_timing": "lastprocess",
-    "child_views_timing": "child views",
-    "child_config_timing": "child config",
-}
+from typing import Any
 
 # ANSI (CLI only when ``LogStyle.use_color`` and stderr is a TTY).
 _RESET = "\033[0m"
@@ -241,34 +234,6 @@ def format_timing_summary(
             lines.append(
                 f"  {int(row.get('duration_ms') or 0):>5}ms  {path}"
             )
-    return lines
-
-
-def format_profile_step(step_name: str, ms: int, *, style: LogStyle | None = None) -> str:
-    """Single lastprocess profile step (verbose ``--profile-lastprocess``)."""
-    style = style or LogStyle()
-    return f"  {step_name}  +{ms}ms"
-
-
-def format_profile_block(
-    prefix: str,
-    rows: Iterable[tuple[str, int, int, int]],
-    *,
-    style: LogStyle | None = None,
-) -> list[str]:
-    """
-    Aggregated profile block.
-
-    Each row is ``(key, n, total_ms, avg_ms)``.
-    """
-    style = style or LogStyle()
-    title = _PROFILE_TITLES.get(prefix, prefix.replace("_timing", ""))
-    lines = [_maybe_color(f"── Profile: {title} ──", _CYAN, style)]
-    for key, n, total_ms, avg_ms in rows:
-        key_col = key[:40].ljust(40)
-        lines.append(
-            f"  {key_col}  n={n}  total={total_ms}ms  avg={avg_ms}ms"
-        )
     return lines
 
 
