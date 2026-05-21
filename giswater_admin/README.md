@@ -1,307 +1,232 @@
 # giswater-admin
 
-CLI y motor **sin Qt** para el ciclo de vida de esquemas Giswater (crear, actualizar, borrar, inspeccionar). Usa los mismos manifiestos YAML y el mismo `SchemaBuilder` que el plugin de QGIS (`GwSchemaBuilderTask` + `QtDbAdapter`), así que automatización, CI y QGIS no divergen en la lógica SQL.
+Headless CLI and engine for the Giswater database schema lifecycle (create, upgrade, drop, inspect). It reads the same YAML manifests under `dbmodel/manifests/` and runs the same `SchemaBuilder` as the QGIS plugin (`GwSchemaBuilderTask` + `QtDbAdapter`), so automation, CI, and the desktop UI do not diverge on SQL execution logic.
 
-**Tabla de contenidos**
+**See also:** [dbmodel README — Schema architecture](../dbmodel/README.md#schema-architecture) · [dbmodel README — Testing](../dbmodel/README.md#testing)
 
-1. [Requisitos](#requisitos)
-2. [Instalación por sistema](#instalación-por-sistema)
-3. [Cómo ejecutar el CLI](#cómo-ejecutar-el-cli)
-4. [Conexión a PostgreSQL](#conexión-a-postgresql)
-5. [Opciones globales (todas los subcomandos)](#opciones-globales-todas-los-subcomandos)
-6. [Flujo típico: base nueva → extensiones → esquema](#flujo-típico-base-nueva--extensiones--esquema)
-7. [Resumen de `kind` y perfiles](#resumen-de-kind-y-perfiles)
-8. [Salida, JSON y trazas](#salida-json-y-trazas)
-9. [Códigos de salida](#códigos-de-salida)
-10. [Integración QGIS](#integración-qgis)
-11. [Tests](#tests)
-12. [Referencia rápida: todos los comandos y ejemplos](#referencia-rápida-todos-los-comandos-y-ejemplos)
+## Table of contents
 
----
-
-## Requisitos
-
-| Componente | Notas |
-|------------|--------|
-| **Python** | 3.9+ recomendado (misma familia que suelen traer QGIS 3.28+). |
-| **PostgreSQL** | Versión compatible con su **dbmodel** (según proyecto Giswater). |
-| **Paquetes Python** | `PyYAML`, `psycopg2-binary` (ver `requirements.txt`). |
-| **Extensiones BD** | Antes del primer `create` debe existir en el **cluster** el soporte para: `postgis`, `postgis_raster`, `tablefunc`, `pgrouting`, `unaccent`. El subcomando **`init-db`** las crea en la base si el binario del servidor las tiene instaladas. |
-
-En el **servidor** deben estar los paquetes de PostGIS / pgRouting acordes a la versión de Postgres (no los instala `pip`). Si `CREATE EXTENSION` falla, el error lo devuelve Postgres (falta paquete OS o permisos de superusuario / rol con privilegio `CREATE` en la base).
+1. [Overview](#overview)
+2. [Where to run it](#where-to-run-it)
+3. [Architecture](#architecture)
+4. [Install](#install)
+5. [Connection](#connection)
+6. [Invocation rules](#invocation-rules)
+7. [Global options](#global-options)
+8. [Commands reference](#commands-reference)
+9. [Kinds and manifest profiles](#kinds-and-manifest-profiles)
+10. [Timing and output](#timing-and-output)
+11. [QGIS integration](#qgis-integration)
+12. [Unit tests](#unit-tests)
+13. [Extending the model](#extending-the-model)
+14. [Keeping docs in sync](#keeping-docs-in-sync)
 
 ---
 
-## Instalación por sistema
+## Overview
 
-Desde la **raíz del repositorio del plugin** (donde está la carpeta `giswater_admin/` junto a `dbmodel/`):
+| Piece | Role |
+|-------|------|
+| `giswater_admin/cli.py` | Argument parsing and dispatch |
+| `giswater_admin/commands/` | Subcommand handlers (`create`, `update`, …) |
+| `giswater_admin/engine/` | `SchemaBuilder`, manifest loader, `sql_runner` |
+| `dbmodel/manifests/*.yaml` | Phase graphs per schema kind |
+| `dbmodel/schemas/` | SQL sources (DDL, functions, updates, samples) |
 
-### Linux / macOS
+Typical flow for a new database:
+
+1. Create an empty PostgreSQL database (outside this CLI).
+2. `init-db` — cluster extensions once per database.
+3. `create` — build a project schema (`ws`, `ud`, …) from a manifest profile.
+4. Optionally `update`, `status`, `drop`.
+
+---
+
+## Where to run it
+
+| Context | Working directory | Command |
+|---------|-----------------|---------|
+| Plugin repo (recommended) | Repository root (`giswater/`, sibling of `dbmodel/` and `giswater_admin/`) | `python3 -m giswater_admin …` |
+| Custom dbmodel tree | Any | Add `--dbmodel-path /path/to/dbmodel` |
+| CI / Docker tests | Inside `runner` container | See [dbmodel testing](../dbmodel/README.md#testing) |
+| QGIS | N/A (in-process) | `GwSchemaBuilderTask` — no subprocess |
+
+**Requirements:** Python 3.9+, `PyYAML`, `psycopg2-binary` ([requirements.txt](requirements.txt)). PostgreSQL with PostGIS/pgRouting packages on the **server** (not installed by `pip`).
+
+Default `--dbmodel-path` resolves to `../dbmodel` relative to this package (the plugin repo’s `dbmodel/` folder).
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TB
+  subgraph hosts [Execution contexts]
+    CLI["python -m giswater_admin"]
+    QGIS["GwSchemaBuilderTask + QtDbAdapter"]
+    CI["dbmodel/test/bootstrap_inner.sh"]
+  end
+  subgraph engine [giswater_admin/engine]
+    Manifest["manifests/*.yaml"]
+    Builder["SchemaBuilder"]
+    Runner["sql_runner"]
+  end
+  subgraph dbmodel_tree [dbmodel/]
+    Schemas["schemas/..."]
+    Updates["updates M/m/p"]
+  end
+  PG[(PostgreSQL)]
+  CLI --> Builder
+  QGIS --> Builder
+  CI --> CLI
+  Builder --> Manifest
+  Builder --> Runner
+  Runner --> Schemas
+  Runner --> Updates
+  Runner --> PG
+```
+
+**Phase types** (declared in manifests, implemented in `engine/manifest.py`):
+
+| Type | Behavior |
+|------|----------|
+| `sql_dir` | Run every `*.sql` in listed folders (optional `recursive`) |
+| `version_walk` | Walk `updates/<M>/<m>/<p>/` semver-ordered; `roots:` for ws/ud (common then kind) |
+| `sql_function` | `SELECT schema.fn($${JSON}$$)` (e.g. `lastprocess`) |
+| `sql_file` | Single file with optional `fallback_source` |
+| `sql_inline` | Literal SQL in YAML |
+
+---
+
+## Install
+
+From the **plugin repository root**:
 
 ```bash
-cd /ruta/al/plugin/giswater
+cd /path/to/giswater
 python3 -m pip install -r giswater_admin/requirements.txt
-# opcional: venv
+```
+
+Optional virtualenv:
+
+```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r giswater_admin/requirements.txt
 ```
 
-Ejemplos de paquetes del sistema (nombres orientativos; ajusta versión de Postgres):
+**OS packages (server side)** — names vary by distro; install PostGIS and pgRouting for your PostgreSQL major version:
 
-- **Debian / Ubuntu:** `postgresql-16-postgis-3`, `postgresql-16-pgrouting`, …
-- **RHEL / Fedora:** grupos `postgresql:server`, postgis desde repos EPEL/distro.
-- **macOS (Homebrew):** `brew install postgresql@16 postgis` (y dependencias de pgRouting según fórmula disponible).
+- Debian/Ubuntu: `postgresql-16-postgis-3`, `postgresql-16-pgrouting`, …
+- macOS (Homebrew): `postgresql@16`, `postgis`
+- Windows: PostGIS/pgRouting matching your PostgreSQL installer
 
-### Windows
-
-```powershell
-cd C:\ruta\al\plugin\giswater
-py -3 -m pip install -r giswater_admin\requirements.txt
-```
-
-Instala PostGIS / pgRouting para el mismo major de PostgreSQL que uses (instalador EnterpriseDB / StackBuilder o paquetes que provea tu distro). Después **`init-db`** debe poder crear las extensiones si el usuario de conexión tiene permisos.
-
----
-
-## Cómo ejecutar el CLI
-
-El punto de entrada es el paquete:
+Verify:
 
 ```bash
 python3 -m giswater_admin --help
 ```
 
-En Windows (Launcher de Python):
-
-```powershell
-py -3 -m giswater_admin --help
-```
-
-**Importante:** Las opciones globales (`--json`, `-v`, `--dbmodel-path`, etc.) deben ir **después del subcomando**, porque están definidas en el parser padre de cada subcomando:
-
-```bash
-# Correcto
-python3 -m giswater_admin create --kind ws --schema demo --profile empty --json
-
-# Incorrecto (el parser raíz no las tiene)
-python3 -m giswater_admin --json create ...
-```
-
-Por defecto los manifiestos y el SQL se resuelven desde **`dbmodel/`** en la raíz del repo del plugin (hermano de `giswater_admin/`). Para otra copia del modelo:
-
-```bash
-python3 -m giswater_admin manifest list --dbmodel-path /otra/ruta/dbmodel
-```
-
 ---
 
-## Conexión a PostgreSQL
+## Connection
 
-Orden de resolución (el primero que aplique):
+Resolution order (first match wins):
 
-1. **`--conn`** — URL `postgresql://usuario:contraseña@host:puerto/base` (o `postgres://…`).
-2. **`--config`** — YAML con claves `host`, `port`, `user`, `password`, `dbname` y/o `service`.
-3. **Variables de entorno** — `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, **`PGSERVICE`**.
+1. `--conn` — `postgresql://user:pass@host:port/dbname` (or `postgres://…`)
+2. `--config` — YAML with `host`, `port`, `user`, `password`, `dbname`, and/or `service`
+3. Environment — `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGSERVICE`
 
-### Linux / macOS (`bash` / `zsh`)
+### Linux / macOS
 
 ```bash
-export PGSERVICE=localhost_giswater
-# o
-export PGHOST=127.0.0.1 PGPORT=5432 PGUSER=gisadmin PGDATABASE=giswater_cli
-export PGPASSWORD='...'   # o usa ~/.pgpass
-
-CONN='postgresql://usuario:pass@127.0.0.1:55433/giswater_cli'
+export CONN='postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli'
 python3 -m giswater_admin status --conn "$CONN"
-```
-
-### Windows (CMD)
-
-```cmd
-set PGHOST=127.0.0.1
-set PGPORT=5432
-set PGUSER=gisadmin
-set PGPASSWORD=secret
-set PGDATABASE=giswater_cli
-py -3 -m giswater_admin status
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-$env:PGHOST = "127.0.0.1"
-$env:PGPORT = "5432"
-$env:PGUSER = "gisadmin"
-$env:PGPASSWORD = "secret"
-$env:PGDATABASE = "giswater_cli"
-py -3 -m giswater_admin status
+$env:CONN = "postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli"
+py -3 -m giswater_admin status --conn $env:CONN
 ```
 
-### Archivo YAML (`--config`)
+### Config file
 
 ```yaml
 host: 127.0.0.1
-port: 55433
+port: 5432
 user: gisadmin
 password: secret
 dbname: giswater_cli
 ```
 
 ```bash
-python3 -m giswater_admin status --config /ruta/conn.yaml
+python3 -m giswater_admin status --config /path/conn.yaml
 ```
 
-**`--check`:** en muchos subcomandos solo calcula el plan o el SQL y **no escribe en la BD**. `init-db --check` no requiere conexión (solo lista el SQL).
+**`--check`:** many subcommands only print the plan or SQL and do not write to the database. `init-db --check` does not require a connection.
 
 ---
 
-## Opciones globales (todas los subcomandos)
+## Invocation rules
 
-Disponibles en cualquier subcomando que incluya el parser padre (`create`, `update`, `status`, `drop`, `init-db`, `audit …`, salvo `manifest validate/list` que también lo incluyen en su rama).
+Global options are on the **parent parser of each subcommand**. They must appear **after** the subcommand name:
 
-| Opción | Descripción |
+```bash
+# Correct
+python3 -m giswater_admin create --kind ws --schema demo --profile empty --json
+
+# Wrong (root parser does not define --json)
+python3 -m giswater_admin --json create ...
+```
+
+---
+
+## Global options
+
+Available on subcommands that include the shared parent parser (`create`, `update`, `status`, `drop`, `init-db`, `audit …`, `manifest list|validate`).
+
+| Option | Description |
 |--------|-------------|
-| `--json` | Una única línea JSON en **stdout** (útil con `jq`, scripts, CI). |
-| `--quiet` | Oculta progreso en stderr; siguen errores/avisos. |
-| `-v` / `--verbose` | Una línea alineada `[n/total]  ruta.sql` por archivo (stderr). |
-| `-d` / `--debug` | Como `-v` + logs `DEBUG` del paquete `giswater_admin` (vista previa del SQL). |
-| `--timing` | Bloque `── Done … ──` al final (por fase + top lentos). Con `-v`, añade duración en cada línea. |
-| `--timing-threshold-ms N` | Con `-v --timing`, solo lista archivos con duración ≥ N ms. |
-| `--timing-top K` | Cuántos archivos más lentos incluir en el resumen (default: 20). |
-| `--timing-detail` | Con `--json --timing`, incluye el listado completo de archivos en el payload. |
-| `--dbmodel-path DIR` | Raíz del árbol `dbmodel` (por defecto: repo del plugin). |
+| `--json` | Single JSON object on **stdout** (for `jq`, CI, scripts). |
+| `--quiet` | Suppress info-level progress on stderr; errors/warnings remain. |
+| `-v` / `--verbose` | One aligned line per executed SQL path on stderr. |
+| `-d` / `--debug` | Like `-v` plus `DEBUG` logs with SQL previews. |
+| `--timing` | `── Done … ──` summary (per phase + slowest files). With `-v`, adds ms per file. |
+| `--timing-threshold-ms N` | With `-v --timing`, only log files with duration ≥ N ms. |
+| `--timing-top K` | Number of slowest files in summary (default: 20). |
+| `--timing-detail` | With `--json --timing`, include full per-file list in the JSON payload. |
+| `--dbmodel-path DIR` | Root of the dbmodel tree (default: sibling `dbmodel/` in the plugin repo). |
 
-Ejemplo para medir tiempos de creación (por fichero SQL):
+**Connection group** (where applicable):
 
-```bash
-# SQL files lentos (resumen por fase + top updates por versión M.m.p):
-python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
-  --timing --timing-top 30 -v --timing-threshold-ms 30 \
-  --conn "$CONN" 2>&1 | tee /tmp/gw_create_timing.log
-
-# JSON para jq (solo updates, >100ms):
-python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
-  --timing --timing-detail --json --conn "$CONN" 2>/dev/null | \
-  jq '.timing.updates_by_version[:20], .timing.slowest_by_phase.updates[:20]'
-```
-
----
-
-## Flujo típico: base nueva → extensiones → esquema
-
-1. Crea una base de datos vacía en Postgres (fuera de este CLI: `createdb`, pgAdmin, Docker, etc.).
-2. **`init-db`** una vez por base (extensiones).
-3. **`create`** según `kind` (ws / ud / …).
-4. Opcional: **`update`**, **`status`**, **`drop`**.
-
-```bash
-export CONN='postgresql://user:pass@127.0.0.1:5432/mi_base'
-python3 -m giswater_admin init-db --conn "$CONN"
-python3 -m giswater_admin create --kind ws --schema ws_demo --srid 25831 --profile empty --conn "$CONN"
-```
-
----
-
-## Resumen de `kind` y perfiles
-
-| `kind` | Perfiles habituales | Requisitos / notas |
-|--------|---------------------|---------------------|
-| **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `ci`, `update` | Red de abastecimiento. Updates en `dbmodel/schemas/network/{common,ws}/updates/M/m/p/` (per-version: common -> ws). |
-| **ud** | igual que ws | Red de saneamiento. Updates en `dbmodel/schemas/network/{common,ud}/updates/M/m/p/` (per-version: common -> ud). |
-| **utils** | `empty`, `update` | **`--ws-schema`** y **`--ud-schema`** en `create`. Updates flat en `dbmodel/schemas/utils/updates/M/m/p/*.sql`. |
-| **am** | `empty`, `update` | Singleton `am`. Updates flat en `dbmodel/schemas/am/updates/M/m/p/*.sql`. Histórico colapsado en `dbmodel/schemas/am/updates/0/0/0/`. |
-| **cm** | `empty`, `with_sample`, `update` | **`--parent-schema`**. `parent_type` ws/ud. `cm/common` + `cm/base`; luego `parent_schema/*` sobre el parent. |
-| **audit** | subcomandos `structure`, `activate`, … | **Estructura** una vez; **activate** por esquema ws/ud objetivo. Sin árbol semver de updates. |
-
-Los detalles exactos están en `dbmodel/manifests/<kind>.yaml`.
-
----
-
-## Salida, JSON y trazas
-
-- **stdout:** resultado final (YAML legible o un JSON si `--json`).
-- **stderr:** progreso formateado (fases + archivos con `-v`), `warning:` / `error:`, y logs de depuración con `-d`.
-- **QGIS:** mismo formato en el panel **Giswater PY**; el diálogo de crear proyecto muestra `Exec. time` + fase/archivo actual en `lbl_time`.
-
-### Formato de log (CLI y QGIS)
-
-Antes (depuración):
-
-```
-info: [581/723] phase:updates
-exec: [581/723] 1155ms dbmodel/schemas/network/ws/updates/4/2/0/dml.sql
-timing: total 10.4s (723 files)
-```
-
-Ahora (`giswater_admin/log_format.py`):
-
-```
-── Schema build: ws / gw_ws_test  profile=empty  v4.9.0 ──
-[581/723]  phase  updates
-[581/723]   1.2s  ws/updates/4/2/0/dml.sql
-── Done  10.4s  723 files ──
-  updates              7.1s  (612 files, 68.0%)
-Slowest:
-   3241ms  updates  ws/updates/4/2/0/dml.sql
-```
-
-Las rutas se acortan con `--dbmodel-path` (CLI) o `BuildParams.sql_root` (QGIS).
-
-Ejemplo solo JSON a archivo de log:
-
-```bash
-python3 -m giswater_admin create --kind ws --schema x --profile empty --conn "$CONN" --json 2>trace.log | jq .
-```
-
----
-
-## Códigos de salida
-
-| Código | Significado |
+| Option | Description |
 |--------|-------------|
-| **0** | Éxito. |
-| **1** | Error (parseo, I/O, Postgres, SQL fallido, plan inválido, etc.). |
+| `--conn` | PostgreSQL URL. |
+| `--config` | Path to connection YAML. |
 
 ---
 
-## Integración QGIS
+## Commands reference
 
-El plugin construye `BuildParams` y ejecuta `SchemaBuilder` en `GwSchemaBuilderTask` con `QtDbAdapter` sobre `tools_db`. Desde código también puedes usar `Out`, `configure_stderr_logging` y `build_progress_cb` como en el CLI.
-
----
-
-## Tests
-
-```bash
-# Rápidos, sin base de datos
-python3 -m pytest test/engine -v
-
-# Humo contra Postgres (se omiten sin PGSERVICE / PGDATABASE)
-PGSERVICE=localhost_giswater python3 -m pytest test/engine/smoke -v
-```
-
----
-
-## Referencia rápida: todos los comandos y ejemplos
-
-Sintaxis base:
+Base syntax:
 
 ```text
-python3 -m giswater_admin <subcomando> [opciones del subcomando] [opciones globales]
+python3 -m giswater_admin <subcommand> [subcommand options] [global options]
 ```
 
----
+Exit codes: **0** success, **1** failure (parse, I/O, PostgreSQL, SQL, invalid plan).
 
 ### `init-db`
 
-Crea extensiones por defecto: `postgis` → `postgis_raster` → `tablefunc` → `pgrouting` → `unaccent` (+ opcional `postgres_fdw`).
+Creates extensions in order: `postgis` → `postgis_raster` → `tablefunc` → `pgrouting` → `unaccent` (optional `postgres_fdw` with `--with-fdw`). Run **once per database** before the first `create`.
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--with-fdw` | También `CREATE EXTENSION postgres_fdw`. |
-| `--continue-on-error` | Sigue tras el primer fallo (por defecto se detiene). |
-| `--check` | Lista el SQL; sin ejecutar; no requiere `--conn`. |
-| `--conn` / `--config` | Conexión (omitible solo con `--check`). |
+| Option | Description |
+|--------|-------------|
+| `--with-fdw` | Also `CREATE EXTENSION postgres_fdw`. |
+| `--continue-on-error` | Try all extensions after a failure (default: stop on first error). |
+| `--check` | Print SQL only; no connection required. |
+| `--conn` / `--config` | Connection (optional with `--check`). |
 
 ```bash
 python3 -m giswater_admin init-db --conn "$CONN"
@@ -313,32 +238,29 @@ python3 -m giswater_admin init-db --check --json
 
 ### `create`
 
-Crea un esquema según manifiesto `dbmodel/manifests/<kind>.yaml`.
+Builds a schema from `dbmodel/manifests/<kind>.yaml` and the chosen profile.
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--kind` | `ws` \| `ud` \| `utils` \| `am` \| `cm` (obligatorio). |
-| `--schema` | Nombre del esquema (obligatorio). |
-| `--srid` | EPSG (defecto `25831`). |
-| `--profile` | Perfil del manifiesto (defecto `empty`). |
-| `--locale` | Defecto `en_US`. |
-| `--plugin-version` | Tope de parches `updates/` (defecto `4.9.0`). |
-| `--db-user` | Autor en `lastprocess` (defecto: usuario de conexión). |
-| `--ws-schema` / `--ud-schema` | Obligatorios si `kind=utils`. |
-| `--parent-schema` | Obligatorio si `kind=cm`. |
-| `--parent-type` | `ws` \| `ud` (sobreescribe auto-detección). |
-| `--main-version` | Para `utils` (`utils_version` en config). |
-| `--am-target` | **Deprecado** (alias oculto). AM ahora usa semver vía `--plugin-version`. |
-| `--check` | Solo plan + recuentos; sin escritura en BD. |
-| `--conn` / `--config` | Conexión. |
+| Option | Description |
+|--------|-------------|
+| `--kind` | **Required.** `ws` \| `ud` \| `utils` \| `am` \| `cm` |
+| `--schema` | **Required.** Target schema name. |
+| `--srid` | EPSG code (default `25831`). |
+| `--profile` | Manifest profile (default `empty`). |
+| `--locale` | i18n folder (default `en_US`). |
+| `--plugin-version` | Upper bound for `updates/` patches (default `4.9.0`). |
+| `--db-user` | Author in `lastprocess` (default: connection user). |
+| `--ws-schema` | Linked ws schema (**required** for `kind=utils`). |
+| `--ud-schema` | Linked ud schema (**required** for `kind=utils`). |
+| `--parent-schema` | Parent ws/ud schema (**required** for `kind=cm`). |
+| `--parent-type` | `ws` \| `ud` — override auto-detection for `cm`. |
+| `--main-version` | Stored in utils as `utils_version` (default: `--plugin-version`). |
+| `--check` | Plan only; no SQL execution. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin create --kind ws --schema ws1 --srid 25831 --profile sample_full --conn "$CONN"
 python3 -m giswater_admin create --kind ud --schema ud1 --profile empty --conn "$CONN"
 python3 -m giswater_admin create --kind utils --schema utils --ws-schema ws1 --ud-schema ud1 --conn "$CONN"
-python3 -m giswater_admin create --kind am --schema am --conn "$CONN"
-python3 -m giswater_admin create --kind am --schema am --plugin-version 4.9.0 --conn "$CONN"
-python3 -m giswater_admin create --kind cm --schema cm1 --parent-schema ws1 --conn "$CONN"
 python3 -m giswater_admin create --kind cm --schema cm1 --parent-schema ws1 --parent-type ws --conn "$CONN"
 python3 -m giswater_admin create --kind ws --schema x --profile empty --check --json
 ```
@@ -347,17 +269,17 @@ python3 -m giswater_admin create --kind ws --schema x --profile empty --check --
 
 ### `update`
 
-Aplica perfil `update` del manifiesto al esquema indicado (parches entre `project_version` y `plugin_version`).
+Applies the manifest `update` profile to an existing schema (patches between `sys_version.giswater` and target version).
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--schema` | Esquema existente (obligatorio). |
-| `--kind` | `ws` \| `ud` \| `utils` \| `am` (opcional: se infiere de `sys_version.project_type`). |
-| `--to-version` | Versión objetivo (defecto: `--plugin-version`). |
-| `--plugin-version` | Defecto `4.9.0`. |
-| `--locale` | Defecto `en_US`. |
-| `--check` | Solo plan. |
-| `--conn` / `--config` | Conexión. |
+| Option | Description |
+|--------|-------------|
+| `--schema` | **Required.** Existing schema. |
+| `--kind` | Optional override; else inferred from `sys_version.project_type`. |
+| `--to-version` | Target version (default: `--plugin-version`). |
+| `--plugin-version` | Default `4.9.0`. |
+| `--locale` | Default `en_US`. |
+| `--check` | Plan only. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin update --schema ws_legacy --conn "$CONN"
@@ -369,12 +291,12 @@ python3 -m giswater_admin update --schema ws_legacy --kind ws --check --json
 
 ### `status`
 
-Lista esquemas que tienen tabla `sys_version` o detalle de uno.
+Lists schemas that expose `sys_version`, or details for one schema.
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--schema` | Si se omite, lista todos los candidatos. |
-| `--conn` / `--config` | Conexión. |
+| Option | Description |
+|--------|-------------|
+| `--schema` | If omitted, list all candidates. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin status --conn "$CONN"
@@ -385,15 +307,15 @@ python3 -m giswater_admin status --schema ws_demo --conn "$CONN" --json
 
 ### `drop`
 
-Elimina un esquema.
+Drops a schema. Irreversible.
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--schema` | Nombre (obligatorio). |
-| `--yes` | Obligatorio para ejecutar (confirmación). |
-| `--cascade` | `DROP SCHEMA … CASCADE`. |
-| `--check` | Muestra el SQL sin ejecutar. |
-| `--conn` / `--config` | Conexión. |
+| Option | Description |
+|--------|-------------|
+| `--schema` | **Required.** |
+| `--yes` | **Required** to execute (confirmation). |
+| `--cascade` | `DROP SCHEMA … CASCADE` (default `RESTRICT`). |
+| `--check` | Show SQL without executing. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin drop --schema old_ws --yes --conn "$CONN"
@@ -405,16 +327,19 @@ python3 -m giswater_admin drop --schema old_ws --yes --check
 
 ### `audit`
 
-Subcomandos obligatorios: `structure` | `activate` | `drop`.
+Subcommands: `structure` | `activate` | `drop` (required third level).
 
 #### `audit structure`
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--with-checkproject` | Incluye carga `audit_checkproject`. |
-| `--locale`, `--plugin-version` | Passthrough al motor. |
-| `--check` | Solo plan. |
-| `--conn` / `--config` | Conexión. |
+Builds the `audit` schema.
+
+| Option | Description |
+|--------|-------------|
+| `--with-checkproject` | Also load `audit_checkproject` helpers. |
+| `--locale` | Default `en_US`. |
+| `--plugin-version` | Default `4.9.0`. |
+| `--check` | Plan only. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin audit structure --conn "$CONN"
@@ -423,12 +348,15 @@ python3 -m giswater_admin audit structure --with-checkproject --conn "$CONN"
 
 #### `audit activate`
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--schema` | Esquema ws/ud donde cablear triggers (obligatorio). |
-| `--locale`, `--plugin-version` | Opcionales. |
-| `--check` | Solo plan. |
-| `--conn` / `--config` | Conexión. |
+Wires audit triggers into a ws/ud project schema.
+
+| Option | Description |
+|--------|-------------|
+| `--schema` | **Required.** Target ws/ud schema. |
+| `--locale` | Default `en_US`. |
+| `--plugin-version` | Default `4.9.0`. |
+| `--check` | Plan only. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin audit activate --schema ws_demo --conn "$CONN"
@@ -436,11 +364,11 @@ python3 -m giswater_admin audit activate --schema ws_demo --conn "$CONN"
 
 #### `audit drop`
 
-| Argumento | Descripción |
-|-----------|-------------|
-| `--yes` | Confirmación. |
-| `--check` | Solo SQL. |
-| `--conn` / `--config` | Conexión. |
+| Option | Description |
+|--------|-------------|
+| `--yes` | Confirm drop. |
+| `--check` | SQL only. |
+| `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin audit drop --yes --conn "$CONN"
@@ -452,7 +380,7 @@ python3 -m giswater_admin audit drop --yes --conn "$CONN"
 
 #### `manifest list`
 
-Enumera YAML en `--dbmodel-path/manifests/` con `kind` y perfiles.
+Lists YAML files under `--dbmodel-path/manifests/`.
 
 ```bash
 python3 -m giswater_admin manifest list
@@ -461,7 +389,11 @@ python3 -m giswater_admin manifest list --dbmodel-path ./dbmodel --json
 
 #### `manifest validate`
 
-Valida un fichero YAML.
+Validates a manifest file.
+
+| Argument | Description |
+|----------|-------------|
+| `path` | Path to `<kind>.yaml` |
 
 ```bash
 python3 -m giswater_admin manifest validate dbmodel/manifests/ws.yaml
@@ -470,22 +402,7 @@ python3 -m giswater_admin manifest validate dbmodel/manifests/ws.yaml --json
 
 ---
 
-### Ejemplos globales (cualquier subcomando que soporte el parser padre)
-
-```bash
-# Trazas por archivo (como log QGIS en terminal)
-python3 -m giswater_admin create --kind ws --schema x --profile empty --conn "$CONN" -v
-
-# Depuración con preview de SQL
-python3 -m giswater_admin create --kind ws --schema x --profile empty --conn "$CONN" -d
-
-# Salida JSON + silenciar progreso en stderr
-python3 -m giswater_admin create --kind ws --schema x --profile empty --conn "$CONN" --json --quiet
-```
-
----
-
-### Caso completo: ws + ud + utils + comprobación (Linux / macOS)
+### End-to-end example (ws + ud + utils)
 
 ```bash
 set -e
@@ -498,23 +415,106 @@ python3 -m giswater_admin create --kind utils --schema utils --ws-schema ws_test
 python3 -m giswater_admin status --conn "$CONN" --json | python3 -m json.tool
 ```
 
-### Mismo flujo en Windows (PowerShell)
+---
 
-```powershell
-$CONN = "postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli"
-py -3 -m giswater_admin init-db --conn $CONN
-py -3 -m giswater_admin create --kind ws --schema ws_test --srid 25831 --profile sample_full --conn $CONN
-py -3 -m giswater_admin create --kind ud --schema ud_test --srid 25831 --profile sample_full --conn $CONN
-py -3 -m giswater_admin create --kind utils --schema utils --ws-schema ws_test --ud-schema ud_test --conn $CONN
-py -3 -m giswater_admin status --conn $CONN --json
-```
+## Kinds and manifest profiles
+
+| `kind` | Typical profiles | Notes |
+|--------|------------------|-------|
+| **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `ci`, `update` | Water supply. Updates: `schemas/network/common/updates` then `schemas/network/ws/updates`. |
+| **ud** | same as ws | Sewerage. Updates: common then `schemas/network/ud/updates`. |
+| **utils** | `empty`, `update` | Requires `--ws-schema` and `--ud-schema` on `create`. |
+| **am** | `empty`, `update` | Asset management singleton. |
+| **cm** | `empty`, `with_sample`, `update` | Requires `--parent-schema`; uses `parent_schema/ws` or `ud`. |
+| **audit** | CLI subcommands | No semver `updates/` tree; `structure` once, `activate` per project. |
+
+**ws/ud profiles** (from [manifests/ws.yaml](../dbmodel/manifests/ws.yaml)):
+
+| Profile | Phases (summary) |
+|---------|------------------|
+| `empty` | `load_base` → `updates` → `lastprocess` → `final_pass` |
+| `sample_full` | … → `load_sample` → `final_pass` |
+| `sample_inv` | … → `load_sample` → `load_inv` → `final_pass` |
+| `dev` | … → `load_dev` → `final_pass` |
+| `ci` | … → `load_sample` → `final_pass` (used by pgTAP bootstrap) |
+| `update` | `reload_fct_ftrg` → `updates` → `lastprocess_upgrade` |
+
+Details and folder layout: [dbmodel README — Schema architecture](../dbmodel/README.md#schema-architecture).
 
 ---
 
-### Ampliar el modelo
+## Timing and output
 
-1. Añadir o editar `dbmodel/manifests/<kind>.yaml`.
-2. Si hace falta un `kind` nuevo, registrarlo en `giswater_admin/cli.py` (`--kind` y lógica del comando si aplica).
-3. Validar: `python3 -m giswater_admin manifest validate dbmodel/manifests/<kind>.yaml`.
+| Stream | Content |
+|--------|---------|
+| **stdout** | Final result (YAML or JSON with `--json`). |
+| **stderr** | Progress (`log_format.py`), warnings, errors; `-v`/`-d` add per-file lines. |
 
-Los tipos de fase soportados en YAML incluyen: `sql_dir`, `version_walk` (con `root:` o `roots: [...]` multi-raíz para ws/ud), `dir_walk` (deprecado), `sql_file`, `sql_function`, `sql_inline`.
+Example stderr with `-v --timing`:
+
+```text
+── Schema build: ws / gw_ws_test  profile=empty  v4.9.0 ──
+[581/723]  phase  updates
+[581/723]   1.2s  ws/updates/4/2/0/dml.sql
+── Done  10.4s  723 files ──
+  updates              7.1s  (612 files, 68.0%)
+Slowest:
+   3241ms  updates  ws/updates/4/2/0/dml.sql
+```
+
+Paths are shortened using `--dbmodel-path` as the root prefix.
+
+```bash
+# Slow SQL files during create
+python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
+  --timing --timing-top 30 -v --timing-threshold-ms 30 \
+  --conn "$CONN" 2>&1 | tee /tmp/gw_create_timing.log
+
+# JSON timing for jq
+python3 -m giswater_admin create --kind ws --schema gw_ws_test --profile empty \
+  --timing --timing-detail --json --conn "$CONN" 2>/dev/null | \
+  jq '.timing.slowest_by_phase.updates[:20]'
+```
+
+Timing is **per SQL file** only (not per PL/pgSQL function step).
+
+---
+
+## QGIS integration
+
+The plugin builds `BuildParams`, runs `SchemaBuilder` in `core/threads/schema_builder_task.py` via `QtDbAdapter`, and can show the same formatted progress in the **Giswater PY** log. After a build, `summarize_build()` from `engine/timing_report.py` feeds the create-project dialog timing label.
+
+---
+
+## Unit tests
+
+No Docker required:
+
+```bash
+# From plugin repo root
+python3 -m pytest test/engine -v
+```
+
+Optional smoke tests against a real cluster (skipped without `PGSERVICE` / `PGDATABASE`):
+
+```bash
+PGSERVICE=localhost_giswater python3 -m pytest test/engine/smoke -v
+```
+
+Database integration tests: [dbmodel/README.md#testing](../dbmodel/README.md#testing).
+
+---
+
+## Extending the model
+
+1. Add or edit `dbmodel/manifests/<kind>.yaml`.
+2. For a new `kind`, register it in `giswater_admin/cli.py` (`--kind` choices and command validation if needed).
+3. Validate: `python3 -m giswater_admin manifest validate dbmodel/manifests/<kind>.yaml`.
+
+Supported phase types: `sql_dir`, `version_walk` (`root:` or `roots:`), `sql_file`, `sql_function`, `sql_inline`. `dir_walk` is deprecated.
+
+---
+
+## Keeping docs in sync
+
+When you add or change CLI flags, update **both** `giswater_admin/cli.py` and this README (global options + affected subcommand tables). A future improvement could dump `argparse` help in CI; that is not automated yet.
