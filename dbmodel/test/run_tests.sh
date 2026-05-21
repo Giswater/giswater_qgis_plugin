@@ -31,6 +31,7 @@ export GW_VERBOSE="${GW_VERBOSE:-}" GW_DEBUG="${GW_DEBUG:-}" GW_TIMING="${GW_TIM
 export GW_TIMING_TOP="${GW_TIMING_TOP:-}" GW_TIMING_THRESHOLD_MS="${GW_TIMING_THRESHOLD_MS:-}"
 export GW_TIMING_DETAIL="${GW_TIMING_DETAIL:-}"
 export GW_PROFILE_LASTPROCESS="${GW_PROFILE_LASTPROCESS:-}" GW_PROFILE_SUMMARY="${GW_PROFILE_SUMMARY:-}"
+export GW_SCHEMA_DUMP="${GW_SCHEMA_DUMP:-}"
 
 cd "${DBMODEL_DIR}"
 
@@ -38,6 +39,8 @@ if command -v lsof >/dev/null 2>&1 && lsof -i ":55432" -sTCP:LISTEN -t >/dev/nul
   echo "WARN: something listens on host port 55432 (legacy local Postgres?)." >&2
   echo "      Tests use Docker internal network only; use GW_CLEAN=1 if runs fail." >&2
 fi
+
+chmod +x "${SCRIPT_DIR}"/*.sh
 
 echo "==> PostgreSQL ${PG_MAJOR} (PostGIS ${POSTGIS_VERSION}) project ${PROJECT}"
 docker compose -f docker-compose.test.yml build --quiet postgres runner

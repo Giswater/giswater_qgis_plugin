@@ -37,6 +37,7 @@ services:
       TEST_GROUPS: ${TEST_GROUPS:-all}
       PG_PROVE_JOBS: ${PG_PROVE_JOBS:-4}
       GW_DUMP_PATH: ${GW_DUMP_PATH:-}
+      GW_SCHEMA_DUMP: ${GW_SCHEMA_DUMP:-}
       GW_VERBOSE: ${GW_VERBOSE:-}
       GW_DEBUG: ${GW_DEBUG:-}
       GW_TIMING: ${GW_TIMING:-}

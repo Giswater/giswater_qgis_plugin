@@ -184,17 +184,33 @@ Flow: `postgres` (`gw-ci`) + `runner` sharing its network → `127.0.0.1:5432` i
 
 Bootstrap is **`giswater_admin` only**: `init-db`, drop `ws_40`/`ud_40` if present, `create --profile ci` (phases: `load_base` → `updates` → `lastprocess` → `load_sample` → `final_pass`), then `replace_vars` copies `test/{ws,ud}/` → `test/.run/{ws,ud}/` (substitutes `SCHEMA_NAME` / `SRID_VALUE` only in the copy), then `pg_prove` on the staging tree. Source SQL under `test/ws` and `test/ud` is never modified.
 
-Locally, without `GW_VERBOSE`/`GW_TIMING` you get phase milestones and a YAML summary; with them, per-file paths and a timing block at the end. **GitHub Actions** sets `GW_VERBOSE=1` and `GW_TIMING=1` on every test job (see `.github/workflows/test-db.yml`).
+Locally, `./dbmodel/test/run_tests.sh` runs bootstrap + all pgTAP groups in one container session (`run_tests_inner.sh`). Without `GW_VERBOSE`/`GW_TIMING` you get phase milestones and a YAML summary; with them, per-file paths and a timing block at the end.
+
+### GitHub Actions (`.github/workflows/test-db.yml`)
+
+| Job | Matrix | Steps (visible in UI) |
+|-----|--------|------------------------|
+| `db-bootstrap` | `ws/ud` × PG 16/17/18 (6) | Start Postgres → **Bootstrap schema** → **Dump schema** → upload artifact |
+| `db-test` | × `schema, security, function, data, performance` (30) | Download dump → Start Postgres → **Restore schema** → **Run pgTAP (group)** |
+| `publish-gw-db` | same 6 (main/tags only) | Build `ghcr.io/giswater/gw-db:…` from bootstrap dump |
+
+Test jobs run **in parallel** per group; each restores the same `gw-schema-pg{N}-{project}.dump` into a fresh Postgres. `GW_VERBOSE=1` and `GW_TIMING=1` on bootstrap and test jobs.
+
+`workflow_dispatch` input `tests` can limit to one group (e.g. `function`).
 
 **Test harness files** (under `dbmodel/test/`):
 
 | File | Role |
 |------|------|
-| `run_tests.sh` | Host orchestrator (Docker compose) |
-| `run_tests_inner.sh` | Bootstrap + pg_prove inside runner |
-| `replace_vars.py` | Substitute schema placeholders in test SQL |
-| `plugin_version.py` | Max semver from `updates/` for `--plugin-version` |
-| `diagnose_db.sh` | Optional host `psql` check (debug compose) |
+| `run_tests.sh` | Host orchestrator (Docker compose), local full run |
+| `run_tests_inner.sh` | Local: bootstrap → all groups → optional dump |
+| `bootstrap_inner.sh` | init-db + create ci + replace_vars |
+| `restore_inner.sh` | init-db + roles + pg_restore from `GW_SCHEMA_DUMP` |
+| `prove_inner.sh` | One `TEST_GROUPS` via pg_prove (`-j 4`) |
+| `dump_schema.sh` | `pg_dump -n {schema}` to `GW_SCHEMA_DUMP` / `GW_DUMP_PATH` |
+| `replace_vars.py` | Staging copy with placeholders resolved |
+| `plugin_version.py` | Max semver from `updates/` |
+| `diagnose_db.sh` | Optional host `psql` (debug compose) |
 
 Plugin version: `python dbmodel/test/plugin_version.py` (from repo root).
 
@@ -206,7 +222,7 @@ docker compose -f docker-compose.test.yml -f docker-compose.debug.yml up -d post
 GW_PUBLISH_PORT=15432 ./test/diagnose_db.sh
 ```
 
-GitHub Actions: `.github/workflows/test-db.yml` (`ws`/`ud` × PostgreSQL 16/17/18).
+Published DB image tags: `ghcr.io/giswater/gw-db:main-pg16-ws` (and `ud`, PG 17/18).
 
 ### Tutorials
 
