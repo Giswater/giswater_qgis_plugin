@@ -12,5 +12,5 @@ if [[ -z "${OUT}" ]]; then
 fi
 
 mkdir -p "$(dirname "${OUT}")"
-echo "==> pg_dump schema ${SCHEMA} -> ${OUT}"
+echo "==> pg_dump schema ${SCHEMA} -> ${OUT} ($(pg_dump --version))"
 pg_dump -h 127.0.0.1 -p 5432 -U postgres -n "${SCHEMA}" -Fc -f "${OUT}" gw_db

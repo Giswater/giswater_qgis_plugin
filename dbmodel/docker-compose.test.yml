@@ -23,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: docker/test-runner/Dockerfile
+      args:
+        PG_MAJOR: ${PG_MAJOR:-16}
     network_mode: service:postgres
     depends_on:
       postgres:
