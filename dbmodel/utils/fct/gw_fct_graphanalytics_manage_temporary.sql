@@ -237,7 +237,7 @@ BEGIN
                 CREATE INDEX IF NOT EXISTS temp_pgr_gully_component_idx ON temp_pgr_gully USING btree (component);
             END IF;
 
-            CREATE TABLE IF NOT EXISTS temp_pgr_mapzone_graph (
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_mapzone_graph (
                 node_id int4 NOT NULL,
                 netscenario_id int4 NULL,
                 mapzone_id int4 NOT NULL,
