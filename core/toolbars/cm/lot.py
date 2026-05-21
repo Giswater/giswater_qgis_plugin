@@ -1616,14 +1616,16 @@ class AddNewLot:
 
         for cur_user, campaign_id in to_insert:
             sql = tools_db.dao.mogrify(
-                "INSERT INTO cm.selector_campaign (cur_user, campaign_id) VALUES (%s, %s)",
-                (cur_user, campaign_id)
+                "INSERT INTO cm.selector_campaign (cur_user, campaign_id) VALUES (%s, %s) "
+                "ON CONFLICT (cur_user, campaign_id) DO NOTHING",
+                (cur_user, campaign_id),
             )
             tools_db.execute_sql(sql)
             sql = tools_db.dao.mogrify(
                 "INSERT INTO cm.selector_lot (cur_user, lot_id) "
-                "SELECT %s, lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s",
-                (cur_user, campaign_id)
+                "SELECT %s, lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s "
+                "ON CONFLICT (cur_user, lot_id) DO NOTHING",
+                (cur_user, campaign_id),
             )
             tools_db.execute_sql(sql)
 

@@ -1,0 +1,50 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+BEGIN;
+
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT * FROM no_plan();
+
+-- Check table
+SELECT has_table('ext_cat_hydrometer'::name, 'Table ext_cat_hydrometer should exist');
+
+-- Check columns
+SELECT columns_are(
+    'ext_cat_hydrometer',
+    ARRAY[
+        'id', 'hydrometer_type', 'madeby', 'class', 'ulmc', 'type',
+        'flownom', 'dnom', 'link', 'url', 'picture', 'svg',
+        'code', 'observ'
+    ],
+    'Table ext_cat_hydrometer should have the correct columns'
+);
+
+-- Check column types
+SELECT col_type_is('ext_cat_hydrometer', 'id', 'varchar(16)', 'Column id should be varchar(16)');
+SELECT col_type_is('ext_cat_hydrometer', 'hydrometer_type', 'varchar(100)', 'Column hydrometer_type should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'madeby', 'varchar(100)', 'Column madeby should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'class', 'varchar(100)', 'Column class should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'ulmc', 'varchar(100)', 'Column ulmc should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'type', 'varchar(100)', 'Column type should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'flownom', 'varchar(100)', 'Column flownom should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'dnom', 'varchar(100)', 'Column dnom should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer', 'link', 'varchar(512)', 'Column link should be varchar(512)');
+SELECT col_type_is('ext_cat_hydrometer', 'url', 'varchar(512)', 'Column url should be varchar(512)');
+SELECT col_type_is('ext_cat_hydrometer', 'picture', 'varchar(512)', 'Column picture should be varchar(512)');
+SELECT col_type_is('ext_cat_hydrometer', 'svg', 'varchar(50)', 'Column svg should be varchar(50)');
+SELECT col_type_is('ext_cat_hydrometer', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('ext_cat_hydrometer', 'observ', 'text', 'Column observ should be text');
+
+-- Finish
+SELECT * FROM finish();
+
+ROLLBACK;

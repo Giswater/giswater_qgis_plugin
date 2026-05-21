@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsTask
 
 from ... import global_vars
-from ...libs import tools_log
+from ...libs import tools_log, tools_os
 
 
 class EmitterCalibrationExecute(QgsTask, QObject):
@@ -56,9 +56,9 @@ class EmitterCalibrationExecute(QgsTask, QObject):
     def run(self):
 
         try:
-            import matplotlib.pyplot  # noqa: F401
-            import pandas  # noqa: F401
-            import wntr  # noqa: F401
+            tools_os.get_dep("matplotlib.pyplot")
+            tools_os.get_dep("pandas")
+            tools_os.get_dep("wntr")
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "
@@ -95,9 +95,10 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 tools_log.log_info(msg, msg_params=msg_params)
 
     def _run_iterations(self):
-        import matplotlib.pyplot as plt
-        import pandas as pd
-        from wntr.sim import EpanetSimulator
+        plt = tools_os.get_dep("matplotlib.pyplot")
+        pd = tools_os.get_dep("pandas")
+        wntr_sim = tools_os.get_dep("wntr.sim")
+        EpanetSimulator = wntr_sim.EpanetSimulator
 
         network_junctions = {}
         network_junctions["all_network"] = []
@@ -320,9 +321,10 @@ class EmitterCalibrationExecute(QgsTask, QObject):
         self.network = network
 
     def _run_iterations_interpolating(self, network_junctions, sum_dem, junctions_coeff_cal, expected_demand, df_dict, interpolated_idx, demands_list_plt):
-        import matplotlib.pyplot as plt
-        import pandas as pd
-        from wntr.sim import EpanetSimulator
+        plt = tools_os.get_dep("matplotlib.pyplot")
+        pd = tools_os.get_dep("pandas")
+        wntr_sim = tools_os.get_dep("wntr.sim")
+        EpanetSimulator = wntr_sim.EpanetSimulator
 
         for trial in range(self.trials):
             # Set current trial
@@ -411,7 +413,8 @@ class EmitterCalibrationExecute(QgsTask, QObject):
         return network
 
     def _add_emitters_loop(self, network_junctions, network, expected_demand, df_dict, idx):
-        from wntr.sim import EpanetSimulator
+        wntr_sim = tools_os.get_dep("wntr.sim")
+        EpanetSimulator = wntr_sim.EpanetSimulator
 
         for l_coeff in [self.min_coeff_mult, self.mid_coeff_mult, self.max_coeff_mult]:
             # Set emitter coefficients
@@ -501,7 +504,8 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 network_junctions["0"].append(v["node_id"])
 
     def _export_network(self):
-        from wntr.network import write_inpfile
+        wntr_network = tools_os.get_dep("wntr.network")
+        write_inpfile = wntr_network.write_inpfile
 
         write_inpfile(
             self.network, Path(self.output_folder) / f"{self.file_name}.inp"

@@ -1,0 +1,5 @@
+4.10.1
+*************
+- Fix config_form_fields `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
+- Fix update of omunit and macroomunit geometry type to multipolygon.
+- Add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.

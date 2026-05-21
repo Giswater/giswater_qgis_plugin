@@ -1,0 +1,9 @@
+4.4.0
+*************
+- Add shorterThan and biggerThan to gw_fct_anl_arc_length.
+- Add uuid column to parent tables: node, arc, connec, element, link, gully.
+    - Add [feature]_uuid columns to element_x_[feature], doc_x_[feature], om_visit_x_[feature].
+- Improve psector mode.
+- Add missing ON CASCADE constraint to element_x_gully.
+- Add missing 0 (Undefined) and -1 (Conflict) values to some mapzones tables.
+- Improve edit_control trigger to handle deleting 0 and -1 mapzones (remove unnecessary rules).

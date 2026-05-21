@@ -1214,14 +1214,14 @@ class GwDscenarioManagerButton(GwAction):
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="EPA", sub_group=sub_group, style_id=style_id, alias=alias)
+                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="EPA", sub_group=sub_group, alias=alias)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 msg = "Remove layer from project?"
                 answer = tools_qt.show_question(msg, "Warning", parameter=f"'{layer.name()}'", force_action=True)
                 if answer:
-                    tools_qgis.remove_layer_from_toc(layer.name(), "EPA", sub_group)
+                    tools_qgis.remove_layer(custom_properties={"gw_id": tablename}, group_name="EPA", sub_group=sub_group)
 
     def _manage_load_all(self, menu, state=None):
 
@@ -1274,7 +1274,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Refresh tableview
         self._fill_dscenario_table()
-    
+
     def _manage_insert_demand(self, view):
         sql = f"INSERT INTO ve_{view} (dscenario_id, feature_id) VALUES ({self.selected_dscenario_id}, '{self.dlg_dscenario.txt_feature_id.text()}');"
         tools_db.execute_sql(sql)
@@ -1293,7 +1293,7 @@ class GwDscenarioManagerButton(GwAction):
         nonvisual = GwNonVisual()
         nonvisual.get_rules(rule_id=rule_id, dscenario_id=self.selected_dscenario_id)
         nonvisual.dialog.rejected.connect(self._fill_dscenario_table)
-    
+
     def _manage_upsert_pattern(self, pattern_id=None):
 
         nonvisual = GwNonVisual()

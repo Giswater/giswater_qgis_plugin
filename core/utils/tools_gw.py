@@ -39,7 +39,8 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, \
     QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, QgsCoordinateTransformContext, \
     QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsGeometry, QgsExpression, QgsRectangle, \
-    QgsEditFormConfig, QgsSymbolLayer, QgsProperty, QgsSimpleLineSymbolLayer, QgsSimpleMarkerSymbolLayer, QgsStyle
+    QgsEditFormConfig, QgsSymbolLayer, QgsProperty, QgsSimpleLineSymbolLayer, QgsSimpleMarkerSymbolLayer, QgsStyle, \
+    QgsDataSourceUri
 from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
@@ -865,7 +866,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None,
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, alias=None, sub_sub_group=None, schema=None,
                         visibility=None, auth_id=None, extent=None, passwd=None, create_project=False, force_create_group=False, properties=None):
     """
     Put selected layer into TOC
@@ -874,7 +875,6 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param field_id: Field id of the table (String)
         :param child_layers: List of layers (StringList)
         :param group: Name of the group that will be created in the toc (String)
-        :param style_id: Id of the style we want to load (integer or String)
         :param alias: Alias of the layer (String)
         :param sub_sub_group: Sub-sub-group of the layer (String)
         :param schema: Schema of the layer (String)
@@ -886,8 +886,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
 
-    auth_id = tools_db.get_srid(tablename if schema_name == "am" else "ve_node", schema_name) if auth_id is None else auth_id
-    extent = _get_extent_parameters(schema_name, tablename if schema_name == "am" else "node") if extent is None else extent
+    auth_id = tools_db.get_srid("ext_arc_asset" if schema_name == "am" else "ve_node", schema_name) if auth_id is None else auth_id
+    extent = _get_extent_parameters(schema_name, "ext_arc_asset" if schema_name == "am" else "node") if extent is None else extent
 
     field_id = field_id.replace(" ", "")
     uri, status = tools_db.get_uri(tablename, the_geom, schema_name)
@@ -918,16 +918,16 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         if alias:
             tablename = alias
         layer = QgsRasterLayer(connString, tablename)
-        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, custom_properties={"gw_id": tablename_og})
 
     else:
         if alias:
             tablename = alias
         layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
+        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group, custom_properties={"gw_id": tablename_og})
 
         # Apply styles to layer
-        if style_id in (None, "-1") and schema_name != 'cm':
+        if schema_name != 'cm':
             set_layer_styles(tablename_og, layer, schema_name if schema_name != "am" else None)
             # Get addparam from sys_table
             sql = f"SELECT addparam FROM sys_table WHERE id = '{tablename_og}'"
@@ -974,6 +974,256 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
 
     if create_project is False:
         global_vars.iface.mapCanvas().refresh()
+
+
+def add_layer_provider(gw_id: str, cfg, group="GW Layers", sub_group=None, alias=None, sub_sub_group=None,
+                        schema=None, visibility=None, force_create_group=False):
+    """
+    Put selected layer into TOC from provider configuration
+        :param gw_id: Giswater ID (String)
+        :param cfg: Provider configuration (dict)
+        :param group: Name of the group that will be created in the toc (String)
+        :param sub_group: Sub-group of the layer (String)
+        :param alias: Alias of the layer (String)
+        :param sub_sub_group: Sub-sub-group of the layer (String)
+        :param schema: Schema of the layer (String)
+        :param visibility: Visibility of the layer (Boolean)
+        :param force_create_group: Force create group (Boolean)
+    """
+    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
+    gw_id_og = gw_id
+
+    provider = cfg["provider"]
+    layer_type = cfg["layer_type"]
+
+    uri = build_uri(gw_id, provider, cfg)
+    if uri is None:
+        return
+
+    if alias:
+        gw_id = alias
+
+    if layer_type == "raster":
+        layer = QgsRasterLayer(uri, gw_id, provider)
+
+    elif layer_type == "vector":
+        layer = QgsVectorLayer(uri, gw_id, provider)
+
+    else:
+        raise ValueError(f"Unsupported layer_type: {layer_type}")
+
+    if not layer.isValid():
+        raise Exception(
+            f"Invalid layer:\n"
+            f"provider={provider}\n"
+            f"uri={uri}"
+        )
+
+    if force_create_group:
+        create_groups = True
+    else:
+        create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
+        create_groups = tools_os.set_boolean(create_groups, default=False)
+
+    if sub_group:
+        sub_group = sub_group.capitalize()
+    if sub_sub_group:
+        sub_sub_group = sub_sub_group.capitalize()
+
+    tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group, custom_properties={"gw_id": gw_id_og})
+
+    # Apply styles to layer
+    set_layer_styles(gw_id_og, layer, schema_name)
+    # Get addparam from sys_table
+    sql = f"SELECT addparam FROM sys_table WHERE id = '{gw_id_og}'"
+    row = tools_db.get_row(sql)
+    if row:
+        addparam = row[0]
+        if addparam and addparam.get('refreshSymbology'):
+            renderer = layer.renderer()
+            if isinstance(renderer, QgsCategorizedSymbolRenderer):
+                refresh_categorized_layer_symbology_classes(layer, addparam)
+
+    if visibility is not None:
+        if visibility is False:
+            tools_qgis.set_layer_visible(layer, recursive=False, visible=False)
+
+
+def build_uri(gw_id: str, provider: str, cfg: dict) -> Optional[str]:
+
+    # direct override
+    raw_uri = cfg.get("raw_uri")
+    if raw_uri:
+        return raw_uri
+
+    builders = {
+        "wms": partial(build_network_uri, encoding="query"),
+        "wfs": partial(build_network_uri, encoding="query"),
+        "xyz": partial(build_network_uri, encoding="query"),
+        "oapif": partial(build_network_uri, encoding="qgis"),
+        "geojson": partial(build_geojson_uri, gw_id=gw_id)
+    }
+
+    builder = builders.get(provider)
+
+    if not builder:
+        tools_qgis.show_warning(f"No URI builder for provider: {provider}")
+        return None
+
+    return builder(cfg)
+
+
+def build_geojson_uri(gw_id: str, cfg: dict) -> Optional[str]:
+    """
+    Build a GeoJSON URI from a provider configuration
+        :param gw_id: Giswater ID (String)
+        :param cfg: Provider configuration (dict)
+        :return: URI (String)
+
+    Example of supported format:
+
+    {
+        "provider": "geojson",
+        "source": {
+            "path": "/tmp/test.geojson"
+        }
+    }
+
+    {
+        "provider": "geojson",
+        "source": {
+            "url": "https://server/data.geojson"
+        }
+    }
+
+    {
+        "provider": "geojson",
+        "source": {
+            "geojson": {...}
+        }
+    }
+    """
+
+    source = cfg.get("source", {})
+
+    # local file
+    if "path" in source:
+        return source["path"]
+
+    # remote URL
+    if "url" in source:
+        return source["url"]
+
+    # inline geojson object
+    if "geojson" in source:
+
+        geojson_data = source["geojson"]
+
+        geojson_str = json.dumps(geojson_data)
+
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        file_name = f"{gw_id}_{timestamp}"
+
+        vsipath = f"/vsimem/{file_name}.geojson"
+
+        gdal.FileFromMemBuffer(
+            vsipath,
+            geojson_str.encode("utf-8")
+        )
+
+        return vsipath
+
+    return None
+
+
+def build_network_uri(cfg: dict, encoding: str = "query") -> str:
+    """
+    Build a network URI from a provider configuration.
+
+    This function normalizes a configuration dictionary into either:
+    - a plain query-string style URI (encoding="query")
+    - a QGIS-style URI using QgsDataSourceUri (encoding="qgis")
+
+    :param cfg: Provider configuration dictionary.
+    :param encoding: Output encoding format:
+        - "query": returns a simple key=value&key=value string
+        - "qgis": returns a QGIS-encoded URI using QgsDataSourceUri
+    :return: URI string
+        
+    Examples of supported formats:
+
+    WMS:
+    {
+        "source": {
+            "url": "https://example.com/wms"
+        },
+        "provider": "wms",
+        "layer_type": "raster",
+        "uri_params": {
+            "format": "image/png",
+            "layers": "example_layer",
+            "styles": "",
+            "dpiMode": 7,
+            "featureCount": 10,
+            "contextualWMSLegend": "0"
+        }
+    }
+
+    OAPIF (OGC API Features):
+    {
+        "source": {
+            "url": "https://example.com/oapif"
+        },
+        "provider": "oapif",
+        "layer_type": "vector",
+        "uri_params": {
+            "srsname": "OGC:CRS84",
+            "version": "auto",
+            "typename": "example_collection",
+            "pagingEnabled": "default",
+            "restrictToRequestBBOX": "1",
+            "preferCoordinatesForWfsT11": "false"
+        }
+    }
+    """
+
+    source = cfg.get("source", {})
+    uri_params = cfg.get("uri_params", {}).copy()
+    network = cfg.get("network", {})
+
+    # merge source
+    uri_params.update(source)
+
+    # custom headers
+    headers = network.get("headers", {})
+    if headers:
+
+        header_string = "&".join(
+            f"{k}:{v}"
+            for k, v in headers.items()
+        )
+
+        uri_params["http-header"] = header_string
+
+    uri = QgsDataSourceUri()
+
+    if encoding == "query":
+        return "&".join(
+            f"{k}={v}"
+            for k, v in uri_params.items()
+        )
+
+    if encoding == "qgis":
+        uri = QgsDataSourceUri()
+
+        for key, value in uri_params.items():
+            uri.setParam(key, value)
+
+        return uri.uri(False)
+
+    raise ValueError(
+        f"Unsupported URI encoding: {encoding}"
+    )
 
 
 def refresh_categorized_layer_symbology_classes(layer, addparam=None):
@@ -1145,6 +1395,12 @@ def validate_qml(qml_content):
 
 
 def set_layer_styles(tablename, layer, schema_name):
+    # Save current layer custom properties and remove them to avoid QML overwrite them
+    custom_properties = {}
+    layer_custom_properties = layer.customPropertyKeys()
+    for cp_key in layer_custom_properties:
+        custom_properties[cp_key] = layer.customProperty(cp_key)
+
     body = f'$${{"data":{{"layername":"{tablename}"}}}}$$'
     json_return = execute_procedure('gw_fct_getstyle', body, schema_name=schema_name)
     if json_return is None or json_return['status'] == 'Failed':
@@ -1167,6 +1423,10 @@ def set_layer_styles(tablename, layer, schema_name):
                 # set new style as current
                 style_manager.setCurrentStyle(style_name)
                 tools_qgis.create_qml(layer, qml)
+
+    # Restore actual custom properties
+    for cp_key, cp_value in custom_properties.items():
+        layer.setCustomProperty(cp_key, cp_value)
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
@@ -1207,11 +1467,13 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 aux_layer_name = str(k)
 
             if del_old_layers:
-                tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+                tools_qgis.remove_layer(custom_properties={"gw_id": aux_layer_name}, group_name=group)
 
             # Use GeoJSON approach like manage_json_return
             geojson_str = json.dumps(data[k])
-            vsipath = f"/vsimem/{aux_layer_name}.geojson"
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            file_name = f"{aux_layer_name}_{timestamp}"
+            vsipath = f"/vsimem/{file_name}.geojson"
             gdal.FileFromMemBuffer(vsipath, geojson_str)
             v_layer = QgsVectorLayer(vsipath, aux_layer_name, 'ogr')
 
@@ -1224,12 +1486,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
             geometry_type = v_layer.geometryType()
 
             # Add layer to project and group
-            QgsProject.instance().addMapLayer(v_layer, False)
-            root = QgsProject.instance().layerTreeRoot()
-            my_group = root.findGroup(group)
-            if my_group is None:
-                my_group = root.insertGroup(0, group)
-            my_group.insertLayer(i, v_layer)
+            tools_qgis.add_layer_to_toc(v_layer, group=group, create_groups=True, custom_properties={"gw_id": aux_layer_name})
 
             # Increase iterator
             i = i + 1
@@ -1583,7 +1840,7 @@ def load_layer_in_hidden_group(layer_name, key_column, add_to_toc=True):
         layer = QgsVectorLayer(uri.uri(False), layer_name, "postgres")
         if layer.isValid():
             if add_to_toc:
-                tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True)
+                tools_qgis.add_layer_to_toc(layer, group="HIDDEN", create_groups=True, custom_properties={"gw_id": table})
             return layer
 
     # Select the layer called 've_node'
@@ -1709,12 +1966,7 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
 
     # Commit changes
     virtual_layer.commitChanges()
-    QgsProject.instance().addMapLayer(virtual_layer, False)
-    root = QgsProject.instance().layerTreeRoot()
-    my_group = root.findGroup(group)
-    if my_group is None:
-        my_group = root.insertGroup(0, group)
-    my_group.insertLayer(sort_val, virtual_layer)
+    tools_qgis.add_layer_to_toc(virtual_layer, group=group, create_groups=True, custom_properties={"gw_id": virtual_layer.name()})
 
 
 def enable_widgets(dialog, result, enable):
@@ -4108,7 +4360,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
                 layer_name = f'{key}'
                 if value.get('layerName'):
                     layer_name = value['layerName']
-                tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
+                tools_qgis.remove_layer(custom_properties={"gw_id": layer_name}, group_name='GW Temporal Layers')
 
                 if 'features' not in value:
                     continue
@@ -4117,19 +4369,16 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
 
                 # Get values for create and populate layer
                 geojson_str = json.dumps(value)
-                vsipath = f"/vsimem/{layer_name}.geojson"
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                file_name = f"{layer_name}_{timestamp}"
+                vsipath = f"/vsimem/{file_name}.geojson"
                 gdal.FileFromMemBuffer(vsipath, geojson_str)
                 v_layer = QgsVectorLayer(vsipath, layer_name, 'ogr')
                 if not v_layer.crs().isValid():
                     v_layer.setCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
                 v_layer.updateExtents()
                 geometry_type = v_layer.geometryType()
-                QgsProject.instance().addMapLayer(v_layer, False)
-                root = QgsProject.instance().layerTreeRoot()
-                my_group = root.findGroup('GW Temporal Layers')
-                if my_group is None:
-                    my_group = root.insertGroup(0, 'GW Temporal Layers')
-                my_group.insertLayer(i, v_layer)
+                tools_qgis.add_layer_to_toc(v_layer, group='GW Temporal Layers', create_groups=True, custom_properties={"gw_id": layer_name})
 
                 # Increase iterator
                 i = i + 1
@@ -4172,6 +4421,12 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
                     v_layer.renderer().symbol().setOpacity(opacity)
 
                 elif return_manager_style['style'] == 'qml':
+                    # Save current layer custom properties and remove them to avoid QML overwrite them
+                    custom_properties = {}
+                    layer_custom_properties = v_layer.customPropertyKeys()
+                    for cp_key in layer_custom_properties:
+                        custom_properties[cp_key] = v_layer.customProperty(cp_key)
+
                     style_id = return_manager_style['id']
                     extras = f'"style_id":"{style_id}", "layername":"{layer_name}"'
                     body = create_body(extras=extras)
@@ -4200,6 +4455,10 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):  # noqa: C90
                                 # set new style as current
                                 style_manager.setCurrentStyle(style_name)
                                 tools_qgis.create_qml(v_layer, qml)
+
+                    # Restore actual custom properties
+                    for cp_key, cp_value in custom_properties.items():
+                        v_layer.setCustomProperty(cp_key, cp_value)
 
                 elif return_manager_style['style'] == 'unique':
                     color = return_manager_style['values']['color']
@@ -4579,8 +4838,7 @@ def manage_layer_manager(json_result, sql=None):
                         group = lyr[layer_name]['group_layer']
                     else:
                         group = "GW Layers"
-                    style_id = lyr[layer_name]['style_id']
-                    add_layer_database(layer_name, the_geom, field_id, group=group, style_id=style_id, alias=lyr.get(layer_name).get('alias'))
+                    add_layer_database(layer_name, the_geom, field_id, group=group, alias=lyr.get(layer_name).get('alias'))
                 tools_qgis.set_layer_visible(layer)
 
         # force reload dataProvider in order to reindex.

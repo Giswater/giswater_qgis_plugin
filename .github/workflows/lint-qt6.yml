@@ -8,6 +8,8 @@ on:
       - 'feature/**'
       - 'fix/**'
       - 'refactor/**'
+    paths-ignore:
+      - 'dbmodel/**'
   pull_request:
     branches:
       - 'main'
@@ -15,6 +17,8 @@ on:
       - 'feature/**'
       - 'fix/**'
       - 'refactor/**'
+    paths-ignore:
+      - 'dbmodel/**'
 
 jobs:
   # Run linting for PyQt6

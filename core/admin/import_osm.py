@@ -11,7 +11,7 @@ import json
 from functools import partial
 from ..ui.ui_manager import GwAdminImportOsmUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_db, tools_qgis, tools_qt
+from ...libs import lib_vars, tools_db, tools_os, tools_qgis, tools_qt
 from qgis.PyQt.QtWidgets import QCheckBox, QVBoxLayout, QTabWidget
 from qgis.PyQt.QtCore import Qt
 
@@ -78,12 +78,15 @@ class GwImportOsm:
         """ Start import process """
 
         try:
-            from shapely.wkt import loads
-            from shapely.ops import transform
-            from pyproj import Transformer
-            import pandas as pd
-            import numpy as np
-            import osmnx as ox
+            shapely_wkt = tools_os.get_dep("shapely.wkt")
+            shapely_ops = tools_os.get_dep("shapely.ops")
+            pyproj = tools_os.get_dep("pyproj")
+            pd = tools_os.get_dep("pandas")
+            np = tools_os.get_dep("numpy")
+            ox = tools_os.get_dep("osmnx")
+            loads = shapely_wkt.loads
+            transform = shapely_ops.transform
+            Transformer = pyproj.Transformer
             ox.settings.useful_tags_way = ox.settings.useful_tags_way + ["surface"]
         except ImportError as e:
             tools_qgis.show_critical(

@@ -403,7 +403,7 @@ class GwPsector:
     def load_psector(self, dialog, psector_id, list_coord=None, form_opened=False):
         """
         Loads data for an existing psector into the dialog.
-        
+
         Args:
             dialog (QDialog): Dialog to populate with psector data
             psector_id (int): ID of psector to load
@@ -540,6 +540,7 @@ class GwPsector:
 
         self.dlg_psector_rapport = GwPsectorRapportUi(self)
         tools_gw.load_settings(self.dlg_psector_rapport)
+        self._set_composer_warning('')
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " prices detail.csv")
@@ -621,7 +622,7 @@ class GwPsector:
             return False
 
         composer_checked = tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')
-        if not composer_checked and not initial:
+        if not composer_checked:
             self._set_composer_warning('')
             return False
 
@@ -654,11 +655,12 @@ class GwPsector:
 
         if atlas is None or not atlas.enabled() or coverage_layer is None:
             self._set_composer_warning(
-                "Composer disabled: atlas must be enabled with coverage layer 've_plan_psector'.")
+                "Composer disabled: atlas must be enabled with coverage layer 'v_plan_psector'.")
             return None
 
-        if coverage_layer.name() != "ve_plan_psector":
-            self._set_composer_warning("Composer disabled: atlas coverage layer must be 've_plan_psector'.")
+        coverage_layer_table = (tools_qgis.get_layer_source_table_name(coverage_layer) or "").lower()
+        if coverage_layer_table != "v_plan_psector":
+            self._set_composer_warning("Composer disabled: atlas coverage layer must be 'v_plan_psector'.")
             return None
 
         total_text_items = 0
@@ -679,6 +681,7 @@ class GwPsector:
             return
 
         label.setText(message)
+        label.setVisible(bool(message))
         if message:
             label.setStyleSheet('color: red')
         else:
@@ -700,7 +703,7 @@ class GwPsector:
             tools_qt.get_folder_path(self.dlg_psector_rapport.txt_path)
             folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
-        if chk_csv is False and chk_csv_detail is False:
+        if chk_composer is False and chk_csv is False and chk_csv_detail is False:
             msg = "You must choose at least one action"
             tools_qgis.show_warning(msg, dialog=self.dlg_psector_rapport)
             return
@@ -759,6 +762,14 @@ class GwPsector:
         if dry_run:
             return True
 
+        # Filter atlas by the current psector_id
+        atlas = layout.atlas()
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')
+        previous_filter = atlas.filterExpression()
+        if psector_id not in (None, 'null', ''):
+            atlas.setFilterFeatures(True)
+            atlas.setFilterExpression(f"psector_id = {psector_id}")
+
         # Since qgis 3.4 cant do .setAtlasMode(QgsComposition.PreviewAtlas)
         # then we need to force the opening of the layout designer, trigger the mActionAtlasPreview action and
         # close the layout designer again (finally sentence)
@@ -789,6 +800,10 @@ class GwPsector:
             return False
         finally:
             designer_window.close()
+            # Restore previous atlas filter
+            atlas.setFilterExpression(previous_filter)
+            if not previous_filter:
+                atlas.setFilterFeatures(False)
 
         return True
 
@@ -1342,9 +1357,9 @@ class GwPsector:
 
         tools_qt.set_widget_enabled(self.dlg_infolog, 'btn_repair', False)
         # Remove temporal layers
-        tools_qgis.remove_layer_from_toc("line", "GW Temporal Layers")
-        tools_qgis.remove_layer_from_toc("point", "GW Temporal Layers")
-        tools_qgis.remove_layer_from_toc("polygon", "GW Temporal Layers")
+        tools_qgis.remove_layer(custom_properties={"gw_id": "line"}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": "point"}, group_name='GW Temporal Layers')
+        tools_qgis.remove_layer(custom_properties={"gw_id": "polygon"}, group_name='GW Temporal Layers')
         tools_qgis.clean_layer_group_from_toc("GW Temporal Layers")
 
         # Refresh canvas
@@ -2273,7 +2288,7 @@ class GwPsector:
     def _load_layer_to_project(self, tablename, geom_field, field_id):
         """Loads a specified database layer yo load ve_plan_psector."""
 
-        tools_gw.add_layer_database(tablename=tablename, the_geom=geom_field, field_id=field_id, style_id=None)
+        tools_gw.add_layer_database(tablename=tablename, the_geom=geom_field, field_id=field_id)
 
     def _activate_layer(self, layer):
         """Makes the layer and its parent groups visible and sets it as active."""
@@ -2735,7 +2750,7 @@ class GwPsector:
 
     def _manage_tab_feature_buttons(self):
         """ Update rel_feature_type when tab changes to ensure buttons work on all tabs """
-        
+
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
         tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
                     'tab_elem': 'element', 'tab_link': 'link'}
@@ -2846,7 +2861,7 @@ class GwPsector:
     def _highlight_features_by_id(self, qtable, feature_type, field_id, rubber_band, width, state_value=1):
         """
         Highlight features by id based on their state
-        
+
         Args:
             state_value: 1 = operative (orange), 0 = obsolete (light blue)
         """

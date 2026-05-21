@@ -1,0 +1,47 @@
+name: 📦 Build plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag or commit SHA to build (leave empty for default branch)"
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo with submodules
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+          submodules: recursive
+          path: ./giswater
+
+      - name: Resolve metadata
+        id: meta
+        run: |
+          cd giswater
+          BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "detached")
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          # Sanitise branch name for artifact naming
+          BRANCH_SAFE=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          echo "artifact_name=giswater-${BRANCH_SAFE}-${SHA_SHORT}" >> "$GITHUB_OUTPUT"
+
+      - name: Stage plugin files
+        run: |
+          mkdir -p staging/giswater
+          rsync -a --exclude='.git' --exclude='.github' \
+                   --exclude='__pycache__' --exclude='*.pyc' \
+                   --exclude='scripts' --exclude='test' \
+                   --exclude='dbmodel/test' --exclude='dbmodel/docker' \
+                   --exclude='libs/tests' \
+                   giswater/ staging/giswater/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact_name }}
+          path: staging/giswater/
+          retention-days: 90

@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.sip import isdeleted
 
-from .....libs import tools_db, tools_qgis, tools_qt
+from .....libs import tools_db, tools_os, tools_qgis, tools_qt
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_epanet_task import GwImportInpTask
@@ -59,7 +59,7 @@ class GwImportEpanet:
         tools_qgis.show_warning(msg, duration=30)
 
         try:
-            import wntr  # noqa: F401
+            tools_os.get_dep("wntr")
             from ....threads.import_inp import parse_epanet_task
 
             global Catalogs, GwParseInpTask  # noqa: F824

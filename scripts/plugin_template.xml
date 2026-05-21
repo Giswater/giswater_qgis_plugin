@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<plugins>
+    <pyqgis_plugin name="giswater" version="__VERSION__">
+        <description>Plugin to enable additional features and capabilities of Giswater working together with QGIS and PostgreSQL</description>
+        <about>Giswater is a open source tool with the goal to move from acquired knowledge to shared knowledge in the areas of water management, such as supply, sewerage, urban drainage.
+		The plugin works with db roles (basic, om, edit, epa, master, admin in order to enable differents features and capabilities in function of user's roles.
+		Two types of projects can be created. Water supply networks (ws) and sewerage and urban drainage networks (ud)
+		For more information you can take a look at Giswater website, where you can find Giswater Users Manual and a link to our Github Wiki
+		- https://www.giswater.org/giswater-manual/ (spanish)
+		- https://www.giswater.org/giswater-manual/?lang=en (english)
+		- Minimum qgis version: 3.34
+		- Maximum qgis version: 4.0
+		Enjoy it!!!</about>
+        <qgis_minimum_version>3.34</qgis_minimum_version>
+		<qgis_maximum_version>4.0</qgis_maximum_version>
+        <author_name>David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Daniel Marín, Ferran Martínez, Arnau Urgeles, Óscar Pueyo, Nico Pérez, Namrata Karki, Maria Guzmán, Jordi Blanch, Xavier Torret</author_name>
+        <download_url>__DOWNLOAD_URL__</download_url>
+        <file_name>giswater.zip</file_name>    
+        <icon>giswater.png</icon>    
+        <tags>giswater, water, hydraulic, model, water supply, urban drainage</tags>       
+        <homepage>https://www.giswater.org</homepage>
+        <repository>https://github.com/giswater/giswater_qgis_plugin</repository>
+        <tracker>https://github.com/giswater/giswater_qgis_plugin/issues</tracker>      
+        <experimental>False</experimental>    
+    </pyqgis_plugin>
+</plugins>

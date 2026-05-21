@@ -714,7 +714,8 @@ class GwToolBoxButton(GwAction):
                f"SELECT concat('ve_',epa_table), feature_type as type, 4 as c FROM sys_feature_epa_type "
                f"WHERE epa_table IS NOT NULL AND epa_table NOT IN ('inp_virtualvalve', 'inp_inlet')"
 			   f" UNION SELECT 've_inp_subcatchment', 'SUBCATCHMENT', 6"
-			   f" UNION SELECT 've_raingage', 'RAINGAGE', 8 ) t "
+			   f" UNION SELECT 've_raingage', 'RAINGAGE', 8"
+               f" UNION SELECT 've_inp_inflows', 'NODE', 8) t "
                f" WHERE type = '{feature_type.upper()}' ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:

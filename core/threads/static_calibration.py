@@ -13,7 +13,7 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...libs import tools_db
+from ...libs import tools_db, tools_os
 from ..utils import tools_gw
 
 
@@ -38,8 +38,9 @@ class GwStaticCalibration(GwTask):
 
     def run(self):
         try:
-            from wntr.network import write_inpfile
-            import scipy  # noqa: F401
+            wntr_network = tools_os.get_dep("wntr.network")
+            write_inpfile = wntr_network.write_inpfile
+            tools_os.get_dep("scipy")
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "
@@ -97,7 +98,8 @@ class Calibrator:
 
     def calibrate(self):
         """Return a calibrated network"""
-        from scipy.optimize import root_scalar
+        scipy_optimize = tools_os.get_dep("scipy.optimize")
+        root_scalar = scipy_optimize.root_scalar
 
         wn = copy.deepcopy(self.network)
         if abs(self.checker.difference(wn)) < self.tolerance:

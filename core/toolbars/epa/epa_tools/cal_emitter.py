@@ -22,7 +22,7 @@ from ....ui.ui_manager import EmitterCalibrationUi
 
 from ....threads.emitter_calibration_execute import EmitterCalibrationExecute
 
-from .....libs import tools_qt, tools_db, tools_qgis
+from .....libs import tools_db, tools_os, tools_qgis, tools_qt
 from ....utils import tools_gw
 
 
@@ -74,7 +74,7 @@ class EmitterCalibration:
     def _execute_process(self):
 
         try:
-            import wntr  # noqa: F401
+            tools_os.get_dep("wntr")
         except ImportError:
             tools_qgis.show_critical(
                 "Python package 'wntr' is not installed. "

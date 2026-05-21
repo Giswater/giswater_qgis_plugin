@@ -71,6 +71,9 @@ class GwMincutButton(GwAction):
             self.mincut.start_offline_mincut()
             return
 
+        if getattr(self.mincut, 'mincut_mode', None) == 'offline':
+            self.mincut.reset_mincut_canvas_snapping(action_pan=False)
+
         self.mincut.mincut_mode = 'network'
         self.mincut.set_dialog(GwMincutUi(self))
         self.mincut.get_mincut()

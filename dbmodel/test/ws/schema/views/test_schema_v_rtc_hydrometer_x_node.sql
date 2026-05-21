@@ -1,0 +1,66 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+BEGIN;
+
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT * FROM no_plan();
+
+-- Check view v_rtc_hydrometer_x_node
+SELECT has_view('v_rtc_hydrometer_x_node'::name, 'View v_rtc_hydrometer_x_node should exist');
+
+-- Check view columns
+SELECT columns_are(
+    'v_rtc_hydrometer_x_node',
+    ARRAY[
+        'hydrometer_id', 'hydrometer_customer_code', 'node_id', 'node_customer_code', 'state', 'muni_name',
+        'expl_id', 'expl_name', 'plot_code', 'priority_id', 'catalog_id', 'category_id',
+        'hydro_number', 'hydro_man_date', 'crm_number', 'customer_name', 'address1', 'address2',
+        'address3', 'address2_1', 'address2_2', 'address2_3', 'm3_volume', 'start_date',
+        'end_date', 'update_date', 'hydrometer_link', 'is_operative', 'shutdown_date'
+    ],
+    'View v_rtc_hydrometer_x_node should have the correct columns'
+);
+
+-- Check column types
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'hydrometer_id', 'int4', 'Column hydrometer_id should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'hydrometer_customer_code', 'text', 'Column hydrometer_customer_code should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'node_id', 'int4', 'Column node_id should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'node_customer_code', 'varchar', 'Column node_customer_code should be varchar');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'state', 'text', 'Column state should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'muni_name', 'text', 'Column muni_name should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'expl_id', 'int4', 'Column expl_id should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'expl_name', 'varchar(100)', 'Column expl_name should be varchar(100)');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'priority_id', 'int4', 'Column priority_id should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'catalog_id', 'int4', 'Column catalog_id should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'category_id', 'int4', 'Column category_id should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'hydro_number', 'text', 'Column hydro_number should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'hydro_man_date', 'date', 'Column hydro_man_date should be date');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'crm_number', 'int4', 'Column crm_number should be int4');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'customer_name', 'text', 'Column customer_name should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'address1', 'text', 'Column address1 should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'address2', 'text', 'Column address2 should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'address3', 'text', 'Column address3 should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'address2_1', 'text', 'Column address2_1 should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'address2_2', 'text', 'Column address2_2 should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'address2_3', 'text', 'Column address2_3 should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'm3_volume', 'float8', 'Column m3_volume should be float8');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'start_date', 'date', 'Column start_date should be date');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'end_date', 'date', 'Column end_date should be date');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'update_date', 'date', 'Column update_date should be date');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'hydrometer_link', 'text', 'Column hydrometer_link should be text');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'is_operative', 'bool', 'Column is_operative should be bool');
+SELECT col_type_is('v_rtc_hydrometer_x_node', 'shutdown_date', 'date', 'Column shutdown_date should be date');
+
+SELECT * FROM finish();
+
+ROLLBACK;

@@ -828,7 +828,7 @@
   <LabelFont style="" description="Arial,9,-1,5,75,0,0,0,0,0"/>
   <FontColor alpha="255" blue="0" green="0" red="0"/>
  </LayoutItem>
- <LayoutItem opacity="1" itemRotation="0" mapUuid="" pictureWidth="39.0118" blendMode="0" templateUuid="{530d465a-00c4-4baa-be3a-a939b2830b71}" anchorPoint="0" northMode="0" groupUuid="" referencePoint="0" pictureHeight="7.87799" file="G:/4-feines/3-en curs/f688_GISWATER_PRODAISA/treball/giswater.jpg" position="366.573,209.451,mm" excludeFromExports="0" svgBorderWidth="0.2" background="false" id="" resizeMode="0" size="39.0118,8.59663,mm" uuid="{530d465a-00c4-4baa-be3a-a939b2830b71}" type="65640" outlineWidthM="0.3,mm" frame="false" svgFillColor="255,255,255,255" positionLock="false" pictureRotation="0" positionOnPage="366.573,209.451,mm" visibility="1" zValue="2" svgBorderColor="0,0,0,255" northOffset="0" frameJoinStyle="miter">
+ <LayoutItem opacity="1" itemRotation="0" mapUuid="" pictureWidth="39.0118" blendMode="0" templateUuid="{530d465a-00c4-4baa-be3a-a939b2830b71}" anchorPoint="0" northMode="0" groupUuid="" referencePoint="0" pictureHeight="7.87799" file="https://download.giswater.org/plugin/resources/images/logo.png" position="366.573,209.451,mm" excludeFromExports="0" svgBorderWidth="0.2" background="false" id="" resizeMode="0" size="39.0118,8.59663,mm" uuid="{530d465a-00c4-4baa-be3a-a939b2830b71}" type="65640" outlineWidthM="0.3,mm" frame="false" svgFillColor="255,255,255,255" positionLock="false" pictureRotation="0" positionOnPage="366.573,209.451,mm" visibility="1" zValue="2" svgBorderColor="0,0,0,255" northOffset="0" frameJoinStyle="miter">
   <FrameColor alpha="255" blue="160" green="47" red="6"/>
   <BackgroundColor alpha="255" blue="255" green="255" red="255"/>
   <LayoutObject>

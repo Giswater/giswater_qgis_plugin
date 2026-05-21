@@ -599,11 +599,11 @@
 		</message>
 		<message>
 			<source>{0} campaign(s) deleted.</source>
-			<translation>{0} кампанія(ї) видалено.</translation>
+			<translation>{0} кампанію(ї) видалено.</translation>
 		</message>
 		<message>
 			<source>{0} campaign(s) deleted.</source>
-			<translation>{0} кампанію(ї) видалено.</translation>
+			<translation>{0} кампанія(ї) видалено.</translation>
 		</message>
 		<message>
 			<source>{0}: Config file is not set</source>
@@ -687,11 +687,11 @@
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
-			<translation>{0} робочих завдань видалено.</translation>
+			<translation>{0} workorder(ів) видалено.</translation>
 		</message>
 		<message>
 			<source>{0} workorder(s) deleted.</source>
-			<translation>{0} workorder(ів) видалено.</translation>
+			<translation>{0} робочих завдань видалено.</translation>
 		</message>
 		<message>
 			<source>{1}</source>
@@ -911,11 +911,11 @@
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
-			<translation>Ви впевнені, що хочете видалити {0} робоче завдання(я)?</translation>
+			<translation>Ви впевнені, що хочете видалити {0} робочих завдань?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete {0} workorder(s)?</source>
-			<translation>Ви впевнені, що хочете видалити {0} робочих завдань?</translation>
+			<translation>Ви впевнені, що хочете видалити {0} робоче завдання(я)?</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete the selected styles?</source>
@@ -1071,11 +1071,11 @@
 		</message>
 		<message>
 			<source>Campaign saved successfully.</source>
-			<translation>Кампанію збережено успішно.</translation>
+			<translation>Кампанію успішно збережено.</translation>
 		</message>
 		<message>
 			<source>Campaign saved successfully.</source>
-			<translation>Кампанію успішно збережено.</translation>
+			<translation>Кампанію збережено успішно.</translation>
 		</message>
 		<message>
 			<source>Canceling task...</source>
@@ -3195,11 +3195,11 @@
 		</message>
 		<message>
 			<source>Invalid workorder ID.</source>
-			<translation>Недійсний ID робочого завдання.</translation>
+			<translation>Неприпустимий ID workorder.</translation>
 		</message>
 		<message>
 			<source>Invalid workorder ID.</source>
-			<translation>Неприпустимий ID workorder.</translation>
+			<translation>Недійсний ID робочого завдання.</translation>
 		</message>
 		<message>
 			<source>INVENTORY</source>
@@ -3775,11 +3775,11 @@
 		</message>
 		<message>
 			<source>No records selected</source>
-			<translation>Записи не вибрано</translation>
+			<translation>Жодного запису не вибрано</translation>
 		</message>
 		<message>
 			<source>No records selected</source>
-			<translation>Жодного запису не вибрано</translation>
+			<translation>Записи не вибрано</translation>
 		</message>
 		<message>
 			<source>No results</source>
@@ -4263,11 +4263,11 @@
 		</message>
 		<message>
 			<source>Please select a workorder to open.</source>
-			<translation>Будь ласка, виберіть workorder для відкриття.</translation>
+			<translation>Будь ласка, виберіть робоче завдання для відкриття.</translation>
 		</message>
 		<message>
 			<source>Please select a workorder to open.</source>
-			<translation>Будь ласка, виберіть робоче завдання для відкриття.</translation>
+			<translation>Будь ласка, виберіть workorder для відкриття.</translation>
 		</message>
 		<message>
 			<source>Please select one or more styles to delete.</source>
@@ -11240,19 +11240,19 @@
 		</message>
 		<message>
 			<source>lbl_builtdate_range</source>
-			<translation>Діапазон року побудови (роки):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_builtdate_range</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_builtdate_range</source>
 			<translation>Діапазон дат побудови (роки):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate_range</source>
 			<translation>Діапазон дат побудови, у роках до та після початкової труби.</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate_range</source>
+			<translation>Діапазон року побудови (роки):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate_range</source>
+			<translation></translation>
 		</message>
 		<message>
 			<source>lbl_cluster_length</source>
@@ -11304,14 +11304,6 @@
 		</message>
 		<message>
 			<source>lbl_leaks</source>
-			<translation>Протікання</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_leaks</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_leaks</source>
 			<translation>Витоки</translation>
 		</message>
 		<message>
@@ -11319,11 +11311,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_material</source>
-			<translation>Фільтрувати за матеріалом:</translation>
+			<source>lbl_leaks</source>
+			<translation>Протікання</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_material</source>
+			<source>tooltip_lbl_leaks</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -11335,12 +11327,12 @@
 			<translation>Використовує лише труби того ж матеріалу, що й початкова.</translation>
 		</message>
 		<message>
-			<source>lbl_max_distance</source>
-			<translation>Максимальна Відстань (м):</translation>
+			<source>lbl_material</source>
+			<translation>Фільтрувати за матеріалом:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_max_distance</source>
-			<translation>Максимальна відстань в метрах між початковою трубою та іншими трубами, включеними до кластеру.</translation>
+			<source>tooltip_lbl_material</source>
+			<translation></translation>
 		</message>
 		<message>
 			<source>lbl_max_distance</source>
@@ -11351,6 +11343,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_max_distance</source>
+			<translation>Максимальна Відстань (м):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>Максимальна відстань в метрах між початковою трубою та іншими трубами, включеними до кластеру.</translation>
+		</message>
+		<message>
 			<source>lbl_pipes</source>
 			<translation>Труби</translation>
 		</message>
@@ -11364,6 +11364,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_pipes</source>
+			<translation></translation>
+		</message>
+		<message>
+			<source>lbl_years</source>
+			<translation>Роки для розрахунку:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_years</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -11375,11 +11383,11 @@
 			<translation>Кількість років даних про витоки для розгляду, з урахуванням давності.</translation>
 		</message>
 		<message>
-			<source>lbl_years</source>
-			<translation>Роки для розрахунку:</translation>
+			<source>tab_config</source>
+			<translation>Налаштування</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_years</source>
+			<source>tooltip_tab_config</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -11391,16 +11399,8 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>tab_config</source>
-			<translation>Налаштування</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation></translation>
-		</message>
-		<message>
 			<source>tab_infolog</source>
-			<translation>Журнал Інформації</translation>
+			<translation>Інформаційний Журнал</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -11408,7 +11408,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Інформаційний Журнал</translation>
+			<translation>Журнал Інформації</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -14748,11 +14748,11 @@
 		<name>featuretype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Змінити тип об&apos;єкта</translation>
+			<translation>Змінити тип елемента</translation>
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Змінити тип об&apos;єкта</translation>
+			<translation>Змінити тип елемента</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
@@ -14760,7 +14760,7 @@
 		</message>
 		<message>
 			<source>dlg_featuretype_change</source>
-			<translation>Змінити тип елемента</translation>
+			<translation>Змінити тип об&apos;єкта</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_featuretype_change</source>
@@ -16368,7 +16368,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation></translation>
+			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -16376,7 +16376,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Прийняти</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -16423,7 +16423,15 @@
 		<name>info_workcat</name>
 		<message>
 			<source>title</source>
-			<translation>Новий категоріяробіт</translation>
+			<translation>Нова Категорія Робіт</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Прийняти</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -16432,14 +16440,6 @@
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation></translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Прийняти</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -16467,7 +16467,7 @@
 		</message>
 		<message>
 			<source>dlg_info_workcat</source>
-			<translation>Новий категоріяробіт</translation>
+			<translation>Нова Категорія Робіт</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_workcat</source>
@@ -16475,7 +16475,7 @@
 		</message>
 		<message>
 			<source>dlg_info_workcat</source>
-			<translation>Нова Категорія Робіт</translation>
+			<translation>Новий категоріяробіт</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_workcat</source>
@@ -17568,7 +17568,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>Скасувати</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -17576,7 +17576,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation></translation>
+			<translation>Скасувати</translation>
 		</message>
 		<message>
 			<source>btn_cancel_task</source>
@@ -17740,7 +17740,7 @@
 		</message>
 		<message>
 			<source>lbl_assigned_to</source>
-			<translation>Призначено:</translation>
+			<translation>Призначено до:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_assigned_to</source>
@@ -17748,7 +17748,7 @@
 		</message>
 		<message>
 			<source>lbl_assigned_to</source>
-			<translation>Призначено до:</translation>
+			<translation>Призначено:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_assigned_to</source>
@@ -17888,7 +17888,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_appropriate</source>
-			<translation>Якщо true, фактичне розташування відповідає запланованій інформації mincut</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>lbl_exec_appropriate</source>
@@ -17896,6 +17896,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_appropriate</source>
+			<translation>Якщо true, фактичне розташування відповідає запланованій інформації mincut</translation>
+		</message>
+		<message>
+			<source>lbl_exec_enddate</source>
+			<translation>Кінцева дата:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_enddate</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -17907,11 +17915,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_exec_enddate</source>
-			<translation>Кінцева дата:</translation>
+			<source>lbl_exec_startdate</source>
+			<translation>Дата початку:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_exec_enddate</source>
+			<source>tooltip_lbl_exec_startdate</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -17923,14 +17931,6 @@
 			<translation>ID Візиту</translation>
 		</message>
 		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Дата початку:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation></translation>
-		</message>
-		<message>
 			<source>lbl_exec_user</source>
 			<translation>Користувач виконання:</translation>
 		</message>
@@ -17944,14 +17944,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_user</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_id</source>
-			<translation>Ідентифікатор:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_id</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -17963,8 +17955,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_id</source>
+			<translation>Ідентифікатор:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_id</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_msg</source>
-			<translation>Не Знайдено Результатів</translation>
+			<translation>Результатів не знайдено</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -17972,7 +17972,7 @@
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>Результатів не знайдено</translation>
+			<translation>Не Знайдено Результатів</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -18012,7 +18012,7 @@
 		</message>
 		<message>
 			<source>lbl_start</source>
-			<translation>Початок:</translation>
+			<translation>Від:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start</source>
@@ -18020,7 +18020,7 @@
 		</message>
 		<message>
 			<source>lbl_start</source>
-			<translation>Від:</translation>
+			<translation>Початок:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start</source>
@@ -18167,7 +18167,15 @@
 		<name>mincut_composer</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut компоновник</translation>
+			<translation>Mincut композитор</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Скасувати</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>Скасувати</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -18176,14 +18184,6 @@
 		<message>
 			<source>tooltip_btn_cancel</source>
 			<translation></translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Скасувати</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>Скасувати</translation>
 		</message>
 		<message>
 			<source>btn_ok</source>
@@ -18203,7 +18203,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_composer</source>
-			<translation>Mincut компоновник</translation>
+			<translation>Mincut композитор</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_composer</source>
@@ -18211,7 +18211,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_composer</source>
-			<translation>Mincut композитор</translation>
+			<translation>Mincut компоновник</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_composer</source>
@@ -18227,7 +18227,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Поворот:</translation>
+			<translation>Обертання:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -18235,7 +18235,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Обертання:</translation>
+			<translation>Поворот:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -18286,7 +18286,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Прийняти</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18294,7 +18294,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation></translation>
+			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -18365,7 +18365,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation></translation>
+			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18373,7 +18373,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>Прийняти</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -18393,7 +18393,7 @@
 		</message>
 		<message>
 			<source>btn_set_real_location</source>
-			<translation>Встановити реальне розташування</translation>
+			<translation>Встановити реальне місцезнаходження</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_real_location</source>
@@ -18401,7 +18401,7 @@
 		</message>
 		<message>
 			<source>btn_set_real_location</source>
-			<translation>Встановити реальне місцезнаходження</translation>
+			<translation>Встановити реальне розташування</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_real_location</source>
@@ -18473,7 +18473,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>До:</translation>
+			<translation>Кому:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -18481,7 +18481,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>Кому:</translation>
+			<translation>До:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -18601,7 +18601,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Робоче замовлення:</translation>
+			<translation>Замовлення на роботу:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -18609,7 +18609,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Замовлення на роботу:</translation>
+			<translation>Робоче замовлення:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -18620,15 +18620,7 @@
 		<name>mincut_hydrometer</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut водолічильник</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Прийняти</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>Прийняти</translation>
+			<translation>Mincut водомір</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -18637,6 +18629,14 @@
 		<message>
 			<source>tooltip_btn_accept</source>
 			<translation></translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Прийняти</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -18656,14 +18656,6 @@
 		</message>
 		<message>
 			<source>dlg_mincut_hydrometer</source>
-			<translation>Mincut водолічильник</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_hydrometer</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>dlg_mincut_hydrometer</source>
 			<translation>Mincut водомір</translation>
 		</message>
 		<message>
@@ -18671,11 +18663,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_ccc</source>
-			<translation>Код клієнта підключення:</translation>
+			<source>dlg_mincut_hydrometer</source>
+			<translation>Mincut водолічильник</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_ccc</source>
+			<source>tooltip_dlg_mincut_hydrometer</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -18687,11 +18679,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_hcc</source>
-			<translation>Водомір код клієнта:</translation>
+			<source>lbl_ccc</source>
+			<translation>Код клієнта підключення:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_hcc</source>
+			<source>tooltip_lbl_ccc</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -18702,12 +18694,20 @@
 			<source>tooltip_lbl_hcc</source>
 			<translation></translation>
 		</message>
+		<message>
+			<source>lbl_hcc</source>
+			<translation>Водомір код клієнта:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hcc</source>
+			<translation></translation>
+		</message>
 	</context>
 	<context>
 		<name>mincut_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut управління</translation>
+			<translation>Mincut Керування</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -18759,7 +18759,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Mincut управління</translation>
+			<translation>Mincut Керування</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -18767,7 +18767,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Mincut Керування</translation>
+			<translation>Mincut управління</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -21197,7 +21197,7 @@
 		<name>priority</name>
 		<message>
 			<source>title</source>
-			<translation>Розрахунок Пріоритету</translation>
+			<translation>Обчислення пріоритету</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -21225,7 +21225,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Скасувати</translation>
+			<translation>Закрити</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21233,7 +21233,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Закрити</translation>
+			<translation>Скасувати</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -21249,23 +21249,23 @@
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>Вибрати елементи на полотні</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation></translation>
+			<translation>Вибрати елементи на полотні</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
 			<translation>Вибрати елементи на полотні</translation>
 		</message>
 		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>dlg_priority</source>
-			<translation>Розрахунок Пріоритету</translation>
+			<translation>Обчислення пріоритету</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -21273,7 +21273,7 @@
 		</message>
 		<message>
 			<source>dlg_priority</source>
-			<translation>Обчислення пріоритету</translation>
+			<translation>Розрахунок Пріоритету</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -21425,7 +21425,7 @@
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Назва результату:</translation>
+			<translation>Ім&apos;я результату:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -21433,7 +21433,7 @@
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Ім&apos;я результату:</translation>
+			<translation>Назва результату:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -21521,7 +21521,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Журнал Інформації</translation>
+			<translation>Журнал інформації</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -21529,7 +21529,7 @@
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Журнал інформації</translation>
+			<translation>Журнал Інформації</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -21556,7 +21556,7 @@
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Діалог</translation>
+			<translation>Менеджер результатів</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -21656,7 +21656,7 @@
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Діалог</translation>
+			<translation>Менеджер результатів</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -21664,7 +21664,7 @@
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Менеджер результатів</translation>
+			<translation>Діалог</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -21704,7 +21704,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Інформація:</translation>
+			<translation>Інфо:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -21712,7 +21712,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Інфо:</translation>
+			<translation>Інформація:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -22593,7 +22593,7 @@
 		</message>
 		<message>
 			<source>chk_composer</source>
-			<translation>Створити PDF-Файл</translation>
+			<translation>Створити PDF-файл</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_composer</source>
@@ -22601,7 +22601,7 @@
 		</message>
 		<message>
 			<source>chk_composer</source>
-			<translation>Створити PDF-файл</translation>
+			<translation>Створити PDF-Файл</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_composer</source>
@@ -22680,7 +22680,7 @@
 		</message>
 		<message>
 			<source>btn_repair</source>
-			<translation>Виправити</translation>
+			<translation>Відремонтувати</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_repair</source>
@@ -22688,7 +22688,7 @@
 		</message>
 		<message>
 			<source>btn_repair</source>
-			<translation>Відремонтувати</translation>
+			<translation>Виправити</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_repair</source>
@@ -23317,14 +23317,6 @@
 		</message>
 		<message>
 			<source>lbl_result_compare</source>
-			<translation>Результат Для Порівняння:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
 			<translation>Результат для порівняння:</translation>
 		</message>
 		<message>
@@ -23332,8 +23324,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_result_compare</source>
+			<translation>Результат Для Порівняння:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_compare</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_result_main</source>
-			<translation>Результат для показу:</translation>
+			<translation>Результат Для Показу:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -23341,7 +23341,7 @@
 		</message>
 		<message>
 			<source>lbl_result_main</source>
-			<translation>Результат Для Показу:</translation>
+			<translation>Результат для показу:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -23542,7 +23542,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>Закрити</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -23550,7 +23550,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation></translation>
+			<translation>Закрити</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -23837,7 +23837,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>OK</translation>
+			<translation>Прийняти</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -23845,7 +23845,7 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Прийняти</translation>
+			<translation>OK</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
@@ -24913,7 +24913,7 @@
 		</message>
 		<message>
 			<source>btn_event_delete</source>
-			<translation>ВИДАЛИТИ ПОДІЮ</translation>
+			<translation>Видалити подію</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_delete</source>
@@ -24921,7 +24921,7 @@
 		</message>
 		<message>
 			<source>btn_event_delete</source>
-			<translation>Видалити подію</translation>
+			<translation>ВИДАЛИТИ ПОДІЮ</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_delete</source>
@@ -25017,14 +25017,6 @@
 		</message>
 		<message>
 			<source>label</source>
-			<translation>Тип елемента:</translation>
-		</message>
-		<message>
-			<source>tooltip_label</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>label</source>
 			<translation>Елемент тип:</translation>
 		</message>
 		<message>
@@ -25032,6 +25024,14 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>label</source>
+			<translation>Тип елемента:</translation>
+		</message>
+		<message>
+			<source>tooltip_label</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_code</source>
 			<translation>Код:</translation>
 		</message>
@@ -25065,7 +25065,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>Кінець дата:*</translation>
+			<translation>Кому:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -25073,7 +25073,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>Кому:</translation>
+			<translation>Кінець дата:*</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -25137,14 +25137,6 @@
 		</message>
 		<message>
 			<source>lbl_start_date</source>
-			<translation>Від:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
 			<translation>Початок дата:*</translation>
 		</message>
 		<message>
@@ -25152,11 +25144,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_status</source>
-			<translation>Статус:</translation>
+			<source>lbl_start_date</source>
+			<translation>Від:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_status</source>
+			<source>tooltip_lbl_start_date</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -25168,11 +25160,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_user_name</source>
-			<translation>Ім&apos;я користувача:</translation>
+			<source>lbl_status</source>
+			<translation>Статус:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_user_name</source>
+			<source>tooltip_lbl_status</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -25184,8 +25176,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_user_name</source>
+			<translation>Ім&apos;я користувача:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_user_name</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_visitcat_id</source>
-			<translation>Візит cat id:</translation>
+			<translation>Visitcat id:*</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visitcat_id</source>
@@ -25193,7 +25193,7 @@
 		</message>
 		<message>
 			<source>lbl_visitcat_id</source>
-			<translation>Visitcat id:*</translation>
+			<translation>Візит cat id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visitcat_id</source>
@@ -25285,7 +25285,7 @@
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation></translation>
+			<translation>Відносини</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
@@ -25293,11 +25293,11 @@
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>Відносини</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>tab_visit</source>
-			<translation>Відвідати</translation>
+			<translation>Візит</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_visit</source>
@@ -25305,7 +25305,7 @@
 		</message>
 		<message>
 			<source>tab_visit</source>
-			<translation>Візит</translation>
+			<translation>Відвідати</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_visit</source>
@@ -25471,7 +25471,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Параметр id:</translation>
+			<translation>ID параметра:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -25479,7 +25479,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>ID параметра:</translation>
+			<translation>Параметр id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -25638,14 +25638,6 @@
 		</message>
 		<message>
 			<source>lbl_geom1</source>
-			<translation>Геом1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
 			<translation>Геом 1:</translation>
 		</message>
 		<message>
@@ -25653,11 +25645,11 @@
 			<translation></translation>
 		</message>
 		<message>
-			<source>lbl_geom2</source>
-			<translation>Геом 2:</translation>
+			<source>lbl_geom1</source>
+			<translation>Геом1:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_geom2</source>
+			<source>tooltip_lbl_geom1</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -25669,8 +25661,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_geom2</source>
+			<translation>Геом 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom2</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_geom3</source>
-			<translation>Геом3:</translation>
+			<translation>Геом 3:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
@@ -25678,7 +25678,7 @@
 		</message>
 		<message>
 			<source>lbl_geom3</source>
-			<translation>Геом 3:</translation>
+			<translation>Геом3:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom3</source>
@@ -25750,14 +25750,6 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Позиція ідентифікатор:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
 			<translation>Ідентифікатор позиції:</translation>
 		</message>
 		<message>
@@ -25765,8 +25757,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_position_id</source>
+			<translation>Позиція ідентифікатор:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_position_value</source>
-			<translation>Значення Позиції:</translation>
+			<translation>Позиція значення:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -25774,7 +25774,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Позиція значення:</translation>
+			<translation>Значення Позиції:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -25846,7 +25846,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Значення 2:</translation>
+			<translation>Значення2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -25854,7 +25854,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Значення2:</translation>
+			<translation>Значення 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -25894,7 +25894,7 @@
 		</message>
 		<message>
 			<source>lbl_ycoord</source>
-			<translation>Ycoord:</translation>
+			<translation>Y координата:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ycoord</source>
@@ -25902,7 +25902,7 @@
 		</message>
 		<message>
 			<source>lbl_ycoord</source>
-			<translation>Y координата:</translation>
+			<translation>Ycoord:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ycoord</source>
@@ -26045,7 +26045,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Геом2:</translation>
+			<translation>Геом 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -26053,7 +26053,7 @@
 		</message>
 		<message>
 			<source>lbl_geom2</source>
-			<translation>Геом 2:</translation>
+			<translation>Геом2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_geom2</source>
@@ -26093,14 +26093,6 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Ідентифікатор позиції:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation></translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
 			<translation>Позиція id:</translation>
 		</message>
 		<message>
@@ -26108,8 +26100,16 @@
 			<translation></translation>
 		</message>
 		<message>
+			<source>lbl_position_id</source>
+			<translation>Ідентифікатор позиції:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation></translation>
+		</message>
+		<message>
 			<source>lbl_position_value</source>
-			<translation>Значення позиції:</translation>
+			<translation>Позиція значення:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -26117,7 +26117,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Позиція значення:</translation>
+			<translation>Значення позиції:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -26157,7 +26157,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Значення2:</translation>
+			<translation>Значення 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -26165,7 +26165,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Значення 2:</translation>
+			<translation>Значення2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -26327,7 +26327,7 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation></translation>
+			<translation>Візит ID</translation>
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
@@ -26335,14 +26335,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>Візит ID</translation>
+			<translation></translation>
 		</message>
 	</context>
 	<context>
 		<name>visit_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Керування візитами</translation>
+			<translation>Керування Відвідинами</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
@@ -26378,7 +26378,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Видалити Візит</translation>
+			<translation>Видалити візит</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -26386,7 +26386,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Видалити візит</translation>
+			<translation>Видалити Візит</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -26426,7 +26426,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_manager</source>
-			<translation>Керування візитами</translation>
+			<translation>Керування Відвідинами</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_manager</source>
@@ -26434,7 +26434,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_manager</source>
-			<translation>Керування Відвідинами</translation>
+			<translation>Керування візитами</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_manager</source>
@@ -26564,7 +26564,7 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
-			<translation>Створити</translation>
+			<translation></translation>
 		</message>
 		<message>
 			<source>btn_create</source>
@@ -26572,6 +26572,14 @@
 		</message>
 		<message>
 			<source>tooltip_btn_create</source>
+			<translation>Створити</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Видалити</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
 			<translation></translation>
 		</message>
 		<message>
@@ -26581,14 +26589,6 @@
 		<message>
 			<source>tooltip_btn_delete</source>
 			<translation>Видалити</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Видалити</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation></translation>
 		</message>
 		<message>
 			<source>dlg_workcat_manager</source>
@@ -26765,7 +26765,7 @@
 		<name>workspace_create</name>
 		<message>
 			<source>title</source>
-			<translation>Створити нове робоче середовище</translation>
+			<translation>Створити новий робочий простір</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -26801,7 +26801,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_create</source>
-			<translation>Створити нове робоче середовище</translation>
+			<translation>Створити новий робочий простір</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_create</source>
@@ -26809,7 +26809,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_create</source>
-			<translation>Створити новий робочий простір</translation>
+			<translation>Створити нове робоче середовище</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_create</source>
@@ -26876,7 +26876,7 @@
 		<name>workspace_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Менеджер Робочого Простору</translation>
+			<translation>Менеджер робочих просторів</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
@@ -26936,7 +26936,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_manager</source>
-			<translation>Менеджер Робочого Простору</translation>
+			<translation>Менеджер робочих просторів</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_manager</source>
@@ -26944,7 +26944,7 @@
 		</message>
 		<message>
 			<source>dlg_workspace_manager</source>
-			<translation>Менеджер робочих просторів</translation>
+			<translation>Менеджер Робочого Простору</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_workspace_manager</source>

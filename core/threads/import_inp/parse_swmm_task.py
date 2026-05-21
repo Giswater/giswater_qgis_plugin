@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from ....libs import tools_db
+from ....libs import tools_db, tools_os
 from ...ui.dialog import GwDialog
 from ..task import GwTask
 
@@ -18,8 +18,10 @@ class GwParseInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
-            from swmm_api import read_inp_file
-            from swmm_api.input_file.section_labels import OPTIONS
+            swmm_api = tools_os.get_dep("swmm_api")
+            section_labels = tools_os.get_dep("swmm_api.input_file.section_labels")
+            read_inp_file = swmm_api.read_inp_file
+            OPTIONS = section_labels.OPTIONS
 
             self.log.append("Reading INP file...")
             self.network = read_inp_file(self.inp_file_path)
@@ -70,12 +72,21 @@ class Catalogs:
 
     @classmethod
     def from_network_model(cls, wn, log: Optional[list[str]] = None):
-        from swmm_api.input_file.section_labels import (
-            JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
-            CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-            XSECTIONS, SUBCATCHMENTS
-        )
-        from swmm_api.input_file.sections import Conduit, CrossSection
+        section_labels = tools_os.get_dep("swmm_api.input_file.section_labels")
+        sections = tools_os.get_dep("swmm_api.input_file.sections")
+        JUNCTIONS = section_labels.JUNCTIONS
+        OUTFALLS = section_labels.OUTFALLS
+        DIVIDERS = section_labels.DIVIDERS
+        STORAGE = section_labels.STORAGE
+        CONDUITS = section_labels.CONDUITS
+        PUMPS = section_labels.PUMPS
+        ORIFICES = section_labels.ORIFICES
+        WEIRS = section_labels.WEIRS
+        OUTLETS = section_labels.OUTLETS
+        XSECTIONS = section_labels.XSECTIONS
+        SUBCATCHMENTS = section_labels.SUBCATCHMENTS
+        Conduit = sections.Conduit
+        CrossSection = sections.CrossSection
 
         def tofloat(x):
             return 0.0 if x is None else float(x)

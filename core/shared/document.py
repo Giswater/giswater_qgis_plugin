@@ -919,7 +919,9 @@ class GwDocument(QObject):
                 lon = -lon
 
             try:
-                from pyproj import CRS, Transformer
+                pyproj = tools_os.get_dep("pyproj")
+                CRS = pyproj.CRS
+                Transformer = pyproj.Transformer
             except ImportError:
                 tools_qgis.show_critical(
                     "Python package 'pyproj' is not installed. "

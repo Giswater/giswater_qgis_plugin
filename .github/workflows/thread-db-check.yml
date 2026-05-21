@@ -2,7 +2,11 @@ name: 🧵 Threaded DB calls check
 
 on:
   push:
+    paths-ignore:
+      - 'dbmodel/**'
   pull_request:
+    paths-ignore:
+      - 'dbmodel/**'
 
 jobs:
   check-threaded-db-calls:

@@ -1,0 +1,11 @@
+4.7.0
+*************
+- refactor(topology): refactor UD tepology fields
+- remove: sys_code unique
+- fix: graphinundation
+- fix: getprofilevalues
+- feat: add function to export EPA result families
+- refactor(mincut): use pgr_linegraph instead of arrange_network
+- feat(profile): load temporal layers when getprofilevalues
+- feat(mapzones): add checks before execute mapzones
+- feat(pg2epa): add new checks on export inp

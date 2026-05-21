@@ -15,6 +15,7 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
+from ...libs import tools_os
 from ...resources.epatools.utils import anl_quantized_demands
 
 
@@ -42,8 +43,9 @@ class GwQuantizedDemands(GwTask):
 
     def run(self):
         try:
-            import pandas  # noqa: F401
-            from wntr.network import write_inpfile
+            tools_os.get_dep("pandas")
+            wntr_network = tools_os.get_dep("wntr.network")
+            write_inpfile = wntr_network.write_inpfile
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "
@@ -94,8 +96,9 @@ class GwQuantizedDemands(GwTask):
             return False
 
     def write_statistics(self, model, file):
-        import pandas as pd
-        from wntr.sim import EpanetSimulator
+        pd = tools_os.get_dep("pandas")
+        wntr_sim = tools_os.get_dep("wntr.sim")
+        EpanetSimulator = wntr_sim.EpanetSimulator
 
         self.status.emit("Running simulation...")
         sim = EpanetSimulator(model.quantized_network)
@@ -225,7 +228,7 @@ class QuantizedModel:
                 junc_obj[time] += consumption.flow
 
     def _get_demand_matrix(self):
-        import pandas as pd
+        pd = tools_os.get_dep("pandas")
 
         obj = {}
 
@@ -359,7 +362,8 @@ class InputFlow:
 
 class InputModel:
     def __init__(self, input_file):
-        from wntr.network import WaterNetworkModel
+        wntr_network = tools_os.get_dep("wntr.network")
+        WaterNetworkModel = wntr_network.WaterNetworkModel
 
         self._wn = WaterNetworkModel(input_file)
 
@@ -388,14 +392,16 @@ class InputModel:
     @property
     @cache
     def _expected_demands(self):
-        from wntr.metrics import expected_demand
+        wntr_metrics = tools_os.get_dep("wntr.metrics")
+        expected_demand = wntr_metrics.expected_demand
 
         return expected_demand(self.network)
 
     @property
     @cache
     def results(self):
-        from wntr.sim import EpanetSimulator
+        wntr_sim = tools_os.get_dep("wntr.sim")
+        EpanetSimulator = wntr_sim.EpanetSimulator
 
         sim = EpanetSimulator(self.network)
         return sim.run_sim()

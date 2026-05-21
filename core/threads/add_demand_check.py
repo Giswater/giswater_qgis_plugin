@@ -17,7 +17,7 @@ from pathlib import Path
 from qgis.core import QgsTask
 
 from .task import GwTask
-from ...libs import tools_db
+from ...libs import tools_db, tools_os
 
 
 class GwAddDemandCheck(GwTask):
@@ -38,7 +38,7 @@ class GwAddDemandCheck(GwTask):
 
     def run(self):
         try:
-            import wntr  # noqa: F401
+            tools_os.get_dep("wntr")
         except ImportError as e:
             self.exception = (
                 f"Python package '{e.name}' is not installed. "

@@ -16,7 +16,7 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...libs import tools_db, tools_qt, lib_vars
+from ...libs import lib_vars, tools_db, tools_os, tools_qt
 
 
 def get_min_greater_than(iterable, value):
@@ -113,7 +113,7 @@ class GwCalculatePriority(GwTask):
 
     def run(self):
         try:
-            import pandas  # noqa: F401
+            tools_os.get_dep("pandas")
         except ImportError:
             self.exception = (
                 "Python package 'pandas' is not installed. "
@@ -194,6 +194,7 @@ class GwCalculatePriority(GwTask):
         if self.method == "SH":
             columns = """
                 a.arc_id,
+                a.arccat_id,
                 a.matcat_id,
                 a.dnom,
                 st_length(a.the_geom) length,
@@ -373,7 +374,7 @@ class GwCalculatePriority(GwTask):
         invalid_material = {"qtd": 0, "set": set()}
         invalid_diameter = {"qtd": 0, "set": set()}
         for arc in arcs:
-            (arc_id, arc_material, arc_diameter, arc_length, rleak, expl_id, presszone_id, strategic) = arc
+            (arc_id, arccat_id, arc_material, arc_diameter, arc_length, rleak, expl_id, presszone_id, strategic) = arc
             if not self.config_material.has_material(arc_material):
                 invalid_material["qtd"] += 1
                 invalid_material["set"].add(arc_material)
@@ -399,16 +400,13 @@ class GwCalculatePriority(GwTask):
             if self.material and self.material != arc_material:
                 continue
 
-            reference_dnom = get_min_greater_than(
-                self.config_catalog.diameters(), int(arc_diameter)
-            )
-            cost_repmain = self.config_catalog.get_cost_repmain(reference_dnom)
+            cost_repmain = self.config_catalog.get_cost_repmain(arccat_id)
 
-            replacement_cost = self.config_catalog.get_cost_constr(reference_dnom)
+            replacement_cost = self.config_catalog.get_cost_constr(arccat_id)
             cost_constr = replacement_cost * float(arc_length)
 
             compliance = 10 - min(
-                self.config_catalog.get_compliance(reference_dnom),
+                self.config_catalog.get_compliance(arccat_id),
                 self.config_material.get_compliance(arc_material),
             )
 
@@ -620,7 +618,7 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
-        import pandas as pd
+        pd = tools_os.get_dep("pandas")
 
         self._emit_report(tools_qt.tr("Getting auxiliary data from DB") + " (1/4)...")
         self.setProgress(10)

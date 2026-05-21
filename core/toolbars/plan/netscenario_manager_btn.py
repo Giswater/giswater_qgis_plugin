@@ -851,7 +851,7 @@ class GwNetscenarioManagerButton(GwAction):
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="MASTERPLAN", sub_group="Netscenario", style_id=style_id, alias=alias)
+                tools_gw.add_layer_database(tablename, the_geom=the_geom, field_id=pk, group="MASTERPLAN", sub_group="Netscenario", alias=alias)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
@@ -859,7 +859,7 @@ class GwNetscenarioManagerButton(GwAction):
                 title = "Warning"
                 answer = tools_qt.show_question(msg, title, parameter=f"'{layer.name()}'", force_action=True)
                 if answer:
-                    tools_qgis.remove_layer_from_toc(alias, "MASTERPLAN", "Netscenario")
+                    tools_qgis.remove_layer(custom_properties={"gw_id": tablename}, group_name="MASTERPLAN", sub_group="Netscenario")
 
     def _manage_load_all(self, menu, state=None):
 

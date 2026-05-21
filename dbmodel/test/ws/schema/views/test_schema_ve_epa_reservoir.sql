@@ -1,0 +1,56 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+BEGIN;
+
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT * FROM no_plan();
+
+-- Check view ve_epa_reservoir
+SELECT has_view('ve_epa_reservoir'::name, 'View ve_epa_reservoir should exist');
+
+-- Check view columns
+SELECT columns_are(
+    've_epa_reservoir',
+    ARRAY[
+        'node_id', 'pattern_id', 'head', 'init_quality', 'source_type', 'source_quality',
+        'source_pattern_id', 'result_id', 'demandmax', 'demandmin', 'demandavg', 'headmax',
+        'headmin', 'headavg', 'pressmax', 'pressmin', 'pressavg', 'qualmax',
+        'qualmin', 'qualavg'
+    ],
+    'View ve_epa_reservoir should have the correct columns'
+);
+
+-- Check column types
+SELECT col_type_is('ve_epa_reservoir', 'node_id', 'int4', 'Column node_id should be int4');
+SELECT col_type_is('ve_epa_reservoir', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
+SELECT col_type_is('ve_epa_reservoir', 'head', 'float8', 'Column head should be float8');
+SELECT col_type_is('ve_epa_reservoir', 'init_quality', 'float8', 'Column init_quality should be float8');
+SELECT col_type_is('ve_epa_reservoir', 'source_type', 'varchar(18)', 'Column source_type should be varchar(18)');
+SELECT col_type_is('ve_epa_reservoir', 'source_quality', 'float8', 'Column source_quality should be float8');
+SELECT col_type_is('ve_epa_reservoir', 'source_pattern_id', 'varchar(16)', 'Column source_pattern_id should be varchar(16)');
+SELECT col_type_is('ve_epa_reservoir', 'result_id', 'varchar(30)', 'Column result_id should be varchar(30)');
+SELECT col_type_is('ve_epa_reservoir', 'demandmax', 'numeric', 'Column demandmax should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'demandmin', 'numeric', 'Column demandmin should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'demandavg', 'numeric(12,2)', 'Column demandavg should be numeric(12,2)');
+SELECT col_type_is('ve_epa_reservoir', 'headmax', 'numeric', 'Column headmax should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'headmin', 'numeric', 'Column headmin should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'headavg', 'numeric(12,2)', 'Column headavg should be numeric(12,2)');
+SELECT col_type_is('ve_epa_reservoir', 'pressmax', 'numeric', 'Column pressmax should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'pressmin', 'numeric', 'Column pressmin should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'pressavg', 'numeric(12,2)', 'Column pressavg should be numeric(12,2)');
+SELECT col_type_is('ve_epa_reservoir', 'qualmax', 'numeric', 'Column qualmax should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'qualmin', 'numeric', 'Column qualmin should be numeric');
+SELECT col_type_is('ve_epa_reservoir', 'qualavg', 'numeric(12,2)', 'Column qualavg should be numeric(12,2)');
+
+SELECT * FROM finish();
+
+ROLLBACK;

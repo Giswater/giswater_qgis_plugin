@@ -83,7 +83,11 @@ class GwGisFileCreate:
                 template = layer.get('project_template')
                 addparam = layer.get('addparam')
                 properties = addparam.get('layerProp', None) if addparam is not None else None
+                provider_config = layer.get('providerConfig')
                 if not template:
+                    continue
+
+                if provider_config is None and layer.get('tableId') is None and layer.get('geomField') == 'None':
                     continue
 
                 depth = template.get('levels_to_read')
@@ -99,16 +103,27 @@ class GwGisFileCreate:
                                     old_level = level.insertGroup(0, levels[i])
                                 level = old_level
                     rectangle = tools_gw._get_extent_parameters(schema)
-                    # Add project layer
-                    tools_gw.add_layer_database(layer['tableName'], layer['geomField'], layer['tableId'], levels[0], levels[1] if len(levels) > 1 else None, style_id='-1', alias=layer['layerName'],
-                                                 sub_sub_group=levels[2] if len(levels) > 2 else None, schema=layer['tableSchema'], visibility=template.get('visibility'), auth_id=auth_id,
-                                                 extent=rectangle, passwd=self.layer_source['password'] if export_passwd else None, create_project=True, force_create_group=False,
-                                                 properties=properties)
+                    group = levels[0]
+                    sub_group = levels[1] if len(levels) > 1 else None
+                    sub_sub_group = levels[2] if len(levels) > 2 else None
+                    if provider_config:
+                        tools_gw.add_layer_provider(
+                            layer['tableName'], provider_config, group, sub_group,
+                            alias=layer['layerName'], sub_sub_group=sub_sub_group,
+                            schema=layer['tableSchema'], visibility=template.get('visibility'),
+                            force_create_group=False)
+                    else:
+                        tools_gw.add_layer_database(
+                            layer['tableName'], layer['geomField'], layer['tableId'], group, sub_group,
+                            alias=layer['layerName'], sub_sub_group=sub_sub_group, schema=layer['tableSchema'],
+                            visibility=template.get('visibility'), auth_id=auth_id, extent=rectangle,
+                            passwd=self.layer_source['password'] if export_passwd else None,
+                            create_project=True, force_create_group=False, properties=properties)
 
         # Hide hidden group
         tools_gw.hide_group_from_toc('HIDDEN')
         root.findGroup('HIDDEN').setItemVisibilityChecked(False)
-        
+
         # Set project CRS
         project.setCrs(QgsCoordinateReferenceSystem(auth_id))
 
@@ -120,7 +135,7 @@ class GwGisFileCreate:
         for layer in layers:
             if isinstance(layer, QgsLayerTreeLayer):
                 layer.setExpanded(False)
-        
+
         # Collapse all groups
         groups = root.findGroups()
         for group in groups:
@@ -144,7 +159,7 @@ class GwGisFileCreate:
             tools_qgis.show_warning(msg, parameter=qgs_path)
             return False, qgs_path
 
-    # region private functions 
+    # region private functions
 
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """

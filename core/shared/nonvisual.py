@@ -663,8 +663,9 @@ class GwNonVisual:
         """ Opens dialog for curve """
 
         try:
-            from scipy.interpolate import CubicSpline  # noqa: F401
-            import numpy as np  # noqa: F401
+            scipy_interpolate = tools_os.get_dep("scipy.interpolate")
+            tools_os.get_dep("numpy")
+            _ = scipy_interpolate.CubicSpline
         except ImportError:
             tools_qgis.show_critical(
                 "Python packages 'scipy' and 'numpy' are not installed. "
@@ -1016,8 +1017,9 @@ class GwNonVisual:
                 self.valid = VALID if valid else NOT_VALID_PAIRS
 
     def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None, geom2=None):
-        from scipy.interpolate import CubicSpline
-        import numpy as np
+        scipy_interpolate = tools_os.get_dep("scipy.interpolate")
+        CubicSpline = scipy_interpolate.CubicSpline
+        np = tools_os.get_dep("numpy")
         """ Note: row & column parameters are passed by the signal """
 
         # Clear plot
