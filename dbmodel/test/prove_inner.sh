@@ -20,8 +20,13 @@ run_pg_prove() {
     echo "==> pg_prove ${label}: no files, skip"
     return 0
   fi
-  echo "==> pg_prove ${label}"
-  pg_prove -h 127.0.0.1 -p 5432 -U postgres -d gw_db -j "${PG_PROVE_JOBS}" "$@"
+  # function/data mutate shared schema — parallel pg_prove (-j>1) causes deadlocks
+  local jobs="${PG_PROVE_JOBS}"
+  if [[ "${label}" == "FUNCTION" || "${label}" == "DATA" ]]; then
+    jobs=1
+  fi
+  echo "==> pg_prove ${label} (-j ${jobs})"
+  pg_prove -h 127.0.0.1 -p 5432 -U postgres -d gw_db -j "${jobs}" "$@"
 }
 
 EXIT_CODE=0
