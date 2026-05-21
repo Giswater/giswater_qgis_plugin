@@ -9,7 +9,15 @@ from . import _helpers as h
 
 # Order matters: postgis_raster needs postgis; pgrouting needs PostGIS.
 # `public.raster` comes from postgis_raster (PostGIS 3+ splits it from core postgis).
-_DEFAULT_EXTENSIONS = ("postgis", "postgis_raster", "tablefunc", "pgrouting", "unaccent")
+_DEFAULT_EXTENSIONS = (
+    "postgis",
+    "postgis_topology",
+    "postgis_raster",
+    "tablefunc",
+    "pgrouting",
+    "unaccent",
+    "pgtap",
+)
 
 
 def run(args: argparse.Namespace, out: Out) -> int:

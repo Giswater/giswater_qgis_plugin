@@ -1,0 +1,5 @@
+# Optional host access: docker compose -f docker-compose.test.yml -f docker-compose.debug.yml up -d postgres
+services:
+  postgres:
+    ports:
+      - "${GW_PUBLISH_PORT:-15432}:5432"

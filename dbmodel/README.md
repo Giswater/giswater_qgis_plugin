@@ -147,6 +147,69 @@ CREATE EXTENSION unaccent;
 
 ## Testing
 
+### pgTAP (CI and local, Docker + giswater_admin)
+
+Prerequisites: **Docker** only (bootstrap and `pg_prove` run inside a `runner` container; no host Postgres port by default).
+
+On **Apple Silicon**, the PostGIS image is `linux/amd64` (emulation); first build may take longer.
+
+From the **plugin repo root** (`giswater/`) or from `dbmodel/`:
+
+```bash
+# Repo root (recommended)
+./dbmodel/test/run_tests.sh ws          # PostgreSQL 16 (default)
+PG_MAJOR=17 ./dbmodel/test/run_tests.sh ws
+PG_MAJOR=17 ./dbmodel/test/run_tests.sh ud
+PG_MAJOR=18 ./dbmodel/test/run_tests.sh ws
+PG_MAJOR=18 ./dbmodel/test/run_tests.sh ud
+
+# From dbmodel/
+./test/run_tests.sh ws
+PG_MAJOR=17 ./test/run_tests.sh ud
+```
+
+Other options:
+
+```bash
+TEST_GROUPS=function ./dbmodel/test/run_tests.sh ws
+GW_CLEAN=1 ./dbmodel/test/run_tests.sh ws   # reset Docker DB volume
+GW_VERBOSE=1 GW_TIMING=1 PG_MAJOR=17 ./dbmodel/test/run_tests.sh ws
+GW_VERBOSE=1 GW_TIMING=1 GW_TIMING_TOP=50 GW_PROFILE_LASTPROCESS=1 ./dbmodel/test/run_tests.sh ws
+GW_DEBUG=1 ./dbmodel/test/run_tests.sh ws   # SQL previews
+```
+
+`PG_MAJOR=18` uses PostGIS **3.6** by default; 16 and 17 use **3.5**. The first run per major rebuilds `gw-ci:pg{N}` (slower on Apple Silicon due to `linux/amd64` emulation).
+
+Flow: `postgres` (`gw-ci`) + `runner` sharing its network → `127.0.0.1:5432` inside Docker is always the test DB (no clash with a local cluster on port **55432**).
+
+Bootstrap is **`giswater_admin` only**: `init-db`, drop `ws_40`/`ud_40` if present, `create --profile ci` (phases: `load_base` → `updates` → `lastprocess` → `load_sample` → `final_pass`), then `replace_vars` copies `test/{ws,ud}/` → `test/.run/{ws,ud}/` (substitutes `SCHEMA_NAME` / `SRID_VALUE` only in the copy), then `pg_prove` on the staging tree. Source SQL under `test/ws` and `test/ud` is never modified.
+
+Locally, without `GW_VERBOSE`/`GW_TIMING` you get phase milestones and a YAML summary; with them, per-file paths and a timing block at the end. **GitHub Actions** sets `GW_VERBOSE=1` and `GW_TIMING=1` on every test job (see `.github/workflows/test-db.yml`).
+
+**Test harness files** (under `dbmodel/test/`):
+
+| File | Role |
+|------|------|
+| `run_tests.sh` | Host orchestrator (Docker compose) |
+| `run_tests_inner.sh` | Bootstrap + pg_prove inside runner |
+| `replace_vars.py` | Substitute schema placeholders in test SQL |
+| `plugin_version.py` | Max semver from `updates/` for `--plugin-version` |
+| `diagnose_db.sh` | Optional host `psql` check (debug compose) |
+
+Plugin version: `python dbmodel/test/plugin_version.py` (from repo root).
+
+**Host `psql` (optional):** publish port 15432 (not 55432):
+
+```bash
+cd dbmodel
+docker compose -f docker-compose.test.yml -f docker-compose.debug.yml up -d postgres
+GW_PUBLISH_PORT=15432 ./test/diagnose_db.sh
+```
+
+GitHub Actions: `.github/workflows/test-db.yml` (`ws`/`ud` × PostgreSQL 16/17/18).
+
+### Tutorials
+
 Example projects with integrated datasets are available to test the system. Check out these tutorial videos to set up your environment:
 
 1. [Install plugin](https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4)

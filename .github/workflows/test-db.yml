@@ -6,11 +6,13 @@ on:
     tags: [v*]
     paths:
       - 'dbmodel/**'
+      - 'giswater_admin/**'
       - '.github/workflows/test-db.yml'
   pull_request:
     branches: [main, release/**, feature/**, refactor/**]
     paths:
       - 'dbmodel/**'
+      - 'giswater_admin/**'
       - '.github/workflows/test-db.yml'
   workflow_dispatch:
     inputs:
@@ -27,23 +29,22 @@ permissions:
   contents: read
   packages: write
 
-defaults:
-  run:
-    working-directory: dbmodel
-
 jobs:
-  ci_test_db:
+  test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         project: [ud, ws]
-        pg_version: [16, 17]
+        pg_version: [16, 17, 18]
 
     env:
-      # PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      PGPASSWORD: postgres
+      PG_MAJOR: ${{ matrix.pg_version }}
+      PG_PROVE_JOBS: "4"
+      TEST_GROUPS: ${{ github.event.inputs.tests || 'all' }}
       GW_SCHEMA: ${{ format('{0}_40', matrix.project) }}
+      GW_VERBOSE: "1"
+      GW_TIMING: "1"
 
     steps:
       - name: Checkout repository
@@ -52,110 +53,44 @@ jobs:
       - name: Show matrix
         run: echo "Testing ${{ matrix.project }} on PostgreSQL ${{ matrix.pg_version }}"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Run database tests
+        working-directory: dbmodel
+        run: |
+          chmod +x test/run_tests.sh test/run_tests_inner.sh
+          REF="${{ github.ref }}"
+          if [[ "${REF}" == "refs/heads/main" || "${REF}" == refs/tags/v* \
+             || "${{ github.event.inputs.build_image }}" == "true" ]]; then
+            export GW_DUMP_PATH="/workspace/dbmodel/gw_${{ matrix.project }}.dump"
+          fi
+          ./test/run_tests.sh ${{ matrix.project }}
+
+      - name: Upload schema dump
+        if: success() && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true')
+        uses: actions/upload-artifact@v4
         with:
-          python-version: "3.x"
+          name: gw-dump-pg${{ matrix.pg_version }}-${{ matrix.project }}
+          path: dbmodel/gw_${{ matrix.project }}.dump
+          retention-days: 7
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r test/requirements.txt
+  publish-gw-db:
+    needs: test
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [ud, ws]
+        pg_version: [16, 17, 18]
 
-      - name: Add PostgreSQL repository
-        run: |
-          sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-          wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Update apt-get & install PostgreSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            postgresql-${{ matrix.pg_version }} \
-            postgresql-${{ matrix.pg_version }}-postgis-3 \
-            postgresql-${{ matrix.pg_version }}-pgrouting \
-            postgresql-${{ matrix.pg_version }}-pgtap \
-            postgis
-
-      - name: Remove default Postgres clusters
-        run: |
-          for cluster in $(pg_lsclusters --no-header | awk '{print $1 ":" $2}'); do
-            ver=$(echo $cluster | cut -d':' -f1)
-            name=$(echo $cluster | cut -d':' -f2)
-            sudo pg_dropcluster --stop $ver $name || true
-          done
-
-      - name: Create & start PG cluster
-        run: |
-          if [ "${{ matrix.pg_version }}" = "16" ]; then
-            PORT=55432
-          else
-            PORT=55433
-          fi
-
-          sudo pg_dropcluster --stop ${{ matrix.pg_version }} main || true
-
-          sudo pg_createcluster ${{ matrix.pg_version }} main --port=$PORT
-          sudo pg_ctlcluster ${{ matrix.pg_version }} main start
-
-          echo "PORT=$PORT" >> $GITHUB_ENV
-
-      - name: Show running clusters
-        run: sudo pg_lsclusters
-
-      - name: Set postgres password
-        run: |
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
-
-      - name: Create PostgreSQL Database
-        run: |
-          psql -h localhost -p ${{ env.PORT }} -U postgres -c "CREATE DATABASE gw_db;"
-
-      - name: Setup PostgreSQL extensions
-        run: |
-          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis;'
-          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgrouting;'
-          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis_raster;'
-          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis_topology;'
-          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgtap;'
-
-      - name: Replace variables in SQL files
-        run: python test/replace_vars.py ${{ matrix.project }}
-
-      - name: Create Sample Schema
-        run: python test/execute_sql_files.py ${{ matrix.project }}
-
-      - name: Run all SQL tests in sequence
-        run: |
-          TEST_GROUPS="${{ github.event.inputs.tests || 'all' }}"
-          PT="${{ matrix.project }}"
-          EXIT_CODE=0
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"schema"* ]]; then
-            echo "Running SCHEMA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/schema/tables"/*.sql "test/${PT}/schema/views"/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"security"* ]]; then
-            echo "Running SECURITY tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/security"/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"function"* ]]; then
-            echo "Running FUNCTION tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/function"/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"data"* ]]; then
-            echo "Running DATA tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/data"/*.sql || EXIT_CODE=1
-          fi
-
-          if [[ "$TEST_GROUPS" == "all" || "$TEST_GROUPS" == *"performance"* ]]; then
-            echo "Running PERFORMANCE tests..."
-            pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db "test/${PT}/performance"/*.sql || EXIT_CODE=1
-          fi
-
-          exit $EXIT_CODE
+      - name: Download schema dump
+        uses: actions/download-artifact@v4
+        with:
+          name: gw-dump-pg${{ matrix.pg_version }}-${{ matrix.project }}
+          path: dbmodel
 
       - name: Set image tag
         run: |
@@ -165,22 +100,22 @@ jobs:
             echo "IMAGE_TAG=${GITHUB_REF_NAME//\//-}" >> $GITHUB_ENV
           fi
 
-      - name: Dump DB for image
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
-        run: |
-          /usr/lib/postgresql/${{ matrix.pg_version }}/bin/pg_dump \
-            -h localhost -p ${{ env.PORT }} -U postgres -n ${{ env.GW_SCHEMA }} -Fc -f gw_${{ matrix.project }}.dump gw_db
-
       - name: Log in to GHCR
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Resolve PostGIS version
+        run: |
+          if [ "${{ matrix.pg_version }}" = "18" ]; then
+            echo "POSTGIS_VERSION=3.6" >> "$GITHUB_ENV"
+          else
+            echo "POSTGIS_VERSION=3.5" >> "$GITHUB_ENV"
+          fi
+
       - name: Build and push DB image
-        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
         uses: docker/build-push-action@v6
         with:
           context: dbmodel
@@ -190,3 +125,4 @@ jobs:
           build-args: |
             GW_DUMP=gw_${{ matrix.project }}.dump
             PG_MAJOR=${{ matrix.pg_version }}
+            POSTGIS_VERSION=${{ env.POSTGIS_VERSION }}
