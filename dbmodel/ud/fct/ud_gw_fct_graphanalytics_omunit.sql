@@ -228,8 +228,14 @@ BEGIN
                     WHEN a1.initoverflowpath = a2.initoverflowpath THEN 0  -- the same: first
                     ELSE 1                                        -- not the same: after
                 END AS initoverflowpath,
-                abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
-                - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+                least(
+	                abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
+	                - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+	                ),
+	                2*pi() - 
+	                abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
+	                - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+	                )
                 ) AS azimuth_difference
             FROM temp_pgr_arc_linegraph l
             JOIN arc a1 ON l.pgr_node_1 = a1.arc_id
@@ -252,8 +258,14 @@ BEGIN
         pair_arcs AS (
             SELECT 
                 l.pgr_node_1, l.pgr_arc_id, l.pgr_node_2, l.graph_delimiter,
-                abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
-                - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+                least(
+	                abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
+	                - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+	                ),
+	                2*pi() - 
+	                abs(st_azimuth(st_lineinterpolatepoint(a1.the_geom,0.99),st_endpoint(a1.the_geom))
+	                - st_azimuth(st_startpoint(a2.the_geom),st_lineinterpolatepoint(a2.the_geom,0.01)) 
+	                )
                 ) AS azimuth_difference
             FROM temp_pgr_arc_linegraph l
             JOIN arc a1 ON l.pgr_node_1 = a1.arc_id
