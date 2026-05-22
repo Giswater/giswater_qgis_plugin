@@ -421,11 +421,10 @@ BEGIN
     FROM macroomunit_end oe
     WHERE o.macroomunit_id = oe.macromapzone_id;
 
-    -- MACROOMUNITS: CATCHMENT_NODE AND ORDER SECTION
-    --==================================
+    -- CATCHMENT_NODE AND ORDER SECTION FOR MACROOMUNITS
+    --===================================================
 
     -- choose the macroomunits from where starts 
-    
     SELECT array_agg(a.macromapzone_id)::INT[] INTO v_root_vids
     FROM temp_pgr_arc a
     WHERE NOT EXISTS (
@@ -433,7 +432,8 @@ BEGIN
         WHERE a.pgr_node_2 = a1.pgr_node_1
     ); 
 
-    -- use pgr_depthFirstSearch for the lineGraph of the network, from pgr_node_2 to pgr_node_1 
+    -- Traverse the line graph upstream (from pgr_node_2 to pgr_node_1)
+    -- considering ONLY MACROOMUNIT boundary connections.
     -- TODO (maybe) order using elev2 for a better ordering, could be faster
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, node, edge, "cost", agg_cost)
     (
@@ -453,18 +453,14 @@ BEGIN
     UPDATE temp_pgr_macroomunit m
     SET catchment_node = t.catchment_node
     FROM (
-        SELECT d.node AS macroomunit_id, d.start_vid, a.pgr_arc_id, a.pgr_node_2 AS catchment_node
+        SELECT d.node AS macroomunit_id, m2.node_2 AS catchment_node
         FROM temp_pgr_drivingdistance d
-        JOIN temp_pgr_arc a ON a.macromapzone_id = d.start_vid
-        WHERE NOT EXISTS (
-            SELECT 1 FROM temp_pgr_arc a1
-            WHERE a.pgr_node_2 = a1.pgr_node_1
-        )
-    )t
+        JOIN temp_pgr_macroomunit m2 ON m2.macroomunit_id = d.start_vid
+    ) t
     WHERE t.macroomunit_id = m.macroomunit_id;
 
     -- update order_number for macroomunits
-    WITH ordered AS (
+    WITH omunit_ordered AS (
         SELECT 
             d.node AS macroomunit_id,
             ROW_NUMBER() OVER (
@@ -475,10 +471,58 @@ BEGIN
         JOIN temp_pgr_macroomunit m 
             ON d.node = m.macroomunit_id
     )
-    UPDATE temp_pgr_macroomunit m
-    SET order_number = o.order_number
-    FROM ordered o
-    WHERE m.macroomunit_id = o.macroomunit_id;
+    UPDATE temp_pgr_macroomunit t
+    SET order_number = oo.order_number
+    FROM omunit_ordered oo
+    WHERE t.macroomunit_id = oo.macroomunit_id;
+
+    -- ORDER SECTION for OMUNITS
+    -- ==========================
+
+    TRUNCATE temp_pgr_drivingdistance;
+
+    -- choose the omunits from where starts 
+    SELECT array_agg(a.mapzone_id)::INT[] INTO v_root_vids
+    FROM temp_pgr_arc a
+    WHERE NOT EXISTS (
+        SELECT 1 FROM temp_pgr_arc a1
+        WHERE a.pgr_node_2 = a1.pgr_node_1
+    ); 
+
+    -- Traverse the line graph upstream (from pgr_node_2 to pgr_node_1)
+    -- considering only OMUNIT and MACROOMUNIT boundary connections.
+    -- Exclude from the graphline the internal OMUNIT links (graph_delimiter = 'NONE') and the catchment separators.
+    -- TODO (maybe) order using elev2 for a better ordering, could be faster
+    INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, node, edge, "cost", agg_cost)
+    (
+        SELECT seq, "depth", start_vid, node, edge, "cost", agg_cost
+        FROM pgr_depthFirstSearch(
+            'SELECT l.pgr_arc_id AS id, a2.mapzone_id AS source, a1.mapzone_id AS target, l.cost, l.reverse_cost 
+            FROM temp_pgr_arc_linegraph l
+            JOIN temp_pgr_arc a1 ON a1.pgr_arc_id = l.pgr_node_1
+            JOIN temp_pgr_arc a2 ON a2.pgr_arc_id = l.pgr_node_2
+            WHERE l.graph_delimiter = ''MACROOMUNIT'' OR l.graph_delimiter = ''OMUNIT'' 
+            ORDER BY a2.macromapzone_id, a2.mapzone_id
+            ',
+        v_root_vids, directed => true)
+    );
+
+    -- update order_number for omunits
+    WITH omunit_ordered AS (
+        SELECT 
+            d.node AS omunit_id,
+            ROW_NUMBER() OVER (
+                PARTITION BY o.macroomunit_id
+                ORDER BY d.seq DESC
+            ) AS order_number
+        FROM temp_pgr_drivingdistance d
+        JOIN temp_pgr_omunit o 
+            ON d.node = o.omunit_id
+    )
+    UPDATE temp_pgr_omunit tpo 
+    SET order_number = oo.order_number
+    FROM omunit_ordered oo
+    WHERE tpo.omunit_id = oo.omunit_id;
 
     -- update geometry of mapzones
     IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
