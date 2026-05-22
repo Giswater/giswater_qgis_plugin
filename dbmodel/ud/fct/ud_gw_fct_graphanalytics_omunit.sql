@@ -323,8 +323,7 @@ BEGIN
     WITH omunit_start AS (
         SELECT t.mapzone_id, t.pgr_node_1
         FROM temp_pgr_arc t
-        GROUP BY t.mapzone_id, t.pgr_node_1
-        HAVING NOT EXISTS (
+        WHERE NOT EXISTS (
             SELECT 1 
             FROM temp_pgr_arc t2
             WHERE t.mapzone_id = t2.mapzone_id 
@@ -339,8 +338,7 @@ BEGIN
     WITH omunit_end AS (
         SELECT t.mapzone_id, t.pgr_node_2
         FROM temp_pgr_arc t
-        GROUP BY t.mapzone_id, t.pgr_node_2
-        HAVING NOT EXISTS (
+        WHERE NOT EXISTS (
             SELECT 1 
             FROM temp_pgr_arc t2
             WHERE t.mapzone_id = t2.mapzone_id 
