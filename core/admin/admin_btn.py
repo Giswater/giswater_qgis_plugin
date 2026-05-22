@@ -12,7 +12,6 @@ import sys
 from functools import partial
 from qgis.PyQt.sip import isdeleted
 from time import time
-from datetime import timedelta
 from typing import Union
 
 from qgis.PyQt.QtCore import QSettings, Qt, QTimer
