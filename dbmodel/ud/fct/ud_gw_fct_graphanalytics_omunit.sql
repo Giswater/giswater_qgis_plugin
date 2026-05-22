@@ -283,7 +283,10 @@ BEGIN
     WHERE l.graph_delimiter ='NONE'
         AND l.pgr_node_1 = a.pgr_arc_id
         AND EXISTS (
-            SELECT 1 FROM temp_pgr_node n WHERE n.graph_delimiter = 'OMUNIT'
+            SELECT 1 FROM temp_pgr_node n 
+            JOIN node nn ON n.pgr_node_id = nn.node_id
+            WHERE n.graph_delimiter = 'OMUNIT'
+            AND nn.has_access
             AND a.pgr_node_2 = n.pgr_node_id   
         );
 
@@ -503,7 +506,7 @@ BEGIN
         v_query_text = '
             UPDATE temp_pgr_macroomunit mo SET the_geom = ST_Multi(b.geom)
             FROM (
-                SELECT o.macroomunit_id, ST_CollectionExtract(ST_Collect(o.the_geom), 3) AS geom
+                SELECT o.macroomunit_id, ST_Union(o.the_geom) AS geom
                 FROM temp_pgr_omunit o
                 GROUP BY o.macroomunit_id
             ) b 
