@@ -24,25 +24,17 @@ from ...giswater_admin.engine import (
     SchemaBuilder,
     load_manifest,
 )
-from ...giswater_admin.engine.timing_report import summarize_build
 from ...giswater_admin.log_format import (
     LogStyle,
     format_build_header,
     format_done,
     format_failure,
     format_file,
-    format_phase,
     format_progress_status,
-    format_timing_summary,
 )
 from ...libs import lib_vars, tools_log
 from ..admin._qt_db_adapter import QtDbAdapter
 from .task import GwTask
-
-
-def _log_schema_lines(lines: list[str]) -> None:
-    for line in lines:
-        tools_log.log_info(line)
 
 
 class GwSchemaBuilderTask(GwTask):
@@ -77,7 +69,7 @@ class GwSchemaBuilderTask(GwTask):
         self._last_progress_label: str = ""
         self._log_style = LogStyle(
             sql_root=params.sql_root or "",
-            show_timing_ms=True,
+            show_timing_ms=False,
         )
 
         # Detect "force commit" preference (legacy `system/force_commit`),
@@ -137,17 +129,9 @@ class GwSchemaBuilderTask(GwTask):
                 )
             else:
                 tools_log.log_warning("SchemaBuilder failed without first_failure")
-            if self.result is not None:
-                self._log_timing_summary(self.result)
             return False
 
-        if self.result is not None:
-            self._log_timing_summary(self.result)
         return True
-
-    def _log_timing_summary(self, result: BuildResult) -> None:
-        summary = summarize_build(result, top=15)
-        _log_schema_lines(format_timing_summary(summary, style=self._log_style))
 
     # ------------------------------------------------------------- progress
 
@@ -159,18 +143,12 @@ class GwSchemaBuilderTask(GwTask):
         fx: Any = None,
     ) -> None:
         self._last_progress_label = label
-        ms = None
-        if fx is not None and getattr(fx, "duration_ms", 0):
-            ms = int(fx.duration_ms)
 
-        if label.startswith("phase:"):
-            phase_id = label.split(":", 1)[1]
-            tools_log.log_info(format_phase(seen, total, phase_id, style=self._log_style))
-        elif label == "done":
+        if label == "done":
             tools_log.log_info(format_done(seen, total, style=self._log_style))
-        else:
+        elif not label.startswith("phase:"):
             tools_log.log_info(
-                format_file(seen, total, label, ms=ms, style=self._log_style)
+                format_file(seen, total, label, style=self._log_style)
             )
 
         if hasattr(self.admin, "schema_build_progress_hint"):

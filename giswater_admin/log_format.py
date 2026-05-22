@@ -151,29 +151,18 @@ def format_progress_status(
     sql_root: str = "",
 ) -> str:
     """
-    Compact status for QGIS ``lbl_time`` (phase + counter + current file).
+    Compact status for QGIS ``lbl_time`` (counter + current file).
     """
-    if label == "done":
-        phase = "done"
-        file_part = ""
-    elif label.startswith("phase:"):
-        phase = label.split(":", 1)[1]
-        file_part = ""
-    elif label.startswith("<fn:") or label.startswith("<inline:"):
-        phase = label.strip("<>")
-        file_part = ""
-    else:
-        phase = ""
-        file_part = shorten_path(label, sql_root)
-        if "/" in file_part or file_part.endswith(".sql"):
-            # infer phase folder segment when path looks like updates/4/2/0/dml.sql
-            top = file_part.split("/", 1)[0]
-            phase = top if top else "sql"
-        else:
-            phase = "sql"
     counter = f"{seen}/{total}" if total else ""
-    parts = [p for p in (phase, counter, file_part) if p]
-    return "  |  ".join(parts)
+    if label == "done":
+        return f"{counter}  done".strip() if counter else "done"
+    if label.startswith("phase:"):
+        return counter
+    if label.startswith("<fn:") or label.startswith("<inline:"):
+        return counter
+    file_part = shorten_path(label, sql_root)
+    parts = [p for p in (counter, file_part) if p]
+    return "  ".join(parts)
 
 
 def format_timing_summary(

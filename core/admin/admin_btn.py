@@ -3321,11 +3321,8 @@ class GwAdminButton:
 
     def _calculate_elapsed_time(self, dialog):
 
-        tf = time()  # Final time
-        td = tf - self.t0  # Delta time
-        text = f"Exec. time: {timedelta(seconds=round(td))}"
-        hint = getattr(self, "schema_build_progress_hint", "") or ""
-        if not hint:
+        text = getattr(self, "schema_build_progress_hint", "") or ""
+        if not text:
             task = self._active_schema_build_task()
             if task is not None:
                 label = getattr(task, "_last_progress_label", "") or ""
@@ -3333,11 +3330,9 @@ class GwAdminButton:
                 seen = getattr(self, "current_sql_file", 0)
                 total = getattr(self, "total_sql_files", 0)
                 if label:
-                    hint = format_progress_status(
+                    text = format_progress_status(
                         seen, total, label, sql_root=sql_root
                     )
-        if hint:
-            text = f"{text}  |  {hint}"
         self._update_time_elapsed(text, dialog)
 
     def _update_time_elapsed(self, text, dialog):

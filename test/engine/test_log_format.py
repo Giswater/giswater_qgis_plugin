@@ -67,7 +67,8 @@ def test_format_progress_status_file():
         sql_root="dbmodel",
     )
     assert "145/723" in hint
-    assert "4/2/0/dml.sql" in hint or "updates" in hint
+    assert "4/2/0/dml.sql" in hint
+    assert "updates" in hint
 
 
 def test_format_build_header():
