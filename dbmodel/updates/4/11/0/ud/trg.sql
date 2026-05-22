@@ -18,3 +18,6 @@ CREATE TRIGGER gw_trg_edit_macroomunit INSTEAD OF INSERT
 OR DELETE
 OR UPDATE ON
 ve_macroomunit FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macroomunit('EDIT');
+
+CREATE TRIGGER gw_trg_edit_node INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
