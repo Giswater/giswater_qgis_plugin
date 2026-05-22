@@ -49,35 +49,37 @@ DECLARE
     v_query_text TEXT;
 
     v_version TEXT;
-    v_srid INTEGER;
 
     v_visible_layer TEXT;
 
-    v_response JSON;
-
+    -- result variables
+    v_result JSON;
     v_result_info JSON;
-    v_result_point JSON;
-    v_result_line JSON;
+    v_result_polygon JSON;
     v_result_polygon_omunit JSON;
     v_result_polygon_macroomunit JSON;
-    v_result TEXT;
+
+    -- response variables
+	v_level integer;
+	v_status text;
+	v_message text;
+	v_response JSON;
+
+    v_error_context text;
 
 	-- LOCK LEVEL LOGIC
 	v_original_disable_locklevel json;
 
     -- general variables
-    v_pgr_distance INTEGER;
     v_root_vids int[];
     
-    -- parameters
-
 BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME";
 
     -- Select configuration values
-	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Get variables from input JSON
 	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
@@ -194,9 +196,11 @@ BEGIN
 
     UPDATE temp_pgr_node t
     SET graph_delimiter = 'OMUNIT'
-    FROM v_temp_node n
-    WHERE 'OMUNIT' = ANY(n.graph_delimiter)
-    AND t.pgr_node_id = n.node_id;
+    FROM v_temp_node vn
+    JOIN node n ON n.node_id = vn.node_id
+    WHERE 'OMUNIT' = ANY(vn.graph_delimiter)
+    AND n.has_access = TRUE
+    AND t.pgr_node_id = vn.node_id;
 
     --------------------------------------------------
     -- SECTION: Create omunits and macroomunits
@@ -569,7 +573,7 @@ BEGIN
             ) AS feature
             FROM (
                 SELECT 
-                    o.omunit_id, o.node_1, o.node_2, o.is_way_in, o.is_way_out, o.macroomunit_id, o.order_number, o.the_geom,  ''ve_omunit'' AS layer 
+                    o.omunit_id, o.node_1, o.node_2, o.macroomunit_id, o.order_number, o.the_geom,  ''ve_omunit'' AS layer 
                 FROM temp_pgr_omunit o
             ) row
         ) features' INTO v_result;
@@ -589,7 +593,7 @@ BEGIN
             ) AS feature
             FROM (
                 SELECT 
-                    mo.macroomunit_id, mo.node_1, mo.node_2, mo.is_way_in, mo.is_way_out, mo.catchment_node, mo.order_number, mo.the_geom,  ''ve_macroomunit'' AS layer 
+                    mo.macroomunit_id, mo.node_1, mo.node_2, mo.catchment_node, mo.order_number, mo.the_geom,  ''ve_macroomunit'' AS layer 
                 FROM temp_pgr_macroomunit mo
             ) row
         ) features' INTO v_result;
@@ -684,6 +688,40 @@ BEGIN
             WHERE m.omunit_id = tpo.omunit_id
         );
 
+        -- Third, delete the macroomunits that don't exist anymore;
+        DELETE FROM macroomunit m
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone mo
+            WHERE mo.macromapzone_id = m.macroomunit_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_macroomunit tmm
+            WHERE m.macroomunit_id = tmm.macroomunit_id
+        );
+
+        -- Insert new macroomunits
+        INSERT INTO macroomunit (macroomunit_id)
+        SELECT tmm.macroomunit_id
+        FROM temp_pgr_macroomunit tmm
+        WHERE NOT EXISTS (
+            SELECT 1 
+            FROM macroomunit m 
+            WHERE tmm.macroomunit_id = m.macroomunit_id
+        );
+
+        -- Update macroomunits
+        UPDATE macroomunit m
+        SET node_1 = tmm.node_1,
+            node_2 = tmm.node_2,
+            catchment_node = tmm.catchment_node,
+            order_number = tmm.order_number,
+            the_geom = tmm.the_geom,
+            expl_id = tmm.expl_id,
+            muni_id = tmm.muni_id,
+            sector_id = tmm.sector_id
+        FROM temp_pgr_macroomunit tmm
+        WHERE m.macroomunit_id = tmm.macroomunit_id;
+
         -- Insert new omunits
         INSERT INTO omunit (omunit_id)
         SELECT tpo.omunit_id
@@ -698,9 +736,8 @@ BEGIN
         UPDATE omunit o
         SET node_1 = tpo.node_1,
             node_2 = tpo.node_2,
-            is_way_in = tpo.is_way_in,
-            is_way_out = tpo.is_way_out,
             order_number = tpo.order_number,
+            macroomunit_id = tpo.macroomunit_id,
             the_geom = tpo.the_geom,
             expl_id = tpo.expl_id,
             muni_id = tpo.muni_id,
@@ -745,36 +782,77 @@ BEGIN
         WHERE l.feature_id = t.pgr_gully_id 
         AND l.omunit_id IS DISTINCT FROM t.mapzone_id;
 
-        --v_visible_layer = '"ve_omunit"';
-        v_visible_layer = NULL;
+        v_visible_layer = 've_omunit';
     END IF;
 
     -- ENDSECTION UPDATE
 
-    v_result := COALESCE(v_result, '{}');
-    v_result_info := CONCAT('{"values":', v_result, '}');
+    -- Get Info for the audit
+	SELECT json_agg(row_to_json(t)) INTO v_result
+	FROM (
+		SELECT id, error_message AS message
+		FROM temp_audit_check_data
+		WHERE cur_user = current_user AND fid = v_fid
+		ORDER BY criticity DESC, id ASC
+	) t;
+	v_result := COALESCE(v_result, '{}');
+	v_result_info := concat ('{"values":',v_result, '}');
 
     -- Control nulls
+    v_result_polygon_omunit := COALESCE(v_result_polygon_omunit, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Temp Omunit',
+		'features', '[]'::jsonb
+	)::json);
+    v_result_polygon_macroomunit := COALESCE(v_result_polygon_macroomunit, jsonb_build_object(
+		'type', 'FeatureCollection',
+		'layerName', 'Temp MacroOmunit',
+		'features', '[]'::jsonb
+	)::json);
+
     v_result_info := COALESCE(v_result_info, '{}');
-    v_result_point := COALESCE(v_result_point, '{}');
-    v_result_line := COALESCE(v_result_line, '{}');
-    v_result_polygon_omunit := COALESCE(v_result_polygon_omunit, '{}');
-    v_result_polygon_macroomunit := COALESCE(v_result_polygon_macroomunit, '{}');
+
+    v_status := COALESCE(v_status, 'Accepted');
+    v_level := COALESCE(v_level, 3);
+    v_message := COALESCE(v_message, 'Omunit dynamic analysis done successfully');
+    v_version := COALESCE(v_version, '');
+
+    v_result_polygon := jsonb_build_array(
+		v_result_polygon_omunit,
+		v_result_polygon_macroomunit
+	)::json;
 
 	-- Restore original disable lock level
     UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
     -- Return
-    RETURN gw_fct_json_create_return(
-        ('{"status":"Accepted", "message":{"level":1, "text":"Omunit dynamic analysis done successfully"}, "version":"' || v_version || '"' ||
-        ',"body":{"form":{}' ||
-        ',"data":{"info":' || v_result_info || ',' ||
-        '"point":' || v_result_point || ',' ||
-        '"line":' || v_result_line || ',' ||
-        '"polygon":' || v_result_polygon_macroomunit || '}' ||
-        '}' ||
-        '}')::json, 3492, NULL, ('{"visible": [' || v_visible_layer || ']}')::json, NULL
-    );
+    	RETURN gw_fct_json_create_return(('{
+		"status":"'||v_status||'",
+		"message":{
+			"level":'||v_level||',
+			"text":"'||v_message||'"
+		},
+		"version":"'||v_version||'",
+		"body":{
+			"form":{},
+			"data":{
+				"polygon":'||v_result_polygon||'
+			}
+		}
+	}')::json, 3492, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+
+	EXCEPTION WHEN OTHERS THEN
+		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+		RETURN json_build_object(
+		'status', 'Failed',
+		'NOSQLERRM', SQLERRM,
+		'message', json_build_object(
+			'level', right(SQLSTATE, 1),
+			'text', SQLERRM
+		),
+		'SQLSTATE', SQLSTATE,
+		'SQLCONTEXT', v_error_context
+	);
 
 END;
 $BODY$
