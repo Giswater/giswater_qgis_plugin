@@ -18,3 +18,10 @@ UPDATE plan_psector SET status = 3 WHERE status = 4;
 ALTER TABLE plan_typevalue DISABLE TRIGGER ALL;
 DELETE FROM plan_typevalue WHERE typevalue='psector_status' AND id='4';
 ALTER TABLE plan_typevalue ENABLE TRIGGER ALL;
+
+-- 22/05/2026
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias)
+VALUES (3542, 'gw_fct_admin_manage_view_dependencies', 'utils', 'function', 'json', 'json',
+'Recursively discovers dependent views on parent editable views across all database schemas, saves their definitions, drops them in safe order and restores them after parent recreation',
+'role_admin', NULL, 'core', NULL)
+ON CONFLICT (id) DO NOTHING;

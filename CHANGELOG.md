@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Algorithm to calculate omunits and macroomunits `gw_fct_graphanalytics_omunit`.
 - `has_access` column to `node` table.
 - `ve_omunit` and `ve_macroomunit` views with edit triggers.
+- New function `gw_fct_admin_manage_view_dependencies` to manage view dependencies.
 
 ### Removed
 
