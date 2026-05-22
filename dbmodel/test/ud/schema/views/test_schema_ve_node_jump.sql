@@ -41,7 +41,7 @@ SELECT columns_are(
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
-        'width', 'sander_depth', 'prot_surface', 'accessibility', 'name', 'wjump_code'
+        'width', 'sander_depth', 'prot_surface', 'accessibility', 'name', 'wjump_code', 'has_access'
     ],
     'View ve_node_jump should have the correct columns'
 );
@@ -72,12 +72,12 @@ SELECT col_type_is('ve_node_jump', 'macroexpl_id', 'int4', 'Column macroexpl_id 
 SELECT col_type_is('ve_node_jump', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_jump', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_jump', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_jump', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_jump', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_jump', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_jump', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_jump', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_jump', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_jump', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_jump', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_jump', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_jump', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_jump', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_jump', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -173,7 +173,7 @@ SELECT col_type_is('ve_node_jump', 'prot_surface', 'bool', 'Column prot_surface 
 SELECT col_type_is('ve_node_jump', 'accessibility', 'varchar(16)', 'Column accessibility should be varchar(16)');
 SELECT col_type_is('ve_node_jump', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_node_jump', 'wjump_code', 'text', 'Column wjump_code should be text');
-
+SELECT col_type_is('ve_node_jump', 'has_access', 'bool', 'Column has_access should be bool');
 SELECT * FROM finish();
 
 ROLLBACK;

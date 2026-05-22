@@ -40,7 +40,7 @@ SELECT columns_are(
         'flooding_rate', 'flooding_vol', 'sector_style', 'omzone_style', 'drainzone_style', 'dwfzone_style',
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
-        'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility'
+        'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'has_access'
     ],
     'View ve_node should have the correct columns'
 );
@@ -165,6 +165,7 @@ SELECT col_type_is('ve_node', 'treatment_type', 'int4', 'Column treatment_type s
 SELECT col_type_is('ve_node', 'has_treatment', 'bool', 'Column has_treatment should be bool');
 SELECT col_type_is('ve_node', 'sector_visibility', 'int4[]', 'Column sector_visibility should be int4[]');
 SELECT col_type_is('ve_node', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
+SELECT col_type_is('ve_node', 'has_access', 'bool', 'Column has_access should be bool');
 
 SELECT * FROM finish();
 

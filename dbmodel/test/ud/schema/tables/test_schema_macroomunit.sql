@@ -21,7 +21,7 @@ SELECT has_table('macroomunit'::name, 'Table macroomunit should exist');
 SELECT columns_are(
     'macroomunit',
     ARRAY[
-        'macroomunit_id', 'node_1', 'node_2', 'is_way_in', 'is_way_out', 'the_geom',
+        'macroomunit_id', 'node_1', 'node_2', 'the_geom',
         'expl_id', 'muni_id', 'sector_id', 'catchment_node', 'order_number'
     ],
     'Table macroomunit should have the correct columns'
@@ -31,8 +31,6 @@ SELECT columns_are(
 SELECT col_type_is('macroomunit', 'macroomunit_id', 'int4', 'Column macroomunit_id should be int4');
 SELECT col_type_is('macroomunit', 'node_1', 'int4', 'Column node_1 should be int4');
 SELECT col_type_is('macroomunit', 'node_2', 'int4', 'Column node_2 should be int4');
-SELECT col_type_is('macroomunit', 'is_way_in', 'bool', 'Column is_way_in should be bool');
-SELECT col_type_is('macroomunit', 'is_way_out', 'bool', 'Column is_way_out should be bool');
 SELECT col_type_is('macroomunit', 'the_geom', 'geometry(multipolygon, SRID_VALUE)', 'Column the_geom should be geometry(multipolygon, SRID_VALUE)');
 SELECT col_type_is('macroomunit', 'expl_id', 'int4[]', 'Column expl_id should be int4[]');
 SELECT col_type_is('macroomunit', 'muni_id', 'int4[]', 'Column muni_id should be int4[]');

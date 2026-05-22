@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'custom_area', 'max_volume', 'util_volume', 'min_height', 'accessibility',
-        'name', 'sewstorage_param_1', 'sewstorage_param_2'
+        'name', 'sewstorage_param_1', 'sewstorage_param_2', 'has_access'
     ],
     'View ve_node_sewer_storage should have the correct columns'
 );
@@ -73,12 +73,12 @@ SELECT col_type_is('ve_node_sewer_storage', 'macroexpl_id', 'int4', 'Column macr
 SELECT col_type_is('ve_node_sewer_storage', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_sewer_storage', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_sewer_storage', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_sewer_storage', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_sewer_storage', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_sewer_storage', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_sewer_storage', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_sewer_storage', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_sewer_storage', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_sewer_storage', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_sewer_storage', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_sewer_storage', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_sewer_storage', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_sewer_storage', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_sewer_storage', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -177,7 +177,7 @@ SELECT col_type_is('ve_node_sewer_storage', 'accessibility', 'varchar(16)', 'Col
 SELECT col_type_is('ve_node_sewer_storage', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_node_sewer_storage', 'sewstorage_param_1', 'text', 'Column sewstorage_param_1 should be text');
 SELECT col_type_is('ve_node_sewer_storage', 'sewstorage_param_2', 'text', 'Column sewstorage_param_2 should be text');
-
+SELECT col_type_is('ve_node_sewer_storage', 'has_access', 'bool', 'Column has_access should be bool');
 SELECT * FROM finish();
 
 ROLLBACK;
