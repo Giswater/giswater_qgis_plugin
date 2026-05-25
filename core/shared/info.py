@@ -1851,10 +1851,6 @@ class GwInfo(QObject):
             # If we make an info
             else:
                 feature = f'"id":"{self.feature_id}", '
-                # Get geometry from existing feature
-                existing_feature = tools_qt.get_feature_by_id(self.layer, int(self.feature_id))
-                if existing_feature and existing_feature.hasGeometry():
-                    _json['the_geom'] = existing_feature.geometry().asWkt()
 
             feature += f'"tableName":"{p_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
