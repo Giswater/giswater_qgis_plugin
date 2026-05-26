@@ -103,6 +103,13 @@ subfolder structure of ud/ws/utils folder
 -----------------------------
 	- Use it to register any change on sqls.
 	- Issue is mandatory. If not exits, create new one on Github.
+	- Network (ws/ud): one changelog.txt per scope under schemas/network/{common,ws,ud}/updates/M/m/p/
+		* common: changes shared by ws and ud
+		* ws or ud: changes only for that project type (same version folder as the SQL patches)
+	- Preferred format (version is the M/m/p folder path): one bullet per line, lines starting with "- "
+		* Optional comments with "#"
+		* Legacy format (version line + asterisks + bullets) is still accepted
+	- Admin and giswater_admin update --check merge common + ws|ud for display
 	- If we need to drop whitout cascade some view, changelog has two parts in order to identify as best as possible that special AND UNIQUE CASE OF DROPS
 
 

@@ -44,7 +44,7 @@ from ..threads.schema_builder_task import GwSchemaBuilderTask, load_kind_manifes
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
-from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema
+from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema, format_upgrade_changelog
 from ...giswater_admin.log_format import format_progress_status
 from ._qt_db_adapter import QtDbAdapter
 
@@ -784,8 +784,8 @@ class GwAdminButton:
         self.folder_locale = os.path.join(self.sql_dir, self.file_pattern_i18n, self.locale)
         # 'common' replaces the legacy 'utils' shared-code folder for ws/ud.
         self.folder_common = os.path.join(self.sql_dir, 'schemas', 'network', 'common')
-        # Changelogs live under common/updates; per-scope updates are
-        # under schemas/network/{common,ws,ud}/updates/<M>/<m>/<p>/.
+        # Legacy path; upgrade changelog UI uses giswater_admin.engine.changelog
+        # (common + ws|ud under schemas/network/*/updates).
         self.folder_updates = os.path.join(self.folder_common, 'updates')
         self.folder_sample = os.path.join(self.sql_dir, 'schemas', 'network', 'sample')
 
@@ -1632,44 +1632,37 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_show_info, dlg_name='admin_projectinfo')
 
     def _read_info_version(self):
-        """"""
+        """Load merged common + ws/ud changelogs for pending upgrade versions."""
 
-        if not os.path.exists(self.folder_updates):
-            msg = "The update folder was not found in sql folder"
-            tools_qgis.show_message(msg)
-            return
+        kind = (self.project_type_selected or self.project_type or 'ws')
+        if kind:
+            kind = str(kind).lower()
+        if kind not in ('ws', 'ud'):
+            tools_log.log_warning(
+                "Changelog preview only supported for ws/ud project types",
+                parameter=kind,
+            )
+            return False
 
-        # Collect all version folders and sort them
-        version_folders = []
+        section_labels = {
+            'common': tools_qt.tr('Common'),
+            'ws': tools_qt.tr('WS'),
+            'ud': tools_qt.tr('UD'),
+        }
+        try:
+            text = format_upgrade_changelog(
+                self.sql_dir,
+                kind,
+                str(self.project_version or '0.0.0'),
+                str(self.plugin_version),
+                section_labels=section_labels,
+            )
+        except ValueError as e:
+            tools_log.log_warning(str(e))
+            return False
 
-        # Walk through the updates directory to find all version folders
-        # EX: 3/6/1, 4/2/0 -> 3.6.1, 4.2.0
-        for root, _, _ in os.walk(self.folder_updates):
-            rel_path = os.path.relpath(root, self.folder_updates)
-            if rel_path == '.':
-                continue
-
-            parts = rel_path.split(os.sep)
-            if len(parts) == 3:
-                try:
-                    major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
-                    version_folders.append((major, minor, patch, root))
-                except ValueError:
-                    continue
-
-        # Sort by version number (major.minor.patch)
-        version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
-
-        # Process each version folder in order
-        project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
-
-        for major, minor, patch, folder_path in version_folders:
-            current_tuple = (major, minor, patch)
-            if current_tuple > project_tuple:
-                folder_aux = os.path.join(self.folder_updates, str(major), str(minor), str(patch))
-                if self._process_folder(folder_aux):
-                    self._read_changelog(sorted(os.listdir(folder_aux)), folder_aux)
-
+        if text:
+            self.message_update = text if not self.message_update else self.message_update + '\n\n' + text
         return True
 
     def _close_dialog_admin(self, dlg):
@@ -2203,35 +2196,6 @@ class GwAdminButton:
 
         settings.endGroup()
         return db_name if db_name else None
-
-    def _read_changelog(self, filelist, filedir):
-        """ Read contents of file 'changelog.txt' """
-
-        f = None
-        if "changelog.txt" not in filelist:
-            msg = "File '{0}' not found in: {1}"
-            msg_params = ("changelog.txt", filedir,)
-            tools_log.log_warning(msg, msg_params=msg_params)
-            return True
-
-        try:
-            filepath = os.path.join(filedir, 'changelog.txt')
-            f = open(filepath, 'r')
-            if f:
-                f_to_read = str(f.read()) + '\n'
-                self.message_update = self.message_update + '\n' + str(f_to_read)
-            else:
-                return False
-        except Exception as e:
-            msg = "Error reading file '{0}': {1}"
-            msg_params = ("changelog.txt", str(e),)
-            tools_log.log_warning(msg, msg_params=msg_params)
-            return False
-        finally:
-            if f:
-                f.close()
-
-        return True
 
     def _copy_schema(self):
         """"""

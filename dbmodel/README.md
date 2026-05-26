@@ -149,7 +149,7 @@ Filtered using `sys_version.giswater` (`project_version`) and CLI `--plugin-vers
 schemas/<kind>/updates/<major>/<minor>/<patch>/*.sql
 ```
 
-**Changelogs** sit beside each version folder (`changelog.txt`). Historical unified `dbmodel/updates/` content was consolidated under `schemas/network/common/updates/<v>/`.
+**Changelogs** sit beside each version folder (`changelog.txt`). Network schemas use up to three files per version: `schemas/network/common/updates/<M>/<m>/<p>/` (shared), plus `ws/updates/...` or `ud/updates/...` for type-specific changes. Prefer bullets only (`- change description`); legacy headers (`M.m.p` + asterisks) still parse. The plugin Admin dialog and `giswater_admin update --check` merge scopes via `giswater_admin.engine.changelog`. Historical unified `dbmodel/updates/` content was consolidated under `schemas/network/common/updates/<v>/`.
 
 ### AM legacy patches
 

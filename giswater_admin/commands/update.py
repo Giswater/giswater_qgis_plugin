@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 
-from ..engine import BuildParams, SchemaBuilder
+from ..engine import BuildParams, SchemaBuilder, changelog_versions_as_dicts, format_upgrade_changelog
 from ..output import Out
 from . import _helpers as h
 
@@ -58,18 +58,32 @@ def run(args: argparse.Namespace, out: Out) -> int:
     if args.check:
         builder = SchemaBuilder(h.NoopConn(), manifest, params)
         plan = builder.plan()
-        out.result(
-            {
-                "ok": True,
-                "mode": "check",
-                "kind": kind,
-                "schema": args.schema,
-                "from_version": project_version,
-                "to_version": target_version,
-                "plan": [{"phase": p.id, "files": n} for p, n in plan],
-                "total_files": sum(n for _, n in plan),
-            }
-        )
+        payload = {
+            "ok": True,
+            "mode": "check",
+            "kind": kind,
+            "schema": args.schema,
+            "from_version": project_version,
+            "to_version": target_version,
+            "plan": [{"phase": p.id, "files": n} for p, n in plan],
+            "total_files": sum(n for _, n in plan),
+        }
+        if kind in ("ws", "ud"):
+            payload["changelog_versions"] = changelog_versions_as_dicts(
+                args.dbmodel_path,
+                kind,
+                project_version,
+                target_version,
+            )
+            payload["changelog"] = format_upgrade_changelog(
+                args.dbmodel_path,
+                kind,
+                project_version,
+                target_version,
+            )
+            if payload["changelog"]:
+                out.info(payload["changelog"])
+        out.result(payload)
         return 0
 
     assert conn is not None
