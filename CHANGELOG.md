@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix visit dialog to show the correct features when the dialog is accepted.
 - fix update of omunit and macroomunit geometry type to multipolygon.
 - add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.
+- Improve performance of `gw_fct_getinfofromcoordinates` function.
 
 ## [4.10.0] - 2026-05-18
 
