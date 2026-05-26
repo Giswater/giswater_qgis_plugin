@@ -1,0 +1,44 @@
+# Audit schema manifest.
+#
+# Two distinct operations: "structure" (DDL/views/report/roles, run
+# once) and "activate" (per-schema trigger wiring, run against each
+# ws/ud schema you want audited).
+#
+# SCHEMA_NAME for `structure` is the audit schema itself; for
+# `activate` SCHEMA_NAME is the target ws/ud schema (set via
+# BuildParams.schema_name to ws_xxx / ud_xxx).
+
+kind: audit
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_structure
+    type: sql_dir
+    description: "Build the audit schema DDL + views + report + roles."
+    steps:
+      - { source: "schemas/audit/structure", recursive: false }
+
+  - id: load_activate
+    type: sql_dir
+    description: "Attach audit triggers + helpers to the target ws/ud schema."
+    steps:
+      - { source: "schemas/audit/activate", recursive: false }
+
+  - id: load_checkproject
+    type: sql_dir
+    optional: true
+    description: "audit_checkproject helpers (optional, kind-specific views)."
+    steps:
+      - { source: "schemas/audit/audit_checkproject", recursive: false }
+
+profiles:
+  structure:
+    phases: [load_structure]
+  activate:
+    phases: [load_activate]
+  checkproject:
+    phases: [load_checkproject]
+  full:
+    phases: [load_structure, load_checkproject]

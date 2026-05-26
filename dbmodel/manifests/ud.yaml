@@ -1,0 +1,106 @@
+# Urban-drainage schema manifest. Structurally identical to ws.yaml;
+# only the project-type tag and source paths differ.
+
+kind: ud
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base
+    type: sql_dir
+    steps:
+      - { source: "schemas/network/common/ddl",  recursive: false }
+      - { source: "schemas/network/common/fct",  recursive: false }
+      - { source: "schemas/network/common/ftrg", recursive: false }
+      - { source: "schemas/network/ud/fct",          recursive: false }
+      - { source: "schemas/network/ud/ftrg",         recursive: false }
+      - { source: "schemas/network/ud/schema_model", recursive: false }
+
+  - id: reload_fct_ftrg
+    type: sql_dir
+    steps:
+      - { source: "schemas/network/common/fct",  recursive: false }
+      - { source: "schemas/network/common/ftrg", recursive: false }
+      - { source: "schemas/network/ud/fct",      recursive: false }
+      - { source: "schemas/network/ud/ftrg",     recursive: false }
+
+  - id: updates
+    type: version_walk
+    description: "Apply update patches per version, common first then ud."
+    roots:
+      - "schemas/network/common/updates"
+      - "schemas/network/ud/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: lastprocess
+    type: sql_function
+    function: "{{ schema_name }}.gw_fct_admin_schema_lastprocess"
+    payload:
+      client:
+        device: 4
+        lang: "{{ locale }}"
+      data:
+        isNewProject: "TRUE"
+        gwVersion: "{{ plugin_version }}"
+        projectType: "UD"
+        epsg: "{{ srid }}"
+        descript: "{{ schema_name }}"
+        name: "{{ schema_name }}"
+        author: "{{ db_user }}"
+        date: "{{ today }}"
+
+  - id: lastprocess_upgrade
+    type: sql_function
+    function: "{{ schema_name }}.gw_fct_admin_schema_lastprocess"
+    payload:
+      client:
+        device: 4
+        lang: "{{ locale }}"
+      data:
+        isNewProject: "FALSE"
+        gwVersion: "{{ plugin_version }}"
+        projectType: "UD"
+        epsg: "{{ srid }}"
+
+  - id: load_sample
+    type: sql_dir
+    optional: true
+    steps:
+      - { source: "schemas/network/sample/user/ud", recursive: false }
+
+  - id: load_inv
+    type: sql_dir
+    optional: true
+    steps:
+      - { source: "schemas/network/sample/inv/ud", recursive: false }
+
+  - id: load_dev
+    type: sql_dir
+    optional: true
+    steps:
+      - { source: "schemas/network/sample/dev/ud", recursive: false }
+
+  - id: final_pass
+    type: sql_dir
+    steps:
+      - source: "schemas/network/ud/final_pass/config_form_fields"
+        recursive: false
+      - source: "schemas/network/ud/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/network/ud/final_pass/i18n/en_US"
+        recursive: false
+
+profiles:
+  empty:
+    phases: [load_base, updates, lastprocess, final_pass]
+  sample_full:
+    phases: [load_base, updates, lastprocess, load_sample, final_pass]
+  sample_inv:
+    phases: [load_base, updates, lastprocess, load_sample, load_inv, final_pass]
+  dev:
+    phases: [load_base, updates, lastprocess, load_dev, final_pass]
+  ci:
+    phases: [load_base, updates, lastprocess, load_sample, final_pass]
+  update:
+    phases: [reload_fct_ftrg, updates, lastprocess_upgrade]

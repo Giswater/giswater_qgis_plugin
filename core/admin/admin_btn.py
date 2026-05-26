@@ -12,10 +12,9 @@ import sys
 from functools import partial
 from qgis.PyQt.sip import isdeleted
 from time import time
-from datetime import timedelta
 from typing import Union
 
-from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
+from qgis.PyQt.QtCore import QSettings, Qt, QTimer
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QAbstractItemView, QTextEdit, \
@@ -41,15 +40,13 @@ from .i18n_manager import GwSchemaI18NManager
 from .import_osm import GwImportOsm
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
-from ..threads.project_schema_create import GwCreateSchemaTask
-from ..threads.project_schema_asset_create import GwCreateSchemaAssetTask
-from ..threads.project_schema_audit_create import GwCreateSchemaAuditTask
-from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
-from ..threads.project_schema_cm_create import GwCreateSchemaCmTask
-from ..threads.project_schema_update import GwUpdateSchemaTask
+from ..threads.schema_builder_task import GwSchemaBuilderTask, load_kind_manifest
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
+from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema
+from ...giswater_admin.log_format import format_progress_status
+from ._qt_db_adapter import QtDbAdapter
 
 
 def _admin_version_tuple(version) -> tuple:
@@ -96,6 +93,7 @@ class GwAdminButton:
         self.progress_value = 0     # (current_sql_file / total_sql_files) * 100
         self.progress_ratio = 0.8   # Ratio to apply to 'progress_value'
         self.is_cm_project = False
+        self.schema_build_progress_hint = ""
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
         """ Button 100: Execute SQL. Info show info """
@@ -164,8 +162,8 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
-        self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
+        self.folder_final_pass = os.path.join(self.sql_dir, 'schemas', 'network', project_type, 'final_pass')
+        self.folder_locale = os.path.join(self.folder_final_pass, 'i18n')
         self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
         # If the locale is no_TR, act as if it was en_US, but disable translation files
@@ -211,7 +209,7 @@ class GwAdminButton:
                     project_srid = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
-                    self.folder_locale = os.path.join(self.folder_final_pass, project_type, 'i18n')
+                    self.folder_locale = os.path.join(self.folder_final_pass, 'i18n')
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', '25831')
                     tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
                 else:
@@ -226,61 +224,244 @@ class GwAdminButton:
         else:
             self.start_create_project_data_schema_task(project_name_schema, params, project_type)
 
-    def start_create_project_data_schema_task(self, project_name_schema, params, project_type):
+    # ------------------------------------------------------------------
+    # Engine bridges. Each of the following entry points builds a
+    # `BuildParams`, picks the right manifest, and submits a single
+    # `GwSchemaBuilderTask`. The legacy per-kind task classes have been
+    # deleted in favour of this central path so the QGIS UI, the CLI,
+    # and pytest all share one engine.
+    # ------------------------------------------------------------------
+
+    def _open_schema_build_message_log(self) -> None:
+        """Show the Giswater PY log tab (same UX as schema update)."""
+        message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+        if message_log is not None:
+            message_log.setVisible(True)
+        QgsMessageLog.logMessage(
+            "",
+            f"{lib_vars.plugin_name.capitalize()} PY",
+            Qgis.MessageLevel.Info,
+        )
+
+    def _active_schema_build_task(self):
+        """Return the running engine task, if any."""
+        for attr in (
+            "task_create_schema",
+            "task_update_schema",
+            "task_create_cm_schema",
+        ):
+            task = getattr(self, attr, None)
+            if task is not None and not isdeleted(task):
+                return task
+        return None
+
+    def _submit_builder(self, kind, params, *, description=None, on_done=None, dlg_for_timer=None):
+        """Build manifest + task and queue it on the QGIS task manager."""
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
         self.error_count = 0
-        # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
-        # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
-        self.schema = project_name_schema
-        # Set background task 'GwCreateSchemaTask'
         self.t0 = time()
         self.timer = QTimer()
-        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_project))
-
+        if dlg_for_timer is not None:
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, dlg_for_timer))
         self.timer.start(1000)
 
-        description = "Create schema"
-        self.task_create_schema = GwCreateSchemaTask(self, description, params, project_type, timer=self.timer)
-        QgsApplication.taskManager().addTask(self.task_create_schema)
-        QgsApplication.taskManager().triggerTask(self.task_create_schema)
+        manifest = load_kind_manifest(self.plugin_dir, kind)
+        desc = description or f"Build {kind}:{params.schema_name}"
+        task = GwSchemaBuilderTask(
+            self, manifest, params,
+            description=desc, timer=self.timer, on_done=on_done,
+        )
+        # Expose under the legacy attribute name so dialog code that probes
+        # `hasattr(admin, 'task_create_schema')` still finds the active task.
+        self.task_create_schema = task
+        QgsApplication.taskManager().addTask(task)
+        QgsApplication.taskManager().triggerTask(task)
+        return task
+
+    def start_create_project_data_schema_task(self, project_name_schema, params, project_type):
+        """Build a ws/ud schema via the engine. `params` is the legacy dict."""
+        self.schema = project_name_schema
+
+        # Map legacy radio buttons → manifest profile.
+        if self.rdb_sample_inv.isChecked() and params.get('example_data', True):
+            profile = 'sample_inv'
+        elif self.rdb_sample_full.isChecked() and params.get('example_data', True):
+            profile = 'sample_full'
+        else:
+            profile = 'empty'
+
+        bp = BuildParams(
+            schema_name=project_name_schema,
+            srid=str(params['project_srid']),
+            locale=params['project_locale'],
+            plugin_version=str(self.plugin_version),
+            profile=profile,
+            run_mode='new_project',
+            db_user=self.username if hasattr(self, 'username') else 'postgres',
+            sql_root=self.sql_dir,
+        )
+        is_test = bool(params.get('is_test', False))
+        on_done = partial(self._on_builder_done_ws_ud, project_name_schema, project_type, is_test)
+        self._submit_builder(
+            project_type, bp,
+            description="Create schema",
+            on_done=on_done,
+            dlg_for_timer=self.dlg_readsql_create_project,
+        )
+
+    def _on_builder_done_ws_ud(self, project_name_schema, project_type, is_test, result):
+        """Bridge engine result → existing manage_process_result behaviour."""
+        if not result.ok:
+            self.error_count += 1
+        self.manage_process_result(project_name_schema, project_type, is_test=is_test)
 
     def create_process(self, process_name=""):
-        self.error_count = 0
-        # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
-        # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
+        """
+        am or audit lifecycle entry point.
 
-        self.t0 = time()
-        self.timer = QTimer()
-        if hasattr(self, f"{process_name}"):
-            self.timer.timeout.connect(partial(self._calculate_elapsed_time, getattr(self, f"dlg_readsql_create_{process_name}_project")))
-
-        self.timer.start(1000)
-
-        description = f"Create {process_name} schema"
-
+        Translates the legacy `process_name` (`am`, `audit`,
+        `audit_activation`) to a manifest kind + profile.
+        """
         if process_name == "am":
-            self.task_create_schema = GwCreateSchemaAssetTask(self, description, self.timer)
+            parent_schema = self._get_schema_name() or ""
+            parent_type = (
+                tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or "ws"
+            ).lower()
+            if not parent_schema:
+                tools_qgis.show_warning(
+                    "Select a ws project schema before creating the am schema."
+                )
+                return
+            bp = BuildParams(
+                schema_name="am",
+                srid=str(self.project_epsg or "25831"),
+                locale=self.locale,
+                plugin_version=str(self.plugin_version),
+                profile="empty",
+                parent_schema=parent_schema,
+                parent_type=parent_type,
+                sql_root=self.sql_dir,
+            )
+            self._submit_builder("am", bp,
+                                 description="Create am schema",
+                                 on_done=self._on_builder_done_other)
         elif process_name in ("audit", "audit_activation"):
-            list_process = []
-            if process_name == "audit":
-                list_process.append('load_audit_structure')
-            else:
-                list_process.append('load_audit_activation')
+            profile = "structure" if process_name == "audit" else "activate"
+            schema_name = "audit"
+            parent_schema = "audit"
+            parent_type = ""
+            if process_name == "audit_activation":
+                # Triggers attach to the currently-selected ws/ud schema.
+                schema_name = self._get_schema_name() or "audit"
+                parent_schema = schema_name
+                parent_type = (
+                    tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or ""
+                ).lower()
+            bp = BuildParams(
+                schema_name=schema_name,
+                srid=str(self.project_epsg or "25831"),
+                locale=self.locale,
+                plugin_version=str(self.plugin_version),
+                profile=profile,
+                parent_schema=parent_schema,
+                parent_type=parent_type,
+                sql_root=self.sql_dir,
+            )
+            self._submit_builder("audit", bp,
+                                 description=f"audit:{profile}",
+                                 on_done=self._on_builder_done_other)
 
-            self.task_create_schema = GwCreateSchemaAuditTask(self, description, self.timer, list_process=list_process)
-        QgsApplication.taskManager().addTask(self.task_create_schema)
-        QgsApplication.taskManager().triggerTask(self.task_create_schema)
+    def _on_builder_done_other(self, result):
+        if not result.ok:
+            self.error_count += 1
+        self.manage_other_process_result()
 
     def _run_create_cm_task(self, steps, process_name):
+        """
+        cm schema lifecycle entry point.
+
+        `steps` is a legacy list like `['load_base_schema']` /
+        `['load_parent_schema']` / `['load_example']`. We map it to a
+        manifest profile and run the engine.
+        """
+        # The cm child schema name is set by `on_btn_create_base_clicked`
+        # via `self.cm_schema_name`; the parent schema (ws_xxx / ud_xxx)
+        # is the currently-selected schema in the main dialog.
+        cm_schema = getattr(self, 'cm_schema_name', None) or self._get_cm_schema_name() or "cm"
+        parent_schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        parent_type = self.project_type_selected or tools_qt.get_text(
+            self.dlg_readsql, self.cmb_project_type
+        )
+        pt_norm = (parent_type or "").lower()
+        if pt_norm and not os.path.isfile(
+            os.path.join(self.sql_dir, "schemas", "cm", "parent_schema", pt_norm, "ddl.sql")
+        ):
+            msg = (
+                f"cm schema is not supported for parent_type='{pt_norm}' in this dbmodel. "
+                f"Missing schemas/cm/parent_schema/{pt_norm}/ddl.sql."
+            )
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
+            return
+
+        # Map step list -> profile. The legacy task ran one step at a
+        # time; in the manifest world we expose a profile for each.
+        if steps == ['load_base_schema']:
+            profile_phases = ['load_base_schema']
+        elif steps == ['load_parent_schema']:
+            profile_phases = ['load_parent_schema']
+        elif steps == ['load_example']:
+            profile_phases = ['load_example']
+        elif steps == ['load_locale']:
+            profile_phases = ['load_locale']
+        else:
+            profile_phases = list(steps)
+
+        # Inject an ad-hoc profile into the manifest so the engine can
+        # dispatch the exact step list the dialog asked for. This avoids
+        # forcing the manifest to declare a profile per legacy step.
+        manifest = load_kind_manifest(self.plugin_dir, "cm")
+        from ...giswater_admin.engine.manifest import Profile  # local import keeps top-level Qt-free
+        profile_name = f"_ui_{'_'.join(profile_phases)}"
+        manifest.profiles[profile_name] = Profile(name=profile_name,
+                                                  phases=tuple(profile_phases))
+
+        bp = BuildParams(
+            schema_name=cm_schema,
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            profile=profile_name,
+            run_mode='new_project',
+            parent_schema=parent_schema or "",
+            parent_type=(parent_type or "").lower(),
+            sql_root=self.sql_dir,
+            db_name=self._get_current_db_name() or "",
+        )
+
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
+        self.error_count = 0
         self.cm_error_count = 0
         self.t0 = time()
         self.timer = QTimer()
         self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_cm_project))
         self.timer.start(1000)
-        process_name = process_name.capitalize()
-        description = process_name
-        self.task = GwCreateSchemaCmTask(self, description, timer=self.timer, list_process=steps, process_name=process_name)
-        QgsApplication.taskManager().addTask(self.task)
-        QgsApplication.taskManager().triggerTask(self.task)
+
+        task = GwSchemaBuilderTask(
+            self, manifest, bp,
+            description=process_name.capitalize() if isinstance(process_name, str) else "cm",
+            timer=self.timer,
+            on_done=partial(self._on_builder_done_cm, process_name),
+        )
+        self.task_create_cm_schema = task
+        QgsApplication.taskManager().addTask(task)
+        QgsApplication.taskManager().triggerTask(task)
+
+    def _on_builder_done_cm(self, process_name, result):
+        if not result.ok:
+            self.cm_error_count += 1
+        self.manage_cm_process_result(process_name)
 
     def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
@@ -372,50 +553,6 @@ class GwAdminButton:
 
         return None
 
-    def execute_last_process(self, new_project: bool = False, schema_name: Union[str, None] = None, schema_type: str = '', locale: bool = False, srid: Union[str, None] = None):
-        """ 
-        Execute last process function
-        
-        :param new_project: Whether this is a new project (True) or an update to an existing one (False).
-        :param schema_name: The name of the schema to use. If None, uses self._get_schema_name().
-        :param schema_type: The type of the schema to use.
-        :param locale: Whether to use the locale.
-        :param srid: The SRID to use.
-        :return bool: True if all relevant folders were processed successfully, False otherwise.
-        """
-
-        if new_project is True:
-            extras = '"isNewProject":"' + str('TRUE') + '", '
-        else:
-            extras = '"isNewProject":"' + str('FALSE') + '", '
-        extras += '"gwVersion":"' + str(self.plugin_version) + '", '
-        extras += '"projectType":"' + str(schema_type).upper() + '", '
-        if srid is None:
-            srid = self.project_epsg
-        extras += '"epsg":' + str(srid).replace('"', '')
-        if new_project is True:
-            if str(self.descript) != 'null':
-                extras += ', ' + '"descript":"' + str(self.descript) + '"'
-            extras += ', ' + '"name":"' + str(schema_name) + '"'
-            extras += ', ' + '"author":"' + str(self.username) + '"'
-            current_date = QDate.currentDate().toString('dd-MM-yyyy')
-            extras += ', ' + '"date":"' + str(current_date) + '"'
-
-        self.schema_name = schema_name
-
-        # Get current locale
-        if not locale:
-            locale = self.locale
-
-        client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
-        data = '"data":{' + extras + '}'
-        body = "$${" + client + data + "}$$"
-        result = tools_gw.execute_procedure('gw_fct_admin_schema_lastprocess', body, self.schema_name, commit=False)
-        if result is None or ('status' in result and result['status'] == 'Failed'):
-            self.error_count = self.error_count + 1
-
-        return result
-
     def _vacuum_project_data_schema(self, verbose=False):
         """ Execute task to vacuum schema """
         description = "Vacuum schema"
@@ -449,81 +586,65 @@ class GwAdminButton:
 
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
-        """"""
+        """Upgrade the currently-selected schema in place via the engine."""
 
         msg = "Are you sure to update the project schema to last version?"
         title = "Info"
         result = tools_qt.show_question(msg, title)
-        if result:
-            # Manage Log Messages panel and open tab Giswater PY
-            message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
-            message_log.setVisible(True)
-            QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", Qgis.MessageLevel.Info)
+        if not result:
+            return
 
-            # Manage Log Messages in tab log
-            main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
-            main_tab.setCurrentWidget(main_tab.findChild(QWidget, "tab_loginfo"))
-            main_tab.setTabEnabled(main_tab.currentIndex(), True)
-            self.infolog_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'tab_log_txt_infolog')
-            self.infolog_updates.setReadOnly(True)
-            self.message_infolog = ''
-            self.infolog_updates.setText(self.message_infolog)
+        # Manage Log Messages panel and open tab Giswater PY
+        message_log = self.iface.mainWindow().findChild(QDockWidget, 'MessageLog')
+        message_log.setVisible(True)
+        QgsMessageLog.logMessage("", f"{lib_vars.plugin_name.capitalize()} PY", Qgis.MessageLevel.Info)
 
-            # Create timer
-            self.t0 = time()
-            self.timer = QTimer()
-            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_show_info))
-            self.timer.start(1000)
+        # Manage Log Messages in tab log
+        main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
+        main_tab.setCurrentWidget(main_tab.findChild(QWidget, "tab_loginfo"))
+        main_tab.setTabEnabled(main_tab.currentIndex(), True)
+        self.infolog_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'tab_log_txt_infolog')
+        self.infolog_updates.setReadOnly(True)
+        self.message_infolog = ''
+        self.infolog_updates.setText(self.message_infolog)
 
-            description = "Update schema"
-            params = {'project_type': project_type}
-            self.task_update_schema = GwUpdateSchemaTask(self, description, params, timer=self.timer)
-            QgsApplication.taskManager().addTask(self.task_update_schema)
-            QgsApplication.taskManager().triggerTask(self.task_update_schema)
+        schema_name = self._get_schema_name()
+        bp = BuildParams(
+            schema_name=schema_name,
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(self.project_version or "0.0.0"),
+            run_mode='upgrade',
+            profile='update',
+            sql_root=self.sql_dir,
+        )
 
-    def load_updates(self, project_type: Union[str, None] = None, update_changelog: bool = False, schema_name: Union[str, None] = None) -> bool:
-        """
-        Load updates for a given project type.
+        self.error_count = 0
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_show_info))
+        self.timer.start(1000)
 
-        :param project_type: The project type to use. If None, uses self.project_type_selected.
-        :param update_changelog: Whether to update the changelog.
-        :param schema_name: The name of the schema to use. If None, uses self._get_schema_name().
+        manifest = load_kind_manifest(self.plugin_dir, project_type)
+        task = GwSchemaBuilderTask(
+            self, manifest, bp,
+            description="Update schema",
+            timer=self.timer,
+            on_done=self._on_builder_done_update,
+        )
+        self.task_update_schema = task
+        QgsApplication.taskManager().addTask(task)
+        QgsApplication.taskManager().triggerTask(task)
 
-        :return bool: True if all updates were loaded successfully, False otherwise.
-        """
-
-        # Get current schema selected
-        if schema_name is None:
-            schema_name = self._get_schema_name()
-
-        self.schema = schema_name
-        self.locale = self.project_language
-
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
-        status = self._load_fct_ftrg()
-        self.task1.setProgress(20)
-        self.task1.setProgress(40)
-        if status:
-            status = self.update_dict_folders(False, project_type=project_type, folder_updates=self.folder_updates)
-        self.task1.setProgress(60)
-        if status:
-            status = self.execute_last_process(schema_name=schema_name, locale=True, schema_type=project_type)
-        self.task1.setProgress(100)
-
-        if update_changelog is False:
-            status = (self.error_count == 0)
-            self._manage_result_message(status, parameter="Load updates")
-            if status:
-                tools_db.dao.commit()
-            else:
-                tools_db.dao.rollback()
-
-            # Reset count error variable to 0
-            self.error_count = 0
-
-        return status
+    def _on_builder_done_update(self, result):
+        if not result.ok:
+            self.error_count += 1
+            tools_db.dao.rollback()
+            self._manage_result_message(False, parameter="Update schema")
+        else:
+            tools_db.dao.commit()
+            self._manage_result_message(True, parameter="Update schema")
 
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
@@ -587,217 +708,6 @@ class GwAdminButton:
 
         # Set signals
         self._set_signals_create_project()
-
-    # region 'Create Project'
-
-    def load_base(self, dict_folders: dict) -> bool:
-        """
-        Load base files from a given dictionary of folders.
-        
-        :param dict_folders: A dictionary with the folders and the number of files in each folder.
-
-        :return bool: True if all files were loaded successfully, False otherwise.
-        """
-
-        for folder in dict_folders.keys():
-            status = self._execute_files(folder, set_progress_bar=True)
-            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
-
-        return True
-
-    def load_sql_folder(self, dict_folders):
-        """"""
-        for folder in dict_folders.keys():
-            status = self._execute_sql_files(folder, set_progress_bar=True)
-            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
-
-        return True
-
-    def load_cm_folder(self, dict_folders, schema_option=None):
-        """"""
-        for folder in dict_folders.keys():
-            status = self._execute_cm_files(folder, set_progress_bar=True, schema_option=schema_option)
-            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
-
-        return True
-
-    def load_final_pass(self, project_type, lang=None, utils=False):
-
-        lang = lang or self.locale
-        project_type = 'utils' if utils else project_type
-        folder_final_pass = os.path.join(self.sql_dir, 'final_pass', project_type)
-        folder_cff = os.path.join(folder_final_pass, 'config_form_fields')
-        folder_i18n = os.path.join(folder_final_pass, 'i18n', lang)
-
-        if self._process_folder(folder_cff) is False:
-            msg = '{0} folder not found'
-            msg_params = ("Final_pass/config_form_fields",)
-            tools_log.log_info(msg, msg_params=msg_params)
-            return False
-
-        status = self._execute_files(folder_cff, set_progress_bar=True)
-        if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-
-        if self._process_folder(folder_i18n) is False:
-            msg = '{0} folder not found, executing en_US folder'
-            msg_params = ("Final_pass/i18n/" + lang,)
-            tools_log.log_info(msg, msg_params=msg_params)
-            folder_i18n = os.path.join(folder_final_pass, 'i18n', 'en_US')
-            if self._process_folder(folder_i18n) is False:
-                msg = '{0} folder not found'
-                msg_params = ("Final_pass/i18n/en_US",)
-                tools_log.log_info(msg, msg_params=msg_params)
-                return False
-
-        status = self._execute_files(folder_i18n, set_progress_bar=True)
-        if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-
-        return True
-
-    def update_patch_dict_folders(self, folder_update: str, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False) -> bool:
-        """
-        Update the patch folders for a given update directory.
-        :param folder_update (str): Path to the update directory containing patch folders.
-        :param new_project (bool): Whether this is a new project (True) or an update to an existing one (False).
-        :param project_type (Union[str, None], optional): The project type to use. If None, uses self.project_type_selected.
-        :param no_ct (bool, optional): If True, skips certain processing steps (context-specific).
-        :return bool: True if all relevant folders were processed successfully, False otherwise.
-        """
-
-        folder_utils = os.path.join(folder_update, 'utils')
-        if self._process_folder(folder_utils) is True:
-            status = self._load_sql(folder_utils, no_ct, set_progress_bar=True)
-            if tools_os.set_boolean(status, False) is False:
-                return False
-
-        if new_project:
-            folder_project = project_type
-        else:
-            folder_project = self.project_type_selected
-
-        if not isinstance(folder_project, str) or not folder_project:
-            return False
-
-        folder_project_type = os.path.join(folder_update, folder_project)
-        if self._process_folder(folder_project_type):
-            status = self._load_sql(folder_project_type, no_ct, set_progress_bar=True)
-            if tools_os.set_boolean(status, False) is False:
-                return False
-
-        return True
-
-    def update_dict_folders(self, new_project: bool, project_type: Union[str, None] = None, no_ct: bool = False, folder_updates: str = '') -> bool:
-        """
-        Update the dictionary folders for a given update directory.
-
-        :param new_project: Whether this is a new project (True) or an update to an existing one (False).
-        :param project_type: The project type to use. If None, uses self.project_type_selected.
-        :param no_ct: If True, skips certain processing steps (context-specific).
-        :param folder_updates: The path to the folder to use for updates. If empty, uses self.folder_updates.
-
-        :return bool: True if all relevant folders were processed successfully, False otherwise.
-        """
-
-        if not folder_updates:
-            folder_updates = self.folder_updates
-
-        if not os.path.exists(folder_updates):
-            msg = "The update folder was not found in sql folder"
-            tools_qgis.show_message(msg)
-            self.error_count = self.error_count + 1
-            return False
-
-        # Collect all version folders and sort them
-        version_folders = []
-
-        # Walk through the updates directory to find all version folders
-        # EX: 3/6/1, 4/2/0 -> 3.6.1, 4.2.0
-        for root, _, _ in os.walk(folder_updates):
-            rel_path = os.path.relpath(root, folder_updates)
-            if rel_path == '.':
-                continue
-
-            parts = rel_path.split(os.sep)
-            if len(parts) == 3:
-                try:
-                    major, minor, patch = int(parts[0]), int(parts[1]), int(parts[2])
-                    version_folders.append((major, minor, patch, root))
-                except ValueError:
-                    continue
-
-        # Sort by version number (major.minor.patch)
-        version_folders.sort(key=lambda x: (x[0], x[1], x[2]))
-
-        # Process each version folder in order
-        project_tuple = tuple(int(x) for x in str(self.project_version).split('.'))
-        plugin_tuple = tuple(int(x) for x in str(self.plugin_version).split('.'))
-
-        for major, minor, patch, folder_path in version_folders:
-            current_tuple = (major, minor, patch)
-            if new_project:
-                if current_tuple <= plugin_tuple:
-                    status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
-                    if tools_os.set_boolean(status, False) is False:
-                        return False
-            else:
-                if current_tuple > project_tuple and current_tuple <= plugin_tuple:
-                    status = self.update_patch_dict_folders(folder_path, new_project, project_type, no_ct)
-                    if tools_os.set_boolean(status, False) is False:
-                        return False
-
-        return True
-
-    def load_childviews(self):
-        if self._process_folder(self.folder_childviews) is False:
-            folder_childviews = os.path.join(self.sql_dir, 'childviews', 'en_US')
-            if self._process_folder(folder_childviews) is False:
-                return False
-            else:
-                status = self._execute_files(folder_childviews, True, set_progress_bar=True)
-                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                    return False
-        else:
-            status = self._execute_files(self.folder_childviews, True, set_progress_bar=True)
-            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                return False
-
-        return True
-
-    def load_sample_data(self, project_type):
-
-        tools_db.dao.commit()
-        folder = os.path.join(self.folder_example, 'user', project_type)
-        status = self._execute_files(folder, set_progress_bar=True)
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-
-        return True
-
-    def load_inv_data(self, project_type):
-        tools_db.dao.commit()
-        folder = os.path.join(self.folder_example, 'inv', project_type)
-        status = self._execute_files(folder, set_progress_bar=True)
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-
-        return True
-
-    def load_dev_data(self, project_type):
-        """"""
-
-        folder = os.path.join(self.folder_example, 'dev', project_type)
-        status = self._execute_files(folder, set_progress_bar=True)
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-
-        return True
-
-    # endregion
 
     # region private functions
 
@@ -865,34 +775,38 @@ class GwAdminButton:
         self.file_pattern_schema_model = "schema_model"
 
         # Declare all folders
+        # Network schemas (ws/ud) live under schemas/network/<project_type>/
         if self.schema_name is not None and self.project_type is not None:
-            self.folder_software = os.path.join(self.sql_dir, self.project_type)
+            self.folder_software = os.path.join(self.sql_dir, 'schemas', 'network', self.project_type)
         else:
             self.folder_software = ""
 
         self.folder_locale = os.path.join(self.sql_dir, self.file_pattern_i18n, self.locale)
-        self.folder_utils = os.path.join(self.sql_dir, self.file_pattern_utils)
-        self.folder_updates = os.path.join(self.sql_dir, 'updates')
-        self.folder_example = os.path.join(self.sql_dir, 'example')
+        # 'common' replaces the legacy 'utils' shared-code folder for ws/ud.
+        self.folder_common = os.path.join(self.sql_dir, 'schemas', 'network', 'common')
+        # Changelogs live under common/updates; per-scope updates are
+        # under schemas/network/{common,ws,ud}/updates/<M>/<m>/<p>/.
+        self.folder_updates = os.path.join(self.folder_common, 'updates')
+        self.folder_sample = os.path.join(self.sql_dir, 'schemas', 'network', 'sample')
 
         # Declare asset db folders
-        self.sql_asset_dir = os.path.join(self.sql_dir, 'am')
+        self.sql_asset_dir = os.path.join(self.sql_dir, 'schemas', 'am')
         self.folder_base = os.path.join(self.sql_asset_dir, 'base')
         self.folder_i18n = os.path.join(self.sql_asset_dir, self.file_pattern_i18n)
         self.folder_asset_updates = os.path.join(self.sql_asset_dir, 'updates')
 
         # Declare audit db folders
-        self.sql_audit_dir = os.path.join(self.sql_dir, 'audit')
+        self.sql_audit_dir = os.path.join(self.sql_dir, 'schemas', 'audit')
         self.folder_audit_structure = os.path.join(self.sql_audit_dir, 'structure')
         self.folder_audit_activate = os.path.join(self.sql_audit_dir, 'activate')
 
         # Declare cm db folders
-        self.sql_cm_dir = os.path.join(self.sql_dir, 'cm')
-        self.folder_cm_utils = os.path.join(self.sql_cm_dir, self.file_pattern_utils)
+        self.sql_cm_dir = os.path.join(self.sql_dir, 'schemas', 'cm')
+        self.folder_cm_common = os.path.join(self.sql_cm_dir, "common")
         self.folder_cm_locale = os.path.join(self.sql_cm_dir, self.file_pattern_i18n, self.locale)
         self.folder_cm_base = os.path.join(self.sql_cm_dir, 'base')
         self.folder_cm_parent_schema = os.path.join(self.sql_cm_dir, 'parent_schema')
-        self.folder_cm_example = os.path.join(self.sql_cm_dir, 'example')
+        self.folder_cm_sample = os.path.join(self.sql_cm_dir, 'sample')
 
         # Variable to commit changes even if schema creation fails
         self.dev_commit = tools_os.set_boolean(
@@ -984,10 +898,12 @@ class GwAdminButton:
 
         # Asset manage buttons
         self.dlg_readsql.btn_create_asset.clicked.connect(partial(self.create_project_data_other_schema, 'am'))
+        self.dlg_readsql.btn_update_asset.clicked.connect(partial(self._update_asset))
         self.dlg_readsql.btn_delete_asset.clicked.connect(partial(self._delete_other_schema, 'am'))
 
         # Campaign manage buttons
         self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
+        self.dlg_readsql.btn_update_cm.clicked.connect(partial(self._update_cm))
         self.dlg_readsql.btn_delete_cm.clicked.connect(partial(self._delete_other_schema, 'cm'))
 
         # Audit buttons
@@ -1540,13 +1456,13 @@ class GwAdminButton:
         :return bool: True if all files were loaded successfully, False otherwise.
         """
 
-        folder = os.path.join(self.folder_utils, self.file_pattern_fct)
+        folder = os.path.join(self.folder_common, self.file_pattern_fct)
 
         status = self._execute_files(folder)
         if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
-        folder = os.path.join(self.folder_utils, self.file_pattern_ftrg)
+        folder = os.path.join(self.folder_common, self.file_pattern_ftrg)
         status = self._execute_files(folder)
         if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
@@ -1765,7 +1681,10 @@ class GwAdminButton:
         """"""
         # TODO: Check this!
         self.locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
-        self.folder_locale = os.path.join(self.sql_dir, 'final_pass', 'i18n')
+        # Locale folder is normally derived from project_type via _set_paths();
+        # this is a legacy reset used by _update_locale before any project_type
+        # context exists, so we point at the project-type-agnostic common tree.
+        self.folder_locale = os.path.join(self.sql_dir, 'schemas', 'network', 'common')
 
     def _populate_data_schema_name(self, widget):
         """"""
@@ -2258,106 +2177,6 @@ class GwAdminButton:
                 f.close()
             return status
 
-    def _execute_cm_files(self, filedir, set_progress_bar=False, schema_option=None):
-        if not os.path.exists(filedir):
-            msg = "Folder not found"
-            tools_log.log_info(msg, parameter=filedir)
-            return True
-
-        status = True
-        # Allow passing a single SQL file path to control execution order
-        if os.path.isfile(filedir) and filedir.lower().endswith('.sql'):
-            self.current_sql_file += 1
-            tools_log.log_info(filedir)
-            status = self._read_execute_cm_file(filedir, set_progress_bar, schema_option)
-            if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
-                return False
-            return status
-
-        for dirpath, _, files in os.walk(filedir):
-            for file in sorted(files):
-                if file.endswith(".sql"):
-                    filepath = os.path.join(dirpath, file)
-                    self.current_sql_file += 1
-                    tools_log.log_info(filepath)
-                    status = self._read_execute_cm_file(filepath, set_progress_bar, schema_option)
-
-                    # If execution fails and dev_commit is False, stop processing
-                    if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
-                        return False
-
-        return status  # Return final status
-
-    def _read_execute_cm_file(self, filepath, set_progress_bar=False, schema_option=None):
-        """"""
-
-        status = False
-        f = None
-        PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        SCHEMA_SRID = str(self.project_epsg)
-        if schema_option in ('load_parent_schema', 'load_example'):
-            SCHEMA_NAME = tools_gw.get_config_parser('btn_admin', 'project_name_cm_schema', "user", "session", force_reload=True)
-        else:
-            SCHEMA_NAME = self.cm_schema_name
-
-        try:
-            # Manage progress bar
-            if set_progress_bar:
-                if hasattr(self, 'task_create_cm_schema') and not isdeleted(self.task_create_cm_schema):
-                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
-                    self.progress_value = int(self.progress_value * self.progress_ratio)
-                    self.task_create_cm_schema.set_progress(self.progress_value)
-
-            if hasattr(self, 'task_create_cm_schema') and not isdeleted(
-                    self.task_create_cm_schema) and self.task_create_cm_schema.isCanceled():
-                return False
-
-            f = open(filepath, 'r', encoding="utf8")
-            if f:
-                file_content = f.read()
-                f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
-                    "PARENT_SCHEMA", PARENT_SCHEMA).replace("PARENT_TYPE", self.project_type_selected)
-
-                # Case-insensitive BD_NAME replacement
-                if re.search(r'bd_name', f_to_read, re.IGNORECASE):
-                    BD_NAME = self._get_current_db_name()
-                    if not BD_NAME:
-                        print("ERROR: Cannot get current database name, but SQL requires BD_NAME placeholder")
-                        return False
-                    f_to_read = re.sub(r'bd_name', BD_NAME, f_to_read, flags=re.IGNORECASE)
-
-                status = tools_db.execute_sql(f_to_read, filepath=filepath, commit=self.dev_commit, is_thread=False)
-
-                if tools_os.set_boolean(status, False) is False:
-                    self.cm_error_count += 1
-
-                    if tools_os.set_boolean(self.dev_commit, False) is False:
-                        tools_db.dao.rollback()
-
-                    if hasattr(self, 'task_create_cm_schema') and not isdeleted(self.task_create_cm_schema):
-                        self.task_create_cm_schema.db_exception = (
-                        lib_vars.session_vars['last_error'], f_to_read, filepath)
-                        self.task_create_cm_schema.cancel()
-
-                    return False
-
-        except Exception as e:
-            self.error_count += 1
-            self.message_infolog = f"_read_execute_file exception: {filepath}\n {str(e)}"
-
-            if tools_os.set_boolean(self.dev_commit, False) is False:
-                tools_db.dao.rollback()
-
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                self.task_create_schema.cancel()
-
-            status = False
-
-        finally:
-            if f:
-                f.close()
-            return status
-
     def _get_current_db_name(self):
         """
         Gets the database name from the currently selected connection in the admin dialog.
@@ -2384,88 +2203,6 @@ class GwAdminButton:
 
         settings.endGroup()
         return db_name if db_name else None
-
-    def _execute_sql_files(self, filedir, set_progress_bar=False):
-        """"""
-
-        if not os.path.exists(filedir):
-            msg = "Folder not found"
-            tools_log.log_info(msg, parameter=filedir)
-            return True
-
-        msg = "Processing folder"
-        tools_log.log_info(msg, parameter=filedir)
-
-        filelist = sorted(os.listdir(filedir))
-        status = True
-        # Manage folders 'i18n'
-        if 'i18n' in filedir:
-            filelist = [f"{self.project_language}.sql"]
-        for file in filelist:
-            if ".sql" in file:
-                filepath = os.path.join(filedir, file)
-                self.current_sql_file += 1
-                status = self._read_execute_sql_file(filepath, set_progress_bar)
-                if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
-                    return False
-
-        return status
-
-    def _read_execute_sql_file(self, filepath, set_progress_bar=False):
-        """"""
-
-        status = False
-        f = None
-
-        PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        SCHEMA_SRID = str(self.project_epsg)
-        SCHEMA_NAME = ""
-        if hasattr(self, f'{self.other_project}_schema_name'):
-            SCHEMA_NAME = getattr(self, f'{self.other_project}_schema_name')
-
-        try:
-            # Manage progress bar
-            if set_progress_bar:
-                if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
-                    self.progress_value = int(self.progress_value * self.progress_ratio)
-                    self.task_create_schema.set_progress(self.progress_value)
-
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
-                return False
-
-            f = open(filepath, 'r', encoding="utf8")
-            if f:
-                f_to_read = str(f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SCHEMA_SRID", SCHEMA_SRID).replace("PARENT_SCHEMA", PARENT_SCHEMA))
-                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
-                if tools_os.set_boolean(status, False) is False:
-                    self.error_count = self.error_count + 1
-                    if tools_os.set_boolean(self.dev_commit, False) is False:
-                        tools_db.dao.rollback()
-
-                    if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                        self.task_create_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
-                        self.task_create_schema.cancel()
-
-                    return False
-
-        except Exception as e:
-            self.error_count = self.error_count + 1
-            msg = "{0} exception: {1}"
-            msg_params = ("_read_execute_file", filepath,)
-            tools_log.log_info(msg, msg_params=msg_params)
-            tools_log.log_info(str(e))
-            self.message_infolog = f"_read_execute_file exception: {filepath}\n {str(e)}"
-            if tools_os.set_boolean(self.dev_commit, False) is False:
-                tools_db.dao.rollback()
-            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-                self.task_create_schema.cancel()
-            status = False
-
-        finally:
-            if f:
-                f.close()
-            return status
 
     def _read_changelog(self, filelist, filedir):
         """ Read contents of file 'changelog.txt' """
@@ -2566,14 +2303,15 @@ class GwAdminButton:
         title = "Info"
         result = tools_qt.show_question(msg, title, force_action=True, msg_params=msg_params)
         if result:
-            sql = f'DROP SCHEMA {project_name} CASCADE;'
-            status = tools_db.execute_sql(sql)
-            if status:
+            fx = engine_drop_schema(QtDbAdapter(), project_name, cascade=True, commit=True)
+            if fx.ok:
                 msg = "Process finished successfully: Delete schema"
                 tools_qt.show_info_box(msg, "Info")
                 self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
                 self._manage_utils()
                 self._set_info_project()
+            else:
+                tools_qt.show_info_box(f"Delete schema failed: {fx.error}", "Error")
 
     def _delete_other_schema(self, schema):
         """ Delete other schema """
@@ -2582,13 +2320,13 @@ class GwAdminButton:
         msg_params = (schema,)
         result = tools_qt.show_question(msg, "Info", force_action=True, msg_params=msg_params)
         if result:
-            sql = f'DROP SCHEMA IF EXISTS {schema} CASCADE;'
-            status = tools_db.execute_sql(sql)
-
-            if status:
+            fx = engine_drop_schema(QtDbAdapter(), schema, cascade=True, commit=True)
+            if fx.ok:
                 msg = "Process finished successfully: Delete schema"
                 tools_qt.show_info_box(msg, "Info")
                 self._set_buttons_enabled()
+            else:
+                tools_qt.show_info_box(f"Delete schema failed: {fx.error}", "Error")
 
     def _build_replace_dlg(self, replace_json):
 
@@ -3202,7 +2940,7 @@ class GwAdminButton:
         """ Take current project type changed """
 
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
-        self.folder_software = os.path.join(self.sql_dir, self.project_type_selected)
+        self.folder_software = os.path.join(self.sql_dir, 'schemas', 'network', self.project_type_selected)
 
     def _populate_functions_dlg(self, dialog, result):
         """"""
@@ -3366,8 +3104,16 @@ class GwAdminButton:
         # Buttons to manage am
         sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'am'"
         rows = tools_db.get_rows(sql)
-        self.dlg_readsql.btn_create_asset.setEnabled(project_type == "ws" and schema_name != "null" and rows is None)
-        self.dlg_readsql.btn_delete_asset.setEnabled(rows is not None)
+        am_exists = rows is not None
+        self.dlg_readsql.btn_create_asset.setEnabled(project_type == "ws" and schema_name != "null" and not am_exists)
+        self.dlg_readsql.btn_update_asset.setEnabled(am_exists)
+        self.dlg_readsql.btn_delete_asset.setEnabled(am_exists)
+
+        # Buttons to manage cm
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'cm'"
+        rows = tools_db.get_rows(sql)
+        cm_exists = rows is not None
+        self.dlg_readsql.btn_update_cm.setEnabled(cm_exists)
 
         # Buttons to manage audit
         sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
@@ -3412,6 +3158,7 @@ class GwAdminButton:
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ud, ud_result_list)
 
     def _create_utils(self):
+        """Create the (singleton) utils satellite schema via the engine."""
 
         # Manage cmb_utils_projecttypes null values
         self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
@@ -3423,127 +3170,169 @@ class GwAdminButton:
             return
 
         # Get giswater version for ws and ud project selected
-        self.ws_project_result = None
-        self.ud_project_result = None
+        ws_row = tools_db.get_row(
+            f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        ud_row = tools_db.get_row(
+            f"SELECT giswater, language, epsg FROM {self.ud_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        if not ws_row or not ud_row:
+            tools_qgis.show_message("Could not read sys_version from ws/ud parent schemas.",
+                                    Qgis.MessageLevel.Warning)
+            return
+        self.ws_project_result = ws_row
+        self.ud_project_result = ud_row
 
-        sql = f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
-        row = tools_db.get_row(sql)
-        if row:
-            self.ws_project_result = row
-
-        sql = f"SELECT giswater, language, epsg FROM {self.ud_project_name}.sys_version ORDER BY id DESC LIMIT 1"
-        row = tools_db.get_row(sql)
-        if row:
-            self.ud_project_result = row
-
-        if self.ws_project_result[0] != self.ud_project_result[0]:
+        if ws_row[0] != ud_row[0]:
             msg = ("You need to select same version for ws and ud projects. "
                    "Versions: WS - {} ; UD - {}")
-            msg_params = (self.ws_project_result, self.ud_project_result,)
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info, msg_params=msg_params)
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info, msg_params=(ws_row, ud_row,))
             return
 
-        # Check is project name already exists
-        sql = ("SELECT schema_name FROM information_schema.schemata "
-               "WHERE schema_name ILIKE 'utils' ORDER BY schema_name")
-        row = tools_db.get_row(sql, commit=False)
+        # Check if utils schema already exists.
+        row = tools_db.get_row(
+            "SELECT schema_name FROM information_schema.schemata "
+            "WHERE schema_name ILIKE 'utils' ORDER BY schema_name",
+            commit=False,
+        )
         if row:
-            msg = "Schema Utils already exist."
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            tools_qgis.show_message("Schema Utils already exist.", Qgis.MessageLevel.Info)
             return
 
-        self.error_count = 0
-        # Set background task 'GwCreateSchemaTask'
-        description = "Create schema"
-        params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
-                  'project_name_schema': 'utils', 'project_locale': self.ws_project_result[1],
-                  'project_srid': self.ws_project_result[2], 'example_data': False, 'schema_version': None,
-                  'schema_utils': 'utils', 'schema_ws': self.ws_project_name, 'schema_ud': self.ud_project_name,
-                  'main_project_version': self.ws_project_result[0]}
-        self.task_create_schema = GwCreateSchemaUtilsTask(self, description, params)
-        QgsApplication.taskManager().addTask(self.task_create_schema)
-        QgsApplication.taskManager().triggerTask(self.task_create_schema)
+        bp = BuildParams(
+            schema_name='utils',
+            srid=str(ws_row[2]),
+            locale=str(ws_row[1]),
+            plugin_version=str(self.plugin_version),
+            main_project_version=str(ws_row[0]),
+            profile='empty',
+            ws_schema=self.ws_project_name,
+            ud_schema=self.ud_project_name,
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder('utils', bp,
+                             description="Create utils schema",
+                             on_done=partial(self._on_builder_done_utils, 'utils'))
 
     def _update_utils(self, schema_name=None):
-
+        """Run the utils 'update' profile in place."""
         if schema_name is None:
-            self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
+            self.ws_project_name = tools_qt.get_text(
+                self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False
+            )
         else:
             self.ws_project_name = schema_name
-        sql = "SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
-        row = tools_db.get_row(sql)
-        if row:
-            self._update_utils_schema(row, schema_name)
 
-    def _load_base_utils(self):
+        row = tools_db.get_row(
+            "SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
 
-        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils')
-        status = self._execute_files(folder, utils_schema_name='utils', aux_schema_name=self.ws_project_name)
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils', 'fct')
-        status = self._execute_files(folder, utils_schema_name='utils')
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'ws')
-        status = self._execute_files(folder, utils_schema_name=self.ws_project_name)
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
-        folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'ud')
-        status = self._execute_files(folder, utils_schema_name=self.ud_project_name)
-        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
-            return False
+        bp = BuildParams(
+            schema_name='utils',
+            srid="0",
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            main_project_version=str(self.plugin_version),
+            profile='update',
+            run_mode='upgrade',
+            ws_schema=self.ws_project_name,
+            ud_schema=getattr(self, 'ud_project_name', '') or '',
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder('utils', bp,
+                             description="Update utils schema",
+                             on_done=partial(self._on_builder_done_utils, 'utils'))
 
-        return True
+    def _on_builder_done_utils(self, schema_name, result):
+        if not result.ok:
+            self.error_count += 1
+        self.manage_process_result(schema_name, 'utils', is_utils=True)
 
-    def _update_utils_schema(self, schema_version=None, schema_name=None, is_thread=False):
+    def _update_asset(self):
+        """Run the am 'update' profile in place (semver upgrade)."""
+        row = tools_db.get_row(
+            "SELECT giswater FROM am.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
 
-        folder_utils_updates = os.path.join(self.sql_dir, 'corporate', 'utils', 'updates')
-        if not os.path.exists(folder_utils_updates):
-            msg = "The update folder was not found in sql folder"
-            if not is_thread:
-                tools_qgis.show_message(msg)
-                self.error_count = self.error_count + 1
-            return False
-        folders = sorted(os.listdir(folder_utils_updates))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(os.path.join(folder_utils_updates, folder)))
-            for sub_folder in sub_folders:
-                aux = str(self.ws_project_result[0]).replace('.', '')
-                if (schema_version is None and sub_folder <= aux) or schema_version is not None and (schema_version < sub_folder < aux):
-                    folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
-                    if self._process_folder(folder_update):
-                        status = self._load_sql(folder_update, utils_schema_name='utils')
-                        if tools_os.set_boolean(status, False) is False:
-                            return False
-                    if self.project_type_selected == 'ws':
-                        folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
-                        if self._process_folder(folder_update):
-                            if schema_name is None:
-                                schema_name = self.ws_project_name
-                            status = self._load_sql(folder_update, utils_schema_name=schema_name)
-                            if tools_os.set_boolean(status, False) is False:
-                                return False
-                    if self.project_type_selected == 'ud':
-                        folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
-                        if self._process_folder(folder_update):
-                            if schema_name is None:
-                                schema_name = self.ud_project_name
-                            status = self._load_sql(folder_update, utils_schema_name=schema_name)
-                            if tools_os.set_boolean(status, False) is False:
-                                return False
-                    folder_update = os.path.join(self.sql_dir, 'final_pass', 'utils', 'i18n', self.locale)
-                    if self._process_folder(folder_update) is True:
-                        status = self._execute_files(folder_update, True)
-                        if tools_os.set_boolean(status, False) is False:
-                            return False
-        return True
+        parent_schema = self._get_schema_name() or ""
+        parent_type = (
+            tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or "ws"
+        ).lower()
+        if not parent_schema:
+            tools_qgis.show_warning(
+                "Select the ws project schema linked to am before updating."
+            )
+            return
+
+        bp = BuildParams(
+            schema_name='am',
+            srid="0",
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            profile='update',
+            run_mode='upgrade',
+            parent_schema=parent_schema,
+            parent_type=parent_type,
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder('am', bp,
+                             description="Update am schema",
+                             on_done=partial(self._on_builder_done_other_update, 'am'))
+
+    def _update_cm(self):
+        """Run the cm 'update' profile in place (semver upgrade)."""
+        row = tools_db.get_row(
+            "SELECT giswater FROM cm.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
+
+        # parent_schema + parent_type come from the currently-selected ws/ud
+        # in the admin dialog (matches how cm was created).
+        parent_schema = self._get_schema_name() or ""
+        parent_type = (
+            tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or ""
+        ).lower()
+
+        bp = BuildParams(
+            schema_name='cm',
+            srid="0",
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            profile='update',
+            run_mode='upgrade',
+            parent_schema=parent_schema,
+            parent_type=parent_type,
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder('cm', bp,
+                             description="Update cm schema",
+                             on_done=partial(self._on_builder_done_other_update, 'cm'))
+
+    def _on_builder_done_other_update(self, schema_name, result):
+        if not result.ok:
+            self.error_count += 1
+        self.manage_other_process_result()
 
     def _calculate_elapsed_time(self, dialog):
 
-        tf = time()  # Final time
-        td = tf - self.t0  # Delta time
-        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+        text = getattr(self, "schema_build_progress_hint", "") or ""
+        if not text:
+            task = self._active_schema_build_task()
+            if task is not None:
+                label = getattr(task, "_last_progress_label", "") or ""
+                sql_root = getattr(getattr(task, "params", None), "sql_root", "") or ""
+                seen = getattr(self, "current_sql_file", 0)
+                total = getattr(self, "total_sql_files", 0)
+                if label:
+                    text = format_progress_status(
+                        seen, total, label, sql_root=sql_root
+                    )
+        self._update_time_elapsed(text, dialog)
 
     def _update_time_elapsed(self, text, dialog):
 

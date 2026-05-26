@@ -1,0 +1,41 @@
+# Asset-management schema manifest.
+#
+# am uses the per-schema semver updates tree:
+#   dbmodel/schemas/am/updates/<M>/<m>/<p>/*.sql   (flat, no subdir)
+#
+# Legacy date-bucketed content (YYYY-MM/) was collapsed into
+# dbmodel/schemas/am/updates/0/0/0/ with filenames prefixed by their
+# original date for chronological ordering.
+
+kind: am
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base
+    type: sql_dir
+    description: "Asset management DDL/DML/sample."
+    steps:
+      - { source: "schemas/am/base", recursive: false }
+
+  - id: load_updates
+    type: version_walk
+    description: "Walk dbmodel/schemas/am/updates/<M>/<m>/<p>/ semver-ordered."
+    root: "schemas/am/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: load_i18n
+    type: sql_file
+    optional: true
+    description: "Optional am i18n file. Singleton .sql per locale."
+    steps:
+      - source: "schemas/am/i18n/{{ locale }}.sql"
+        fallback_source: "schemas/am/i18n/en_US.sql"
+
+profiles:
+  empty:
+    phases: [load_base, load_updates, load_i18n]
+  update:
+    phases: [load_updates, load_i18n]

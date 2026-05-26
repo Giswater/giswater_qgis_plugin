@@ -86,6 +86,12 @@ Compatible with Windows, Mac, and Linux, but EPA models are only supported on Wi
 
 ## Test
 
+**Database model (pgTAP, Docker):** [dbmodel/README.md — Testing](dbmodel/README.md#testing) — `./dbmodel/test/run_tests.sh ws` (PostgreSQL 16–18 via `PG_MAJOR`).
+
+**Schema CLI (no QGIS):** [giswater_admin/README.md](giswater_admin/README.md) — `python3 -m giswater_admin create --kind ws …`
+
+**Python unit tests:** `python3 -m pytest test/engine -v` (from plugin repo root).
+
 Use the provided example projects, pre-loaded with datasets for testing. Find setup videos below:
 
 - [Install the plugin](https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4)
@@ -119,7 +125,8 @@ Find answers to common questions in the [Giswater FAQs](https://github.com/Giswa
 
 - **Docs**: [Documentation repository](https://github.com/Giswater/docs)
 - **QGIS Plugin**: [QGIS Plugin repository](https://github.com/Giswater/giswater_qgis_plugin)
-- **Database Model**: [Database Model repository](https://github.com/Giswater/giswater_dbmodel)
+- **Database Model**: [Database Model repository](https://github.com/Giswater/giswater_dbmodel) — in this repo: [dbmodel/](dbmodel/) ([schema layout](dbmodel/README.md#schema-architecture), [local tests](dbmodel/README.md#testing))
+- **Headless schema CLI**: [giswater_admin/](giswater_admin/) ([full reference](giswater_admin/README.md))
 
 Other repositories may exist but are either deprecated or inactive.
 

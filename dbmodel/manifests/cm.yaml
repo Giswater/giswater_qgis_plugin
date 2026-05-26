@@ -1,0 +1,87 @@
+# Campaign-management schema manifest.
+#
+# `schemas/cm/common/` = shared CM SQL (like `network/common` for ws/ud).
+# Not the satellite `utils` schema (`kind: utils` in manifests/utils.yaml).
+#
+# cm attaches to a parent ws OR ud schema. The CLI / plugin auto-detects
+# `parent_type` from the parent's sys_version.project_type and passes
+# it via BuildParams so {{ parent_type }} resolves to "ws" or "ud".
+#
+# Phases mirror project_schema_cm_create.GwCreateSchemaCmTask.
+# `load_parent_schema` runs against the PARENT schema (not the cm
+# schema being created), so its steps override SCHEMA_NAME via
+# `schema_override`.
+
+kind: cm
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base_schema
+    type: sql_dir
+    description: "Bootstrap cm schema: common ddl/fct/ftrg + cm base."
+    steps:
+      - { source: "schemas/cm/common/ddl",  recursive: false }
+      - { source: "schemas/cm/common/fct",  recursive: false }
+      - { source: "schemas/cm/common/ftrg", recursive: false }
+      - { source: "schemas/cm/base",        recursive: false }
+
+  - id: load_parent_schema
+    type: sql_dir
+    description: >
+      Run parent_schema artefacts. SCHEMA_NAME flips to PARENT_SCHEMA for
+      these steps because the SQL bodies build views/triggers inside
+      the ws/ud parent, not the cm child.
+    steps:
+      - source: "schemas/cm/parent_schema/{{ parent_type }}/ddl.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cm/parent_schema/fct"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cm/parent_schema/ftrg"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cm/parent_schema/utils"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cm/parent_schema/{{ parent_type }}/trg.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_sample
+    type: sql_dir
+    optional: true
+    description: "Sample catalogues + parent-type-specific seed data."
+    steps:
+      - source: "schemas/cm/sample/utils"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cm/sample/{{ parent_type }}"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_updates
+    type: version_walk
+    optional: true
+    description: "Walk dbmodel/schemas/cm/updates/<M>/<m>/<p>/ semver-ordered."
+    root: "schemas/cm/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: load_locale
+    type: sql_dir
+    description: "cm i18n. Falls back to en_US when locale folder missing."
+    steps:
+      - source: "schemas/cm/i18n/{{ locale }}"
+        fallback_source: "schemas/cm/i18n/en_US"
+        recursive: false
+
+profiles:
+  empty:
+    phases: [load_base_schema, load_parent_schema, load_updates, load_locale]
+  with_sample:
+    phases: [load_base_schema, load_parent_schema, load_sample, load_updates, load_locale]
+  update:
+    phases: [load_updates, load_locale]
