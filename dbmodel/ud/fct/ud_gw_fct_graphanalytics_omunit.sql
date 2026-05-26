@@ -188,10 +188,11 @@ BEGIN
 	FROM v_temp_gully g
 	JOIN temp_pgr_arc a ON a.pgr_arc_id = g.arc_id;
 
-    INSERT INTO temp_pgr_old_mapzone (mapzone_id)
-    SELECT DISTINCT a.omunit_id
+    INSERT INTO temp_pgr_old_mapzone (mapzone_id, macromapzone_id)
+    SELECT DISTINCT a.omunit_id, o.macroomunit_id
     FROM temp_pgr_arc t
     JOIN arc a ON t.pgr_arc_id = a.arc_id
+    JOIN omunit o ON a.omunit_id = o.omunit_id
     WHERE a.omunit_id > 0;
 
     UPDATE temp_pgr_node t
