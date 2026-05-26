@@ -25,3 +25,8 @@ VALUES (3542, 'gw_fct_admin_manage_view_dependencies', 'utils', 'function', 'jso
 'Recursively discovers dependent views on parent editable views across all database schemas, saves their definitions, drops them in safe order and restores them after parent recreation',
 'role_admin', NULL, 'core', NULL)
 ON CONFLICT (id) DO NOTHING;
+
+-- 26/05/2026
+UPDATE sys_param_user
+SET descript = 'If true, disable gw_trg_array_fk_array_table trigger logic on all tables'
+WHERE id = 'edit_disable_arc_fkarray';
