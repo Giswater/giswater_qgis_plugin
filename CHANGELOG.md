@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.0] - 2026-05-26
+
 ### Added
 
 - Algorithm to calculate omunits and macroomunits `gw_fct_graphanalytics_omunit`.
@@ -301,7 +303,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.0...main
+[4.11.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...v4.11.0
 [4.10.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...v4.10.0
 [4.9.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...v4.9.1
 [4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0
