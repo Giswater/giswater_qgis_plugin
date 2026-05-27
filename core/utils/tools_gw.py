@@ -1009,14 +1009,14 @@ def add_layer_provider(gw_id: str, cfg, group="GW Layers", sub_group=None, alias
         layer = QgsVectorLayer(uri, gw_id, provider)
 
     else:
-        raise ValueError(f"Unsupported layer_type: {layer_type}")
+        msg = f"Unsupported layer_type: {layer_type}"
+        tools_qgis.show_warning(msg)
+        return
 
     if not layer.isValid():
-        raise Exception(
-            f"Invalid layer:\n"
-            f"provider={provider}\n"
-            f"uri={uri}"
-        )
+        msg = f"Invalid layer:\nprovider={provider}\nuri={uri}"
+        tools_qgis.show_warning(msg)
+        return
 
     if force_create_group:
         create_groups = True
@@ -1066,7 +1066,8 @@ def build_uri(gw_id: str, provider: str, cfg: dict) -> Optional[str]:
     builder = builders.get(provider)
 
     if not builder:
-        tools_qgis.show_warning(f"No URI builder for provider: {provider}")
+        msg = f"No URI builder for provider: {provider}"
+        tools_qgis.show_warning(msg)
         return None
 
     return builder(cfg)
