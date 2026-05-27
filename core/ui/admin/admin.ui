@@ -733,6 +733,46 @@
              </widget>
             </item>
             <item row="4" column="0">
+             <widget class="QGroupBox" name="groupBox_cibs">
+              <property name="title">
+               <string>Schema cibs</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_cibs">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_cibs_schema">
+                 <property name="text">
+                  <string>Schema:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="cmb_cibs"/>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <widget class="QPushButton" name="btn_create_cibs">
+                 <property name="text">
+                  <string>Create cibs schema</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QPushButton" name="btn_adapt_cibs">
+                 <property name="text">
+                  <string>Adapt schema to use cibs</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="QPushButton" name="btn_copy_data_cibs">
+                 <property name="text">
+                  <string>Copy data to cibs</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="5" column="0">
              <widget class="QGroupBox" name="grb_i18n">
               <property name="title">
                <string>i18n</string>
@@ -778,7 +818,7 @@
               </layout>
              </widget>
             </item>
-            <item row="5" column="0">
+            <item row="6" column="0">
              <spacer name="verticalSpacer_4">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -897,6 +937,10 @@
   <tabstop>cmb_utils_ud</tabstop>
   <tabstop>btn_create_utils</tabstop>
   <tabstop>btn_update_utils</tabstop>
+  <tabstop>cmb_cibs</tabstop>
+  <tabstop>btn_create_cibs</tabstop>
+  <tabstop>btn_adapt_cibs</tabstop>
+  <tabstop>btn_copy_data_cibs</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
