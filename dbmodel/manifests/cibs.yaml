@@ -15,19 +15,14 @@ phases:
     type: sql_dir
     description: "Bootstrap cibs schema: base."
     steps:
-      - { source: "schemas/cibs/base",  recursive: false }
+      - { source: "schemas/cibs/base/base.sql",  recursive: false }
+      - { source: "schemas/cibs/base/fct/",  recursive: false }
 
   - id: integrate_cibs
     type: sql_dir
     description: "Integrate cibs with the parent schema (ws/ud)."
     steps:
-      - source: "schemas/cibs/{{ parent_type }}/ddl.sql"
-        recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cibs/{{ parent_type }}/ddlview.sql"
-        recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cibs/{{ parent_type }}/dml.sql"
+      - source: "schemas/cibs/integration/{{parent_type}}/integration.sql"
         recursive: false
         schema_override: "{{ parent_schema }}"
 
