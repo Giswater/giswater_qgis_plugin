@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update reference function id for gw_fct_anl_node_topological_consistency.
 - `gw_fct_graphanalytics_omunit` function to disable `edit_disable_arc_fkarray` when updating omunits.
 - Optimize `gw_trg_array_fk_array_table`: pg_catalog type lookup and global `edit_disable_arc_fkarray` bypass.
+- Fix function id references in `sys_function` and `config_function` tables.
 
 ## [4.11.0] - 2026-05-26
 
