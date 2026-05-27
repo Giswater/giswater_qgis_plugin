@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update reference function id for gw_fct_anl_node_topological_consistency.
+
 ## [4.11.0] - 2026-05-26
 
 ### Added

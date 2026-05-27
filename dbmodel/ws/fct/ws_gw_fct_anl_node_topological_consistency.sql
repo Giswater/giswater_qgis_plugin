@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
---FUNCTION CODE: 2302
+--FUNCTION CODE: 2212
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_anl_node_topological_consistency(p_data json) ;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_topological_consistency(p_data json)
@@ -51,7 +51,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"function":"2302", "fid":"108", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
+                       "data":{"function":"2212", "fid":"108", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
 	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -152,11 +152,11 @@ BEGIN
 
 	IF v_count = 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3596", "function":"2302", "fid":"108", "fcount":"'||v_count||'", "is_process":true}}$$)';
+                       "data":{"message":"3596", "function":"2212", "fid":"108", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                       "data":{"message":"3594", "function":"2302", "parameters":{"v_count":"'||v_count||'"}, "fid":"108", "fcount":"'||v_count||'", "is_process":true}}$$)';
+                       "data":{"message":"3594", "function":"2212", "parameters":{"v_count":"'||v_count||'"}, "fid":"108", "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
@@ -181,7 +181,7 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||
 			'}}'||
-	    '}')::json, 2302, null, null, null);
+	    '}')::json, 2212, null, null, null);
 
 END;
 $BODY$
