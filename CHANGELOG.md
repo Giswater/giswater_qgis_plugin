@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.1] - 2026-05-27
+
 ### Fixed
 
 - Update reference function id for gw_fct_anl_node_topological_consistency.
@@ -40,6 +42,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix update of omunit and macroomunit geometry type to multipolygon.
 - add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.
 - Improve performance of `gw_fct_getinfofromcoordinates` function.
+
+## [4.10.1] - 2026-05-20
+
+### Fixed
+
+- `config_form_fields` `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
+- `visit` insert correctly the records on `om_visit_x_*` tables.
+- correct signal for rejected visit dialog.
+- recreate the triggers for the mapzones when the utility scheme is activated.
+- fix visit dialog to show the correct features when the dialog is accepted.
+- fix update of omunit and macroomunit geometry type to multipolygon.
+- add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.
 
 ## [4.10.0] - 2026-05-18
 
@@ -310,8 +324,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.0...main
-[4.11.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...v4.11.0
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.1...release/4.11
+[4.11.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.0...v4.11.1
+[4.11.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.1...v4.11.0
+[4.10.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...v4.10.1
 [4.10.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...v4.10.0
 [4.9.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...v4.9.1
 [4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0
