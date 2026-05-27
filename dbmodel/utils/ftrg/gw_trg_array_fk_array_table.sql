@@ -17,25 +17,22 @@ name_id_column text;
 name_id_table text;
 name_array_column text;
 all_exist boolean;
-v_data_type text;
 v_querystring text;
-v_value text;
 v_check_null_value boolean;
 v_disable_arc_fkarray boolean := false;
+v_is_array boolean;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	IF TG_TABLE_NAME = 'arc' THEN
-		SELECT COALESCE(value::boolean, false) INTO v_disable_arc_fkarray
-		FROM config_param_user
-		WHERE parameter = 'edit_disable_arc_fkarray'
-		AND cur_user = current_user;
+	SELECT COALESCE(value::boolean, false) INTO v_disable_arc_fkarray
+	FROM config_param_user
+	WHERE parameter = 'edit_disable_arc_fkarray'
+	AND cur_user = current_user;
 
-		IF v_disable_arc_fkarray IS TRUE THEN
-			RETURN NEW;
-		END IF;
+	IF v_disable_arc_fkarray THEN
+		RETURN NEW;
 	END IF;
 
     name_array_column := TG_ARGV[0];
@@ -47,35 +44,39 @@ BEGIN
 			"data":{"message":"3324", "function":"1320"}}$$);';
     END IF;
 
-    -- Get data type
-    EXECUTE 'SELECT data_type FROM information_schema.columns WHERE table_schema = $1 AND table_name = $2 AND column_name = $3'
-    USING TG_TABLE_SCHEMA, TG_TABLE_NAME, name_array_column
-    INTO v_data_type;
-    
-    -- Check for null values
-    IF v_data_type = 'ARRAY' THEN
-        EXECUTE format('SELECT array_length(($1).%I, 1) IS NULL', 
-                      name_array_column, name_array_column, name_array_column) 
+    SELECT ty.typcategory = 'A'
+    INTO v_is_array
+    FROM pg_attribute att
+    JOIN pg_class cls ON cls.oid = att.attrelid
+    JOIN pg_namespace nsp ON nsp.oid = cls.relnamespace
+    JOIN pg_type ty ON ty.oid = att.atttypid
+    WHERE nsp.nspname = TG_TABLE_SCHEMA
+      AND cls.relname = TG_TABLE_NAME
+      AND att.attname = name_array_column
+      AND att.attnum > 0
+      AND NOT att.attisdropped;
+
+    IF v_is_array THEN
+        EXECUTE format('SELECT ($1).%I IS NULL OR cardinality(($1).%I) IS NULL',
+                      name_array_column, name_array_column)
         USING NEW INTO v_check_null_value;
     ELSE
         EXECUTE format('SELECT ($1).%I IS NULL', name_array_column) USING NEW INTO v_check_null_value;
     END IF;
-    
+
     IF v_check_null_value IS TRUE THEN
         RETURN NEW;
     END IF;
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 
-        IF v_data_type = 'ARRAY' THEN
+        IF v_is_array THEN
 
             v_querystring := format('SELECT NOT EXISTS (SELECT 1 FROM unnest(($1).%I) as arrays
             LEFT JOIN '||name_id_table||' ON arrays = '||name_id_table||'.'||name_id_column||'::int4 WHERE '||name_id_table||'.'||name_id_column||' IS NULL)', name_array_column);
-            RAISE NOTICE 'v_querystring: %', v_querystring;
             EXECUTE v_querystring USING NEW INTO all_exist;
 
-
-        ELSEIF v_data_type = 'integer' THEN
+        ELSE
 
             v_querystring := format('SELECT EXISTS (SELECT 1 FROM '||name_id_table||'
             WHERE '||name_id_table||'.'||name_id_column||'::int4 = ($1).%I)', name_array_column);
