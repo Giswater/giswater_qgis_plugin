@@ -36,9 +36,3 @@ VALUES
     ('v_cat_hydrometer_type', 'Hydrometer type base view.', 'role_basic', 'core'),
     ('v_cat_hydrometer_category_x_pattern', 'Hydrometer category x pattern base view.', 'role_basic', 'core')
 ON CONFLICT (id) DO UPDATE SET descript = EXCLUDED.descript;
-
-UPDATE config_form_fields
-SET dv_querytext='SELECT name as id, name as idval FROM v_cat_hydrometer_state WHERE id IS NOT NULL'
-WHERE formname='connec' AND formtype='form_feature' AND columnname='cmb_hydrometer_state' AND tabname='tab_hydrometer';
-UPDATE config_form_fields SET linkedobject = REPLACE(linkedobject, 'v_ui_hydrometer', 'vf_hydrometer') WHERE linkedobject ILIKE '%v_ui_hydrometer%';
-UPDATE config_form_list SET query_text = REPLACE(query_text, 'v_ui_hydroval', 've_hydrometer_data') WHERE query_text ILIKE '%v_ui_hydroval%';
