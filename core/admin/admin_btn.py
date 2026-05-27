@@ -492,11 +492,11 @@ class GwAdminButton:
             parent_schema, _, parent_type = schema_info
             pt_norm = (parent_type or "").lower()
             if pt_norm and not os.path.isfile(
-                os.path.join(self.sql_dir, "schemas", "cibs", pt_norm, "ddl.sql")
+                os.path.join(self.sql_dir, "schemas", "cibs", "integration", pt_norm, "integration.sql")
             ):
                 msg = (
                     f"cibs schema is not supported for parent_type='{pt_norm}' in this dbmodel. "
-                    f"Missing schemas/cibs/{pt_norm}/ddl.sql."
+                    f"Missing schemas/cibs/integration/{pt_norm}/integration.sql."
                 )
                 tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
                 return
