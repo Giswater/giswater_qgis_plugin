@@ -117,3 +117,11 @@ UPDATE config_form_list SET query_text = REPLACE(query_text, 'v_ui_hydroval', 'v
 ALTER TABLE ext_hydrometer_data DROP CONSTRAINT IF EXISTS ext_rtc_hydrometer_x_data_hydrometer_id_fkey;
 ALTER TABLE ext_hydrometer_data ADD CONSTRAINT ext_hydrometer_data_hydrometer_id_fkey
 FOREIGN KEY (hydrometer_id) REFERENCES ext_hydrometer(hydrometer_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+-- rename scada tables
+ALTER TABLE IF EXISTS ext_rtc_scada RENAME TO ext_scada;
+
+DELETE FROM sys_table WHERE id IN ('ext_rtc_scada');
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES ('ext_scada', 'Scada table.', 'role_basic', 'core');

@@ -217,7 +217,7 @@ v_queryhydro =
 				UPDATE dma SET active = TRUE FROM 
 				(SELECT * FROM 
 				(SELECT dma_id, (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent''  as node_id FROM dma) b JOIN 
-				(SELECT DISTINCT (node_id) FROM ext_cat_period, ext_rtc_scada_x_data JOIN node USING (node_id) WHERE  
+				(SELECT DISTINCT (node_id) FROM ext_cat_period, ext_scada_x_data JOIN node USING (node_id) WHERE  
 				node.expl_id in ('||v_expl||')AND start_date < value_date AND end_date > value_date) a USING (node_id))c
 				WHERE dma.dma_id = c.dma_id';
 
@@ -270,7 +270,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3) 
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_rtc_scada_x_data e JOIN mapzone_graph g USING (node_id)
+				FROM ext_scada_x_data e JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date 
 				AND g.flow_sign = 1 AND g.mapzone_type = ''DMA''
@@ -285,7 +285,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_rtc_scada_x_data e JOIN mapzone_graph g USING (node_id)
+				FROM ext_scada_x_data e JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date
 				AND g.mapzone_type = ''DMA''
@@ -372,7 +372,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3)
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_rtc_scada_x_data e 
+				FROM ext_scada_x_data e 
 				JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date 
@@ -388,7 +388,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_rtc_scada_x_data e 
+				FROM ext_scada_x_data e 
 				JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date

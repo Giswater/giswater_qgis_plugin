@@ -238,3 +238,14 @@ FOREIGN KEY (hydrometer_id) REFERENCES ext_hydrometer(hydrometer_id) ON UPDATE C
 ALTER TABLE ext_hydrometer_data DROP CONSTRAINT IF EXISTS cat_period_id_fk;
 ALTER TABLE ext_hydrometer_data ADD CONSTRAINT cat_period_id_fk
 FOREIGN KEY (cat_period_id) REFERENCES ext_cat_period(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+-- rename scada tables
+ALTER TABLE IF EXISTS ext_rtc_scada RENAME TO ext_scada;
+ALTER TABLE IF EXISTS ext_rtc_scada_x_data RENAME TO ext_scada_x_data;
+
+DELETE FROM sys_table WHERE id IN ('ext_rtc_scada', 'ext_rtc_scada_x_data');
+INSERT INTO sys_table (id, descript, sys_role, source)
+VALUES
+    ('ext_scada', 'Scada table.', 'role_basic', 'core'),
+    ('ext_scada_x_data', 'Scada data table.', 'role_basic', 'core');
