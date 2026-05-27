@@ -1,3 +1,4 @@
 4.11.1
 *************
 - Update reference function id for gw_fct_anl_node_topological_consistency.
+- `gw_fct_graphanalytics_omunit` function to disable `edit_disable_arc_fkarray` when updating omunits.
