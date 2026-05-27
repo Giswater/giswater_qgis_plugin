@@ -256,6 +256,7 @@ class GwAdminButton:
             "task_create_schema",
             "task_update_schema",
             "task_create_cm_schema",
+            "task_create_cibs_schema",
         ):
             task = getattr(self, attr, None)
             if task is not None and not isdeleted(task):
@@ -470,20 +471,113 @@ class GwAdminButton:
             self.cm_error_count += 1
         self.manage_cm_process_result(process_name)
 
-    def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
+    def _run_create_cibs_task(self, steps, process_name):
+        """
+        cibs schema lifecycle entry point.
+
+        `steps` is a legacy list like `['load_base_schema']` /
+        `['integrate_cibs']` / `['copy_data_cibs']`. We map it to a
+        manifest profile and run the engine.
+        """
+        cibs_schema = "cibs"
+        parent_schema = ""
+        parent_type = ""
+
+        if any(step in ("integrate_cibs", "copy_data_cibs") for step in steps):
+            schema_info = self._get_cibs_schema_info()
+            if schema_info is None:
+                msg = "Select a WS or UD schema for the cibs operation"
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
+                return
+            parent_schema, _, parent_type = schema_info
+            pt_norm = (parent_type or "").lower()
+            if pt_norm and not os.path.isfile(
+                os.path.join(self.sql_dir, "schemas", "cibs", pt_norm, "ddl.sql")
+            ):
+                msg = (
+                    f"cibs schema is not supported for parent_type='{pt_norm}' in this dbmodel. "
+                    f"Missing schemas/cibs/{pt_norm}/ddl.sql."
+                )
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
+                return
+
+        if steps == ['load_base_schema']:
+            profile_phases = ['load_base_schema']
+        elif steps == ['integrate_cibs']:
+            profile_phases = ['integrate_cibs']
+        else:
+            profile_phases = list(steps)
+
+        manifest = load_kind_manifest(self.plugin_dir, "cibs")
+        from ...giswater_admin.engine.manifest import Profile  # local import keeps top-level Qt-free
+        profile_name = profile_phases[0]
+        manifest.profiles[profile_name] = Profile(name=profile_name,
+                                                  phases=tuple(profile_phases))
+
+        bp = BuildParams(
+            schema_name=cibs_schema,
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            profile=profile_name,
+            run_mode='new_project',
+            parent_schema=parent_schema or "",
+            parent_type=(parent_type or "").lower(),
+            sql_root=self.sql_dir,
+            db_name=self._get_current_db_name() or "",
+        )
+
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
+        self.error_count = 0
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.start(1000)
+
+        task = GwSchemaBuilderTask(
+            self, manifest, bp,
+            description=process_name.capitalize() if isinstance(process_name, str) else "cibs",
+            timer=self.timer,
+            on_done=partial(self._on_builder_done_cibs, process_name),
+        )
+        self.task_create_cibs_schema = task
+        QgsApplication.taskManager().addTask(task)
+        QgsApplication.taskManager().triggerTask(task)
+
+    def _on_builder_done_cibs(self, process_name, result):
+        if not result.ok:
+            self.error_count += 1
+        elif process_name == 'Adapt schema to cibs':
+            schema_name = getattr(self, 'cibs_project_name', None)
+            if schema_name:
+                sql = f"SELECT {schema_name}.gw_fct_admin_role_permissions();"
+                tools_log.log_info("Task '{0}' execute sql: '{1}'",
+                                   msg_params=("Adapt cibs schema", sql,))
+                if not tools_db.execute_sql(sql):
+                    self.error_count += 1
+                else:
+                    sql = (f"UPDATE {schema_name}.config_param_system "
+                           f"SET value = 'true' WHERE parameter = 'admin_cibs_schema'")
+                    tools_log.log_info("Task '{0}' execute sql: '{1}'",
+                                       msg_params=("Adapt cibs schema", sql,))
+                    if not tools_db.execute_sql(sql):
+                        self.error_count += 1
+        self.manage_process_result('cibs', 'cibs', is_cibs=True)
+
+    def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, is_cibs=False, dlg=None):
         """"""
 
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Create project")
         if status:
             tools_db.dao.commit()
-            if is_utils is False:
+            if is_utils is False and is_cibs is False:
                 self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self._refresh_admin_catalog_cache()
                 self._populate_data_schema_name(self.cmb_project_type)
                 self._manage_utils()
-                if project_name is not None and is_utils is False:
+                if project_name is not None and is_utils is False and is_cibs is False:
                     tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', project_type)
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, project_name)
                     self._set_info_project()
@@ -1166,6 +1260,10 @@ class GwAdminButton:
 
         self.dlg_readsql.btn_create_utils.clicked.connect(partial(self._create_utils))
         self.dlg_readsql.btn_update_utils.clicked.connect(partial(self._update_utils))
+        self.dlg_readsql.btn_create_cibs.clicked.connect(partial(self._create_cibs))
+        self.dlg_readsql.btn_adapt_cibs.clicked.connect(partial(self._adapt_cibs))
+        self.dlg_readsql.btn_copy_data_cibs.clicked.connect(partial(self._copy_cibs_data))
+        self.dlg_readsql.cmb_cibs.currentIndexChanged.connect(partial(self._manage_cibs_buttons))
 
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
@@ -3201,6 +3299,66 @@ class GwAdminButton:
             self.dlg_readsql.cmb_utils_ud.clear()
         else:
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_utils_ud, ud_result_list)
+        
+        self._manage_cibs(ws_result_list, ud_result_list)
+
+    def _manage_cibs(self, ws_result_list, ud_result_list):
+        """Refresh cibs combo and button states."""
+
+        cibs_result_list = ws_result_list + ud_result_list
+        if not cibs_result_list:
+            self.dlg_readsql.cmb_cibs.clear()
+        else:
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_cibs, cibs_result_list)
+
+        sql = ("SELECT schema_name FROM information_schema.schemata "
+               "WHERE schema_name ILIKE 'cibs' ORDER BY schema_name")
+        row = tools_db.get_row(sql, commit=False)
+        self.dlg_readsql.btn_create_cibs.setEnabled(row is None)
+        self.dlg_readsql.btn_adapt_cibs.setEnabled(row is not None)
+        self._manage_cibs_buttons()
+
+    def _manage_cibs_buttons(self):
+        """Enable copy-data button only for schemas already adapted to cibs."""
+
+        if not self._cibs_schema_exists():
+            self.dlg_readsql.btn_copy_data_cibs.setEnabled(False)
+            return
+
+        schema_info = self._get_cibs_schema_info()
+        if schema_info is None:
+            self.dlg_readsql.btn_copy_data_cibs.setEnabled(False)
+            return
+
+        schema_name = schema_info[0]
+        sql = (f"SELECT value::boolean FROM {schema_name}.config_param_system "
+               f"WHERE parameter = 'admin_cibs_schema'")
+        row = tools_db.get_row(sql, commit=False)
+        self.dlg_readsql.btn_copy_data_cibs.setEnabled(row is not None and row[0] is True)
+
+    def _get_cibs_schema_info(self):
+        """Return selected schema name and sys_version row, or None if invalid."""
+
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_cibs, return_string_null=False)
+        if schema_name == "":
+            return None
+
+        sql = (f"SELECT giswater, language, epsg, project_type "
+               f"FROM {schema_name}.sys_version ORDER BY id DESC LIMIT 1")
+        row = tools_db.get_row(sql)
+        if row is None:
+            return None
+
+        project_type = row[3].lower() if row[3] else None
+        if project_type not in ('ws', 'ud'):
+            return None
+
+        return schema_name, row, project_type
+
+    def _cibs_schema_exists(self):
+        sql = ("SELECT schema_name FROM information_schema.schemata "
+               "WHERE schema_name ILIKE 'cibs' ORDER BY schema_name")
+        return tools_db.get_row(sql, commit=False) is not None
 
     def _create_utils(self):
         """Create the (singleton) utils satellite schema via the engine."""
@@ -3253,6 +3411,75 @@ class GwAdminButton:
         self._submit_builder('utils', bp,
                              description="Create utils schema",
                              on_done=partial(self._on_builder_done_utils, 'utils'))
+
+    def _create_cibs(self):
+
+        if self._cibs_schema_exists():
+            msg = "Schema cibs already exist."
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        self._run_create_cibs_task(['load_base_schema'], 'Create cibs schema')
+
+    def _adapt_cibs(self):
+
+        schema_info = self._get_cibs_schema_info()
+        if schema_info is None:
+            msg = "Select a WS or UD schema to adapt to cibs"
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        self.cibs_project_name, self.cibs_project_result, self.cibs_project_type = schema_info
+
+        if not self._cibs_schema_exists():
+            msg = "cibs schema does not exist. Create it first."
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        sql = (f"SELECT value::boolean FROM {self.cibs_project_name}.config_param_system "
+               f"WHERE parameter = 'admin_cibs_schema'")
+        row = tools_db.get_row(sql)
+        if row and row[0] is True:
+            msg = "Selected schema is already adapted to cibs"
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        schema_name = self.cibs_project_name
+        msg = ("You are about to adapt schema '{0}' to cibs.\n\n"
+               "Are you sure you want to continue?")
+        msg_params = (schema_name,)
+        title = "Adapt schema to cibs"
+        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
+
+        if not answer:
+            return
+
+        self._run_create_cibs_task(['integrate_cibs'], 'Adapt schema to cibs')
+
+    def _copy_cibs_data(self):
+
+        schema_info = self._get_cibs_schema_info()
+        if schema_info is None:
+            msg = "Select a WS or UD schema to copy data to cibs"
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        self.cibs_project_name, self.cibs_project_result, self.cibs_project_type = schema_info
+
+        if not self._cibs_schema_exists():
+            msg = "cibs schema does not exist. Create it first."
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        sql = (f"SELECT value::boolean FROM {self.cibs_project_name}.config_param_system "
+               f"WHERE parameter = 'admin_cibs_schema'")
+        row = tools_db.get_row(sql)
+        if row is None or row[0] is not True:
+            msg = "Selected schema must be adapted to cibs before copying data"
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        self._run_create_cibs_task(['copy_data_cibs'], 'Copy data to cibs')
 
     def _update_utils(self, schema_name=None):
         """Run the utils 'update' profile in place."""
