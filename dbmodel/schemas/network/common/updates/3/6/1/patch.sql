@@ -938,7 +938,7 @@ begin
 		FOREIGN KEY (province_id) REFERENCES ext_province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	
 	 end if;
-end; $$
+end; $$;
 
 
 DROP TRIGGER gw_trg_link_data ON link;

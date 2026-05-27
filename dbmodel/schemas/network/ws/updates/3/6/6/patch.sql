@@ -465,7 +465,7 @@ where id = 3256;
 
 
 
-. Manage null values on shortpipe status
+-- Manage null values on shortpipe status
 
 UPDATE config_form_fields set dv_querytext = 'SELECT DISTINCT (id) AS id, idval AS idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_value_status_shortpipe''' 
 WHERE formname in ('ve_epa_shortpipe', 'v_edit_inp_shortpipe') and columnname ='status';
