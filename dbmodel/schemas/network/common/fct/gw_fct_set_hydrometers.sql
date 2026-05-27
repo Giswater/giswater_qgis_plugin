@@ -118,8 +118,12 @@ BEGIN
 	-- REPLACE action: delete all existing hydrometers first
 	IF v_action = 'REPLACE' THEN
 		-- Count before deleting
-		SELECT count(*) INTO v_deleted FROM ext_rtc_hydrometer;
-		TRUNCATE ext_rtc_hydrometer CASCADE;
+		SELECT count(*) INTO v_deleted FROM v_hydrometer;
+		IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_cibs_schema') IS TRUE THEN
+			TRUNCATE cibs.hydrometer CASCADE;
+		ELSE
+			TRUNCATE ext_hydrometer CASCADE;
+		END IF;
 	END IF;
 
 	-- Process each hydrometer in the array
@@ -175,17 +179,17 @@ BEGIN
 			-- Delete hydrometer
 			IF v_code IS NOT NULL THEN
 				-- Check if exists first
-				SELECT EXISTS(SELECT 1 FROM ext_rtc_hydrometer WHERE code = v_code) INTO v_exists;
+				SELECT EXISTS(SELECT 1 FROM v_hydrometer WHERE code = v_code) INTO v_exists;
 
 				IF v_exists THEN
-					DELETE FROM ext_rtc_hydrometer WHERE code = v_code;
+					DELETE FROM v_hydrometer WHERE code = v_code;
 					v_deleted := v_deleted + 1;
 				END IF;
 			END IF;
 
 		ELSIF v_action IN ('INSERT', 'REPLACE') THEN
-			-- Insert into ext_rtc_hydrometer
-			INSERT INTO ext_rtc_hydrometer (
+			-- Insert into v_hydrometer
+			INSERT INTO v_hydrometer (
 				code,
 				hydro_number,
 				state_id,
@@ -219,7 +223,7 @@ BEGIN
 
 		ELSIF v_action = 'UPDATE' THEN
 			-- Check if hydrometer exists
-			SELECT EXISTS(SELECT 1 FROM ext_rtc_hydrometer WHERE code = v_code) INTO v_exists;
+			SELECT EXISTS(SELECT 1 FROM v_hydrometer WHERE code = v_code) INTO v_exists;
 
 			IF NOT v_exists THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"4454", "function":"3520","parameters":{"code":"'||v_code||'"}}}$$);';
@@ -227,7 +231,7 @@ BEGIN
 			END IF;
 
 			-- Build dynamic UPDATE query
-			v_query := 'UPDATE ext_rtc_hydrometer SET ';
+			v_query := 'UPDATE v_hydrometer SET ';
 
 			-- Add fields to update (only non-null fields)
 			IF v_hydro_number IS NOT NULL THEN
@@ -290,9 +294,9 @@ BEGIN
 
 			-- Update link if provided
 			IF v_link IS NOT NULL THEN
-				UPDATE ext_rtc_hydrometer SET link = v_link WHERE code = v_code;
+				UPDATE v_hydrometer SET link = v_link WHERE code = v_code;
 				IF NOT FOUND THEN
-					INSERT INTO ext_rtc_hydrometer (code, link) VALUES (v_code, v_link);
+					INSERT INTO v_hydrometer (code, link) VALUES (v_code, v_link);
 				END IF;
 			END IF;
 		END IF;

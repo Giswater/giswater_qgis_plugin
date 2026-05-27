@@ -331,7 +331,7 @@ BEGIN
 	)
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT result_id_arg, erh.hydrometer_id 
-	FROM ext_rtc_hydrometer erh
+	FROM v_hydrometer erh
 	JOIN connec c ON erh.customer_code = c.customer_code
 	WHERE erh.state_id IN (SELECT state_id FROM states)
 		AND EXISTS (
@@ -349,7 +349,7 @@ BEGIN
 	)
 	INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT result_id_arg, erh.hydrometer_id
-	FROM ext_rtc_hydrometer erh
+	FROM v_hydrometer erh
 	JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
 	JOIN node n ON n.node_id = mn.node_id
 	JOIN om_mincut_node omn ON n.node_id = omn.node_id
@@ -382,11 +382,11 @@ BEGIN
 
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM
-	(SELECT concat('{"category":"',hc.observ,'","number":"', count(v_rtc_hydrometer.hydrometer_id), '"}')::json as b
-			FROM v_rtc_hydrometer
-			JOIN connec c ON v_rtc_hydrometer.feature_id = c.connec_id
+	(SELECT concat('{"category":"',hc.observ,'","number":"', count(h.hydrometer_id), '"}')::json as b
+			FROM vf_hydrometer h
+			JOIN connec c ON c.customer_code::text = h.customer_code::text
 			JOIN om_mincut_connec omc ON c.connec_id=omc.connec_id
-			LEFT JOIN ext_hydrometer_category hc ON hc.id::text=v_rtc_hydrometer.category_id::text
+			LEFT JOIN v_cat_hydrometer_category hc ON hc.id::text=h.category_id::text
 			WHERE omc.result_id=result_id_arg
 			GROUP BY hc.observ ORDER BY hc.observ)a);
 

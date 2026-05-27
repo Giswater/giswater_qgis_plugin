@@ -33,7 +33,7 @@ DECLARE
 	v_datatype text;
 	v_defaultvalue text;
 	v_isutils boolean;
-	v_iscrm boolean;
+	v_iscibs boolean;
 	v_newname text;
 	v_querytext text;
 	v_layers record;
@@ -53,7 +53,7 @@ BEGIN
 	v_datatype = (p_data->>'data')::json->>'dataType';
 	v_defaultvalue = (p_data->>'data')::json->>'defaultValue';
 	v_isutils = (p_data->>'data')::json->>'isUtils';
-	v_iscrm = (p_data->>'data')::json->>'isCrm';
+	v_iscibs = (p_data->>'data')::json->>'iscibs';
 	v_newname = (p_data->>'data')::json->>'newName';
 
 
@@ -62,8 +62,8 @@ BEGIN
 	IF v_isutils IS TRUE AND (SELECT value::boolean FROM config_param_system WHERE parameter='admin_utils_schema') IS TRUE THEN
 		v_target_schemaname := 'utils';
 		v_target_table := replace(v_table, 'ext_', '');
-	ELSIF v_iscrm IS TRUE AND (SELECT value::boolean FROM config_param_system WHERE parameter='admin_crm_schema') IS TRUE THEN
-		v_target_schemaname := 'crm';
+	ELSIF v_iscibs IS TRUE AND (SELECT value::boolean FROM config_param_system WHERE parameter='admin_cibs_schema') IS TRUE THEN
+		v_target_schemaname := 'cibs';
 		v_target_table := replace(v_table, 'ext_', '');
 	ELSE
 		v_target_schemaname := v_schemaname;

@@ -191,7 +191,7 @@ BEGIN
 
 				DELETE FROM om_mincut_hydrometer WHERE result_id = v_mincut;
 
-				FOR v_id IN (SELECT hydrometer_id FROM v_rtc_hydrometer WHERE feature_id = v_connec::text) LOOP
+				FOR v_id IN (SELECT hydrometer_id FROM vf_hydrometer WHERE feature_id = v_connec::text) LOOP
 					INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id) VALUES (v_mincut, v_id);
 				END LOOP;
 

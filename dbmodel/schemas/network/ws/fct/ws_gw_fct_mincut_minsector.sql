@@ -182,7 +182,7 @@ BEGIN
 	-- insert hydrometer from connec
 	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT p_mincut_id, erh.hydrometer_id
-	FROM ext_rtc_hydrometer erh
+	FROM v_hydrometer erh
 	JOIN connec c ON erh.customer_code = c.customer_code
 	JOIN temp_om_mincut_connec ON c.connec_id=temp_om_mincut_connec.connec_id
 	JOIN value_state_type v ON state_type = v.id
@@ -191,7 +191,7 @@ BEGIN
 	-- insert hydrometer from node
 	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
 	SELECT p_mincut_id,erh.hydrometer_id
-	FROM ext_rtc_hydrometer erh
+	FROM v_hydrometer erh
 	JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
 	JOIN node n ON n.node_id = mn.node_id
 	JOIN temp_om_mincut_node ON n.node_id=temp_om_mincut_node.node_id
@@ -223,12 +223,12 @@ BEGIN
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(hydrometer_id), '"}')::json as b FROM
 				(SELECT h.hydrometer_id, h.category_id
-				FROM v_rtc_hydrometer h
+				FROM vf_hydrometer h
 				JOIN temp_om_mincut_connec ON h.feature_id=temp_om_mincut_connec.connec_id
 				WHERE h.feature_type = 'CONNEC'
 				union
 				SELECT h.hydrometer_id, h.category_id
-				FROM v_rtc_hydrometer h
+				FROM vf_hydrometer h
 				JOIN temp_om_mincut_node ON h.feature_id=temp_om_mincut_node.node_id
 				WHERE h.feature_type = 'NODE'
 				)a

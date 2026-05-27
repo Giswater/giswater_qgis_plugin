@@ -104,9 +104,9 @@ BEGIN
 	END IF;
 
 	-- log for hydrometer's state
-	SELECT count(*) INTO v_count FROM ext_rtc_hydrometer_state WHERE is_operative IS TRUE;
+	SELECT count(*) INTO v_count FROM v_cat_hydrometer_state WHERE is_operative IS TRUE;
 	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(id,'-',name) as c
-	FROM ext_rtc_hydrometer_state WHERE is_operative IS TRUE order by id) a;
+	FROM v_cat_hydrometer_state WHERE is_operative IS TRUE order by id) a;
 
 	IF v_count = 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4386", "prefix_id": "1002", "function":"2244", "fid":"216", "criticity":"2", "is_process":true, "tempTable":"temp_", "cur_user":"current_user"}}$$)';
@@ -421,20 +421,20 @@ BEGIN
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincutid, erh.hydrometer_id
-		FROM ext_rtc_hydrometer erh
+		FROM v_hydrometer erh
 		JOIN ve_connec c ON erh.customer_code=c.customer_code
 		JOIN om_mincut_connec omc ON c.connec_id=omc.connec_id
-		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=erh.hydrometer_id
+		LEFT JOIN vf_hydrometer ON vf_hydrometer.hydrometer_id=erh.hydrometer_id
 		WHERE omc.result_id=v_mincutid AND c.is_operative=TRUE
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincutid,erh.hydrometer_id
-		FROM ext_rtc_hydrometer erh
+		FROM v_hydrometer erh
 		JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
 		JOIN node n ON n.node_id = mn.node_id
 		JOIN om_mincut_node omn ON n.node_id=omn.node_id
-		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=erh.hydrometer_id
+		LEFT JOIN vf_hydrometer ON vf_hydrometer.hydrometer_id=erh.hydrometer_id
 		WHERE omn.result_id=v_mincutid
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
@@ -448,23 +448,23 @@ BEGIN
 		-- count hydrometers
 		SELECT count (*) INTO v_numhydrometer FROM
 		(SELECT omc.connec_id
-				FROM v_rtc_hydrometer
-				JOIN om_mincut_connec omc ON v_rtc_hydrometer.feature_id=omc.connec_id
+				FROM vf_hydrometer
+				JOIN om_mincut_connec omc ON vf_hydrometer.feature_id=omc.connec_id
 				WHERE omc.result_id=v_mincutid
 			UNION SELECT omn.node_id
-				FROM v_rtc_hydrometer
-				JOIN om_mincut_node omn ON v_rtc_hydrometer.feature_id=omn.node_id
+				FROM vf_hydrometer
+				JOIN om_mincut_node omn ON vf_hydrometer.feature_id=omn.node_id
 				WHERE omn.result_id=v_mincutid)a	;
 
 		-- priority hydrometers
 		v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(hydrometer_id), '"}')::json as b FROM
 				(SELECT h.hydrometer_id, h.category_id
-				FROM v_rtc_hydrometer h
+				FROM vf_hydrometer h
 				JOIN om_mincut_connec omc ON h.feature_id=omc.connec_id
 				WHERE omc.result_id=v_mincutid
 				union
 				SELECT h.hydrometer_id, h.category_id
-				FROM v_rtc_hydrometer h
+				FROM vf_hydrometer h
 				JOIN om_mincut_node omn ON h.feature_id=omn.node_id
 				WHERE omn.result_id=v_mincutid)a
 				GROUP BY category_id ORDER BY category_id)a)b;

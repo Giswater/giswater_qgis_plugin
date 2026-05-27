@@ -18,8 +18,8 @@ SELECT SCHEMA_NAME.gw_fct_import_hydrometer_x_data($${
 
 --fid:470
 
-SELECT * FROM ext_rtc_hydrometer_x_data
-DELETE FROM ext_rtc_hydrometer_x_data
+SELECT * FROM ext_hydrometer_data
+DELETE FROM ext_hydrometer_data
 
 
 */
@@ -55,7 +55,7 @@ BEGIN
 	FOR v_addfields IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
 		i = i+1;
-		INSERT INTO ext_rtc_hydrometer_x_data (hydrometer_id, cat_period_id, sum, value_date, value_type, value_status, value_state) VALUES
+		INSERT INTO v_hydrometer_data (hydrometer_id, cat_period_id, sum, value_date, value_type, value_status, value_state) VALUES
 		(v_addfields.csv1::integer, v_addfields.csv2, v_addfields.csv3::float, v_addfields.csv4::timestamp, v_addfields.csv5::integer, v_addfields.csv6::integer, v_addfields.csv7::integer);
 	END LOOP;
 

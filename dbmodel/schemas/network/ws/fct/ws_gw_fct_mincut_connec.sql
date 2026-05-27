@@ -57,7 +57,7 @@ BEGIN
 	-- get connecs when mincut class = 3
 	IF v_mincut_class=3 THEN
 		INSERT INTO om_mincut_connec (result_id, connec_id) 
-		SELECT DISTINCT ON (connec_id) result_id, connec_id FROM ext_rtc_hydrometer erh JOIN connec c ON erh.customer_code = c.customer_code JOIN om_mincut_hydrometer USING (hydrometer_id) 
+		SELECT DISTINCT ON (connec_id) result_id, connec_id FROM v_hydrometer erh JOIN connec c ON erh.customer_code = c.customer_code JOIN om_mincut_hydrometer USING (hydrometer_id) 
 		WHERE result_id = v_mincut ON CONFLICT (result_id, connec_id) DO NOTHING;
 	ELSIF v_mincut_class=2 THEN
 		UPDATE om_mincut_connec m SET the_geom=c.the_geom, customer_code=c.customer_code FROM connec c 
@@ -89,8 +89,8 @@ BEGIN
 	-- count priority hydrometers
 	v_priority = (SELECT (array_to_json(array_agg((b)))) FROM 
 	(SELECT concat('{"category":"',observ,'","number":"', count(om_mincut_hydrometer.hydrometer_id), '"}')::json as b FROM om_mincut_hydrometer 
-			JOIN v_rtc_hydrometer USING (hydrometer_id)
-			LEFT JOIN ext_hydrometer_category ON ext_hydrometer_category.id::text=v_rtc_hydrometer.category_id::text
+			JOIN vf_hydrometer USING (hydrometer_id)
+			LEFT JOIN v_cat_hydrometer_category ON v_cat_hydrometer_category.id::text=vf_hydrometer.category_id::text
 			WHERE result_id=v_mincut
 			GROUP BY observ ORDER BY observ)a);
 

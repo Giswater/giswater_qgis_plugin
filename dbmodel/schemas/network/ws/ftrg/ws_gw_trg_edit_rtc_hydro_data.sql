@@ -24,7 +24,7 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-        UPDATE ext_rtc_hydrometer_x_data 
+        UPDATE v_hydrometer_data 
         SET custom_sum=NEW.custom_sum
         WHERE id=OLD.id;
          -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

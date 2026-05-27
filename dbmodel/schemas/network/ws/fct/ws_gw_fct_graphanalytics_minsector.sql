@@ -374,12 +374,12 @@ BEGIN
     WITH
         hydrometer AS (
             SELECT erh.hydrometer_id, pgr_c.mapzone_id
-            FROM ext_rtc_hydrometer erh
+            FROM v_hydrometer erh
             JOIN connec c ON c.customer_code = erh.customer_code
             JOIN temp_pgr_connec pgr_c ON pgr_c.pgr_connec_id = c.connec_id
             UNION
             SELECT erh.hydrometer_id, pgr_n.mapzone_id
-            FROM ext_rtc_hydrometer erh
+            FROM v_hydrometer erh
             JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
             JOIN node n ON n.node_id = mn.node_id
             JOIN temp_pgr_node pgr_n ON pgr_n.pgr_node_id = n.node_id
@@ -388,7 +388,7 @@ BEGIN
         hydrometer_result AS (
             SELECT h.mapzone_id, count(*) AS num_hydro
             FROM hydrometer h
-            JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
+            JOIN v_hydrometer e ON e.hydrometer_id = h.hydrometer_id
             WHERE e.state_id IN (
                 SELECT (json_array_elements_text((value::json->>'1')::json))::INTEGER
                 FROM config_param_system

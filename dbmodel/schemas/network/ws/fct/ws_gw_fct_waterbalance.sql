@@ -124,11 +124,11 @@ v_queryhydro =
 		'WITH 
 			hydrometer AS (
 				SELECT h.hydrometer_id, c.dma_id
-				FROM ext_rtc_hydrometer h
+				FROM v_hydrometer h
 				JOIN connec c ON c.customer_code = h.customer_code
 				UNION 
 				SELECT h.hydrometer_id, n.dma_id
-				FROM ext_rtc_hydrometer h
+				FROM v_hydrometer h
 				JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
 				JOIN node n ON n.node_id = mn.node_id
 			),
@@ -142,7 +142,7 @@ v_queryhydro =
 				first_value(d.cat_period_id) OVER w AS last_cat_period_id,
 				first_value(p.end_date) OVER w::date AS last_end_date,
 				first_value(p.period_seconds) OVER w AS last_period_seconds
-				FROM ext_rtc_hydrometer_x_data d
+				FROM v_hydrometer_data d
 				JOIN ext_cat_period p ON d.cat_period_id = p.id
 				WINDOW w AS (PARTITION BY d.hydrometer_id ORDER BY p.end_date desc)
     		), 
@@ -158,7 +158,7 @@ v_queryhydro =
 			hydro_data_selected AS (
 				SELECT d.*
 				FROM hydro_data_calculat d
-				JOIN ext_rtc_hydrometer h ON d.hydrometer_id = h.hydrometer_id
+				JOIN v_hydrometer h ON d.hydrometer_id = h.hydrometer_id
 				WHERE h.end_date IS NULL
 			),
 			hydro_data_selected_expl AS (
@@ -307,11 +307,11 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				)
@@ -319,9 +319,9 @@ v_queryhydro =
 			SET auth_bill_met_hydro = a.value::numeric
 			FROM (
 				SELECT dma_id, (sum(d.sum))::numeric as value
-				FROM ext_rtc_hydrometer_x_data d
+				FROM v_hydrometer_data d
 				JOIN hydrometer h USING (hydrometer_id) 
-				JOIN ext_rtc_hydrometer e ON e.hydrometer_id = d.hydrometer_id
+				JOIN v_hydrometer e ON e.hydrometer_id = d.hydrometer_id
 				WHERE d.cat_period_id = '||quote_literal(v_period)||'::text 
 				AND (e.is_waterbal IS TRUE OR e.is_waterbal IS NULL)
 				GROUP BY dma_id
@@ -347,18 +347,18 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				)
 			SELECT count(DISTINCT d.hydrometer_id)
-			FROM ext_rtc_hydrometer_x_data d
+			FROM v_hydrometer_data d
 			JOIN hydrometer h USING (hydrometer_id) 
-			JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
+			JOIN v_hydrometer e ON e.hydrometer_id = h.hydrometer_id
 			JOIN om_waterbalance n ON n.dma_id = h.dma_id
 			WHERE (e.is_waterbal = TRUE OR e.is_waterbal IS NULL) 
 			AND n.cat_period_id = '||quote_literal(v_period) ||'::text 
@@ -411,11 +411,11 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				),
@@ -450,9 +450,9 @@ v_queryhydro =
 			FROM (
 				SELECT h.dma_id, 
 				sum(d.sum*(p.c_seconds/p.p_seconds))::numeric as value
-				FROM ext_rtc_hydrometer_x_data d
+				FROM v_hydrometer_data d
 				JOIN hydrometer h USING (hydrometer_id) 
-				JOIN ext_rtc_hydrometer e ON e.hydrometer_id = d.hydrometer_id
+				JOIN v_hydrometer e ON e.hydrometer_id = d.hydrometer_id
 				JOIN period_selected p USING (cat_period_id)
 				WHERE (e.is_waterbal IS TRUE OR e.is_waterbal IS NULL)
 				GROUP BY dma_id
@@ -479,11 +479,11 @@ v_queryhydro =
 			WITH 
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN connec c ON c.customer_code = h.customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
-					FROM ext_rtc_hydrometer h
+					FROM v_hydrometer h
 					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				),
@@ -514,10 +514,10 @@ v_queryhydro =
 					AND  p.start_date < p.enddate
 				)
 			SELECT count(DISTINCT d.hydrometer_id)
-			FROM ext_rtc_hydrometer_x_data d
+			FROM v_hydrometer_data d
 			JOIN period_selected p USING (cat_period_id)
 			JOIN hydrometer h ON h.hydrometer_id = d.hydrometer_id
-			JOIN ext_rtc_hydrometer e ON e.hydrometer_id = h.hydrometer_id
+			JOIN v_hydrometer e ON e.hydrometer_id = h.hydrometer_id
 			JOIN om_waterbalance n ON n.dma_id = h.dma_id
 			WHERE (e.is_waterbal = TRUE OR e.is_waterbal IS NULL) 
 			AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
@@ -541,7 +541,7 @@ v_queryhydro =
 		EXECUTE '
 		UPDATE om_waterbalance n SET n_hydro = coalesce(count_hydro,0) FROM 
 		(SELECT dma_id, count(erh.hydrometer_id) as count_hydro
-		FROM ext_rtc_hydrometer erh
+		FROM v_hydrometer erh
 		JOIN connec c ON erh.customer_code = c.customer_code
 		GROUP BY dma_id)a
 		WHERE n.dma_id = a.dma_id AND n.startdate::date = '||quote_literal(v_startdate)||'::date 

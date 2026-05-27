@@ -151,7 +151,7 @@ BEGIN
 		-- save previous values to set hydrometer selector
 		DELETE FROM temp_t_table WHERE fid=435 AND cur_user=current_user;
 		INSERT INTO temp_t_table (fid, text_column)
-		SELECT 435, (array_agg(id)) FROM ext_rtc_hydrometer_state;
+		SELECT 435, (array_agg(id)) FROM v_cat_hydrometer_state;
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 1/7 - Preprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;

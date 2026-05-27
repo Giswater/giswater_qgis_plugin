@@ -20,7 +20,7 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
         
-        --IF NEW.hydrometer_id IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
+        --IF NEW.hydrometer_id IN (SELECT id::varchar(16) from v_hydrometer) THEN
             RETURN NEW;
         --ELSE
             --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -33,7 +33,7 @@ BEGIN
         
     ELSIF TG_OP = 'DELETE' THEN
         
-        --IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from ext_rtc_hydrometer) THEN
+        --IF OLD.hydrometer_id NOT IN (SELECT id::varchar(16) from v_hydrometer) THEN
             RETURN OLD;
         --ELSE
             --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

@@ -213,7 +213,7 @@ BEGIN
 			    SELECT dma_id, count(*) AS n_connecs
 			    FROM connec WHERE state = 1 GROUP BY dma_id
 		    ), cc AS ( -- total hydrometers
-			    SELECT c.dma_id, count(erh.hydrometer_id) AS n_hydro FROM ext_rtc_hydrometer erh 
+			    SELECT c.dma_id, count(erh.hydrometer_id) AS n_hydro FROM v_hydrometer erh 
 			    JOIN connec c ON c.customer_code = erh.customer_code GROUP BY c.dma_id
 		    ), dd AS ( -- total pumps
 			    SELECT a.dma_id, count(a.node_id) AS n_pump FROM node a 

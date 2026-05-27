@@ -1623,7 +1623,7 @@ BEGIN
 		)
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, erh.hydrometer_id
-		FROM ext_rtc_hydrometer erh
+		FROM v_hydrometer erh
 		JOIN connec c ON erh.customer_code = c.customer_code
 		WHERE erh.state_id IN (SELECT state_id FROM states)
 		AND EXISTS (
@@ -1641,7 +1641,7 @@ BEGIN
 		)
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, erh.hydrometer_id
-		FROM ext_rtc_hydrometer erh
+		FROM v_hydrometer erh
 		JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
 		JOIN node n ON n.node_id = mn.node_id
 		WHERE erh.state_id IN (SELECT state_id FROM states)
@@ -1693,12 +1693,12 @@ BEGIN
 				SELECT
 					json_build_object(
 						'category', hc.observ,
-						'number', count(v_rtc_hydrometer.hydrometer_id)
+						'number', count(h.hydrometer_id)
 					) AS b
-				FROM v_rtc_hydrometer
-				JOIN connec c ON v_rtc_hydrometer.feature_id = c.connec_id
+				FROM vf_hydrometer h
+				JOIN connec c ON h.feature_id = c.connec_id
 				JOIN om_mincut_connec omc ON c.connec_id = omc.connec_id
-				LEFT JOIN ext_hydrometer_category hc ON hc.id::text = v_rtc_hydrometer.category_id::text
+				LEFT JOIN v_cat_hydrometer_category hc ON hc.id::text = h.category_id::text
 				WHERE omc.result_id = v_mincut_id
 				GROUP BY hc.observ
 				ORDER BY hc.observ
@@ -2144,7 +2144,7 @@ BEGIN
 						)
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 						SELECT v_mincut_affected_id, erh.hydrometer_id
-						FROM ext_rtc_hydrometer erh
+						FROM v_hydrometer erh
 						JOIN connec c ON erh.customer_code = c.customer_code
 						WHERE erh.state_id IN (SELECT state_id FROM states)
 						AND EXISTS (
@@ -2162,7 +2162,7 @@ BEGIN
 						)
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 						SELECT v_mincut_affected_id, erh.hydrometer_id
-						FROM ext_rtc_hydrometer erh
+						FROM v_hydrometer erh
 						JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
 						JOIN node n ON n.node_id = mn.node_id
 						WHERE erh.state_id IN (SELECT state_id FROM states)
@@ -2271,12 +2271,12 @@ BEGIN
 								SELECT
 									json_build_object(
 										'category', hc.observ,
-										'number', count(v_rtc_hydrometer.hydrometer_id)
+										'number', count(h.hydrometer_id)
 									) AS b
-								FROM v_rtc_hydrometer
-								JOIN connec c ON v_rtc_hydrometer.feature_id = c.connec_id
+								FROM vf_hydrometer h
+								JOIN connec c ON h.feature_id = c.connec_id
 								JOIN om_mincut_connec omc ON c.connec_id = omc.connec_id
-								LEFT JOIN ext_hydrometer_category hc ON hc.id::text = v_rtc_hydrometer.category_id::text
+								LEFT JOIN v_cat_hydrometer_category hc ON hc.id::text = h.category_id::text
 								WHERE omc.result_id = v_mincut_affected_id
 								GROUP BY hc.observ
 								ORDER BY hc.observ

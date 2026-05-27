@@ -250,7 +250,7 @@ BEGIN
 
 				-- hydrometer control
 				SELECT count(*) INTO v_num_feature
-				FROM ext_rtc_hydrometer erh
+				FROM v_hydrometer erh
 					JOIN connec c ON c.customer_code = erh.customer_code
 				WHERE c.connec_id = feature_id_aux
                 	AND erh.state_id IN (
@@ -276,7 +276,7 @@ BEGIN
 
 				-- hydrometer control
 				SELECT count(*) INTO v_num_feature
-				FROM ext_rtc_hydrometer erh
+				FROM v_hydrometer erh
 					JOIN connec c ON c.customer_code = erh.customer_code
 				WHERE c.connec_id = feature_id_aux
                 	AND erh.state_id IN (
