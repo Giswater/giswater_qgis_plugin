@@ -172,7 +172,6 @@ class GwAdminButton:
         self.project_epsg = project_srid
         self.folder_final_pass = os.path.join(self.sql_dir, 'schemas', 'network', project_type, 'final_pass')
         self.folder_locale = os.path.join(self.folder_final_pass, 'i18n')
-        self.folder_childviews = os.path.join(self.sql_dir, 'childviews', self.locale)
 
         # If the locale is no_TR, act as if it was en_US, but disable translation files
         self.locale = project_locale

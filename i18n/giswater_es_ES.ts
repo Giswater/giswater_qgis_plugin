@@ -10369,14 +10369,6 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 			<translation>Crear, configurar o eliminar un campo adicional relacionado con un tipo de entidad seleccionada o para todos los tipos de elementos definidos en un proyecto.</translation>
 		</message>
 		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Administrar vistas secundarias</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Recrear vistas secundarias para un tipo de elemento seleccionado o para todos los tipos de elementos definidos en un proyecto</translation>
-		</message>
-		<message>
 			<source>grb_manage_sys_fields</source>
 			<translation>Administrar campos de sistema</translation>
 		</message>

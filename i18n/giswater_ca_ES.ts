@@ -10367,14 +10367,6 @@
 			<translation>Crear, configurar o eliminar un camp adicional relacionat amb un tipus d&apos;entitat seleccionada o per a tots els tipus d&apos;elements definits en un projecte.</translation>
 		</message>
 		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Administrar vistes secundaries</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Recrear vistes secundaries per a un tipus d&apos;element seleccionat o per a tot tipus d&apos;elements definits en un projecte.</translation>
-		</message>
-		<message>
 			<source>grb_manage_sys_fields</source>
 			<translation>Administrar camps de sistema</translation>
 		</message>

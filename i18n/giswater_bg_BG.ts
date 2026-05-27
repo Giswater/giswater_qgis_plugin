@@ -5298,11 +5298,15 @@
 			<translation>Полето &quot;Път&quot; се изисква за данни за внос на INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>Процедурата ще изтрие характеристики в базата данни, освен ако не е възел, който не разделя дъга.\n
- Моля, уверете се, че функциите нямат стойност за изтриване true.\n
+			<translation>Процедурата ще изтрие характеристики в базата данни, освен ако не е възел, който не разделя дъга.\n
+
+ Моля, уверете се, че функциите нямат стойност за изтриване true.\n
+
  От друга страна, трябва да знаете, че в таблицата за проследимост ще се съхранява предходна информация.</translation>
 		</message>
 		<message>
@@ -10363,14 +10367,6 @@
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
 			<translation>Създаване, конфигуриране или премахване на допълнително поле, свързано с избран тип функция или за всички типове функции, дефинирани в проекта</translation>
-		</message>
-		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Управление на подчинени изгледи</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Пресъздаване на подчинени изгледи за избран тип функция или за всички типове функции, дефинирани в проекта</translation>
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>

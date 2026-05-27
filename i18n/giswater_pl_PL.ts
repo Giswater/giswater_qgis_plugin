@@ -5298,11 +5298,15 @@
 			<translation>Pole &quot;Ścieżka&quot; jest wymagane w przypadku importu danych INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>Procedura usunie cechy w bazie danych, chyba że jest to węzeł, który nie dzieli łuku.
- Upewnij się, że cechy nie mają wartości undelete na true.\n
+			<translation>Procedura usunie cechy w bazie danych, chyba że jest to węzeł, który nie dzieli łuku.
+
+ Upewnij się, że cechy nie mają wartości undelete na true.\n
+
  Z drugiej strony musisz wiedzieć, że tabela identyfikowalności będzie przechowywać informacje poprzedzające.</translation>
 		</message>
 		<message>
@@ -10363,14 +10367,6 @@
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
 			<translation>Utwórz, skonfiguruj lub usuń dodatkowe pole związane z wybranym typem funkcji lub dla wszystkich typów funkcji zdefiniowanych w projekcie.</translation>
-		</message>
-		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Zarządzanie widokami podrzędnymi</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Odtwarzanie widoków podrzędnych dla wybranego typu funkcji lub dla wszystkich typów funkcji zdefiniowanych w projekcie.</translation>
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>
