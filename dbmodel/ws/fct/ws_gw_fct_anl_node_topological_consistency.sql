@@ -65,7 +65,7 @@ BEGIN
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
-		v_query_text := 'AND vn.node_id = ANY($1)';
+		v_query_text := 'AND vn.node_id = ANY(' || quote_literal(v_array) || ')';
 	ELSE
 		v_query_text := '';
 	END IF;
@@ -82,8 +82,7 @@ BEGIN
 		%s
 		GROUP BY vn.node_id, vn.nodecat_id, vn.state, vn.expl_id, vn.the_geom, cfn.num_arcs
 		HAVING COUNT(*) <> cfn.num_arcs
-	$sql$, v_worklayer, v_query_text)
-	USING v_array;
+	$sql$, v_worklayer, v_query_text);
 
 	-- set selector
 	DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
