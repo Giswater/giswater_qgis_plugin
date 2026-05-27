@@ -39,6 +39,9 @@ v_node_aux record;
 v_error_context text;
 v_count integer;
 
+-- query variables
+v_query_text text;
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -62,68 +65,25 @@ BEGIN
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, expl_id, fid, the_geom)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id 
-				WHERE num_arcs=4 AND node_id IN ('||v_array ||')
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 4
-				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id 
-				WHERE num_arcs=3 AND node_id IN ('||v_array ||')
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 3
-				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id 
-				WHERE num_arcs=2 AND node_id IN ('||v_array ||')
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 2
-				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id 
-				WHERE num_arcs=1 AND node_id IN ('||v_array ||')
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 1;';
+		v_query_text := 'AND vn.node_id = ANY($1)';
 	ELSE
-		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, expl_id, fid, the_geom)
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id WHERE num_arcs=4
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 4
-				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id WHERE num_arcs=3
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 3
-				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id WHERE num_arcs=2
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 2
-				UNION
-				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
-				FROM '||v_worklayer||' 
-				JOIN ve_arc ON ve_arc.node_1 = '||v_worklayer||'.node_id OR ve_arc.node_2 = '||v_worklayer||'.node_id
-				JOIN cat_feature_node ON node_type=id WHERE num_arcs=1
-				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
-				HAVING COUNT(*) != 1;';
+		v_query_text := '';
 	END IF;
+
+	EXECUTE format($sql$
+		INSERT INTO anl_node (node_id, nodecat_id, state, descript, num_arcs, expl_id, fid, the_geom)
+		SELECT vn.node_id, vn.nodecat_id, vn.state, cfn.num_arcs as descript, COUNT(*) AS num_arcs, vn.expl_id, 108 AS fid, vn.the_geom
+		FROM %I vn
+		JOIN cat_feature_node cfn ON vn.node_type = cfn.id
+		JOIN arc a ON a.node_1 = vn.node_id OR a.node_2 = vn.node_id
+		WHERE EXISTS (SELECT 1 FROM vf_arc vfa WHERE a.arc_id = vfa.arc_id)
+		AND cfn.num_arcs > 0
+		AND cfn.num_arcs <= 4
+		%s
+		GROUP BY vn.node_id, vn.nodecat_id, vn.state, vn.expl_id, vn.the_geom, cfn.num_arcs
+		HAVING COUNT(*) <> cfn.num_arcs
+	$sql$, v_worklayer, v_query_text)
+	USING v_array;
 
 	-- set selector
 	DELETE FROM selector_audit WHERE fid=108 AND cur_user=current_user;
@@ -143,7 +103,7 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
-    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, ST_Transform(the_geom, 4326) as the_geom, num_arcs
+    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript as expected_num_arcs,fid, ST_Transform(the_geom, 4326) as the_geom, num_arcs
     FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
 
   	v_result_point = v_result;
