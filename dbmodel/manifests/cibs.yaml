@@ -1,0 +1,38 @@
+# Corporate cibs schema manifest.
+#
+# `schemas/cibs/base/` bootstraps the shared `cibs` schema.
+# `integrate_cibs` / `copy_data_cibs` run against a parent ws OR ud
+# schema; steps use `schema_override` so SCHEMA_NAME resolves to the
+# parent project schema, not `cibs`.
+
+kind: cibs
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base_schema
+    type: sql_dir
+    description: "Bootstrap cibs schema: base."
+    steps:
+      - { source: "schemas/cibs/base",  recursive: false }
+
+  - id: integrate_cibs
+    type: sql_dir
+    description: "Integrate cibs with the parent schema (ws/ud)."
+    steps:
+      - source: "schemas/cibs/{{ parent_type }}/ddl.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cibs/{{ parent_type }}/ddlview.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/cibs/{{ parent_type }}/dml.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+profiles:
+  empty:
+    phases: [load_base_schema]
+  integrate:
+    phases: [integrate_cibs]
