@@ -67,9 +67,15 @@ class ConnectionLike(Protocol):
 
 def list_sql_files(folder: str, recursive: bool = False) -> list[str]:
     """List ``.sql`` files in ``folder``. Stable alphabetical order."""
-    if not os.path.isdir(folder):
-        return []
     out: list[str] = []
+
+    if not os.path.exists(folder):
+        return out
+
+    if not os.path.isdir(folder):
+        out.append(folder)
+        return out
+
     if recursive:
         for root, _dirs, files in os.walk(folder):
             for name in sorted(files):
