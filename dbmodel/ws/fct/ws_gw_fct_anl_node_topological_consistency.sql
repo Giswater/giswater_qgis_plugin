@@ -34,7 +34,7 @@ v_result_info json;
 v_result_point json;
 v_selectionmode text;
 v_worklayer text;
-v_array text;
+v_array integer[];
 v_node_aux record;
 v_error_context text;
 v_count integer;
@@ -61,7 +61,7 @@ BEGIN
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 
-	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+	v_array := (SELECT array_agg(a::integer) FROM json_array_elements_text(v_id) a);
 
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN

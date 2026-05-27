@@ -27,7 +27,7 @@ v_worklayer text;
 v_result json;
 v_result_info json;
 v_result_line json;
-v_array text;
+v_array integer[];
 v_version text;
 v_error_context text;
 v_count integer;
@@ -52,7 +52,7 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_checktype := ((p_data ->>'data')::json->>'parameters')::json->>'checkType';
 
-	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+	v_array := (SELECT array_agg(a::integer) FROM json_array_elements_text(v_id) a);
 
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
