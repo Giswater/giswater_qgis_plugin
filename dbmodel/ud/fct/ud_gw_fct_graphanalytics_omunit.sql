@@ -69,10 +69,11 @@ DECLARE
 
 	-- LOCK LEVEL LOGIC
 	v_original_disable_locklevel json;
+	v_original_disable_fkarray text;
 
     -- general variables
     v_root_vids int[];
-    
+
 BEGIN
 
 	-- Search path
@@ -126,7 +127,6 @@ BEGIN
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;
     END IF;
-
 
 	-- Starting process
 	EXECUTE 'SELECT gw_fct_getmessage($${"data":{"function":"3492", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true", "separator_id":"2049", "tempTable":"temp_"}}$$)';
@@ -644,6 +644,11 @@ BEGIN
 
     ELSE 
 
+        SELECT value INTO v_original_disable_fkarray FROM config_param_user
+        WHERE parameter = 'edit_disable_arc_fkarray' AND cur_user = current_user;
+        UPDATE config_param_user SET value = 'true'
+        WHERE parameter = 'edit_disable_arc_fkarray' AND cur_user = current_user;
+
         -- update TABLES
         -----------------
 
@@ -862,8 +867,13 @@ BEGIN
 	-- Restore original disable lock level
     UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
+    IF v_commitchanges THEN
+        UPDATE config_param_user SET value = COALESCE(v_original_disable_fkarray, 'false')
+        WHERE parameter = 'edit_disable_arc_fkarray' AND cur_user = current_user;
+    END IF;
+
     -- Return
-    	RETURN gw_fct_json_create_return(('{
+    v_result := gw_fct_json_create_return(('{
 		"status":"'||v_status||'",
 		"message":{
 			"level":'||v_level||',
@@ -877,6 +887,8 @@ BEGIN
 			}
 		}
 	}')::json, 3492, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
+
+    RETURN v_result;
 
 	EXCEPTION WHEN OTHERS THEN
 		GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
@@ -895,3 +907,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+  
