@@ -12,6 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 UPDATE config_function SET id = 2212 WHERE id = 2302;
 
 DELETE FROM sys_function WHERE id = 3404;
+DELETE FROM config_function WHERE id IN (3064, 3066);
 
 UPDATE config_function c SET id = s.id
 FROM sys_function s
