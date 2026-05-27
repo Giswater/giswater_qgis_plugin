@@ -82,21 +82,21 @@ phases:
     optional: true
     description: "Sample 'user' data for ws."
     steps:
-      - { source: "schemas/network/sample/user/ws", recursive: false }
+      - { source: "schemas/network/ws/sample/user", recursive: false }
 
   - id: load_inv
     type: sql_dir
     optional: true
     description: "Inventory-only fixtures on top of sample. v1 = subtractive."
     steps:
-      - { source: "schemas/network/sample/inv/ws", recursive: false }
+      - { source: "schemas/network/ws/sample/inv", recursive: false }
 
   - id: load_dev
     type: sql_dir
     optional: true
     description: "Dev fixtures. Reachable via CLI --profile dev."
     steps:
-      - { source: "schemas/network/sample/dev/ws", recursive: false }
+      - { source: "schemas/network/ws/sample/dev", recursive: false }
 
   - id: final_pass
     type: sql_dir

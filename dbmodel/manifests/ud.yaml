@@ -68,19 +68,19 @@ phases:
     type: sql_dir
     optional: true
     steps:
-      - { source: "schemas/network/sample/user/ud", recursive: false }
+      - { source: "schemas/network/ud/sample/user", recursive: false }
 
   - id: load_inv
     type: sql_dir
     optional: true
     steps:
-      - { source: "schemas/network/sample/inv/ud", recursive: false }
+      - { source: "schemas/network/ud/sample/inv", recursive: false }
 
   - id: load_dev
     type: sql_dir
     optional: true
     steps:
-      - { source: "schemas/network/sample/dev/ud", recursive: false }
+      - { source: "schemas/network/ud/sample/dev", recursive: false }
 
   - id: final_pass
     type: sql_dir

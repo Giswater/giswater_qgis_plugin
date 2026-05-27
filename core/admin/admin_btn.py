@@ -1159,7 +1159,7 @@ class GwAdminButton:
         # Legacy path; upgrade changelog UI uses giswater_admin.engine.changelog
         # (common + ws|ud under schemas/network/*/updates).
         self.folder_updates = os.path.join(self.folder_common, 'updates')
-        self.folder_sample = os.path.join(self.sql_dir, 'schemas', 'network', 'sample')
+        self.folder_sample = os.path.join(self.folder_software, 'sample')
 
         # Declare asset db folders
         self.sql_asset_dir = os.path.join(self.sql_dir, 'schemas', 'am')

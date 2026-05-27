@@ -58,7 +58,7 @@ dbmodel/
 | `audit` | singleton | [`schemas/audit/`](./schemas/audit/) | No semver tree; `audit structure` / `activate` via CLI |
 
 [`schemas/network/common/`](./schemas/network/common/) — DDL, functions, triggers, and shared update patches used by **both** `ws` and `ud`.  
-[`schemas/network/sample/`](./schemas/network/sample/) — Seed scripts (`user/`, `inv/`, `dev/`) referenced by optional manifest phases.
+[`schemas/network/{ws,ud}/sample/`](./schemas/network/ws/sample/) — Seed scripts (`user/`, `inv/`, `dev/`) referenced by optional manifest phases.
 
 ### How manifests drive a build
 
@@ -80,7 +80,7 @@ Example **ws** pipeline ([`manifests/ws.yaml`](./manifests/ws.yaml)):
 | `load_base` | `sql_dir` | `common/ddl`, `common/fct`, `common/ftrg`, then `ws/fct`, `ws/ftrg`, `ws/schema_model` |
 | `updates` | `version_walk` | For each version ≤ `--plugin-version`: **common** patches, then **ws** patches |
 | `lastprocess` | `sql_function` | `gw_fct_admin_schema_lastprocess` (child views, permissions, metadata) |
-| `load_sample` | `sql_dir` (optional) | `schemas/network/sample/user/ws` |
+| `load_sample` | `sql_dir` (optional) | `schemas/network/ws/sample/user` |
 | `final_pass` | `sql_dir` | Form fields + i18n (`{{ locale }}`, fallback `en_US`) |
 
 **Upgrade profile** (`update`): `reload_fct_ftrg` → `updates` (only `project_version < v <= plugin_version`) → `lastprocess_upgrade`.
@@ -132,7 +132,7 @@ flowchart LR
 - **One codebase, two project schemas:** shared logic lives in `common/`; type-specific pieces in `ws/` or `ud/`.
 - **Version order:** for each `M.m.p`, the engine applies **all** `common` SQL for that version, then **all** `ws` or `ud` SQL for that version, before moving to the next version.
 - **`lastprocess`:** server-side bookkeeping (child views, role grants batched at end of MULTI-CREATE, sequences, mapzone defaults).
-- **`sample/`:** only when the manifest profile includes `load_sample`, `load_inv`, or `load_dev`.
+- **`sample/`:** only when the manifest profile includes `load_sample`, `load_inv`, or `load_dev`. Lives under each project type (`schemas/network/ws/sample/`, `schemas/network/ud/sample/`), like `final_pass/`.
 
 ### Version walk rules
 

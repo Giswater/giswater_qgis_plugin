@@ -15214,7 +15214,3 @@ INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, c
 ('config_engine_def', 'Table to define engines configuration', 'role_om', NULL, '34', NULL, 'Config engine', NULL, NULL, NULL, 'am', NULL),
 ('config_material_def', 'Table to define the materials', 'role_om', NULL, '34', NULL, 'Config material', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM PARENT_SCHEMA.cat_material WHERE active = true;
-
-INSERT INTO config_catalog_def SELECT id AS arccat_id, dnom::NUMERIC, round(dnom::NUMERIC * 3 / 5 + 70) AS cost_constr, round(dnom::NUMERIC * 9 / 5 + 310) AS cost_repmain, 10 AS compliance FROM PARENT_SCHEMA.cat_arc WHERE dnom IS NOT NULL;
