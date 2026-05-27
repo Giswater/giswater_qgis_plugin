@@ -1,5 +1,3 @@
-3.6.21
-*************
 - Bug fix on import_inp_timeseries
 - Add variable to choose if mincuts could be only deleted by its creator or by all users
 - Sanitize config_toolbox to avoid errors when setting default values

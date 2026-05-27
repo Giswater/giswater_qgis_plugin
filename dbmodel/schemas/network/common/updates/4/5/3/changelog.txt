@@ -1,5 +1,3 @@
-4.5.3
-*************
 - Fix `cat_arc` `area` translation on es_CR
 - translate(config_param_system) `admin_currency`
 - Fix `config_fprocess` add rpt_arc_stats and rpt_node_stats entries

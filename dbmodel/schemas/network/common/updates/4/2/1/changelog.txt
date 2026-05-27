@@ -1,3 +1,1 @@
-4.2.1
-*************
 - Fix graphical error log of go2epa

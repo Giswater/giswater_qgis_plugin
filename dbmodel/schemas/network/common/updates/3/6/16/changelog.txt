@@ -1,5 +1,3 @@
-3.6.16
-*************
 - Update timser_id combo of raingage showing only active timeseries with Rainfall type
 - Enhance performance for v_edit_node
 - Enable see expl_id2 objects when only expl_id is selected by managing sector_id

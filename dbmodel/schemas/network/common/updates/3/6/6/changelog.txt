@@ -1,5 +1,3 @@
-3.6.6
-*************
 - Minor bug fix
 - New function to merge psectors (gw_fct_psector_merge)
 - Adjustent of fk for catalogs on inp tables (moving from on delete cascade to restrict)

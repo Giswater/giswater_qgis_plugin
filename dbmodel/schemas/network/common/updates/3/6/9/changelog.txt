@@ -1,5 +1,3 @@
-3.6.9
-*************
 - Minor bug fix for ud & ws projects.
 - Minor fix spelling.
 - Update builtdate on sample (ws/ud).

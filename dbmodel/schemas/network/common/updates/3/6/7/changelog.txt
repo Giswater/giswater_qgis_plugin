@@ -1,5 +1,3 @@
-3.6.7
-*************
 - Refactor of the creation of projects (empty, inventory, full and import inp)
 - Add selector period strategy on selector
 - Drop not null for dma's (ud and ws)

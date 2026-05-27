@@ -1,5 +1,3 @@
-4.8.1
-*************
 - Fix `gw_trg_arc_node_values` trigger on ws schemas.
 - Fix `gw_fct_graphanalytics_macromapzones` streamline temporary table management.
 - Fix `gw_fct_pg2epa_export_inp` add alias for emitter_coeff.

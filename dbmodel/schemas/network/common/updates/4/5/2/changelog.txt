@@ -1,5 +1,3 @@
-4.5.2
-*************
 - Fix psector translations
 - Fix initproject
 - Fix config_form_fields dma

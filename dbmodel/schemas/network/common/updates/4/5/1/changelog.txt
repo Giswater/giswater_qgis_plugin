@@ -1,5 +1,3 @@
-4.5.1
-*************
 - Fix psector merge
 - Fix psector duplicate
 - Fix psector topology when duplicated nodes are found

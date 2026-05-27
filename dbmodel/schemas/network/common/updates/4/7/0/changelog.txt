@@ -1,5 +1,3 @@
-4.7.0
-*************
 - refactor(topology): refactor UD tepology fields
 - remove: sys_code unique
 - fix: graphinundation

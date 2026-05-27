@@ -1,5 +1,3 @@
-4.1.0
-*************
 - Recreate all giswater views
 - Remove vp_basic_* views & Remove from sys_table
 - Variable currency on getformfields for Plan tab on feature forms

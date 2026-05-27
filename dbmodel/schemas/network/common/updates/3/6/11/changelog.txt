@@ -1,5 +1,3 @@
-3.6.11
-*************
 - Rename config_graph_inlet to config_graph_mincut.
 - Remove expl_id from config_graph_mincut due it is redudant
 - Disable mincut if user has not any inlet on canvas to work with

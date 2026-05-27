@@ -25,7 +25,7 @@ UPDATE config_form_tableview SET alias = 'Presszone' WHERE objectname = 'cat_res
 UPDATE config_form_tableview SET alias = 'Material' WHERE objectname = 'cat_result' AND columnname = 'material_id';
 
 
--- 21/11/2025
+
 -- DELETE OLD ONES
 DELETE FROM PARENT_SCHEMA.sys_table WHERE id IN ('arc_output', 'ext_arc_asset', 'leaks', 'v_asset_arc_input', 'v_asset_arc_corporate', 'v_asset_arc_output', 'v_asset_arc_output_compare') AND source = 'am';
 DELETE FROM PARENT_SCHEMA.config_typevalue WHERE typevalue = 'sys_table_context' AND id = '{"levels": ["AM", "LAYERS"]}';

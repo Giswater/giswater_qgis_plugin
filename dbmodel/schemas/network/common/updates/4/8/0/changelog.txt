@@ -1,5 +1,3 @@
-4.8.0
-*************
 - refactor(doc): convert doc_id to integer
 - feat(graphanalytics): improve fluid_type and treatment_type temporal layers
 - feat(graphanalytics): show warning when commitchange and use psector are true
