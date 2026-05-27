@@ -5233,7 +5233,7 @@ AS SELECT DISTINCT p.id,
 -- left join inp_frweir w using (flwreg_id);
 
 
- [Modified]
+-- [Modified]
 --create view for cat_feature_flwreg
 
 

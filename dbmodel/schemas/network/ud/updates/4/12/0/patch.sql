@@ -15,84 +15,6 @@ SELECT * FROM ext_hydrometer;
 CREATE OR REPLACE VIEW v_hydrometer_data AS
 SELECT * FROM ext_hydrometer_data;
 
-CREATE OR REPLACE VIEW vf_hydrometer AS
-WITH sel_expl AS (
-    SELECT selector_expl.expl_id
-    FROM selector_expl
-    WHERE selector_expl.cur_user = CURRENT_USER
-)
-SELECT
-    v_hydrometer.hydrometer_id,
-    v_hydrometer.code AS hydrometer_customer_code,
-    connec.connec_id AS feature_id,
-    'CONNEC'::text AS feature_type,
-    COALESCE(
-        v_hydrometer.customer_code,
-        'XXXX'::character varying
-    ) AS customer_code,
-    cat_hydrometer_state.name AS state,
-    v_municipality.name AS muni_name,
-    connec.expl_id,
-    exploitation.name AS expl_name,
-    v_hydrometer.plot_code,
-    v_hydrometer.priority_id,
-    v_hydrometer.catalog_id,
-    v_hydrometer.category_id,
-    v_hydrometer.hydro_number,
-    v_hydrometer.hydro_man_date,
-    v_hydrometer.crm_number,
-    v_hydrometer.customer_name,
-    v_hydrometer.address1,
-    v_hydrometer.address2,
-    v_hydrometer.address3,
-    v_hydrometer.address2_1,
-    v_hydrometer.address2_2,
-    v_hydrometer.address2_3,
-    v_hydrometer.m3_volume,
-    v_hydrometer.start_date,
-    v_hydrometer.end_date,
-    v_hydrometer.update_date,
-    concat(
-        COALESCE(
-            (SELECT config_param_system.value
-            FROM config_param_system
-            WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)
-            , ''
-        ),
-        v_hydrometer.link
-    ) AS hydrometer_link,
-    cat_hydrometer_state.is_operative,
-    v_hydrometer.shutdown_date
-FROM v_hydrometer
-    JOIN ext_cat_hydrometer_state ON cat_hydrometer_state.id = v_hydrometer.state_id
-    JOIN connec ON connec.customer_code::text = v_hydrometer.customer_code::text
-    LEFT JOIN v_municipality ON v_municipality.muni_id = connec.muni_id
-    LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
-WHERE EXISTS (
-    SELECT 1
-    FROM sel_expl
-    WHERE sel_expl.expl_id = connec.expl_id
-);
-
-CREATE OR REPLACE VIEW ve_hydrometer_data AS
-SELECT v_hydrometer_data.id,
-    connec.connec_id AS feature_id,
-    v_hydrometer_data.hydrometer_id,
-    v_hydrometer.code,
-    v_hydrometer.catalog_id,
-    v_hydrometer_data.cat_period_id,
-    ext_cat_period.code AS cat_period_code,
-    v_hydrometer_data.value_date,
-    v_hydrometer_data.sum,
-    v_hydrometer_data.custom_sum,
-    'CONNEC'::text AS feature_type
-FROM v_hydrometer_data
-    JOIN v_hydrometer ON v_hydrometer_data.hydrometer_id::bigint = v_hydrometer.hydrometer_id::bigint
-    LEFT JOIN ext_cat_hydrometer ON cat_hydrometer.id::bigint = v_hydrometer.catalog_id::bigint
-    JOIN connec ON connec.customer_code::text = v_hydrometer.customer_code::text
-    JOIN ext_cat_period ON v_hydrometer_data.cat_period_id::text = ext_cat_period.id::text
-ORDER BY v_hydrometer_data.hydrometer_id, v_hydrometer_data.cat_period_id DESC;
-
 CREATE OR REPLACE VIEW v_cat_hydrometer AS
 SELECT * FROM ext_cat_hydrometer;
 
@@ -107,6 +29,84 @@ SELECT * FROM ext_cat_hydrometer_type;
 
 CREATE OR REPLACE VIEW v_cat_hydrometer_category AS
 SELECT * FROM ext_cat_hydrometer_category;
+
+CREATE OR REPLACE VIEW vf_hydrometer AS
+WITH sel_expl AS (
+    SELECT selector_expl.expl_id
+    FROM selector_expl
+    WHERE selector_expl.cur_user = CURRENT_USER
+)
+SELECT
+    vh.hydrometer_id,
+    vh.code AS hydrometer_customer_code,
+    connec.connec_id AS feature_id,
+    'CONNEC'::text AS feature_type,
+    COALESCE(
+        vh.customer_code,
+        'XXXX'::character varying
+    ) AS customer_code,
+    vchs.name AS state,
+    v_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    vh.plot_code,
+    vh.priority_id,
+    vh.catalog_id,
+    vh.category_id,
+    vh.hydro_number,
+    vh.hydro_man_date,
+    vh.crm_number,
+    vh.customer_name,
+    vh.address1,
+    vh.address2,
+    vh.address3,
+    vh.address2_1,
+    vh.address2_2,
+    vh.address2_3,
+    vh.m3_volume,
+    vh.start_date,
+    vh.end_date,
+    vh.update_date,
+    concat(
+        COALESCE(
+            (SELECT config_param_system.value
+            FROM config_param_system
+            WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)
+            , ''
+        ),
+        vh.link
+    ) AS hydrometer_link,
+    vchs.is_operative,
+    vh.shutdown_date
+FROM v_hydrometer vh
+    JOIN v_cat_hydrometer_state vchs ON vchs.id = vh.state_id
+    JOIN connec ON connec.customer_code::text = vh.customer_code::text
+    LEFT JOIN v_municipality ON v_municipality.muni_id = connec.muni_id
+    LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+WHERE EXISTS (
+    SELECT 1
+    FROM sel_expl
+    WHERE sel_expl.expl_id = connec.expl_id
+);
+
+CREATE OR REPLACE VIEW ve_hydrometer_data AS
+SELECT vhd.id,
+    connec.connec_id AS feature_id,
+    vhd.hydrometer_id,
+    vh.code,
+    vh.catalog_id,
+    vhd.cat_period_id,
+    cp.code AS cat_period_code,
+    vhd.value_date,
+    vhd.sum,
+    vhd.custom_sum,
+    'CONNEC'::text AS feature_type
+FROM v_hydrometer_data vhd
+    JOIN v_hydrometer vh ON vhd.hydrometer_id::bigint = vh.hydrometer_id::bigint
+    LEFT JOIN v_cat_hydrometer vch ON vch.id::bigint = vh.catalog_id::bigint
+    JOIN connec ON connec.customer_code::text = vh.customer_code::text
+    JOIN ext_cat_period cp ON vhd.cat_period_id::text = cp.id::text
+ORDER BY vhd.hydrometer_id, vhd.cat_period_id DESC;
 
 UPDATE config_form_fields
 SET dv_querytext='SELECT name as id, name as idval FROM v_cat_hydrometer_state WHERE id IS NOT NULL'
