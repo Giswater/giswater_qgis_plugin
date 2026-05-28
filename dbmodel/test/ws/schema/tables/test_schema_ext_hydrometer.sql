@@ -34,7 +34,7 @@ SELECT columns_are(
 -- Check column types
 SELECT col_type_is('ext_hydrometer', 'hydrometer_id', 'int4', 'Column hydrometer_id should be int4');
 SELECT col_type_is('ext_hydrometer', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('ext_hydrometer', 'hydro_customer_code', 'varchar(30)', 'Column hydro_customer_code should be varchar(30)');
+SELECT col_type_is('ext_hydrometer', 'hydro_customer_code', 'text', 'Column hydro_customer_code should be text');
 SELECT col_type_is('ext_hydrometer', 'id_number', 'text', 'Column id_number should be text');
 SELECT col_type_is('ext_hydrometer', 'hydro_number', 'text', 'Column hydro_number should be text');
 SELECT col_type_is('ext_hydrometer', 'feature_customer_code', 'varchar(30)', 'Column feature_customer_code should be varchar(30)');
