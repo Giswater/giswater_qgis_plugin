@@ -139,7 +139,7 @@ BEGIN
 	END LOOP;
 
 
-	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
+	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION
               SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
 
 	FOR v_layer IN EXECUTE v_sql
@@ -152,7 +152,7 @@ BEGIN
 			--    For views it suposse pk is the first column
 			IF v_idname IS NULL THEN
 				EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-				AND t.relname = $1 
+				AND t.relname = $1
 				AND s.nspname = $2
 				ORDER BY a.attnum LIMIT 1'
 				INTO v_idname
@@ -161,10 +161,10 @@ BEGIN
 			END IF;
 
 			--     Get geometry_column
-			EXECUTE 'SELECT attname FROM pg_attribute a        
+			EXECUTE 'SELECT attname FROM pg_attribute a
 					JOIN pg_class t on a.attrelid = t.oid
 					JOIN pg_namespace s on t.relnamespace = s.oid
-					WHERE a.attnum > 0 
+					WHERE a.attnum > 0
 					AND NOT a.attisdropped
 					AND t.relname = $1
 					AND s.nspname = $2
@@ -190,15 +190,15 @@ BEGIN
 		IF v_geometrytype IN ('ST_Polygon'::text, 'ST_Multipolygon'::text, 'ST_MultiPolygon'::text) THEN
 				--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
 				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) 
-				FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
+				FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2)
 				ORDER BY  ST_area('||v_layer||'.'||v_the_geom||') asc) a'
 						INTO v_ids
 						USING v_point, v_sensibility;
 			ELSE
 
 				--  Get element's parent type in order to be able to find featuretype'
-				EXECUTE 'SELECT lower(feature_type) FROM 
+				EXECUTE 'SELECT lower(feature_type) FROM
 				(SELECT parent_layer as layer, feature_type FROM cat_feature UNION SELECT child_layer as layer ,feature_type FROM cat_feature) a WHERE
 				layer =  '||quote_literal(v_layer)||';'
 				INTO v_parenttype;
@@ -208,7 +208,7 @@ BEGIN
 					IF v_parenttype IN ('node', 'arc', 'connec', 'gully') THEN
 						v_feature_type := substring(v_layer from 4 for length(v_layer) - 1);
 						EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-							SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
+							SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom,
 							(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry),
 							(
 								SELECT array_agg(row_to_json(psector))
@@ -220,15 +220,15 @@ BEGIN
 										AND px.state = 1 AND p.status NOT IN (5, 6, 7)
 								) AS psector
 							) AS plan_psector_data
-							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2)
 							ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
 							INTO v_ids
 							USING v_point, v_sensibility;
 					ELSE
 						EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-							SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
+							SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom,
 							(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
-							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2)
 							ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
 							INTO v_ids
 							USING v_point, v_sensibility;
@@ -272,7 +272,7 @@ BEGIN
 				ELSE
 					IF v_parenttype IS NOT NULL AND v_parenttype = 'link' THEN
 						EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-							SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
+							SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom,
 							(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry),
 							(
 								SELECT array_agg(row_to_json(psector))
@@ -284,20 +284,20 @@ BEGIN
 										AND px.state = 1 AND p.status NOT IN (5, 6, 7)
 								) AS psector
 							) AS plan_psector_data
-							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+							FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2)
 							ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
 							INTO v_ids
 							USING v_point, v_sensibility;
 					ELSE
 						EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-						SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
+						SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom,
 						(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
-						FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+						FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2)
 						ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
 						INTO v_ids
 						USING v_point, v_sensibility;
 					END IF;
-					
+
 				END IF;
 
 			END IF;
@@ -335,12 +335,13 @@ BEGIN
 	v_valve_text_netscenario := COALESCE(v_valve_text_netscenario, '');
 
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":"'||v_version||'"'||
-             ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
-			',"form":{}'||
-			',"feature":{}'||
-			',"data":{"layersNames":' || fields ||''|| v_valve_text ||''|| v_valve_text_netscenario ||'}}'||
-	    '}')::json, 2590, null, null, null);
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":"'||v_version||'", "message":{"level":1, "text":"Process done successfully"}'||
+        ',"body":{'||
+		'"form":{}'||
+		',"feature":{}'||
+		',"data":{"layersNames":' || fields ||''|| v_valve_text ||''|| v_valve_text_netscenario ||'}}'||
+    '}')::json, 2590, null, null, null);
+
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

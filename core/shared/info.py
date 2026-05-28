@@ -205,7 +205,7 @@ class GwInfo(QObject):
                 return False, None
 
             # Manage status failed
-            if json_result['status'] == 'Failed' or ('results' in json_result and json_result['results'] <= 0):
+            if json_result['status'] == 'Failed' or not json_result.get('body', {}).get('form'):
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
