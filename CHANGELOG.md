@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rename columns in `tbl_mincut_manager` tableview: `expl_id` to `exploitation`, `muni_id` to `municipality`.
 - Fix `gw_fct_setselectors`: use `selector_municipality` (muni) instead of `selector_sector` to update selector_expl.
 - `gw_fct_setmincut`: set `expl_id` from arc and `macroexpl_id` from exploitation on `om_mincut`.
-
+- Fix visit dialog: unify `parameter_id` combo fill logic and refresh it after visit load and on Event tab entry.
 
 ## [4.11.1] - 2026-05-27
 
