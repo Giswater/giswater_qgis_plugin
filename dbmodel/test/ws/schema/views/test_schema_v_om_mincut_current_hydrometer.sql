@@ -21,7 +21,7 @@ SELECT has_view('v_om_mincut_current_hydrometer'::name, 'View v_om_mincut_curren
 SELECT columns_are(
     'v_om_mincut_current_hydrometer',
     ARRAY[
-        'id', 'result_id', 'work_order', 'hydrometer_id', 'hydrometer_customer_code', 'connec_id',
+        'id', 'result_id', 'work_order', 'hydrometer_id', 'hydro_customer_code', 'connec_id',
         'connec_code'
     ],
     'View v_om_mincut_current_hydrometer should have the correct columns'
@@ -32,7 +32,7 @@ SELECT col_type_is('v_om_mincut_current_hydrometer', 'id', 'int4', 'Column id sh
 SELECT col_type_is('v_om_mincut_current_hydrometer', 'result_id', 'int4', 'Column result_id should be int4');
 SELECT col_type_is('v_om_mincut_current_hydrometer', 'work_order', 'varchar(50)', 'Column work_order should be varchar(50)');
 SELECT col_type_is('v_om_mincut_current_hydrometer', 'hydrometer_id', 'int4', 'Column hydrometer_id should be int4');
-SELECT col_type_is('v_om_mincut_current_hydrometer', 'hydrometer_customer_code', 'text', 'Column hydrometer_customer_code should be text');
+SELECT col_type_is('v_om_mincut_current_hydrometer', 'hydro_customer_code', 'text', 'Column hydro_customer_code should be text');
 SELECT col_type_is('v_om_mincut_current_hydrometer', 'connec_id', 'int4', 'Column connec_id should be int4');
 SELECT col_type_is('v_om_mincut_current_hydrometer', 'connec_code', 'text', 'Column connec_code should be text');
 

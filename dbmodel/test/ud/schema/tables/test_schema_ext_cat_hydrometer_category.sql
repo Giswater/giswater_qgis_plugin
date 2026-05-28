@@ -15,21 +15,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT * FROM no_plan();
 
 -- Check table
-SELECT has_table('ext_hydrometer_category'::name, 'Table ext_hydrometer_category should exist');
+SELECT has_table('ext_cat_hydrometer_category'::name, 'Table ext_cat_hydrometer_category should exist');
 
 -- Check columns
 SELECT columns_are(
-    'ext_hydrometer_category',
+    'ext_cat_hydrometer_category',
     ARRAY[
         'id', 'observ', 'code'
     ],
-    'Table ext_hydrometer_category should have the correct columns'
+    'Table ext_cat_hydrometer_category should have the correct columns'
 );
 
 -- Check column types
-SELECT col_type_is('ext_hydrometer_category', 'id', 'varchar(16)', 'Column id should be varchar(16)');
-SELECT col_type_is('ext_hydrometer_category', 'observ', 'varchar(100)', 'Column observ should be varchar(100)');
-SELECT col_type_is('ext_hydrometer_category', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('ext_cat_hydrometer_category', 'id', 'varchar(16)', 'Column id should be varchar(16)');
+SELECT col_type_is('ext_cat_hydrometer_category', 'observ', 'varchar(100)', 'Column observ should be varchar(100)');
+SELECT col_type_is('ext_cat_hydrometer_category', 'code', 'text', 'Column code should be text');
 
 -- Finish
 SELECT * FROM finish();
