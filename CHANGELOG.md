@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve UD checks in getvisit and setvisit
+- Update mincut selector config in `config_param_system` (`basic_selector_tab_mincut`): add `typeaheadFilter` so filter in web works.
+- Rename columns in `tbl_mincut_manager` tableview: `expl_id` to `exploitation`, `muni_id` to `municipality`.
+
+
 ## [4.11.1] - 2026-05-27
 
 ### Fixed
