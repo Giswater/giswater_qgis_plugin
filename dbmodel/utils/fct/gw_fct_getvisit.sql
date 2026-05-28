@@ -86,6 +86,7 @@ v_project_type text;
 
 v_class_feature_type text;
 v_real_feature text;
+v_has_gully_visit boolean := false;
 
 BEGIN
 
@@ -251,6 +252,10 @@ BEGIN
     -- Resolve actual feature for ALL-template classes
     IF upper(v_class_feature_type) = 'ALL' THEN
 
+        IF v_project_type = 'UD' AND v_visit_id IS NOT NULL THEN
+            SELECT EXISTS (SELECT 1 FROM om_visit_x_gully WHERE visit_id = v_visit_id) INTO v_has_gully_visit;
+        END IF;
+
         IF v_featuretype IS NOT NULL THEN
             v_real_feature := lower(v_featuretype);
 
@@ -262,7 +267,7 @@ BEGIN
             v_real_feature := 'connec';
         ELSIF v_fields IS NOT NULL AND NULLIF(v_fields->>'link_id', '') IS NOT NULL THEN
             v_real_feature := 'link';
-        ELSIF v_fields IS NOT NULL AND NULLIF(v_fields->>'gully_id', '') IS NOT NULL THEN
+        ELSIF v_project_type = 'UD' AND v_fields IS NOT NULL AND NULLIF(v_fields->>'gully_id', '') IS NOT NULL THEN
             v_real_feature := 'gully';
 
         ELSIF v_visit_id IS NOT NULL AND EXISTS (SELECT 1 FROM om_visit_x_node   WHERE visit_id = v_visit_id) THEN
@@ -273,7 +278,7 @@ BEGIN
             v_real_feature := 'connec';
         ELSIF v_visit_id IS NOT NULL AND EXISTS (SELECT 1 FROM om_visit_x_link   WHERE visit_id = v_visit_id) THEN
             v_real_feature := 'link';
-        ELSIF v_visit_id IS NOT NULL AND v_project_type = 'UD' AND EXISTS (SELECT 1 FROM om_visit_x_gully WHERE visit_id = v_visit_id) THEN
+        ELSIF v_has_gully_visit THEN
             v_real_feature := 'gully';
 
         ELSIF v_feature_type IS NOT NULL THEN

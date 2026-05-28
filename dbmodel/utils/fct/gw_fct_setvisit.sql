@@ -82,6 +82,7 @@ v_visitclass_link integer;
 v_class_feature_type text;
 v_real_feature text;
 v_effective_feature_type text;
+v_has_gully_visit boolean := false;
 
 BEGIN
 
@@ -123,6 +124,11 @@ BEGIN
 
     -- Resolve actual feature for ALL-template classes
     IF upper(v_class_feature_type) = 'ALL' THEN
+
+        IF v_project_type = 'UD' AND v_visit_id IS NOT NULL THEN
+            SELECT EXISTS (SELECT 1 FROM om_visit_x_gully WHERE visit_id = v_visit_id) INTO v_has_gully_visit;
+        END IF;
+
         IF v_node_id IS NOT NULL THEN
             v_real_feature := 'node';
         ELSIF v_arc_id IS NOT NULL THEN
@@ -131,7 +137,7 @@ BEGIN
             v_real_feature := 'connec';
         ELSIF NULLIF(v_fields->>'link_id', '') IS NOT NULL THEN
             v_real_feature := 'link';
-        ELSIF v_gully_id IS NOT NULL THEN
+        ELSIF v_project_type = 'UD' AND v_gully_id IS NOT NULL THEN
             v_real_feature := 'gully';
         ELSIF v_visit_id IS NOT NULL AND EXISTS (SELECT 1 FROM om_visit_x_node   WHERE visit_id = v_visit_id) THEN
             v_real_feature := 'node';
@@ -141,7 +147,7 @@ BEGIN
             v_real_feature := 'connec';
         ELSIF v_visit_id IS NOT NULL AND EXISTS (SELECT 1 FROM om_visit_x_link   WHERE visit_id = v_visit_id) THEN
             v_real_feature := 'link';
-        ELSIF v_visit_id IS NOT NULL AND v_project_type = 'UD' AND EXISTS (SELECT 1 FROM om_visit_x_gully WHERE visit_id = v_visit_id) THEN
+        ELSIF v_has_gully_visit THEN
             v_real_feature := 'gully';
         ELSE
             RAISE EXCEPTION 'Visit class % has feature_type=ALL but no feature id was provided/resolved', v_class;
