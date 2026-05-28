@@ -43,7 +43,7 @@ ALTER SEQUENCE IF EXISTS ext_rtc_hydrometer_x_data_seq RENAME TO ext_hydrometer_
 CREATE TABLE ext_hydrometer (
     hydrometer_id integer NOT NULL DEFAULT nextval('SCHEMA_NAME.ext_hydrometer_hydrometer_id_seq'::regclass),
     code text,
-    hydro_customer_code character varying(30),
+    hydro_customer_code text,
     id_number text,
     hydro_number text,
     feature_customer_code character varying(30),
@@ -92,9 +92,9 @@ FROM ext_rtc_hydrometer;
 ALTER TABLE IF EXISTS ext_rtc_hydrometer RENAME TO _ext_rtc_hydrometer;
 
 
-UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_rtc_hydrometer', 'v_hydrometer') WHERE dv_querytext ILIKE '%ext_rtc_hydrometer%';
-UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_hydrometer_state', 'v_cat_hydrometer_state') WHERE dv_querytext ILIKE '%ext_hydrometer_state%';
-UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_hydrometer_category', 'v_cat_hydrometer_category') WHERE dv_querytext ILIKE '%ext_hydrometer_category%';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_rtc_hydrometer', 'v_hydrometer') WHERE dv_querytext ILIKE '% ext_rtc_hydrometer %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_hydrometer_state', 'v_cat_hydrometer_state') WHERE dv_querytext ILIKE '% ext_hydrometer_state %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_hydrometer_category', 'v_cat_hydrometer_category') WHERE dv_querytext ILIKE '% ext_hydrometer_category %';
 
 UPDATE config_form_fields SET columnname = 'hydro_customer_code' WHERE columnname = 'hydrometer_customer_code';
 UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, '"hydrometer_customer_code"', '"hydro_customer_code"')::json WHERE widgetfunction::text ILIKE '%hydrometer_customer_code%';

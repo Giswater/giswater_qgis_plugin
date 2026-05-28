@@ -22,7 +22,7 @@ SELECT columns_are(
     'sys_version',
     ARRAY[
         'id', 'giswater', 'project_type', 'postgres', 'postgis', 'date',
-        'language', 'epsg'
+        'language', 'epsg', 'addparam'
     ],
     'Table sys_version should have the correct columns'
 );
@@ -36,6 +36,7 @@ SELECT col_type_is('sys_version', 'postgis', 'varchar(512)', 'Column postgis sho
 SELECT col_type_is('sys_version', 'date', 'timestamp(6) without time zone', 'Column date should be timestamp(6) without time zone');
 SELECT col_type_is('sys_version', 'language', 'varchar(50)', 'Column language should be varchar(50)');
 SELECT col_type_is('sys_version', 'epsg', 'int4', 'Column epsg should be int4');
+SELECT col_type_is('sys_version', 'addparam', 'jsonb', 'Column addparam should be jsonb');
 
 -- Finish
 SELECT * FROM finish();
