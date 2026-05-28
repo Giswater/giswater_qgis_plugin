@@ -328,16 +328,22 @@ BEGIN
 	
 	ELSE
 		-- Keep anl_the_geom on refresh/recompute; only (re)position on explicit click or first arc bind
-		UPDATE om_mincut SET
+		UPDATE om_mincut om SET
 			anl_feature_id = v_arc_id,
 			anl_feature_type = 'ARC',
 			anl_the_geom = CASE
 				WHEN v_point IS NOT NULL THEN v_point
-				WHEN anl_the_geom IS NULL OR anl_feature_id IS DISTINCT FROM v_arc_id THEN
+				WHEN om.anl_the_geom IS NULL OR om.anl_feature_id IS DISTINCT FROM v_arc_id THEN
 					(SELECT ST_LineInterpolatePoint(the_geom, 0.5) FROM v_temp_arc WHERE arc_id = v_arc_id)
-				ELSE anl_the_geom
-			END
-		WHERE id = v_mincut_id;
+				ELSE om.anl_the_geom
+			END,
+			expl_id = a.expl_id,
+			macroexpl_id = e.macroexpl_id
+		FROM v_temp_arc a
+		JOIN exploitation e ON e.expl_id = a.expl_id
+		WHERE om.id = v_mincut_id
+		  AND a.arc_id = v_arc_id
+		  AND a.expl_id IS NOT NULL;
 	END IF;
 
 	-- check if there is at least one operative node, if not - exit
@@ -477,6 +483,15 @@ BEGIN
 			IF (p_data->'data')::jsonb ? 'forecastEnd' THEN v_query_text := concat(v_query_text, ', forecast_end = ', quote_nullable(v_forecast_end)); END IF;
 			v_query_text := concat(v_query_text, ' WHERE id = ', v_mincut_id);
 			EXECUTE v_query_text;
+
+			UPDATE om_mincut m
+			SET expl_id = a.expl_id,
+			    macroexpl_id = e.macroexpl_id
+			FROM v_temp_arc a
+			JOIN exploitation e ON e.expl_id = a.expl_id
+			WHERE m.id = v_mincut_id
+			  AND a.arc_id = v_arc_id
+			  AND a.expl_id IS NOT NULL;
 		END IF;
 
 	ELSIF v_action = 'mincutRefresh' THEN
@@ -590,6 +605,26 @@ BEGIN
 			END IF;
 		END IF;
 	ELSIF v_action IN ('mincutAccept', 'mincutEnd') THEN
+
+		IF v_action = 'mincutAccept' THEN
+			UPDATE om_mincut m
+			SET expl_id = src.expl_id,
+			    macroexpl_id = src.macroexpl_id
+			FROM (
+				SELECT a.expl_id, e.macroexpl_id
+				FROM om_mincut om
+				JOIN arc a ON a.arc_id = COALESCE(
+					NULLIF(CASE WHEN upper(om.anl_feature_type) = 'ARC' THEN om.anl_feature_id END, NULL),
+					(SELECT arc_id FROM arc
+					 WHERE the_geom IS NOT NULL AND om.anl_the_geom IS NOT NULL
+					 ORDER BY the_geom <-> om.anl_the_geom LIMIT 1)
+				)
+				JOIN exploitation e ON e.expl_id = a.expl_id
+				WHERE om.id = v_mincut_id
+				  AND a.expl_id IS NOT NULL
+			) src
+			WHERE m.id = v_mincut_id;
+		END IF;
 
 		-- call setfields
 		v_message := json_build_object(
