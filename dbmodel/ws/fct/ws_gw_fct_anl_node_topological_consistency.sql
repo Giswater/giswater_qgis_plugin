@@ -50,7 +50,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- Reset values
-	DELETE FROM anl_node WHERE cur_user="current_user"() AND anl_node.fid=108;
+	DROP TABLE IF EXISTS temp_anl_node;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=108;
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -71,14 +71,13 @@ BEGIN
 	END IF;
 
 	EXECUTE format($sql$
-		INSERT INTO anl_node (node_id, nodecat_id, state, descript, num_arcs, expl_id, fid, the_geom)
-		SELECT vn.node_id, vn.nodecat_id, vn.state, cfn.num_arcs as descript, COUNT(*) AS num_arcs, vn.expl_id, 108 AS fid, vn.the_geom
+		CREATE TEMP TABLE temp_anl_node AS
+		SELECT vn.node_id, vn.nodecat_id, vn.state, cfn.num_arcs as expected_num_arcs, COUNT(*) AS num_arcs, vn.expl_id, vn.the_geom
 		FROM %I vn
 		JOIN cat_feature_node cfn ON vn.node_type = cfn.id
 		JOIN arc a ON a.node_1 = vn.node_id OR a.node_2 = vn.node_id
 		WHERE EXISTS (SELECT 1 FROM vf_arc vfa WHERE a.arc_id = vfa.arc_id)
-		AND cfn.num_arcs > 0
-		AND cfn.num_arcs <= 4
+		AND cfn.num_arcs IN (1, 2, 3, 4)
 		%s
 		GROUP BY vn.node_id, vn.nodecat_id, vn.state, vn.expl_id, vn.the_geom, cfn.num_arcs
 		HAVING COUNT(*) <> cfn.num_arcs
@@ -102,12 +101,12 @@ BEGIN
     'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
     'properties', to_jsonb(row) - 'the_geom'
     ) AS feature
-    FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript as expected_num_arcs,fid, ST_Transform(the_geom, 4326) as the_geom, num_arcs
-    FROM  anl_node WHERE cur_user="current_user"() AND fid=108) row) features;
+    FROM (SELECT node_id, nodecat_id, state, expl_id, expected_num_arcs, ST_Transform(the_geom, 4326) as the_geom, num_arcs
+    FROM  temp_anl_node) row) features;
 
   	v_result_point = v_result;
 
-	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=108;
+	SELECT count(*) INTO v_count FROM temp_anl_node;
 
 	IF v_count = 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -120,7 +119,7 @@ BEGIN
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 108,  concat ('Node_id: ',array_agg(node_id), '.' ), v_count
-		FROM anl_node WHERE cur_user="current_user"() AND fid=108;
+		FROM temp_anl_node;
 
 	END IF;
 
