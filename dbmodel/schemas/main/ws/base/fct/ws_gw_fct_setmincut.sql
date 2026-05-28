@@ -1624,7 +1624,7 @@ BEGIN
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, erh.hydrometer_id
 		FROM v_hydrometer erh
-		JOIN connec c ON erh.customer_code = c.customer_code
+		JOIN connec c ON erh.feature_customer_code = c.customer_code
 		WHERE erh.state_id IN (SELECT state_id FROM states)
 		AND EXISTS (
 			SELECT 1
@@ -1642,7 +1642,7 @@ BEGIN
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, erh.hydrometer_id
 		FROM v_hydrometer erh
-		JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+		JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code
 		JOIN node n ON n.node_id = mn.node_id
 		WHERE erh.state_id IN (SELECT state_id FROM states)
 		AND EXISTS (
@@ -2145,7 +2145,7 @@ BEGIN
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 						SELECT v_mincut_affected_id, erh.hydrometer_id
 						FROM v_hydrometer erh
-						JOIN connec c ON erh.customer_code = c.customer_code
+						JOIN connec c ON erh.feature_customer_code = c.customer_code
 						WHERE erh.state_id IN (SELECT state_id FROM states)
 						AND EXISTS (
 							SELECT 1
@@ -2163,7 +2163,7 @@ BEGIN
 						INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 						SELECT v_mincut_affected_id, erh.hydrometer_id
 						FROM v_hydrometer erh
-						JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+						JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code
 						JOIN node n ON n.node_id = mn.node_id
 						WHERE erh.state_id IN (SELECT state_id FROM states)
 						AND EXISTS (

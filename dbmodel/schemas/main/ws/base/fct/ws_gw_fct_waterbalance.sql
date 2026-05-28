@@ -125,31 +125,31 @@ v_queryhydro =
 			hydrometer AS (
 				SELECT h.hydrometer_id, c.dma_id
 				FROM v_hydrometer h
-				JOIN connec c ON c.customer_code = h.customer_code
+				JOIN connec c ON c.customer_code = h.feature_customer_code
 				UNION 
 				SELECT h.hydrometer_id, n.dma_id
 				FROM v_hydrometer h
-				JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+				JOIN man_netwjoin mn ON mn.customer_code = h.feature_customer_code
 				JOIN node n ON n.node_id = mn.node_id
 			),
 			hydro_data AS (
 				SELECT
 				d.hydrometer_id,
 				d.cat_period_id,
-				d.sum,
+				d.billed_volume,
 				p.end_date AS p_end_date,
-				first_value(d.sum) OVER w AS last_sum,
+				first_value(d.billed_volume) OVER w AS last_billed_volume,
 				first_value(d.cat_period_id) OVER w AS last_cat_period_id,
 				first_value(p.end_date) OVER w::date AS last_end_date,
 				first_value(p.period_seconds) OVER w AS last_period_seconds
-				FROM v_hydrometer_data d
-				JOIN ext_cat_period p ON d.cat_period_id = p.id
+				FROM v_hydrometer_period d
+				JOIN v_cat_period p ON d.cat_period_id = p.id
 				WINDOW w AS (PARTITION BY d.hydrometer_id ORDER BY p.end_date desc)
     		), 
 			hydro_data_calculat AS (
 				SELECT DISTINCT
 				d.hydrometer_id,
-				d.last_sum,
+				d.last_billed_volume,
 				d.last_cat_period_id,
 				d.last_end_date,
 				d.last_period_seconds AS p_seconds
@@ -217,7 +217,7 @@ v_queryhydro =
 				UPDATE dma SET active = TRUE FROM 
 				(SELECT * FROM 
 				(SELECT dma_id, (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent''  as node_id FROM dma) b JOIN 
-				(SELECT DISTINCT (node_id) FROM ext_cat_period, ext_scada_x_data JOIN node USING (node_id) WHERE  
+				(SELECT DISTINCT (node_id) FROM v_cat_period, ext_rtc_scada_x_data JOIN node USING (node_id) WHERE  
 				node.expl_id in ('||v_expl||')AND start_date < value_date AND end_date > value_date) a USING (node_id))c
 				WHERE dma.dma_id = c.dma_id';
 
@@ -241,8 +241,8 @@ v_queryhydro =
 
 		IF v_method = 'CPW' THEN -- time method: period_id
 			v_descript = 'Time method: period_id';
-			v_startdate = (SELECT start_date::date FROM ext_cat_period WHERE id = v_period);
-			v_enddate =  (SELECT end_date::date - 1 FROM ext_cat_period WHERE id = v_period);
+			v_startdate = (SELECT start_date::date FROM v_cat_period WHERE id = v_period);
+			v_enddate =  (SELECT end_date::date - 1 FROM v_cat_period WHERE id = v_period);
 
 		ELSIF v_method = 'CDI' THEN -- time METHOD: date interval
 			v_period = 'CUSTOM DATE INT.';
@@ -270,7 +270,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3) 
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_scada_x_data e JOIN mapzone_graph g USING (node_id)
+				FROM ext_rtc_scada_x_data e JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date 
 				AND g.flow_sign = 1 AND g.mapzone_type = ''DMA''
@@ -285,7 +285,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_scada_x_data e JOIN mapzone_graph g USING (node_id)
+				FROM ext_rtc_scada_x_data e JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date
 				AND g.mapzone_type = ''DMA''
@@ -308,18 +308,18 @@ v_queryhydro =
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
 					FROM v_hydrometer h
-					JOIN connec c ON c.customer_code = h.customer_code
+					JOIN connec c ON c.customer_code = h.feature_customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
 					FROM v_hydrometer h
-					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN man_netwjoin mn ON mn.customer_code = h.feature_customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				)
 			UPDATE om_waterbalance n 
 			SET auth_bill_met_hydro = a.value::numeric
 			FROM (
-				SELECT dma_id, (sum(d.sum))::numeric as value
-				FROM v_hydrometer_data d
+				SELECT dma_id, (sum(d.billed_volume))::numeric as value
+				FROM v_hydrometer_period d
 				JOIN hydrometer h USING (hydrometer_id) 
 				JOIN v_hydrometer e ON e.hydrometer_id = d.hydrometer_id
 				WHERE d.cat_period_id = '||quote_literal(v_period)||'::text 
@@ -348,15 +348,15 @@ v_queryhydro =
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
 					FROM v_hydrometer h
-					JOIN connec c ON c.customer_code = h.customer_code
+					JOIN connec c ON c.customer_code = h.feature_customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
 					FROM v_hydrometer h
-					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN man_netwjoin mn ON mn.customer_code = h.feature_customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				)
 			SELECT count(DISTINCT d.hydrometer_id)
-			FROM v_hydrometer_data d
+			FROM v_hydrometer_period d
 			JOIN hydrometer h USING (hydrometer_id) 
 			JOIN v_hydrometer e ON e.hydrometer_id = h.hydrometer_id
 			JOIN om_waterbalance n ON n.dma_id = h.dma_id
@@ -372,7 +372,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_in =  value::numeric(12,3)
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_scada_x_data e 
+				FROM ext_rtc_scada_x_data e 
 				JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date 
@@ -388,7 +388,7 @@ v_queryhydro =
 			UPDATE om_waterbalance n SET total_sys_input =  value::numeric(12,3)
 			FROM (
 				SELECT g.mapzone_id AS dma_id, (sum(coalesce(e.value,0)*g.flow_sign))::numeric as value 
-				FROM ext_scada_x_data e 
+				FROM ext_rtc_scada_x_data e 
 				JOIN mapzone_graph g USING (node_id)
 				WHERE e.value_date >= '||quote_literal(v_startdate)||'::date 
 				AND e.value_date <= '||quote_literal(v_enddate)||'::date
@@ -412,18 +412,18 @@ v_queryhydro =
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
 					FROM v_hydrometer h
-					JOIN connec c ON c.customer_code = h.customer_code
+					JOIN connec c ON c.customer_code = h.feature_customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
 					FROM v_hydrometer h
-					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN man_netwjoin mn ON mn.customer_code = h.feature_customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				),
 				period AS (
 					SELECT p.id as cat_period_id, p.start_date::date, p.end_date::date, p.period_seconds AS p_seconds,
 					'||quote_literal(v_startdate)||'::date AS startdate,
 					'||quote_literal(v_enddate)||'::date + 1 AS enddate
-					FROM ext_cat_period p
+					FROM v_cat_period p
 				),
 				period_calculat AS (
 					SELECT p.*,
@@ -449,8 +449,8 @@ v_queryhydro =
 			SET auth_bill_met_hydro = a.value::numeric
 			FROM (
 				SELECT h.dma_id, 
-				sum(d.sum*(p.c_seconds/p.p_seconds))::numeric as value
-				FROM v_hydrometer_data d
+				sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric as value
+				FROM v_hydrometer_period d
 				JOIN hydrometer h USING (hydrometer_id) 
 				JOIN v_hydrometer e ON e.hydrometer_id = d.hydrometer_id
 				JOIN period_selected p USING (cat_period_id)
@@ -480,18 +480,18 @@ v_queryhydro =
 				hydrometer AS (
 					SELECT h.hydrometer_id, c.dma_id
 					FROM v_hydrometer h
-					JOIN connec c ON c.customer_code = h.customer_code
+					JOIN connec c ON c.customer_code = h.feature_customer_code
 					UNION 
 					SELECT h.hydrometer_id, n.dma_id
 					FROM v_hydrometer h
-					JOIN man_netwjoin mn ON mn.customer_code = h.customer_code
+					JOIN man_netwjoin mn ON mn.customer_code = h.feature_customer_code
 					JOIN node n ON n.node_id = mn.node_id
 				),
 				period AS (
 					SELECT p.id as cat_period_id, p.start_date::date, p.end_date::date, p.period_seconds AS p_seconds,
 					'||quote_literal(v_startdate)||'::date AS startdate,
 					'||quote_literal(v_startdate)||'::date + 1 AS enddate
-					FROM ext_cat_period p
+					FROM v_cat_period p
 				),
 				period_calculat AS (
 					SELECT p.*,
@@ -514,7 +514,7 @@ v_queryhydro =
 					AND  p.start_date < p.enddate
 				)
 			SELECT count(DISTINCT d.hydrometer_id)
-			FROM v_hydrometer_data d
+			FROM v_hydrometer_period d
 			JOIN period_selected p USING (cat_period_id)
 			JOIN hydrometer h ON h.hydrometer_id = d.hydrometer_id
 			JOIN v_hydrometer e ON e.hydrometer_id = h.hydrometer_id
@@ -542,7 +542,7 @@ v_queryhydro =
 		UPDATE om_waterbalance n SET n_hydro = coalesce(count_hydro,0) FROM 
 		(SELECT dma_id, count(erh.hydrometer_id) as count_hydro
 		FROM v_hydrometer erh
-		JOIN connec c ON erh.customer_code = c.customer_code
+		JOIN connec c ON erh.feature_customer_code = c.customer_code
 		GROUP BY dma_id)a
 		WHERE n.dma_id = a.dma_id AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
 		AND n.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';

@@ -205,8 +205,6 @@ UPDATE man_type_function SET function_type = replace (function_type, 'Standard',
 UPDATE ve_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 UPDATE man_valve SET to_arc=2037 WHERE node_id=1092;
 
-UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
-
 UPDATE ve_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 
 UPDATE cat_mat_roughness set roughness  = 0.003;
@@ -308,9 +306,6 @@ UPDATE config_csv SET active = true WHERE fid in (469,470);
 
 UPDATE config_param_system SET value = '{"usePsectors":false, "ignoreGraphanalytics":false, "ignoreEpa":false, "ignorePlan":false}'
 WHERE parameter = 'admin_checkproject';
-
-
-UPDATE ext_rtc_dma_period set avg_press = 30;
 
 UPDATE config_param_system SET value = (replace(value, 'Disable', 'Random')) WHERE parameter='utils_graphanalytics_style';
 

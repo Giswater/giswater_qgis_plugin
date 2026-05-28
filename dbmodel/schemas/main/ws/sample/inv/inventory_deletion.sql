@@ -37,7 +37,6 @@ UPDATE inp_junction SET demand=null, pattern_id = null;
 UPDATE inp_connec SET demand=null, pattern_id = null;
 
 UPDATE ext_cat_hydrometer_category SET pattern_id = null;
-UPDATE ext_rtc_dma_period SET pattern_id = null;
 UPDATE dma SET pattern_id = null;
 UPDATE sector SET pattern_id = null;
 
