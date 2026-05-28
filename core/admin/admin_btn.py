@@ -678,6 +678,9 @@ class GwAdminButton:
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type=None):
         """Upgrade the currently-selected schema in place via the engine."""
+        # QPushButton.clicked emits a bool; ignore it when wired directly.
+        if isinstance(project_type, bool):
+            project_type = None
         project_type = self._resolve_update_kind() if project_type is None else str(project_type).lower()
         if project_type not in ('ws', 'ud'):
             tools_qgis.show_warning(
@@ -707,6 +710,15 @@ class GwAdminButton:
         self.infolog_updates.setText(self.message_infolog)
 
         schema_name = self._get_schema_name()
+        self._update_from_version = str(self.project_version or '0.0.0')
+        if schema_name:
+            tools_db.execute_sql(
+                f"DELETE FROM {schema_name}.audit_check_data "
+                f"WHERE fid = 133 AND cur_user = current_user",
+                commit=False,
+            )
+
+        self._refresh_update_dialog_state(running=True)
         bp = BuildParams(
             schema_name=schema_name,
             srid=str(self.project_epsg or "25831"),
@@ -737,15 +749,109 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(task)
         QgsApplication.taskManager().triggerTask(task)
 
+    def _schema_needs_update(self) -> bool:
+        return _admin_version_tuple(self.project_version) < _admin_version_tuple(self.plugin_version)
+
+    def _refresh_update_dialog_state(self, *, running: bool = False, success: bool = False) -> None:
+        dlg = getattr(self, 'dlg_readsql_show_info', None)
+        if dlg is None or isdeleted(dlg):
+            return
+
+        dlg.btn_close.setEnabled(not running)
+        if running:
+            dlg.btn_update.hide()
+            dlg.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
+        elif success or not self._schema_needs_update():
+            dlg.btn_update.hide()
+            dlg.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
+        else:
+            dlg.btn_update.show()
+            dlg.btn_update.setEnabled(True)
+            dlg.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, True)
+        dlg.show()
+
+    def _fill_update_log_tab(self, schema_name, result=None) -> None:
+        """Populate Log tab after schema update (audit_check_data + version summary)."""
+        dlg = getattr(self, 'dlg_readsql_show_info', None)
+        if dlg is None or isdeleted(dlg):
+            return
+
+        lines: list[str] = []
+        if schema_name and tools_db.check_table('audit_check_data', schema_name):
+            rows = tools_db.get_rows(
+                f"SELECT error_message FROM {schema_name}.audit_check_data "
+                f"WHERE fid = 133 "
+                f"ORDER BY criticity DESC, id ASC"
+            )
+            if rows:
+                lines = [str(row[0]) for row in rows if row[0] is not None]
+
+        if result is not None and result.ok:
+            old_version = getattr(self, '_update_from_version', '') or str(self.project_version or '')
+            new_version = str(self.plugin_version)
+            info = tools_gw.get_project_info(schema_name) if schema_name else None
+            if info and info.get('project_version'):
+                new_version = str(info['project_version'])
+            summary = (
+                f"Project have been sucessfully updated from {old_version} "
+                f"version to {new_version} version"
+            )
+            if not any('sucessfully updated' in line for line in lines):
+                if lines:
+                    lines.append('')
+                lines.append(summary)
+        elif result is not None and not result.ok:
+            failure = result.first_failure()
+            err = lib_vars.session_vars.get('last_error') or ''
+            if failure is not None:
+                err = err or failure.error or failure.path or ''
+            if self.message_infolog:
+                err = f"{self.message_infolog}\n{err}".strip()
+            if err:
+                lines = [str(err)]
+        elif not lines and self.message_infolog:
+            lines = [self.message_infolog]
+
+        text = '\n'.join(lines)
+        log_widget = dlg.findChild(QTextEdit, 'tab_log_txt_infolog')
+        if log_widget is not None:
+            log_widget.setReadOnly(True)
+            log_widget.setPlainText(text)
+
+        main_tab = dlg.findChild(QTabWidget, 'mainTab')
+        log_tab = dlg.findChild(QWidget, 'tab_loginfo')
+        if main_tab is not None and log_tab is not None:
+            log_idx = main_tab.indexOf(log_tab)
+            if log_idx >= 0:
+                main_tab.setTabEnabled(log_idx, True)
+                main_tab.setCurrentIndex(log_idx)
+
     def _on_builder_done_update(self, result):
+        schema_name = self._get_schema_name()
+        if self.timer is not None:
+            try:
+                self.timer.stop()
+            except Exception:  # noqa: BLE001
+                pass
+        if getattr(self, 'dlg_readsql_show_info', None) is not None and not isdeleted(self.dlg_readsql_show_info):
+            elapsed = format_elapsed_mmss(int(time() - self.t0))
+            self._update_time_elapsed(
+                f"{elapsed} | done" if result.ok else f"{elapsed} | failed",
+                self.dlg_readsql_show_info,
+            )
+
         if not result.ok:
             self.error_count += 1
             tools_db.dao.rollback()
             self._manage_result_message(False, parameter="Update schema")
+            self._refresh_update_dialog_state(running=False, success=False)
+            self._fill_update_log_tab(schema_name, result)
         else:
             tools_db.dao.commit()
             self._manage_result_message(True, parameter="Update schema")
             self._set_info_project()
+            self._fill_update_log_tab(schema_name, result)
+            self._refresh_update_dialog_state(running=False, success=True)
             if getattr(self, 'dlg_readsql_show_info', None) is not None and not isdeleted(self.dlg_readsql_show_info):
                 self.message_update = ''
                 self._read_info_version()
@@ -753,6 +859,7 @@ class GwAdminButton:
                 if info_updates is not None:
                     info_updates.setText(self.message_update)
                 self._update_manage_ui()
+        self.error_count = 0
 
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
@@ -1845,6 +1952,7 @@ class GwAdminButton:
         # Set listeners
         self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql_show_info))
         self.dlg_readsql_show_info.btn_update.clicked.connect(self.update)
+        self._refresh_update_dialog_state(running=False)
 
         # Set shortcut keys
         self.dlg_readsql_show_info.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_show_info))
