@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print highest network update semver (M.m.p) under dbmodel/schemas/network."""
+"""Print highest network update semver (M.m.p) under dbmodel/schemas/main/."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def _max_version(root: str) -> tuple[int, int, int] | None:
 
 def main() -> int:
     base = os.path.join(
-        os.path.dirname(__file__), "..", "schemas", "network"
+        os.path.dirname(__file__), "..", "schemas", "main"
     )
     base = os.path.abspath(base)
     candidates: list[tuple[int, int, int]] = []
