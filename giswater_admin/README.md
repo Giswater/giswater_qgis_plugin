@@ -249,18 +249,20 @@ Builds a schema from `dbmodel/manifests/<kind>.yaml` and the chosen profile.
 | `--locale` | i18n folder (default `en_US`). |
 | `--plugin-version` | Upper bound for `updates/` patches (default `4.9.0`). |
 | `--db-user` | Author in `lastprocess` (default: connection user). |
-| `--ws-schema` | Linked ws schema (**required** for `kind=utils`). |
-| `--ud-schema` | Linked ud schema (**required** for `kind=utils`). |
+| `--ws-schema` | Parent ws schema (`utils` profiles `integrate_ws` / optional context). |
+| `--ud-schema` | Parent ud schema (`utils` profiles `integrate_ud` / optional context). |
+| `--copy-source-schema` | Parent schema for `utils` profile `copy_data`. |
 | `--parent-schema` | Parent ws/ud schema (**required** for `kind=cm`). |
 | `--parent-type` | `ws` \| `ud` — override auto-detection for `cm`. |
-| `--main-version` | Stored in utils as `utils_version` (default: `--plugin-version`). |
+| `--main-version` | Legacy alias; utils version is stored in `utils.sys_version.giswater`. |
 | `--check` | Plan only; no SQL execution. |
 | `--conn` / `--config` | Connection. |
 
 ```bash
 python3 -m giswater_admin create --kind ws --schema ws1 --srid 25831 --profile sample_full --conn "$CONN"
 python3 -m giswater_admin create --kind ud --schema ud1 --profile empty --conn "$CONN"
-python3 -m giswater_admin create --kind utils --schema utils --ws-schema ws1 --ud-schema ud1 --conn "$CONN"
+python3 -m giswater_admin create --kind utils --schema utils --profile empty --conn "$CONN"
+python3 -m giswater_admin create --kind utils --schema utils --profile integrate_ws --ws-schema ws1 --conn "$CONN"
 python3 -m giswater_admin create --kind cm --schema cm1 --parent-schema ws1 --parent-type ws --conn "$CONN"
 python3 -m giswater_admin create --kind ws --schema x --profile empty --check --json
 ```
@@ -411,7 +413,8 @@ export CONN='postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli'
 python3 -m giswater_admin init-db --conn "$CONN"
 python3 -m giswater_admin create --kind ws --schema ws_test --srid 25831 --profile sample_full --conn "$CONN"
 python3 -m giswater_admin create --kind ud --schema ud_test --srid 25831 --profile sample_full --conn "$CONN"
-python3 -m giswater_admin create --kind utils --schema utils --ws-schema ws_test --ud-schema ud_test --conn "$CONN"
+python3 -m giswater_admin create --kind utils --schema utils --profile empty --conn "$CONN"
+python3 -m giswater_admin create --kind utils --schema utils --profile integrate_ws --ws-schema ws_test --conn "$CONN"
 python3 -m giswater_admin status --conn "$CONN" --json | python3 -m json.tool
 ```
 
@@ -421,9 +424,9 @@ python3 -m giswater_admin status --conn "$CONN" --json | python3 -m json.tool
 
 | `kind` | Typical profiles | Notes |
 |--------|------------------|-------|
-| **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `ci`, `update` | Water supply. Updates: `schemas/network/common/updates` then `schemas/network/ws/updates`. |
-| **ud** | same as ws | Sewerage. Updates: common then `schemas/network/ud/updates`. |
-| **utils** | `empty`, `update` | Requires `--ws-schema` and `--ud-schema` on `create`. |
+| **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `ci`, `update` | Water supply. Updates: `schemas/main/common/updates` then `schemas/main/ws/updates`. |
+| **ud** | same as ws | Sewerage. Updates: common then `schemas/main/ud/updates`. |
+| **utils** | `empty`, `integrate_ws`, `integrate_ud`, `copy_data`, `update` | Standalone create; integrate ws/ud separately; version in `utils.sys_version`. |
 | **am** | `empty`, `update` | Asset management singleton. |
 | **cm** | `empty`, `with_sample`, `update` | Requires `--parent-schema`; uses `parent_schema/ws` or `ud`. |
 | **audit** | CLI subcommands | No semver `updates/` tree; `structure` once, `activate` per project. |

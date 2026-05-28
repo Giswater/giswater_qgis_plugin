@@ -1,14 +1,7 @@
 # utils (satellite) schema manifest.
 #
-# Mirrors admin_btn `_load_base_utils` + `_update_utils_schema` +
-# project_schema_utils_create.GwCreateSchemaUtilsTask:
-#
-#   load_base_utils -> [updates] -> fk_ws -> fk_ud -> role_perms ->
-#   bump_version -> final_pass
-#
-# The first phase walks `schemas/utils/{utils,ws,ud}` with per-step
-# SCHEMA_NAME overrides because each subfolder targets a different
-# schema (utils itself, the ws_schema, the ud_schema).
+# Decoupled lifecycle: create utils alone, integrate ws/ud separately,
+# copy data from a selected parent schema.
 
 kind: utils
 engine_version: 1
@@ -16,26 +9,28 @@ engine_version: 1
 substitutions: {}
 
 phases:
-  - id: load_base_utils
+  - id: load_base_schema
     type: sql_dir
-    description: "Bootstrap utils tables/fcts/trg + utils/ws/ud DDL."
+    description: "Bootstrap utils schema DDL + functions."
     steps:
-      - { source: "schemas/utils/utils",     recursive: false,
-          schema_override: "{{ schema_name }}", aux_override: "{{ ws_schema }}" }
-      - { source: "schemas/utils/utils/fct", recursive: false,
-          schema_override: "{{ schema_name }}" }
-      - { source: "schemas/utils/ws",        recursive: false,
-          schema_override: "{{ ws_schema }}" }
-      - { source: "schemas/utils/ud",        recursive: false,
-          schema_override: "{{ ud_schema }}" }
+      - { source: "schemas/addon/utils/base/base.sql", recursive: false }
+      - { source: "schemas/addon/utils/base/fct", recursive: false }
 
-  - id: updates
-    type: version_walk
-    optional: true
-    description: "Apply utils-specific update patches (flat, M/m/p/*.sql)."
-    root: "schemas/utils/updates"
-    range:
-      mode: "{{ run_mode }}"
+  - id: integrate_utils_ws
+    type: sql_dir
+    description: "Integrate utils with a ws parent schema."
+    steps:
+      - source: "schemas/addon/utils/integration/ws/integration.sql"
+        recursive: false
+        schema_override: "{{ ws_schema }}"
+
+  - id: integrate_utils_ud
+    type: sql_dir
+    description: "Integrate utils with a ud parent schema."
+    steps:
+      - source: "schemas/addon/utils/integration/ud/integration.sql"
+        recursive: false
+        schema_override: "{{ ud_schema }}"
 
   - id: fk_ws
     type: sql_inline
@@ -47,32 +42,49 @@ phases:
     description: "Wire utils foreign keys into the ud schema."
     sql: "SELECT {{ ud_schema }}.gw_fct_admin_schema_utils_fk();"
 
+  - id: copy_data_utils
+    type: sql_dir
+    description: "Copy ext_* data from selected parent into utils."
+    steps:
+      - source: "schemas/addon/utils/data/data.sql"
+        recursive: false
+        schema_override: "{{ copy_source_schema }}"
+
   - id: role_perms
     type: sql_inline
-    description: "Re-grant role permissions across the ws schema (ws drives roles)."
+    description: "Re-grant role permissions on ws parent."
     sql: "SELECT {{ ws_schema }}.gw_fct_admin_role_permissions();"
 
-  - id: bump_version
-    type: sql_inline
-    description: "Pin utils version into config_param_system."
-    sql: >
-      INSERT INTO {{ schema_name }}.config_param_system (parameter, value, descript)
-      VALUES ('utils_version', '{{ main_project_version }}', 'UTILS')
-      ON CONFLICT (parameter) DO UPDATE SET value = EXCLUDED.value;
+  - id: updates
+    type: version_walk
+    description: "Apply utils-specific update patches."
+    root: "schemas/addon/utils/updates"
+    range:
+      mode: "{{ run_mode }}"
 
-  - id: final_pass
-    type: sql_dir
-    optional: true
-    description: "Final-pass for utils: form fields + i18n; falls back to en_US."
-    steps:
-      - source: "schemas/utils/final_pass/config_form_fields"
-        recursive: false
-      - source: "schemas/utils/final_pass/i18n/{{ locale }}"
-        fallback_source: "schemas/utils/final_pass/i18n/en_US"
-        recursive: false
+  - id: register_version
+    type: sql_function
+    description: "Append utils.sys_version row."
+    function: "utils.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "UTILS"
+        isNewProject: "{{ register_is_new }}"
+        inferParentsFromConfig: "{{ infer_parents_from_config }}"
+        parentSchema: "{{ register_parent_schema }}"
+        mergeAddparam: {}
 
 profiles:
   empty:
-    phases: [load_base_utils, fk_ws, fk_ud, role_perms, bump_version, final_pass]
+    phases: [load_base_schema, updates, register_version]
+  integrate_ws:
+    phases: [integrate_utils_ws, fk_ws, role_perms, register_version]
+  integrate_ud:
+    phases: [integrate_utils_ud, fk_ud, register_version]
+  copy_data:
+    phases: [copy_data_utils]
   update:
-    phases: [updates, fk_ws, fk_ud, role_perms, bump_version, final_pass]
+    phases: [updates, register_version]

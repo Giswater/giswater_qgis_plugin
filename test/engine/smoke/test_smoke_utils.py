@@ -42,21 +42,25 @@ def parent_schemas(adapter, temp_schema_name):
             drop_schema(adapter, schema, cascade=True, commit=True)
 
 
-def test_utils_empty(adapter, parent_schemas):
-    ws, ud = parent_schemas
+def test_utils_empty(adapter):
     manifest = load_manifest(os.path.join(DBMODEL, "manifests", "utils.yaml"))
     params = BuildParams(
         schema_name="utils", srid="25831",
         plugin_version="4.9.0", main_project_version="4.9.0",
-        profile="empty", ws_schema=ws, ud_schema=ud,
+        profile="empty", register_is_new="true",
         sql_root=DBMODEL,
     )
     try:
-        # utils is a singleton; drop any stale one first.
         drop_schema(adapter, "utils", cascade=True, commit=True)
         result = SchemaBuilder(adapter, manifest, params).run()
         assert result.ok, f"utils build: {result.first_failure()}"
         adapter.commit()
+        with adapter.raw.cursor() as cur:
+            cur.execute(
+                "SELECT giswater FROM utils.sys_version ORDER BY id DESC LIMIT 1"
+            )
+            row = cur.fetchone()
+        assert row is not None and row[0] == "4.9.0"
     finally:
         drop_schema(adapter, "utils", cascade=True, commit=True)
 
@@ -68,7 +72,7 @@ def test_utils_update_in_place(adapter, parent_schemas):
     create_params = BuildParams(
         schema_name="utils", srid="25831",
         plugin_version="4.8.0", main_project_version="4.8.0",
-        profile="empty", ws_schema=ws, ud_schema=ud,
+        profile="empty", register_is_new="true",
         sql_root=DBMODEL,
     )
     try:
@@ -82,7 +86,7 @@ def test_utils_update_in_place(adapter, parent_schemas):
             plugin_version="4.9.0", project_version="4.8.0",
             main_project_version="4.9.0",
             run_mode="upgrade", profile="update",
-            ws_schema=ws, ud_schema=ud,
+            infer_parents_from_config="true",
             sql_root=DBMODEL,
         )
         r2 = SchemaBuilder(adapter, manifest, update_params).run()
@@ -91,11 +95,10 @@ def test_utils_update_in_place(adapter, parent_schemas):
 
         with adapter.raw.cursor() as cur:
             cur.execute(
-                "SELECT value FROM utils.config_param_system "
-                "WHERE parameter = 'utils_version'"
+                "SELECT giswater FROM utils.sys_version ORDER BY id DESC LIMIT 1"
             )
             row = cur.fetchone()
         assert row is not None
-        assert row[0] == "4.9.0", f"unexpected utils_version after upgrade: {row}"
+        assert row[0] == "4.9.0", f"unexpected utils sys_version after upgrade: {row}"
     finally:
         drop_schema(adapter, "utils", cascade=True, commit=True)

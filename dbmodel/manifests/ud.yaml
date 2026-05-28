@@ -10,27 +10,27 @@ phases:
   - id: load_base
     type: sql_dir
     steps:
-      - { source: "schemas/network/common/ddl",  recursive: false }
-      - { source: "schemas/network/common/fct",  recursive: false }
-      - { source: "schemas/network/common/ftrg", recursive: false }
-      - { source: "schemas/network/ud/fct",          recursive: false }
-      - { source: "schemas/network/ud/ftrg",         recursive: false }
-      - { source: "schemas/network/ud/schema_model", recursive: false }
+      - { source: "schemas/main/common/base/ddl",  recursive: false }
+      - { source: "schemas/main/common/base/fct",  recursive: false }
+      - { source: "schemas/main/common/base/ftrg", recursive: false }
+      - { source: "schemas/main/ud/base/fct",          recursive: false }
+      - { source: "schemas/main/ud/base/ftrg",         recursive: false }
+      - { source: "schemas/main/ud/base/schema_model", recursive: false }
 
   - id: reload_fct_ftrg
     type: sql_dir
     steps:
-      - { source: "schemas/network/common/fct",  recursive: false }
-      - { source: "schemas/network/common/ftrg", recursive: false }
-      - { source: "schemas/network/ud/fct",      recursive: false }
-      - { source: "schemas/network/ud/ftrg",     recursive: false }
+      - { source: "schemas/main/common/base/fct",  recursive: false }
+      - { source: "schemas/main/common/base/ftrg", recursive: false }
+      - { source: "schemas/main/ud/base/fct",      recursive: false }
+      - { source: "schemas/main/ud/base/ftrg",     recursive: false }
 
   - id: updates
     type: version_walk
     description: "Apply update patches per version, common first then ud."
     roots:
-      - "schemas/network/common/updates"
-      - "schemas/network/ud/updates"
+      - "schemas/main/common/updates"
+      - "schemas/main/ud/updates"
     range:
       mode: "{{ run_mode }}"
 
@@ -50,6 +50,7 @@ phases:
         name: "{{ schema_name }}"
         author: "{{ db_user }}"
         date: "{{ today }}"
+        creationProfile: "{{ creation_profile }}"
 
   - id: lastprocess_upgrade
     type: sql_function
@@ -68,27 +69,27 @@ phases:
     type: sql_dir
     optional: true
     steps:
-      - { source: "schemas/network/ud/sample/user", recursive: false }
+      - { source: "schemas/main/ud/sample/user", recursive: false }
 
   - id: load_inv
     type: sql_dir
     optional: true
     steps:
-      - { source: "schemas/network/ud/sample/inv", recursive: false }
+      - { source: "schemas/main/ud/sample/inv", recursive: false }
 
   - id: load_dev
     type: sql_dir
     optional: true
     steps:
-      - { source: "schemas/network/ud/sample/dev", recursive: false }
+      - { source: "schemas/main/ud/sample/dev", recursive: false }
 
   - id: final_pass
     type: sql_dir
     steps:
-      - source: "schemas/network/ud/final_pass/config_form_fields"
+      - source: "schemas/main/ud/final_pass/config_form_fields"
         recursive: false
-      - source: "schemas/network/ud/final_pass/i18n/{{ locale }}"
-        fallback_source: "schemas/network/ud/final_pass/i18n/en_US"
+      - source: "schemas/main/ud/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/main/ud/final_pass/i18n/en_US"
         recursive: false
 
 profiles:
@@ -103,4 +104,4 @@ profiles:
   ci:
     phases: [load_base, updates, lastprocess, load_sample, final_pass]
   update:
-    phases: [reload_fct_ftrg, updates, lastprocess_upgrade]
+    phases: [updates, reload_fct_ftrg, lastprocess_upgrade]

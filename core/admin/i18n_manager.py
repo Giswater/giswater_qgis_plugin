@@ -1996,6 +1996,7 @@ class GwSchemaI18NManager:
         message = "Language"
         message = "Date of creation"
         message = "Date of last update"
+        message = "Creation type"
         message = "In schema"
         message = "Dscenario manager"
         message = "Hydrology scenario manager"

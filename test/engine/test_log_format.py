@@ -5,7 +5,9 @@ from __future__ import annotations
 from giswater_admin.log_format import (
     LogStyle,
     format_build_header,
+    format_elapsed_mmss,
     format_file,
+    format_lbl_time_status,
     format_phase,
     format_progress_status,
     format_timing_summary,
@@ -19,9 +21,14 @@ def test_shorten_path_strips_sql_root():
     assert shorten_path(path, root) == "ws/updates/4/2/0/dml.sql"
 
 
-def test_shorten_path_strips_dbmodel_prefix():
-    path = "dbmodel/schemas/network/ws/ddl.sql"
-    assert shorten_path(path) == "ws/ddl.sql"
+def test_shorten_path_strips_addon_prefix():
+    path = "dbmodel/schemas/addon/utils/base/base.sql"
+    assert shorten_path(path) == "utils/base/base.sql"
+
+
+def test_shorten_path_strips_main_prefix():
+    path = "dbmodel/schemas/main/ws/updates/4/2/0/dml.sql"
+    assert shorten_path(path) == "ws/updates/4/2/0/dml.sql"
 
 
 def test_format_phase_counter_padding():
@@ -66,9 +73,23 @@ def test_format_progress_status_file():
         "dbmodel/schemas/network/ws/updates/4/2/0/dml.sql",
         sql_root="dbmodel",
     )
-    assert "145/723" in hint
-    assert "4/2/0/dml.sql" in hint
-    assert "updates" in hint
+    assert hint == "[145/723] - ws/updates/4/2/0/dml.sql"
+
+
+def test_format_lbl_time_status():
+    line = format_lbl_time_status(
+        61,
+        0,
+        500,
+        "dbmodel/schemas/main/ws/base/base.sql",
+        sql_root="dbmodel",
+    )
+    assert line == "01:01 | [0/500] - ws/base/base.sql"
+
+
+def test_format_elapsed_mmss():
+    assert format_elapsed_mmss(61) == "01:01"
+    assert format_elapsed_mmss(0) == "00:00"
 
 
 def test_format_build_header():

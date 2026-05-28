@@ -3,12 +3,7 @@
 # Mirrors the legacy admin_btn `create_project_data_schema` flow:
 #   load_base -> updates -> lastprocess -> [sample | inv] -> final_pass
 #
-# Template variables resolved at runtime from BuildParams.as_ctx():
-#   schema_name, srid, locale, plugin_version, project_version,
-#   run_mode, db_user, today, profile, ...
-#
-# File-content substitutions (engine-baseline, see BuildParams.base_subs):
-#   SCHEMA_NAME, SRID_VALUE, AUX_SCHEMA_NAME
+# SQL sources live under dbmodel/schemas/main/.
 
 kind: ws
 engine_version: 1
@@ -20,28 +15,28 @@ phases:
     type: sql_dir
     description: "DDL + common functions/triggers + ws functions/triggers + ws schema_model"
     steps:
-      - { source: "schemas/network/common/ddl",  recursive: false }
-      - { source: "schemas/network/common/fct",  recursive: false }
-      - { source: "schemas/network/common/ftrg", recursive: false }
-      - { source: "schemas/network/ws/fct",          recursive: false }
-      - { source: "schemas/network/ws/ftrg",         recursive: false }
-      - { source: "schemas/network/ws/schema_model", recursive: false }
+      - { source: "schemas/main/common/base/ddl",  recursive: false }
+      - { source: "schemas/main/common/base/fct",  recursive: false }
+      - { source: "schemas/main/common/base/ftrg", recursive: false }
+      - { source: "schemas/main/ws/base/fct",          recursive: false }
+      - { source: "schemas/main/ws/base/ftrg",         recursive: false }
+      - { source: "schemas/main/ws/base/schema_model", recursive: false }
 
   - id: reload_fct_ftrg
     type: sql_dir
     description: "Re-apply functions and triggers (no DDL, no schema_model)."
     steps:
-      - { source: "schemas/network/common/fct",  recursive: false }
-      - { source: "schemas/network/common/ftrg", recursive: false }
-      - { source: "schemas/network/ws/fct",      recursive: false }
-      - { source: "schemas/network/ws/ftrg",     recursive: false }
+      - { source: "schemas/main/common/base/fct",  recursive: false }
+      - { source: "schemas/main/common/base/ftrg", recursive: false }
+      - { source: "schemas/main/ws/base/fct",      recursive: false }
+      - { source: "schemas/main/ws/base/ftrg",     recursive: false }
 
   - id: updates
     type: version_walk
     description: "Apply update patches per version, common first then ws."
     roots:
-      - "schemas/network/common/updates"
-      - "schemas/network/ws/updates"
+      - "schemas/main/common/updates"
+      - "schemas/main/ws/updates"
     range:
       mode: "{{ run_mode }}"
 
@@ -62,6 +57,7 @@ phases:
         name: "{{ schema_name }}"
         author: "{{ db_user }}"
         date: "{{ today }}"
+        creationProfile: "{{ creation_profile }}"
 
   - id: lastprocess_upgrade
     type: sql_function
@@ -82,30 +78,30 @@ phases:
     optional: true
     description: "Sample 'user' data for ws."
     steps:
-      - { source: "schemas/network/ws/sample/user", recursive: false }
+      - { source: "schemas/main/ws/sample/user", recursive: false }
 
   - id: load_inv
     type: sql_dir
     optional: true
     description: "Inventory-only fixtures on top of sample. v1 = subtractive."
     steps:
-      - { source: "schemas/network/ws/sample/inv", recursive: false }
+      - { source: "schemas/main/ws/sample/inv", recursive: false }
 
   - id: load_dev
     type: sql_dir
     optional: true
     description: "Dev fixtures. Reachable via CLI --profile dev."
     steps:
-      - { source: "schemas/network/ws/sample/dev", recursive: false }
+      - { source: "schemas/main/ws/sample/dev", recursive: false }
 
   - id: final_pass
     type: sql_dir
     description: "Form fields + i18n. Falls back to en_US when locale folder missing."
     steps:
-      - source: "schemas/network/ws/final_pass/config_form_fields"
+      - source: "schemas/main/ws/final_pass/config_form_fields"
         recursive: false
-      - source: "schemas/network/ws/final_pass/i18n/{{ locale }}"
-        fallback_source: "schemas/network/ws/final_pass/i18n/en_US"
+      - source: "schemas/main/ws/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/main/ws/final_pass/i18n/en_US"
         recursive: false
 
 profiles:
@@ -120,6 +116,4 @@ profiles:
   ci:
     phases: [load_base, updates, lastprocess, load_sample, final_pass]
   update:
-    # In-place upgrade. Set run_mode=upgrade to narrow the version walk to
-    # project_version < v <= plugin_version.
-    phases: [reload_fct_ftrg, updates, lastprocess_upgrade]
+    phases: [updates, reload_fct_ftrg, lastprocess_upgrade]

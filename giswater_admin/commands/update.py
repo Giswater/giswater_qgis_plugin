@@ -43,6 +43,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         return 1
 
     target_version = args.to_version or args.plugin_version
+    infer_parents = "true" if kind == "utils" else "false"
     params = BuildParams(
         schema_name=args.schema,
         srid="0",  # irrelevant for upgrade phases (they don't touch SRID)
@@ -53,6 +54,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         profile="update",
         db_user=_safe_user(args),
         sql_root=args.dbmodel_path,
+        infer_parents_from_config=infer_parents,
     )
 
     if args.check:

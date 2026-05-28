@@ -20,9 +20,19 @@ def run(args: argparse.Namespace, out: Out) -> int:
         )
         return 1
 
-    if args.kind == "utils" and (not args.ws_schema or not args.ud_schema):
-        out.error("kind=utils requires --ws-schema and --ud-schema.")
-        return 1
+    if args.kind == "utils":
+        if args.profile == "integrate_ws" and not args.ws_schema:
+            out.error("kind=utils profile=integrate_ws requires --ws-schema.")
+            return 1
+        if args.profile == "integrate_ud" and not args.ud_schema:
+            out.error("kind=utils profile=integrate_ud requires --ud-schema.")
+            return 1
+        if args.profile == "copy_data" and not (args.copy_source_schema or args.ws_schema or args.ud_schema):
+            out.error(
+                "kind=utils profile=copy_data requires --copy-source-schema "
+                "(or --ws-schema / --ud-schema)."
+            )
+            return 1
     if args.kind == "cm" and not args.parent_schema:
         out.error("kind=cm requires --parent-schema.")
         return 1
@@ -74,7 +84,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         if not h.cm_parent_supported(args.dbmodel_path, parent_type):
             out.error(
                 f"kind=cm: parent_type='{parent_type}' is not supported in this dbmodel. "
-                f"Missing 'schemas/cm/parent_schema/{parent_type}/ddl.sql'."
+                f"Missing 'schemas/addon/cm/integration/{parent_type}/integration.sql'."
             )
             if conn is not None:
                 conn.close()
@@ -94,6 +104,31 @@ def run(args: argparse.Namespace, out: Out) -> int:
             main_version = ws_ver
             out.info(f"main_project_version lifted from {args.ws_schema}: {ws_ver}")
 
+    creation_profile = ""
+    if args.kind in ("ws", "ud"):
+        _profile_map = {
+            "empty": "empty",
+            "sample_inv": "inventory",
+            "sample_full": "sample",
+        }
+        creation_profile = _profile_map.get(args.profile, "")
+
+    register_is_new = "false"
+    infer_parents = "false"
+    register_parent = ""
+    copy_source = args.copy_source_schema or ""
+    if args.kind == "utils":
+        if args.profile == "empty":
+            register_is_new = "true"
+        elif args.profile in ("integrate_ws", "integrate_ud", "update"):
+            infer_parents = "true"
+        if args.profile == "integrate_ws":
+            register_parent = args.ws_schema or ""
+        elif args.profile == "integrate_ud":
+            register_parent = args.ud_schema or ""
+        elif args.profile == "copy_data":
+            copy_source = copy_source or args.ws_schema or args.ud_schema or ""
+
     params = BuildParams(
         schema_name=args.schema,
         srid=str(srid),
@@ -110,6 +145,11 @@ def run(args: argparse.Namespace, out: Out) -> int:
         parent_type=parent_type,
         am_target=am_target,
         main_project_version=main_version,
+        creation_profile=creation_profile,
+        copy_source_schema=copy_source,
+        register_is_new=register_is_new,
+        infer_parents_from_config=infer_parents,
+        register_parent_schema=register_parent,
     )
 
     if args.check:

@@ -1,12 +1,6 @@
 # Audit schema manifest.
 #
-# Two distinct operations: "structure" (DDL/views/report/roles, run
-# once) and "activate" (per-schema trigger wiring, run against each
-# ws/ud schema you want audited).
-#
-# SCHEMA_NAME for `structure` is the audit schema itself; for
-# `activate` SCHEMA_NAME is the target ws/ud schema (set via
-# BuildParams.schema_name to ws_xxx / ud_xxx).
+# structure = audit DDL; activate = per-parent trigger wiring.
 
 kind: audit
 engine_version: 1
@@ -16,29 +10,50 @@ substitutions: {}
 phases:
   - id: load_structure
     type: sql_dir
-    description: "Build the audit schema DDL + views + report + roles."
+    description: "Build the audit schema DDL + base functions."
     steps:
-      - { source: "schemas/audit/structure", recursive: false }
+      - { source: "schemas/addon/audit/base/base.sql", recursive: false }
+      - { source: "schemas/addon/audit/base/fct", recursive: false }
 
   - id: load_activate
     type: sql_dir
     description: "Attach audit triggers + helpers to the target ws/ud schema."
     steps:
-      - { source: "schemas/audit/activate", recursive: false }
+      - source: "schemas/addon/audit/integration/common/fct"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/addon/audit/integration/{{ parent_type }}/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
 
-  - id: load_checkproject
-    type: sql_dir
+  - id: load_updates
+    type: version_walk
     optional: true
-    description: "audit_checkproject helpers (optional, kind-specific views)."
-    steps:
-      - { source: "schemas/audit/audit_checkproject", recursive: false }
+    description: "Audit semver patches."
+    root: "schemas/addon/audit/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: register_version
+    type: sql_function
+    description: "Append audit.sys_version row."
+    function: "audit.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "AUDIT"
+        isNewProject: "TRUE"
+        parentSchema: "{{ parent_schema }}"
+        mergeAddparam: {}
 
 profiles:
   structure:
-    phases: [load_structure]
+    phases: [load_structure, load_updates, register_version]
   activate:
     phases: [load_activate]
-  checkproject:
-    phases: [load_checkproject]
+  update:
+    phases: [load_updates, register_version]
   full:
-    phases: [load_structure, load_checkproject]
+    phases: [load_structure, load_updates, register_version]

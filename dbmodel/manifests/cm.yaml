@@ -1,16 +1,6 @@
 # Campaign-management schema manifest.
 #
-# `schemas/cm/common/` = shared CM SQL (like `network/common` for ws/ud).
-# Not the satellite `utils` schema (`kind: utils` in manifests/utils.yaml).
-#
-# cm attaches to a parent ws OR ud schema. The CLI / plugin auto-detects
-# `parent_type` from the parent's sys_version.project_type and passes
-# it via BuildParams so {{ parent_type }} resolves to "ws" or "ud".
-#
-# Phases mirror project_schema_cm_create.GwCreateSchemaCmTask.
-# `load_parent_schema` runs against the PARENT schema (not the cm
-# schema being created), so its steps override SCHEMA_NAME via
-# `schema_override`.
+# cm attaches to a parent ws OR ud schema via integration/.
 
 kind: cm
 engine_version: 1
@@ -20,33 +10,19 @@ substitutions: {}
 phases:
   - id: load_base_schema
     type: sql_dir
-    description: "Bootstrap cm schema: common ddl/fct/ftrg + cm base."
+    description: "Bootstrap cm schema: base ddl/fct/ftrg."
     steps:
-      - { source: "schemas/cm/common/ddl",  recursive: false }
-      - { source: "schemas/cm/common/fct",  recursive: false }
-      - { source: "schemas/cm/common/ftrg", recursive: false }
-      - { source: "schemas/cm/base",        recursive: false }
+      - { source: "schemas/addon/cm/base/base.sql", recursive: false }
+      - { source: "schemas/addon/cm/base/fct",  recursive: false }
+      - { source: "schemas/addon/cm/base/ftrg", recursive: false }
 
-  - id: load_parent_schema
+  - id: integrate_cm
     type: sql_dir
-    description: >
-      Run parent_schema artefacts. SCHEMA_NAME flips to PARENT_SCHEMA for
-      these steps because the SQL bodies build views/triggers inside
-      the ws/ud parent, not the cm child.
+    description: "Wire cm into the parent ws/ud schema."
     steps:
-      - source: "schemas/cm/parent_schema/{{ parent_type }}/ddl.sql"
+      - source: "schemas/addon/cm/integration/common/integration.sql"
         recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cm/parent_schema/fct"
-        recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cm/parent_schema/ftrg"
-        recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cm/parent_schema/utils"
-        recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cm/parent_schema/{{ parent_type }}/trg.sql"
+      - source: "schemas/addon/cm/integration/{{ parent_type }}/integration.sql"
         recursive: false
         schema_override: "{{ parent_schema }}"
 
@@ -55,18 +31,17 @@ phases:
     optional: true
     description: "Sample catalogues + parent-type-specific seed data."
     steps:
-      - source: "schemas/cm/sample/utils"
+      - source: "schemas/addon/cm/sample/user"
         recursive: false
-        schema_override: "{{ parent_schema }}"
-      - source: "schemas/cm/sample/{{ parent_type }}"
+      - source: "schemas/addon/cm/integration/{{ parent_type }}/sample.sql"
         recursive: false
         schema_override: "{{ parent_schema }}"
 
   - id: load_updates
     type: version_walk
     optional: true
-    description: "Walk dbmodel/schemas/cm/updates/<M>/<m>/<p>/ semver-ordered."
-    root: "schemas/cm/updates"
+    description: "Walk dbmodel/schemas/addon/cm/updates/<M>/<m>/<p>/ semver-ordered."
+    root: "schemas/addon/cm/updates"
     range:
       mode: "{{ run_mode }}"
 
@@ -74,14 +49,28 @@ phases:
     type: sql_dir
     description: "cm i18n. Falls back to en_US when locale folder missing."
     steps:
-      - source: "schemas/cm/i18n/{{ locale }}"
-        fallback_source: "schemas/cm/i18n/en_US"
+      - source: "schemas/addon/cm/i18n/{{ locale }}"
+        fallback_source: "schemas/addon/cm/i18n/en_US"
         recursive: false
+
+  - id: register_version
+    type: sql_function
+    description: "Sync cm.sys_version from parent."
+    function: "cm.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "CM"
+        isNewProject: "TRUE"
+        parentSchema: "{{ parent_schema }}"
+        mergeAddparam: {}
 
 profiles:
   empty:
-    phases: [load_base_schema, load_parent_schema, load_updates, load_locale]
+    phases: [load_base_schema, integrate_cm, load_updates, load_locale, register_version]
   with_sample:
-    phases: [load_base_schema, load_parent_schema, load_sample, load_updates, load_locale]
+    phases: [load_base_schema, integrate_cm, load_sample, load_updates, load_locale, register_version]
   update:
-    phases: [load_updates, load_locale]
+    phases: [load_updates, load_locale, register_version]

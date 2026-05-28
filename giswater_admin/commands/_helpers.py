@@ -68,7 +68,7 @@ def detect_project_version(conn: Any, schema: str) -> str:
     try:
         with conn.raw.cursor() as cur:  # type: ignore[attr-defined]
             cur.execute(
-                f"SELECT giswater FROM \"{schema}\".sys_version "
+                f'SELECT giswater FROM "{schema}".sys_version '
                 "ORDER BY id DESC LIMIT 1"
             )
             row = cur.fetchone()
@@ -135,7 +135,9 @@ def cm_parent_supported(dbmodel_path: str, parent_type: str) -> bool:
     """
     if not parent_type:
         return False
-    ddl = os.path.join(dbmodel_path, "schemas", "cm", "parent_schema", parent_type, "ddl.sql")
+    ddl = os.path.join(
+        dbmodel_path, "schemas", "addon", "cm", "integration", parent_type, "integration.sql"
+    )
     return os.path.isfile(ddl)
 
 

@@ -52,6 +52,13 @@ class BuildParams:
     main_project_version: str = ""
     db_name: str = ""
 
+    # sys_version registration (manifest sql_function payloads).
+    creation_profile: str = ""
+    copy_source_schema: str = ""
+    register_is_new: str = "false"
+    infer_parents_from_config: str = "false"
+    register_parent_schema: str = ""
+
     # Cooperative cancel.
     cancel_token: CancelToken = field(default_factory=CancelToken)
 
@@ -80,6 +87,11 @@ class BuildParams:
             "am_target": self.am_target,
             "today": self.today,
             "profile": self.profile,
+            "creation_profile": self.creation_profile,
+            "copy_source_schema": self.copy_source_schema,
+            "register_is_new": self.register_is_new,
+            "infer_parents_from_config": self.infer_parents_from_config,
+            "register_parent_schema": self.register_parent_schema,
         }
 
     def base_subs(self) -> dict[str, str]:

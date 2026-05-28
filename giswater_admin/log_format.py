@@ -55,8 +55,12 @@ def shorten_path(path: str, sql_root: str = "") -> str:
     elif root and p == root:
         p = ""
     for prefix in (
+        "dbmodel/schemas/main/",
+        "dbmodel/schemas/addon/",
         "dbmodel/schemas/network/",
         "dbmodel/schemas/",
+        "schemas/main/",
+        "schemas/addon/",
         "schemas/network/",
     ):
         if p.startswith(prefix):
@@ -143,6 +147,12 @@ def format_file(
     return line
 
 
+def format_elapsed_mmss(seconds: int) -> str:
+    """Compact MM:SS elapsed time for QGIS ``lbl_time``."""
+    seconds = max(0, int(seconds))
+    return f"{seconds // 60:02d}:{seconds % 60:02d}"
+
+
 def format_progress_status(
     seen: int,
     total: int,
@@ -153,16 +163,34 @@ def format_progress_status(
     """
     Compact status for QGIS ``lbl_time`` (counter + current file).
     """
-    counter = f"{seen}/{total}" if total else ""
+    counter = f"[{seen}/{total}]" if total else ""
     if label == "done":
-        return f"{counter}  done".strip() if counter else "done"
+        return f"{counter} - done".strip(" -") if counter else "done"
     if label.startswith("phase:"):
-        return counter
+        pid = label.removeprefix("phase:")
+        return f"{counter} - phase {pid}".strip(" -") if counter else f"phase {pid}"
     if label.startswith("<fn:") or label.startswith("<inline:"):
         return counter
     file_part = shorten_path(label, sql_root)
-    parts = [p for p in (counter, file_part) if p]
-    return "  ".join(parts)
+    if counter and file_part:
+        return f"{counter} - {file_part}"
+    return counter or file_part
+
+
+def format_lbl_time_status(
+    elapsed_seconds: int,
+    seen: int,
+    total: int,
+    label: str = "",
+    *,
+    sql_root: str = "",
+) -> str:
+    """``lbl_time`` line: ``MM:SS | [n/total] - file``."""
+    elapsed = format_elapsed_mmss(elapsed_seconds)
+    hint = format_progress_status(seen, total, label, sql_root=sql_root)
+    if hint:
+        return f"{elapsed} | {hint}"
+    return elapsed
 
 
 def format_timing_summary(

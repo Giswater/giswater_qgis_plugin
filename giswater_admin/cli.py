@@ -87,15 +87,15 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--ws-schema", default=None,
                     help="Linked ws schema (required for kind=utils).")
     sp.add_argument("--ud-schema", default=None,
-                    help="Linked ud schema (required for kind=utils).")
+                    help="Linked ud schema (utils integrate_ud / optional context).")
+    sp.add_argument("--copy-source-schema", default=None,
+                    help="Parent schema to copy ext_* data from (utils copy_data).")
     sp.add_argument("--parent-schema", default=None,
                     help="Parent ws/ud schema (required for kind=cm).")
     sp.add_argument("--parent-type", default=None, choices=["ws", "ud"],
                     help="Override kind=cm parent_type (default: auto-detect).")
     sp.add_argument("--main-version", default=None,
-                    help="Main project version stored in satellite schemas "
-                         "(utils.config_param_system.utils_version). "
-                         "Defaults to --plugin-version.")
+                    help="Main project version for satellite context. Defaults to --plugin-version.")
     sp.add_argument("--am-target", default=None,
                     help=argparse.SUPPRESS)  # deprecated: AM now uses --plugin-version (semver).
     sp.add_argument("--check", action="store_true",

@@ -46,7 +46,7 @@ from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 from ..threads.admin_load_task import GwAdminLoadTask, AdminLoadResult, READ_EXTENSIONS
 from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema, format_upgrade_changelog
-from ...giswater_admin.log_format import format_progress_status
+from ...giswater_admin.log_format import format_elapsed_mmss, format_lbl_time_status
 from ._qt_db_adapter import QtDbAdapter
 from . import _admin_catalog as admin_catalog
 
@@ -305,6 +305,7 @@ class GwAdminButton:
             locale=params['project_locale'],
             plugin_version=str(self.plugin_version),
             profile=profile,
+            creation_profile={'empty': 'empty', 'sample_inv': 'inventory', 'sample_full': 'sample'}.get(profile, 'empty'),
             run_mode='new_project',
             db_user=self.username if hasattr(self, 'username') else 'postgres',
             sql_root=self.sql_dir,
@@ -403,11 +404,13 @@ class GwAdminButton:
         )
         pt_norm = (parent_type or "").lower()
         if pt_norm and not os.path.isfile(
-            os.path.join(self.sql_dir, "schemas", "cm", "parent_schema", pt_norm, "ddl.sql")
+            os.path.join(
+                self.sql_dir, "schemas", "addon", "cm", "integration", pt_norm, "integration.sql"
+            )
         ):
             msg = (
                 f"cm schema is not supported for parent_type='{pt_norm}' in this dbmodel. "
-                f"Missing schemas/cm/parent_schema/{pt_norm}/ddl.sql."
+                f"Missing schemas/addon/cm/integration/{pt_norm}/integration.sql."
             )
             tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
             return
@@ -417,7 +420,7 @@ class GwAdminButton:
         if steps == ['load_base_schema']:
             profile_phases = ['load_base_schema']
         elif steps == ['load_parent_schema']:
-            profile_phases = ['load_parent_schema']
+            profile_phases = ['integrate_cm']
         elif steps == ['load_example']:
             profile_phases = ['load_example']
         elif steps == ['load_locale']:
@@ -492,11 +495,13 @@ class GwAdminButton:
             parent_schema, _, parent_type = schema_info
             pt_norm = (parent_type or "").lower()
             if pt_norm and not os.path.isfile(
-                os.path.join(self.sql_dir, "schemas", "cibs", "integration", pt_norm, "integration.sql")
+                os.path.join(
+                    self.sql_dir, "schemas", "addon", "cibs", "integration", pt_norm, "integration.sql"
+                )
             ):
                 msg = (
                     f"cibs schema is not supported for parent_type='{pt_norm}' in this dbmodel. "
-                    f"Missing schemas/cibs/integration/{pt_norm}/integration.sql."
+                    f"Missing schemas/addon/cibs/integration/{pt_norm}/integration.sql."
                 )
                 tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
                 return
@@ -1989,15 +1994,23 @@ class GwAdminButton:
             project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
             if project_date_create == project_date_update:
                 project_date_update = ''
+            creation_profile = last_dict_info.get('creation_profile')
+            creation_profile_labels = {
+                'empty': tools_qt.tr("Empty data"),
+                'inventory': tools_qt.tr("Inventory Example"),
+                'sample': tools_qt.tr("Full Example"),
+            }
             msg = (f'''{tools_qt.tr("PostgreSQL version")}: {self.postgresql_version}\n'''
                    f'''{tools_qt.tr("PostGis version")}: {self.postgis_version}\n'''
                    f'''{tools_qt.tr("PgRouting version")}: {self.pgrouting_version}\n \n'''
                    f'''{tools_qt.tr("Schema name")}: {schema_name}\n'''
                    f'''{tools_qt.tr("Version")}: {self.project_version}\n'''
                    f'''EPSG: {self.project_epsg}\n'''
-                   f'''{tools_qt.tr("Language")}: {self.project_language}\n'''
-                   f'''{tools_qt.tr("Date of creation")}: {project_date_create}\n'''
-                   f'''{tools_qt.tr("Date of last update")}: {project_date_update}\n''')
+                   f'''{tools_qt.tr("Language")}: {self.project_language}\n''')
+            if creation_profile:
+                msg += f'''{tools_qt.tr("Creation type")}: {creation_profile_labels.get(creation_profile, creation_profile)}\n'''
+            msg += (f'''{tools_qt.tr("Date of creation")}: {project_date_create}\n'''
+                    f'''{tools_qt.tr("Date of last update")}: {project_date_update}\n''')
 
             self.software_version_info.setText(msg)
 
@@ -3360,57 +3373,112 @@ class GwAdminButton:
                "WHERE schema_name ILIKE 'cibs' ORDER BY schema_name")
         return tools_db.get_row(sql, commit=False) is not None
 
-    def _create_utils(self):
-        """Create the (singleton) utils satellite schema via the engine."""
-
-        # Manage cmb_utils_projecttypes null values
-        self.ws_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False)
-        self.ud_project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_utils_ud, return_string_null=False)
-
-        if self.ws_project_name == "" or self.ud_project_name == "":
-            msg = "You need to have a ws and ud schema created to create a utils schema"
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
-            return
-
-        # Get giswater version for ws and ud project selected
-        ws_row = tools_db.get_row(
-            f"SELECT giswater, language, epsg FROM {self.ws_project_name}.sys_version ORDER BY id DESC LIMIT 1"
+    def _run_create_utils_task(
+        self,
+        profile,
+        process_name,
+        ws_schema='',
+        ud_schema='',
+        copy_source='',
+        project_version='0.0.0',
+    ):
+        register_is_new = 'true' if profile == 'empty' else 'false'
+        infer_parents = 'true' if profile in ('integrate_ws', 'integrate_ud', 'update') else 'false'
+        register_parent = ws_schema if profile == 'integrate_ws' else (
+            ud_schema if profile == 'integrate_ud' else ''
         )
-        ud_row = tools_db.get_row(
-            f"SELECT giswater, language, epsg FROM {self.ud_project_name}.sys_version ORDER BY id DESC LIMIT 1"
-        )
-        if not ws_row or not ud_row:
-            tools_qgis.show_message("Could not read sys_version from ws/ud parent schemas.",
-                                    Qgis.MessageLevel.Warning)
-            return
-        self.ws_project_result = ws_row
-        self.ud_project_result = ud_row
 
-        if ws_row[0] != ud_row[0]:
-            msg = ("You need to select same version for ws and ud projects. "
-                   "Versions: WS - {} ; UD - {}")
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info, msg_params=(ws_row, ud_row,))
-            return
-
-        # Check if utils schema already exists.
-        if admin_catalog.schema_exists('utils'):
-            tools_qgis.show_message("Schema Utils already exist.", Qgis.MessageLevel.Info)
-            return
+        srid = str(getattr(self, 'project_epsg', None) or '25831')
+        locale = self.locale
+        parent_schema = ws_schema or ud_schema
+        if parent_schema:
+            row = tools_db.get_row(
+                f"SELECT giswater, language, epsg FROM {parent_schema}.sys_version "
+                "ORDER BY id DESC LIMIT 1"
+            )
+            if row:
+                locale = str(row[1])
+                srid = str(row[2])
 
         bp = BuildParams(
             schema_name='utils',
-            srid=str(ws_row[2]),
-            locale=str(ws_row[1]),
+            srid=srid,
+            locale=locale,
             plugin_version=str(self.plugin_version),
-            main_project_version=str(ws_row[0]),
-            profile='empty',
-            ws_schema=self.ws_project_name,
-            ud_schema=self.ud_project_name,
+            project_version=str(project_version),
+            profile=profile,
+            run_mode='upgrade' if profile == 'update' else 'new_project',
+            ws_schema=ws_schema or '',
+            ud_schema=ud_schema or '',
+            copy_source_schema=copy_source or '',
+            register_is_new=register_is_new,
+            infer_parents_from_config=infer_parents,
+            register_parent_schema=register_parent,
             sql_root=self.sql_dir,
         )
-        self._submit_builder('utils', bp,
-                             description="Create utils schema",
-                             on_done=partial(self._on_builder_done_utils, 'utils'))
+
+        self._submit_builder(
+            'utils', bp,
+            description=process_name,
+            on_done=partial(self._on_builder_done_utils, 'utils'),
+        )
+
+    def _create_utils(self):
+        """Create the (singleton) utils satellite schema via the engine."""
+        if admin_catalog.schema_exists('utils'):
+            tools_qgis.show_message("Schema Utils already exist.", Qgis.MessageLevel.Info)
+            return
+        self._run_create_utils_task('empty', 'Create utils schema')
+
+    def _adapt_utils_ws(self, ws_schema=None):
+        ws = ws_schema or tools_qt.get_text(
+            self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False
+        )
+        if not ws:
+            tools_qgis.show_message("Select a WS schema to integrate.", Qgis.MessageLevel.Info)
+            return
+        if not admin_catalog.schema_exists('utils'):
+            tools_qgis.show_message("Utils schema does not exist. Create it first.", Qgis.MessageLevel.Info)
+            return
+        row = tools_db.get_row(f"SELECT {ws}.gw_fct_admin_satellite_enabled('utils')")
+        if row and row[0] is True:
+            tools_qgis.show_message("Selected schema is already integrated with utils.", Qgis.MessageLevel.Info)
+            return
+        self._run_create_utils_task('integrate_ws', 'Integrate utils with WS', ws_schema=ws)
+
+    def _adapt_utils_ud(self, ud_schema=None):
+        ud = ud_schema or tools_qt.get_text(
+            self.dlg_readsql, self.dlg_readsql.cmb_utils_ud, return_string_null=False
+        )
+        if not ud:
+            tools_qgis.show_message("Select a UD schema to integrate.", Qgis.MessageLevel.Info)
+            return
+        if not admin_catalog.schema_exists('utils'):
+            tools_qgis.show_message("Utils schema does not exist. Create it first.", Qgis.MessageLevel.Info)
+            return
+        row = tools_db.get_row(f"SELECT {ud}.gw_fct_admin_satellite_enabled('utils')")
+        if row and row[0] is True:
+            tools_qgis.show_message("Selected schema is already integrated with utils.", Qgis.MessageLevel.Info)
+            return
+        self._run_create_utils_task('integrate_ud', 'Integrate utils with UD', ud_schema=ud)
+
+    def _copy_utils_data(self, copy_source=None):
+        source = copy_source or tools_qt.get_text(
+            self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False
+        )
+        if not source:
+            source = tools_qt.get_text(
+                self.dlg_readsql, self.dlg_readsql.cmb_utils_ud, return_string_null=False
+            )
+        if not source:
+            tools_qgis.show_message("Select a parent schema to copy data from.", Qgis.MessageLevel.Info)
+            return
+        if not admin_catalog.schema_exists('utils'):
+            tools_qgis.show_message("Utils schema does not exist. Create it first.", Qgis.MessageLevel.Info)
+            return
+        self._run_create_utils_task(
+            'copy_data', 'Copy utils data', copy_source=source, ws_schema=source
+        )
 
     def _create_cibs(self):
 
@@ -3483,34 +3551,23 @@ class GwAdminButton:
 
     def _update_utils(self, schema_name=None):
         """Run the utils 'update' profile in place."""
-        if schema_name is None:
-            self.ws_project_name = tools_qt.get_text(
-                self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False
-            )
-        else:
-            self.ws_project_name = schema_name
-
         row = tools_db.get_row(
-            "SELECT value FROM utils.config_param_system WHERE parameter = 'utils_version'"
+            "SELECT giswater FROM utils.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
-
-        bp = BuildParams(
-            schema_name='utils',
-            srid="0",
-            locale=self.locale,
-            plugin_version=str(self.plugin_version),
-            project_version=str(current_version),
-            main_project_version=str(self.plugin_version),
-            profile='update',
-            run_mode='upgrade',
-            ws_schema=self.ws_project_name,
-            ud_schema=getattr(self, 'ud_project_name', '') or '',
-            sql_root=self.sql_dir,
+        ws_schema = tools_db.get_row(
+            "SELECT value FROM utils.config_param_system WHERE parameter = 'ws_current_schema'"
         )
-        self._submit_builder('utils', bp,
-                             description="Update utils schema",
-                             on_done=partial(self._on_builder_done_utils, 'utils'))
+        ud_schema = tools_db.get_row(
+            "SELECT value FROM utils.config_param_system WHERE parameter = 'ud_current_schema'"
+        )
+        self._run_create_utils_task(
+            'update',
+            'Update utils schema',
+            ws_schema=(ws_schema[0] if ws_schema else ''),
+            ud_schema=(ud_schema[0] if ud_schema else ''),
+            project_version=str(current_version),
+        )
 
     def _on_builder_done_utils(self, schema_name, result):
         if not result.ok:
@@ -3587,18 +3644,22 @@ class GwAdminButton:
 
     def _calculate_elapsed_time(self, dialog):
 
-        text = getattr(self, "schema_build_progress_hint", "") or ""
-        if not text:
+        elapsed_seconds = int(time() - self.t0)
+        hint = getattr(self, "schema_build_progress_hint", "") or ""
+        if hint:
+            text = f"{format_elapsed_mmss(elapsed_seconds)} | {hint}"
+        else:
             task = self._active_schema_build_task()
             if task is not None:
                 label = getattr(task, "_last_progress_label", "") or ""
                 sql_root = getattr(getattr(task, "params", None), "sql_root", "") or ""
                 seen = getattr(self, "current_sql_file", 0)
                 total = getattr(self, "total_sql_files", 0)
-                if label:
-                    text = format_progress_status(
-                        seen, total, label, sql_root=sql_root
-                    )
+                text = format_lbl_time_status(
+                    elapsed_seconds, seen, total, label, sql_root=sql_root
+                )
+            else:
+                text = format_elapsed_mmss(elapsed_seconds)
         self._update_time_elapsed(text, dialog)
 
     def _update_time_elapsed(self, text, dialog):
