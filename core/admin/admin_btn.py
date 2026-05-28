@@ -366,14 +366,19 @@ class GwAdminButton:
                 schema_name = resolved_parent or "audit"
                 parent_schema = resolved_parent or "audit"
                 parent_type = resolved_type
+            register_is_new = "true" if profile == "structure" else "false"
+            register_parent = "" if profile == "structure" else (resolved_parent or "")
             bp = BuildParams(
                 schema_name=schema_name,
                 srid=str(self.project_epsg or "25831"),
                 locale=self.locale,
                 plugin_version=str(self.plugin_version),
                 profile=profile,
+                run_mode="new_project" if profile == "structure" else "upgrade",
                 parent_schema=parent_schema,
                 parent_type=parent_type,
+                register_is_new=register_is_new,
+                register_parent_schema=register_parent,
                 sql_root=self.sql_dir,
             )
             self._submit_builder("audit", bp,
@@ -473,24 +478,24 @@ class GwAdminButton:
             self.cm_error_count += 1
         self.manage_cm_process_result(process_name)
 
-    def _run_create_cibs_task(self, steps, process_name):
-        """
-        cibs schema lifecycle entry point.
-
-        `steps` is a legacy list like `['load_base_schema']` /
-        `['integrate_cibs']`. We map it to a manifest profile and run the engine.
-        """
-        cibs_schema = "cibs"
-        parent_schema = ""
-        parent_type = ""
-
-        if any(step == "integrate_cibs" for step in steps):
-            schema_info = self._get_cibs_schema_info()
-            if schema_info is None:
-                msg = "Select a WS or UD schema for the cibs operation"
-                tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
-                return
-            parent_schema, _, parent_type = schema_info
+    def _run_create_cibs_task(
+        self,
+        profile,
+        process_name,
+        *,
+        parent_schema="",
+        parent_type="",
+        on_done=None,
+    ):
+        """Run a cibs manifest profile via the schema builder engine."""
+        if profile == "integrate":
+            if not parent_schema or not parent_type:
+                schema_info = self._get_cibs_schema_info()
+                if schema_info is None:
+                    msg = "Select a WS or UD schema for the cibs operation"
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
+                    return
+                parent_schema, _, parent_type = schema_info
             pt_norm = (parent_type or "").lower()
             if pt_norm and not os.path.isfile(
                 os.path.join(
@@ -504,48 +509,34 @@ class GwAdminButton:
                 tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
                 return
 
-        if steps == ['load_base_schema']:
-            profile_phases = ['load_base_schema']
-        elif steps == ['integrate_cibs']:
-            profile_phases = ['integrate_cibs']
-        else:
-            profile_phases = list(steps)
-
-        manifest = load_kind_manifest(self.plugin_dir, "cibs")
-        from ...giswater_admin.engine.manifest import Profile  # local import keeps top-level Qt-free
-        profile_name = profile_phases[0]
-        manifest.profiles[profile_name] = Profile(name=profile_name,
-                                                  phases=tuple(profile_phases))
+        register_is_new = "true" if profile == "empty" else "false"
+        infer_parents = "true" if profile in ("integrate", "update") else "false"
+        register_parent = parent_schema if profile == "integrate" else ""
 
         bp = BuildParams(
-            schema_name=cibs_schema,
+            schema_name="cibs",
             srid=str(self.project_epsg or "25831"),
             locale=self.locale,
             plugin_version=str(self.plugin_version),
-            profile=profile_name,
-            run_mode='new_project',
+            profile=profile,
+            run_mode="upgrade" if profile == "update" else "new_project",
             parent_schema=parent_schema or "",
             parent_type=(parent_type or "").lower(),
+            register_is_new=register_is_new,
+            infer_parents_from_config=infer_parents,
+            register_parent_schema=register_parent,
             sql_root=self.sql_dir,
             db_name=self._get_current_db_name() or "",
         )
 
-        self._open_schema_build_message_log()
-        self.schema_build_progress_hint = ""
-        self.error_count = 0
-        self.t0 = time()
-        self.timer = QTimer()
-        self.timer.start(1000)
-
-        task = GwSchemaBuilderTask(
-            self, manifest, bp,
-            description=process_name.capitalize() if isinstance(process_name, str) else "cibs",
-            timer=self.timer,
-            on_done=partial(self._on_builder_done_cibs, process_name),
+        callback = on_done if on_done is not None else partial(self._on_builder_done_cibs, process_name)
+        task = self._submit_builder(
+            "cibs",
+            bp,
+            description=process_name,
+            on_done=callback,
         )
         self.task_create_cibs_schema = task
-        QgsApplication.taskManager().addTask(task)
-        QgsApplication.taskManager().triggerTask(task)
 
     def _on_builder_done_cibs(self, process_name, result):
         if not result.ok:
@@ -3789,7 +3780,7 @@ class GwAdminButton:
             tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
-        self._run_create_cibs_task(['load_base_schema'], 'Create cibs schema')
+        self._run_create_cibs_task('empty', 'Create cibs schema')
 
     def _adapt_cibs(self):
 
@@ -3824,7 +3815,12 @@ class GwAdminButton:
         if not answer:
             return
 
-        self._run_create_cibs_task(['integrate_cibs'], 'Adapt schema to cibs')
+        self._run_create_cibs_task(
+            'integrate',
+            'Adapt schema to cibs',
+            parent_schema=self.cibs_project_name,
+            parent_type=self.cibs_project_type,
+        )
 
     def _copy_cibs_data(self):
 
@@ -3912,6 +3908,7 @@ class GwAdminButton:
             run_mode='upgrade',
             parent_schema='audit',
             parent_type='',
+            register_is_new='false',
             sql_root=self.sql_dir,
         )
         callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'audit')

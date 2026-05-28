@@ -44,9 +44,9 @@ phases:
       data:
         gwVersion: "{{ plugin_version }}"
         projectType: "CIBS"
-        isNewProject: "TRUE"
-        inferParentsFromConfig: "FALSE"
-        parentSchema: "{{ parent_schema }}"
+        isNewProject: "{{ register_is_new }}"
+        inferParentsFromConfig: "{{ infer_parents_from_config }}"
+        parentSchema: "{{ register_parent_schema }}"
         mergeAddparam: {}
 
 profiles:

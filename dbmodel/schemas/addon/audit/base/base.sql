@@ -5,9 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-CREATE SCHEMA IF NOT EXISTS audit;
+SET search_path = audit, public, pg_catalog;
 
-CREATE TABLE audit.log (
+CREATE TABLE log (
     id serial8 PRIMARY KEY,
     tstamp timestamp default now(),
     table_name text,
@@ -22,7 +22,7 @@ CREATE TABLE audit.log (
     schema text
 );
 
-CREATE TABLE audit.sys_version (
+CREATE TABLE sys_version (
 	id serial4 NOT NULL,
 	giswater varchar(16) NOT NULL,
 	project_type varchar(16) NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE audit.sys_version (
 	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE audit.audit_fid_log
+CREATE TABLE audit_fid_log
 (
   id bigserial NOT NULL PRIMARY KEY,
   fid smallint,
@@ -47,7 +47,7 @@ CREATE TABLE audit.audit_fid_log
   source json
 );
 
-CREATE TABLE audit.anl_arc
+CREATE TABLE anl_arc
 (
   id bigserial NOT NULL PRIMARY KEY,
   arc_id character varying(16) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE audit.anl_arc
   source json
 );
 
-CREATE TABLE audit.anl_node
+CREATE TABLE anl_node
 (
   id bigserial NOT NULL PRIMARY KEY,
   node_id character varying(16) NOT NULL,
@@ -95,48 +95,46 @@ CREATE TABLE audit.anl_node
 
 
 CREATE INDEX anl_node_fprocesscat_id_index
-  ON audit.anl_node
+  ON anl_node
   USING btree
   (fid);
 
 CREATE INDEX anl_node_index
-  ON audit.anl_node
+  ON anl_node
   USING gist
   (the_geom);
 
 CREATE INDEX anl_node_node_id_index
-  ON audit.anl_node
+  ON anl_node
   USING btree
   (node_id COLLATE pg_catalog."default");
 
 CREATE INDEX anl_arc_arc_id
-  ON audit.anl_arc
+  ON anl_arc
   USING btree
   (arc_id COLLATE pg_catalog."default");
 
 CREATE INDEX anl_arc_index
-  ON audit.anl_arc
+  ON anl_arc
   USING gist
   (the_geom);
 
 
 
 
-SET search_path = audit, public, pg_catalog;
-
-CREATE or replace VIEW audit.v_log AS
+CREATE or replace VIEW v_log AS
 SELECT insert_by,  count (*) , action, date FROM
-(SELECT insert_by, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log)a
+(SELECT insert_by, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from log)a
 group by insert_by, date, action
 ORDER BY date desc;
 
-GRANT ALL ON TABLE audit.v_log TO role_plan;
+GRANT ALL ON TABLE v_log TO role_plan;
 
 
-CREATE OR REPLACE VIEW audit.v_fidlog_aux
+CREATE OR REPLACE VIEW v_fidlog_aux
 AS WITH last_date AS (
          SELECT max(afl.tstamp) as tstamp, source->>'schema' as schema
-           FROM audit.audit_fid_log afl
+           FROM audit_fid_log afl
            group by source ->>'schema'
         )
  SELECT a.tstamp::date AS date,
@@ -145,7 +143,7 @@ AS WITH last_date AS (
     a.fprocess_name,
     a.criticity,
     a.fcount AS value
-   FROM audit.audit_fid_log a,
+   FROM audit_fid_log a,
     last_date
   WHERE a.tstamp = last_date.tstamp and a.source->>'schema' = last_date.schema
   ORDER BY a.tstamp, (a.source ->> 'schema'), a.type;
@@ -176,7 +174,7 @@ GRANT INSERT, SELECT ON TABLE v_fidlog TO role_basic;
 
 
 
-CREATE OR REPLACE VIEW audit.v_fidlog_table
+CREATE OR REPLACE VIEW v_fidlog_table
 AS SELECT ct.date_schema[1]::date AS date,
     ct.date_schema[2] AS schema,
     'WARNING'::text AS criticity,
@@ -191,7 +189,7 @@ AS SELECT ct.date_schema[1]::date AS date,
     (ct.length::numeric / 1000::numeric)::numeric(12,1) AS km,
     (100000::numeric * (COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) + COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0))::numeric / ct.length::numeric)::integer AS index
    FROM crosstab('
-SELECT ARRAY[date::text, schema], type, value FROM audit.v_fidlog where criticity in (0,2)
+SELECT ARRAY[date::text, schema], type, value FROM v_fidlog where criticity in (0,2)
 '::text, 'VALUES (''Check om-data''), (''Check om-topology''), (''Check graf-data''),(''Check epa-config''), (''Check epa-data''),(''Check epa-topology''), (''Check plan-config''),(''length'')'::text) ct(date_schema text[], omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
 UNION
  SELECT ct.date_schema[1]::date AS date,
@@ -208,7 +206,7 @@ UNION
     (ct.length::numeric / 1000::numeric)::numeric(12,1) AS km,
     (100000::numeric * (COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) + COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0))::numeric / ct.length::numeric)::integer AS index
    FROM crosstab('
-SELECT ARRAY[date::text, schema], type, value FROM audit.v_fidlog where criticity in (0,3)
+SELECT ARRAY[date::text, schema], type, value FROM v_fidlog where criticity in (0,3)
 '::text, 'VALUES (''Check om-data''), (''Check om-topology''), (''Check graf-data''),(''Check epa-config''), (''Check epa-data''),(''Check epa-topology''), (''Check plan-config''),(''length'')'::text) ct(date_schema text[], omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
   ORDER BY 1, 2, 3, 4;
 
@@ -216,7 +214,7 @@ GRANT ALL ON TABLE v_fidlog TO role_admin;
 GRANT INSERT, SELECT ON TABLE v_fidlog TO role_basic;
 
 
-CREATE OR REPLACE VIEW audit.v_fidlog_index
+CREATE OR REPLACE VIEW v_fidlog_index
 AS SELECT ct.date_schema[1]::date AS date,
     ct.date_schema[2] AS schema,
     a.total AS errors,
@@ -225,20 +223,20 @@ AS SELECT ct.date_schema[1]::date AS date,
     ct.index_3 AS err100km,
     ct.index_2 AS war100km,
     concat(ct.index_3, '.', ct.index_2) AS index
-   FROM crosstab('SELECT ARRAY[date::text, schema], criticity, index  FROM audit.v_fidlog_table'::text, 'VALUES (''WARNING''), (''ERROR'')'::text) ct(date_schema text[], index_2 integer, index_3 integer)
+   FROM crosstab('SELECT ARRAY[date::text, schema], criticity, index  FROM v_fidlog_table'::text, 'VALUES (''WARNING''), (''ERROR'')'::text) ct(date_schema text[], index_2 integer, index_3 integer)
      JOIN ( SELECT v_fidlog_table.date,
             v_fidlog_table.schema,
             v_fidlog_table.total,
             v_fidlog_table.km,
             v_fidlog_table.index
-           FROM audit.v_fidlog_table
+           FROM v_fidlog_table
           WHERE v_fidlog_table.criticity = 'ERROR'::text) a ON a.date = ct.date_schema[1]::date AND a.schema = ct.date_schema[2]
      JOIN ( SELECT v_fidlog_table.date,
             v_fidlog_table.schema,
             v_fidlog_table.total,
             v_fidlog_table.km,
             v_fidlog_table.index
-           FROM audit.v_fidlog_table
+           FROM v_fidlog_table
           WHERE v_fidlog_table.criticity = 'WARNING'::text) b ON b.date = ct.date_schema[1]::date AND b.schema = ct.date_schema[2]
   WHERE ct.index_3 IS NOT NULL AND ct.index_2 IS NOT NULL;
 
@@ -248,22 +246,20 @@ GRANT INSERT, SELECT ON TABLE v_fidlog_index TO role_basic;
 
 SET search_path = PARENT_SCHEMA, public, pg_catalog;
 
-CREATE OR REPLACE VIEW audit.v_log AS
+CREATE OR REPLACE VIEW v_log AS
 SELECT insert_by,  count (*) , action, date FROM
-(SELECT insert_by, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date, schema from audit.log)a
+(SELECT insert_by, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date, schema from log)a
 group by insert_by, date, action, schema
 ORDER BY date desc;
 
-GRANT ALL ON TABLE audit.v_log TO role_plan;
-
-INSERT INTO audit.sys_version (id, giswater, project_type, postgres, postgis, "date", "language", epsg) VALUES(2, '4.0.001', 'AUDIT', 'PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit', '3.4 USE_GEOS=1 USE_PROJ=1 USE_STATS=1', '2025-04-16 10:48:31.383', 'en_US', 25831) ON CONFLICT (id) DO NOTHING;
+GRANT ALL ON TABLE v_log TO role_plan;
 
 
 GRANT ALL ON SCHEMA audit TO role_basic; --probably the restriction might be stronger
-GRANT ALL ON SEQUENCE audit.log_id_seq TO role_basic;
+GRANT ALL ON SEQUENCE log_id_seq TO role_basic;
 
 
-CREATE TABLE IF NOT EXISTS audit.snapshot (
+CREATE TABLE IF NOT EXISTS snapshot (
     date DATE DEFAULT CURRENT_DATE,
     description TEXT NULL,
     tables TEXT[] NULL,
