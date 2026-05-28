@@ -17,13 +17,14 @@ DECLARE
 	v_creation_profile text;
 	v_infer_parents boolean;
 	v_parent_schema text;
+	v_parent_kind text;
 	v_merge jsonb;
 	v_prev record;
 	v_environment jsonb;
 	v_addparam jsonb;
 	v_parent_arr jsonb;
-	v_ws text;
-	v_ud text;
+	v_kind_arr jsonb;
+	v_network_parents jsonb;
 	v_satellites jsonb;
 BEGIN
 	SET search_path = utils, public;
@@ -35,6 +36,7 @@ BEGIN
 	v_creation_profile := NULLIF((p_data -> 'data') ->> 'creationProfile', '');
 	v_infer_parents := lower(COALESCE((p_data -> 'data') ->> 'inferParentsFromConfig', 'false')) IN ('true', 't', '1');
 	v_parent_schema := NULLIF((p_data -> 'data') ->> 'parentSchema', '');
+	v_parent_kind := lower(NULLIF(COALESCE((p_data -> 'data') ->> 'parentKind', ''), ''));
 	v_merge := COALESCE((p_data -> 'data') -> 'mergeAddparam', '{}'::json)::jsonb;
 	v_environment := jsonb_build_object('postgres', version(), 'postgis', postgis_version());
 	SELECT * INTO v_prev FROM utils.sys_version ORDER BY id DESC LIMIT 1;
@@ -63,19 +65,31 @@ BEGIN
 		v_addparam := v_addparam || v_merge;
 	END IF;
 	IF v_infer_parents THEN
-		SELECT value INTO v_ws FROM utils.config_param_system WHERE parameter = 'ws_current_schema';
-		SELECT value INTO v_ud FROM utils.config_param_system WHERE parameter = 'ud_current_schema';
-		v_parent_arr := COALESCE(v_addparam -> 'parent_schemas', '[]'::jsonb);
-		IF v_ws IS NOT NULL AND v_ws <> '' THEN v_parent_arr := v_parent_arr || to_jsonb(v_ws); END IF;
-		IF v_ud IS NOT NULL AND v_ud <> '' THEN v_parent_arr := v_parent_arr || to_jsonb(v_ud); END IF;
-		v_addparam := jsonb_set(v_addparam, '{parent_schemas}', (
-			SELECT COALESCE(jsonb_agg(DISTINCT elem), '[]'::jsonb) FROM jsonb_array_elements_text(v_parent_arr) AS elem
-		), true);
+		v_addparam := jsonb_set(
+			v_addparam,
+			'{parent_schemas}',
+			COALESCE(v_addparam -> 'parent_schemas', '[]'::jsonb),
+			true
+		);
+		v_addparam := jsonb_set(
+			v_addparam,
+			'{network_parents}',
+			COALESCE(v_addparam -> 'network_parents', '{}'::jsonb),
+			true
+		);
 	ELSIF v_parent_schema IS NOT NULL THEN
 		v_parent_arr := COALESCE(v_addparam -> 'parent_schemas', '[]'::jsonb) || to_jsonb(v_parent_schema);
 		v_addparam := jsonb_set(v_addparam, '{parent_schemas}', (
 			SELECT COALESCE(jsonb_agg(DISTINCT elem), '[]'::jsonb) FROM jsonb_array_elements_text(v_parent_arr) AS elem
 		), true);
+		IF v_parent_kind IN ('ws', 'ud') THEN
+			v_network_parents := COALESCE(v_addparam -> 'network_parents', '{}'::jsonb);
+			v_kind_arr := COALESCE(v_network_parents -> v_parent_kind, '[]'::jsonb) || to_jsonb(v_parent_schema);
+			v_network_parents := jsonb_set(v_network_parents, ARRAY[v_parent_kind], (
+				SELECT COALESCE(jsonb_agg(DISTINCT elem), '[]'::jsonb) FROM jsonb_array_elements_text(v_kind_arr) AS elem
+			), true);
+			v_addparam := jsonb_set(v_addparam, '{network_parents}', v_network_parents, true);
+		END IF;
 	END IF;
 	INSERT INTO utils.sys_version (giswater, project_type, postgres, postgis, language, epsg, addparam)
 	VALUES (v_gwversion, upper(COALESCE(v_projecttype, 'UTILS')), version(), postgis_version(), v_language, v_epsg, v_addparam);

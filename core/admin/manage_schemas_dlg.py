@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from functools import partial
 
+from qgis.PyQt.QtCore import QEvent, Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QHeaderView
 
@@ -36,12 +37,10 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_refresh.clicked.connect(partial(self._refresh_inventory))
         self.btn_update_network.clicked.connect(partial(self._update_network))
         self.btn_utils_create.clicked.connect(partial(self.admin._create_utils))
-        self.btn_utils_integrate_ws.clicked.connect(partial(self._integrate_ws))
-        self.btn_utils_integrate_ud.clicked.connect(partial(self._integrate_ud))
-        self.btn_utils_copy_data.clicked.connect(partial(self._copy_data))
+        self.btn_utils_integrate.clicked.connect(partial(self._integrate_utils))
         self.btn_utils_update.clicked.connect(partial(self.admin._update_utils))
         self.btn_cibs_create.clicked.connect(partial(self.admin._create_cibs))
-        self.btn_cibs_adapt.clicked.connect(partial(self._adapt_cibs))
+        self.btn_cibs_integrate.clicked.connect(partial(self._integrate_cibs))
         self.btn_cibs_copy.clicked.connect(partial(self._adapt_cibs_copy))
         self.btn_cibs_update.clicked.connect(partial(self.admin._update_cibs))
         self.btn_create_am.clicked.connect(partial(self._create_am))
@@ -73,6 +72,21 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        self.tbl_network.viewport().installEventFilter(self)
+
+    def eventFilter(self, watched, event):
+        if watched is self.tbl_network.viewport():
+            if (
+                event.type() == QEvent.Type.MouseButtonPress
+                and event.button() == Qt.MouseButton.LeftButton
+            ):
+                index = self.tbl_network.indexAt(event.pos())
+                if index.isValid():
+                    selection = self.tbl_network.selectionModel()
+                    if selection is not None and selection.isSelected(index):
+                        selection.clearSelection()
+                        return True
+        return super().eventFilter(watched, event)
 
     def _network_rows(self) -> list[dict]:
         return [
@@ -221,15 +235,25 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_utils_update.setEnabled(
             utils_exists and self._needs_update(str((utils_row or {}).get("version") or ""))
         )
-        self.btn_utils_integrate_ws.setEnabled(has_network_parent and parent_kind == "WS" and utils_exists)
-        self.btn_utils_integrate_ud.setEnabled(has_network_parent and parent_kind == "UD" and utils_exists)
-        self.btn_utils_copy_data.setEnabled(has_network_parent and utils_exists)
+        self.btn_utils_integrate.setEnabled(
+            has_network_parent
+            and utils_exists
+            and not admin_catalog.parent_satellite_linked(
+                self._inventory_rows, parent, "utils"
+            )
+        )
 
         self.btn_cibs_create.setEnabled(not cibs_exists)
         self.btn_cibs_update.setEnabled(
             cibs_exists and self._needs_update(str((cibs_row or {}).get("version") or ""))
         )
-        self.btn_cibs_adapt.setEnabled(has_network_parent and cibs_exists)
+        self.btn_cibs_integrate.setEnabled(
+            has_network_parent
+            and cibs_exists
+            and not admin_catalog.parent_satellite_linked(
+                self._inventory_rows, parent, "cibs"
+            )
+        )
         self.btn_cibs_copy.setEnabled(has_network_parent and cibs_exists)
 
         self.btn_create_am.setEnabled(not am_exists and has_network_parent and parent_kind == "WS")
@@ -318,31 +342,22 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             return
         self.admin._reload_audit_triggers(schema_name=parent)
 
-    def _integrate_ws(self):
-        parent = self._selected_parent()
+    def _integrate_utils(self):
+        parent, parent_kind = self._parent_context()
         if not parent:
-            tools_qt.show_info_box("Select a WS anchor in the network table.")
+            tools_qt.show_info_box("Select a WS or UD anchor in the network table.")
             return
-        self.admin._adapt_utils_ws(ws_schema=parent)
+        if parent_kind == "WS":
+            self.admin._adapt_utils_ws(ws_schema=parent)
+        elif parent_kind == "UD":
+            self.admin._adapt_utils_ud(ud_schema=parent)
+        else:
+            tools_qt.show_info_box("Integrate utils requires a WS or UD anchor.")
 
-    def _integrate_ud(self):
+    def _integrate_cibs(self):
         parent = self._selected_parent()
         if not parent:
-            tools_qt.show_info_box("Select a UD anchor in the network table.")
-            return
-        self.admin._adapt_utils_ud(ud_schema=parent)
-
-    def _copy_data(self):
-        parent = self._selected_parent()
-        if not parent:
-            tools_qt.show_info_box("Select a network anchor to copy data from.")
-            return
-        self.admin._copy_utils_data(copy_source=parent)
-
-    def _adapt_cibs(self):
-        parent = self._selected_parent()
-        if not parent:
-            tools_qt.show_info_box("Select a network anchor to adapt cibs.")
+            tools_qt.show_info_box("Select a network anchor to integrate cibs.")
             return
         tools_qt.set_widget_text(self.admin.dlg_readsql, self.admin.dlg_readsql.cmb_cibs, parent)
         self.admin._adapt_cibs()

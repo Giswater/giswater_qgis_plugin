@@ -88,8 +88,6 @@ def build_parser() -> argparse.ArgumentParser:
                     help="Linked ws schema (required for kind=utils).")
     sp.add_argument("--ud-schema", default=None,
                     help="Linked ud schema (utils integrate_ud / optional context).")
-    sp.add_argument("--copy-source-schema", default=None,
-                    help="Parent schema to copy ext_* data from (utils copy_data).")
     sp.add_argument("--parent-schema", default=None,
                     help="Parent ws/ud schema (required for kind=cm).")
     sp.add_argument("--parent-type", default=None, choices=["ws", "ud"],

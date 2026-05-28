@@ -94,13 +94,44 @@ class BuildParams:
             "register_parent_schema": self.register_parent_schema,
         }
 
+    def integration_parent_schema(self) -> str:
+        """WS/UD network schema when running an integrate_* profile."""
+        if self.profile == "integrate_ws":
+            return (
+                self.register_parent_schema
+                or self.parent_schema
+                or self.ws_schema
+                or ""
+            ).strip()
+        if self.profile == "integrate_ud":
+            return (
+                self.register_parent_schema
+                or self.parent_schema
+                or self.ud_schema
+                or ""
+            ).strip()
+        if self.profile == "integrate":
+            return (
+                self.register_parent_schema
+                or self.parent_schema
+                or ""
+            ).strip()
+        return ""
+
     def base_subs(self) -> dict[str, str]:
         """
         File-content substitutions. Mirrors legacy ``_read_execute_file`` +
         ``_read_execute_cm_file`` behaviour.
+
+        Integrate profiles run parent-network SQL (``integration/*.sql``) where
+        ``SCHEMA_NAME`` must be the ws/ud anchor, not the ``utils`` satellite.
         """
+        schema_name = self.schema_name
+        parent = self.integration_parent_schema()
+        if parent:
+            schema_name = parent
         return {
-            "SCHEMA_NAME": self.schema_name,
+            "SCHEMA_NAME": schema_name,
             "SRID_VALUE": str(self.srid),
             "SCHEMA_SRID": str(self.srid),
             "AUX_SCHEMA_NAME": self.aux_schema_name or "",
@@ -389,12 +420,27 @@ class SchemaBuilder:
                 return fb
         return None
 
+    def _integration_parent_schema(self) -> str:
+        """Network schema for integration SQL (ws/ud parent, not the satellite)."""
+        parent = self.params.integration_parent_schema()
+        if parent:
+            return parent
+        for key in ("parent_schema", "ws_schema", "ud_schema"):
+            value = str(self._ctx.get(key) or "").strip()
+            if value:
+                return value
+        return ""
+
     def _step_subs(self, step: Step) -> dict[str, str]:
         if not step.schema_override and not step.aux_override:
             return self._subs
         s = dict(self._subs)
         if step.schema_override:
-            s["SCHEMA_NAME"] = render(step.schema_override, self._ctx)
+            rendered = render(step.schema_override, self._ctx).strip()
+            if not rendered or "{{" in rendered:
+                rendered = self._integration_parent_schema()
+            if rendered:
+                s["SCHEMA_NAME"] = rendered
         if step.aux_override:
             s["AUX_SCHEMA_NAME"] = render(step.aux_override, self._ctx)
         return s

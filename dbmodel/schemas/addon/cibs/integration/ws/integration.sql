@@ -54,3 +54,14 @@ SELECT * FROM cibs.cat_period_type;
 
 CREATE OR REPLACE VIEW v_cat_period AS
 SELECT * FROM cibs.cat_period;
+
+SELECT "SCHEMA_NAME".gw_fct_admin_sys_version_register(json_build_object(
+	'data', json_build_object(
+		'gwVersion', (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1),
+		'mergeAddparam', json_build_object(
+			'satellites', json_build_object(
+				'cibs', json_build_object('enabled', true, 'schema', 'cibs')
+			)
+		)
+	)
+)::json);

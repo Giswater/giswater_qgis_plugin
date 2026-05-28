@@ -143,3 +143,43 @@ def test_substitutions_applied_in_file_content(tmp_path: Path):
     )
     SchemaBuilder(conn, _manifest(), params).run()
     assert any("ws_real" in p for p in sent_payloads)
+
+
+def test_utils_integrate_ud_uses_parent_schema_for_sql(tmp_path: Path, dbmodel_path: Path):
+    """Integration SQL must run against the ud parent, not the utils satellite schema."""
+    from giswater_admin.engine.manifest import load_manifest
+    from giswater_admin.engine.templating import apply_subs
+    import os
+
+    manifest_path = os.path.join(dbmodel_path, "manifests", "utils.yaml")
+    if not os.path.isfile(manifest_path):
+        return
+
+    manifest = load_manifest(manifest_path)
+    step = manifest.phase("integrate_utils_ud").steps[0]
+    params = BuildParams(
+        schema_name="utils",
+        ud_schema="ud_parent",
+        parent_schema="ud_parent",
+        sql_root=dbmodel_path,
+        plugin_version="4.12.0",
+        profile="integrate_ud",
+    )
+    subs = SchemaBuilder(_RecConn(), manifest, params)._step_subs(step)
+    assert subs["SCHEMA_NAME"] == "ud_parent"
+
+    params_ud_only = BuildParams(
+        schema_name="utils",
+        ud_schema="ud_only",
+        register_parent_schema="ud_only",
+        sql_root=dbmodel_path,
+        plugin_version="4.12.0",
+        profile="integrate_ud",
+    )
+    assert params_ud_only.base_subs()["SCHEMA_NAME"] == "ud_only"
+
+    sql_path = os.path.join(dbmodel_path, step.source)
+    with open(sql_path, encoding="utf-8") as f:
+        sql = apply_subs(f.read(), subs)
+    assert 'SET search_path = "ud_parent"' in sql
+    assert "ALTER TABLE node DROP CONSTRAINT node_district_id_fkey;" in sql

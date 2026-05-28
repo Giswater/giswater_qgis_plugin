@@ -193,6 +193,16 @@ def _parse_addparam(addparam: Any) -> dict[str, Any]:
     return {}
 
 
+def _format_linked_entry(kind: str, schema: str) -> str:
+    kind_l = str(kind or "").lower()
+    schema_s = str(schema or kind or "").lower()
+    if not kind_l:
+        return schema_s
+    if schema_s == kind_l:
+        return kind_l
+    return f"{kind_l}:{schema_s}"
+
+
 def _entry_from_sys_version_row(
     schema_name: str,
     project_type: Any,
@@ -213,13 +223,93 @@ def _entry_from_sys_version_row(
 
     if ap.get("parent_schemas"):
         entry["linked"] = ", ".join(str(x) for x in ap.get("parent_schemas") or [])
+    elif ap.get("network_parents"):
+        linked = []
+        for kind, schemas in (ap.get("network_parents") or {}).items():
+            for schema in schemas or []:
+                linked.append(_format_linked_entry(str(kind), str(schema)))
+        entry["linked"] = ", ".join(linked)
     elif ap.get("satellites"):
         linked = []
         for kind, meta in (ap.get("satellites") or {}).items():
             if isinstance(meta, dict) and meta.get("enabled"):
-                linked.append(f"{kind}:{meta.get('schema', kind)}")
+                linked.append(_format_linked_entry(str(kind), str(meta.get("schema", kind))))
         entry["linked"] = ", ".join(linked)
     return entry
+
+
+def _append_linked_satellite(linked: str, satellite: str, schema: str) -> str:
+    sat_l = satellite.lower()
+    parts = [part.strip() for part in linked.split(",") if part.strip()]
+    if any(
+        part.lower() == sat_l or part.lower().startswith(f"{sat_l}:")
+        for part in parts
+    ):
+        return ", ".join(parts)
+    parts.append(_format_linked_entry(satellite, schema))
+    return ", ".join(parts)
+
+
+def _legacy_parent_satellites(
+    schema_name: str,
+    fetcher: RowFetcher,
+) -> list[tuple[str, str]]:
+    """Map legacy config_param_system flags to (satellite, schema) pairs."""
+    linked: list[tuple[str, str]] = []
+    row = fetcher(
+        f"SELECT value FROM {_quote_ident(schema_name)}.config_param_system "
+        "WHERE parameter = 'admin_cibs_schema' LIMIT 1",
+        None,
+    )
+    if row and row[0] and str(row[0][0]).lower() in ("true", "t", "1"):
+        linked.append(("cibs", "cibs"))
+    return linked
+
+
+def register_parent_satellite_enabled(
+    parent_schema: str,
+    satellite: str,
+    *,
+    satellite_schema: str | None = None,
+    gw_version: str | None = None,
+    fetcher: RowFetcher = _tools_db_fetch,
+) -> bool:
+    """Mark a satellite as enabled on a WS/UD parent sys_version row."""
+    if not parent_schema:
+        return False
+    if gw_version is None:
+        row = fetcher(
+            f"SELECT giswater FROM {_quote_ident(parent_schema)}.sys_version "
+            "ORDER BY id DESC LIMIT 1",
+            None,
+        )
+        gw_version = str(row[0][0]) if row and row[0] and row[0][0] else ""
+    sat_schema = satellite_schema or satellite
+    payload = json.dumps(
+        {
+            "data": {
+                "gwVersion": gw_version,
+                "mergeAddparam": {
+                    "satellites": {
+                        satellite.lower(): {
+                            "enabled": True,
+                            "schema": sat_schema,
+                        }
+                    }
+                },
+            }
+        },
+        ensure_ascii=False,
+    )
+    sql = (
+        f"SELECT {_quote_ident(parent_schema)}.gw_fct_admin_sys_version_register("
+        f"$${payload}$$)"
+    )
+    try:
+        row = fetcher(sql, None)
+    except Exception:
+        return False
+    return row is not None
 
 
 def fetch_schema_inventory(fetcher: RowFetcher = _tools_db_fetch) -> list[dict[str, Any]]:
@@ -261,11 +351,59 @@ def fetch_schema_inventory(fetcher: RowFetcher = _tools_db_fetch) -> list[dict[s
 
         values = row[0]
         addparam = values[2] if len(values) > 2 else None
-        inventory.append(
-            _entry_from_sys_version_row(schema_name, values[0], values[1], addparam)
-        )
+        entry = _entry_from_sys_version_row(schema_name, values[0], values[1], addparam)
+        if str(entry.get("kind") or "").upper() in ("WS", "UD"):
+            linked = str(entry.get("linked") or "")
+            for satellite, sat_schema in _legacy_parent_satellites(schema_name, fetcher):
+                linked = _append_linked_satellite(linked, satellite, sat_schema)
+            entry["linked"] = linked
+        inventory.append(entry)
 
     return inventory
+
+
+def get_utils_network_parents(fetcher: RowFetcher = _tools_db_fetch) -> dict[str, list[str]]:
+    """Read WS/UD parent schemas from utils.sys_version.addparam (legacy config fallback)."""
+    result: dict[str, list[str]] = {"ws": [], "ud": []}
+    if not schema_exists("utils", fetcher):
+        return result
+
+    row = fetcher(
+        "SELECT addparam FROM utils.sys_version ORDER BY id DESC LIMIT 1",
+        None,
+    )
+    ap = _parse_addparam(row[0][0] if row and row[0] else None)
+    network = ap.get("network_parents") or {}
+    if isinstance(network, dict):
+        for kind in ("ws", "ud"):
+            values = network.get(kind) or []
+            if isinstance(values, list):
+                result[kind] = [str(v) for v in values if v]
+
+    if not result["ws"] and not result["ud"]:
+        parents = ap.get("parent_schemas") or []
+        if isinstance(parents, list):
+            for schema_name in parents:
+                entry = _fetch_schema_sys_version_entry(str(schema_name), fetcher)
+                kind = str(entry.get("kind") or "").lower()
+                if kind in result and str(schema_name) not in result[kind]:
+                    result[kind].append(str(schema_name))
+
+    if not result["ws"]:
+        legacy = fetcher(
+            "SELECT value FROM utils.config_param_system WHERE parameter = 'ws_current_schema'",
+            None,
+        )
+        if legacy and legacy[0] and legacy[0][0]:
+            result["ws"] = [str(legacy[0][0])]
+    if not result["ud"]:
+        legacy = fetcher(
+            "SELECT value FROM utils.config_param_system WHERE parameter = 'ud_current_schema'",
+            None,
+        )
+        if legacy and legacy[0] and legacy[0][0]:
+            result["ud"] = [str(legacy[0][0])]
+    return result
 
 
 _NETWORK_SATELLITE_ORDER = ("utils", "cibs", "am", "cm", "audit")
@@ -392,6 +530,24 @@ def build_network_update_plan(
 
 def schema_needs_plugin_update(version: str, plugin_version: str) -> bool:
     return _version_tuple(version) < _version_tuple(plugin_version)
+
+
+def parent_satellite_linked(
+    inventory: list[dict[str, Any]],
+    parent_schema: str,
+    satellite: str = "utils",
+) -> bool:
+    """True when a WS/UD parent row lists the satellite in ``linked`` (from addparam)."""
+    row = find_inventory_row(inventory, schema=parent_schema)
+    if not row:
+        return False
+    sat_l = satellite.lower()
+    linked = str(row.get("linked") or "")
+    for part in linked.split(","):
+        p = part.strip().lower()
+        if p == sat_l or p.startswith(f"{sat_l}:"):
+            return True
+    return False
 
 
 def find_inventory_row(

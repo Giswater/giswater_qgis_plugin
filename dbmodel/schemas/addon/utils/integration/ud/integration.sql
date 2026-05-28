@@ -64,10 +64,7 @@ SELECT * FROM utils.province;
 CREATE OR REPLACE VIEW v_type_street AS
 SELECT * FROM utils.type_street;
 
-INSERT INTO utils.config_param_system(parameter, value, descript)
-VALUES ('ud_current_schema', 'SCHEMA_NAME', 'Indicate the name for the UD schema');
-
-SELECT gw_fct_admin_sys_version_register(json_build_object(
+SELECT "SCHEMA_NAME".gw_fct_admin_sys_version_register(json_build_object(
 	'data', json_build_object(
 		'gwVersion', (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1),
 		'mergeAddparam', json_build_object(
@@ -90,6 +87,45 @@ DELETE FROM sys_table WHERE id = 'ext_region_x_province';
 DELETE FROM sys_table WHERE id = 'ext_province';
 DELETE FROM sys_table WHERE id = 'ext_type_street';
 
+DO $gw$
+BEGIN
+	IF to_regclass('ext_province_old') IS NOT NULL THEN
+		INSERT INTO utils.province SELECT * FROM ext_province_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_region_old') IS NOT NULL THEN
+		INSERT INTO utils.region SELECT * FROM ext_region_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_region_x_province_old') IS NOT NULL THEN
+		INSERT INTO utils.region_x_province SELECT * FROM ext_region_x_province_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_municipality_old') IS NOT NULL THEN
+		INSERT INTO utils.municipality SELECT * FROM ext_municipality_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_district_old') IS NOT NULL THEN
+		INSERT INTO utils.district SELECT * FROM ext_district_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_cat_raster_old') IS NOT NULL THEN
+		INSERT INTO utils.cat_raster SELECT * FROM ext_cat_raster_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_raster_dem_old') IS NOT NULL THEN
+		INSERT INTO utils.raster_dem SELECT * FROM ext_raster_dem_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_type_street_old') IS NOT NULL THEN
+		INSERT INTO utils.type_street SELECT * FROM ext_type_street_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_streetaxis_old') IS NOT NULL THEN
+		INSERT INTO utils.streetaxis SELECT * FROM ext_streetaxis_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_plot_old') IS NOT NULL THEN
+		INSERT INTO utils.plot SELECT * FROM ext_plot_old ON CONFLICT DO NOTHING;
+	END IF;
+	IF to_regclass('ext_address_old') IS NOT NULL THEN
+		INSERT INTO utils.address SELECT * FROM ext_address_old ON CONFLICT DO NOTHING;
+	END IF;
+END
+$gw$;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 ALTER TABLE node DROP CONSTRAINT node_district_id_fkey;
 ALTER TABLE node ADD CONSTRAINT node_district_id_fkey FOREIGN KEY (district_id) REFERENCES utils.district(district_id) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -141,17 +177,17 @@ ALTER TABLE gully ADD CONSTRAINT gully_streetaxis_id_fkey FOREIGN KEY (muni_id, 
 ALTER TABLE gully DROP CONSTRAINT gully_streetaxis2_id_fkey;
 ALTER TABLE gully ADD CONSTRAINT gully_streetaxis2_id_fkey FOREIGN KEY (muni_id, streetaxis_id) REFERENCES utils.streetaxis(muni_id, id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE ext_raster_dem_old DROP CONSTRAINT raster_dem_rastercat_id_fkey;
-ALTER TABLE ext_streetaxis_old DROP CONSTRAINT ext_streetaxis_muni_id_fkey;
-ALTER TABLE ext_streetaxis_old DROP CONSTRAINT ext_streetaxis_type_street_fkey;
-ALTER TABLE ext_address_old DROP CONSTRAINT ext_address_muni_id_fkey;
-ALTER TABLE ext_address_old DROP CONSTRAINT ext_address_plot_id_fkey;
-ALTER TABLE ext_address_old DROP CONSTRAINT ext_address_streetaxis_id_fkey;
-ALTER TABLE ext_plot_old DROP CONSTRAINT ext_plot_muni_id_fkey;
-ALTER TABLE ext_plot_old DROP CONSTRAINT ext_plot_streetaxis_id_fkey;
-ALTER TABLE ext_district_old DROP CONSTRAINT ext_district_muni_id_fkey;
-ALTER TABLE ext_municipality_old DROP CONSTRAINT ext_municipality_province_id_fkey;
-ALTER TABLE ext_municipality_old DROP CONSTRAINT ext_municipality_region_id_fkey;
+ALTER TABLE IF EXISTS ext_raster_dem_old DROP CONSTRAINT IF EXISTS raster_dem_rastercat_id_fkey;
+ALTER TABLE IF EXISTS ext_streetaxis_old DROP CONSTRAINT IF EXISTS ext_streetaxis_muni_id_fkey;
+ALTER TABLE IF EXISTS ext_streetaxis_old DROP CONSTRAINT IF EXISTS ext_streetaxis_type_street_fkey;
+ALTER TABLE IF EXISTS ext_address_old DROP CONSTRAINT IF EXISTS ext_address_muni_id_fkey;
+ALTER TABLE IF EXISTS ext_address_old DROP CONSTRAINT IF EXISTS ext_address_plot_id_fkey;
+ALTER TABLE IF EXISTS ext_address_old DROP CONSTRAINT IF EXISTS ext_address_streetaxis_id_fkey;
+ALTER TABLE IF EXISTS ext_plot_old DROP CONSTRAINT IF EXISTS ext_plot_muni_id_fkey;
+ALTER TABLE IF EXISTS ext_plot_old DROP CONSTRAINT IF EXISTS ext_plot_streetaxis_id_fkey;
+ALTER TABLE IF EXISTS ext_district_old DROP CONSTRAINT IF EXISTS ext_district_muni_id_fkey;
+ALTER TABLE IF EXISTS ext_municipality_old DROP CONSTRAINT IF EXISTS ext_municipality_province_id_fkey;
+ALTER TABLE IF EXISTS ext_municipality_old DROP CONSTRAINT IF EXISTS ext_municipality_region_id_fkey;
 
 
 DROP TRIGGER IF EXISTS gw_trg_fk_array_array_table_muni ON sector;

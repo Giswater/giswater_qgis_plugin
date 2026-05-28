@@ -236,7 +236,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="btn_utils_integrate_ws">
+           <widget class="QPushButton" name="btn_utils_integrate">
             <property name="minimumSize">
              <size>
               <width>88</width>
@@ -244,37 +244,11 @@
              </size>
             </property>
             <property name="text">
-             <string>WS</string>
+             <string>Integrate</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="btn_utils_integrate_ud">
-            <property name="minimumSize">
-             <size>
-              <width>88</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>UD</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QPushButton" name="btn_utils_copy_data">
-            <property name="minimumSize">
-             <size>
-              <width>88</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Copy data</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4" colspan="2">
+          <item row="1" column="2" colspan="4">
            <spacer name="horizontalSpacer_utils_1">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -368,7 +342,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="btn_cibs_adapt">
+           <widget class="QPushButton" name="btn_cibs_integrate">
             <property name="minimumSize">
              <size>
               <width>88</width>
@@ -376,7 +350,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Adapt</string>
+             <string>Integrate</string>
             </property>
            </widget>
           </item>

@@ -12,18 +12,18 @@ RETURNS boolean AS
 $BODY$
 DECLARE
 	v_addparam jsonb;
-	v_enabled boolean;
 BEGIN
-	SET search_path = "SCHEMA_NAME", public;
-	SELECT addparam INTO v_addparam FROM sys_version ORDER BY id DESC LIMIT 1;
+	SELECT addparam INTO v_addparam
+	FROM "SCHEMA_NAME".sys_version
+	ORDER BY id DESC
+	LIMIT 1;
 	IF v_addparam IS NULL OR NOT (v_addparam ? 'satellites') THEN
 		RETURN FALSE;
 	END IF;
-	EXECUTE format(
-		'SELECT ($1 -> ''satellites'' -> %L ->> ''enabled'')::boolean',
-		lower(p_kind)
-	) INTO v_enabled USING v_addparam;
-	RETURN COALESCE(v_enabled, FALSE);
+	RETURN COALESCE(
+		(v_addparam -> 'satellites' -> lower(p_kind) ->> 'enabled')::boolean,
+		FALSE
+	);
 END;
 $BODY$
 LANGUAGE plpgsql STABLE

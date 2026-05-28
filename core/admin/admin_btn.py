@@ -544,6 +544,8 @@ class GwAdminButton:
         elif process_name == 'Adapt schema to cibs':
             schema_name = getattr(self, 'cibs_project_name', None)
             if schema_name:
+                if not admin_catalog.register_parent_satellite_enabled(schema_name, "cibs"):
+                    self.error_count += 1
                 sql = f"SELECT {schema_name}.gw_fct_admin_role_permissions();"
                 tools_log.log_info("Task '{0}' execute sql: '{1}'",
                                    msg_params=("Adapt cibs schema", sql,))
@@ -3675,7 +3677,12 @@ class GwAdminButton:
         on_done=None,
     ):
         register_is_new = 'true' if profile == 'empty' else 'false'
-        infer_parents = 'true' if profile in ('integrate_ws', 'integrate_ud', 'update') else 'false'
+        infer_parents = 'true' if profile == 'update' else 'false'
+        integrate_parent_type = ''
+        if profile == 'integrate_ws':
+            integrate_parent_type = 'ws'
+        elif profile == 'integrate_ud':
+            integrate_parent_type = 'ud'
         register_parent = ws_schema if profile == 'integrate_ws' else (
             ud_schema if profile == 'integrate_ud' else ''
         )
@@ -3702,6 +3709,8 @@ class GwAdminButton:
             run_mode='upgrade' if profile == 'update' else 'new_project',
             ws_schema=ws_schema or '',
             ud_schema=ud_schema or '',
+            parent_schema=parent_schema or '',
+            parent_type=integrate_parent_type,
             copy_source_schema=copy_source or '',
             register_is_new=register_is_new,
             infer_parents_from_config=infer_parents,
@@ -3754,24 +3763,6 @@ class GwAdminButton:
             tools_qgis.show_message("Selected schema is already integrated with utils.", Qgis.MessageLevel.Info)
             return
         self._run_create_utils_task('integrate_ud', 'Integrate utils with UD', ud_schema=ud)
-
-    def _copy_utils_data(self, copy_source=None):
-        source = copy_source or tools_qt.get_text(
-            self.dlg_readsql, self.dlg_readsql.cmb_utils_ws, return_string_null=False
-        )
-        if not source:
-            source = tools_qt.get_text(
-                self.dlg_readsql, self.dlg_readsql.cmb_utils_ud, return_string_null=False
-            )
-        if not source:
-            tools_qgis.show_message("Select a parent schema to copy data from.", Qgis.MessageLevel.Info)
-            return
-        if not admin_catalog.schema_exists('utils'):
-            tools_qgis.show_message("Utils schema does not exist. Create it first.", Qgis.MessageLevel.Info)
-            return
-        self._run_create_utils_task(
-            'copy_data', 'Copy utils data', copy_source=source, ws_schema=source
-        )
 
     def _create_cibs(self):
 
@@ -3853,17 +3844,14 @@ class GwAdminButton:
             "SELECT giswater FROM utils.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
-        ws_schema = tools_db.get_row(
-            "SELECT value FROM utils.config_param_system WHERE parameter = 'ws_current_schema'"
-        )
-        ud_schema = tools_db.get_row(
-            "SELECT value FROM utils.config_param_system WHERE parameter = 'ud_current_schema'"
-        )
+        network_parents = admin_catalog.get_utils_network_parents()
+        ws_list = network_parents.get("ws") or []
+        ud_list = network_parents.get("ud") or []
         self._run_create_utils_task(
             'update',
             'Update utils schema',
-            ws_schema=(ws_schema[0] if ws_schema else ''),
-            ud_schema=(ud_schema[0] if ud_schema else ''),
+            ws_schema=ws_list[0] if ws_list else '',
+            ud_schema=ud_list[0] if ud_list else '',
             project_version=str(current_version),
             on_done=on_done,
         )

@@ -25,6 +25,7 @@ DECLARE
 	v_environment jsonb;
 	v_addparam jsonb;
 	v_parent_arr jsonb;
+	v_utils_addparam jsonb;
 	v_ws text;
 	v_ud text;
 	v_satellites jsonb;
@@ -88,14 +89,19 @@ BEGIN
 	END IF;
 
 	IF v_infer_parents AND to_regnamespace('utils') IS NOT NULL THEN
-		SELECT value INTO v_ws FROM utils.config_param_system WHERE parameter = 'ws_current_schema';
-		SELECT value INTO v_ud FROM utils.config_param_system WHERE parameter = 'ud_current_schema';
+		SELECT addparam INTO v_utils_addparam FROM utils.sys_version ORDER BY id DESC LIMIT 1;
 		v_parent_arr := COALESCE(v_addparam -> 'parent_schemas', '[]'::jsonb);
-		IF v_ws IS NOT NULL AND v_ws <> '' THEN
-			v_parent_arr := v_parent_arr || to_jsonb(v_ws);
-		END IF;
-		IF v_ud IS NOT NULL AND v_ud <> '' THEN
-			v_parent_arr := v_parent_arr || to_jsonb(v_ud);
+		IF v_utils_addparam IS NOT NULL THEN
+			v_parent_arr := v_parent_arr || COALESCE(v_utils_addparam -> 'parent_schemas', '[]'::jsonb);
+		ELSE
+			SELECT value INTO v_ws FROM utils.config_param_system WHERE parameter = 'ws_current_schema';
+			SELECT value INTO v_ud FROM utils.config_param_system WHERE parameter = 'ud_current_schema';
+			IF v_ws IS NOT NULL AND v_ws <> '' THEN
+				v_parent_arr := v_parent_arr || to_jsonb(v_ws);
+			END IF;
+			IF v_ud IS NOT NULL AND v_ud <> '' THEN
+				v_parent_arr := v_parent_arr || to_jsonb(v_ud);
+			END IF;
 		END IF;
 		v_addparam := jsonb_set(v_addparam, '{parent_schemas}', (
 			SELECT COALESCE(jsonb_agg(DISTINCT elem), '[]'::jsonb)

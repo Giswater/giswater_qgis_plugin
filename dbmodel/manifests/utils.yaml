@@ -1,7 +1,7 @@
 # utils (satellite) schema manifest.
 #
-# Decoupled lifecycle: create utils alone, integrate ws/ud separately,
-# copy data from a selected parent schema.
+# Lifecycle: create utils alone, then integrate each ws/ud parent
+# (integration copies ext_* data into utils before repointing FKs).
 
 kind: utils
 engine_version: 1
@@ -25,7 +25,7 @@ phases:
     steps:
       - source: "schemas/addon/utils/integration/ws/integration.sql"
         recursive: false
-        schema_override: "{{ ws_schema }}"
+        schema_override: "{{ parent_schema }}"
 
   - id: integrate_utils_ud
     type: sql_dir
@@ -33,30 +33,7 @@ phases:
     steps:
       - source: "schemas/addon/utils/integration/ud/integration.sql"
         recursive: false
-        schema_override: "{{ ud_schema }}"
-
-  - id: fk_ws
-    type: sql_inline
-    description: "Wire utils foreign keys into the ws schema."
-    sql: "SELECT {{ ws_schema }}.gw_fct_admin_schema_utils_fk();"
-
-  - id: fk_ud
-    type: sql_inline
-    description: "Wire utils foreign keys into the ud schema."
-    sql: "SELECT {{ ud_schema }}.gw_fct_admin_schema_utils_fk();"
-
-  - id: copy_data_utils
-    type: sql_dir
-    description: "Copy ext_* data from selected parent into utils."
-    steps:
-      - source: "schemas/addon/utils/data/data.sql"
-        recursive: false
-        schema_override: "{{ copy_source_schema }}"
-
-  - id: role_perms
-    type: sql_inline
-    description: "Re-grant role permissions on ws parent."
-    sql: "SELECT {{ ws_schema }}.gw_fct_admin_role_permissions();"
+        schema_override: "{{ parent_schema }}"
 
   - id: updates
     type: version_walk
@@ -78,16 +55,15 @@ phases:
         isNewProject: "{{ register_is_new }}"
         inferParentsFromConfig: "{{ infer_parents_from_config }}"
         parentSchema: "{{ register_parent_schema }}"
+        parentKind: "{{ parent_type }}"
         mergeAddparam: {}
 
 profiles:
   empty:
     phases: [load_base_schema, updates, register_version]
   integrate_ws:
-    phases: [integrate_utils_ws, fk_ws, role_perms, register_version]
+    phases: [integrate_utils_ws, register_version]
   integrate_ud:
-    phases: [integrate_utils_ud, fk_ud, register_version]
-  copy_data:
-    phases: [copy_data_utils]
+    phases: [integrate_utils_ud, register_version]
   update:
     phases: [updates, register_version]

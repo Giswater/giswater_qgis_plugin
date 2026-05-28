@@ -27,12 +27,6 @@ def run(args: argparse.Namespace, out: Out) -> int:
         if args.profile == "integrate_ud" and not args.ud_schema:
             out.error("kind=utils profile=integrate_ud requires --ud-schema.")
             return 1
-        if args.profile == "copy_data" and not (args.copy_source_schema or args.ws_schema or args.ud_schema):
-            out.error(
-                "kind=utils profile=copy_data requires --copy-source-schema "
-                "(or --ws-schema / --ud-schema)."
-            )
-            return 1
     if args.kind == "cm" and not args.parent_schema:
         out.error("kind=cm requires --parent-schema.")
         return 1
@@ -116,18 +110,17 @@ def run(args: argparse.Namespace, out: Out) -> int:
     register_is_new = "false"
     infer_parents = "false"
     register_parent = ""
-    copy_source = args.copy_source_schema or ""
     if args.kind == "utils":
         if args.profile == "empty":
             register_is_new = "true"
-        elif args.profile in ("integrate_ws", "integrate_ud", "update"):
+        elif args.profile == "update":
             infer_parents = "true"
         if args.profile == "integrate_ws":
             register_parent = args.ws_schema or ""
+            parent_type = "ws"
         elif args.profile == "integrate_ud":
             register_parent = args.ud_schema or ""
-        elif args.profile == "copy_data":
-            copy_source = copy_source or args.ws_schema or args.ud_schema or ""
+            parent_type = "ud"
 
     params = BuildParams(
         schema_name=args.schema,
@@ -141,12 +134,11 @@ def run(args: argparse.Namespace, out: Out) -> int:
         sql_root=args.dbmodel_path,
         ws_schema=args.ws_schema or "",
         ud_schema=args.ud_schema or "",
-        parent_schema=args.parent_schema or "",
+        parent_schema=args.parent_schema or register_parent or args.ws_schema or args.ud_schema or "",
         parent_type=parent_type,
         am_target=am_target,
         main_project_version=main_version,
         creation_profile=creation_profile,
-        copy_source_schema=copy_source,
         register_is_new=register_is_new,
         infer_parents_from_config=infer_parents,
         register_parent_schema=register_parent,
