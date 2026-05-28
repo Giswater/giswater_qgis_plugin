@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.2] - 2026-05-28
+
 ### Fixed
 
 - `gw_trg_edit_psector` trigger to set obsolete features where psector_x_* state is 0 before setting on service features.
@@ -267,7 +269,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...release/4.9
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.2...release/4.9
+[4.9.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...v4.9.2
 [4.9.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...v4.9.1
 [4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0
 [4.8.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.3...v4.8.4
