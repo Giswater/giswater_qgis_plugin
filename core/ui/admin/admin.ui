@@ -332,6 +332,22 @@
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
+            <item row="0" column="0" colspan="2">
+             <widget class="QGroupBox" name="grb_manage_schemas">
+              <property name="title">
+               <string>Additional schema management</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_manage_schemas">
+               <item>
+                <widget class="QPushButton" name="btn_manage_schemas">
+                 <property name="text">
+                  <string>Manage schemas</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
             <item row="4" column="0" colspan="2">
              <widget class="QGroupBox" name="grb_schema_reload">
               <property name="title">
@@ -909,6 +925,7 @@
   <tabstop>btn_copy</tabstop>
   <tabstop>btn_schema_create</tabstop>
   <tabstop>btn_gis_create</tabstop>
+  <tabstop>btn_manage_schemas</tabstop>
   <tabstop>custom_path_folder</tabstop>
   <tabstop>btn_custom_select_file</tabstop>
   <tabstop>btn_custom_load_file</tabstop>

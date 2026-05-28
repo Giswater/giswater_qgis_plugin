@@ -5,16 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-
-SET ROLE role_system;
-
-CREATE SCHEMA utils AUTHORIZATION role_system;
-
 SET search_path = utils, public;
-
-GRANT ALL ON SCHEMA utils TO role_admin;
-GRANT ALL ON SCHEMA utils TO role_basic;
-ALTER DEFAULT PRIVILEGES IN SCHEMA utils GRANT SELECT ON TABLES TO role_basic;
 
 CREATE TABLE config_param_system (
 	"parameter" varchar(50) NOT NULL,
@@ -69,8 +60,8 @@ CREATE TABLE province (
 CREATE TABLE region_x_province (
 	region_id int4 NOT NULL,
 	province_id int4 NOT NULL,
-	CONSTRAINT region_x_province_pkey PRIMARY KEY (region_id, province_id)
-    CONSTRAINT region_x_province_region_id_fkey FOREIGN KEY (region_id) REFERENCES region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT region_x_province_pkey PRIMARY KEY (region_id, province_id),
+    CONSTRAINT region_x_province_region_id_fkey FOREIGN KEY (region_id) REFERENCES region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT region_x_province_province_id_fkey FOREIGN KEY (province_id) REFERENCES province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -84,7 +75,7 @@ CREATE TABLE municipality (
 	province_id int4 NULL,
 	code varchar(100) NULL,
 	CONSTRAINT municipality_pkey PRIMARY KEY (muni_id),
-    CONSTRAINT municipality_region_id_fkey FOREIGN KEY (region_id) REFERENCES region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT municipality_region_id_fkey FOREIGN KEY (region_id) REFERENCES region(region_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT municipality_province_id_fkey FOREIGN KEY (province_id) REFERENCES province(province_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -103,6 +94,30 @@ CREATE TABLE district (
     CONSTRAINT district_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+CREATE SEQUENCE streetaxis_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
+CREATE SEQUENCE plot_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+	
+CREATE SEQUENCE address_id_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 2147483647
+	START 1
+	CACHE 1
+	NO CYCLE;
+
 CREATE TABLE streetaxis (
 	id varchar(16) DEFAULT nextval('streetaxis_id_seq'::regclass) NOT NULL,
 	code varchar(100) NULL,
@@ -114,7 +129,7 @@ CREATE TABLE streetaxis (
 	"source" text NULL,
 	CONSTRAINT streetaxis_pkey PRIMARY KEY (id),
 	CONSTRAINT streetaxis_unique UNIQUE (muni_id, id),
-    CONSTRAINT streetaxis_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT streetaxis_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT streetaxis_type_street_fkey FOREIGN KEY (type) REFERENCES type_street(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -137,7 +152,7 @@ CREATE TABLE plot (
 	"text" text NULL,
 	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	CONSTRAINT plot_pkey PRIMARY KEY (id),
-    CONSTRAINT plot_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT plot_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT plot_streetaxis_id_fkey FOREIGN KEY (streetaxis_id) REFERENCES streetaxis(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX idx_plot_muni_id ON plot USING btree (muni_id);
@@ -158,8 +173,8 @@ CREATE TABLE address (
 	code varchar(100) NULL,
 	"source" text NULL,
 	CONSTRAINT address_pkey PRIMARY KEY (id),
-    CONSTRAINT address_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE
-    CONSTRAINT address_streetaxis_id_fkey FOREIGN KEY (streetaxis_id) REFERENCES streetaxis(id) ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT address_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT address_streetaxis_id_fkey FOREIGN KEY (streetaxis_id) REFERENCES streetaxis(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT address_plot_id_fkey FOREIGN KEY (plot_id) REFERENCES plot(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -184,7 +199,7 @@ CREATE TABLE cat_raster (
 );
 
 CREATE TABLE raster_dem (
-	id int4 DEFAULT nextval('raster_dem_id_seq'::regclass) NOT NULL,
+	id serial NOT NULL,
 	rast public.raster NULL,
 	rastercat_id text NULL,
 	envelope public.geometry(polygon, SRID_VALUE) NULL,

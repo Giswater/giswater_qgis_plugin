@@ -8,14 +8,6 @@ or (at your option) any later version.
 
 SET search_path = "cibs", public, pg_catalog;
 
-SET ROLE role_admin;
-
-CREATE SCHEMA IF NOT EXISTS cibs AUTHORIZATION role_admin;
-
-GRANT ALL ON SCHEMA cibs TO role_admin;
-GRANT ALL ON SCHEMA cibs TO role_basic;
-ALTER DEFAULT PRIVILEGES IN SCHEMA cibs GRANT SELECT ON TABLES TO role_basic;
-
 CREATE TABLE cibs.sys_version (
 	id serial4 NOT NULL,
 	giswater varchar(16) NOT NULL,
@@ -25,7 +17,7 @@ CREATE TABLE cibs.sys_version (
 	"date" timestamp(6) DEFAULT now() NOT NULL,
 	"language" varchar(50) NOT NULL,
 	epsg int4 NOT NULL,
-    addparam jsonb
+    addparam jsonb,
 	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
 );
 

@@ -13,8 +13,11 @@ phases:
     type: sql_dir
     description: "Bootstrap utils schema DDL + functions."
     steps:
-      - { source: "schemas/addon/utils/base/base.sql", recursive: false }
+      - { source: "schemas/addon/utils/base/init.sql", recursive: false }
       - { source: "schemas/addon/utils/base/fct", recursive: false }
+      - { source: "schemas/addon/utils/base/ftrg", recursive: false }
+      - { source: "schemas/addon/utils/base/base.sql", recursive: false }
+
 
   - id: integrate_utils_ws
     type: sql_dir

@@ -4,6 +4,7 @@ Fast pg_catalog queries for the admin dialog (avoid information_schema + N+1).
 
 from __future__ import annotations
 
+import json
 from typing import Any, Callable, Iterable, Optional
 
 from ...libs import tools_db
@@ -136,3 +137,273 @@ def combo_items_for_project_type(
 ) -> list[list[str]]:
     want = project_type.upper()
     return [[s, s] for s, pt in schemas if str(pt).upper() == want]
+
+
+_SATELLITE_SCHEMAS = frozenset({"utils", "cibs", "am", "cm", "audit"})
+
+_SYS_VERSION_COLUMNS = """
+SELECT table_schema, column_name
+FROM information_schema.columns
+WHERE table_name = 'sys_version'
+  AND table_schema = ANY(%s::text[])
+  AND column_name = ANY(ARRAY['giswater', 'version', 'addparam'])
+"""
+
+
+def _sys_version_columns_by_schema(
+    schema_names: Iterable[str],
+    fetcher: RowFetcher,
+) -> dict[str, set[str]]:
+    names = list(schema_names)
+    if not names:
+        return {}
+    rows = fetcher(_SYS_VERSION_COLUMNS, [names])
+    result: dict[str, set[str]] = {name: set() for name in names}
+    if not rows:
+        return result
+    for schema_name, column_name in rows:
+        result.setdefault(str(schema_name), set()).add(str(column_name))
+    return result
+
+
+def _version_column_for_schema(schema_name: str, columns: set[str]) -> str:
+    if schema_name in _SATELLITE_SCHEMAS:
+        if "version" in columns:
+            return "version"
+        if "giswater" in columns:
+            return "giswater"
+    else:
+        if "giswater" in columns:
+            return "giswater"
+        if "version" in columns:
+            return "version"
+    return "giswater"
+
+
+def _parse_addparam(addparam: Any) -> dict[str, Any]:
+    if isinstance(addparam, dict):
+        return addparam
+    if addparam:
+        try:
+            parsed = json.loads(addparam)
+            if isinstance(parsed, dict):
+                return parsed
+        except (TypeError, ValueError):
+            pass
+    return {}
+
+
+def _entry_from_sys_version_row(
+    schema_name: str,
+    project_type: Any,
+    version: Any,
+    addparam: Any,
+) -> dict[str, Any]:
+    entry: dict[str, Any] = {
+        "schema": schema_name,
+        "kind": str(project_type or ""),
+        "version": str(version or ""),
+        "profile": "",
+        "linked": "",
+    }
+    ap = _parse_addparam(addparam)
+    env = ap.get("environment") or {}
+    if isinstance(env, dict):
+        entry["profile"] = str(env.get("creation_profile") or "")
+
+    if ap.get("parent_schemas"):
+        entry["linked"] = ", ".join(str(x) for x in ap.get("parent_schemas") or [])
+    elif ap.get("satellites"):
+        linked = []
+        for kind, meta in (ap.get("satellites") or {}).items():
+            if isinstance(meta, dict) and meta.get("enabled"):
+                linked.append(f"{kind}:{meta.get('schema', kind)}")
+        entry["linked"] = ", ".join(linked)
+    return entry
+
+
+def fetch_schema_inventory(fetcher: RowFetcher = _tools_db_fetch) -> list[dict[str, Any]]:
+    """Unified schema list for Manage schemas dialog."""
+    names = set(fetch_schema_names_with_sys_version(fetcher))
+    for satellite in _SATELLITE_SCHEMAS:
+        if schema_exists(satellite, fetcher):
+            names.add(satellite)
+
+    if not names:
+        return []
+
+    columns_by_schema = _sys_version_columns_by_schema(names, fetcher)
+    inventory: list[dict[str, Any]] = []
+
+    for schema_name in sorted(names):
+        empty_entry: dict[str, Any] = {
+            "schema": schema_name,
+            "kind": "",
+            "version": "",
+            "profile": "",
+            "linked": "",
+        }
+        columns = columns_by_schema.get(schema_name, set())
+        version_col = _version_column_for_schema(schema_name, columns)
+        select_cols = ["project_type", version_col]
+        if "addparam" in columns:
+            select_cols.append("addparam")
+
+        row = fetcher(
+            f"SELECT {', '.join(select_cols)} "
+            f"FROM {_quote_ident(schema_name)}.sys_version "
+            "ORDER BY id DESC LIMIT 1",
+            None,
+        )
+        if not row or not row[0]:
+            inventory.append(empty_entry)
+            continue
+
+        values = row[0]
+        addparam = values[2] if len(values) > 2 else None
+        inventory.append(
+            _entry_from_sys_version_row(schema_name, values[0], values[1], addparam)
+        )
+
+    return inventory
+
+
+_NETWORK_SATELLITE_ORDER = ("utils", "cibs", "am", "cm", "audit")
+
+
+def _version_tuple(version: Any) -> tuple:
+    parts = str(version or "0").split(".")
+    if len(parts) >= 4:
+        parts = parts[:3]
+    nums = []
+    for part in parts:
+        try:
+            nums.append(int(part))
+        except ValueError:
+            nums.append(0)
+    return tuple(nums) if nums else (0,)
+
+
+def _fetch_schema_sys_version_entry(
+    schema_name: str,
+    fetcher: RowFetcher = _tools_db_fetch,
+) -> dict[str, Any]:
+    if not schema_exists(schema_name, fetcher):
+        return {}
+
+    columns_by_schema = _sys_version_columns_by_schema([schema_name], fetcher)
+    columns = columns_by_schema.get(schema_name, set())
+    version_col = _version_column_for_schema(schema_name, columns)
+    select_cols = ["project_type", version_col]
+    if "addparam" in columns:
+        select_cols.append("addparam")
+
+    row = fetcher(
+        f"SELECT {', '.join(select_cols)} "
+        f"FROM {_quote_ident(schema_name)}.sys_version "
+        "ORDER BY id DESC LIMIT 1",
+        None,
+    )
+    if not row or not row[0]:
+        return {"schema": schema_name, "kind": "", "version": "", "addparam": {}}
+
+    values = row[0]
+    addparam = values[2] if len(values) > 2 else None
+    return {
+        "schema": schema_name,
+        "kind": str(values[0] or ""),
+        "version": str(values[1] or ""),
+        "addparam": _parse_addparam(addparam),
+    }
+
+
+def get_anchor_satellites(
+    anchor_schema: str,
+    fetcher: RowFetcher = _tools_db_fetch,
+) -> dict[str, Any]:
+    entry = _fetch_schema_sys_version_entry(anchor_schema, fetcher)
+    satellites = entry.get("addparam", {}).get("satellites") or {}
+    return satellites if isinstance(satellites, dict) else {}
+
+
+def _satellite_schema_name(
+    kind: str,
+    satellites: dict[str, Any],
+    fetcher: RowFetcher,
+) -> Optional[str]:
+    meta = satellites.get(kind) or satellites.get(kind.upper()) or {}
+    if isinstance(meta, dict):
+        if meta.get("enabled") is False:
+            return None
+        schema_name = str(meta.get("schema") or kind)
+        if schema_exists(schema_name, fetcher):
+            return schema_name
+
+    if kind == "cm":
+        cm_schema = find_cm_schema(fetcher=fetcher)
+        if cm_schema:
+            return cm_schema
+
+    if schema_exists(kind, fetcher):
+        return kind
+    return None
+
+
+def build_network_update_plan(
+    anchor_schema: str,
+    plugin_version: str,
+    fetcher: RowFetcher = _tools_db_fetch,
+) -> list[dict[str, Any]]:
+    """Ordered update targets for the network anchored on a WS/UD schema."""
+    anchor_entry = _fetch_schema_sys_version_entry(anchor_schema, fetcher)
+    anchor_kind = str(anchor_entry.get("kind") or "").upper()
+    if anchor_kind not in ("WS", "UD"):
+        return []
+
+    plugin_v = _version_tuple(plugin_version)
+    plan: list[dict[str, Any]] = []
+    anchor_version = str(anchor_entry.get("version") or "0.0.0")
+    plan.append({
+        "kind": anchor_kind.lower(),
+        "schema": anchor_schema,
+        "version": anchor_version,
+        "needs_update": _version_tuple(anchor_version) < plugin_v,
+        "parent_schema": anchor_schema,
+        "parent_type": anchor_kind.lower(),
+    })
+
+    satellites = get_anchor_satellites(anchor_schema, fetcher)
+    for kind in _NETWORK_SATELLITE_ORDER:
+        schema_name = _satellite_schema_name(kind, satellites, fetcher)
+        if not schema_name:
+            continue
+        entry = _fetch_schema_sys_version_entry(schema_name, fetcher)
+        version = str(entry.get("version") or "0.0.0")
+        plan.append({
+            "kind": kind,
+            "schema": schema_name,
+            "version": version,
+            "needs_update": _version_tuple(version) < plugin_v,
+            "parent_schema": anchor_schema,
+            "parent_type": anchor_kind.lower(),
+        })
+    return plan
+
+
+def schema_needs_plugin_update(version: str, plugin_version: str) -> bool:
+    return _version_tuple(version) < _version_tuple(plugin_version)
+
+
+def find_inventory_row(
+    inventory: list[dict[str, Any]],
+    *,
+    schema: Optional[str] = None,
+    kind: Optional[str] = None,
+) -> Optional[dict[str, Any]]:
+    want_kind = kind.upper() if kind else None
+    for row in inventory:
+        if schema is not None and row.get("schema") == schema:
+            return row
+        if want_kind and str(row.get("kind") or "").upper() == want_kind:
+            return row
+    return None

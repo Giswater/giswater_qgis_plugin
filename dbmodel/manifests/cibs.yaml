@@ -13,8 +13,11 @@ phases:
     type: sql_dir
     description: "Bootstrap cibs schema: base."
     steps:
+      - { source: "schemas/addon/cibs/base/init.sql", recursive: false }
+      - { source: "schemas/addon/cibs/base/fct",  recursive: false }
+      - { source: "schemas/addon/cibs/base/ftrg",  recursive: false }
       - { source: "schemas/addon/cibs/base/base.sql",  recursive: false }
-      - { source: "schemas/addon/cibs/base/fct/",  recursive: false }
+
 
   - id: integrate_cibs
     type: sql_dir
@@ -51,3 +54,5 @@ profiles:
     phases: [load_base_schema, updates, register_version]
   integrate:
     phases: [integrate_cibs, updates, register_version]
+  update:
+    phases: [updates, register_version]

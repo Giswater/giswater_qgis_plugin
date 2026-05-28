@@ -135,7 +135,7 @@ class GwAdminButton:
             try_set_connection=set_database_connection,
         )
 
-    def create_project_data_other_schema(self, project):
+    def create_project_data_other_schema(self, project, parent_schema=None, parent_type=None):
         """ Create other schema """
 
         self.other_project = project
@@ -147,7 +147,11 @@ class GwAdminButton:
         if not answer:
             return
 
-        self.create_process(project)
+        self.create_process(
+            project,
+            parent_schema=parent_schema,
+            parent_type=parent_type,
+        )
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
@@ -325,7 +329,7 @@ class GwAdminButton:
             self.error_count += 1
         self.manage_process_result(project_name_schema, project_type, is_test=is_test)
 
-    def create_process(self, process_name=""):
+    def create_process(self, process_name="", parent_schema=None, parent_type=None):
         """
         am or audit lifecycle entry point.
 
@@ -333,10 +337,7 @@ class GwAdminButton:
         `audit_activation`) to a manifest kind + profile.
         """
         if process_name == "am":
-            parent_schema = self._get_schema_name() or ""
-            parent_type = (
-                tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or "ws"
-            ).lower()
+            parent_schema, parent_type = self._resolve_parent_context(parent_schema, parent_type)
             if not parent_schema:
                 tools_qgis.show_warning(
                     "Select a ws project schema before creating the am schema."
@@ -358,15 +359,13 @@ class GwAdminButton:
         elif process_name in ("audit", "audit_activation"):
             profile = "structure" if process_name == "audit" else "activate"
             schema_name = "audit"
+            resolved_parent, resolved_type = self._resolve_parent_context(parent_schema, parent_type)
             parent_schema = "audit"
             parent_type = ""
             if process_name == "audit_activation":
-                # Triggers attach to the currently-selected ws/ud schema.
-                schema_name = self._get_schema_name() or "audit"
-                parent_schema = schema_name
-                parent_type = (
-                    tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or ""
-                ).lower()
+                schema_name = resolved_parent or "audit"
+                parent_schema = resolved_parent or "audit"
+                parent_type = resolved_type
             bp = BuildParams(
                 schema_name=schema_name,
                 srid=str(self.project_epsg or "25831"),
@@ -575,6 +574,9 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Create project")
         if status:
             tools_db.dao.commit()
+            refresh = getattr(self, '_manage_schemas_refresh', None)
+            if refresh:
+                refresh()
             if is_utils is False and is_cibs is False:
                 self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
@@ -603,6 +605,9 @@ class GwAdminButton:
         if status:
             tools_db.dao.commit()
             self._set_buttons_enabled()
+            refresh = getattr(self, '_manage_schemas_refresh', None)
+            if refresh:
+                refresh()
 
         else:
             tools_db.dao.rollback()
@@ -673,6 +678,164 @@ class GwAdminButton:
         if not kind and hasattr(self, 'cmb_project_type'):
             kind = tools_qt.get_text(self.dlg_readsql, self.cmb_project_type)
         return str(kind or 'ws').lower()
+
+    def _resolve_parent_context(self, parent_schema=None, parent_type=None):
+        if parent_schema:
+            pt = parent_type
+            if not pt:
+                entry = admin_catalog._fetch_schema_sys_version_entry(str(parent_schema))
+                pt = str(entry.get("kind") or "ws").lower()
+            return str(parent_schema), str(pt or "ws").lower()
+        schema_name = self._get_schema_name() or ""
+        pt = ""
+        if hasattr(self, 'dlg_readsql') and self.dlg_readsql:
+            pt = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        return schema_name, str(pt or "ws").lower()
+
+    def _run_schema_upgrade(self, schema_name, project_type, on_done=None):
+        """Upgrade a ws/ud schema in place via the engine."""
+        row = tools_db.get_row(
+            f"SELECT giswater, language, epsg FROM {schema_name}.sys_version "
+            "ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
+        bp = BuildParams(
+            schema_name=schema_name,
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
+            locale=str(row[1] if row and row[1] else self.locale),
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            run_mode='upgrade',
+            profile='update',
+            sql_root=self.sql_dir,
+        )
+        callback = on_done if on_done is not None else self._on_builder_done_update
+        self._submit_builder(
+            project_type,
+            bp,
+            description=f"Update {schema_name}",
+            on_done=callback,
+        )
+
+    def _update_network(self, anchor_schema=None):
+        """Sequentially update anchor WS/UD and linked satellites."""
+        anchor = anchor_schema or self._get_schema_name() or ""
+        if not anchor:
+            tools_qgis.show_message(
+                "Select a WS or UD parent schema.",
+                Qgis.MessageLevel.Info,
+            )
+            return
+
+        anchor_entry = admin_catalog._fetch_schema_sys_version_entry(anchor)
+        anchor_kind = str(anchor_entry.get("kind") or "").upper()
+        if anchor_kind not in ("WS", "UD"):
+            tools_qgis.show_message(
+                "Update network requires a WS or UD anchor schema.",
+                Qgis.MessageLevel.Info,
+            )
+            return
+
+        plan = admin_catalog.build_network_update_plan(anchor, str(self.plugin_version))
+        pending = [step for step in plan if step.get("needs_update")]
+        if not pending:
+            tools_qgis.show_message(
+                "Network is already up to date.",
+                Qgis.MessageLevel.Info,
+            )
+            return
+
+        summary = "\n".join(
+            f"- {step['schema']} ({step['kind']}): {step['version']} -> {self.plugin_version}"
+            for step in pending
+        )
+        if not tools_qt.show_question(
+            f"Update the following schemas?\n\n{summary}",
+            "Update network",
+        ):
+            return
+
+        self._update_plan_queue = pending
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
+        self.error_count = 0
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.start(1000)
+        self._run_update_plan_step(0)
+
+    def _run_update_plan_step(self, index):
+        queue = getattr(self, '_update_plan_queue', None) or []
+        if index >= len(queue):
+            self._finish_update_plan(success=True)
+            return
+
+        step = queue[index]
+        on_done = partial(self._chain_update_done, index)
+        kind = str(step.get("kind") or "").lower()
+        schema_name = str(step.get("schema") or "")
+        parent_schema = step.get("parent_schema")
+        parent_type = step.get("parent_type")
+
+        if kind in ("ws", "ud"):
+            self._run_schema_upgrade(schema_name, kind, on_done=on_done)
+        elif kind == "utils":
+            self._update_utils(on_done=on_done)
+        elif kind == "cibs":
+            self._update_cibs(on_done=on_done)
+        elif kind == "am":
+            self._update_asset(
+                parent_schema=parent_schema,
+                parent_type=parent_type,
+                on_done=on_done,
+            )
+        elif kind == "cm":
+            self._update_cm(
+                parent_schema=parent_schema,
+                parent_type=parent_type,
+                cm_schema=schema_name,
+                on_done=on_done,
+            )
+        elif kind == "audit":
+            self._update_audit(on_done=on_done)
+        else:
+            tools_qgis.show_warning(
+                "Unsupported schema kind in update plan.",
+                parameter=kind,
+            )
+            self._finish_update_plan(success=False)
+
+    def _chain_update_done(self, index, result):
+        if self.timer is not None:
+            try:
+                self.timer.stop()
+            except Exception:  # noqa: BLE001
+                pass
+        if not result.ok:
+            self.error_count += 1
+            tools_db.dao.rollback()
+            self._manage_result_message(False, parameter="Update network")
+            self._finish_update_plan(success=False)
+            return
+
+        tools_db.dao.commit()
+        self._run_update_plan_step(index + 1)
+
+    def _finish_update_plan(self, success=True):
+        if self.timer is not None:
+            try:
+                self.timer.stop()
+            except Exception:  # noqa: BLE001
+                pass
+        self._update_plan_queue = []
+        if success:
+            self._refresh_admin_catalog_cache()
+            self._set_info_project()
+            self._manage_result_message(True, parameter="Update network")
+            refresh = getattr(self, '_manage_schemas_refresh', None)
+            if refresh:
+                refresh()
+        self.error_count = 0
 
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type=None):
@@ -1330,6 +1493,11 @@ class GwAdminButton:
         if global_vars.gw_dev_mode is not True:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
 
+        for _gb_name in ('groupBox_2', 'groupBox', 'groupBox_cibs'):
+            _gb = self.dlg_readsql.findChild(QGroupBox, _gb_name)
+            if _gb is not None:
+                _gb.setVisible(False)
+
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
         self.project_types = self.project_types.split(',')
@@ -1388,6 +1556,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
+        self.dlg_readsql.btn_manage_schemas.clicked.connect(partial(self._open_manage_schemas))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
         self.dlg_readsql.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_readsql))
@@ -1426,7 +1595,7 @@ class GwAdminButton:
         # Markdown generator
         self.dlg_readsql.btn_markdown_generator.clicked.connect(partial(self._markdown_generator))
 
-    def _activate_audit(self, other_project):
+    def _activate_audit(self, other_project, parent_schema=None, parent_type=None):
         """ Activate audit functionality """
 
         self.other_project = other_project
@@ -1436,15 +1605,19 @@ class GwAdminButton:
             answer = tools_qt.show_question(msg, title)
             if not answer:
                 return
-            self.create_process("audit_activation")
+            self.create_process(
+                "audit_activation",
+                parent_schema=parent_schema,
+                parent_type=parent_type,
+            )
         else:
             msg = "Schema audit not found, please create it first"
             tools_qgis.show_warning(msg)
 
-    def _reload_audit_triggers(self):
+    def _reload_audit_triggers(self, schema_name=None):
         """ Update audit triggers to start or stop auditing a table """
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = schema_name or self._get_schema_name()
         result = tools_gw.execute_procedure('gw_fct_update_audit_triggers', schema_name=schema_name)
 
         if result:
@@ -2230,6 +2403,18 @@ class GwAdminButton:
             partial(self._change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self._update_locale))
         self.filter_srid.textChanged.connect(partial(self._filter_srid_changed))
+
+    def _open_manage_schemas(self):
+        from .manage_schemas_dlg import GwManageSchemasDialog
+        dlg = GwManageSchemasDialog(self, parent=self.dlg_readsql)
+        tools_gw.load_settings(dlg)
+        self._manage_schemas_refresh = dlg._refresh_inventory
+        lib_vars.session_vars["message_parent"] = dlg
+        try:
+            dlg.exec()
+        finally:
+            lib_vars.session_vars["message_parent"] = None
+            self._manage_schemas_refresh = None
 
     def _open_create_project(self):
         """"""
@@ -3277,12 +3462,18 @@ class GwAdminButton:
             if msg_ok is None:
                 msg = "Process finished successfully"
                 msg_ok = msg
-            tools_qgis.show_info(msg_ok, parameter=parameter)
+            if lib_vars.session_vars.get("message_parent"):
+                tools_qt.show_info_box(msg_ok, "Info", parameter=parameter)
+            else:
+                tools_qgis.show_info(msg_ok, parameter=parameter)
         else:
             if msg_error is None:
                 msg = "Process finished with some errors"
                 msg_error = msg
-            tools_qgis.show_warning(msg_error, parameter=parameter)
+            if lib_vars.session_vars.get("message_parent"):
+                tools_qt.show_warning_box(msg_error, parameter=parameter)
+            else:
+                tools_qgis.show_warning(msg_error, parameter=parameter)
 
     def _manage_json_message(self, json_result, parameter=None, title=None):
         """ Manage message depending result @status """
@@ -3490,6 +3681,7 @@ class GwAdminButton:
         ud_schema='',
         copy_source='',
         project_version='0.0.0',
+        on_done=None,
     ):
         register_is_new = 'true' if profile == 'empty' else 'false'
         infer_parents = 'true' if profile in ('integrate_ws', 'integrate_ud', 'update') else 'false'
@@ -3526,10 +3718,11 @@ class GwAdminButton:
             sql_root=self.sql_dir,
         )
 
+        callback = on_done if on_done is not None else partial(self._on_builder_done_utils, 'utils')
         self._submit_builder(
             'utils', bp,
             description=process_name,
-            on_done=partial(self._on_builder_done_utils, 'utils'),
+            on_done=callback,
         )
 
     def _create_utils(self):
@@ -3633,7 +3826,32 @@ class GwAdminButton:
 
         self._run_create_cibs_task(['integrate_cibs'], 'Adapt schema to cibs')
 
-    def _update_utils(self, schema_name=None):
+    def _copy_cibs_data(self):
+
+        schema_info = self._get_cibs_schema_info()
+        if schema_info is None:
+            msg = "Select a WS or UD schema to copy data to cibs"
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        self.cibs_project_name, self.cibs_project_result, self.cibs_project_type = schema_info
+
+        if not self._cibs_schema_exists():
+            msg = "cibs schema does not exist. Create it first."
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        sql = (f"SELECT value::boolean FROM {self.cibs_project_name}.config_param_system "
+               f"WHERE parameter = 'admin_cibs_schema'")
+        row = tools_db.get_row(sql)
+        if row is None or row[0] is not True:
+            msg = "Selected schema must be adapted to cibs before copying data"
+            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            return
+
+        self._run_create_cibs_task(['copy_data_cibs'], 'Copy data to cibs')
+
+    def _update_utils(self, schema_name=None, on_done=None):
         """Run the utils 'update' profile in place."""
         row = tools_db.get_row(
             "SELECT giswater FROM utils.sys_version ORDER BY id DESC LIMIT 1"
@@ -3651,6 +3869,57 @@ class GwAdminButton:
             ws_schema=(ws_schema[0] if ws_schema else ''),
             ud_schema=(ud_schema[0] if ud_schema else ''),
             project_version=str(current_version),
+            on_done=on_done,
+        )
+
+    def _update_cibs(self, on_done=None):
+        """Run the cibs 'update' profile in place."""
+        row = tools_db.get_row(
+            "SELECT giswater FROM cibs.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
+        bp = BuildParams(
+            schema_name='cibs',
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            profile='update',
+            run_mode='upgrade',
+            sql_root=self.sql_dir,
+        )
+        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'cibs')
+        self._submit_builder(
+            'cibs',
+            bp,
+            description="Update cibs schema",
+            on_done=callback,
+        )
+
+    def _update_audit(self, on_done=None):
+        """Run the audit 'update' profile in place."""
+        row = tools_db.get_row(
+            "SELECT giswater FROM audit.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
+        bp = BuildParams(
+            schema_name='audit',
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            profile='update',
+            run_mode='upgrade',
+            parent_schema='audit',
+            parent_type='',
+            sql_root=self.sql_dir,
+        )
+        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'audit')
+        self._submit_builder(
+            'audit',
+            bp,
+            description="Update audit schema",
+            on_done=callback,
         )
 
     def _on_builder_done_utils(self, schema_name, result):
@@ -3658,17 +3927,14 @@ class GwAdminButton:
             self.error_count += 1
         self.manage_process_result(schema_name, 'utils', is_utils=True)
 
-    def _update_asset(self):
+    def _update_asset(self, parent_schema=None, parent_type=None, on_done=None):
         """Run the am 'update' profile in place (semver upgrade)."""
         row = tools_db.get_row(
             "SELECT giswater FROM am.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
 
-        parent_schema = self._get_schema_name() or ""
-        parent_type = (
-            tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or "ws"
-        ).lower()
+        parent_schema, parent_type = self._resolve_parent_context(parent_schema, parent_type)
         if not parent_schema:
             tools_qgis.show_warning(
                 "Select the ws project schema linked to am before updating."
@@ -3687,39 +3953,37 @@ class GwAdminButton:
             parent_type=parent_type,
             sql_root=self.sql_dir,
         )
+        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'am')
         self._submit_builder('am', bp,
                              description="Update am schema",
-                             on_done=partial(self._on_builder_done_other_update, 'am'))
+                             on_done=callback)
 
-    def _update_cm(self):
+    def _update_cm(self, parent_schema=None, parent_type=None, cm_schema=None, on_done=None):
         """Run the cm 'update' profile in place (semver upgrade)."""
+        cm_schema = cm_schema or admin_catalog.find_cm_schema() or "cm"
         row = tools_db.get_row(
-            "SELECT giswater FROM cm.sys_version ORDER BY id DESC LIMIT 1"
+            f"SELECT giswater FROM {cm_schema}.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
 
-        # parent_schema + parent_type come from the currently-selected ws/ud
-        # in the admin dialog (matches how cm was created).
-        parent_schema = self._get_schema_name() or ""
-        parent_type = (
-            tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type) or ""
-        ).lower()
+        parent_schema, parent_type = self._resolve_parent_context(parent_schema, parent_type)
 
         bp = BuildParams(
-            schema_name='cm',
+            schema_name=cm_schema,
             srid="0",
             locale=self.locale,
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',
             run_mode='upgrade',
-            parent_schema=parent_schema,
+            parent_schema=parent_schema or "",
             parent_type=parent_type,
             sql_root=self.sql_dir,
         )
+        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'cm')
         self._submit_builder('cm', bp,
                              description="Update cm schema",
-                             on_done=partial(self._on_builder_done_other_update, 'cm'))
+                             on_done=callback)
 
     def _on_builder_done_other_update(self, schema_name, result):
         if not result.ok:
