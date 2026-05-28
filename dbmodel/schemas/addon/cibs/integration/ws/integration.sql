@@ -14,7 +14,7 @@ ALTER TABLE IF EXISTS ext_cat_hydrometer_type RENAME TO ext_cat_hydrometer_type_
 ALTER TABLE IF EXISTS ext_cat_hydrometer_category RENAME TO ext_cat_hydrometer_category_old;
 ALTER TABLE IF EXISTS ext_cat_hydrometer_state RENAME TO ext_cat_hydrometer_state_old;
 ALTER TABLE IF EXISTS ext_hydrometer RENAME TO ext_hydrometer_old;
-ALTER TABLE IF EXISTS ext_hydrometer_data RENAME TO ext_hydrometer_data_old;
+ALTER TABLE IF EXISTS ext_hydrometer_period RENAME TO ext_hydrometer_period_old;
 ALTER TABLE IF EXISTS ext_cat_hydrometer_category_x_pattern RENAME TO ext_cat_hydrometer_category_x_pattern_old;
 
 DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer';
@@ -23,14 +23,16 @@ DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer_type';
 DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer_category';
 DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer_state';
 DELETE FROM sys_table WHERE id = 'ext_hydrometer';
-DELETE FROM sys_table WHERE id = 'ext_hydrometer_data';
+DELETE FROM sys_table WHERE id = 'ext_hydrometer_period';
+DELETE FROM sys_table WHERE id = 'ext_cat_period_type';
+DELETE FROM sys_table WHERE id = 'ext_cat_period';
 
 
 CREATE OR REPLACE VIEW v_hydrometer AS
 SELECT * FROM cibs.hydrometer;
 
-CREATE OR REPLACE VIEW v_hydrometer_data AS
-SELECT * FROM cibs.hydrometer_data;
+CREATE OR REPLACE VIEW v_hydrometer_period AS
+SELECT * FROM cibs.hydrometer_period;
 
 CREATE OR REPLACE VIEW v_cat_hydrometer AS
 SELECT * FROM cibs.cat_hydrometer;
@@ -46,3 +48,9 @@ SELECT * FROM cibs.cat_hydrometer_type;
 
 CREATE OR REPLACE VIEW v_cat_hydrometer_category AS
 SELECT * FROM cibs.cat_hydrometer_category;
+
+CREATE OR REPLACE VIEW v_cat_period_type AS
+SELECT * FROM cibs.cat_period_type;
+
+CREATE OR REPLACE VIEW v_cat_period AS
+SELECT * FROM cibs.cat_period;
