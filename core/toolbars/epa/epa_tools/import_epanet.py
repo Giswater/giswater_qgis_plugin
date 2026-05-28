@@ -247,7 +247,7 @@ class GwImportEpanet:
             queries = [
                 'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
                 'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
-                'DELETE FROM ext_scada_x_data;',
+                'DELETE FROM ext_rtc_scada_x_data;',
                 'DELETE FROM config_graph_checkvalve;',
                 'DELETE FROM connec CASCADE;',
                 'DELETE FROM node CASCADE;',
