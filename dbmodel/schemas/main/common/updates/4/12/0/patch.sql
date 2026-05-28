@@ -100,6 +100,47 @@ UPDATE config_form_fields SET columnname = 'hydro_customer_code' WHERE columnnam
 UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, '"hydrometer_customer_code"', '"hydro_customer_code"')::json WHERE widgetfunction::text ILIKE '%hydrometer_customer_code%';
 UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, '"hydrometer_customer_code"', '"hydro_customer_code"')::json WHERE widgetcontrols::text ILIKE '%hydrometer_customer_code%';
 
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'v_rtc_hydrometer', 'vf_hydrometer') WHERE query_text ILIKE '% v_rtc_hydrometer %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_cat_period_type', 'v_cat_period_type') WHERE query_text ILIKE '% ext_cat_period_type %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_cat_period', 'v_cat_period') WHERE query_text ILIKE '% ext_cat_period %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_cat_hydrometer', 'v_cat_hydrometer') WHERE query_text ILIKE '% ext_cat_hydrometer %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_cat_hydrometer_type', 'v_cat_hydrometer_type') WHERE query_text ILIKE '% ext_cat_hydrometer_type %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_hydrometer_category', 'v_cat_hydrometer_category') WHERE query_text ILIKE '% ext_hydrometer_category %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_cat_hydrometer_priority', 'v_cat_hydrometer_priority') WHERE query_text ILIKE '% ext_cat_hydrometer_priority %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_rtc_hydrometer_state', 'v_cat_hydrometer_state') WHERE query_text ILIKE '% ext_rtc_hydrometer_state %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_rtc_hydrometer', 'v_hydrometer') WHERE query_text ILIKE '% ext_rtc_hydrometer %';
+UPDATE sys_fprocess SET query_text = REPLACE(query_text, 'ext_rtc_hydrometer_data', 'v_hydrometer_period') WHERE query_text ILIKE '% ext_rtc_hydrometer_data %';
+
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_cat_period_type', 'v_cat_period_type') WHERE dv_querytext ILIKE '% ext_cat_period_type %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_cat_period', 'v_cat_period') WHERE dv_querytext ILIKE '% ext_cat_period %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_cat_hydrometer', 'v_cat_hydrometer') WHERE dv_querytext ILIKE '% ext_cat_hydrometer %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_cat_hydrometer_type', 'v_cat_hydrometer_type') WHERE dv_querytext ILIKE '% ext_cat_hydrometer_type %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_hydrometer_category', 'v_cat_hydrometer_category') WHERE dv_querytext ILIKE '% ext_hydrometer_category %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_cat_hydrometer_priority', 'v_cat_hydrometer_priority') WHERE dv_querytext ILIKE '% ext_cat_hydrometer_priority %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_rtc_hydrometer_state', 'v_cat_hydrometer_state') WHERE dv_querytext ILIKE '% ext_rtc_hydrometer_state %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_rtc_hydrometer', 'v_hydrometer') WHERE dv_querytext ILIKE '% ext_rtc_hydrometer %';
+UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'ext_rtc_hydrometer_data', 'v_hydrometer_period') WHERE dv_querytext ILIKE '% ext_rtc_hydrometer_data %';
+
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_cat_period_type', 'v_cat_period_type')::json WHERE widgetfunction::text ILIKE '% ext_cat_period_type %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_cat_period', 'v_cat_period')::json WHERE widgetfunction::text ILIKE '% ext_cat_period %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_cat_hydrometer', 'v_cat_hydrometer')::json WHERE widgetfunction::text ILIKE '% ext_cat_hydrometer %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_cat_hydrometer_type', 'v_cat_hydrometer_type')::json WHERE widgetfunction::text ILIKE '% ext_cat_hydrometer_type %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_hydrometer_category', 'v_cat_hydrometer_category')::json WHERE widgetfunction::text ILIKE '% ext_hydrometer_category %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_cat_hydrometer_priority', 'v_cat_hydrometer_priority')::json WHERE widgetfunction::text ILIKE '% ext_cat_hydrometer_priority %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_rtc_hydrometer_state', 'v_cat_hydrometer_state')::json WHERE widgetfunction::text ILIKE '% ext_rtc_hydrometer_state %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_rtc_hydrometer', 'v_hydrometer')::json WHERE widgetfunction::text ILIKE '% ext_rtc_hydrometer %';
+UPDATE config_form_fields SET widgetfunction = REPLACE(widgetfunction::text, 'ext_rtc_hydrometer_data', 'v_hydrometer_period')::json WHERE widgetfunction::text ILIKE '% ext_rtc_hydrometer_data %';
+
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_cat_period_type', 'v_cat_period_type')::json WHERE widgetcontrols::text ILIKE '% ext_cat_period_type %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_cat_period', 'v_cat_period')::json WHERE widgetcontrols::text ILIKE '% ext_cat_period %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_cat_hydrometer', 'v_cat_hydrometer')::json WHERE widgetcontrols::text ILIKE '% ext_cat_hydrometer %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_cat_hydrometer_type', 'v_cat_hydrometer_type')::json WHERE widgetcontrols::text ILIKE '% ext_cat_hydrometer_type %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_hydrometer_category', 'v_cat_hydrometer_category')::json WHERE widgetcontrols::text ILIKE '% ext_hydrometer_category %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_cat_hydrometer_priority', 'v_cat_hydrometer_priority')::json WHERE widgetcontrols::text ILIKE '% ext_cat_hydrometer_priority %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_rtc_hydrometer_state', 'v_cat_hydrometer_state')::json WHERE widgetcontrols::text ILIKE '% ext_rtc_hydrometer_state %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_rtc_hydrometer', 'v_hydrometer')::json WHERE widgetcontrols::text ILIKE '% ext_rtc_hydrometer %';
+UPDATE config_form_fields SET widgetcontrols = REPLACE(widgetcontrols::text, 'ext_rtc_hydrometer_data', 'v_hydrometer_period')::json WHERE widgetcontrols::text ILIKE '% ext_rtc_hydrometer_data %';
+
 CREATE TABLE ext_hydrometer_period (
     id bigint NOT NULL DEFAULT nextval('SCHEMA_NAME.ext_hydrometer_period_id_seq'::regclass),
     hydrometer_id integer,
