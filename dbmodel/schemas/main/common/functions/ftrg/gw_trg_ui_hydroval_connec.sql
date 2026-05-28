@@ -25,7 +25,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
         UPDATE v_hydrometer_data 
-        SET custom_sum=NEW.custom_sum
+        SET billed_volume=NEW.billed_volume
         WHERE id=OLD.id;
         -- PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
          -- "data":{"message":"2", "function":"1310","parameters":null, "variables":null}}$$); 

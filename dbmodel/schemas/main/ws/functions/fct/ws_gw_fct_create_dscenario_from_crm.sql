@@ -103,9 +103,9 @@ BEGIN
         SELECT
         d.hydrometer_id,
         d.cat_period_id,
-        d.sum,
+        d.billed_volume,
         p.end_date AS p_end_date,
-        first_value(d.sum) OVER w AS last_sum,
+        first_value(d.billed_volume) OVER w AS last_sum,
         first_value(d.cat_period_id) OVER w AS last_cat_period_id,
         first_value(p.end_date) OVER w::date AS last_end_date,
         first_value(p.period_seconds) OVER w AS last_period_seconds
@@ -252,7 +252,7 @@ BEGIN
 						JOIN node n ON n.node_id = mn.node_id
 				),
 				data AS (
-					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, sum, custom_sum
+					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, billed_volume
 					FROM v_hydrometer_data d
 					JOIN hydros h
 					ON h.hydrometer_id = d.hydrometer_id
@@ -261,9 +261,8 @@ BEGIN
 				SELECT
 					feature_type,
 					feature_id,
-					COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY data.dma_id) AS demand_weight,
-					sum,
-					custom_sum,
+					billed_volume / SUM(billed_volume) OVER (PARTITION BY data.dma_id) AS demand_weight,
+					billed_volume,
 					d.pattern_id AS pattern_id,
 					hydrometer_id,
 					data.expl_id,
@@ -275,7 +274,7 @@ BEGIN
 		ELSE
 			v_querytext = '
 			with final_hydros as (
-				SELECT hydrometer_id, sum, custom_sum, pattern_id from v_hydrometer_data where cat_period_id = '||quote_literal(v_period)||'
+				SELECT hydrometer_id, billed_volume, pattern_id from v_hydrometer_data where cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.customer_code UNION
 						SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code JOIN node n ON n.node_id = mn.node_id
@@ -327,8 +326,7 @@ BEGIN
 					h.feature_id,
 					h.feature_type,
 					h.expl_id,
-					SUM(d.sum * (p.c_seconds / p.p_seconds))::numeric(10,0) AS sum,
-					NULL::numeric AS custom_sum,
+					SUM(d.billed_volume * (p.c_seconds / p.p_seconds))::numeric(10,0) AS billed_volume,
 					d.pattern_id
 				FROM v_hydrometer_data d
 				JOIN period_selected p ON d.cat_period_id = p.id
@@ -338,9 +336,8 @@ BEGIN
 			SELECT
 				feature_type,
 				feature_id,
-				COALESCE(custom_sum, sum) / SUM(COALESCE(custom_sum, sum)) OVER (PARTITION BY data.dma_id) AS demand_weight,
-				sum,
-				custom_sum,
+				billed_volume / SUM(billed_volume) OVER (PARTITION BY data.dma_id) AS demand_weight,
+				billed_volume,
 				d.pattern_id AS pattern_id,
 				hydrometer_id,
 				data.expl_id,
@@ -356,7 +353,7 @@ BEGIN
 		'final_hydros AS  (
 			    SELECT
 			    d.hydrometer_id,
-			    sum(d.sum*(p.c_seconds/p.p_seconds))::numeric(10,0) AS sum, null as custom_sum, pattern_id
+			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, pattern_id
 			    FROM v_hydrometer_data d
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
@@ -396,7 +393,7 @@ BEGIN
 		-- count hydrometers and total vol grouped by feature_type
 		EXECUTE 'SELECT COUNT(hydrometer_id) FROM ('||v_querytext||')' INTO v_total_hydro;
 
-		EXECUTE 'SELECT sum("sum") FROM ('||v_querytext||')' INTO v_total_vol;
+		EXECUTE 'SELECT sum("billed_volume") FROM ('||v_querytext||')' INTO v_total_vol;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('There are ', v_total_hydro, ' hydrometers with data for this period and this exploitation.'));
@@ -416,7 +413,7 @@ BEGIN
 			EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
 			WITH aux as ('||v_querytext||')
 			SELECT  feature_type, '||v_scenarioid||', feature_id,
-			(case when custom_sum is null then '||v_factor||'*sum::numeric else '||v_factor||'*custom_sum::numeric end) as volume,
+			'||v_factor||'*billed_volume::numeric as volume,
 			hydrometer_id as source
 			FROM aux order by 2';
 		END IF;

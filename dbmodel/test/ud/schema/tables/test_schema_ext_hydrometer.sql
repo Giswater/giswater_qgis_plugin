@@ -21,12 +21,12 @@ SELECT has_table('ext_hydrometer'::name, 'Table ext_hydrometer should exist');
 SELECT columns_are(
     'ext_hydrometer',
     ARRAY[
-        'hydrometer_id', 'code', 'hydrometer_category', 'customer_name',
-        'id_number', 'cat_hydrometer_id', 'start_date', 'hydro_number', 'identif', 'state_id',
-        'expl_id', 'hydro_customer_code', 'plot_code', 'priority_id', 'catalog_id', 'category_id',
-        'wmeter_number', 'muni_id', 'address1_1', 'address1_2', 'address1_3', 'address2_1',
-        'address2_2', 'address2_3', 'assessed_volume', 'wmeter_builtdate', 'end_date', 'update_date',
-        'shutdown_date', 'link', 'customer_code'
+        'hydrometer_id', 'code', 'hydro_customer_code', 'id_number', 'hydro_number',
+        'feature_customer_code', 'customer_name', 'contract_id', 'identif', 'state_id', 'expl_id',
+        'priority_id', 'catalog_id', 'category_id', 'crmzone_id', 'crmzone_order', 'wmeter_number',
+        'wmeter_builtdate', 'wmeter_instaldate', 'plot_code', 'muni_id', 'start_date', 'update_date',
+        'shutdown_date', 'end_date', 'address1_1', 'address1_2', 'address1_3', 'address2_1',
+        'address2_2', 'address2_3', 'assessed_volume', 'is_waterbal', 'link'
     ],
     'Table ext_hydrometer should have the correct columns'
 );
@@ -34,35 +34,38 @@ SELECT columns_are(
 -- Check column types
 SELECT col_type_is('ext_hydrometer', 'hydrometer_id', 'int4', 'Column hydrometer_id should be int4');
 SELECT col_type_is('ext_hydrometer', 'code', 'text', 'Column code should be text');
-SELECT col_type_is('ext_hydrometer', 'hydrometer_category', 'text', 'Column hydrometer_category should be text');
-SELECT col_type_is('ext_hydrometer', 'customer_name', 'text', 'Column customer_name should be text');
+SELECT col_type_is('ext_hydrometer', 'hydro_customer_code', 'text', 'Column hydro_customer_code should be text');
 SELECT col_type_is('ext_hydrometer', 'id_number', 'text', 'Column id_number should be text');
-SELECT col_type_is('ext_hydrometer', 'cat_hydrometer_id', 'text', 'Column cat_hydrometer_id should be text');
-SELECT col_type_is('ext_hydrometer', 'start_date', 'date', 'Column start_date should be date');
 SELECT col_type_is('ext_hydrometer', 'hydro_number', 'text', 'Column hydro_number should be text');
+SELECT col_type_is('ext_hydrometer', 'feature_customer_code', 'varchar(30)', 'Column feature_customer_code should be varchar(30)');
+SELECT col_type_is('ext_hydrometer', 'customer_name', 'text', 'Column customer_name should be text');
+SELECT col_type_is('ext_hydrometer', 'contract_id', 'text', 'Column contract_id should be text');
 SELECT col_type_is('ext_hydrometer', 'identif', 'text', 'Column identif should be text');
 SELECT col_type_is('ext_hydrometer', 'state_id', 'int2', 'Column state_id should be int2');
 SELECT col_type_is('ext_hydrometer', 'expl_id', 'int4', 'Column expl_id should be int4');
-SELECT col_type_is('ext_hydrometer', 'hydro_customer_code', 'varchar(30)', 'Column hydro_customer_code should be varchar(30)');
-SELECT col_type_is('ext_hydrometer', 'plot_code', 'int4', 'Column plot_code should be int4');
 SELECT col_type_is('ext_hydrometer', 'priority_id', 'int4', 'Column priority_id should be int4');
 SELECT col_type_is('ext_hydrometer', 'catalog_id', 'int4', 'Column catalog_id should be int4');
 SELECT col_type_is('ext_hydrometer', 'category_id', 'int4', 'Column category_id should be int4');
+SELECT col_type_is('ext_hydrometer', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
+SELECT col_type_is('ext_hydrometer', 'crmzone_order', 'int4', 'Column crmzone_order should be int4');
 SELECT col_type_is('ext_hydrometer', 'wmeter_number', 'int4', 'Column wmeter_number should be int4');
+SELECT col_type_is('ext_hydrometer', 'wmeter_builtdate', 'date', 'Column wmeter_builtdate should be date');
+SELECT col_type_is('ext_hydrometer', 'wmeter_instaldate', 'date', 'Column wmeter_instaldate should be date');
+SELECT col_type_is('ext_hydrometer', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
 SELECT col_type_is('ext_hydrometer', 'muni_id', 'int4', 'Column muni_id should be int4');
+SELECT col_type_is('ext_hydrometer', 'start_date', 'date', 'Column start_date should be date');
+SELECT col_type_is('ext_hydrometer', 'update_date', 'date', 'Column update_date should be date');
+SELECT col_type_is('ext_hydrometer', 'shutdown_date', 'date', 'Column shutdown_date should be date');
+SELECT col_type_is('ext_hydrometer', 'end_date', 'date', 'Column end_date should be date');
 SELECT col_type_is('ext_hydrometer', 'address1_1', 'text', 'Column address1_1 should be text');
 SELECT col_type_is('ext_hydrometer', 'address1_2', 'text', 'Column address1_2 should be text');
 SELECT col_type_is('ext_hydrometer', 'address1_3', 'text', 'Column address1_3 should be text');
 SELECT col_type_is('ext_hydrometer', 'address2_1', 'text', 'Column address2_1 should be text');
 SELECT col_type_is('ext_hydrometer', 'address2_2', 'text', 'Column address2_2 should be text');
 SELECT col_type_is('ext_hydrometer', 'address2_3', 'text', 'Column address2_3 should be text');
-SELECT col_type_is('ext_hydrometer', 'assessed_volume', 'int4', 'Column assessed_volume should be int4');
-SELECT col_type_is('ext_hydrometer', 'wmeter_builtdate', 'date', 'Column wmeter_builtdate should be date');
-SELECT col_type_is('ext_hydrometer', 'end_date', 'date', 'Column end_date should be date');
-SELECT col_type_is('ext_hydrometer', 'update_date', 'date', 'Column update_date should be date');
-SELECT col_type_is('ext_hydrometer', 'shutdown_date', 'date', 'Column shutdown_date should be date');
+SELECT col_type_is('ext_hydrometer', 'assessed_volume', 'float8', 'Column assessed_volume should be float8');
+SELECT col_type_is('ext_hydrometer', 'is_waterbal', 'bool', 'Column is_waterbal should be bool');
 SELECT col_type_is('ext_hydrometer', 'link', 'text', 'Column link should be text');
-SELECT col_type_is('ext_hydrometer', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 
 -- Finish
 SELECT * FROM finish();

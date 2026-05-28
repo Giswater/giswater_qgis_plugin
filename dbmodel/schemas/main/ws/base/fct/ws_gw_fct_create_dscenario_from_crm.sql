@@ -252,7 +252,7 @@ BEGIN
 						JOIN node n ON n.node_id = mn.node_id
 				),
 				data AS (
-					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, billed_volume, custom_sum
+					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, billed_volume
 					FROM v_hydrometer_period d
 					JOIN hydros h
 					ON h.hydrometer_id = d.hydrometer_id
@@ -263,7 +263,6 @@ BEGIN
 					feature_id,
 					billed_volume / SUM(billed_volume) OVER (PARTITION BY data.dma_id) AS demand_weight,
 					billed_volume,
-					custom_sum,
 					d.pattern_id AS pattern_id,
 					hydrometer_id,
 					data.expl_id,
@@ -275,7 +274,7 @@ BEGIN
 		ELSE
 			v_querytext = '
 			with final_hydros as (
-				SELECT hydrometer_id, billed_volume, custom_sum, pattern_id from v_hydrometer_period where cat_period_id = '||quote_literal(v_period)||'
+				SELECT hydrometer_id, billed_volume, pattern_id from v_hydrometer_period where cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.feature_customer_code UNION
 						SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code JOIN node n ON n.node_id = mn.node_id
@@ -354,7 +353,7 @@ BEGIN
 		'final_hydros AS  (
 			    SELECT
 			    d.hydrometer_id,
-			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, null as custom_sum, pattern_id
+			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, pattern_id
 			    FROM v_hydrometer_period d
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
@@ -414,7 +413,7 @@ BEGIN
 			EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
 			WITH aux as ('||v_querytext||')
 			SELECT  feature_type, '||v_scenarioid||', feature_id,
-			(case when custom_sum is null then '||v_factor||'*billed_volume::numeric else '||v_factor||'*custom_sum::numeric end) as volume,
+			'||v_factor||'*billed_volume::numeric as volume,
 			hydrometer_id as source
 			FROM aux order by 2';
 		END IF;
