@@ -479,14 +479,13 @@ class GwAdminButton:
         cibs schema lifecycle entry point.
 
         `steps` is a legacy list like `['load_base_schema']` /
-        `['integrate_cibs']` / `['copy_data_cibs']`. We map it to a
-        manifest profile and run the engine.
+        `['integrate_cibs']`. We map it to a manifest profile and run the engine.
         """
         cibs_schema = "cibs"
         parent_schema = ""
         parent_type = ""
 
-        if any(step in ("integrate_cibs", "copy_data_cibs") for step in steps):
+        if any(step == "integrate_cibs" for step in steps):
             schema_info = self._get_cibs_schema_info()
             if schema_info is None:
                 msg = "Select a WS or UD schema for the cibs operation"
@@ -1397,8 +1396,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_utils.clicked.connect(partial(self._update_utils))
         self.dlg_readsql.btn_create_cibs.clicked.connect(partial(self._create_cibs))
         self.dlg_readsql.btn_adapt_cibs.clicked.connect(partial(self._adapt_cibs))
-        self.dlg_readsql.btn_copy_data_cibs.clicked.connect(partial(self._copy_cibs_data))
-        self.dlg_readsql.cmb_cibs.currentIndexChanged.connect(partial(self._manage_cibs_buttons))
 
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
@@ -3460,25 +3457,6 @@ class GwAdminButton:
         row = tools_db.get_row(sql, commit=False)
         self.dlg_readsql.btn_create_cibs.setEnabled(row is None)
         self.dlg_readsql.btn_adapt_cibs.setEnabled(row is not None)
-        self._manage_cibs_buttons()
-
-    def _manage_cibs_buttons(self):
-        """Enable copy-data button only for schemas already adapted to cibs."""
-
-        if not self._cibs_schema_exists():
-            self.dlg_readsql.btn_copy_data_cibs.setEnabled(False)
-            return
-
-        schema_info = self._get_cibs_schema_info()
-        if schema_info is None:
-            self.dlg_readsql.btn_copy_data_cibs.setEnabled(False)
-            return
-
-        schema_name = schema_info[0]
-        sql = (f"SELECT value::boolean FROM {schema_name}.config_param_system "
-               f"WHERE parameter = 'admin_cibs_schema'")
-        row = tools_db.get_row(sql, commit=False)
-        self.dlg_readsql.btn_copy_data_cibs.setEnabled(row is not None and row[0] is True)
 
     def _get_cibs_schema_info(self):
         """Return selected schema name and sys_version row, or None if invalid."""
@@ -3654,31 +3632,6 @@ class GwAdminButton:
             return
 
         self._run_create_cibs_task(['integrate_cibs'], 'Adapt schema to cibs')
-
-    def _copy_cibs_data(self):
-
-        schema_info = self._get_cibs_schema_info()
-        if schema_info is None:
-            msg = "Select a WS or UD schema to copy data to cibs"
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
-            return
-
-        self.cibs_project_name, self.cibs_project_result, self.cibs_project_type = schema_info
-
-        if not self._cibs_schema_exists():
-            msg = "cibs schema does not exist. Create it first."
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
-            return
-
-        sql = (f"SELECT value::boolean FROM {self.cibs_project_name}.config_param_system "
-               f"WHERE parameter = 'admin_cibs_schema'")
-        row = tools_db.get_row(sql)
-        if row is None or row[0] is not True:
-            msg = "Selected schema must be adapted to cibs before copying data"
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
-            return
-
-        self._run_create_cibs_task(['copy_data_cibs'], 'Copy data to cibs')
 
     def _update_utils(self, schema_name=None):
         """Run the utils 'update' profile in place."""

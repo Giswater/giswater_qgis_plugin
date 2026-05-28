@@ -756,13 +756,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0" colspan="2">
-                <widget class="QPushButton" name="btn_copy_data_cibs">
-                 <property name="text">
-                  <string>Copy data to cibs</string>
-                 </property>
-                </widget>
-               </item>
               </layout>
              </widget>
             </item>
@@ -934,7 +927,6 @@
   <tabstop>cmb_cibs</tabstop>
   <tabstop>btn_create_cibs</tabstop>
   <tabstop>btn_adapt_cibs</tabstop>
-  <tabstop>btn_copy_data_cibs</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
