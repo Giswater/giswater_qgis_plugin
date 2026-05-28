@@ -897,7 +897,7 @@ BEGIN
 
 	-- message for null
 	IF v_tablename IS NULL THEN
-		v_message='{"level":0, "text":"No feature found", "results":0}';
+		v_message='{"level":0, "text":"No feature found"}';
 	END IF;
 
 	--    Control NULL's
