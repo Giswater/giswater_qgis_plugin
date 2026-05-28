@@ -561,14 +561,14 @@ BEGIN
 			INSERT INTO selector_expl
 			SELECT DISTINCT expl_id, current_user 
 			FROM temp_muni_sector_expl
-			JOIN selector_sector USING (sector_id)
+			JOIN selector_municipality USING (muni_id)
  		    WHERE cur_user = current_user
 			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 			-- macrosector
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 
-			-- expl
+			-- sector
 			DELETE FROM selector_sector WHERE cur_user = current_user;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user 
