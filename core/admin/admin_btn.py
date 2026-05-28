@@ -170,7 +170,7 @@ class GwAdminButton:
         self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
-        self.folder_final_pass = os.path.join(self.sql_dir, 'schemas', 'network', project_type, 'final_pass')
+        self.folder_final_pass = os.path.join(self.sql_dir, 'schemas', 'main', project_type, 'final_pass')
         self.folder_locale = os.path.join(self.folder_final_pass, 'i18n')
 
         # If the locale is no_TR, act as if it was en_US, but disable translation files
@@ -669,9 +669,22 @@ class GwAdminButton:
             if not isdeleted(task):
                 task.cancel()
 
+    def _resolve_update_kind(self) -> str:
+        kind = self.project_type_selected or self.project_type
+        if not kind and hasattr(self, 'cmb_project_type'):
+            kind = tools_qt.get_text(self.dlg_readsql, self.cmb_project_type)
+        return str(kind or 'ws').lower()
+
     # TODO: Rename this function => Update all versions from changelog file.
-    def update(self, project_type):
+    def update(self, project_type=None):
         """Upgrade the currently-selected schema in place via the engine."""
+        project_type = self._resolve_update_kind() if project_type is None else str(project_type).lower()
+        if project_type not in ('ws', 'ud'):
+            tools_qgis.show_warning(
+                "Schema update is only supported for ws/ud project types.",
+                parameter=project_type,
+            )
+            return
 
         msg = "Are you sure to update the project schema to last version?"
         title = "Info"
@@ -705,6 +718,8 @@ class GwAdminButton:
             sql_root=self.sql_dir,
         )
 
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
         self.error_count = 0
         self.t0 = time()
         self.timer = QTimer()
@@ -730,6 +745,14 @@ class GwAdminButton:
         else:
             tools_db.dao.commit()
             self._manage_result_message(True, parameter="Update schema")
+            self._set_info_project()
+            if getattr(self, 'dlg_readsql_show_info', None) is not None and not isdeleted(self.dlg_readsql_show_info):
+                self.message_update = ''
+                self._read_info_version()
+                info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
+                if info_updates is not None:
+                    info_updates.setText(self.message_update)
+                self._update_manage_ui()
 
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
@@ -1152,17 +1175,17 @@ class GwAdminButton:
         self.file_pattern_schema_model = "schema_model"
 
         # Declare all folders
-        # Network schemas (ws/ud) live under schemas/network/<project_type>/
+        # Network schemas (ws/ud) live under schemas/main/<project_type>/
         if self.schema_name is not None and self.project_type is not None:
-            self.folder_software = os.path.join(self.sql_dir, 'schemas', 'network', self.project_type)
+            self.folder_software = os.path.join(self.sql_dir, 'schemas', 'main', self.project_type)
         else:
             self.folder_software = ""
 
         self.folder_locale = os.path.join(self.sql_dir, self.file_pattern_i18n, self.locale)
         # 'common' replaces the legacy 'utils' shared-code folder for ws/ud.
-        self.folder_common = os.path.join(self.sql_dir, 'schemas', 'network', 'common')
-        # Legacy path; upgrade changelog UI uses giswater_admin.engine.changelog
-        # (common + ws|ud under schemas/network/*/updates).
+        self.folder_common = os.path.join(self.sql_dir, 'schemas', 'main', 'common')
+        # Upgrade changelog UI uses giswater_admin.engine.changelog
+        # (common + ws|ud under schemas/main/*/updates).
         self.folder_updates = os.path.join(self.folder_common, 'updates')
         self.folder_sample = os.path.join(self.folder_software, 'sample')
 
@@ -1821,7 +1844,7 @@ class GwAdminButton:
 
         # Set listeners
         self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql_show_info))
-        self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
+        self.dlg_readsql_show_info.btn_update.clicked.connect(self.update)
 
         # Set shortcut keys
         self.dlg_readsql_show_info.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_show_info))
@@ -1883,7 +1906,7 @@ class GwAdminButton:
         # Locale folder is normally derived from project_type via _set_paths();
         # this is a legacy reset used by _update_locale before any project_type
         # context exists, so we point at the project-type-agnostic common tree.
-        self.folder_locale = os.path.join(self.sql_dir, 'schemas', 'network', 'common')
+        self.folder_locale = os.path.join(self.sql_dir, 'schemas', 'main', 'common')
 
     def _populate_data_schema_name(self, widget):
         """Fill project schema combo from cached catalog or pg_catalog."""
@@ -3113,7 +3136,7 @@ class GwAdminButton:
         """ Take current project type changed """
 
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
-        self.folder_software = os.path.join(self.sql_dir, 'schemas', 'network', self.project_type_selected)
+        self.folder_software = os.path.join(self.sql_dir, 'schemas', 'main', self.project_type_selected)
 
     def _populate_functions_dlg(self, dialog, result):
         """"""

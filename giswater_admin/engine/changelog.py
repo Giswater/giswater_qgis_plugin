@@ -34,7 +34,7 @@ def network_update_roots(sql_root: str, kind: str) -> list[str]:
     k = (kind or "").strip().lower()
     if k not in ("ws", "ud"):
         raise ValueError(f"network changelog kind must be 'ws' or 'ud', got: {kind!r}")
-    base = os.path.join(sql_root, "schemas", "network")
+    base = os.path.join(sql_root, "schemas", "main")
     return [
         os.path.join(base, "common", "updates"),
         os.path.join(base, k, "updates"),
