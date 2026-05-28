@@ -307,7 +307,7 @@ BEGIN
     ELSIF v_tablename LIKE 've_%gully%' THEN
         v_sourcetable = 'gully';
     ELSIF v_tablename LIKE '%hydrometer%' THEN
-        v_sourcetable = 'v_rtc_hydrometer';
+        v_sourcetable = 'vf_hydrometer';
     ELSIF v_tablename LIKE '%element%' THEN
         v_sourcetable = 'element';
     ELSE

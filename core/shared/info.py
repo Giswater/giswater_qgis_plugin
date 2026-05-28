@@ -4258,7 +4258,7 @@ def open_selected_hydro(**kwargs):
     index = selected_list[0]
     row = index.row()
 
-    table_name = 'v_ui_hydrometer'
+    table_name = 'vf_hydrometer'
     column_index = tools_qt.get_col_index_by_col_name(qtable, 'hydrometer_id')
     feature_id = index.sibling(row, column_index).data()
 

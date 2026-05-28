@@ -457,7 +457,7 @@ BEGIN
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
 	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'connec';
 	ELSIF v_tablename LIKE 've_gully_%' THEN v_sourcetable = 'gully';
-	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'v_rtc_hydrometer';
+	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'vf_hydrometer';
 	ELSIF v_tablename LIKE '%elem%' THEN v_sourcetable = 'element';
 	ELSIF v_tablename LIKE 've_%' AND v_tablename != 've_flwreg' THEN v_sourcetable = replace (v_tablename, 've_', '');
 	ELSE v_sourcetable = v_tablename;
@@ -850,7 +850,7 @@ BEGIN
 	EXECUTE 'SELECT value::json->>''newText'' FROM config_param_system WHERE parameter=''admin_formheader_field''' INTO v_formheader_new_text;
 
 	-- get value to use on header
-	IF v_sourcetable ='v_rtc_hydrometer' THEN
+	IF v_sourcetable ='vf_hydrometer' THEN
 		v_childtype = (SELECT (value::json->>'hydrometer')::json->>'childType' FROM config_param_system WHERE parameter='admin_formheader_field');
 		v_formheader_field = (SELECT (value::json->>'hydrometer')::json->>'column' FROM config_param_system WHERE parameter='admin_formheader_field');
 		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE hydrometer_id ='||quote_literal(v_id);
