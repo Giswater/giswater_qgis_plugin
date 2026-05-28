@@ -55,7 +55,7 @@ BEGIN
 	v_array := (SELECT array_agg(a::integer) FROM json_array_elements_text(v_id) a);
 
 	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+	DROP TABLE IF EXISTS temp_anl_arc;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -70,8 +70,8 @@ BEGIN
 
 	IF v_checktype='geometry' THEN
 		EXECUTE format($sql$
-			INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, node_1, node_2, expl_id, fid, the_geom)
-			SELECT a.arc_id, a.arccat_id, a.state, ta.arc_id_aux, a.node_1, a.node_2, a.expl_id, %s AS fid, a.the_geom
+			CREATE TEMP TABLE temp_anl_arc AS
+			SELECT a.arc_id, a.arccat_id, a.state, ta.arc_id_aux, a.node_1, a.node_2, a.expl_id, a.the_geom
 			FROM (
 				SELECT va.the_geom, MIN(va.arc_id) AS arc_id_aux
 				FROM %I va
@@ -81,11 +81,11 @@ BEGIN
 			) ta
 			JOIN arc a ON ta.the_geom = a.the_geom
 			WHERE EXISTS (SELECT 1 FROM vf_arc vfa WHERE vfa.arc_id = a.arc_id)
-		$sql$, v_fid, v_worklayer, v_query_text);
+		$sql$, v_worklayer, v_query_text);
 	ELSIF v_checktype='finalNodes' THEN
 		EXECUTE format($sql$
-			INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, node_1, node_2, expl_id, fid, the_geom)
-			SELECT a.arc_id, a.arccat_id, a.state, ta.arc_id_aux, a.node_1, a.node_2, a.expl_id, %s AS fid, a.the_geom
+			CREATE TEMP TABLE temp_anl_arc AS
+			SELECT a.arc_id, a.arccat_id, a.state, ta.arc_id_aux, a.node_1, a.node_2, a.expl_id, a.the_geom
 			FROM (
 				SELECT va.node_1, va.node_2, min(va.arc_id) AS arc_id_aux
 				FROM %I va
@@ -95,7 +95,7 @@ BEGIN
 			) ta
 			JOIN arc a ON a.node_1 = ta.node_1 AND a.node_2 = ta.node_2
 			WHERE EXISTS (SELECT 1 FROM vf_arc vfa WHERE vfa.arc_id = a.arc_id)
-		$sql$, v_fid, v_worklayer, v_query_text);
+		$sql$, v_worklayer, v_query_text);
 	END IF;
 
 	-- set selector
@@ -115,15 +115,15 @@ BEGIN
 	   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	    'properties', to_jsonb(row) - 'the_geom'
 	  	) AS feature
-	  	FROM (SELECT id, arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, ST_Transform(the_geom, 4326) as the_geom
-	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
+	  	FROM (SELECT arc_id, arc_id_aux, arccat_id, state,  node_1, node_2, expl_id, ST_Transform(the_geom, 4326) as the_geom
+	  	FROM  temp_anl_arc) row) features;
 
 	v_result_line := COALESCE(v_result, '{}');
 
 	IF v_checktype='finalNodes' THEN
-		SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+		SELECT count(*) INTO v_count FROM temp_anl_arc;
 	ELSE
-		SELECT count(*)/2 INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+		SELECT count(*)/2 INTO v_count FROM temp_anl_arc;
 	END IF;
 
 
@@ -136,8 +136,8 @@ BEGIN
                        "data":{"message":"3576", "function":"3040", "fid":"'||v_fid||'", "parameters":{"v_count":"'||v_count||'"}, "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT v_fid,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count
-		FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+		SELECT v_fid, concat('Arc_id: ', array_agg(arc_id), '.'), v_count
+		FROM temp_anl_arc;
 
 	END IF;
 
