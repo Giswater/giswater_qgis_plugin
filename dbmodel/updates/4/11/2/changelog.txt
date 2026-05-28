@@ -1,0 +1,5 @@
+4.11.2
+*************
+- Improve UD checks in getvisit and setvisit
+- Update mincut selector config in `config_param_system` (`basic_selector_tab_mincut`): add `typeaheadFilter` so filter in web works.
+- Rename columns in `tbl_mincut_manager` tableview: `expl_id` to `exploitation`, `muni_id` to `municipality`.
