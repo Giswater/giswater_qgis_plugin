@@ -105,17 +105,17 @@ BEGIN
         d.cat_period_id,
         d.billed_volume,
         p.end_date AS p_end_date,
-        first_value(d.billed_volume) OVER w AS last_sum,
+        first_value(d.billed_volume) OVER w AS last_billed_volume,
         first_value(d.cat_period_id) OVER w AS last_cat_period_id,
         first_value(p.end_date) OVER w::date AS last_end_date,
         first_value(p.period_seconds) OVER w AS last_period_seconds
-        FROM v_hydrometer_data d
-        JOIN ext_cat_period p ON d.cat_period_id = p.id
+        FROM v_hydrometer_period d
+        JOIN v_cat_period p ON d.cat_period_id = p.id
         WINDOW w AS (PARTITION BY d.hydrometer_id ORDER BY p.end_date desc)
     ), hydro_data_calculat AS (
         SELECT DISTINCT
         d.hydrometer_id,
-        d.last_sum,
+        d.last_billed_volume,
         d.last_cat_period_id,
         d.last_end_date,
         d.last_period_seconds AS p_seconds
@@ -129,13 +129,13 @@ BEGIN
 	     SELECT d.*, c.expl_id AS expl_id
 	     FROM hydro_data_selected d
 	     JOIN v_hydrometer hc ON hc.hydrometer_id = d.hydrometer_id
-	     JOIN connec c ON c.customer_code = hc.customer_code
+	     JOIN connec c ON c.customer_code = hc.feature_customer_code
 		 WHERE c.expl_id in ('||v_expl||')
 	     UNION ALL
 	     SELECT d.*, n.expl_id AS expl_id
 	     FROM hydro_data_selected d
 	     JOIN v_hydrometer erh ON erh.hydrometer_id = d.hydrometer_id
-	     JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+	     JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code
 	     JOIN node n ON n.node_id = mn.node_id
 	     WHERE n.expl_id in ('||v_expl||')
      ), hydro_estimated_statistic AS (
@@ -189,11 +189,11 @@ BEGIN
 		v_waterbal = 'TRUE, FALSE, NULL';
 	END IF;
 	
-	v_crm_name := (SELECT code FROM ext_cat_period WHERE id  = v_period);
+	v_crm_name := (SELECT code FROM v_cat_period WHERE id  = v_period);
 	
 	IF v_tmethod = '1' then
 
-		v_periodseconds := (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period);
+		v_periodseconds := (SELECT period_seconds FROM v_cat_period WHERE id  = v_period);
 	
 	ELSIF v_tmethod = '2' THEN --use date INTERVAL
 	
@@ -243,17 +243,17 @@ BEGIN
 				'WITH hydros AS (
 					SELECT hydrometer_id, c.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
 					from v_hydrometer e
-						JOIN connec c ON c.customer_code = e.customer_code
+						JOIN connec c ON c.customer_code = e.feature_customer_code
 					UNION ALL
 					SELECT
 						hydrometer_id, n.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
 					from v_hydrometer erh
-						JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+						JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code
 						JOIN node n ON n.node_id = mn.node_id
 				),
 				data AS (
 					SELECT d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, billed_volume
-					FROM v_hydrometer_data d
+					FROM v_hydrometer_period d
 					JOIN hydros h
 					ON h.hydrometer_id = d.hydrometer_id
 					WHERE d.cat_period_id = '||quote_literal(v_period)||'
@@ -274,10 +274,13 @@ BEGIN
 		ELSE
 			v_querytext = '
 			with final_hydros as (
-				SELECT hydrometer_id, billed_volume, pattern_id from v_hydrometer_data where cat_period_id = '||quote_literal(v_period)||'
+				SELECT hydrometer_id, billed_volume, hc.pattern_id
+				FROM v_hydrometer_period
+				JOIN v_cat_hydrometer_category hc ON hc.category_id = category_id
+				WHERE cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
-				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.customer_code UNION
-						SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code JOIN node n ON n.node_id = mn.node_id
+				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.feature_customer_code UNION
+						SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code JOIN node n ON n.node_id = mn.node_id
 			)
 			SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
 		END IF;
@@ -296,7 +299,7 @@ BEGIN
 					WHEN p.end_date <= '||quote_literal(v_enddate)||'::date + INTERVAL ''1 day'' THEN p.end_date
 						ELSE '||quote_literal(v_enddate)||'
 				END::date AS c_end_date
-			FROM ext_cat_period p
+			FROM v_cat_period p
 		),
 		period_selected AS (
 			SELECT
@@ -312,11 +315,11 @@ BEGIN
 			'hydros AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, c.dma_id, ''CONNEC'' AS feature_type, c.expl_id
 				FROM v_hydrometer erh
-				JOIN connec c ON c.customer_code = erh.customer_code
+				JOIN connec c ON c.customer_code = erh.feature_customer_code
 				UNION ALL
 				SELECT erh.hydrometer_id, n.node_id AS feature_id, n.dma_id, ''NODE'' AS feature_type, n.expl_id
 				FROM v_hydrometer erh
-				JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code
+				JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code
 				JOIN node n ON n.node_id = mn.node_id
 			),
 			data AS (
@@ -327,11 +330,12 @@ BEGIN
 					h.feature_type,
 					h.expl_id,
 					SUM(d.billed_volume * (p.c_seconds / p.p_seconds))::numeric(10,0) AS billed_volume,
-					d.pattern_id
-				FROM v_hydrometer_data d
+					hc.pattern_id
+				FROM v_hydrometer_period d
+				JOIN v_cat_hydrometer_category hc ON hc.category_id = d.category_id
 				JOIN period_selected p ON d.cat_period_id = p.id
 				JOIN hydros h ON d.hydrometer_id = h.hydrometer_id
-				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, d.pattern_id
+				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, hc.pattern_id
 			)
 			SELECT
 				feature_type,
@@ -354,12 +358,13 @@ BEGIN
 			    SELECT
 			    d.hydrometer_id,
 			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, pattern_id
-			    FROM v_hydrometer_data d
+			    FROM v_hydrometer_period d
+				JOIN v_cat_hydrometer_category hc ON hc.category_id = d.category_id
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
 			), aux_data AS (
-				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON erh.customer_code = c.customer_code UNION
-				SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.customer_code JOIN node n ON n.node_id = mn.node_id
+				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON erh.feature_customer_code = c.customer_code UNION
+				SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code JOIN node n ON n.node_id = mn.node_id
 			)
 				SELECT*FROM final_hydros LEFT JOIN aux_data USING (hydrometer_id) where feature_id is not null and expl_id in ('||v_expl||')';
 		END IF;
@@ -380,7 +385,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Demand units: ',v_demandunits));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Period seconds: ',abs(v_periodseconds)));
 	
-		IF (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period) IS NULL THEN
+		IF (SELECT period_seconds FROM v_cat_period WHERE id  = v_period) IS NULL THEN
 			SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 			VALUES (v_fid, null, 2, concat('WARNING: The period has not data on period_seconds columns. The system default value have been used ( ',v_periodseconds,' ) '));
@@ -436,7 +441,7 @@ BEGIN
 				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
 				FROM sector s
 				JOIN connec c ON s.sector_id = c.sector_id
-				JOIN v_hydrometer h ON h.customer_code = c.customer_code
+				JOIN v_hydrometer h ON h.feature_customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
@@ -445,7 +450,7 @@ BEGIN
 				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
 				FROM dma s
 				JOIN connec c ON c.dma_id = s.dma_id
-				JOIN v_hydrometer h ON h.customer_code = c.customer_code
+				JOIN v_hydrometer h ON h.feature_customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
@@ -455,15 +460,7 @@ BEGIN
 				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
 				FROM ext_rtc_dma_period s
 				JOIN connec c ON c.dma_id = s.dma_id::integer
-				JOIN v_hydrometer h ON h.customer_code = c.customer_code
-				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
-				AND dscenario_id = '||v_scenarioid||'';
-
-			ELSIF v_pattern = 5 THEN -- hydrometer period
-
-				EXECUTE '
-				UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id
-				FROM v_hydrometer_data h
+				JOIN v_hydrometer h ON h.feature_customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
 				AND dscenario_id = '||v_scenarioid||'';
 
@@ -471,7 +468,7 @@ BEGIN
 
 				UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 				FROM v_hydrometer h
-				JOIN ext_cat_hydrometer_category c ON c.id::integer = h.category_id
+				JOIN v_cat_hydrometer_category c ON c.id::integer = h.category_id
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
@@ -481,7 +478,7 @@ BEGIN
 				UPDATE inp_dscenario_demand d SET pattern_id = i.pattern_id 
 				FROM inp_connec i
 				JOIN connec c ON c.connec_id = i.connec_id
-				JOIN v_hydrometer h ON h.customer_code = c.customer_code
+				JOIN v_hydrometer h ON h.feature_customer_code = c.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 				
@@ -490,7 +487,7 @@ BEGIN
 				FROM inp_junction i
 				JOIN node n ON n.node_id = i.node_id
 				JOIN man_netwjoin mn ON mn.node_id = n.node_id
-				JOIN v_hydrometer h ON h.customer_code = mn.customer_code
+				JOIN v_hydrometer h ON h.feature_customer_code = mn.customer_code
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
@@ -514,8 +511,6 @@ BEGIN
 				VALUES (v_fid, v_result_id, 2, concat('DMA DEFAULT: dma table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('DMA PERIOD: ext_rtc_dma_period table.'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER PERIOD: ext_hydrometer_data table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER CATEGORY: hydrometer_category table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
