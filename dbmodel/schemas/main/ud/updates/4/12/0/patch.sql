@@ -10,6 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 ALTER TABLE ext_cat_hydrometer_category ADD COLUMN pattern_id varchar(16);
+ALTER TABLE ext_cat_hydrometer_category ADD CONSTRAINT ext_cat_hydrometer_category_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id);
 
 CREATE OR REPLACE VIEW v_hydrometer AS
 SELECT * FROM ext_hydrometer;
