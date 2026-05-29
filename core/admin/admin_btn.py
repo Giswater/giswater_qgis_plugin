@@ -3707,11 +3707,8 @@ class GwAdminButton:
         else:
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_cibs, cibs_result_list)
 
-        sql = ("SELECT schema_name FROM information_schema.schemata "
-               "WHERE schema_name ILIKE 'cibs' ORDER BY schema_name")
-        row = tools_db.get_row(sql, commit=False)
-        self.dlg_readsql.btn_create_cibs.setEnabled(row is None)
-        self.dlg_readsql.btn_adapt_cibs.setEnabled(row is not None)
+        self.dlg_readsql.btn_create_cibs.setEnabled(not admin_catalog.schema_exists("cibs"))
+        self.dlg_readsql.btn_adapt_cibs.setEnabled(admin_catalog.schema_exists("cibs"))
 
     def _get_cibs_schema_info(self, schema_name=None):
         """Return selected schema name and sys_version row, or None if invalid."""
@@ -3736,9 +3733,7 @@ class GwAdminButton:
         return schema_name, row, project_type
 
     def _cibs_schema_exists(self):
-        sql = ("SELECT schema_name FROM information_schema.schemata "
-               "WHERE schema_name ILIKE 'cibs' ORDER BY schema_name")
-        return tools_db.get_row(sql, commit=False) is not None
+        return admin_catalog.schema_exists("cibs")
 
     def _run_create_utils_task(
         self,

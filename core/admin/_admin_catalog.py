@@ -143,11 +143,16 @@ def combo_items_for_project_type(
 _SATELLITE_SCHEMAS = frozenset({"utils", "cibs", "am", "cm", "audit"})
 
 _SYS_VERSION_COLUMNS = """
-SELECT table_schema, column_name
-FROM information_schema.columns
-WHERE table_name = 'sys_version'
-  AND table_schema = ANY(%s::text[])
-  AND column_name = ANY(ARRAY['giswater', 'version', 'addparam', 'date'])
+SELECT n.nspname, a.attname
+FROM pg_catalog.pg_namespace n
+JOIN pg_catalog.pg_class c ON c.relnamespace = n.oid
+JOIN pg_catalog.pg_attribute a ON a.attrelid = c.oid
+WHERE c.relname = 'sys_version'
+  AND c.relkind IN ('r', 'p')
+  AND n.nspname = ANY(%s::text[])
+  AND a.attname = ANY(ARRAY['giswater', 'version', 'addparam', 'date'])
+  AND a.attnum > 0
+  AND NOT a.attisdropped
 """
 
 
