@@ -256,6 +256,8 @@ GRANT ALL ON TABLE v_log TO role_plan;
 
 
 GRANT ALL ON SCHEMA audit TO role_basic; --probably the restriction might be stronger
+GRANT SELECT ON ALL TABLES IN SCHEMA audit TO role_basic;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA audit TO role_basic;
 GRANT ALL ON SEQUENCE log_id_seq TO role_basic;
 
 

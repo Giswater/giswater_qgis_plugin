@@ -368,18 +368,6 @@ UPDATE PARENT_SCHEMA.config_param_system
    SET value = '{"schemaName":"cm"}'
  WHERE parameter = 'admin_schema_cm';
 
-UPDATE cm.sys_version AS dst
-   SET
-     giswater  = src.giswater,
-     "language" = src."language",
-     epsg      = src.epsg
-  FROM (
-    SELECT giswater, "language", epsg
-      FROM PARENT_SCHEMA.sys_version
-     ORDER BY date DESC
-     LIMIT 1
-  ) AS src;
-
 -- topological trace
 INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
@@ -1135,3 +1123,6 @@ BEGIN
     );
 END
 $$;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA cm TO role_basic;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA cm TO role_basic;

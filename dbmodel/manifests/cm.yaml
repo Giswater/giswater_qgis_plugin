@@ -12,9 +12,10 @@ phases:
     type: sql_dir
     description: "Bootstrap cm schema: base ddl/fct/ftrg."
     steps:
-      - { source: "schemas/addon/cm/base/base.sql", recursive: false }
+      - { source: "schemas/addon/cm/base/init.sql", recursive: false }
       - { source: "schemas/addon/cm/base/fct",  recursive: false }
       - { source: "schemas/addon/cm/base/ftrg", recursive: false }
+      - { source: "schemas/addon/cm/base/base.sql", recursive: false }
 
   - id: integrate_cm
     type: sql_dir

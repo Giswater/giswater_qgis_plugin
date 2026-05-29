@@ -28,7 +28,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmCreateUi, \
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, \
     GwAdminMarkdownGeneratorUi  # noqa: F401
 
 from ..utils import tools_gw
@@ -390,7 +390,15 @@ class GwAdminButton:
             self.error_count += 1
         self.manage_other_process_result()
 
-    def _run_create_cm_task(self, steps, process_name):
+    def _run_create_cm_task(
+        self,
+        steps,
+        process_name,
+        *,
+        parent_schema=None,
+        parent_type=None,
+        dlg_for_timer=None,
+    ):
         """
         cm schema lifecycle entry point.
 
@@ -398,14 +406,16 @@ class GwAdminButton:
         `['load_parent_schema']` / `['load_example']`. We map it to a
         manifest profile and run the engine.
         """
-        # The cm child schema name is set by `on_btn_create_base_clicked`
-        # via `self.cm_schema_name`; the parent schema (ws_xxx / ud_xxx)
-        # is the currently-selected schema in the main dialog.
         cm_schema = getattr(self, 'cm_schema_name', None) or self._get_cm_schema_name() or "cm"
-        parent_schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        parent_type = self.project_type_selected or tools_qt.get_text(
-            self.dlg_readsql, self.cmb_project_type
-        )
+        if parent_schema is None and getattr(self, 'dlg_readsql', None) is not None:
+            parent_schema = tools_qt.get_text(
+                self.dlg_readsql, self.dlg_readsql.project_schema_name
+            )
+        parent_schema = parent_schema or ""
+        if parent_type is None:
+            parent_type = self.project_type_selected or ""
+        if not parent_type and getattr(self, 'dlg_readsql', None) is not None:
+            parent_type = tools_qt.get_text(self.dlg_readsql, self.cmb_project_type)
         pt_norm = (parent_type or "").lower()
         if pt_norm and not os.path.isfile(
             os.path.join(
@@ -422,11 +432,11 @@ class GwAdminButton:
         # Map step list -> profile. The legacy task ran one step at a
         # time; in the manifest world we expose a profile for each.
         if steps == ['load_base_schema']:
-            profile_phases = ['load_base_schema']
+            profile_phases = ['load_base_schema', 'load_locale', 'register_version']
         elif steps == ['load_parent_schema']:
-            profile_phases = ['integrate_cm']
+            profile_phases = ['integrate_cm', 'register_version']
         elif steps == ['load_example']:
-            profile_phases = ['load_example']
+            profile_phases = ['load_sample', 'register_version']
         elif steps == ['load_locale']:
             profile_phases = ['load_locale']
         else:
@@ -460,7 +470,13 @@ class GwAdminButton:
         self.cm_error_count = 0
         self.t0 = time()
         self.timer = QTimer()
-        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_cm_project))
+        timer_dlg = (
+            dlg_for_timer
+            or getattr(self, '_manage_schemas_dlg', None)
+            or self.dlg_readsql_create_cm_project
+        )
+        if timer_dlg is not None:
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, timer_dlg))
         self.timer.start(1000)
 
         task = GwSchemaBuilderTask(
@@ -617,6 +633,9 @@ class GwAdminButton:
         self._manage_result_message(status, parameter=f"CM Task: {process_name.capitalize()}")
         if status:
             tools_db.dao.commit()
+            refresh = getattr(self, '_manage_schemas_refresh', None)
+            if refresh:
+                refresh()
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0
@@ -626,6 +645,91 @@ class GwAdminButton:
             tools_qgis.show_info(msg)
             if self.dlg_readsql_create_cm_project:
                 tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
+
+    def _cm_has_sample_data(self) -> bool:
+        cm_schema = self._get_cm_schema_name() or "cm"
+        has_team = bool(
+            tools_db.get_rows(f"SELECT 1 FROM {cm_schema}.cat_team LIMIT 1")
+        )
+        has_org = bool(
+            tools_db.get_rows(f"SELECT 1 FROM {cm_schema}.cat_organization LIMIT 1")
+        )
+        return has_team and has_org
+
+    def _create_cm_schema(self):
+        """Create the CM base schema (no parent link)."""
+        name = 'cm'
+        description = 'cm'
+
+        tools_gw.set_config_parser('btn_admin', 'project_name_cm_schema', name, prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'cm_project_descript', description, prefix=False)
+
+        if not self._check_project_name(name, description):
+            return
+
+        msg = "This process will take a few seconds. Are you sure to continue?"
+        title = "Create base schema"
+        if not tools_qt.show_question(msg, title):
+            return
+
+        self.cm_schema_name = name
+        self.cm_schema_description = description
+        self.base_schema_created = True
+        self._run_create_cm_task(['load_base_schema'], 'Create cm base schema')
+
+    def _integrate_cm(self, parent_schema=None, parent_type=None):
+        """Link CM to the selected WS/UD parent schema."""
+        parent_schema, parent_type = self._resolve_parent_context(parent_schema, parent_type)
+        if not parent_schema:
+            tools_qt.show_info_box("Select a WS or UD anchor in the network table.")
+            return
+
+        msg = (
+            "You are about to perform this action aiming to the following schema: {0}\n\n"
+            "Are you sure you want to continue?"
+        )
+        if not tools_qt.show_question(msg, "Link to parent schema", msg_params=(parent_schema,)):
+            return
+
+        self.project_type_selected = parent_type
+        self.parent_schema_created = True
+        self._run_create_cm_task(
+            ['load_parent_schema'],
+            'Link to parent schema',
+            parent_schema=parent_schema,
+            parent_type=parent_type,
+        )
+
+    def _load_cm_sample(self, parent_schema=None, parent_type=None):
+        """Load CM example data for the selected parent schema."""
+        parent_schema, parent_type = self._resolve_parent_context(parent_schema, parent_type)
+        if not parent_schema:
+            tools_qt.show_info_box("Select a WS or UD anchor in the network table.")
+            return
+
+        msg = (
+            "You are about to perform this action aiming to the following schema: {0}\n\n"
+            "Are you sure you want to continue?"
+        )
+        if not tools_qt.show_question(msg, "Load example data", msg_params=(parent_schema,)):
+            return
+
+        self.example_type = parent_type
+        self.project_example_name = parent_schema
+        self.project_type_selected = parent_type
+        self._run_create_cm_task(
+            ['load_example'],
+            'Load example data',
+            parent_schema=parent_schema,
+            parent_type=parent_type,
+        )
+
+    def _set_cm_pschema_qgis(self):
+        """Flag the next QGIS project creation as a CM project."""
+        self.is_cm_project = True
+        tools_qgis.show_info(
+            tools_qt.tr("Layer of CM project will be added to the project when create"),
+        )
 
     def _get_cm_schema_name(self):
         """
@@ -1637,7 +1741,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_delete_asset.clicked.connect(partial(self._delete_other_schema, 'am'))
 
         # Campaign manage buttons
-        self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
+        self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_manage_schemas))
         self.dlg_readsql.btn_update_cm.clicked.connect(partial(self._update_cm))
         self.dlg_readsql.btn_delete_cm.clicked.connect(partial(self._delete_other_schema, 'cm'))
 
@@ -2472,6 +2576,7 @@ class GwAdminButton:
         self._manage_schemas_refresh = dlg._refresh_inventory
         self._manage_schemas_update_system_info = dlg._update_system_info
         self._manage_schemas_sync_connection = dlg._sync_connection_combo
+        self._manage_schemas_dlg = dlg
         lib_vars.session_vars["message_parent"] = dlg
         try:
             dlg.exec()
@@ -2480,6 +2585,7 @@ class GwAdminButton:
             self._manage_schemas_refresh = None
             self._manage_schemas_update_system_info = None
             self._manage_schemas_sync_connection = None
+            self._manage_schemas_dlg = None
 
     def _open_create_project(self):
         """"""
@@ -2503,136 +2609,20 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
 
     def _open_create_cm_project(self):
-        """Open main CM launcher dialog (admin_cm_create.ui)"""
-
-        self.dlg_readsql_create_cm_project = GwAdminCmCreateUi(self)
-        tools_gw.load_settings(self.dlg_readsql_create_cm_project)
-
-        self.dlg_readsql_create_cm_project.key_escape.connect(
-            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False)
-        )
-        self.dlg_readsql_create_cm_project.btn_close.clicked.connect(
-            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False)
-        )
-
-        # checks if we have an existing cm project
-        self.cm_schema = self._get_cm_schema_name()
-        if self.cm_schema:
-            self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
-
-            # checks if we have the parent linked to cm
-            schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-            if schema_name:
-
-                # Query the JSON->>'schema_name' value from config_param_system
-                rows = tools_db.get_rows(
-                    "SELECT (value::json)->> 'schemaName' "
-                    f"  FROM {schema_name}.config_param_system "
-                    " WHERE parameter = 'admin_schema_cm'"
-                )
-
-                linked_cm = None
-                if rows and rows[0] and rows[0][0]:
-                    linked_cm = rows[0][0].strip()
-
-                if linked_cm:
-                    self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
-            # Check if cat_team has any rows
-            has_team = bool(
-                tools_db.get_rows(
-                    f"SELECT 1 FROM {self.cm_schema}.cat_team LIMIT 1"
-                )
-            )
-            # Check if cat_organization has any rows
-            has_org = bool(
-                tools_db.get_rows(
-                    f"SELECT 1 FROM {self.cm_schema}.cat_organization LIMIT 1"
-                )
-            )
-            # If both exist, disable the "Create example" button
-            if has_team and has_org:
-                self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
-            else:
-                self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
-            self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(True)
-        else:
-            self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
-            self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
-            self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
-
-        self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
-        self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
-        self.dlg_readsql_create_cm_project.btn_example.clicked.connect(self.on_btn_create_example_clicked)
-        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.clicked.connect(self.on_btn_pschema_qgis_file_clicked)
-
-        self.dlg_readsql_create_cm_project.setWindowTitle("Create CM Project")
-        tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cm_create')
+        """Legacy entry point — CM actions live in Manage Schemas."""
+        self._open_manage_schemas()
 
     def on_btn_create_base_clicked(self):
-        """Handle the 'Create Base Schema' button click."""
-
-        name = 'cm'
-        description = 'cm'
-
-        tools_gw.set_config_parser('btn_admin', 'project_name_cm_schema', name, prefix=False)
-        tools_gw.set_config_parser('btn_admin', 'cm_project_descript', description, prefix=False)
-
-        if not self._check_project_name(name, description):
-            return
-
-        msg = "This process will take a few seconds. Are you sure to continue?"
-        title = "Create base schema"
-        answer = tools_qt.show_question(msg, title)
-        if not answer:
-            return
-
-        self.cm_schema_name = name
-        self.cm_schema_description = description
-        self.base_schema_created = True
-
-        self._run_create_cm_task(['load_base_schema'], 'Create cm base schema')
-
-        if self.dlg_readsql_create_cm_project is not None:
-            self.dlg_readsql_create_cm_project.btn_base_schema.setEnabled(False)
-            self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(True)
-            self.dlg_readsql_create_cm_project.btn_example.setEnabled(True)
+        self._create_cm_schema()
 
     def on_btn_create_parent_clicked(self):
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        msg = "You are about to perform this action aiming to the following schema: {0}\n\nAre you sure you want to continue?"
-        msg_params = (schema_name,)
-        title = "Create parent schema"
-        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
-
-        if not answer:
-            return
-
-        self.parent_schema_created = True
-        self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        self._run_create_cm_task(['load_parent_schema'], 'Link to parent schema')
-        self.dlg_readsql_create_cm_project.btn_parent_schema.setEnabled(False)
-        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(True)
+        self._integrate_cm()
 
     def on_btn_create_example_clicked(self):
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        msg = "You are about to perform this action aiming to the following schema: {0}\n\nAre you sure you want to continue?"
-        msg_params = (schema_name,)
-        title = "Create parent schema"
-        answer = tools_qt.show_question(msg, title, msg_params=msg_params)
-
-        if not answer:
-            return
-
-        self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        self.project_example_name = schema_name
-        self._run_create_cm_task(['load_example'], 'Load example data')
-        self.dlg_readsql_create_cm_project.btn_example.setEnabled(False)
+        self._load_cm_sample()
 
     def on_btn_pschema_qgis_file_clicked(self):
-        """ Sets the project to be created as a 'CM' project. """
-        self.is_cm_project = True
-        tools_qgis.show_info(tools_qt.tr("Layer of CM project will be added to the project when create"), dialog=self.dlg_readsql_create_cm_project)
-        self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
+        self._set_cm_pschema_qgis()
 
     def _open_rename(self, schema_name=None, schema_version=None):
         """"""
@@ -4098,6 +4088,8 @@ class GwAdminButton:
             return
 
         lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        if lbl_time is None:
+            return
         lbl_time.setText(text)
 
     # endregion

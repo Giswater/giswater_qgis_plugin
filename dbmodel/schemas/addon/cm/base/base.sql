@@ -7,8 +7,6 @@ or (at your option) any later version.
 
 SET search_path = cm, public, pg_catalog;
 
-CREATE SCHEMA cm;
-
 -- system roles
 DO $$
 BEGIN
@@ -77,6 +75,7 @@ CREATE TABLE sys_version (
 	"date" timestamp(6) NOT NULL DEFAULT now(),
 	"language" varchar(50) NOT NULL,
 	epsg int4 NOT NULL,
+	addparam jsonb NULL,
 	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
 );
 
@@ -1135,9 +1134,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('workorder', 'form_feature', 'tab_data', 'observ', 'lyt_data_1', 9, 'string', 'text', 'Observ:', 'Observ', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('workorder', 'form_feature', 'tab_data', 'cost', 'lyt_data_1', 10, 'string', 'text', 'Cost:', 'Cost', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 
-INSERT INTO sys_version (giswater, project_type, postgres, postgis, "language", epsg)
-VALUES('', 'cm', (select version()), (select postgis_version()), 'en_US', 00000);
-
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('ve_PARENT_SCHEMA_camp_arc', 've_PARENT_SCHEMA_camp_arc', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('ve_PARENT_SCHEMA_camp_connec', 've_PARENT_SCHEMA_camp_connec', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('ve_PARENT_SCHEMA_camp_link', 've_PARENT_SCHEMA_camp_link', 'role_basic', '{"template": [1], "visibility": true, "levels_to_read": 2}'::jsonb, '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -1151,6 +1147,10 @@ GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_field;
 GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_manager;
 GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_admin;
 GRANT ALL PRIVILEGES ON DATABASE BD_NAME TO role_cm_edit;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA cm TO role_basic;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA cm TO role_basic;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA cm TO role_basic;
 
 GRANT ALL ON SCHEMA cm TO role_cm_field;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_field;
@@ -1173,7 +1173,9 @@ GRANT ALL ON SCHEMA cm TO role_cm_edit;
 GRANT ALL ON SCHEMA PARENT_SCHEMA TO role_cm_edit;
 GRANT ALL ON ALL TABLES IN SCHEMA cm TO role_cm_edit;
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA cm TO role_cm_edit;
+RESET ROLE;
 GRANT role_edit TO role_cm_edit;
+SET ROLE role_system;
 
 UPDATE config_form_fields SET
 widgetcontrols = '{"vdefault_value": 

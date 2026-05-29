@@ -8,6 +8,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QEvent, Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 
 from ..ui.ui_manager import GwAdminManageSchemasUi
@@ -34,13 +35,16 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self._selected_network_parent = ""
         self._network_model = QStandardItemModel(0, len(_NETWORK_COLUMNS), self)
         self._network_model.setHorizontalHeaderLabels(list(_NETWORK_COLUMNS))
+        self._satellites_height = 0
 
         self.messageBar().hide()
         self._setup_layout()
         self._setup_connection()
         self._setup_network_table()
         self._setup_satellite_labels()
+        self._setup_cm_actions()
         self._refresh_inventory()
+        self._lock_satellites_height()
         self._connect_signals()
 
     def _setup_satellite_labels(self) -> None:
@@ -71,6 +75,10 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
                     layout.setStretch(1, 1)
                     layout.setStretch(2, 0)
 
+    def _setup_cm_actions(self) -> None:
+        self.btn_cm_qgis.setIcon(QgsApplication.getThemeIcon("mActionAddProject"))
+        self.btn_cm_qgis.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
+
     def _setup_layout(self) -> None:
         self.verticalLayout.setStretch(0, 0)
         self.verticalLayout.setStretch(1, 1)
@@ -83,19 +91,23 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Fixed,
         )
-        self._fix_satellites_height()
 
     def apply_fixed_geometry(self) -> None:
         """Restore fixed size after load_settings may have resized the dialog."""
         self.setSizeGripEnabled(False)
-        self._fix_satellites_height()
+        self._lock_satellites_height()
         self.setFixedSize(_FIXED_WIDTH, _FIXED_HEIGHT)
 
-    def _fix_satellites_height(self) -> None:
+    def _lock_satellites_height(self) -> None:
+        """Pin satellite panel height once so refresh/label updates do not resize the dialog."""
+        if self._satellites_height > 0:
+            self.wgt_satellites.setFixedHeight(self._satellites_height)
+            return
         self.wgt_satellites.adjustSize()
         content_h = self.wgt_satellites.sizeHint().height()
         if content_h > 0:
-            self.wgt_satellites.setFixedHeight(content_h)
+            self._satellites_height = content_h
+            self.wgt_satellites.setFixedHeight(self._satellites_height)
 
     def _setup_connection(self) -> None:
         self.admin._populate_combo_connections()
@@ -185,8 +197,11 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_create_am.clicked.connect(partial(self._create_am))
         self.btn_update_am.clicked.connect(partial(self._update_am))
         self.btn_delete_am.clicked.connect(partial(self.admin._delete_other_schema, 'am'))
-        self.btn_create_cm.clicked.connect(partial(self.admin._open_create_cm_project))
+        self.btn_create_cm.clicked.connect(partial(self._create_cm))
         self.btn_update_cm.clicked.connect(partial(self._update_cm))
+        self.btn_cm_integrate.clicked.connect(partial(self._integrate_cm))
+        self.btn_cm_sample.clicked.connect(partial(self._load_cm_sample))
+        self.btn_cm_qgis.clicked.connect(partial(self._create_cm_qgis))
         self.btn_delete_cm.clicked.connect(partial(self._delete_cm))
         self.btn_create_audit.clicked.connect(partial(self._create_audit))
         self.btn_update_audit.clicked.connect(partial(self.admin._update_audit))
@@ -235,32 +250,46 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
 
     def _refresh_inventory(self) -> None:
         previous_parent = self._selected_network_parent
-        self._inventory_rows = admin_catalog.fetch_schema_inventory()
-        self._populate_network_table()
-        if previous_parent:
-            self._select_network_row(previous_parent)
-        self._update_schema_labels()
-        self._update_action_state()
+        self.btn_refresh.setEnabled(False)
+        try:
+            update_info = getattr(self.admin, "_manage_schemas_update_system_info", None)
+            if update_info:
+                update_info()
+            self._inventory_rows = admin_catalog.fetch_schema_inventory()
+            self._populate_network_table()
+            if previous_parent:
+                self._select_network_row(previous_parent)
+            self._update_schema_labels()
+            self._update_action_state()
+        finally:
+            self.btn_refresh.setEnabled(True)
 
     def _populate_network_table(self) -> None:
         self.tbl_network.setSortingEnabled(False)
-        self._network_model.removeRows(0, self._network_model.rowCount())
-        for row in self._network_rows():
-            values = (
-                row.get("schema", ""),
-                row.get("kind", ""),
-                row.get("version", ""),
-                row.get("profile", ""),
-                row.get("linked", ""),
-                row.get("date_created", ""),
-                row.get("date_updated", ""),
-            )
-            items = []
-            for value in values:
-                item = QStandardItem(str(value or ""))
-                item.setEditable(False)
-                items.append(item)
-            self._network_model.appendRow(items)
+        selection = self.tbl_network.selectionModel()
+        if selection is not None:
+            selection.blockSignals(True)
+        try:
+            self._network_model.removeRows(0, self._network_model.rowCount())
+            for row in self._network_rows():
+                values = (
+                    row.get("schema", ""),
+                    row.get("kind", ""),
+                    row.get("version", ""),
+                    row.get("profile", ""),
+                    row.get("linked", ""),
+                    row.get("date_created", ""),
+                    row.get("date_updated", ""),
+                )
+                items = []
+                for value in values:
+                    item = QStandardItem(str(value or ""))
+                    item.setEditable(False)
+                    items.append(item)
+                self._network_model.appendRow(items)
+        finally:
+            if selection is not None:
+                selection.blockSignals(False)
         self.tbl_network.setSortingEnabled(True)
         if self._network_model.rowCount() > 0:
             self.tbl_network.resizeColumnToContents(_COL_LINKED)
@@ -362,14 +391,18 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self._update_satellite_panel("grb_cm", "lbl_cm_info", "CM", cm_row, "cm")
         self._update_satellite_panel("grb_audit", "lbl_audit_info", "Audit", audit_row, "audit")
         self._update_network_label()
-        self._fix_satellites_height()
 
     def _update_network_label(self) -> None:
         parent = self._selected_parent()
         if not parent:
-            self.lbl_network_selection.setText(
-                tools_qt.tr("Anchor: select a row below"),
-            )
+            if self._satellite_row(kind="CM"):
+                self.lbl_network_selection.setText(
+                    tools_qt.tr("Anchor: select a WS/UD row to integrate CM"),
+                )
+            else:
+                self.lbl_network_selection.setText(
+                    tools_qt.tr("Anchor: select a row below"),
+                )
             return
         self.lbl_network_selection.setText(
             f"{tools_qt.tr('Anchor')}: {parent}",
@@ -434,10 +467,23 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         )
         self.btn_delete_am.setEnabled(am_exists)
 
-        self.btn_create_cm.setEnabled(not cm_exists and has_network_parent)
+        self.btn_create_cm.setEnabled(not cm_exists)
         self.btn_update_cm.setEnabled(
             cm_exists and self._needs_update(str((cm_row or {}).get("version") or ""))
         )
+        self.btn_cm_integrate.setEnabled(
+            has_network_parent
+            and cm_exists
+            and not admin_catalog.parent_satellite_linked(
+                self._inventory_rows, parent, "cm"
+            )
+        )
+        self.btn_cm_sample.setEnabled(
+            has_network_parent
+            and cm_exists
+            and not self.admin._cm_has_sample_data()
+        )
+        self.btn_cm_qgis.setEnabled(cm_exists)
         self.btn_delete_cm.setEnabled(cm_exists)
 
         self.btn_create_audit.setEnabled(not audit_exists)
@@ -502,6 +548,32 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             parent_schema=parent,
             parent_type=parent_type.lower(),
         )
+
+    def _create_cm(self) -> None:
+        self.admin._create_cm_schema()
+
+    def _integrate_cm(self) -> None:
+        parent, parent_type = self._parent_context()
+        if not parent:
+            tools_qt.show_info_box("Select a WS or UD anchor in the network table.")
+            return
+        self.admin._integrate_cm(
+            parent_schema=parent,
+            parent_type=parent_type.lower(),
+        )
+
+    def _load_cm_sample(self) -> None:
+        parent, parent_type = self._parent_context()
+        if not parent:
+            tools_qt.show_info_box("Select a WS or UD anchor in the network table.")
+            return
+        self.admin._load_cm_sample(
+            parent_schema=parent,
+            parent_type=parent_type.lower(),
+        )
+
+    def _create_cm_qgis(self) -> None:
+        self.admin._set_cm_pschema_qgis()
 
     def _update_cm(self) -> None:
         parent, parent_type = self._parent_context()

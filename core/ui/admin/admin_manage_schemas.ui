@@ -629,6 +629,38 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="btn_cm_integrate">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Link CM to the selected network schema</string>
+              </property>
+              <property name="text">
+               <string>Integrate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_cm_sample">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Load CM example data for the selected network schema</string>
+              </property>
+              <property name="text">
+               <string>Sample</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="btn_delete_cm">
               <property name="minimumSize">
                <size>
@@ -638,6 +670,22 @@
               </property>
               <property name="text">
                <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QToolButton" name="btn_cm_qgis">
+              <property name="maximumSize">
+               <size>
+                <width>28</width>
+                <height>28</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Create pschema qgis file</string>
+              </property>
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </item>
@@ -777,6 +825,13 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="layout_footer">
+     <item>
+      <widget class="QLabel" name="lbl_time">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer_footer">
        <property name="orientation">

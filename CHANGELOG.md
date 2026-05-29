@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- dbmodel layout: schemas grouped under `dbmodel/schemas/main` and `addons`; network updates consolidated into `patch.sql` per version (drop separate `ddl`/`dml`/`ddlview`/`trg` files for new bumps).
+- Manage Schemas CM panel: Create/Integrate/Sample/QGIS actions replace the old `admin_cm_create` launcher dialog. schemas grouped under `dbmodel/schemas/main` and `addons`; network updates consolidated into `patch.sql` per version (drop separate `ddl`/`dml`/`ddlview`/`trg` files for new bumps).
 - Admin: utils/cibs/audit flows consolidated; schema SQL paths point at `main/`; build logs list SQL files only; progress/time labels on schema builder tasks.
 - Hydrometers: rename `ext_rtc_hydrometer` → `ext_hydrometer`, `ext_rtc_hydrometer_data` → `ext_hydrometer_period`; `sum` → `billed_volume`; form/list queries use `v_`/`ve_` views; `ext_cat_hydrometer_category` id type integer.
 - SCADA tables: `ext_rtc_scada` / `ext_rtc_scada_x_data` naming aligned across imports, functions, and tests.

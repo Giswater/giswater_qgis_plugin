@@ -174,8 +174,3 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $function$
 ;
-
--- Permissions
-
-ALTER FUNCTION cm.gw_trg_cm_edit_feature() OWNER TO postgres;
-GRANT ALL ON FUNCTION cm.gw_trg_cm_edit_feature() TO postgres;

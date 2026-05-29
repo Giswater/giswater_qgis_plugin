@@ -113,10 +113,3 @@ END;
 
 $function$
 ;
-
--- Permissions
-
-ALTER FUNCTION cm.gw_fct_cm_create_logreturn(json) OWNER TO postgres;
-GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn(json) TO public;
-GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn(json) TO postgres;
-GRANT ALL ON FUNCTION cm.gw_fct_cm_create_logreturn(json) TO role_basic;
