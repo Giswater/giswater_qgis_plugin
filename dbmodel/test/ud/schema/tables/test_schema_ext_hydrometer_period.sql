@@ -21,9 +21,9 @@ SELECT has_table('ext_hydrometer_period'::name, 'Table ext_hydrometer_period sho
 SELECT columns_are(
     'ext_hydrometer_period',
     ARRAY[
-        'id', 'hydrometer_id', 'min', 'max', 'avg', 'sum',
-        'custom_sum', 'cat_period_id', 'value_date', 'pattern_id', 'value_type', 'value_status',
-        'value_state', 'wmeter_number'
+        'id', 'hydrometer_id', 'wmeter_number', 'cat_period_id', 'billed_volume',
+        'value_date', 'value_type', 'value_status', 'value_state', 'fraud_type',
+        'fraud_status', 'fraud_probability', 'submetering_value'
     ],
     'Table ext_hydrometer_period should have the correct columns'
 );
@@ -31,22 +31,22 @@ SELECT columns_are(
 -- Check column types
 SELECT col_type_is('ext_hydrometer_period', 'id', 'int8', 'Column id should be int8');
 SELECT col_type_is('ext_hydrometer_period', 'hydrometer_id', 'int4', 'Column hydrometer_id should be int4');
-SELECT col_type_is('ext_hydrometer_period', 'min', 'float8', 'Column min should be float8');
-SELECT col_type_is('ext_hydrometer_period', 'max', 'float8', 'Column max should be float8');
-SELECT col_type_is('ext_hydrometer_period', 'avg', 'float8', 'Column avg should be float8');
-SELECT col_type_is('ext_hydrometer_period', 'sum', 'float8', 'Column sum should be float8');
-SELECT col_type_is('ext_hydrometer_period', 'custom_sum', 'float8', 'Column custom_sum should be float8');
+SELECT col_type_is('ext_hydrometer_period', 'wmeter_number', 'text', 'Column wmeter_number should be text');
 SELECT col_type_is('ext_hydrometer_period', 'cat_period_id', 'varchar(16)', 'Column cat_period_id should be varchar(16)');
+SELECT col_type_is('ext_hydrometer_period', 'billed_volume', 'float8', 'Column billed_volume should be float8');
 SELECT col_type_is('ext_hydrometer_period', 'value_date', 'date', 'Column value_date should be date');
-SELECT col_type_is('ext_hydrometer_period', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 SELECT col_type_is('ext_hydrometer_period', 'value_type', 'int4', 'Column value_type should be int4');
 SELECT col_type_is('ext_hydrometer_period', 'value_status', 'int4', 'Column value_status should be int4');
 SELECT col_type_is('ext_hydrometer_period', 'value_state', 'int4', 'Column value_state should be int4');
-SELECT col_type_is('ext_hydrometer_period', 'wmeter_number', 'text', 'Column wmeter_number should be text');
+SELECT col_type_is('ext_hydrometer_period', 'fraud_type', 'int4', 'Column fraud_type should be int4');
+SELECT col_type_is('ext_hydrometer_period', 'fraud_status', 'int4', 'Column fraud_status should be int4');
+SELECT col_type_is('ext_hydrometer_period', 'fraud_probability', 'numeric(12,2)', 'Column fraud_probability should be numeric(12,2)');
+SELECT col_type_is('ext_hydrometer_period', 'submetering_value', 'float8', 'Column submetering_value should be float8');
 
 -- Check foreign keys
 SELECT has_fk('ext_hydrometer_period', 'Table ext_hydrometer_period should have foreign keys');
 
+SELECT fk_ok('ext_hydrometer_period', 'cat_period_id', 'ext_cat_period', 'id', 'FK cat_period_id → ext_cat_period.id');
 SELECT fk_ok('ext_hydrometer_period', 'hydrometer_id', 'ext_hydrometer', 'hydrometer_id', 'FK hydrometer_id → ext_hydrometer.hydrometer_id');
 
 -- Finish
