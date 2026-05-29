@@ -5918,6 +5918,7 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 -- Normalize "label": replace underscores with spaces, trim, ensure only the first letter is uppercase,
 -- and append a colon if missing. Only updates rows needing changes.
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_typevalue_fk;
 UPDATE config_form_fields
 SET "label" =
     UPPER(LEFT(cleaned, 1)) ||
@@ -5944,6 +5945,7 @@ WHERE config_form_fields.formname   = sub.formname
      OR RIGHT(sub.cleaned, 1) <> ':'
   );
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_typevalue_fk;
 
 UPDATE config_param_system
 SET "label" =
