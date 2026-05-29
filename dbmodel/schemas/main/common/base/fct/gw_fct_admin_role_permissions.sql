@@ -64,7 +64,6 @@ $BODY$
 
 DECLARE
 
-v_roleexists text;
 v_dbnname varchar;
 v_schema_array name[];
 v_schemaname varchar;
@@ -92,63 +91,6 @@ BEGIN
 	v_schemaname :=v_schema_array[1];
 
 	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_vpn_permissions');
-
-	-- Create (if not exists) roles and grant permissions
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_basic';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_basic" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-	ALTER DEFAULT PRIVILEGES IN SCHEMA SCHEMA_NAME GRANT SELECT ON TABLES TO role_basic;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_om';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_om" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_basic TO role_om;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_edit';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_edit" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_om TO role_edit;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_epa';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_epa" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_edit TO role_epa;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_plan';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_plan" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_epa TO role_plan;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_admin';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_admin" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_plan TO role_admin;
-		-- Grant role admin to postgres user
-		GRANT role_admin TO postgres;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_system';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_system" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_admin TO role_system;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_crm';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_crm" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	-- Assign role admin to current user
-	IF 'role_admin' NOT IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) and
-	(select rolsuper from pg_roles where rolname = current_user) is true THEN
-		GRANT role_admin TO current_user;
-	END IF;
-
 
 	-- Grant generic permissions
 	IF v_vpn_dbuser THEN
