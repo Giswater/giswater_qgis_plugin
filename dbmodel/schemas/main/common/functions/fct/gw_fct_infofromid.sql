@@ -239,8 +239,7 @@ BEGIN
 
 		IF v_idname_array IS NULL THEN
 			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
-			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":"'|| v_version ||'"'||
-			', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "version":"'|| v_version ||'", "body":{}}')::json;
 
 		END IF;
 
@@ -457,7 +456,7 @@ BEGIN
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
 	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'connec';
 	ELSIF v_tablename LIKE 've_gully_%' THEN v_sourcetable = 'gully';
-	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'v_rtc_hydrometer';
+	ELSIF v_tablename LIKE '%hydrometer%' THEN v_sourcetable = 'vf_hydrometer';
 	ELSIF v_tablename LIKE '%elem%' THEN v_sourcetable = 'element';
 	ELSIF v_tablename LIKE 've_%' AND v_tablename != 've_flwreg' THEN v_sourcetable = replace (v_tablename, 've_', '');
 	ELSE v_sourcetable = v_tablename;
@@ -850,7 +849,7 @@ BEGIN
 	EXECUTE 'SELECT value::json->>''newText'' FROM config_param_system WHERE parameter=''admin_formheader_field''' INTO v_formheader_new_text;
 
 	-- get value to use on header
-	IF v_sourcetable ='v_rtc_hydrometer' THEN
+	IF v_sourcetable ='vf_hydrometer' THEN
 		v_childtype = (SELECT (value::json->>'hydrometer')::json->>'childType' FROM config_param_system WHERE parameter='admin_formheader_field');
 		v_formheader_field = (SELECT (value::json->>'hydrometer')::json->>'column' FROM config_param_system WHERE parameter='admin_formheader_field');
 		v_querystring ='SELECT '||quote_ident(v_formheader_field)||' FROM '||quote_ident(v_sourcetable)||' WHERE hydrometer_id ='||quote_literal(v_id);
@@ -898,7 +897,7 @@ BEGIN
 
 	-- message for null
 	IF v_tablename IS NULL THEN
-		v_message='{"level":0, "text":"No feature found", "results":0}';
+		v_message='{"level":0, "text":"No feature found"}';
 	END IF;
 
 	--    Control NULL's

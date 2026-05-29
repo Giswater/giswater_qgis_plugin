@@ -1009,14 +1009,14 @@ def add_layer_provider(gw_id: str, cfg, group="GW Layers", sub_group=None, alias
         layer = QgsVectorLayer(uri, gw_id, provider)
 
     else:
-        raise ValueError(f"Unsupported layer_type: {layer_type}")
+        msg = f"Unsupported layer_type: {layer_type}"
+        tools_qgis.show_warning(msg)
+        return
 
     if not layer.isValid():
-        raise Exception(
-            f"Invalid layer:\n"
-            f"provider={provider}\n"
-            f"uri={uri}"
-        )
+        msg = f"Invalid layer:\nprovider={provider}\nuri={uri}"
+        tools_qgis.show_warning(msg)
+        return
 
     if force_create_group:
         create_groups = True
@@ -1066,7 +1066,8 @@ def build_uri(gw_id: str, provider: str, cfg: dict) -> Optional[str]:
     builder = builders.get(provider)
 
     if not builder:
-        tools_qgis.show_warning(f"No URI builder for provider: {provider}")
+        msg = f"No URI builder for provider: {provider}"
+        tools_qgis.show_warning(msg)
         return None
 
     return builder(cfg)
@@ -4360,16 +4361,9 @@ def get_project_info(schemaname=None, order_direction="DESC"):
         tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
-    has_addparam = tools_db.check_column(tablename, 'addparam', schemaname)
-    if has_addparam:
-        sql = (f"SELECT lower(project_type), epsg, giswater, language, date, "
-               f"addparam -> 'environment' ->> 'creation_profile' "
-               f"FROM {schemaname}.{tablename} "
-               f"ORDER BY id {order_direction} LIMIT 1")
-    else:
-        sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
-               f"FROM {schemaname}.{tablename} "
-               f"ORDER BY id {order_direction} LIMIT 1")
+    sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
+           f"FROM {schemaname}.{tablename} "
+           f"ORDER BY id {order_direction} LIMIT 1")
     row = tools_db.get_row(sql)
     if row:
         project_info_dict = {'project_type': row[0],
@@ -4378,8 +4372,6 @@ def get_project_info(schemaname=None, order_direction="DESC"):
                              'project_language': row[3],
                              'project_date': row[4]
                              }
-        if has_addparam and row[5]:
-            project_info_dict['creation_profile'] = row[5]
 
     return project_info_dict
 

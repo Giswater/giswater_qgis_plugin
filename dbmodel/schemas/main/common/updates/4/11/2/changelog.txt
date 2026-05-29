@@ -1,0 +1,1 @@
+- Fix `gw_fct_setselectors`: use `selector_municipality` (muni) instead of `selector_sector` to update exploitation and sector selectors on municipality tab.

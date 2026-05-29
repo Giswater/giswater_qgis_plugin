@@ -94,6 +94,9 @@ v_featuredialog text;
 v_client_epsg integer;
 v_parent text;
 
+v_base_table text;
+v_vf_layer   text;
+
 BEGIN
 
 	--  Set search path to local schema
@@ -259,26 +262,34 @@ BEGIN
 				v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 60);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			else 
-				
-			--  Get element from active layer, using parent layer with exists wich enhances a lot the performance
+			else
+				-- TODO: refactor this block of code, create base_table into config_info_layer.
+				IF v_layer.layer_id IN ('ve_node', 've_arc', 've_connec', 've_link', 've_element', 've_gully') THEN
+					v_base_table := substring(v_layer.layer_id from 4);       -- 've_node' → 'node'
+					v_vf_layer   := 'vf_' || substring(v_layer.layer_id from 4); -- 've_node' → 'vf_node'
+				ELSE
+					v_base_table := v_layer.layer_id;
+					v_vf_layer   := v_layer.layer_id;
+				END IF;
+				--  Get element from active layer, using parent layer with exists wich enhances a lot the performance
 				v_querystring = concat(
-					'WITH params AS (SELECT ',
-						'''', v_point, '''::geometry(POINT,', v_client_epsg, ') as pt, ', 
-						v_sensibility, '::double precision AS r)',
-
-					', near AS (',
+					'WITH near AS (',
 						'SELECT lp.', quote_ident(v_idname), ', lp.state, lp.', quote_ident(v_the_geom),
-						' FROM ', quote_ident(v_layer.layer_id), ' lp, params p',
-						' ORDER BY lp.', quote_ident(v_the_geom), ' <-> p.pt',
-						' LIMIT 200)',
-					
-					' SELECT n.', quote_ident(v_idname),
-					' FROM near n, params p',
-					' WHERE n.', quote_ident(v_the_geom), ' && ST_Expand(p.pt, p.r)',
-					' AND ST_DWithin(n.', quote_ident(v_the_geom), ', p.pt, p.r)',
-					' ORDER BY CASE WHEN n.state=1 THEN 1 WHEN n.state=2 THEN 2 WHEN n.state=0 THEN 3 ELSE 4 END,',
-					' n.', quote_ident(v_the_geom), ' <-> p.pt',
+						' FROM ', quote_ident(v_base_table), ' lp',
+						' ORDER BY lp.', quote_ident(v_the_geom), ' <-> ''', v_point, '''::geometry',
+						' LIMIT 200',
+					'), filtered AS (',
+						'SELECT n.', quote_ident(v_idname), ', n.state, n.', quote_ident(v_the_geom),
+						' FROM near n',
+						' JOIN ', quote_ident(v_vf_layer), ' vf USING (', quote_ident(v_idname), ')',
+					')',
+					'SELECT f.', quote_ident(v_idname),
+					' FROM filtered f',
+					' WHERE f.', quote_ident(v_the_geom), ' && ST_Expand(''', v_point, '''::geometry, ', v_sensibility, ')',
+					' AND ST_DWithin(f.', quote_ident(v_the_geom), ', ''', v_point, '''::geometry, ', v_sensibility, ')',
+					' ORDER BY',
+					' CASE WHEN f.state=1 THEN 1 WHEN f.state=2 THEN 2 WHEN f.state=0 THEN 3 ELSE 4 END,',
+					' f.', quote_ident(v_the_geom), ' <-> ''', v_point, '''::geometry',
 					' LIMIT 1'
 				);
 			end if;			
@@ -322,8 +333,7 @@ BEGIN
 
 	-- Control NULL's
 	IF v_id IS NULL THEN
-		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":"'|| v_version ||'"'||
-		', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "version":"'|| v_version ||'", "body":{}}')::json;
 	END IF;
 
 	IF v_toolbar IS NULL THEN

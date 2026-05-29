@@ -239,8 +239,7 @@ BEGIN
 
 		IF v_idname_array IS NULL THEN
 			EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
-			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":"'|| v_version ||'"'||
-			', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "version":"'|| v_version ||'", "body":{}}')::json;
 
 		END IF;
 
@@ -898,7 +897,7 @@ BEGIN
 
 	-- message for null
 	IF v_tablename IS NULL THEN
-		v_message='{"level":0, "text":"No feature found", "results":0}';
+		v_message='{"level":0, "text":"No feature found"}';
 	END IF;
 
 	--    Control NULL's

@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Improve UD checks in getvisit and setvisit
+- Update mincut selector config in `config_param_system` (`basic_selector_tab_mincut`): add `typeaheadFilter` so filter in web works.
+- Rename columns in `tbl_mincut_manager` tableview: `expl_id` to `exploitation`, `muni_id` to `municipality`.
+- Fix `gw_fct_setselectors`: use `selector_municipality` (muni) instead of `selector_sector` to update selector_expl.
+- `gw_fct_setmincut`: set `expl_id` from arc and `macroexpl_id` from exploitation on `om_mincut`.
+- Fix visit dialog: unify `parameter_id` combo fill logic and refresh it after visit load and on Event tab entry.
+
+## [4.11.1] - 2026-05-27
+
+### Fixed
+
+- Update reference function id for gw_fct_anl_node_topological_consistency.
+- `gw_fct_graphanalytics_omunit` function to disable `edit_disable_arc_fkarray` when updating omunits.
+- Optimize `gw_trg_array_fk_array_table`: pg_catalog type lookup and global `edit_disable_arc_fkarray` bypass.
+- Fix function id references in `sys_function` and `config_function` tables.
+
+## [4.11.0] - 2026-05-26
+
+### Added
+
+- Algorithm to calculate omunits and macroomunits `gw_fct_graphanalytics_omunit`.
+- `has_access` column to `node` table.
+- `ve_omunit` and `ve_macroomunit` views with edit triggers.
+- New function `gw_fct_admin_manage_view_dependencies` to manage view dependencies.
+
 ### Removed
 
 - `sector_id` and `muni_id` from `exploitation` table.
@@ -22,6 +49,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - recreate the triggers for the mapzones when the utility scheme is activated.
 - fix visit dialog to show the correct features when the dialog is accepted.
 - fix update of omunit and macroomunit geometry type to multipolygon.
+- add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.
+- Improve performance of `gw_fct_getinfofromcoordinates` function.
+
+## [4.10.1] - 2026-05-20
+
+### Fixed
+
+- `config_form_fields` `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
+- `visit` insert correctly the records on `om_visit_x_*` tables.
+- correct signal for rejected visit dialog.
+- recreate the triggers for the mapzones when the utility scheme is activated.
+- fix visit dialog to show the correct features when the dialog is accepted.
+- fix update of omunit and macroomunit geometry type to multipolygon.
+- add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.
 
 ## [4.10.0] - 2026-05-18
 
@@ -292,7 +333,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.1...main
+[4.11.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.0...v4.11.1
+[4.11.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.1...v4.11.0
+[4.10.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...v4.10.1
 [4.10.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...v4.10.0
 [4.9.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...v4.9.1
 [4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0

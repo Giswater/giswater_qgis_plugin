@@ -27,12 +27,15 @@ v_worklayer text;
 v_result json;
 v_result_info json;
 v_result_line json;
-v_array text;
+v_array integer[];
 v_version text;
 v_error_context text;
 v_count integer;
 v_checktype text;
 v_fid integer = 479;
+
+-- query variables
+v_query_text text;
 
 
 BEGIN
@@ -40,7 +43,7 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- SELECT giswater
+	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data
@@ -49,56 +52,50 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_checktype := ((p_data ->>'data')::json->>'parameters')::json->>'checkType';
 
-	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+	v_array := (SELECT array_agg(a::integer) FROM json_array_elements_text(v_id) a);
 
 	-- Reset values
-	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+	DROP TABLE IF EXISTS temp_anl_arc;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                        "data":{"function":"3040", "fid":"'||v_fid||'", "criticity":"4", "is_process":true, "is_header":"true"}}$$)';
 
+	-- Computing process
+	IF v_selectionmode = 'previousSelection' THEN
+		v_query_text := 'AND BOOL_OR(va.arc_id = ANY(' || quote_literal(v_array) || '))';
+	ELSE
+		v_query_text := '';
+	END IF;
 
 	IF v_checktype='geometry' THEN
-		-- Computing process
-		IF v_selectionmode = 'previousSelection' THEN
-			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, node_1, node_2, expl_id, fid, the_geom)
-					SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, fid, the_geom FROM (
-					SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, 
-					t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, '||v_fid||' as fid, t1.the_geom
-					FROM '||v_worklayer||' AS t1, '||v_worklayer||' AS t2 
-					WHERE St_equals(t1.the_geom,t2.the_geom)
-					AND t1.arc_id != t2.arc_id AND t1.arc_id IN ('||v_array||') ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0';
-		ELSE
-			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, node_1, node_2, expl_id, fid, the_geom)
-					SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, fid, the_geom FROM (
-					SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, 
-					t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, '||v_fid||' as fid, t1.the_geom
-					FROM '||v_worklayer||' AS t1, '||v_worklayer||' AS t2
-					WHERE St_equals(t1.the_geom,t2.the_geom)
-					AND t1.arc_id != t2.arc_id ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0';
-		END IF;
+		EXECUTE format($sql$
+			CREATE TEMP TABLE temp_anl_arc AS
+			SELECT a.arc_id, a.arccat_id, a.state, ta.arc_id_aux, a.node_1, a.node_2, a.expl_id, a.the_geom
+			FROM (
+				SELECT va.the_geom, MIN(va.arc_id) AS arc_id_aux
+				FROM %I va
+				GROUP BY va.the_geom
+				HAVING COUNT(*) > 1
+				%s
+			) ta
+			JOIN arc a ON ta.the_geom = a.the_geom
+			WHERE EXISTS (SELECT 1 FROM vf_arc vfa WHERE vfa.arc_id = a.arc_id)
+		$sql$, v_worklayer, v_query_text);
 	ELSIF v_checktype='finalNodes' THEN
-		-- Computing process
-		IF v_selectionmode = 'previousSelection' THEN
-
-			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, the_geom)
-			SELECT * FROM (SELECT DISTINCT ON (node_1, node_2) arc_id, arccat_id, state, node_1, node_2,expl_id, '||v_fid||',the_geom 
-			FROM  '||v_worklayer||'  WHERE  arc_id IN ('||v_array||') AND  CONCAT(node_1,'':'',node_2) IN
-			(SELECT CONCAT(node_1,'':'',node_2) FROM '||v_worklayer||' WHERE arc_id IN ('||v_array||') GROUP BY node_1, node_2  HAVING count(*) >1))a';
-
-			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id::text FROM '||v_worklayer||' va
-			WHERE aa.node_1 = va.node_1::text and aa.node_2=va.node_2::text AND  aa.arc_id!=va.arc_id::text AND va.arc_id IN ('||v_array||') ;';
-
-		ELSE
-			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, the_geom)
-			SELECT * FROM (SELECT DISTINCT ON (node_1, node_2) arc_id, arccat_id, state, node_1, node_2,expl_id, '||v_fid||',the_geom 
-			FROM  '||v_worklayer||'  WHERE CONCAT(node_1,'':'',node_2) IN
-			(SELECT CONCAT(node_1,'':'',node_2) FROM '||v_worklayer||' GROUP BY node_1, node_2  HAVING count(*) >1))a';
-
-			EXECUTE 'UPDATE anl_arc aa SET arc_id_aux=va.arc_id::text FROM '||v_worklayer||' va
-			WHERE aa.node_1 = va.node_1::text and aa.node_2=va.node_2::text AND  aa.arc_id!=va.arc_id::text;';
-		END IF;
+		EXECUTE format($sql$
+			CREATE TEMP TABLE temp_anl_arc AS
+			SELECT a.arc_id, a.arccat_id, a.state, ta.arc_id_aux, a.node_1, a.node_2, a.expl_id, a.the_geom
+			FROM (
+				SELECT va.node_1, va.node_2, min(va.arc_id) AS arc_id_aux
+				FROM %I va
+				GROUP BY va.node_1, va.node_2
+				HAVING COUNT(*) > 1
+				%s
+			) ta
+			JOIN arc a ON a.node_1 = ta.node_1 AND a.node_2 = ta.node_2
+			WHERE EXISTS (SELECT 1 FROM vf_arc vfa WHERE vfa.arc_id = a.arc_id)
+		$sql$, v_worklayer, v_query_text);
 	END IF;
 
 	-- set selector
@@ -118,15 +115,15 @@ BEGIN
 	   'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 	    'properties', to_jsonb(row) - 'the_geom'
 	  	) AS feature
-	  	FROM (SELECT id, arc_id, arccat_id, state,  node_1, node_2, expl_id, fid, ST_Transform(the_geom, 4326) as the_geom
-	  	FROM  anl_arc WHERE cur_user="current_user"() AND fid=v_fid) row) features;
+	  	FROM (SELECT arc_id, arc_id_aux, arccat_id, state,  node_1, node_2, expl_id, ST_Transform(the_geom, 4326) as the_geom
+	  	FROM  temp_anl_arc) row) features;
 
 	v_result_line := COALESCE(v_result, '{}');
 
 	IF v_checktype='finalNodes' THEN
-		SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+		SELECT count(*) INTO v_count FROM temp_anl_arc;
 	ELSE
-		SELECT count(*)/2 INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+		SELECT count(*)/2 INTO v_count FROM temp_anl_arc;
 	END IF;
 
 
@@ -139,8 +136,8 @@ BEGIN
                        "data":{"message":"3576", "function":"3040", "fid":"'||v_fid||'", "parameters":{"v_count":"'||v_count||'"}, "fcount":"'||v_count||'", "is_process":true}}$$)';
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT v_fid,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count
-		FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
+		SELECT v_fid, concat('Arc_id: ', array_agg(arc_id), '.'), v_count
+		FROM temp_anl_arc;
 
 	END IF;
 

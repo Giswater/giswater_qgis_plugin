@@ -205,7 +205,7 @@ class GwInfo(QObject):
                 return False, None
 
             # Manage status failed
-            if json_result['status'] == 'Failed' or ('results' in json_result and json_result['results'] <= 0):
+            if json_result['status'] == 'Failed' or not json_result.get('body', {}).get('form'):
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
@@ -1851,10 +1851,6 @@ class GwInfo(QObject):
             # If we make an info
             else:
                 feature = f'"id":"{self.feature_id}", '
-                # Get geometry from existing feature
-                existing_feature = tools_qt.get_feature_by_id(self.layer, int(self.feature_id))
-                if existing_feature and existing_feature.hasGeometry():
-                    _json['the_geom'] = existing_feature.geometry().asWkt()
 
             feature += f'"tableName":"{p_table_id}", '
             feature += f' "featureType":"{self.feature_type}" '
@@ -4258,7 +4254,7 @@ def open_selected_hydro(**kwargs):
     index = selected_list[0]
     row = index.row()
 
-    table_name = 'vf_hydrometer'
+    table_name = 'v_ui_hydrometer'
     column_index = tools_qt.get_col_index_by_col_name(qtable, 'hydrometer_id')
     feature_id = index.sibling(row, column_index).data()
 
