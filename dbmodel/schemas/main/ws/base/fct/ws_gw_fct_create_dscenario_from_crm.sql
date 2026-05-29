@@ -274,7 +274,10 @@ BEGIN
 		ELSE
 			v_querytext = '
 			with final_hydros as (
-				SELECT hydrometer_id, billed_volume, pattern_id from v_hydrometer_period where cat_period_id = '||quote_literal(v_period)||'
+				SELECT hydrometer_id, billed_volume, hc.pattern_id
+				FROM v_hydrometer_period
+				JOIN v_cat_hydrometer_category hc ON hc.category_id = category_id
+				WHERE cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.feature_customer_code UNION
 						SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code JOIN node n ON n.node_id = mn.node_id
@@ -327,11 +330,12 @@ BEGIN
 					h.feature_type,
 					h.expl_id,
 					SUM(d.billed_volume * (p.c_seconds / p.p_seconds))::numeric(10,0) AS billed_volume,
-					d.pattern_id
+					hc.pattern_id
 				FROM v_hydrometer_period d
+				JOIN v_cat_hydrometer_category hc ON hc.category_id = d.category_id
 				JOIN period_selected p ON d.cat_period_id = p.id
 				JOIN hydros h ON d.hydrometer_id = h.hydrometer_id
-				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, d.pattern_id
+				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, hc.pattern_id
 			)
 			SELECT
 				feature_type,
@@ -355,6 +359,7 @@ BEGIN
 			    d.hydrometer_id,
 			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, pattern_id
 			    FROM v_hydrometer_period d
+				JOIN v_cat_hydrometer_category hc ON hc.category_id = d.category_id
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
 			), aux_data AS (
@@ -459,14 +464,6 @@ BEGIN
 				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
 				AND dscenario_id = '||v_scenarioid||'';
 
-			ELSIF v_pattern = 5 THEN -- hydrometer period
-
-				EXECUTE '
-				UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id
-				FROM v_hydrometer_period h
-				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
-				AND dscenario_id = '||v_scenarioid||'';
-
 			ELSIF v_pattern = 6 THEN -- hydrometer category
 
 				UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
@@ -514,8 +511,6 @@ BEGIN
 				VALUES (v_fid, v_result_id, 2, concat('DMA DEFAULT: dma table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('DMA PERIOD: ext_rtc_dma_period table.'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER PERIOD: ext_hydrometer_period table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 				VALUES (v_fid, v_result_id, 2, concat('HYDROMETER CATEGORY: hydrometer_category table.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
