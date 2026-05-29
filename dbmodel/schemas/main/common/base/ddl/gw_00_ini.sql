@@ -33,37 +33,37 @@ DECLARE
 	v_role_exists boolean;
 BEGIN
     	-- Create (if not exists) roles and grant permissions
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_basic';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_basic') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_basic" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 	END IF;
 	ALTER DEFAULT PRIVILEGES IN SCHEMA SCHEMA_NAME GRANT SELECT ON TABLES TO role_basic;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_om';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_om') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_om" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 		GRANT role_basic TO role_om;
 	END IF;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_edit';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_edit') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_edit" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 		GRANT role_om TO role_edit;
 	END IF;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_epa';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_epa') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_epa" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 		GRANT role_edit TO role_epa;
 	END IF;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_plan';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_plan') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_plan" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 		GRANT role_epa TO role_plan;
 	END IF;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_admin';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_admin') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_admin" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 		GRANT role_plan TO role_admin;
@@ -71,13 +71,13 @@ BEGIN
 		GRANT role_admin TO postgres;
 	END IF;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_system';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_system') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_system" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 		GRANT role_admin TO role_system;
 	END IF;
 
-	SELECT rolname into v_role_exists FROM pg_roles WHERE rolname = 'role_crm';
+	SELECT EXISTS(SELECT rolname FROM pg_roles WHERE rolname = 'role_crm') into v_role_exists;
 	IF v_role_exists is null THEN
 		CREATE ROLE "role_crm" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 	END IF;
