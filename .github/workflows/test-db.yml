@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Show matrix
         run: echo "Bootstrap ${{ matrix.project }} on PostgreSQL ${{ matrix.pg_version }} (PostGIS ${POSTGIS_VERSION})"
@@ -75,7 +75,7 @@ jobs:
 
       - name: Upload schema dump artifact
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
           path: dbmodel/gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}.dump
@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # matrix.* is not allowed in job-level if: — filter here for workflow_dispatch
       - name: Filter test group
@@ -132,7 +132,7 @@ jobs:
 
       - name: Download schema dump
         if: steps.filter.outputs.active == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
           path: dbmodel
@@ -179,10 +179,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download schema dump
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
           path: dbmodel
