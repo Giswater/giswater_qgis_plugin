@@ -7,8 +7,23 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>720</height>
+    <height>680</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>920</width>
+    <height>680</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>920</width>
+    <height>680</height>
+   </size>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
   </property>
   <property name="windowTitle">
    <string>Manage schemas</string>
@@ -31,6 +46,12 @@
    </property>
    <item>
     <widget class="QGroupBox" name="grb_network">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
       <string>Network (WS / UD)</string>
      </property>
@@ -59,6 +80,32 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_network_rename">
+          <property name="minimumSize">
+           <size>
+            <width>88</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Rename</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_network_delete">
+          <property name="minimumSize">
+           <size>
+            <width>88</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Delete</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btn_update_network">
@@ -94,21 +141,15 @@
       <item>
        <widget class="QTableView" name="tbl_network">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
+          <verstretch>1</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>140</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>180</height>
+          <height>100</height>
          </size>
         </property>
         <property name="editTriggers">
@@ -138,27 +179,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QScrollArea" name="scroll_satellites">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+    <widget class="QWidget" name="wgt_satellites">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scroll_satellites_contents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>880</width>
-        <height>420</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="layout_satellites">
-       <property name="spacing">
+     <layout class="QGridLayout" name="layout_satellites">
+       <property name="horizontalSpacing">
         <number>8</number>
        </property>
-       <item>
+       <property name="verticalSpacing">
+        <number>8</number>
+       </property>
+       <item row="0" column="0">
         <widget class="QGroupBox" name="grb_utils">
          <property name="title">
           <string>Utils</string>
@@ -264,7 +299,7 @@
          </layout>
         </widget>
        </item>
-       <item>
+       <item row="0" column="1">
         <widget class="QGroupBox" name="grb_cibs">
          <property name="title">
           <string>Cibs</string>
@@ -383,7 +418,7 @@
          </layout>
         </widget>
        </item>
-       <item>
+       <item row="1" column="0">
         <widget class="QGroupBox" name="grb_am">
          <property name="title">
           <string>AM</string>
@@ -460,7 +495,7 @@
          </layout>
         </widget>
        </item>
-       <item>
+       <item row="1" column="1">
         <widget class="QGroupBox" name="grb_cm">
          <property name="title">
           <string>CM</string>
@@ -537,7 +572,7 @@
          </layout>
         </widget>
        </item>
-       <item>
+       <item row="2" column="0" colspan="2">
         <widget class="QGroupBox" name="grb_audit">
          <property name="title">
           <string>Audit</string>
@@ -675,8 +710,7 @@
          </layout>
         </widget>
        </item>
-      </layout>
-     </widget>
+     </layout>
     </widget>
    </item>
    <item>

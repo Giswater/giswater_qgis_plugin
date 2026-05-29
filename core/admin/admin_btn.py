@@ -2401,6 +2401,7 @@ class GwAdminButton:
         from .manage_schemas_dlg import GwManageSchemasDialog
         dlg = GwManageSchemasDialog(self, parent=self.dlg_readsql)
         tools_gw.load_settings(dlg)
+        dlg.apply_fixed_geometry()
         self._manage_schemas_refresh = dlg._refresh_inventory
         lib_vars.session_vars["message_parent"] = dlg
         try:
@@ -2562,11 +2563,19 @@ class GwAdminButton:
         tools_qgis.show_info(tools_qt.tr("Layer of CM project will be added to the project when create"), dialog=self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_pschema_qgis_file.setEnabled(False)
 
-    def _open_rename(self):
+    def _open_rename(self, schema_name=None, schema_version=None):
         """"""
 
+        schema = schema_name or tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        if not schema or schema == "null":
+            msg = "Please, select a project to rename"
+            tools_qt.show_info_box(msg, "Info")
+            return
+
+        project_version = schema_version or self.project_version
+
         # Open rename if schema is updated
-        if _admin_version_tuple(self.plugin_version) != _admin_version_tuple(self.project_version):
+        if _admin_version_tuple(self.plugin_version) != _admin_version_tuple(project_version):
             msg = "The schema version has to be updated to make rename"
             tools_qt.show_info_box(msg, "Info")
             return
@@ -2574,8 +2583,6 @@ class GwAdminButton:
         # Create dialog
         self.dlg_readsql_rename = GwAdminRenameProjUi(self)
         tools_gw.load_settings(self.dlg_readsql_rename)
-
-        schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self._rename_project_data_schema, schema, None))
@@ -2758,10 +2765,10 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_copy_schema)
         QgsApplication.taskManager().triggerTask(self.task_copy_schema)
 
-    def _delete_schema(self):
+    def _delete_schema(self, schema_name=None):
         """"""
 
-        project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_name = schema_name or tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
             msg = "Please, select a project to delete"
             tools_qt.show_info_box(msg, "Info")
@@ -2788,6 +2795,9 @@ class GwAdminButton:
                 self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
                 self._manage_utils()
                 self._set_info_project()
+                refresh = getattr(self, '_manage_schemas_refresh', None)
+                if refresh:
+                    refresh()
             else:
                 tools_qt.show_info_box(f"Delete schema failed: {fx.error}", "Error")
 

@@ -86,11 +86,15 @@ class GwRenameSchemaTask(GwTask):
             self.admin.dlg_readsql_rename.show()
 
         if self.status:
+            self.admin._refresh_admin_catalog_cache()
             self.admin._populate_data_schema_name(self.admin.cmb_project_type)
             tools_qt.set_widget_text(self.admin.dlg_readsql, self.admin.dlg_readsql.project_schema_name, str(self.new_schema_name))
 
             # Set info project
             self.admin._set_info_project()
+            refresh = getattr(self.admin, '_manage_schemas_refresh', None)
+            if refresh:
+                refresh()
             if hasattr(self.admin, 'dlg_readsql_rename') and not isdeleted(self.admin.dlg_readsql_rename) and self.admin.dlg_readsql_rename.isVisible():
                 self.admin._close_dialog_admin(self.admin.dlg_readsql_rename)
 

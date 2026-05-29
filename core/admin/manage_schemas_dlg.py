@@ -8,7 +8,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QEvent, Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
-from qgis.PyQt.QtWidgets import QHeaderView
+from qgis.PyQt.QtWidgets import QHeaderView, QSizePolicy
 
 from ..ui.ui_manager import GwAdminManageSchemasUi
 from ...libs import tools_qt
@@ -16,6 +16,8 @@ from . import _admin_catalog as admin_catalog
 
 _NETWORK_COLUMNS = ("Schema", "Kind", "Version", "Profile", "Linked")
 _COL_SCHEMA = 0
+_FIXED_WIDTH = 920
+_FIXED_HEIGHT = 680
 
 
 class GwManageSchemasDialog(GwAdminManageSchemasUi):
@@ -29,12 +31,40 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self._network_model.setHorizontalHeaderLabels(list(_NETWORK_COLUMNS))
 
         self.messageBar().hide()
+        self._setup_layout()
         self._setup_network_table()
         self._refresh_inventory()
         self._connect_signals()
 
+    def _setup_layout(self) -> None:
+        self.verticalLayout.setStretch(0, 1)
+        self.verticalLayout.setStretch(1, 0)
+        self.verticalLayout.setStretch(2, 0)
+        self.layout_network_root.setStretch(1, 1)
+        self.layout_satellites.setColumnStretch(0, 1)
+        self.layout_satellites.setColumnStretch(1, 1)
+        self.wgt_satellites.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+        self._fix_satellites_height()
+
+    def apply_fixed_geometry(self) -> None:
+        """Restore fixed size after load_settings may have resized the dialog."""
+        self.setSizeGripEnabled(False)
+        self._fix_satellites_height()
+        self.setFixedSize(_FIXED_WIDTH, _FIXED_HEIGHT)
+
+    def _fix_satellites_height(self) -> None:
+        self.wgt_satellites.adjustSize()
+        content_h = self.wgt_satellites.sizeHint().height()
+        if content_h > 0:
+            self.wgt_satellites.setFixedHeight(content_h)
+
     def _connect_signals(self) -> None:
         self.btn_refresh.clicked.connect(partial(self._refresh_inventory))
+        self.btn_network_rename.clicked.connect(partial(self._rename_network_schema))
+        self.btn_network_delete.clicked.connect(partial(self._delete_network_schema))
         self.btn_update_network.clicked.connect(partial(self._update_network))
         self.btn_utils_create.clicked.connect(partial(self.admin._create_utils))
         self.btn_utils_integrate.clicked.connect(partial(self._integrate_utils))
@@ -277,6 +307,28 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_delete_audit.setEnabled(audit_exists)
 
         self.btn_update_network.setEnabled(self._network_has_pending_updates(parent))
+        has_selection = bool(parent) and parent_kind in ("WS", "UD")
+        self.btn_network_delete.setEnabled(has_selection)
+        self.btn_network_rename.setEnabled(
+            has_selection
+            and not self._needs_update(str((self._satellite_row(schema=parent) or {}).get("version") or ""))
+        )
+
+    def _delete_network_schema(self) -> None:
+        parent = self._selected_parent()
+        if not parent:
+            tools_qt.show_info_box("Select a WS or UD schema in the table.")
+            return
+        self.admin._delete_schema(schema_name=parent)
+
+    def _rename_network_schema(self) -> None:
+        parent = self._selected_parent()
+        if not parent:
+            tools_qt.show_info_box("Select a WS or UD schema in the table.")
+            return
+        row = self._satellite_row(schema=parent)
+        version = str((row or {}).get("version") or "")
+        self.admin._open_rename(schema_name=parent, schema_version=version)
 
     def _update_network(self) -> None:
         parent = self._selected_parent()
