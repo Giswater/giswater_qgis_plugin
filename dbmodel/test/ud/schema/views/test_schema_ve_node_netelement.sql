@@ -40,7 +40,7 @@ SELECT columns_are(
         'flooding_rate', 'flooding_vol', 'sector_style', 'omzone_style', 'drainzone_style', 'dwfzone_style',
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
-        'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility'
+        'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'has_access'
     ],
     'View ve_node_netelement should have the correct columns'
 );
@@ -71,12 +71,12 @@ SELECT col_type_is('ve_node_netelement', 'macroexpl_id', 'int4', 'Column macroex
 SELECT col_type_is('ve_node_netelement', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_netelement', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_netelement', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_netelement', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_netelement', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_netelement', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_netelement', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netelement', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netelement', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_netelement', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_netelement', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netelement', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netelement', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_netelement', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_netelement', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -165,7 +165,7 @@ SELECT col_type_is('ve_node_netelement', 'treatment_type', 'int4', 'Column treat
 SELECT col_type_is('ve_node_netelement', 'has_treatment', 'bool', 'Column has_treatment should be bool');
 SELECT col_type_is('ve_node_netelement', 'sector_visibility', 'int4[]', 'Column sector_visibility should be int4[]');
 SELECT col_type_is('ve_node_netelement', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
-
+SELECT col_type_is('ve_node_netelement', 'has_access', 'bool', 'Column has_access should be bool');
 SELECT * FROM finish();
 
 ROLLBACK;

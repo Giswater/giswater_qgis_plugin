@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'inlet', 'bottom_channel', 'accessibility', 'name', 'sander_depth',
-        'inlet_medium'
+        'inlet_medium', 'has_access'
     ],
     'View ve_node_netinit should have the correct columns'
 );
@@ -73,12 +73,12 @@ SELECT col_type_is('ve_node_netinit', 'macroexpl_id', 'int4', 'Column macroexpl_
 SELECT col_type_is('ve_node_netinit', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_netinit', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_netinit', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_netinit', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_netinit', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_netinit', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_netinit', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netinit', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netinit', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_netinit', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_netinit', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netinit', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netinit', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_netinit', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_netinit', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -175,7 +175,7 @@ SELECT col_type_is('ve_node_netinit', 'accessibility', 'varchar(16)', 'Column ac
 SELECT col_type_is('ve_node_netinit', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('ve_node_netinit', 'sander_depth', 'numeric(12,3)', 'Column sander_depth should be numeric(12,3)');
 SELECT col_type_is('ve_node_netinit', 'inlet_medium', 'int4', 'Column inlet_medium should be int4');
-
+SELECT col_type_is('ve_node_netinit', 'has_access', 'bool', 'Column has_access should be bool');
 SELECT * FROM finish();
 
 ROLLBACK;

@@ -35,7 +35,7 @@ SELECT columns_are(
         'adescript', 'verified', 'xyz_date', 'uncertain', 'datasource', 'unconnected',
         'label_x', 'label_y', 'label_rotation', 'rotation', 'label_quadrant', 'hemisphere',
         'inventory', 'publish', 'is_scadamap', 'lock_level', 'expl_visibility', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid', 'has_access'
     ],
     'Table node should have the correct columns'
 );
@@ -130,6 +130,7 @@ SELECT col_type_is('node', 'updated_at', 'timestamp with time zone', 'Column upd
 SELECT col_type_is('node', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('node', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column the_geom should be geometry(point, SRID_VALUE)');
 SELECT col_type_is('node', 'uuid', 'uuid', 'Column uuid should be uuid');
+SELECT col_type_is('node', 'has_access', 'bool', 'Column has_access should be bool');
 
 -- Check foreign keys
 SELECT has_fk('node', 'Table node should have foreign keys');

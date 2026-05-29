@@ -43,7 +43,7 @@ SELECT columns_are(
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'sander_depth', 'max_volume', 'util_volume', 'inlet', 'bottom_channel',
         'accessibility', 'name', 'bottom_mat', 'slope', 'height', 'weir_param_1',
-        'weir_param_2'
+        'weir_param_2', 'has_access'
     ],
     'View ve_node_weir should have the correct columns'
 );
@@ -74,12 +74,12 @@ SELECT col_type_is('ve_node_weir', 'macroexpl_id', 'int4', 'Column macroexpl_id 
 SELECT col_type_is('ve_node_weir', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_weir', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_weir', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_weir', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_weir', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_weir', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_weir', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_weir', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_weir', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_weir', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_weir', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_weir', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_weir', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_weir', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_weir', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -182,7 +182,7 @@ SELECT col_type_is('ve_node_weir', 'slope', 'numeric', 'Column slope should be n
 SELECT col_type_is('ve_node_weir', 'height', 'numeric(12,4)', 'Column height should be numeric(12,4)');
 SELECT col_type_is('ve_node_weir', 'weir_param_1', 'int4', 'Column weir_param_1 should be int4');
 SELECT col_type_is('ve_node_weir', 'weir_param_2', 'text', 'Column weir_param_2 should be text');
-
+SELECT col_type_is('ve_node_weir', 'has_access', 'bool', 'Column has_access should be bool');
 SELECT * FROM finish();
 
 ROLLBACK;

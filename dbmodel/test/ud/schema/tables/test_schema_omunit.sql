@@ -21,7 +21,7 @@ SELECT has_table('omunit'::name, 'Table omunit should exist');
 SELECT columns_are(
     'omunit',
     ARRAY[
-        'omunit_id', 'node_1', 'node_2', 'is_way_in', 'is_way_out', 'macroomunit_id',
+        'omunit_id', 'node_1', 'node_2', 'macroomunit_id',
         'order_number', 'the_geom', 'expl_id', 'muni_id', 'sector_id'
     ],
     'Table omunit should have the correct columns'
@@ -31,8 +31,6 @@ SELECT columns_are(
 SELECT col_type_is('omunit', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('omunit', 'node_1', 'int4', 'Column node_1 should be int4');
 SELECT col_type_is('omunit', 'node_2', 'int4', 'Column node_2 should be int4');
-SELECT col_type_is('omunit', 'is_way_in', 'bool', 'Column is_way_in should be bool');
-SELECT col_type_is('omunit', 'is_way_out', 'bool', 'Column is_way_out should be bool');
 SELECT col_type_is('omunit', 'macroomunit_id', 'int4', 'Column macroomunit_id should be int4');
 SELECT col_type_is('omunit', 'order_number', 'int4', 'Column order_number should be int4');
 SELECT col_type_is('omunit', 'the_geom', 'geometry(multipolygon, SRID_VALUE)', 'Column the_geom should be geometry(multipolygon, SRID_VALUE)');
