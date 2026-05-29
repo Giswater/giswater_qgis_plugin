@@ -152,14 +152,6 @@ CREATE TABLE cibs.hydrometer_period (
 	CONSTRAINT hydrometer_period_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES hydrometer(hydrometer_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE cibs.cat_hydrometer_category_x_pattern (
-    category_id character varying(16) NOT NULL,
-    period_type integer NOT NULL,
-    pattern_id character varying(16) NOT NULL,
-    observ text,
-    CONSTRAINT cat_hydrometer_category_x_pattern_pkey PRIMARY KEY (category_id)
-);
-
 
 CREATE TABLE cat_period_type (
 	id serial4 NOT NULL,

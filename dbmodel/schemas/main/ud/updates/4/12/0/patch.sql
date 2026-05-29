@@ -9,6 +9,8 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+ALTER TABLE ext_cat_hydrometer_category ADD COLUMN pattern_id varchar(16);
+
 CREATE OR REPLACE VIEW v_hydrometer AS
 SELECT * FROM ext_hydrometer;
 

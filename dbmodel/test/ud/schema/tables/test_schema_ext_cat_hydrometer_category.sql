@@ -21,15 +21,16 @@ SELECT has_table('ext_cat_hydrometer_category'::name, 'Table ext_cat_hydrometer_
 SELECT columns_are(
     'ext_cat_hydrometer_category',
     ARRAY[
-        'id', 'observ', 'code'
+        'id', 'observ', 'code', 'pattern_id'
     ],
     'Table ext_cat_hydrometer_category should have the correct columns'
 );
 
 -- Check column types
-SELECT col_type_is('ext_cat_hydrometer_category', 'id', 'varchar(16)', 'Column id should be varchar(16)');
+SELECT col_type_is('ext_cat_hydrometer_category', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('ext_cat_hydrometer_category', 'observ', 'varchar(100)', 'Column observ should be varchar(100)');
 SELECT col_type_is('ext_cat_hydrometer_category', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('ext_cat_hydrometer_category', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
 
 -- Finish
 SELECT * FROM finish();

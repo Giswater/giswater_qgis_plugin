@@ -15,7 +15,6 @@ ALTER TABLE IF EXISTS ext_cat_hydrometer_category RENAME TO ext_cat_hydrometer_c
 ALTER TABLE IF EXISTS ext_cat_hydrometer_state RENAME TO ext_cat_hydrometer_state_old;
 ALTER TABLE IF EXISTS ext_hydrometer RENAME TO ext_hydrometer_old;
 ALTER TABLE IF EXISTS ext_hydrometer_period RENAME TO ext_hydrometer_period_old;
-ALTER TABLE IF EXISTS ext_cat_hydrometer_category_x_pattern RENAME TO ext_cat_hydrometer_category_x_pattern_old;
 
 DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer';
 DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer_priority';
@@ -26,7 +25,6 @@ DELETE FROM sys_table WHERE id = 'ext_hydrometer';
 DELETE FROM sys_table WHERE id = 'ext_hydrometer_period';
 DELETE FROM sys_table WHERE id = 'ext_cat_period_type';
 DELETE FROM sys_table WHERE id = 'ext_cat_period';
-DELETE FROM sys_table WHERE id = 'ext_cat_hydrometer_category_x_pattern';
 
 
 CREATE OR REPLACE VIEW v_hydrometer AS
