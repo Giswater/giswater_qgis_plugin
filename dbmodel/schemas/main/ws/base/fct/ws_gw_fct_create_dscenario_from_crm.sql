@@ -364,7 +364,7 @@ BEGIN
 				JOIN v_hydrometer h ON h.hydrometer_id = d.hydrometer_id
 				JOIN v_cat_hydrometer_category hc ON hc.id = h.category_id
 			    JOIN period_selected p ON d.cat_period_id = p.id
-			    GROUP BY hydrometer_id, pattern_id
+			    GROUP BY d.hydrometer_id, pattern_id
 			), aux_data AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON erh.feature_customer_code = c.customer_code UNION
 				SELECT erh.hydrometer_id, n.node_id AS feature_id, ''NODE'' AS feature_type, n.expl_id FROM v_hydrometer erh JOIN man_netwjoin mn ON mn.customer_code = erh.feature_customer_code JOIN node n ON n.node_id = mn.node_id
