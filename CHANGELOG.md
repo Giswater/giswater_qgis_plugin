@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Manage Schemas** dialog (`GwManageSchemasDialog`): single UI to inventory network anchors and manage satellite schemas (utils, cibs, AM, CM, audit) with contextual actions, fixed geometry, and refresh after admin load.
+- Connection selector and read-only **system info** panel in Manage Schemas (PostgreSQL / PostGIS / PgRouting versions and missing extensions); switch DB connection without closing the dialog (`reload_connection_for_manage_schemas`).
+- Rename and delete actions for network (WS/UD) schemas from Manage Schemas, wired to existing admin rename/delete flows.
+- `_admin_catalog` module and `AdminLoadTask`: fast `pg_catalog` inventory (schemas with `sys_version`, aux flags, pending updates) instead of repeated `information_schema` round-trips.
+- `GwSchemaBuilderTask`: generic `QgsTask` around `giswater_admin.engine.SchemaBuilder`, replacing legacy per-schema create threads (`project_schema_*_create`).
+- New **`cibs`** schema and manifest; `sys_version` on cibs; WS/UD integration SQL and admin actions to create, update, adapt, and copy hydrometer data from a selected network parent.
+- Hydrometer model refresh (4.12.0): `ext_hydrometer_period`, `v_`/`ve_` hydrometer views, editable `ve_hydrometer_period`, and `v_cat_*` catalogue views; sample dumps and forms updated.
+- AM/CM manifests and parent-schema creation stubs from Manage Schemas (WS-only AM).
+- pgTAP tests for UD link views (`ve_link`, `ve_link_vlink`, `ve_link_pipelink`).
+- CI/dbmodel: PostGIS matrix, Docker/Podman test runner, parallel `pg_prove`, and stricter SQL folder validation in `sql_runner`.
+- libs: `show_warning_box`, configurable DB connection timeout, and message boxes that respect `message_parent` (modal child of admin dialogs).
+
+### Changed
+
+- dbmodel layout: schemas grouped under `dbmodel/schemas/main` and `addons`; network updates consolidated into `patch.sql` per version (drop separate `ddl`/`dml`/`ddlview`/`trg` files for new bumps).
+- Admin: utils/cibs/audit flows consolidated; schema SQL paths point at `main/`; build logs list SQL files only; progress/time labels on schema builder tasks.
+- Hydrometers: rename `ext_rtc_hydrometer` → `ext_hydrometer`, `ext_rtc_hydrometer_data` → `ext_hydrometer_period`; `sum` → `billed_volume`; form/list queries use `v_`/`ve_` views; `ext_cat_hydrometer_category` id type integer.
+- SCADA tables: `ext_rtc_scada` / `ext_rtc_scada_x_data` naming aligned across imports, functions, and tests.
+- `ws_gw_fct_create_dscenario_from_crm`: joins and `hydrometer_id` references updated for the new hydrometer tables (no `pattern_id`).
+- Manage Schemas: cibs adapt/copy pass the selected network schema directly (no `dlg_readsql.cmb_cibs` workaround); info messages use `show_info_box` when opened from the dialog.
+- Mapzone type columns (`sector_type`, `drainzone_type`, `omzone_type`, `dwfzone_type`) widened to `varchar(30)` in tests and patches.
+
+### Removed
+
+- Deprecated `ext_cat_hydrometer_category_x_pattern` table and related tests.
+- Legacy admin threads: `project_schema_create`, `project_schema_utils_create`, `project_schema_cm_create`, `project_schema_audit_create`, `project_schema_asset_create`, `project_schema_update`.
+- Standalone cibs “copy data” button from the main admin UI (copy remains available from Manage Schemas).
+- Obsolete dbmodel per-version changelog/SQL trees under old `updates/` layout (superseded by `schemas/main/.../updates`).
+
+### Fixed
+
+- `gw_fct_anl_arc_*` pgTAP tests: drop leftover temp tables between cases.
+- UD schema tests and link view definitions after hydrometer / structure refactors.
+- WS schema tests after hydrometer catalogue and view renames.
+- `om_mincut_hydrometer` FK targets `ext_hydrometer`; mincut hydrometer views rebuilt on `v_hydrometer` / `v_hydrometer_period`.
+- Plugin/schema path resolution (`plugin_version`, cibs integration SQL, manifests).
+
 ## [4.11.2] - 2026-05-29
 
 ### Fixed
