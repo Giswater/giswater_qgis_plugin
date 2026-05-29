@@ -33,6 +33,9 @@ CREATE USER basic_user;
 GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
+-- Clean temp tables left by other roles in the same session before switching role
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_arc;
 
 SET role basic_user;
 
@@ -45,6 +48,8 @@ SELECT is(
     'Check if gw_fct_anl_arc_duplicated with tablename > ve_arc and checktype > finalnodes returns status "Failed" for basic_user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_arc;
 SET role om_user;
 
 SELECT is(
@@ -56,6 +61,8 @@ SELECT is(
     'Check if gw_fct_anl_arc_duplicated with tablename > ve_arc and checktype > finalnodes returns status "Accepted" for om_user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_arc;
 SET role edit_user;
 
 SELECT is(
@@ -67,6 +74,8 @@ SELECT is(
     'Check if gw_fct_anl_arc_duplicated with tablename > ve_arc and checktype > finalnodes returns status "Accepted" for edit_user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_arc;
 SET role epa_user;
 
 SELECT is(
@@ -78,6 +87,8 @@ SELECT is(
     'Check if gw_fct_anl_arc_duplicated with tablename > ve_arc and checktype > finalnodes returns status "Accepted" for epa_user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_arc;
 SET role plan_user;
 
 SELECT is(
