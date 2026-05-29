@@ -31,6 +31,10 @@ CREATE USER basic_user;
 GRANT role_basic to basic_user;
 
 -- Extract and test the "status" field from the function's JSON response
+-- Clean temp tables left by other roles in the same session before switching role
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_node;
+DROP TABLE IF EXISTS temp_anl_arc_x_node;
 
 SET role basic_user;
 
@@ -43,6 +47,9 @@ SELECT is (
     'Check if gw_fct_anl_arc_no_startend_node with tablename > ve_arc returns status "Failed" for basic user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_node;
+DROP TABLE IF EXISTS temp_anl_arc_x_node;
 SET role om_user;
 
 SELECT is (
@@ -54,6 +61,9 @@ SELECT is (
     'Check if gw_fct_anl_arc_no_startend_node with tablename > ve_arc returns status "Accepted" for om user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_node;
+DROP TABLE IF EXISTS temp_anl_arc_x_node;
 SET role edit_user;
 
 SELECT is (
@@ -65,6 +75,9 @@ SELECT is (
     'Check if gw_fct_anl_arc_no_startend_node with tablename > ve_arc returns status "Accepted" for edit user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_node;
+DROP TABLE IF EXISTS temp_anl_arc_x_node;
 SET role epa_user;
 
 SELECT is (
@@ -76,6 +89,9 @@ SELECT is (
     'Check if gw_fct_anl_arc_no_startend_node with tablename > ve_arc returns status "Accepted" for epa user'
 );
 
+RESET ROLE;
+DROP TABLE IF EXISTS temp_anl_node;
+DROP TABLE IF EXISTS temp_anl_arc_x_node;
 SET role plan_user;
 
 SELECT is (
