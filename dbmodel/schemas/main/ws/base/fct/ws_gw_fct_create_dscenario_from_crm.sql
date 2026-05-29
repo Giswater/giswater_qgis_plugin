@@ -276,7 +276,7 @@ BEGIN
 			with final_hydros as (
 				SELECT hydrometer_id, billed_volume, hc.pattern_id
 				FROM v_hydrometer_period
-				JOIN v_cat_hydrometer_category hc ON hc.category_id = category_id
+				JOIN v_cat_hydrometer_category hc ON hc.id = category_id
 				WHERE cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.feature_customer_code UNION
@@ -332,7 +332,7 @@ BEGIN
 					SUM(d.billed_volume * (p.c_seconds / p.p_seconds))::numeric(10,0) AS billed_volume,
 					hc.pattern_id
 				FROM v_hydrometer_period d
-				JOIN v_cat_hydrometer_category hc ON hc.category_id = d.category_id
+				JOIN v_cat_hydrometer_category hc ON hc.id = d.category_id
 				JOIN period_selected p ON d.cat_period_id = p.id
 				JOIN hydros h ON d.hydrometer_id = h.hydrometer_id
 				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, hc.pattern_id
@@ -359,7 +359,7 @@ BEGIN
 			    d.hydrometer_id,
 			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, pattern_id
 			    FROM v_hydrometer_period d
-				JOIN v_cat_hydrometer_category hc ON hc.category_id = d.category_id
+				JOIN v_cat_hydrometer_category hc ON hc.id = d.category_id
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
 			), aux_data AS (
@@ -454,21 +454,11 @@ BEGIN
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 
-			ELSIF v_pattern = 4 THEN -- dma period
-
-				EXECUTE '
-				UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
-				FROM ext_rtc_dma_period s
-				JOIN connec c ON c.dma_id = s.dma_id::integer
-				JOIN v_hydrometer h ON h.feature_customer_code = c.customer_code
-				WHERE d.source = h.hydrometer_id::text AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||'))
-				AND dscenario_id = '||v_scenarioid||'';
-
 			ELSIF v_pattern = 6 THEN -- hydrometer category
 
 				UPDATE inp_dscenario_demand d SET pattern_id = c.pattern_id 
 				FROM v_hydrometer h
-				JOIN v_cat_hydrometer_category c ON c.id::integer = h.category_id
+				JOIN v_cat_hydrometer_category c ON c.id = h.category_id
 				WHERE d.source = h.hydrometer_id::text
 				AND dscenario_id = v_scenarioid;
 

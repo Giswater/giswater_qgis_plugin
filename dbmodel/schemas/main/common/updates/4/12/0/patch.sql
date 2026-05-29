@@ -33,6 +33,17 @@ ALTER TABLE IF EXISTS ext_rtc_hydrometer_x_data DROP CONSTRAINT IF EXISTS ext_rt
 ALTER TABLE IF EXISTS om_mincut_hydrometer DROP CONSTRAINT IF EXISTS om_mincut_hydrometer_hydrometer_id_fkey;
 
 ALTER TABLE IF EXISTS ext_hydrometer_category RENAME TO ext_cat_hydrometer_category;
+
+DO $$
+BEGIN
+    BEGIN
+        ALTER TABLE ext_cat_hydrometer_category ALTER COLUMN id TYPE integer USING id::integer;
+    EXCEPTION WHEN OTHERS THEN
+        RAISE EXCEPTION 'All ids on ext_hydrometer_category table must be integers';
+    END;
+END $$;
+
+
 ALTER TABLE IF EXISTS ext_rtc_hydrometer_state RENAME TO ext_cat_hydrometer_state;
 
 ALTER SEQUENCE IF EXISTS ext_rtc_hydrometer_hydrometer_id_seq RENAME TO ext_hydrometer_hydrometer_id_seq;

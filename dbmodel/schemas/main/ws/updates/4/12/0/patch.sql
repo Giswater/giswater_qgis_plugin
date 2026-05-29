@@ -337,7 +337,6 @@ UPDATE config_toolbox
       1,
       2,
       3,
-      4,
       6,
       7
     ],
@@ -346,7 +345,6 @@ UPDATE config_toolbox
       "NONE",
       "SECTOR-DEFAULT",
       "DMA-DEFAULT",
-      "DMA-PERIOD",
       "HYDROMETER-CATEGORY",
       "FEATURE-PATTERN"
     ],
