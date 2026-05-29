@@ -276,7 +276,8 @@ BEGIN
 			with final_hydros as (
 				SELECT hydrometer_id, billed_volume, hc.pattern_id
 				FROM v_hydrometer_period
-				JOIN v_cat_hydrometer_category hc ON hc.id = category_id
+				JOIN v_hydrometer h ON h.hydrometer_id = hydrometer_id
+				JOIN v_cat_hydrometer_category hc ON hc.id = h.category_id
 				WHERE cat_period_id = '||quote_literal(v_period)||'
 			), aux_data AS (
 				SELECT erh.hydrometer_id, c.connec_id AS feature_id, ''CONNEC'' AS feature_type, c.expl_id FROM v_hydrometer erh JOIN connec c ON c.customer_code = erh.feature_customer_code UNION
@@ -332,7 +333,8 @@ BEGIN
 					SUM(d.billed_volume * (p.c_seconds / p.p_seconds))::numeric(10,0) AS billed_volume,
 					hc.pattern_id
 				FROM v_hydrometer_period d
-				JOIN v_cat_hydrometer_category hc ON hc.id = d.category_id
+				JOIN v_hydrometer h ON h.hydrometer_id = d.hydrometer_id
+				JOIN v_cat_hydrometer_category hc ON hc.id = h.category_id
 				JOIN period_selected p ON d.cat_period_id = p.id
 				JOIN hydros h ON d.hydrometer_id = h.hydrometer_id
 				GROUP BY d.hydrometer_id, h.dma_id, h.feature_id, h.feature_type, h.expl_id, hc.pattern_id
@@ -359,7 +361,8 @@ BEGIN
 			    d.hydrometer_id,
 			    sum(d.billed_volume*(p.c_seconds/p.p_seconds))::numeric(10,0) AS billed_volume, pattern_id
 			    FROM v_hydrometer_period d
-				JOIN v_cat_hydrometer_category hc ON hc.id = d.category_id
+				JOIN v_hydrometer h ON h.hydrometer_id = d.hydrometer_id
+				JOIN v_cat_hydrometer_category hc ON hc.id = h.category_id
 			    JOIN period_selected p ON d.cat_period_id = p.id
 			    GROUP BY hydrometer_id, pattern_id
 			), aux_data AS (

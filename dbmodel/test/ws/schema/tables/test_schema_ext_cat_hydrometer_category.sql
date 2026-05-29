@@ -27,7 +27,7 @@ SELECT columns_are(
 );
 
 -- Check column types
-SELECT col_type_is('ext_cat_hydrometer_category', 'id', 'varchar(16)', 'Column id should be varchar(16)');
+SELECT col_type_is('ext_cat_hydrometer_category', 'id', 'integer', 'Column id should be integer');
 SELECT col_type_is('ext_cat_hydrometer_category', 'observ', 'varchar(100)', 'Column observ should be varchar(100)');
 SELECT col_type_is('ext_cat_hydrometer_category', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('ext_cat_hydrometer_category', 'pattern_id', 'varchar(16)', 'Column pattern_id should be varchar(16)');
