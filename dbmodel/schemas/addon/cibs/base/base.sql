@@ -95,7 +95,7 @@ CREATE TABLE cibs.cat_hydrometer_state (
 CREATE TABLE cibs.hydrometer (
     hydrometer_id integer NOT NULL DEFAULT nextval('cibs.hydrometer_hydrometer_id_seq'::regclass),
     code text,
-    hydro_customer_code character varying(30),
+    hydro_customer_code text,
     id_number text,
     hydro_number text,
     feature_customer_code character varying(30),
