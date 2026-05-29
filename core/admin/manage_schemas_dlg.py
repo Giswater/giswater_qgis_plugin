@@ -14,10 +14,15 @@ from ..ui.ui_manager import GwAdminManageSchemasUi
 from ...libs import tools_qt
 from . import _admin_catalog as admin_catalog
 
-_NETWORK_COLUMNS = ("Schema", "Kind", "Version", "Profile", "Linked")
+_NETWORK_COLUMNS = (
+    "Schema", "Kind", "Version", "Profile", "Linked", "Created", "Last update",
+)
 _COL_SCHEMA = 0
-_FIXED_WIDTH = 920
-_FIXED_HEIGHT = 680
+_COL_LINKED = 4
+_COL_CREATED = 5
+_COL_UPDATED = 6
+_FIXED_WIDTH = 980
+_FIXED_HEIGHT = 760
 
 
 class GwManageSchemasDialog(GwAdminManageSchemasUi):
@@ -32,14 +37,45 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
 
         self.messageBar().hide()
         self._setup_layout()
+        self._setup_connection()
         self._setup_network_table()
+        self._setup_satellite_labels()
         self._refresh_inventory()
         self._connect_signals()
 
+    def _setup_satellite_labels(self) -> None:
+        for attr in (
+            "lbl_utils_info",
+            "lbl_cibs_info",
+            "lbl_am_info",
+            "lbl_cm_info",
+            "lbl_audit_info",
+        ):
+            label = getattr(self, attr, None)
+            if label is not None:
+                label.setWordWrap(True)
+                label.setMinimumWidth(0)
+                label.setSizePolicy(
+                    QSizePolicy.Policy.Preferred,
+                    QSizePolicy.Policy.Minimum,
+                )
+        for grb_attr in (
+            "grb_utils", "grb_cibs", "grb_am", "grb_cm", "grb_audit",
+        ):
+            group = getattr(self, grb_attr, None)
+            layout = group.layout() if group is not None else None
+            if layout is not None:
+                layout.setContentsMargins(8, 10, 8, 6)
+                if layout.count() >= 3:
+                    layout.setStretch(0, 0)
+                    layout.setStretch(1, 1)
+                    layout.setStretch(2, 0)
+
     def _setup_layout(self) -> None:
-        self.verticalLayout.setStretch(0, 1)
-        self.verticalLayout.setStretch(1, 0)
+        self.verticalLayout.setStretch(0, 0)
+        self.verticalLayout.setStretch(1, 1)
         self.verticalLayout.setStretch(2, 0)
+        self.verticalLayout.setStretch(3, 0)
         self.layout_network_root.setStretch(1, 1)
         self.layout_satellites.setColumnStretch(0, 1)
         self.layout_satellites.setColumnStretch(1, 1)
@@ -61,7 +97,80 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         if content_h > 0:
             self.wgt_satellites.setFixedHeight(content_h)
 
+    def _setup_connection(self) -> None:
+        self.admin._populate_combo_connections()
+        if self.admin.list_connections:
+            tools_qt.fill_combo_values(self.cmb_connection, self.admin.list_connections)
+        current = ""
+        if getattr(self.admin, "cmb_connection", None) is not None:
+            current = tools_qt.get_text(
+                self.admin.dlg_readsql,
+                self.admin.cmb_connection,
+                return_string_null=False,
+            )
+        if not current:
+            current = self.admin._get_last_connection() or ""
+        if current:
+            tools_qt.set_combo_value(self.cmb_connection, current, 1)
+        self._active_connection = current
+        self._update_system_info()
+
+    def _format_system_info(self) -> str:
+        result = getattr(self.admin, "_admin_catalog_cache", None)
+        pg = self.admin.postgresql_version or "?"
+        postgis = self.admin.postgis_version or "?"
+        pgrouting = self.admin.pgrouting_version or "?"
+        lines = [
+            f"{tools_qt.tr('PostgreSQL version')}: {pg}",
+            f"{tools_qt.tr('PostGis version')}: {postgis}",
+            f"{tools_qt.tr('PgRouting version')}: {pgrouting}",
+        ]
+        if result and getattr(result, "extensions_present", None):
+            missing = sorted(
+                name for name, present in result.extensions_present.items() if not present
+            )
+            if missing:
+                lines.append(
+                    f"{tools_qt.tr('Missing extensions')}: {', '.join(missing)}"
+                )
+        return "\n".join(lines)
+
+    def _update_system_info(self) -> None:
+        self.txt_system_info.setPlainText(self._format_system_info())
+
+    def _sync_connection_combo(self, connection_name: str) -> None:
+        if not connection_name:
+            return
+        self.cmb_connection.blockSignals(True)
+        tools_qt.set_combo_value(self.cmb_connection, connection_name, 1)
+        self._active_connection = connection_name
+        self.cmb_connection.blockSignals(False)
+
+    def _on_connection_changed(self) -> None:
+        connection_name = tools_qt.get_text(
+            self, self.cmb_connection, return_string_null=False
+        )
+        if not connection_name or connection_name == self._active_connection:
+            return
+        previous = self._active_connection
+        self.setEnabled(False)
+        try:
+            if not self.admin.reload_connection_for_manage_schemas(connection_name):
+                if previous:
+                    self.cmb_connection.blockSignals(True)
+                    tools_qt.set_combo_value(self.cmb_connection, previous, 1)
+                    self.cmb_connection.blockSignals(False)
+                return
+            self._active_connection = connection_name
+            self._selected_network_parent = ""
+            self.tbl_network.clearSelection()
+            self._update_system_info()
+            self._refresh_inventory()
+        finally:
+            self.setEnabled(True)
+
     def _connect_signals(self) -> None:
+        self.cmb_connection.currentIndexChanged.connect(partial(self._on_connection_changed))
         self.btn_refresh.clicked.connect(partial(self._refresh_inventory))
         self.btn_network_rename.clicked.connect(partial(self._rename_network_schema))
         self.btn_network_delete.clicked.connect(partial(self._delete_network_schema))
@@ -96,12 +205,12 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.tbl_network.verticalHeader().setVisible(False)
 
         header = self.tbl_network.horizontalHeader()
-        header.setStretchLastSection(True)
+        header.setStretchLastSection(False)
         header.setSectionResizeMode(_COL_SCHEMA, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        for col in (1, 2, 3, _COL_CREATED, _COL_UPDATED):
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(_COL_LINKED, QHeaderView.ResizeMode.ResizeToContents)
+        header.setMinimumSectionSize(48)
         self.tbl_network.viewport().installEventFilter(self)
 
     def eventFilter(self, watched, event):
@@ -143,6 +252,8 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
                 row.get("version", ""),
                 row.get("profile", ""),
                 row.get("linked", ""),
+                row.get("date_created", ""),
+                row.get("date_updated", ""),
             )
             items = []
             for value in values:
@@ -151,6 +262,8 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
                 items.append(item)
             self._network_model.appendRow(items)
         self.tbl_network.setSortingEnabled(True)
+        if self._network_model.rowCount() > 0:
+            self.tbl_network.resizeColumnToContents(_COL_LINKED)
 
     def _on_network_selection_changed(self, *_args) -> None:
         self._selected_network_parent = self._selected_parent()
@@ -190,12 +303,39 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
                 return str(project_type).upper()
         return ""
 
-    def _format_schema_info(self, row: dict | None, default_name: str = "") -> str:
-        if not row:
-            return "Not installed"
-        schema = str(row.get("schema") or default_name or "?")
+    def _satellite_group_title(
+        self, group_name: str, row: dict | None, default_schema: str = "",
+    ) -> str:
+        if not row or not str(row.get("version") or ""):
+            return group_name
+        schema = str(row.get("schema") or default_schema or "?")
         version = str(row.get("version") or "?")
-        return f"{schema} · {version}"
+        return f"{group_name} · {schema} · {version}"
+
+    def _format_satellite_dates(self, row: dict | None) -> str:
+        if not row:
+            return tools_qt.tr("Not installed")
+        parts: list[str] = []
+        created = str(row.get("date_created") or "")
+        updated = str(row.get("date_updated") or "")
+        if created:
+            parts.append(f"{tools_qt.tr('Created')}: {created}")
+        if updated:
+            parts.append(f"{tools_qt.tr('Last update')}: {updated}")
+        return " · ".join(parts)
+
+    def _update_satellite_panel(
+        self,
+        group_attr: str,
+        label_attr: str,
+        group_name: str,
+        row: dict | None,
+        default_schema: str = "",
+    ) -> None:
+        group = getattr(self, group_attr, None)
+        if group is not None:
+            group.setTitle(self._satellite_group_title(group_name, row, default_schema))
+        self._set_info_label(label_attr, self._format_satellite_dates(row))
 
     def _satellite_row(self, *, kind: str | None = None, schema: str | None = None) -> dict | None:
         return admin_catalog.find_inventory_row(
@@ -216,22 +356,24 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         cm_row = self._satellite_row(kind="CM")
         audit_row = self._satellite_row(kind="AUDIT") or self._satellite_row(schema="audit")
 
-        self._set_info_label("lbl_utils_info", self._format_schema_info(utils_row, "utils"))
-        self._set_info_label("lbl_cibs_info", self._format_schema_info(cibs_row, "cibs"))
-        self._set_info_label("lbl_am_info", self._format_schema_info(am_row, "am"))
-        self._set_info_label("lbl_cm_info", self._format_schema_info(cm_row, "cm"))
-        self._set_info_label("lbl_audit_info", self._format_schema_info(audit_row, "audit"))
+        self._update_satellite_panel("grb_utils", "lbl_utils_info", "Utils", utils_row, "utils")
+        self._update_satellite_panel("grb_cibs", "lbl_cibs_info", "Cibs", cibs_row, "cibs")
+        self._update_satellite_panel("grb_am", "lbl_am_info", "AM", am_row, "am")
+        self._update_satellite_panel("grb_cm", "lbl_cm_info", "CM", cm_row, "cm")
+        self._update_satellite_panel("grb_audit", "lbl_audit_info", "Audit", audit_row, "audit")
         self._update_network_label()
+        self._fix_satellites_height()
 
     def _update_network_label(self) -> None:
         parent = self._selected_parent()
         if not parent:
-            self.lbl_network_selection.setText("Anchor: select a row below")
+            self.lbl_network_selection.setText(
+                tools_qt.tr("Anchor: select a row below"),
+            )
             return
-        row = self._satellite_row(schema=parent)
-        kind = str((row or {}).get("kind") or self._parent_kind(parent) or "?").upper()
-        version = str((row or {}).get("version") or "?")
-        self.lbl_network_selection.setText(f"Anchor: {parent} · {kind} · {version}")
+        self.lbl_network_selection.setText(
+            f"{tools_qt.tr('Anchor')}: {parent}",
+        )
 
     def _needs_update(self, version: str) -> bool:
         return admin_catalog.schema_needs_plugin_update(
@@ -411,13 +553,11 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         if not parent:
             tools_qt.show_info_box("Select a network anchor to integrate cibs.")
             return
-        tools_qt.set_widget_text(self.admin.dlg_readsql, self.admin.dlg_readsql.cmb_cibs, parent)
-        self.admin._adapt_cibs()
+        self.admin._adapt_cibs(parent_schema=parent)
 
     def _adapt_cibs_copy(self):
         parent = self._selected_parent()
         if not parent:
             tools_qt.show_info_box("Select a network anchor to copy cibs data.")
             return
-        tools_qt.set_widget_text(self.admin.dlg_readsql, self.admin.dlg_readsql.cmb_cibs, parent)
-        self.admin._copy_cibs_data()
+        self.admin._copy_cibs_data(parent_schema=parent)

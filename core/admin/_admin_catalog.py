@@ -5,6 +5,7 @@ Fast pg_catalog queries for the admin dialog (avoid information_schema + N+1).
 from __future__ import annotations
 
 import json
+from datetime import date, datetime
 from typing import Any, Callable, Iterable, Optional
 
 from ...libs import tools_db
@@ -146,8 +147,26 @@ SELECT table_schema, column_name
 FROM information_schema.columns
 WHERE table_name = 'sys_version'
   AND table_schema = ANY(%s::text[])
-  AND column_name = ANY(ARRAY['giswater', 'version', 'addparam'])
+  AND column_name = ANY(ARRAY['giswater', 'version', 'addparam', 'date'])
 """
+
+
+def _format_sys_version_date(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, (datetime, date)):
+        if isinstance(value, date) and not isinstance(value, datetime):
+            value = datetime.combine(value, datetime.min.time())
+        return value.strftime("%d-%m-%Y %H:%M:%S")
+    return str(value)
+
+
+def _inventory_date_fields(created_raw: Any, updated_raw: Any) -> dict[str, str]:
+    date_created = _format_sys_version_date(created_raw)
+    date_updated = _format_sys_version_date(updated_raw)
+    if date_created and date_updated and date_created == date_updated:
+        date_updated = ""
+    return {"date_created": date_created, "date_updated": date_updated}
 
 
 def _sys_version_columns_by_schema(
@@ -215,6 +234,8 @@ def _entry_from_sys_version_row(
         "version": str(version or ""),
         "profile": "",
         "linked": "",
+        "date_created": "",
+        "date_updated": "",
     }
     ap = _parse_addparam(addparam)
     env = ap.get("environment") or {}
@@ -332,12 +353,20 @@ def fetch_schema_inventory(fetcher: RowFetcher = _tools_db_fetch) -> list[dict[s
             "version": "",
             "profile": "",
             "linked": "",
+            "date_created": "",
+            "date_updated": "",
         }
         columns = columns_by_schema.get(schema_name, set())
         version_col = _version_column_for_schema(schema_name, columns)
         select_cols = ["project_type", version_col]
         if "addparam" in columns:
             select_cols.append("addparam")
+        if "date" in columns:
+            qn = _quote_ident(schema_name)
+            select_cols.extend([
+                f"(SELECT date FROM {qn}.sys_version ORDER BY id ASC LIMIT 1)",
+                f"(SELECT date FROM {qn}.sys_version ORDER BY id DESC LIMIT 1)",
+            ])
 
         row = fetcher(
             f"SELECT {', '.join(select_cols)} "
@@ -350,8 +379,14 @@ def fetch_schema_inventory(fetcher: RowFetcher = _tools_db_fetch) -> list[dict[s
             continue
 
         values = row[0]
-        addparam = values[2] if len(values) > 2 else None
+        addparam = None
+        next_idx = 2
+        if "addparam" in columns and len(values) > 2:
+            addparam = values[2]
+            next_idx = 3
         entry = _entry_from_sys_version_row(schema_name, values[0], values[1], addparam)
+        if "date" in columns and len(values) > next_idx + 1:
+            entry.update(_inventory_date_fields(values[next_idx], values[next_idx + 1]))
         if str(entry.get("kind") or "").upper() in ("WS", "UD"):
             linked = str(entry.get("linked") or "")
             for satellite, sat_schema in _legacy_parent_satellites(schema_name, fetcher):

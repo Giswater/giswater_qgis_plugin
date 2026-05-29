@@ -1264,6 +1264,63 @@ class GwAdminButton:
         self._admin_catalog_cache = result
         return result
 
+    def reload_connection_for_manage_schemas(self, connection_name: str) -> bool:
+        """Switch PostgreSQL connection while Manage schemas is open."""
+        connection_name = str(connection_name or "").strip()
+        if not connection_name:
+            return False
+
+        self._schema_cache.pop(connection_name, None)
+        self._cached_pg_versions = None
+        self._extensions_checked = False
+        self._load_connection_service_flag(connection_name)
+
+        credentials = self._get_connection_credentials(connection_name)
+        if not tools_db.ping_database(credentials):
+            tools_qt.show_info_box(
+                "Connection failed. Please, check connection parameters",
+                "Info",
+            )
+            return False
+
+        self.logged, credentials = tools_db.connect_to_database_credentials(
+            credentials, max_attempts=0
+        )
+        if not self.logged:
+            err = lib_vars.session_vars.get("last_error") or (
+                "Connection failed. Please, check connection parameters"
+            )
+            tools_qt.show_info_box(err, "Info")
+            return False
+
+        tools_db.dao_db_credentials = credentials
+        lib_vars.session_vars["logged_status"] = True
+
+        result = self._build_admin_load_result_sync(connection_name)
+        self._schema_cache[connection_name] = result
+        self._admin_catalog_cache = result
+        self.postgresql_version = result.pg_version
+        self.postgis_version = result.postgis_version
+        self.pgrouting_version = result.pgrouting_version
+        self._cached_pg_versions = {
+            "pg": result.pg_version,
+            "postgis": result.postgis_version,
+            "pgrouting": result.pgrouting_version,
+        }
+        self.connection_name = connection_name
+        self._set_last_connection(connection_name)
+        self.username = self._get_user_connection(connection_name)
+
+        if getattr(self, "cmb_connection", None) is not None:
+            self.cmb_connection.blockSignals(True)
+            tools_qt.set_combo_value(self.cmb_connection, connection_name, 1)
+            self.cmb_connection.blockSignals(False)
+
+        update_info = getattr(self, "_manage_schemas_update_system_info", None)
+        if update_info:
+            update_info()
+        return True
+
     def _start_admin_load_sync(self, connection_name):
         self._extensions_checked = False
         self._cached_pg_versions = None
@@ -1359,6 +1416,16 @@ class GwAdminButton:
         self._update_manage_ui()
         self._manage_utils()
         self._set_buttons_enabled()
+
+        refresh = getattr(self, "_manage_schemas_refresh", None)
+        if refresh:
+            refresh()
+        update_info = getattr(self, "_manage_schemas_update_system_info", None)
+        if update_info:
+            update_info()
+        manage_cmb = getattr(self, "_manage_schemas_sync_connection", None)
+        if manage_cmb:
+            manage_cmb(connection_name)
 
     def _finalize_admin_permissions_and_status(self):
         message = ''
@@ -2403,12 +2470,16 @@ class GwAdminButton:
         tools_gw.load_settings(dlg)
         dlg.apply_fixed_geometry()
         self._manage_schemas_refresh = dlg._refresh_inventory
+        self._manage_schemas_update_system_info = dlg._update_system_info
+        self._manage_schemas_sync_connection = dlg._sync_connection_combo
         lib_vars.session_vars["message_parent"] = dlg
         try:
             dlg.exec()
         finally:
             lib_vars.session_vars["message_parent"] = None
             self._manage_schemas_refresh = None
+            self._manage_schemas_update_system_info = None
+            self._manage_schemas_sync_connection = None
 
     def _open_create_project(self):
         """"""
@@ -3652,10 +3723,13 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_cibs.setEnabled(row is None)
         self.dlg_readsql.btn_adapt_cibs.setEnabled(row is not None)
 
-    def _get_cibs_schema_info(self):
+    def _get_cibs_schema_info(self, schema_name=None):
         """Return selected schema name and sys_version row, or None if invalid."""
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_cibs, return_string_null=False)
+        if not schema_name:
+            schema_name = tools_qt.get_text(
+                self.dlg_readsql, self.dlg_readsql.cmb_cibs, return_string_null=False
+            )
         if schema_name == "":
             return None
 
@@ -3783,19 +3857,25 @@ class GwAdminButton:
 
         self._run_create_cibs_task('empty', 'Create cibs schema')
 
-    def _adapt_cibs(self):
+    def _adapt_cibs(self, parent_schema=None):
 
-        schema_info = self._get_cibs_schema_info()
+        schema_info = self._get_cibs_schema_info(schema_name=parent_schema)
         if schema_info is None:
             msg = "Select a WS or UD schema to adapt to cibs"
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            if lib_vars.session_vars.get("message_parent"):
+                tools_qt.show_info_box(msg, "Info")
+            else:
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         self.cibs_project_name, self.cibs_project_result, self.cibs_project_type = schema_info
 
         if not self._cibs_schema_exists():
             msg = "cibs schema does not exist. Create it first."
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            if lib_vars.session_vars.get("message_parent"):
+                tools_qt.show_info_box(msg, "Info")
+            else:
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         sql = (f"SELECT value::boolean FROM {self.cibs_project_name}.config_param_system "
@@ -3803,7 +3883,10 @@ class GwAdminButton:
         row = tools_db.get_row(sql)
         if row and row[0] is True:
             msg = "Selected schema is already adapted to cibs"
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            if lib_vars.session_vars.get("message_parent"):
+                tools_qt.show_info_box(msg, "Info")
+            else:
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         schema_name = self.cibs_project_name
@@ -3823,12 +3906,15 @@ class GwAdminButton:
             parent_type=self.cibs_project_type,
         )
 
-    def _copy_cibs_data(self):
+    def _copy_cibs_data(self, parent_schema=None):
 
-        schema_info = self._get_cibs_schema_info()
+        schema_info = self._get_cibs_schema_info(schema_name=parent_schema)
         if schema_info is None:
             msg = "Select a WS or UD schema to copy data to cibs"
-            tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
+            if lib_vars.session_vars.get("message_parent"):
+                tools_qt.show_info_box(msg, "Info")
+            else:
+                tools_qgis.show_message(msg, Qgis.MessageLevel.Info)
             return
 
         self.cibs_project_name, self.cibs_project_result, self.cibs_project_type = schema_info
