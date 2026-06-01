@@ -27,9 +27,9 @@ SELECT is(
 
 -- Test 2: Verify hydrometer was inserted
 SELECT is(
-    (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
+    (SELECT count(*)::integer FROM ext_hydrometer WHERE code = 'TEST_H001'),
     1,
-    'Verify hydrometer was inserted into ext_rtc_hydrometer'
+    'Verify hydrometer was inserted into ext_hydrometer'
 );
 
 -- Test 3: Insert multiple hydrometers
@@ -45,7 +45,7 @@ SELECT is(
 
 -- Test 4: Verify multiple hydrometers were inserted
 SELECT is(
-    (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H002', 'TEST_H003')),
+    (SELECT count(*)::integer FROM ext_hydrometer WHERE code IN ('TEST_H002', 'TEST_H003')),
     2,
     'Verify multiple hydrometers were inserted'
 );
@@ -62,14 +62,14 @@ SELECT is(
 
 -- Test 6: Verify hydrometer was updated
 SELECT is(
-    (SELECT hydro_number FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
+    (SELECT hydro_number FROM ext_hydrometer WHERE code = 'TEST_H001'),
     '12345-UPDATED',
     'Verify hydrometer hydro_number was updated'
 );
 
 -- Test 7: Verify hydrometer state was updated
 SELECT is(
-    (SELECT state_id FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
+    (SELECT state_id FROM ext_hydrometer WHERE code = 'TEST_H001'),
     2::smallint,
     'Verify hydrometer state_id was updated'
 );
@@ -97,7 +97,7 @@ SELECT is(
 
 -- Test 10: Verify hydrometer was deleted
 SELECT is(
-    (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code = 'TEST_H001'),
+    (SELECT count(*)::integer FROM ext_hydrometer WHERE code = 'TEST_H001'),
     0,
     'Verify hydrometer was deleted'
 );
@@ -125,7 +125,7 @@ SELECT is(
 
 -- Test 13: REPLACE action (delete all and insert new ones)
 -- First insert some test data
-INSERT INTO ext_rtc_hydrometer (code, hydro_number, state_id, expl_id)
+INSERT INTO ext_hydrometer (code, hydro_number, state_id, expl_id)
 VALUES ('TEST_H010', '10001', 1, 1),
        ('TEST_H011', '10002', 1, 1);
 
@@ -142,14 +142,14 @@ SELECT is(
 
 -- Test 14: Verify old hydrometers were deleted
 SELECT is(
-    (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H010', 'TEST_H011')),
+    (SELECT count(*)::integer FROM ext_hydrometer WHERE code IN ('TEST_H010', 'TEST_H011')),
     0,
     'Verify old hydrometers were deleted by REPLACE'
 );
 
 -- Test 15: Verify new hydrometers were inserted
 SELECT is(
-    (SELECT count(*)::integer FROM ext_rtc_hydrometer WHERE code IN ('TEST_H020', 'TEST_H021')),
+    (SELECT count(*)::integer FROM ext_hydrometer WHERE code IN ('TEST_H020', 'TEST_H021')),
     2,
     'Verify new hydrometers were inserted by REPLACE'
 );

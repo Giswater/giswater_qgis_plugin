@@ -1,0 +1,2 @@
+- Bug fix on 'Set junctions as outlet' toolbox function
+- Bug fix on the use of specific sequence for feature codes

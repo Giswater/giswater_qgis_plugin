@@ -1,5 +1,0 @@
-4.11.0
-*************
-- Remove sector_id and muni_id from exploitation table.
-- (UD) Add `has_access` column to `node` table. 
-- Change column type to varchar(30) in ve_* views for mapzones type columns.

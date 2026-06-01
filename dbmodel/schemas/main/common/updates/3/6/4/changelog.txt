@@ -1,0 +1,14 @@
+- New tables: plan_netscenario, plan_netscenario_dma, plan_netscenario_presszone, plan_netscenario_arc, plan_netscenario_node, plan_netscenario_connec for storing data related to mapzone netscenario.
+- New function gw_fct_graphanalytics_mapzones_plan for creating mapzones for netscenario.
+- New function gw_fct_mapzones_dscenario_pattern for inserting features and it's patterns into dscenario demanda based on values assigned to each netscenario mapzone.
+- New functions: gw_fct_create_netscenario_empty, gw_fct_create_netscenario_from_toc, gw_fct_duplicate_netscenario for creating new netscenarios.
+- Enhance views (vi_t_) to export timeseries, patterns and curves from project to inp file only when they are used
+- New function (3266) gw_fct_set_rpt_archived that moves data related to selected result_id from rpt and rpt_inp tables to archived tables
+- New function (3268) gw_fct_pg2epa_setinitvalues that updates initlevel of inlets and tanks using values from selected simulation
+- Add config_visit_parameter and om_visit_cat tables to Giswater Load Layers button
+- New function (3270) gw_fct_config_mapzones for configurating mapzones using manager
+- Modify edit triggers to check that inserted streetname exists on ext_streetaxis
+- New field is_waterbal on ext_rtc_hydrometer to mark hydrometers which values enter into water balance calculations
+- New field trace_featuregeom on element and polygon to enable or disable their movement according to the movement of its node/connec/gully/element
+- New field sector_id on inp_transects (UD).
+- New view v_edit_inp_transects with trigger.

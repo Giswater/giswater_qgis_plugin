@@ -2085,14 +2085,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Manage child views</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>tab_advanced</source>
 			<translation>Advanced</translation>
 		</message>

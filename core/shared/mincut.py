@@ -71,8 +71,8 @@ class GwMincut:
         self.mincut_mode = 'network'
 
         # Other variables
-        self.col1 = "customer_code"
-        self.col2 = "hydrometer_customer_code"
+        self.col1 = "feature_customer_code"
+        self.col2 = "hydro_customer_code"
         self.lbl1 = "Connec customer code:"
         self.lbl2 = "Hydrometer customer code:"
 
@@ -1680,9 +1680,10 @@ class GwMincut:
             return
 
         # Get 'hydrometers' related with this 'connec'
-        sql = (f"SELECT DISTINCT({self.col2})"
-               f" FROM v_rtc_hydrometer"
-               f" WHERE feature_id = '{connec_id}'")
+        sql = (f"SELECT DISTINCT(h.{self.col2})"
+               f" FROM vf_hydrometer h"
+               f" JOIN connec c ON c.customer_code::text = h.feature_customer_code::text"
+               f" WHERE c.connec_id = '{connec_id}'")
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
@@ -1711,7 +1712,7 @@ class GwMincut:
             return
 
         # Check if hydrometer_id belongs to any 'connec_id'
-        sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
+        sql = (f"SELECT hydrometer_id FROM vf_hydrometer"
                f" WHERE {self.col2} = '{hydrometer_cc}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -1794,8 +1795,8 @@ class GwMincut:
 
         # Set 'expr_filter' of connecs related with current mincut
         result_mincut_id = tools_qt.get_text(self.dlg_hydro, self.result_mincut_id)
-        sql = (f"SELECT DISTINCT(connec_id) FROM ext_rtc_hydrometer AS rtc"
-               f" JOIN connec ON connec.customer_code::text = rtc.customer_code::text"
+        sql = (f"SELECT DISTINCT(connec_id) FROM v_hydrometer AS rtc"
+               f" JOIN connec ON connec.customer_code::text = rtc.feature_customer_code::text"
                f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
                f" WHERE result_id = {result_mincut_id}")
@@ -1926,8 +1927,8 @@ class GwMincut:
     def _reload_table_hydro(self, expr_filter=None):
         """ Reload contents of table 'hydro' """
 
-        expr = tools_qt.set_table_model(self.dlg_hydro, "tbl_hydro", "v_rtc_hydrometer", expr_filter)
-        tools_gw.set_tablemodel_config(self.dlg_hydro, "tbl_hydro", 'v_rtc_hydrometer')
+        expr = tools_qt.set_table_model(self.dlg_hydro, "tbl_hydro", "vf_hydrometer", expr_filter)
+        tools_gw.set_tablemodel_config(self.dlg_hydro, "tbl_hydro", 'vf_hydrometer')
         return expr
 
     def _delete_records_connec(self):
@@ -2049,8 +2050,9 @@ class GwMincut:
                     f" (result_id, {element}_id) "
                     f" VALUES ('{result_mincut_id}', '{element_id}');\n")
             # Get hydrometer_id of selected connec
-            sql2 = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
-                    f" WHERE feature_id = '{element_id}'")
+            sql2 = (f"SELECT h.hydrometer_id FROM vf_hydrometer h"
+                    f" JOIN connec c ON c.customer_code::text = h.feature_customer_code::text"
+                    f" WHERE c.connec_id = '{element_id}'")
             rows = tools_db.get_rows(sql2)
             if rows:
                 for row in rows:

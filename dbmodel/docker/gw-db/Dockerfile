@@ -1,6 +1,7 @@
 ARG PG_MAJOR=16
 ARG POSTGIS_VERSION=3.5
 FROM postgis/postgis:${PG_MAJOR}-${POSTGIS_VERSION}
+# POSTGIS_VERSION: 3.5 for PG 16/17, 3.6 for PG 18
 
 ARG GW_DUMP=gw_ws.dump
 ARG GW_GLOBALS=gw_ws.globals.sql

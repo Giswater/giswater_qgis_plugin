@@ -5298,11 +5298,15 @@
 			<translation>Câmpul &quot;Path&quot; este necesar pentru importul datelor INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>Procedura va șterge caracteristicile din baza de date, cu excepția cazului în care este un nod care nu împarte arcul.\n
- Vă rugăm să vă asigurați că trăsăturile nu au valoarea undelete pe true.\n
+			<translation>Procedura va șterge caracteristicile din baza de date, cu excepția cazului în care este un nod care nu împarte arcul.\n
+
+ Vă rugăm să vă asigurați că trăsăturile nu au valoarea undelete pe true.\n
+
  Pe de altă parte, trebuie să știți că tabelul de trasabilitate va stoca informații precedente.</translation>
 		</message>
 		<message>
@@ -10363,14 +10367,6 @@
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
 			<translation>Crearea, configurarea sau eliminarea unui câmp suplimentar legat de un tip de caracteristică selectat sau pentru toate tipurile de caracteristici definite într-un proiect</translation>
-		</message>
-		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Gestionarea vizualizărilor pentru copii</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Recreați vederi copil pentru un tip de caracteristică selectat sau pentru toate tipurile de caracteristici definite într-un proiect</translation>
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>

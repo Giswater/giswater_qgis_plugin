@@ -2,117 +2,420 @@
 	<h1>Giswater DB Model</h1>
 	<a href="https://github.com/Giswater/giswater_dbmodel"><img alt="Giswater Dbmodel Badge" src="https://img.shields.io/badge/GISWATER-DBMODEL-blue?style=for-the-badge&logo=postgresql&logoColor=ffffff"></a>
 	<a href="./LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/giswater/giswater_dbmodel?style=for-the-badge"></a>
-	<a href="https://github.com/Giswater/giswater_dbmodel/actions/workflows/ci_test_ud_db.yml"><img alt="CI Testing UD" src="https://img.shields.io/github/actions/workflow/status/giswater/giswater_dbmodel/ci_test_ud_db.yml?branch=dev-4.0&style=for-the-badge&label=TEST%20UD"></a>
-	<a href="https://github.com/Giswater/giswater_dbmodel/actions/workflows/ci_test_ws_db.yml"><img alt="CI Testing WS" src="https://img.shields.io/github/actions/workflow/status/giswater/giswater_dbmodel/ci_test_ws_db.yml?branch=dev-4.0&style=for-the-badge&label=TEST%20WS"></a>
 </div>
 
-**Giswater** revolutionizes water management by simplifying the planning and control of water supply networks without costly investments. Since its launch in 2014, Giswater is the first open-source software designed for integrated water management, connecting IT solutions and databases for high-performance management systems. It integrates seamlessly with hydraulic modeling software like **EPANET** and **SWMM**, making it indispensable for professionals and organizations in water management.
+PostgreSQL schema definitions, versioned update patches, and pgTAP tests for Giswater. Builds are driven by YAML manifests and the headless CLI [`giswater_admin`](../giswater_admin/README.md) (same engine as the QGIS plugin).
 
-### Features
-
-- Open-source tool for complete water cycle management.
-- Works with hydraulic tools (**EPANET**, **EPA SWMM**) and GIS systems.
-- Integrates with business management tools (ERP, CRM, BI).
-- Compatible with Windows, Mac, and Linux (for most features)
+**See also:** [giswater-admin CLI reference](../giswater_admin/README.md)
 
 ## Table of Contents
 
-1. [Requirements](#requirements)
-2. [Installation](#installation)
-3. [Testing](#testing)
-4. [Deployment](#deployment)
-5. [Wiki](#wiki)
-6. [FAQ](#faqs)
-7. [Repositories](#repositories)
-8. [Versioning](#versioning)
-9. [License](#license)
-10. [Acknowledgements](#acknowledgements)
+1. [Schema architecture](#schema-architecture)
+2. [Requirements](#requirements)
+3. [Installation](#installation)
+4. [Testing](#testing)
+5. [Deployment](#deployment)
+6. [Wiki](#wiki)
+7. [FAQ](#faqs)
+8. [Repositories](#repositories)
+9. [Versioning](#versioning)
+10. [License](#license)
+11. [Acknowledgements](#acknowledgements)
+
+---
+
+## Schema architecture
+
+Giswater uses **six PostgreSQL schemas** in a typical deployment. The `dbmodel/` tree separates **orchestration** (manifests) from **SQL sources** (`schemas/`). Folders under `schemas/network/common/` are not a database schema—they are SQL applied **into** both `ws` and `ud` project schemas.
+
+### Repository layout
+
+```
+dbmodel/
+├── manifests/              # YAML: phases + profiles per kind (ws, ud, utils, …)
+├── schemas/
+│   ├── network/
+│   │   ├── common/         # Shared SQL → loaded into ws AND ud (not a PG schema)
+│   │   ├── ws/             # Water-supply–specific SQL
+│   │   ├── ud/             # Sewerage-specific SQL
+│   │   └── sample/         # Optional seed data (user / inv / dev)
+│   ├── utils/              # Satellite utils schema
+│   ├── am/                 # Asset management
+│   ├── cm/                 # Campaign management (parent-linked)
+│   └── audit/              # Audit schema (structure / activate)
+└── test/                   # pgTAP sources + Docker harness
+```
+
+### Six schemas vs folders
+
+| PostgreSQL schema | Type | Base folder | Updates (semver `M/m/p`) |
+|-------------------|------|-------------|---------------------------|
+| `ws` | project | [`schemas/network/ws/`](./schemas/network/ws/) | `schemas/network/common/updates/` **then** `schemas/network/ws/updates/` (interleaved per version) |
+| `ud` | project | [`schemas/network/ud/`](./schemas/network/ud/) | `schemas/network/common/updates/` **then** `schemas/network/ud/updates/` |
+| `utils` | singleton | [`schemas/utils/`](./schemas/utils/) | `schemas/utils/updates/` (flat under each version) |
+| `am` | singleton | [`schemas/am/`](./schemas/am/) | `schemas/am/updates/` |
+| `cm` | singleton | [`schemas/cm/`](./schemas/cm/) | `schemas/cm/updates/` |
+| `audit` | singleton | [`schemas/audit/`](./schemas/audit/) | No semver tree; `audit structure` / `activate` via CLI |
+
+[`schemas/network/common/`](./schemas/network/common/) — DDL, functions, triggers, and shared update patches used by **both** `ws` and `ud`.  
+[`schemas/network/{ws,ud}/sample/`](./schemas/network/ws/sample/) — Seed scripts (`user/`, `inv/`, `dev/`) referenced by optional manifest phases.
+
+### How manifests drive a build
+
+```mermaid
+sequenceDiagram
+  participant CLI as giswater_admin_create
+  participant M as manifests/ws.yaml
+  participant B as SchemaBuilder
+  participant SQL as schemas/network
+  CLI->>M: profile=empty|ci|sample_full|...
+  M->>B: ordered phases
+  B->>SQL: sql_dir / version_walk / sql_function
+```
+
+Example **ws** pipeline ([`manifests/ws.yaml`](./manifests/ws.yaml)):
+
+| Phase | Type | What runs |
+|-------|------|-----------|
+| `load_base` | `sql_dir` | `common/ddl`, `common/fct`, `common/ftrg`, then `ws/fct`, `ws/ftrg`, `ws/schema_model` |
+| `updates` | `version_walk` | For each version ≤ `--plugin-version`: **common** patches, then **ws** patches |
+| `lastprocess` | `sql_function` | `gw_fct_admin_schema_lastprocess` (child views, permissions, metadata) |
+| `load_sample` | `sql_dir` (optional) | `schemas/network/ws/sample/user` |
+| `final_pass` | `sql_dir` | Form fields + i18n (`{{ locale }}`, fallback `en_US`) |
+
+**Upgrade profile** (`update`): `reload_fct_ftrg` → `updates` (only `project_version < v <= plugin_version`) → `lastprocess_upgrade`.
+
+### Phase types (engine)
+
+Defined in [`giswater_admin/engine/manifest.py`](../giswater_admin/engine/manifest.py):
+
+| Type | Purpose |
+|------|---------|
+| `sql_dir` | All `*.sql` in listed paths (alphabetical; `recursive` optional) |
+| `version_walk` | Semver folders under `updates/`; `roots:` lists multiple trees (ws/ud) |
+| `sql_function` | `SELECT schema.fn($${JSON}$$)` |
+| `sql_file` | Single file + optional `fallback_source` |
+| `sql_inline` | Literal SQL in YAML |
+
+### Template substitutions
+
+| Layer | Tokens | Example |
+|-------|--------|---------|
+| File content | `SCHEMA_NAME`, `SRID_VALUE`, `AUX_SCHEMA_NAME`, `PARENT_SCHEMA` (cm) | Replaced in every `.sql` file |
+| Manifest YAML | `{{ schema_name }}`, `{{ plugin_version }}`, `{{ locale }}`, … | From `BuildParams.as_ctx()` |
+
+Authors can use either layer depending on the file.
+
+### Network harmony: common + ws/ud
+
+```mermaid
+flowchart LR
+  subgraph load_base [load_base]
+    Cddl[common/ddl fct ftrg]
+    K[ws or ud fct ftrg schema_model]
+    Cddl --> K
+  end
+  subgraph updates [updates per version]
+    Cu[common/updates/M/m/p]
+    Ku[ws or ud/updates/M/m/p]
+    Cu --> Ku
+  end
+  subgraph finish [post-updates]
+    LP[lastprocess]
+    FP[final_pass]
+  end
+  load_base --> updates
+  updates --> LP
+  LP --> FP
+```
+
+- **One codebase, two project schemas:** shared logic lives in `common/`; type-specific pieces in `ws/` or `ud/`.
+- **Version order:** for each `M.m.p`, the engine applies **all** `common` SQL for that version, then **all** `ws` or `ud` SQL for that version, before moving to the next version.
+- **`lastprocess`:** server-side bookkeeping (child views, role grants batched at end of MULTI-CREATE, sequences, mapzone defaults).
+- **`sample/`:** only when the manifest profile includes `load_sample`, `load_inv`, or `load_dev`. Lives under each project type (`schemas/network/ws/sample/`, `schemas/network/ud/sample/`), like `final_pass/`.
+
+### Version walk rules
+
+Filtered using `sys_version.giswater` (`project_version`) and CLI `--plugin-version`:
+
+| `run_mode` | Patches applied |
+|------------|-----------------|
+| `new_project` | Every patch with `v <= plugin_version` |
+| `upgrade` | Patches with `project_version < v <= plugin_version` |
+
+**Singleton** schemas (am, cm, utils): one updates root per kind:
+
+```
+schemas/<kind>/updates/<major>/<minor>/<patch>/*.sql
+```
+
+**Changelogs** sit beside each version folder (`changelog.txt`). Network schemas use up to three files per version: `schemas/network/common/updates/<M>/<m>/<p>/` (shared), plus `ws/updates/...` or `ud/updates/...` for type-specific changes. Prefer bullets only (`- change description`); legacy headers (`M.m.p` + asterisks) still parse. The plugin Admin dialog and `giswater_admin update --check` merge scopes via `giswater_admin.engine.changelog`. Historical unified `dbmodel/updates/` content was consolidated under `schemas/network/common/updates/<v>/`.
+
+### AM legacy patches
+
+`am` once used calendar folders `am/updates/<YYYY-MM>/`. Historical SQL was collapsed into `schemas/am/updates/0/0/0/` with date-prefixed filenames. New patches use normal semver folders.
+
+### CM layout (parent-linked)
+
+| Path | Role |
+|------|------|
+| `schemas/cm/common/` | Shared CM DDL/fct/ftrg (not the satellite `utils` schema) |
+| `schemas/cm/base/` | Core `cm` tables |
+| `schemas/cm/parent_schema/utils/` | Parent-link views/triggers (`PARENT_SCHEMA`; ws+ud) |
+| `schemas/cm/parent_schema/ws` \| `ud/` | Type-specific hooks (ud: gully tables) |
+
+Prerequisite: parent `ws` or `ud` project already created. CLI: `create --kind cm --parent-schema <parent> [--parent-type ws|ud]`.
+
+### Singleton schemas (utils, am, audit)
+
+| Kind | Create requirements |
+|------|---------------------|
+| **utils** | `--ws-schema` and `--ud-schema` |
+| **am** | Standalone |
+| **audit** | `audit structure` once; `audit activate --schema <ws|ud>` per project |
+
+pgTAP bootstrap uses `create --profile ci` on `ws` or `ud` — see [Testing](#testing).
+
+---
 
 ## Requirements
 
-To use Giswater, you need:
+| Component | Notes |
+|-----------|--------|
+| **PostgreSQL** | **16, 17, or 18** (aligned with CI and Docker images). |
+| **PostGIS / pgRouting** | Server packages matching PG major; created via [`giswater_admin init-db`](../giswater_admin/README.md#init-db). |
+| **Python 3.9+** | For CLI and test harness (`PyYAML`, `psycopg2-binary`). |
+| **Docker** | For local pgTAP runs (see [Testing](#testing)). |
+| **QGIS** | Frontend only (not required for CLI or db tests). |
 
-- **PostgreSQL**: Ensure pgAdmin/dbeaver (DB manager) and PostGIS (spatial extension) are installed.
-- **QGIS**: Geoprocessing software for frontend use.
+---
 
 ## Installation
 
-Giswater is a client-server system requiring installation on both the backend and frontend.
+Giswater is client–server: backend (PostgreSQL + schemas) and frontend (QGIS plugin).
 
-### Backend Environment:
+### Backend
 
-- Compatible with Windows, Mac, and Linux.
-- Install **PostgreSQL** (versions 9.5 to 14).
-- Enable the following extensions:
+1. Install PostgreSQL 16–18 with PostGIS and pgRouting on the **server**.
+2. Create an empty database.
+3. From the plugin repo root:
 
-```postgres
-CREATE EXTENSION postgis;
-CREATE EXTENSION pgrouting;
-CREATE EXTENSION tablefunc;
-CREATE EXTENSION unaccent;
+```bash
+pip install -r giswater_admin/requirements.txt
+export CONN='postgresql://user:pass@127.0.0.1:5432/mydb'
+python3 -m giswater_admin init-db --conn "$CONN"
+python3 -m giswater_admin create --kind ws --schema ws_demo --srid 25831 --profile empty --conn "$CONN"
 ```
 
-### Frontend Environment:
+Extensions created by `init-db`: `postgis`, `postgis_raster`, `tablefunc`, `pgrouting`, `unaccent`.
 
-- Compatible with Windows, Mac, and Linux. **EPA models** work best on Windows.
-- Install **QGIS** (latest LTR version).
-- Install **SWMM** (5.1) and **EPANET** (2.2). Note: EPA models may not work fully on Linux.
+### Frontend
+
+- QGIS LTR, Giswater plugin, EPANET/SWMM as needed (EPA tools mainly on Windows).
+
+---
 
 ## Testing
 
-Example projects with integrated datasets are available to test the system. Check out these tutorial videos to set up your environment:
+pgTAP tests run in Docker: a `postgres` service plus a `runner` container that calls `giswater_admin` and `pg_prove`. No host PostgreSQL port is required by default.
+
+### Prerequisites
+
+- [ ] **Docker Desktop** (or Docker Engine) running — `docker info` must succeed.
+- [ ] Run from **plugin repo root** or `dbmodel/`.
+- [ ] On **Apple Silicon**, images are `linux/amd64` (emulation); first `PG_MAJOR` build can take several minutes.
+
+### Quick start
+
+```bash
+# From plugin repo root (recommended)
+./dbmodel/test/run_tests.sh ws          # PostgreSQL 16 (default)
+PG_MAJOR=17 ./dbmodel/test/run_tests.sh ws
+PG_MAJOR=18 ./dbmodel/test/run_tests.sh ud
+
+# From dbmodel/
+./test/run_tests.sh ws
+```
+
+`PG_MAJOR=18` uses PostGIS **3.6**; 16 and 17 use **3.5**.
+
+### Environment variables
+
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `PG_MAJOR` | `16` | Postgres image / client major (`16`, `17`, `18`) |
+| `POSTGIS_VERSION` | `3.5` (`3.6` for PG 18) | PostGIS image tag |
+| `TEST_GROUPS` | `all` | `schema`, `security`, `function`, `data`, `performance`, or `all` |
+| `PG_PROVE_JOBS` | `4` | Parallelism; **forced to `1`** for `function` and `data` groups (schema mutations) |
+| `GW_VERBOSE` | — | Passes `-v` to `giswater_admin` |
+| `GW_DEBUG` | — | Passes `-d` |
+| `GW_TIMING` | — | Passes `--timing` |
+| `GW_TIMING_TOP` | — | `--timing-top` |
+| `GW_TIMING_THRESHOLD_MS` | — | `--timing-threshold-ms` |
+| `GW_TIMING_DETAIL` | — | `--timing-detail` |
+| `GW_CLEAN` | — | Remove Docker volumes on exit |
+| `GW_DUMP_PATH` | — | After success, write `pg_dump` to this path |
+| `GW_SCHEMA_DUMP` | — | Restore path for CI-style restore jobs |
+
+### Local workflow
+
+```mermaid
+flowchart LR
+  subgraph host [Host]
+    R[run_tests.sh]
+  end
+  subgraph compose [Docker network]
+    PG[postgres gw-ci]
+    RUN[runner]
+    R --> RUN
+    RUN --> PG
+  end
+  subgraph inner [run_tests_inner.sh]
+    B[bootstrap_inner.sh]
+    P[prove_inner.sh]
+    B --> P
+  end
+  RUN --> inner
+```
+
+**Bootstrap** (`bootstrap_inner.sh`):
+
+1. `giswater_admin init-db`
+2. `drop` + `create --profile ci` → schema `ws_40` or `ud_40`
+3. `replace_vars.py` → copies `test/ws` or `test/ud` to `test/.run/{ws,ud}/` (only placeholders `SCHEMA_NAME`, `SRID_VALUE` resolved; **sources never modified**)
+
+**Prove** (`prove_inner.sh`): runs pgTAP for one `TEST_GROUPS` value against the staging tree.
+
+```bash
+TEST_GROUPS=function ./dbmodel/test/run_tests.sh ws
+GW_CLEAN=1 ./dbmodel/test/run_tests.sh ws
+GW_VERBOSE=1 GW_TIMING=1 GW_TIMING_TOP=50 PG_MAJOR=17 ./dbmodel/test/run_tests.sh ws
+GW_DEBUG=1 ./dbmodel/test/run_tests.sh ws
+```
+
+Inside Docker, Postgres is always `127.0.0.1:5432` on the compose network. A warning about host port **55432** refers to a possible legacy local cluster; tests do not use it unless you opt into debug compose.
+
+### Troubleshooting
+
+| Symptom | Action |
+|---------|--------|
+| `500 Internal Server Error` on `docker.sock/_ping` | Start or restart Docker Desktop; wait until `docker info` works |
+| Stale volume / odd failures | `GW_CLEAN=1 ./dbmodel/test/run_tests.sh ws` |
+| `schema ws_40 already exists` | Bootstrap drops first; if stuck, `GW_CLEAN=1` |
+| Deadlocks in function tests | `prove_inner.sh` uses `-j 1` for FUNCTION/DATA by design |
+
+### CI workflow (`.github/workflows/test-db.yml`)
+
+```mermaid
+flowchart LR
+  BS[db-bootstrap matrix 6] --> Art[schema dump artifact]
+  Art --> DT[db-test matrix 30]
+  BS --> Pub[publish-gw-db main/tags]
+```
+
+| Job | Matrix | Steps |
+|-----|--------|-------|
+| `db-bootstrap` | `ws/ud` × PG 16/17/18 (6) | Postgres → bootstrap → dump → upload artifact |
+| `db-test` | × groups: schema, security, function, data, performance (30) | Download dump → restore → pg_prove group |
+| `publish-gw-db` | same 6 (main/tags) | Build `ghcr.io/giswater/gw-db:…` from bootstrap dump |
+
+Jobs run groups in parallel; each test job restores the same dump into a fresh Postgres. `GW_VERBOSE=1` and `GW_TIMING=1` on bootstrap and test jobs.
+
+`workflow_dispatch` input `tests` can limit to one group (e.g. `function`).
+
+### Test harness files
+
+| File | Role |
+|------|------|
+| [`test/run_tests.sh`](./test/run_tests.sh) | Host: `docker compose` orchestration |
+| [`test/run_tests_inner.sh`](./test/run_tests_inner.sh) | Container: bootstrap → all groups → optional dump |
+| [`test/bootstrap_inner.sh`](./test/bootstrap_inner.sh) | `init-db` + `create --profile ci` + `replace_vars` |
+| [`test/restore_inner.sh`](./test/restore_inner.sh) | `init-db` + roles + `pg_restore` from `GW_SCHEMA_DUMP` |
+| [`test/prove_inner.sh`](./test/prove_inner.sh) | One `TEST_GROUPS`; `-j 1` for function/data |
+| [`test/dump_schema.sh`](./test/dump_schema.sh) | `pg_dump -n {schema}` |
+| [`test/replace_vars.py`](./test/replace_vars.py) | Staging copy for pgTAP |
+| [`test/plugin_version.py`](./test/plugin_version.py) | Max semver from `updates/` |
+| [`test/diagnose_db.sh`](./test/diagnose_db.sh) | Optional host `psql` via debug compose |
+
+Plugin version helper:
+
+```bash
+python3 dbmodel/test/plugin_version.py
+```
+
+### Optional: host psql against test DB
+
+```bash
+cd dbmodel
+docker compose -f docker-compose.test.yml -f docker-compose.debug.yml up -d postgres
+GW_PUBLISH_PORT=15432 ./test/diagnose_db.sh
+```
+
+Published images: `ghcr.io/giswater/gw-db:main-pg16-ws` (and `ud`, PG 17/18).
+
+### Tutorials
 
 1. [Install plugin](https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4)
 2. [Setup connection](https://www.youtube.com/watch?v=LJGCUrqa0es&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=3)
 3. [Create DB schema example](https://www.youtube.com/watch?v=nR3PBtfGi9k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=2)
 4. [Create QGIS project](https://www.youtube.com/watch?v=RwFumKKTB2k&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=1)
 
+---
+
 ## Deployment
 
-### Prerequisites:
+### Prerequisites
 
-- Ensure you have PostgreSQL access with DB superuser permissions for tasks like schema creation, roles, backups, and restoration.
+- PostgreSQL access with privileges to create schemas, roles, and extensions (superuser or equivalent for `init-db`).
 
-### Mandatory Project Setup:
+### Mandatory project setup
 
-- Fill required catalogs: **materials**, **node**, and **arc**.
-- Define **inventory layers** (network shapes) with required fields.
-- Set up **mapzones**: e.g., macroexploitation, municipality, sector.
+- Catalogs: materials, node, arc.
+- Map zones: macroexploitation, municipality, sector, dma, etc.
 
-Start by creating two nodes; then, insert arcs. For configuration options, visit the [Giswater configuration guide](https://github.com/Giswater/giswater_dbmodel/wiki/Config).
+- [Start from scratch](https://github.com/Giswater/giswater_dbmodel/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project)
+- [Configuration guide](https://github.com/Giswater/giswater_dbmodel/wiki/Config)
 
-### Getting Started:
-
-- [Start from scratch](https://github.com/Giswater/giswater_dbmodel/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project).
-- Optionally, load INP files (in beta). See more about [Import INP debug mode](https://github.com/Giswater/giswater_dbmodel/wiki).
+---
 
 ## Wiki
 
-For comprehensive documentation, visit the [Giswater Wiki](https://github.com/Giswater/giswater_dbmodel/wiki).
+[ Giswater Wiki](https://github.com/Giswater/giswater_dbmodel/wiki)
+
+---
 
 ## FAQs
 
-Check out the [FAQs section](https://github.com/Giswater/giswater_dbmodel/wiki/FAQs) for common questions.
+[FAQs](https://github.com/Giswater/giswater_dbmodel/wiki/FAQs)
+
+---
 
 ## Repositories
 
 - **Docs**: [Giswater Docs](https://github.com/Giswater/docs)
 - **QGIS Plugin**: [Giswater QGIS Plugin](https://github.com/Giswater/giswater_qgis_plugin)
 - **Database Model**: [Giswater DB Model](https://github.com/Giswater/giswater_dbmodel)
+- **CLI (in plugin repo)**: [giswater_admin/README.md](../giswater_admin/README.md)
 
-Other repositories are either deprecated or not in use.
+---
 
 ## Versioning
 
-Giswater follows a three-tier release system: **Major**, **Minor**, and **Build** updates.
+Giswater uses **Major**, **Minor**, and **Patch** (Build) releases:
 
-- **Major**: Architecture updates (not backward compatible).
-- **Minor**: Bug fixes, new functionalities (backward compatible).
-- **Build**: Small fixes, monthly releases.
+- **Major**: architectural changes (may break compatibility)
+- **Minor**: features and fixes (backward compatible)
+- **Patch**: small fixes
+
+SQL patches under `schemas/*/updates/<M>/<m>/<p>/` follow plugin semver caps via `--plugin-version`.
+
+---
 
 ## License
 
-This software is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for more details.
+GNU General Public License v3.0 — see [LICENSE](LICENSE).
+
+---
 
 ## Acknowledgements
 

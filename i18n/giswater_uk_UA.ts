@@ -5298,8 +5298,10 @@
 			<translation>Поле &apos;Path&apos; є обов&apos;язковим для імпорту даних INP.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>Процедура видалить елементи з бази даних, якщо це не вузол, який не розділяє дугу.\n
  Будь ласка, переконайтеся, що елементи не мають значення undelete рівного true.\n
@@ -10363,14 +10365,6 @@
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
 			<translation>Створити, налаштувати або видалити додаткове поле, пов’язане з обраним типом елемента або для всіх типів елементів, визначених у проєкті</translation>
-		</message>
-		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Керувати дочірніми поданнями</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Пересоздати дочірні подання для обраного типу елемента або для всіх типів елементів, визначених у проєкті</translation>
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>

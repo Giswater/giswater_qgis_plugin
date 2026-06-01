@@ -28,13 +28,13 @@ jobs:
       image: registry.gitlab.com/oslandia/qgis/pyqgis-4-checker/pyqgis-qt-checker:latest
       options: --user root
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Dry run lint (log only)
         run: pyqt5_to_pyqt6.py --dry_run --logfile pyqt6_checker.log ./ 
 
       - name: Upload log artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pyqt6_checker-log
           path: pyqt6_checker.log

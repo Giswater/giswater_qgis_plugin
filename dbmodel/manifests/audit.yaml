@@ -1,0 +1,59 @@
+# Audit schema manifest.
+#
+# structure = audit DDL; activate = per-parent trigger wiring.
+
+kind: audit
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_structure
+    type: sql_dir
+    description: "Build the audit schema DDL + base functions."
+    steps:
+      - { source: "schemas/addon/audit/base/base.sql", recursive: false }
+      - { source: "schemas/addon/audit/base/fct", recursive: false }
+
+  - id: load_activate
+    type: sql_dir
+    description: "Attach audit triggers + helpers to the target ws/ud schema."
+    steps:
+      - source: "schemas/addon/audit/integration/common/fct"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/addon/audit/integration/{{ parent_type }}/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_updates
+    type: version_walk
+    optional: true
+    description: "Audit semver patches."
+    root: "schemas/addon/audit/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: register_version
+    type: sql_function
+    description: "Append audit.sys_version row."
+    function: "audit.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "AUDIT"
+        isNewProject: "{{ register_is_new }}"
+        parentSchema: "{{ register_parent_schema }}"
+        mergeAddparam: {}
+
+profiles:
+  structure:
+    phases: [load_structure, load_updates, register_version]
+  activate:
+    phases: [load_activate]
+  update:
+    phases: [load_updates, register_version]
+  full:
+    phases: [load_structure, load_updates, register_version]

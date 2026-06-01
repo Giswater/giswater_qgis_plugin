@@ -5298,11 +5298,15 @@
 			<translation>Das Feld &quot;Pfad&quot; ist für den Import von INP-Daten erforderlich.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>Die Prozedur löscht Merkmale in der Datenbank, es sei denn, es handelt sich um einen Knoten, der den Bogen nicht teilt.\n
- Bitte stellen Sie sicher, dass Features keinen Undelete-Wert auf true haben.\n
+			<translation>Die Prozedur löscht Merkmale in der Datenbank, es sei denn, es handelt sich um einen Knoten, der den Bogen nicht teilt.\n
+
+ Bitte stellen Sie sicher, dass Features keinen Undelete-Wert auf true haben.\n
+
  Auf der anderen Seite müssen Sie wissen, dass die Rückverfolgbarkeitstabelle Präzedenzfallinformationen speichern wird.</translation>
 		</message>
 		<message>
@@ -10363,14 +10367,6 @@
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
 			<translation>Erstellen, Konfigurieren oder Entfernen eines zusätzlichen Feldes, das sich auf einen ausgewählten Merkmalstyp oder auf alle in einem Projekt definierten Merkmalstypen bezieht</translation>
-		</message>
-		<message>
-			<source>grb_manage_childviews</source>
-			<translation>Verwalten von untergeordneten Ansichten</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_manage_childviews</source>
-			<translation>Erstellen Sie untergeordnete Ansichten für einen ausgewählten Featuretyp oder für alle in einem Projekt definierten Featuretypen neu.</translation>
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>

@@ -1,0 +1,73 @@
+# Asset-management schema manifest.
+
+kind: am
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base
+    type: sql_dir
+    description: "Asset management DDL."
+    steps:
+      - { source: "schemas/addon/am/base/base.sql", recursive: false }
+
+  - id: integrate_am
+    type: sql_dir
+    description: "Wire am into the parent ws/ud schema."
+    steps:
+      - source: "schemas/addon/am/integration/{{ parent_type }}/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/addon/am/integration/common/fct"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_sample
+    type: sql_dir
+    optional: true
+    description: "Optional am sample data."
+    steps:
+      - source: "schemas/addon/am/sample/user"
+        recursive: false
+      - source: "schemas/addon/am/integration/{{ parent_type }}/sample.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_updates
+    type: version_walk
+    description: "Walk dbmodel/schemas/addon/am/updates/<M>/<m>/<p>/ semver-ordered."
+    root: "schemas/addon/am/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: load_i18n
+    type: sql_dir
+    optional: true
+    description: "Optional am i18n per locale folder."
+    steps:
+      - source: "schemas/addon/am/i18n/{{ locale }}"
+        fallback_source: "schemas/addon/am/i18n/en_US"
+        recursive: false
+
+  - id: register_version
+    type: sql_function
+    description: "Append am.sys_version row."
+    function: "am.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "AM"
+        isNewProject: "TRUE"
+        parentSchema: "{{ parent_schema }}"
+        mergeAddparam: {}
+
+profiles:
+  empty:
+    phases: [load_base, integrate_am, load_updates, load_i18n, register_version]
+  with_sample:
+    phases: [load_base, integrate_am, load_sample, load_updates, load_i18n, register_version]
+  update:
+    phases: [load_updates, load_i18n, register_version]
