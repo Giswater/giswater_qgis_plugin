@@ -42,20 +42,20 @@ DO $$
 DECLARE
     v_utils boolean;
 BEGIN
-    SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
-    IF NOT v_utils THEN
-      ALTER TABLE ext_address DROP COLUMN IF EXISTS expl_id;
-      ALTER TABLE ext_streetaxis DROP COLUMN IF EXISTS expl_id;
-      ALTER TABLE ext_plot DROP COLUMN IF EXISTS expl_id;
-      ELSE
-      ALTER TABLE utils.address DROP COLUMN IF EXISTS ws_expl_id;
-      ALTER TABLE utils.address DROP COLUMN IF EXISTS ud_expl_id;
-      
-      ALTER TABLE utils.streetaxis DROP COLUMN IF EXISTS ws_expl_id;
-      ALTER TABLE utils.streetaxis DROP COLUMN IF EXISTS ud_expl_id;
-      
-      ALTER TABLE utils.plot DROP COLUMN IF EXISTS ws_expl_id;
-      ALTER TABLE utils.plot DROP COLUMN IF EXISTS ud_expl_id;
+    SELECT COALESCE(value::boolean, false) INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+    IF v_utils IS TRUE THEN
+		ALTER TABLE utils.address DROP COLUMN IF EXISTS ws_expl_id;
+		ALTER TABLE utils.address DROP COLUMN IF EXISTS ud_expl_id;
+
+		ALTER TABLE utils.streetaxis DROP COLUMN IF EXISTS ws_expl_id;
+		ALTER TABLE utils.streetaxis DROP COLUMN IF EXISTS ud_expl_id;
+
+		ALTER TABLE utils.plot DROP COLUMN IF EXISTS ws_expl_id;
+		ALTER TABLE utils.plot DROP COLUMN IF EXISTS ud_expl_id;
+	ELSE
+		ALTER TABLE ext_address DROP COLUMN IF EXISTS expl_id;
+		ALTER TABLE ext_streetaxis DROP COLUMN IF EXISTS expl_id;
+		ALTER TABLE ext_plot DROP COLUMN IF EXISTS expl_id;
     END IF;
 END $$;
 
