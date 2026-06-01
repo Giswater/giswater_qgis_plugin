@@ -23,6 +23,19 @@ INTENDED USE CASES (automatic restore works)
     - Widening or changing output column types without dropping columns.
       Dependents that reference columns by name (without explicit incompatible casts) are
       recreated with the same SQL and pick up the new types from the parent.
+    - Replacing parent table/view references during RESTORE via the replacements parameter
+      (e.g. ext_municipality -> v_municipality after introducing an intermediate view).
+
+ROOT OBJECTS
+    rootViews accepts views, materialized views, and tables (relkind v, m, r).
+    Tables are never dropped, even when dropRoots is true; only views and matviews are dropped
+    as roots. Use dropRoots=false when the root table must remain untouched.
+
+SAVE-DROP OPTIONS
+    dropDependents (default true): when false, definitions are saved to temp_view_dependencies
+    but dependent views/matviews are not dropped. Use this to snapshot definitions before
+    manual changes or to prepare a RESTORE batch while keeping objects online.
+    dropRoots (default true): when false, root views/matviews are not dropped either.
 
 NOT SUPPORTED (manual intervention required)
     - Removing columns from a parent view when dependents still reference them.
@@ -30,6 +43,8 @@ NOT SUPPORTED (manual intervention required)
     - Renaming columns, changing column order semantics, or altering expressions in ways
       that make the saved definition invalid.
     - GRANTs, COMMENTs, indexes on materialized views, and REFRESH ... CONCURRENTLY setup.
+    - Replacements that change SQL semantics or reference incompatible columns; replacements
+      are textual substitutions applied to saved definitions and trigger DDL.
 
 MATERIALIZED VIEWS
     Included in dependency discovery (relkind = m). On RESTORE they are recreated with
@@ -39,10 +54,24 @@ MATERIALIZED VIEWS
 
 EXAMPLE
 
--- Preview dependents
-SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"LIST","rootViews":["ve_node"]}}$$);
+-- Preview dependents of a table or view
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"LIST","rootViews":["ext_municipality"]}}$$);
 
--- Save, drop, recreate parent, restore
+-- Save definitions only (dependents stay in place)
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP","rootViews":["ext_municipality"],"dropDependents":false,"dropRoots":false}}$$);
+
+-- Save and drop dependents; table root is kept
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP","rootViews":["ext_municipality"],"dropRoots":false}}$$);
+CREATE OR REPLACE VIEW v_municipality AS SELECT * FROM ext_municipality;
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{
+  "action":"RESTORE",
+  "replacements":[
+    {"from":"v_ext_municipality","to":"ve_municipality"},
+    {"from":"ext_municipality","to":"v_municipality"}
+  ]
+}}$$);
+
+-- Save, drop, recreate parent view, restore unchanged
 SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP","rootViews":["ve_node"]}}$$);
 -- CREATE OR REPLACE VIEW ve_node AS ...
 SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"RESTORE"}}$$);
@@ -58,8 +87,10 @@ DECLARE
     v_action text;
     v_batch_id integer;
     v_drop_roots boolean;
+    v_drop_dependents boolean;
     v_root_views text[];
     v_root_views_json text;
+    v_replacements_json text;
     v_count integer := 0;
     v_info json := '[]'::json;
     v_level integer;
@@ -69,9 +100,12 @@ DECLARE
 
     rec record;
     rec_trg record;
+    rec_repl record;
     v_def text;
+    v_trg_def text;
     v_trg text;
     v_replace text;
+    v_from_esc text;
     v_trg_cols text;
     v_trg_stmt text;
 
@@ -83,12 +117,14 @@ BEGIN
 
     v_action := json_extract_path_text(p_data, 'data', 'action');
     v_root_views_json := json_extract_path_text(p_data, 'data', 'rootViews');
+    v_replacements_json := json_extract_path(p_data, 'data', 'replacements')::text;
     v_batch_id := COALESCE(
         json_extract_path_text(p_data, 'data', 'batchId')::integer,
         json_extract_path_text(p_data, 'data', 'fid')::integer,
         1
     );
     v_drop_roots := COALESCE(json_extract_path_text(p_data, 'data', 'dropRoots')::boolean, true);
+    v_drop_dependents := COALESCE(json_extract_path_text(p_data, 'data', 'dropDependents')::boolean, true);
 
     IF v_action IS NULL THEN
         RAISE EXCEPTION 'Parameter action is mandatory (LIST, SAVE-DROP, RESTORE, CLEAN)';
@@ -122,7 +158,7 @@ BEGIN
         END IF;
         v_root_views := ARRAY(SELECT json_array_elements_text(v_root_views_json::json));
         IF array_length(v_root_views, 1) IS NULL THEN
-            RAISE EXCEPTION 'Parameter rootViews must contain at least one view name';
+            RAISE EXCEPTION 'Parameter rootViews must contain at least one root object name';
         END IF;
     END IF;
 
@@ -141,7 +177,7 @@ BEGIN
                 JOIN pg_namespace n ON n.oid = c.relnamespace
                 WHERE n.nspname = v_schemaname
                   AND c.relname = ANY(v_root_views)
-                  AND c.relkind IN ('v', 'm')
+                  AND c.relkind IN ('v', 'm', 'r')
 
                 UNION ALL
 
@@ -179,7 +215,7 @@ BEGIN
                 JOIN pg_namespace n ON n.oid = c.relnamespace
                 WHERE n.nspname = v_schemaname
                   AND c.relname = ANY(v_root_views)
-                  AND c.relkind IN ('v', 'm')
+                  AND c.relkind IN ('v', 'm', 'r')
 
                 UNION ALL
 
@@ -262,18 +298,20 @@ BEGIN
             v_count := v_count + 1;
         END LOOP;
 
-        FOR rec IN
-            SELECT view_schema, view_name, relkind
-            FROM temp_view_dependencies
-            WHERE batch_id = v_batch_id
-            ORDER BY view_depth DESC, view_schema, view_name
-        LOOP
-            IF rec.relkind = 'm' THEN
-                EXECUTE format('DROP MATERIALIZED VIEW IF EXISTS %I.%I', rec.view_schema, rec.view_name);
-            ELSE
-                EXECUTE format('DROP VIEW IF EXISTS %I.%I', rec.view_schema, rec.view_name);
-            END IF;
-        END LOOP;
+        IF v_drop_dependents IS TRUE THEN
+            FOR rec IN
+                SELECT view_schema, view_name, relkind
+                FROM temp_view_dependencies
+                WHERE batch_id = v_batch_id
+                ORDER BY view_depth DESC, view_schema, view_name
+            LOOP
+                IF rec.relkind = 'm' THEN
+                    EXECUTE format('DROP MATERIALIZED VIEW IF EXISTS %I.%I', rec.view_schema, rec.view_name);
+                ELSE
+                    EXECUTE format('DROP VIEW IF EXISTS %I.%I', rec.view_schema, rec.view_name);
+                END IF;
+            END LOOP;
+        END IF;
 
         IF v_drop_roots IS TRUE THEN
             FOR rec IN
@@ -294,7 +332,11 @@ BEGIN
 
         v_status := 'Accepted';
         v_level := 3;
-        v_message := concat('Saved and dropped ', v_count, ' dependent object(s)');
+        IF v_drop_dependents IS TRUE THEN
+            v_message := concat('Saved and dropped ', v_count, ' dependent object(s)');
+        ELSE
+            v_message := concat('Saved ', v_count, ' dependent object(s)');
+        END IF;
 
     ELSIF v_action = 'RESTORE' THEN
 
@@ -304,12 +346,47 @@ BEGIN
             WHERE batch_id = v_batch_id
             ORDER BY view_depth ASC, view_schema, view_name
         LOOP
+            v_def := rec.view_definition;
+            v_trg_def := rec.trigger_definition;
+
+            IF v_replacements_json IS NOT NULL AND btrim(v_replacements_json) <> '' THEN
+                FOR rec_repl IN
+                    SELECT x."from" AS from_pat, x."to" AS to_pat
+                    FROM json_to_recordset(v_replacements_json::json) AS x("from" text, "to" text)
+                LOOP
+                    v_from_esc := regexp_replace(rec_repl.from_pat, '([\[\](){}.*+?|^$\\])', '\\\1', 'g');
+                    v_def := regexp_replace(v_def, '\m' || v_from_esc || '\M', rec_repl.to_pat, 'g');
+                    IF position('.' IN rec_repl.from_pat) = 0 THEN
+                        v_def := regexp_replace(
+                            v_def,
+                            '\m' || regexp_replace(v_schemaname, '([\[\](){}.*+?|^$\\])', '\\\1', 'g') || '\.' || v_from_esc || '\M',
+                            rec_repl.to_pat,
+                            'g'
+                        );
+                    END IF;
+                    v_def := replace(v_def, '"' || rec_repl.from_pat || '"', '"' || rec_repl.to_pat || '"');
+
+                    IF v_trg_def IS NOT NULL THEN
+                        v_trg_def := regexp_replace(v_trg_def, '\m' || v_from_esc || '\M', rec_repl.to_pat, 'g');
+                        IF position('.' IN rec_repl.from_pat) = 0 THEN
+                            v_trg_def := regexp_replace(
+                                v_trg_def,
+                                '\m' || regexp_replace(v_schemaname, '([\[\](){}.*+?|^$\\])', '\\\1', 'g') || '\.' || v_from_esc || '\M',
+                                rec_repl.to_pat,
+                                'g'
+                            );
+                        END IF;
+                        v_trg_def := replace(v_trg_def, '"' || rec_repl.from_pat || '"', '"' || rec_repl.to_pat || '"');
+                    END IF;
+                END LOOP;
+            END IF;
+
             IF rec.relkind = 'm' THEN
                 EXECUTE format(
                     'CREATE MATERIALIZED VIEW %I.%I AS %s',
                     rec.view_schema,
                     rec.view_name,
-                    rec.view_definition
+                    v_def
                 );
                 EXECUTE format(
                     'REFRESH MATERIALIZED VIEW %I.%I',
@@ -321,13 +398,13 @@ BEGIN
                     'CREATE OR REPLACE VIEW %I.%I AS %s',
                     rec.view_schema,
                     rec.view_name,
-                    rec.view_definition
+                    v_def
                 );
 
-                IF rec.trigger_definition IS NOT NULL AND btrim(rec.trigger_definition) <> '' THEN
+                IF v_trg_def IS NOT NULL AND btrim(v_trg_def) <> '' THEN
                     FOR v_trg_stmt IN
                         SELECT btrim(stmt)
-                        FROM regexp_split_to_table(rec.trigger_definition, E'\\n+') AS stmt
+                        FROM regexp_split_to_table(v_trg_def, E'\\n+') AS stmt
                         WHERE btrim(stmt) <> ''
                     LOOP
                         EXECUTE v_trg_stmt;
