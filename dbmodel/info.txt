@@ -6,141 +6,175 @@ or (at your option) any later version.
 */
 
 
-This file explains the sql's structure of this folder
+This file explains the SQL structure of dbmodel/.
+For full architecture, manifests, CLI, and testing see README.md.
 
 
 -- Folders structure
 --------------------------------
-api
-corporate
-dev
-example
-i18n
-tools
-ud
-updates
-utils
-ws
+manifests          YAML build pipelines (ws, ud, utils, am, cm, audit, cibs)
+schemas/
+  main/            Network project schemas (ws, ud)
+    common/        Shared SQL loaded into BOTH ws and ud (not a PG schema)
+    ws/
+    ud/
+  addon/           Satellite schemas
+    utils/
+    am/
+    cm/
+    audit/
+    cibs/
+corporate/         Optional corporate/custom overlays (outside manifests)
+dev/
+docker/
+test/              pgTAP tests + Docker harness
+tools/
 
-subfolder structure of ud/ws/utils folder
-	- ddl
-	- ddlrule
-	- ddlview
-	- dml
-	- fct
-	- ftrg
-	- tablect
-	- trg
+Builds are driven by manifests/ + giswater_admin (same engine as QGIS Manage Schemas).
+See also: ../giswater_admin/README.md
 
---- Instructions to update sql's
+
+-- Subfolder structure (schemas/main/ws and schemas/main/ud)
 --------------------------------
-1) FUNCTION AND TRIGGER FUNCTION:
-	It's mandatory to modify the original definition. They must be unique and must be located on (fct) and (ftrg) folders.
-	In case of different code for different versions 'IF' on code will be used
-	Use always one file for each function/trigger
+base/
+  init.sql         (common only)
+  fct/             Functions (one file per function)
+  ftrg/            Trigger functions (one file per trigger function)
+  schema_model/    Base DDL, views, rules, table constraints, triggers
+updates/
+  M/m/p/
+    patch.sql      All SQL for that version bump (single file per scope)
+    changelog.txt
+sample/            Optional seed data (user/, inv/, dev/)
+final_pass/
+  config_form_fields/
+  i18n/            Locale folders (en_US, es_ES, ca_ES, …)
+
+
+-- Subfolder structure (schemas/main/common)
+--------------------------------
+base/
+  init.sql
+  fct/
+  ftrg/
+updates/
+  M/m/p/
+    patch.sql
+    changelog.txt
+
+
+-- Subfolder structure (schemas/addon/<kind>)
+--------------------------------
+base/
+  init.sql
+  base.sql         (DDL bootstrap where applicable)
+  fct/
+  ftrg/
+integration/       Parent-link SQL (utils, cm, audit, cibs)
+  common/          (cm, audit)
+  ws/ | ud/        Type-specific integration hooks
+updates/
+  M/m/p/
+    patch.sql
+    changelog.txt
+sample/            (optional, e.g. cm)
+i18n/              (optional, e.g. cm, am)
+
+
+-- Update order (network ws/ud)
+--------------------------------
+For each version M.m.p the engine applies, in order:
+  1) schemas/main/common/updates/M/m/p/patch.sql
+  2) schemas/main/ws/updates/M/m/p/patch.sql   (or ud/updates/…)
+Then moves to the next version.
+
+Satellite schemas walk a single updates/ tree:
+  schemas/addon/<kind>/updates/M/m/p/patch.sql
+
+
+--- Instructions to update SQL
+--------------------------------
+1) FUNCTION AND TRIGGER FUNCTION (base):
+   Edit the original definition in base/fct/ or base/ftrg/.
+   They must be unique; use one file per function/trigger.
+   In case of different code for different versions use 'IF' in code.
+   Do NOT duplicate base definitions in update patches unless strictly needed.
 
 2) VIEWS:
-	It's forbidden to modify the original definition. Keep the original defition but put a comment there like 'definiton updated on 3.x.xxxx'
-	Use ddlview.sql file located on ws/ud/utils update folders.
-	DROP IS NOT FORBIDDEN but use it only if it's needed.
-	DROP CASCADE IS FORBIDDEN. If it's needed, take time and wait for next major release.
-	Identify any change on any view on the chapter views of changelog.txt file
+   Do not modify schema_model/ view definitions for version bumps.
+   Put view changes in the version patch.sql for the correct scope (common, ws, ud, …).
+   DROP is allowed when needed; DROP CASCADE is FORBIDDEN (wait for next major if unavoidable).
+   Document any view change in changelog.txt.
 
+3) TABLES, RULES, TRIGGERS, CONSTRAINTS:
+   Do not modify schema_model/ base definitions for version bumps.
+   Put changes in patch.sql under the correct updates/M/m/p/ folder.
+   DROP is FORBIDDEN. If a relation becomes deprecated use:
+     UPDATE audit_cat_table / audit_cat_function / audit_cat_sequence SET isdeprectaded=TRUE
 
-3)  TABLES, RULES, TRIGGERS, CONSTRAINTS:
-	It's forbidden to modify the original definition. Keep the original defition but put a comment there like 'definiton updated on 3.x.xxxx'
-	Use below files located on ws/ud/utils update folders
-		ddl.sql
-		dml.sql
-		ddlrule.sql
-		tablect.sql
-		trg.sql
-	DROP IS FORBIDDEN for all. If same function / trigger / table / view or sequence becomes deprecated we must use:
-		UPDATE audit_cat_table / audit_cat_function / audit_cat_sequence  SET isdeprectaded=TRUE
+4) DML:
+   Same as above: patch.sql in the correct scope folder.
+   For inserts on system tables prefer ON CONFLICT (pk_field) DO NOTHING.
 
+5) I18N:
+   Network (ws/ud): schemas/main/{ws,ud}/final_pass/i18n/<locale>/
+   CM: schemas/addon/cm/i18n/<locale>/
+   AM: schemas/addon/am/i18n/<locale>/
+   Do not edit en_US base strings in place for version bumps; add/update via patch.sql or
+   locale files as appropriate for the manifest final_pass / load_locale phase.
 
-4) DML
-	It's forbidden to modify the original definition. Keep the original defition but put a comment there like 'definiton updated on 3.x.xxxx'
-	Use below files located on ws/ud/utils update folders
-		ddl.sql
-		dml.sql
-		ddlrule.sql
-		tablect.sql
-		trg.sql
-5) I18N
-	It's forbidden to modify the original definition. Keep the original defition but put a comment there 'definiton updated on 3.x.xxxx'
-	It's specific case of dml
-	Use below files located on EN/ES/CA/PT folders
-		ud.sql
-		ws.sql
-		utils.sql
-6) API:
-	Same as ud/ws projects but without ws/ud folders
-	No ws/ud folders means that no specific ws/ud sql file will be located on API folder
-	In case of specific ws/ud API table/view/function use update files of ws/ud to work with
+6) NEW VERSION BUMP (network):
+   Create folders as needed:
+     schemas/main/common/updates/M/m/p/patch.sql + changelog.txt   (if shared)
+     schemas/main/ws/updates/M/m/p/patch.sql + changelog.txt         (ws-only)
+     schemas/main/ud/updates/M/m/p/patch.sql + changelog.txt         (ud-only)
+   Use a single patch.sql per scope (no separate ddl.sql, dml.sql, ddlview.sql, trg.sql for new bumps).
 
-7) OTHER PROJECT TYPES
-	If you are looking to use Giswater sql project creation and update structure of specific project
-	- Define list of other project types on config.file
-	- Create folder with same name defined on config.file and use this subfolder structure:
-		example
-		i18n
-		updates
-		ddl
-		ddlrule
-		ddlview
-		dml
-		fct
-		ftrg
-		tablect
-		trg
-	- Same behaviour of WS/UD will be done with the unique difference of the location of folders
+7) CORPORATE / CUSTOM:
+   SQL under corporate/ is outside standard manifests.
+   Keep corporate overlays separate from schemas/main and schemas/addon.
 
-8) MANDATORY FOLDERS
-	- Some times reader of SQL crash. To prevent some bugs is mandatory to define al folders in spite of no information needs. Put sql file with 'SET SEARCH_PATH' as unique row
 
 -- Changelog file
 -----------------------------
-	- Use it to register any change on sqls.
-	- Issue is mandatory. If not exits, create new one on Github.
-	- Network (ws/ud): one changelog.txt per scope under schemas/network/{common,ws,ud}/updates/M/m/p/
-		* common: changes shared by ws and ud
-		* ws or ud: changes only for that project type (same version folder as the SQL patches)
-	- Preferred format (version is the M/m/p folder path): one bullet per line, lines starting with "- "
-		* Optional comments with "#"
-		* Legacy format (version line + asterisks + bullets) is still accepted
-	- Admin and giswater_admin update --check merge common + ws|ud for display
-	- If we need to drop whitout cascade some view, changelog has two parts in order to identify as best as possible that special AND UNIQUE CASE OF DROPS
+  - Use it to register any change on SQL.
+  - Issue is mandatory. If it does not exist, create a new one on GitHub.
+  - Network (ws/ud): one changelog.txt per scope under schemas/main/{common,ws,ud}/updates/M/m/p/
+      * common: changes shared by ws and ud
+      * ws or ud: changes only for that project type (same version folder as patch.sql)
+  - Satellite: changelog.txt beside patch.sql under schemas/addon/<kind>/updates/M/m/p/
+  - Preferred format: one bullet per line, lines starting with "- "
+      * Optional comments with "#"
+      * Legacy format (version line + asterisks + bullets) is still accepted
+  - Manage Schemas dialog and `giswater_admin update --check` merge common + ws|ud for display.
+  - If a view must be dropped without cascade, document it explicitly in changelog (special case).
 
 
--- Rules to prevent conflits on update files
+-- Rules to prevent conflicts on update files
 --------------------------------------------
-		- For ct and trg use DROP...IF EXISTS......CASCADE
-		- For tables and sequences use CREATE TABLE/SEQUENCE IF NOT EXISTS ....
-		- For views use CREATE OR REPLACE VIEW
-		- For insert on system tables use ON CONFLICT (pk_field) DO NOTHING
-		- For new fields, USE THE FUNCTION gw_fct_admin_manage_fields (see below an example of new field)
-						SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_web_fields", "column":"table_type", "dataType":"text"}}$$)
+  - For ct and trg use DROP...IF EXISTS......CASCADE
+  - For tables and sequences use CREATE TABLE/SEQUENCE IF NOT EXISTS ....
+  - For views use CREATE OR REPLACE VIEW
+  - For insert on system tables use ON CONFLICT (pk_field) DO NOTHING
+  - For new fields, USE THE FUNCTION gw_fct_admin_manage_fields (example):
+      SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_web_fields", "column":"table_type", "dataType":"text"}}$$)
 
 
-
--- Workflows
+-- Workflows (via manifests + giswater_admin / Manage Schemas)
 ----------------------------
-1) CREATE EMPTY PROJECT
-2) CREATE EMPTY PROJECT WITHOUT CONSTRAINTS AND TRIGGERS
-3) CREATE PROJECT WITH SAMPLE DATA
-4) CREATE PROJECT WITH SAMPLE FOR DEV
-5) CREATE PROJECT USING INP FILE
-6) PROJECT UPDATE
-7) CREATE API
-8) API UPDATE
-9) LAST PROCESS FUNCTION
-	- Grant permissions to all relations using audit_cat_* tables
-	- Enable foreing keys with utils schema if exists
-	- Drop deprecated table/views/functions/sequences ONLY for new projects;
+1) CREATE EMPTY PROJECT          profile empty
+2) CREATE PROJECT WITH SAMPLE    profile sample_full
+3) CREATE PROJECT SAMPLE + INV   profile sample_inv
+4) CREATE PROJECT FOR DEV        profile dev
+5) PROJECT UPDATE                profile update
+6) CREATE / INTEGRATE SATELLITE  utils, cm, audit, cibs (see manifests/*.yaml)
+7) LAST PROCESS FUNCTION         gw_fct_admin_schema_lastprocess (manifest phase lastprocess)
+   - Grant permissions to all relations using audit_cat_* tables
+   - Enable foreign keys with utils schema if exists
+   - Drop deprecated table/views/functions/sequences ONLY for new projects
 
 
--- List of ui views desacoplated from code (fields to filter must exists) but users can adapt by ownself this views
+-- List of ui views decoupled from code (fields to filter must exist) but users can adapt these views
 -------------------------------------------------------------------------------------------------------------------
 v_ui_hydrometer
 v_ui_anl_mincut_result_cat

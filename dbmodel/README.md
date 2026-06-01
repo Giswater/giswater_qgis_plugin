@@ -26,7 +26,7 @@ PostgreSQL schema definitions, versioned update patches, and pgTAP tests for Gis
 
 ## Schema architecture
 
-Giswater uses **six PostgreSQL schemas** in a typical deployment. The `dbmodel/` tree separates **orchestration** (manifests) from **SQL sources** (`schemas/`). Folders under `schemas/network/common/` are not a database schema—they are SQL applied **into** both `ws` and `ud` project schemas.
+Giswater uses **project schemas** (`ws`, `ud`) plus **satellite schemas** (`utils`, `am`, `cm`, `audit`, `cibs`). The `dbmodel/` tree separates **orchestration** (manifests) from **SQL sources** (`schemas/`). Folders under `schemas/main/common/` are not a database schema—they are SQL applied **into** both `ws` and `ud` project schemas.
 
 ### Repository layout
 
@@ -34,31 +34,45 @@ Giswater uses **six PostgreSQL schemas** in a typical deployment. The `dbmodel/`
 dbmodel/
 ├── manifests/              # YAML: phases + profiles per kind (ws, ud, utils, …)
 ├── schemas/
-│   ├── network/
+│   ├── main/               # Network project schemas (ws, ud)
 │   │   ├── common/         # Shared SQL → loaded into ws AND ud (not a PG schema)
 │   │   ├── ws/             # Water-supply–specific SQL
-│   │   ├── ud/             # Sewerage-specific SQL
-│   │   └── sample/         # Optional seed data (user / inv / dev)
-│   ├── utils/              # Satellite utils schema
-│   ├── am/                 # Asset management
-│   ├── cm/                 # Campaign management (parent-linked)
-│   └── audit/              # Audit schema (structure / activate)
+│   │   └── ud/             # Sewerage-specific SQL
+│   └── addon/              # Satellite schemas
+│       ├── utils/
+│       ├── am/
+│       ├── cm/
+│       ├── audit/
+│       └── cibs/
+├── corporate/              # Optional corporate/custom overlays (outside manifests)
 └── test/                   # pgTAP sources + Docker harness
 ```
 
-### Six schemas vs folders
+Each **main** project folder (`ws/`, `ud/`) typically contains:
+
+| Subfolder | Role |
+|-----------|------|
+| `base/` | Bootstrap SQL: `fct/`, `ftrg/`, `schema_model/` (common also has `init.sql`) |
+| `updates/` | Semver patches (`M/m/p/patch.sql`) |
+| `sample/` | Optional seed data (`user/`, `inv/`, `dev/`) |
+| `final_pass/` | Form fields + i18n (locale folders) |
+
+Each **addon** kind follows a similar pattern: `base/`, `integration/` (parent-link SQL), `updates/`, and optional `sample/` or `i18n/`.
+
+### Schemas vs folders
 
 | PostgreSQL schema | Type | Base folder | Updates (semver `M/m/p`) |
 |-------------------|------|-------------|---------------------------|
-| `ws` | project | [`schemas/network/ws/`](./schemas/network/ws/) | `schemas/network/common/updates/` **then** `schemas/network/ws/updates/` (interleaved per version) |
-| `ud` | project | [`schemas/network/ud/`](./schemas/network/ud/) | `schemas/network/common/updates/` **then** `schemas/network/ud/updates/` |
-| `utils` | singleton | [`schemas/utils/`](./schemas/utils/) | `schemas/utils/updates/` (flat under each version) |
-| `am` | singleton | [`schemas/am/`](./schemas/am/) | `schemas/am/updates/` |
-| `cm` | singleton | [`schemas/cm/`](./schemas/cm/) | `schemas/cm/updates/` |
-| `audit` | singleton | [`schemas/audit/`](./schemas/audit/) | No semver tree; `audit structure` / `activate` via CLI |
+| `ws` | project | [`schemas/main/ws/`](./schemas/main/ws/) | `schemas/main/common/updates/` **then** `schemas/main/ws/updates/` (interleaved per version) |
+| `ud` | project | [`schemas/main/ud/`](./schemas/main/ud/) | `schemas/main/common/updates/` **then** `schemas/main/ud/updates/` |
+| `utils` | satellite | [`schemas/addon/utils/`](./schemas/addon/utils/) | `schemas/addon/utils/updates/` |
+| `am` | satellite | [`schemas/addon/am/`](./schemas/addon/am/) | `schemas/addon/am/updates/` |
+| `cm` | satellite | [`schemas/addon/cm/`](./schemas/addon/cm/) | `schemas/addon/cm/updates/` |
+| `audit` | satellite | [`schemas/addon/audit/`](./schemas/addon/audit/) | `schemas/addon/audit/updates/`; bootstrap via `structure` / `activate` profiles |
+| `cibs` | satellite | [`schemas/addon/cibs/`](./schemas/addon/cibs/) | `schemas/addon/cibs/updates/` |
 
-[`schemas/network/common/`](./schemas/network/common/) — DDL, functions, triggers, and shared update patches used by **both** `ws` and `ud`.  
-[`schemas/network/{ws,ud}/sample/`](./schemas/network/ws/sample/) — Seed scripts (`user/`, `inv/`, `dev/`) referenced by optional manifest phases.
+[`schemas/main/common/`](./schemas/main/common/) — functions, triggers, and shared update patches used by **both** `ws` and `ud`.  
+[`schemas/main/{ws,ud}/sample/`](./schemas/main/ws/sample/) — Seed scripts (`user/`, `inv/`, `dev/`) referenced by optional manifest phases.
 
 ### How manifests drive a build
 
@@ -67,7 +81,7 @@ sequenceDiagram
   participant CLI as giswater_admin_create
   participant M as manifests/ws.yaml
   participant B as SchemaBuilder
-  participant SQL as schemas/network
+  participant SQL as schemas/main
   CLI->>M: profile=empty|ci|sample_full|...
   M->>B: ordered phases
   B->>SQL: sql_dir / version_walk / sql_function
@@ -77,10 +91,10 @@ Example **ws** pipeline ([`manifests/ws.yaml`](./manifests/ws.yaml)):
 
 | Phase | Type | What runs |
 |-------|------|-----------|
-| `load_base` | `sql_dir` | `common/ddl`, `common/fct`, `common/ftrg`, then `ws/fct`, `ws/ftrg`, `ws/schema_model` |
+| `load_base` | `sql_dir` | `common/base/init.sql`, `common/base/fct`, `common/base/ftrg`, then `ws/base/fct`, `ws/base/ftrg`, `ws/base/schema_model` |
 | `updates` | `version_walk` | For each version ≤ `--plugin-version`: **common** patches, then **ws** patches |
 | `lastprocess` | `sql_function` | `gw_fct_admin_schema_lastprocess` (child views, permissions, metadata) |
-| `load_sample` | `sql_dir` (optional) | `schemas/network/ws/sample/user` |
+| `load_sample` | `sql_dir` (optional) | `schemas/main/ws/sample/user` |
 | `final_pass` | `sql_dir` | Form fields + i18n (`{{ locale }}`, fallback `en_US`) |
 
 **Upgrade profile** (`update`): `reload_fct_ftrg` → `updates` (only `project_version < v <= plugin_version`) → `lastprocess_upgrade`.
@@ -111,9 +125,9 @@ Authors can use either layer depending on the file.
 ```mermaid
 flowchart LR
   subgraph load_base [load_base]
-    Cddl[common/ddl fct ftrg]
-    K[ws or ud fct ftrg schema_model]
-    Cddl --> K
+    Cbase[common/base init fct ftrg]
+    K[ws or ud base fct ftrg schema_model]
+    Cbase --> K
   end
   subgraph updates [updates per version]
     Cu[common/updates/M/m/p]
@@ -132,7 +146,7 @@ flowchart LR
 - **One codebase, two project schemas:** shared logic lives in `common/`; type-specific pieces in `ws/` or `ud/`.
 - **Version order:** for each `M.m.p`, the engine applies **all** `common` SQL for that version, then **all** `ws` or `ud` SQL for that version, before moving to the next version.
 - **`lastprocess`:** server-side bookkeeping (child views, role grants batched at end of MULTI-CREATE, sequences, mapzone defaults).
-- **`sample/`:** only when the manifest profile includes `load_sample`, `load_inv`, or `load_dev`. Lives under each project type (`schemas/network/ws/sample/`, `schemas/network/ud/sample/`), like `final_pass/`.
+- **`sample/`:** only when the manifest profile includes `load_sample`, `load_inv`, or `load_dev`. Lives under each project type (`schemas/main/ws/sample/`, `schemas/main/ud/sample/`), like `final_pass/`.
 
 ### Version walk rules
 
@@ -143,36 +157,41 @@ Filtered using `sys_version.giswater` (`project_version`) and CLI `--plugin-vers
 | `new_project` | Every patch with `v <= plugin_version` |
 | `upgrade` | Patches with `project_version < v <= plugin_version` |
 
-**Singleton** schemas (am, cm, utils): one updates root per kind:
+**Satellite** schemas (utils, am, cm, audit, cibs): one updates root per kind:
 
 ```
-schemas/<kind>/updates/<major>/<minor>/<patch>/*.sql
+schemas/addon/<kind>/updates/<major>/<minor>/<patch>/patch.sql
 ```
 
-**Changelogs** sit beside each version folder (`changelog.txt`). Network schemas use up to three files per version: `schemas/network/common/updates/<M>/<m>/<p>/` (shared), plus `ws/updates/...` or `ud/updates/...` for type-specific changes. Prefer bullets only (`- change description`); legacy headers (`M.m.p` + asterisks) still parse. The plugin Admin dialog and `giswater_admin update --check` merge scopes via `giswater_admin.engine.changelog`. Historical unified `dbmodel/updates/` content was consolidated under `schemas/network/common/updates/<v>/`.
+**Update patches** for new version bumps use a single `patch.sql` per scope (replacing the legacy split across `ddl.sql`, `dml.sql`, `ddlview.sql`, `trg.sql`, …). Older consolidated history may still appear as large `patch.sql` files from the migration.
+
+**Changelogs** sit beside each version folder (`changelog.txt`). Network schemas use up to three scopes per version: `schemas/main/common/updates/<M>/<m>/<p>/` (shared), plus `ws/updates/...` or `ud/updates/...` for type-specific changes. Prefer bullets only (`- change description`); legacy headers (`M.m.p` + asterisks) still parse. The plugin **Manage Schemas** dialog and `giswater_admin update --check` merge scopes via `giswater_admin.engine.changelog`. Historical unified `dbmodel/updates/` content was consolidated under `schemas/main/common/updates/<v>/`.
 
 ### AM legacy patches
 
-`am` once used calendar folders `am/updates/<YYYY-MM>/`. Historical SQL was collapsed into `schemas/am/updates/0/0/0/` with date-prefixed filenames. New patches use normal semver folders.
+`am` once used calendar folders `am/updates/<YYYY-MM>/`. Historical SQL was collapsed into `schemas/addon/am/updates/0/0/0/` with date-prefixed filenames. New patches use normal semver folders.
 
 ### CM layout (parent-linked)
 
 | Path | Role |
 |------|------|
-| `schemas/cm/common/` | Shared CM DDL/fct/ftrg (not the satellite `utils` schema) |
-| `schemas/cm/base/` | Core `cm` tables |
-| `schemas/cm/parent_schema/utils/` | Parent-link views/triggers (`PARENT_SCHEMA`; ws+ud) |
-| `schemas/cm/parent_schema/ws` \| `ud/` | Type-specific hooks (ud: gully tables) |
+| `schemas/addon/cm/base/` | Core `cm` DDL + `fct/` + `ftrg/` |
+| `schemas/addon/cm/integration/common/` | Shared parent-link SQL |
+| `schemas/addon/cm/integration/ws` \| `ud/` | Type-specific integration hooks |
+| `schemas/addon/cm/i18n/` | Locale folders (fallback `en_US`) |
+| `schemas/addon/cm/sample/` | Optional seed catalogues |
 
 Prerequisite: parent `ws` or `ud` project already created. CLI: `create --kind cm --parent-schema <parent> [--parent-type ws|ud]`.
 
-### Singleton schemas (utils, am, audit)
+### Satellite schemas (utils, am, cm, audit, cibs)
 
 | Kind | Create requirements |
 |------|---------------------|
-| **utils** | `--ws-schema` and `--ud-schema` |
+| **utils** | Standalone create; integrate each parent with `--ws-schema` / `--ud-schema` |
 | **am** | Standalone |
-| **audit** | `audit structure` once; `audit activate --schema <ws|ud>` per project |
+| **cm** | `--parent-schema` + `--parent-type ws\|ud` |
+| **audit** | `structure` profile once; `activate` per parent project |
+| **cibs** | Standalone create; `integrate` profile wires parent ws/ud |
 
 pgTAP bootstrap uses `create --profile ci` on `ws` or `ud` — see [Testing](#testing).
 
@@ -334,7 +353,7 @@ Jobs run groups in parallel; each test job restores the same dump into a fresh P
 | [`test/prove_inner.sh`](./test/prove_inner.sh) | One `TEST_GROUPS`; `-j 1` for function/data |
 | [`test/dump_schema.sh`](./test/dump_schema.sh) | `pg_dump -n {schema}` |
 | [`test/replace_vars.py`](./test/replace_vars.py) | Staging copy for pgTAP |
-| [`test/plugin_version.py`](./test/plugin_version.py) | Max semver from `updates/` |
+| [`test/plugin_version.py`](./test/plugin_version.py) | Max semver from `schemas/main/*/updates/` |
 | [`test/diagnose_db.sh`](./test/diagnose_db.sh) | Optional host `psql` via debug compose |
 
 Plugin version helper:
@@ -407,7 +426,7 @@ Giswater uses **Major**, **Minor**, and **Patch** (Build) releases:
 - **Minor**: features and fixes (backward compatible)
 - **Patch**: small fixes
 
-SQL patches under `schemas/*/updates/<M>/<m>/<p>/` follow plugin semver caps via `--plugin-version`.
+SQL patches under `schemas/main/*/updates/<M>/<m>/<p>/` and `schemas/addon/*/updates/<M>/<m>/<p>/` follow plugin semver caps via `--plugin-version`.
 
 ---
 
