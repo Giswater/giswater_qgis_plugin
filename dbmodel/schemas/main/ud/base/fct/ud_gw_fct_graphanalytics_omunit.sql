@@ -54,8 +54,6 @@ DECLARE
 
     -- result variables
     v_result JSON;
-    -- result variables
-    v_result JSON;
     v_result_info JSON;
     v_result_polygon JSON;
     v_result_polygon_omunit JSON;
