@@ -53,7 +53,6 @@ DECLARE
 
     v_response JSON;
     v_error_context TEXT;
-    v_result_info JSON;
     v_result_point JSON;
     v_result_line JSON;
     v_result_polygon JSON;
@@ -494,12 +493,12 @@ BEGIN
     FROM (
         SELECT
             ta.mapzone_id AS minsector_id,
-            array_agg(DISTINCT va.expl_id) AS expl_id_arr,
-            array_agg(DISTINCT va.dma_id) AS dma_id_arr,
-            array_agg(DISTINCT va.dqa_id) AS dqa_id_arr,
-            array_agg(DISTINCT va.muni_id) AS muni_id_arr,
-            array_agg(DISTINCT va.sector_id) AS sector_id_arr,
-            array_agg(DISTINCT va.supplyzone_id) AS supplyzone_id_arr
+            array_agg(DISTINCT va.expl_id ORDER BY va.expl_id) AS expl_id_arr,
+            array_agg(DISTINCT va.dma_id ORDER BY va.dma_id) AS dma_id_arr,
+            array_agg(DISTINCT va.dqa_id ORDER BY va.dqa_id) AS dqa_id_arr,
+            array_agg(DISTINCT va.muni_id ORDER BY va.muni_id) AS muni_id_arr,
+            array_agg(DISTINCT va.sector_id ORDER BY va.sector_id) AS sector_id_arr,
+            array_agg(DISTINCT va.supplyzone_id ORDER BY va.supplyzone_id) AS supplyzone_id_arr
         FROM temp_pgr_arc ta
         JOIN arc va ON va.arc_id = ta.pgr_arc_id
         GROUP BY ta.mapzone_id
@@ -897,16 +896,7 @@ BEGIN
 
     EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4354", "function":"2706", "fid":"'||v_fid||'", "is_process":true, "tempTable":"temp_"}}$$)';
 
-    -- Info
-    SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-    FROM (
-        SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user = current_user AND fid = v_fid ORDER BY id
-    ) row;
-    v_result := COALESCE(v_result, '{}');
-    v_result_info := CONCAT('{"values":', v_result, '}');
-
     -- Control nulls
-    v_result_info := COALESCE(v_result_info, '{}');
     v_result_point := COALESCE(v_result_point, '{}');
     v_result_line := COALESCE(v_result_line, '{}');
     v_result_polygon := COALESCE(v_result_polygon, '{}');
@@ -922,8 +912,7 @@ BEGIN
     RETURN gw_fct_json_create_return(
         ('{"status":"Accepted", "message":{"level":1, "text":"Minsector dynamic analysis done successfully"}, "version":"' || v_version || '"' ||
         ',"body":{"form":{}' ||
-        ',"data":{"info":' || v_result_info || ',' ||
-        '"point":' || v_result_point || ',' ||
+        ',"data":{"point":' || v_result_point || ',' ||
         '"line":' || v_result_line || ',' ||
         '"polygon":' || v_result_polygon || '}' ||
         '}' ||

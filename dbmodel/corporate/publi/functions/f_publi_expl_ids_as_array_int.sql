@@ -6,12 +6,13 @@ or (at your option) any later version.
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+-- DROP FUNCTION publi.f_publi_expl_ids_as_array(_int4);
 
-DELETE FROM config_function WHERE id = 3424;
-DELETE FROM config_function WHERE id = 3066;
-
-UPDATE config_function c SET id = s.id
-FROM sys_function s
-WHERE c.function_name = s.function_name
-AND c.id <> s.id;
+CREATE OR REPLACE FUNCTION publi.f_publi_expl_ids_as_array(p_expl_ids integer[])
+ RETURNS integer[]
+ LANGUAGE sql
+ IMMUTABLE
+AS $function$
+    SELECT COALESCE(p_expl_ids, ARRAY[]::integer[]);
+$function$
+;
