@@ -66,16 +66,6 @@ DECLARE
 	v_response JSON;
 
     v_error_context text;
-    v_result_polygon_omunit JSON;
-    v_result_polygon_macroomunit JSON;
-
-    -- response variables
-	v_level integer;
-	v_status text;
-	v_message text;
-	v_response JSON;
-
-    v_error_context text;
 
 	-- LOCK LEVEL LOGIC
 	v_original_disable_locklevel json;
