@@ -15,7 +15,7 @@ phases:
     type: sql_dir
     description: "DDL + common functions/triggers + ws functions/triggers + ws schema_model"
     steps:
-      - { source: "schemas/main/common/base/ddl",  recursive: false }
+      - { source: "schemas/main/common/base/init.sql",  recursive: false }
       - { source: "schemas/main/common/base/fct",  recursive: false }
       - { source: "schemas/main/common/base/ftrg", recursive: false }
       - { source: "schemas/main/ws/base/fct",          recursive: false }

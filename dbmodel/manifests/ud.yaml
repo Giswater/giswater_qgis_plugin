@@ -10,7 +10,7 @@ phases:
   - id: load_base
     type: sql_dir
     steps:
-      - { source: "schemas/main/common/base/ddl",  recursive: false }
+      - { source: "schemas/main/common/base/init.sql",  recursive: false }
       - { source: "schemas/main/common/base/fct",  recursive: false }
       - { source: "schemas/main/common/base/ftrg", recursive: false }
       - { source: "schemas/main/ud/base/fct",          recursive: false }
