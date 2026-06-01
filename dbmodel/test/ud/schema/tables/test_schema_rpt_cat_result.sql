@@ -23,7 +23,7 @@ SELECT columns_are(
     ARRAY[
         'result_id', 'exec_date', 'cur_user', 'inp_options', 'rpt_stats', 'export_options',
         'network_stats', 'status', 'addparam', 'expl_id', 'network_type', 'sector_id',
-        'descript', 'iscorporate', 'inp_file'
+        'descript', 'iscorporate', 'inp_file', 'is_twin'
     ],
     'Table rpt_cat_result should have the correct columns'
 );
@@ -44,6 +44,7 @@ SELECT col_type_is('rpt_cat_result', 'sector_id', 'int4[]', 'Column sector_id sh
 SELECT col_type_is('rpt_cat_result', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('rpt_cat_result', 'iscorporate', 'bool', 'Column iscorporate should be bool');
 SELECT col_type_is('rpt_cat_result', 'inp_file', 'bytea', 'Column inp_file should be bytea');
+SELECT col_type_is('rpt_cat_result', 'is_twin', 'bool', 'Column is_twin should be bool');
 
 -- Finish
 SELECT * FROM finish();
