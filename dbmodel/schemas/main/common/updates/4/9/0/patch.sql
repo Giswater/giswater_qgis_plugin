@@ -35,41 +35,70 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"data":{"action":"MULTI-DE
 drop view if exists v_edit_connec;
 drop view if exists ve_connec;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_municipality", "column":"expl_id"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_municipality", "column":"sector_id"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_address", "column":"expl_id"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_streetaxis", "column":"expl_id"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_plot", "column":"expl_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_municipality", "column":"expl_id", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"ext_municipality", "column":"sector_id", "isUtils":true}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_address", "column":"ext_code", "newName":"code"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_municipality", "column":"ext_code", "newName":"code"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_district", "column":"ext_code", "newName":"code"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_plot", "column":"plot_code", "newName":"code"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_province", "column":"ext_code", "newName":"code"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_region", "column":"ext_code", "newName":"code"}}$$);
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+    SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+    IF NOT v_utils THEN
+      ALTER TABLE ext_address DROP COLUMN IF EXISTS expl_id;
+      ALTER TABLE ext_streetaxis DROP COLUMN IF EXISTS expl_id;
+      ALTER TABLE ext_plot DROP COLUMN IF EXISTS expl_id;
+      ELSE
+      ALTER TABLE utils.address DROP COLUMN IF EXISTS ws_expl_id;
+      ALTER TABLE utils.address DROP COLUMN IF EXISTS ud_expl_id;
+      
+      ALTER TABLE utils.streetaxis DROP COLUMN IF EXISTS ws_expl_id;
+      ALTER TABLE utils.streetaxis DROP COLUMN IF EXISTS ud_expl_id;
+      
+      ALTER TABLE utils.plot DROP COLUMN IF EXISTS ws_expl_id;
+      ALTER TABLE utils.plot DROP COLUMN IF EXISTS ud_expl_id;
+    END IF;
+END $$;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_address", "column":"ext_code", "newName":"code", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_municipality", "column":"ext_code", "newName":"code", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_district", "column":"ext_code", "newName":"code", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_plot", "column":"plot_code", "newName":"code", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_province", "column":"ext_code", "newName":"code", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ext_region", "column":"ext_code", "newName":"code", "isUtils":true}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec", "column":"plot_code", "newName":"plot_id"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_address", "column":"code", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_streetaxis", "column":"code", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_district", "column":"code", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_plot", "column":"code", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_municipality", "column":"code", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_province", "column":"code", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_region", "column":"code", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_address", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_streetaxis", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_district", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_plot", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_municipality", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_province", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_region", "column":"code", "dataType":"varchar(100)", "isUtils":true}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"connec", "column":"plot_id", "dataType":"varchar(100)"}}$$);
 
 
-CREATE SEQUENCE ext_plot_id_seq
-	INCREMENT BY 1
-	MINVALUE 1
-	MAXVALUE 2147483647
-	START 1
-	CACHE 1
-	NO CYCLE;
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
 
-ALTER TABLE ext_plot ALTER COLUMN id SET DEFAULT nextval('ext_plot_id_seq');
-ALTER TABLE ext_streetaxis ALTER COLUMN id SET DEFAULT nextval('ext_streetaxis_id_seq');
-ALTER TABLE ext_address ALTER COLUMN id SET DEFAULT nextval('ext_address_id_seq');
+    SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+    IF v_utils IS true THEN
+  ELSE
+    CREATE SEQUENCE ext_plot_id_seq
+      INCREMENT BY 1
+      MINVALUE 1
+      MAXVALUE 2147483647
+      START 1
+      CACHE 1
+      NO CYCLE;
+
+    ALTER TABLE ext_plot ALTER COLUMN id SET DEFAULT nextval('ext_plot_id_seq');
+    ALTER TABLE ext_streetaxis ALTER COLUMN id SET DEFAULT nextval('ext_streetaxis_id_seq');
+    ALTER TABLE ext_address ALTER COLUMN id SET DEFAULT nextval('ext_address_id_seq');
+  END IF;
+END $$;
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer", "column":"customer_code", "dataType":"varchar(30)"}}$$);
@@ -258,121 +287,182 @@ END $$;
 
 ALTER TABLE sys_table ADD COLUMN IF NOT EXISTS provider_config jsonb NULL;
 
-CREATE OR REPLACE VIEW v_municipality AS
-SELECT * FROM ext_municipality;
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS TRUE THEN
+		CREATE OR REPLACE VIEW v_municipality AS
+		SELECT * FROM utils.municipality;
+
+		CREATE OR REPLACE VIEW v_streetaxis AS
+		SELECT * FROM utils.streetaxis;
+
+		CREATE OR REPLACE VIEW v_address AS
+		SELECT * FROM utils.address;
+
+		CREATE OR REPLACE VIEW v_plot AS
+		SELECT * FROM utils.plot;
+
+		CREATE OR REPLACE VIEW v_raster_dem AS
+		SELECT * FROM utils.raster_dem;
+
+		CREATE OR REPLACE VIEW v_district AS
+		SELECT * FROM utils.district;
+
+		CREATE OR REPLACE VIEW v_region AS
+		SELECT * FROM utils.region;
+
+		CREATE OR REPLACE VIEW v_province AS
+		SELECT * FROM utils.province;
+
+		CREATE OR REPLACE VIEW v_type_street AS
+		SELECT * FROM utils.type_street;
+	ELSE
+		CREATE OR REPLACE VIEW v_municipality AS
+		SELECT * FROM ext_municipality;
+
+		CREATE OR REPLACE VIEW v_streetaxis AS
+		SELECT * FROM ext_streetaxis;
+
+		CREATE OR REPLACE VIEW v_address AS
+		SELECT * FROM ext_address;
+
+		CREATE OR REPLACE VIEW v_plot AS
+		SELECT * FROM ext_plot;
+
+		CREATE OR REPLACE VIEW v_raster_dem AS
+		SELECT * FROM ext_raster_dem;
+
+		CREATE OR REPLACE VIEW v_district AS
+		SELECT * FROM ext_district;
+
+		CREATE OR REPLACE VIEW v_region AS
+		SELECT * FROM ext_region;
+
+		CREATE OR REPLACE VIEW v_province AS
+		SELECT * FROM ext_province;
+
+		CREATE OR REPLACE VIEW v_type_street AS
+		SELECT * FROM ext_type_street;
+	END IF;
+END $$;
 
 CREATE OR REPLACE VIEW ve_municipality
 AS SELECT DISTINCT s.muni_id,
-    m.name,
-    m.active,
-    m.the_geom
-   FROM v_municipality m,
-    selector_municipality s
-  WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW v_streetaxis AS
-SELECT * FROM ext_streetaxis;
+	m.name,
+	m.active,
+	m.the_geom
+FROM v_municipality m,
+	selector_municipality s
+WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW ve_streetaxis
 AS SELECT v_streetaxis.id,
-    v_streetaxis.code,
-    v_streetaxis.type,
-    v_streetaxis.name,
-    v_streetaxis.text,
-    v_streetaxis.the_geom,
-    v_streetaxis.muni_id,
-        CASE
-            WHEN v_streetaxis.type IS NULL THEN v_streetaxis.name::text
-            WHEN v_streetaxis.text IS NULL THEN ((v_streetaxis.name::text || ', '::text) || v_streetaxis.type::text) || '.'::text
-            WHEN v_streetaxis.type IS NULL AND v_streetaxis.text IS NULL THEN v_streetaxis.name::text
-            ELSE (((v_streetaxis.name::text || ', '::text) || v_streetaxis.type::text) || '. '::text) || v_streetaxis.text
-        END AS descript,
-    v_streetaxis.source
-   FROM selector_municipality,
-    v_streetaxis
-  WHERE v_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
+	v_streetaxis.code,
+	v_streetaxis.type,
+	v_streetaxis.name,
+	v_streetaxis.text,
+	v_streetaxis.the_geom,
+	v_streetaxis.muni_id,
+		CASE
+			WHEN v_streetaxis.type IS NULL THEN v_streetaxis.name::text
+			WHEN v_streetaxis.text IS NULL THEN ((v_streetaxis.name::text || ', '::text) || v_streetaxis.type::text) || '.'::text
+			WHEN v_streetaxis.type IS NULL AND v_streetaxis.text IS NULL THEN v_streetaxis.name::text
+			ELSE (((v_streetaxis.name::text || ', '::text) || v_streetaxis.type::text) || '. '::text) || v_streetaxis.text
+		END AS descript,
+	v_streetaxis.source
+FROM selector_municipality,
+	v_streetaxis
+WHERE v_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
 
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
 
-CREATE OR REPLACE VIEW v_address AS
-SELECT * FROM ext_address;
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS TRUE THEN
+		CREATE OR REPLACE VIEW ve_raster_dem
+		AS SELECT DISTINCT ON (r.id) r.id,
+			c.code,
+			c.alias,
+			c.raster_type,
+			c.descript,
+			c.source,
+			c.provider,
+			c.year,
+			r.rast,
+			r.rastercat_id,
+			r.envelope
+		FROM ve_municipality a,
+			v_raster_dem r
+			JOIN utils.cat_raster c ON c.id = r.rastercat_id
+		WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+	ELSE
+		CREATE OR REPLACE VIEW ve_raster_dem
+		AS SELECT DISTINCT ON (r.id) r.id,
+			c.code,
+			c.alias,
+			c.raster_type,
+			c.descript,
+			c.source,
+			c.provider,
+			c.year,
+			r.rast,
+			r.rastercat_id,
+			r.envelope
+		FROM ve_municipality a,
+			v_raster_dem r
+			JOIN ext_cat_raster c ON c.id = r.rastercat_id
+		WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
+	END IF;
+END $$;
 
 CREATE OR REPLACE VIEW ve_address
 AS SELECT v_address.id,
-    v_address.muni_id,
-    v_address.postcode,
-    v_address.streetaxis_id,
-    v_address.postnumber,
-    v_address.plot_id,
-    v_streetaxis.name,
-    v_address.the_geom,
-    v_address.postcomplement,
-    v_address.code,
-    v_address.source
-   FROM selector_municipality s,
-    v_address
-     LEFT JOIN v_streetaxis ON v_streetaxis.id::text = v_address.streetaxis_id::text
-  WHERE v_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW v_plot AS
-SELECT * FROM ext_plot;
+	v_address.muni_id,
+	v_address.postcode,
+	v_address.streetaxis_id,
+	v_address.postnumber,
+	v_address.plot_id,
+	v_streetaxis.name,
+	v_address.the_geom,
+	v_address.postcomplement,
+	v_address.code,
+	v_address.source
+FROM selector_municipality s,
+	v_address
+	LEFT JOIN v_streetaxis ON v_streetaxis.id::text = v_address.streetaxis_id::text
+WHERE v_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW ve_plot
 AS SELECT v_plot.id,
-    v_plot.code,
-    v_plot.muni_id,
-    v_plot.postcode,
-    v_plot.streetaxis_id,
-    v_plot.postnumber,
-    v_plot.complement,
-    v_plot.placement,
-    v_plot.square,
-    v_plot.observ,
-    v_plot.text,
-    v_plot.the_geom
-   FROM selector_municipality s,
-    v_plot
-  WHERE v_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW v_raster_dem AS
-SELECT * FROM ext_raster_dem;
-
-CREATE OR REPLACE VIEW ve_raster_dem
-AS SELECT DISTINCT ON (r.id) r.id,
-    c.code,
-    c.alias,
-    c.raster_type,
-    c.descript,
-    c.source,
-    c.provider,
-    c.year,
-    r.rast,
-    r.rastercat_id,
-    r.envelope
-   FROM ve_municipality a,
-    v_raster_dem r
-     JOIN ext_cat_raster c ON c.id = r.rastercat_id
-  WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
-
-CREATE OR REPLACE VIEW v_district AS
-SELECT * FROM ext_district;
+	v_plot.code,
+	v_plot.muni_id,
+	v_plot.postcode,
+	v_plot.streetaxis_id,
+	v_plot.postnumber,
+	v_plot.complement,
+	v_plot.placement,
+	v_plot.square,
+	v_plot.observ,
+	v_plot.text,
+	v_plot.the_geom
+FROM selector_municipality s,
+	v_plot
+WHERE v_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW ve_district
 AS SELECT v_district.*
-   FROM selector_municipality s,
-    v_district
-  WHERE v_district.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+FROM selector_municipality s,
+	v_district
+WHERE v_district.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
-CREATE OR REPLACE VIEW v_region AS
-SELECT * FROM ext_region;
-
-CREATE OR REPLACE VIEW v_province AS
-SELECT * FROM ext_province;
-
-CREATE OR REPLACE VIEW v_type_street AS
-SELECT * FROM ext_type_street;
 
 CREATE OR REPLACE VIEW vf_arc AS
  SELECT a.arc_id, COALESCE(pp.state, a.state) AS p_state
@@ -634,7 +724,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 
 INSERT INTO sys_message
 (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4624, 'There are values not allowed in the field ''%alias%'' (%column%) of the table ''%table%''', NULL, 0, true, 'utils', 'core', 'AUDIT');
+VALUES(4624, 'There are values not allowed in the field ''%alias%'' (%column%) of the table ''%table%''', NULL, 0, true, 'utils', 'core', 'AUDIT') ON CONFLICT DO NOTHING;
 
 DELETE FROM config_form_tabs WHERE formname='selector_basic' AND tabname='tab_hydro_state';
 DELETE FROM config_typevalue WHERE typevalue='tabname_typevalue' AND id='tab_hydro_state';
@@ -1087,8 +1177,22 @@ VALUES('visitmanager_form', 'utils', 'tbl_visit_manager', 'id', 0, true, NULL, N
 DELETE FROM config_param_system
 	WHERE "parameter"='basic_search_v2_tab_hydrometer';
 
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+		ALTER TABLE connec ADD CONSTRAINT connec_plot_id_fkey FOREIGN KEY (plot_id) REFERENCES utils.plot(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	ELSE
+		ALTER TABLE connec ADD CONSTRAINT connec_plot_id_fkey FOREIGN KEY (plot_id) REFERENCES ext_plot(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+	END IF;
+END $$;
+
 CREATE INDEX connec_plot_code ON connec USING btree (code);
-ALTER TABLE connec ADD CONSTRAINT connec_plot_id_fkey FOREIGN KEY (plot_id) REFERENCES ext_plot(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
 
 ALTER TABLE cat_feature_node ALTER COLUMN graph_delimiter SET DEFAULT '{NONE}';
 
@@ -1147,8 +1251,21 @@ ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON link FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('link_id');
 
-DROP TRIGGER gw_trg_fk_array_array_table_expl ON ext_municipality;
-DROP TRIGGER gw_trg_fk_array_array_table_sector ON ext_municipality;
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+		DROP TRIGGER gw_trg_fk_array_array_table_expl ON utils.municipality;
+		DROP TRIGGER gw_trg_fk_array_array_table_sector ON utils.municipality;
+	ELSE
+		DROP TRIGGER gw_trg_fk_array_array_table_expl ON ext_municipality;
+		DROP TRIGGER gw_trg_fk_array_array_table_sector ON ext_municipality;
+	END IF;
+END $$;
 
 create trigger gw_trg_edit_address instead of insert or delete or update on ve_address for each row execute function gw_trg_edit_address();
 create trigger gw_trg_edit_municipality instead of insert or delete or update on ve_municipality for each row execute function gw_trg_edit_municipality();
