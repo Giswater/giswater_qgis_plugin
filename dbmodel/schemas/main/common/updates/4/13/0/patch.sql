@@ -8,4 +8,6 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog; 
 
 -- Add column is_twin
-ALTER TABLE rpt_cat_result ADD COLUMN is_twin boolean DEFAULT false;
+ALTER TABLE rpt_cat_result ADD COLUMN IF NOT EXISTS is_twin boolean DEFAULT false;
+
+ALTER TABLE rpt_cat_result ADD COLUMN IF NOT EXISTS parent_id varchar(16);
