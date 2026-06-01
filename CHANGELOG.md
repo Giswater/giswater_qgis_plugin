@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - pgTAP tests for UD link views (`ve_link`, `ve_link_vlink`, `ve_link_pipelink`).
 - CI/dbmodel: PostGIS matrix, Docker/Podman test runner, parallel `pg_prove`, and stricter SQL folder validation in `sql_runner`.
 - libs: `show_warning_box`, configurable DB connection timeout, and message boxes that respect `message_parent` (modal child of admin dialogs).
+- Add column `is_twin` and `parent_id` to `rpt_cat_result`
+- Add column `vnom` to `man_tank`
+- Recreate triggers for `pol` tables
 
 ### Changed
 

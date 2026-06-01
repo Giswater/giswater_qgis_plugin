@@ -1,1 +1,2 @@
 - refactor `hydrometers`: create new views from hydrometers
+- recreate triggers for `pol` tables

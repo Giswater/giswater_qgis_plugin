@@ -132,3 +132,26 @@ UPDATE config_form_fields SET formname = 'ext_hydrometer' WHERE formname = 'ext_
 UPDATE config_form_fields SET formname = 'ext_hydrometer_period' WHERE formname = 'ext_rtc_hydrometer_data';
 
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
+DROP TRIGGER IF EXISTS gw_trg_edit_pol_element on ve_pol_element;
+
+CREATE TRIGGER gw_trg_edit_pol_chamber INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_chamber
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_connec INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_connec_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_element INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_netgully INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_netgully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_node INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_storage INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_storage
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();
+
+CREATE TRIGGER gw_trg_edit_pol_wwtp INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_pol_wwtp
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();

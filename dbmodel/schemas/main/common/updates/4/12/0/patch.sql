@@ -213,3 +213,8 @@ ALTER TABLE ext_hydrometer ADD CONSTRAINT ext_hydrometer_ext_cat_hydrometer_stat
 ALTER TABLE ext_hydrometer ADD CONSTRAINT ext_hydrometer_ext_cat_hydrometer_priority_fk FOREIGN KEY (priority_id) REFERENCES ext_cat_hydrometer_priority(id);
 
 ALTER TABLE IF EXISTS sys_version ADD COLUMN IF NOT EXISTS addparam jsonb;
+
+-- Add column is_twin
+ALTER TABLE rpt_cat_result ADD COLUMN IF NOT EXISTS is_twin boolean DEFAULT false;
+
+ALTER TABLE rpt_cat_result ADD COLUMN IF NOT EXISTS parent_id varchar(16);

@@ -1,1 +1,2 @@
 - refactor `hydrometers`: create new views from hydrometers
+- add column `vnom` to `man_tank`
