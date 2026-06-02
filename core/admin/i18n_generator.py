@@ -1165,7 +1165,7 @@ class GwI18NGenerator:
 
         self.path_dic = {
             "i18n_ws": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ws{os.sep}i18n{os.sep}{self.language}{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}schemas{os.sep}main{os.sep}ws{os.sep}final_pass{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["ws", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
@@ -1176,7 +1176,7 @@ class GwI18NGenerator:
                     "su_basic_tables", "dbjson", "dbconfig_form_fields_json"]
             },
             "i18n_ud": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}final_pass{os.sep}ud{os.sep}i18n{os.sep}{self.language}{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}schemas{os.sep}main{os.sep}ud{os.sep}final_pass{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["ud", "utils"],
                 "checkbox": self.dlg_qm.chk_i18n_files,
@@ -1187,14 +1187,14 @@ class GwI18NGenerator:
                     "su_basic_tables", "dbjson", "dbconfig_form_fields_json"]
             },
             "am": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}am{os.sep}i18n{os.sep}{self.language}{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}schemas{os.sep}addon{os.sep}am{os.sep}final_pass{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["am"],
                 "checkbox": self.dlg_qm.chk_am_files,
                 "tables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]
             },
             "cm": {
-                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}cm{os.sep}i18n{os.sep}{self.language}{os.sep}",
+                "path": f"{self.plugin_dir}{os.sep}dbmodel{os.sep}schemas{os.sep}addon{os.sep}cm{os.sep}final_pass{os.sep}i18n{os.sep}{self.language}{os.sep}",
                 "name": f"{self.language}.sql",
                 "project_type": ["cm"],
                 "checkbox": self.dlg_qm.chk_cm_files,
