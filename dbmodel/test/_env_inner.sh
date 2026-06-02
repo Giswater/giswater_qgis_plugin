@@ -8,7 +8,7 @@ TEST_GROUPS="${TEST_GROUPS:-all}"
 PG_PROVE_JOBS="${PG_PROVE_JOBS:-4}"
 GW_CONN="${GW_CONN:-postgresql://postgres:postgres@127.0.0.1:5432/gw_db}"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="${GW_TEST_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 DBMODEL_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 REPO_ROOT="$(cd "${DBMODEL_DIR}/.." && pwd)"
 STAGING_MARKER="${SCRIPT_DIR}/.run/.staging_${PROJECT}"

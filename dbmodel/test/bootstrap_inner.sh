@@ -3,7 +3,8 @@
 set -euo pipefail
 
 # shellcheck source=_env_inner.sh
-source "$(dirname "${BASH_SOURCE[0]}")/_env_inner.sh" "${1:?Usage: bootstrap_inner.sh ws|ud}"
+_TEST_ROOT="${GW_TEST_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+source "${_TEST_ROOT}/_env_inner.sh" "${1:?Usage: bootstrap_inner.sh ws|ud}"
 
 echo "==> giswater_admin init-db"
 python3 -m giswater_admin init-db --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" \

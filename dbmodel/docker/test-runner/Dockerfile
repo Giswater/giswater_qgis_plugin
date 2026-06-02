@@ -17,4 +17,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends "postgresql-client-${PG_MAJOR}" \
     && rm -rf /var/lib/apt/lists/*
 
+COPY docker/test-runner/gw_bash.sh /usr/local/lib/gw-test/gw_bash.sh
+COPY docker/test-runner/entrypoint.sh /usr/local/bin/gw-test-entrypoint
+RUN chmod +x /usr/local/bin/gw-test-entrypoint
+
 WORKDIR /workspace

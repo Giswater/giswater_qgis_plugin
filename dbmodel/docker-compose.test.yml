@@ -25,8 +25,8 @@ services:
       dockerfile: docker/test-runner/Dockerfile
       args:
         PG_MAJOR: ${PG_MAJOR:-16}
-    # Inner script path lives here (not on host argv) so Git Bash MSYS does not rewrite /workspace/...
-    entrypoint: ["/bin/bash", "/workspace/dbmodel/test/run_tests_inner.sh"]
+    # Image entrypoint strips CRLF from bind-mounted test/*.sh (Windows checkout).
+    entrypoint: ["/usr/local/bin/gw-test-entrypoint"]
     network_mode: service:postgres
     depends_on:
       postgres:

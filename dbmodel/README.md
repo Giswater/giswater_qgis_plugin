@@ -319,7 +319,7 @@ Inside Docker, Postgres is always `127.0.0.1:5432` on the compose network. A war
 
 | Symptom | Action |
 |---------|--------|
-| `env: 'bash\r': No such file or directory` | Script saved with Windows CRLF — `sed -i 's/\r$//' dbmodel/test/*.sh`; repo `.gitattributes` keeps `*.sh` as LF |
+| `env: 'bash\r'` or `set: pipefail: invalid option` | Windows CRLF on `test/*.sh`. Host: `sed -i 's/\r$//' dbmodel/test/*.sh`. Runner strips `\r` in-container — **rebuild** after pull: `docker compose -f docker-compose.test.yml build runner` |
 | `500 Internal Server Error` on `docker.sock/_ping` | Start or restart Docker Desktop; wait until `docker info` works |
 | Stale volume / odd failures | `GW_CLEAN=1 ./dbmodel/test/run_tests.sh ws` |
 | `schema ws_40 already exists` | Bootstrap drops first; if stuck, `GW_CLEAN=1` |

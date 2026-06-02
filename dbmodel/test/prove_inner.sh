@@ -4,7 +4,8 @@ set -euo pipefail
 shopt -s nullglob
 
 # shellcheck source=_env_inner.sh
-source "$(dirname "${BASH_SOURCE[0]}")/_env_inner.sh" "${1:?Usage: prove_inner.sh ws|ud}"
+_TEST_ROOT="${GW_TEST_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+source "${_TEST_ROOT}/_env_inner.sh" "${1:?Usage: prove_inner.sh ws|ud}"
 
 if [[ -f "${STAGING_MARKER}" ]]; then
   TEST_STAGING="$(cat "${STAGING_MARKER}")"

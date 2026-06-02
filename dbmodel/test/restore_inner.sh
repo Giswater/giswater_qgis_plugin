@@ -3,7 +3,8 @@
 set -euo pipefail
 
 # shellcheck source=_env_inner.sh
-source "$(dirname "${BASH_SOURCE[0]}")/_env_inner.sh" "${1:?Usage: restore_inner.sh ws|ud}"
+_TEST_ROOT="${GW_TEST_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+source "${_TEST_ROOT}/_env_inner.sh" "${1:?Usage: restore_inner.sh ws|ud}"
 
 GW_SCHEMA_DUMP="${GW_SCHEMA_DUMP:?GW_SCHEMA_DUMP required (path to pg_dump -Fc)}"
 if [[ ! -f "${GW_SCHEMA_DUMP}" ]]; then
