@@ -92,7 +92,7 @@ BEGIN
         IF v_new_data::jsonb ? 'the_geom' THEN
             -- TODO: This line has been commented, waiting to resolve the management of labels when opening the audit form from the plugin
             --v_new_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_new_data);
-            v_geometry := ST_AsText(NEW.the_geom);
+            v_geometry := COALESCE(ST_AsText(NEW.the_geom), 'NULL');
             v_new_data := jsonb_set(v_new_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
         END IF;
 
@@ -104,7 +104,7 @@ BEGIN
         IF v_old_data::jsonb ? 'the_geom' THEN
             -- TODO: This line has been commented, waiting to resolve the management of labels when opening the audit form from the plugin
             --v_old_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_old_data);
-            v_geometry := ST_AsText(OLD.the_geom);
+            v_geometry := COALESCE(ST_AsText(OLD.the_geom), 'NULL');
             v_old_data := jsonb_set(v_old_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
         END IF;
     END IF;
