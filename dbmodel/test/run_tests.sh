@@ -78,8 +78,9 @@ fi
 echo "==> postgres ready"
 
 EXIT_CODE=0
-compose run --rm -T runner \
-  bash /workspace/dbmodel/test/run_tests_inner.sh "${PROJECT}" || EXIT_CODE=$?
+if ! compose run --rm -T runner "${PROJECT}"; then
+  EXIT_CODE=$?
+fi
 
 # runner is ephemeral (compose run --rm); stop postgres only (avoids podman-compose runner errors)
 if [[ -n "${GW_CLEAN:-}" ]]; then

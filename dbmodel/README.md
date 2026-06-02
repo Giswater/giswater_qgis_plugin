@@ -241,6 +241,7 @@ pgTAP tests run in Docker: a `postgres` service plus a `runner` container that c
 ### Prerequisites
 
 - [ ] **Docker Desktop** (or Docker Engine) running — `docker info` must succeed.
+- [ ] **bash** (macOS, Linux, WSL). Same script everywhere; only pitfall is CRLF on `*.sh` if an editor saves Windows line endings.
 - [ ] Run from **plugin repo root** or `dbmodel/`.
 - [ ] On **Apple Silicon**, images are `linux/amd64` (emulation); first `PG_MAJOR` build can take several minutes.
 
@@ -318,6 +319,7 @@ Inside Docker, Postgres is always `127.0.0.1:5432` on the compose network. A war
 
 | Symptom | Action |
 |---------|--------|
+| `env: 'bash\r': No such file or directory` | Script saved with Windows CRLF — `sed -i 's/\r$//' dbmodel/test/*.sh`; repo `.gitattributes` keeps `*.sh` as LF |
 | `500 Internal Server Error` on `docker.sock/_ping` | Start or restart Docker Desktop; wait until `docker info` works |
 | Stale volume / odd failures | `GW_CLEAN=1 ./dbmodel/test/run_tests.sh ws` |
 | `schema ws_40 already exists` | Bootstrap drops first; if stuck, `GW_CLEAN=1` |
