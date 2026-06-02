@@ -39,6 +39,8 @@ v_filter_split text;
 v_record record;
 v_geom text;
 
+v_limit integer;
+
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
@@ -71,6 +73,9 @@ BEGIN
 				AND isenabled = TRUE
 				AND (v_device = ANY(device) OR device IS NULL)
 		LOOP
+
+			v_limit = COALESCE((v_tab_params->>'sys_limit')::int, 10);
+
 			IF v_parameter = 'basic_search_v2_tab_psector' AND v_tiled IS TRUE THEN
 				CONTINUE;
 			END IF;
@@ -84,7 +89,7 @@ BEGIN
 				IF v_record.count = 1 THEN
 					v_sys_query_text_add = v_tab_params->>'sys_query_text_add';
 					v_sql = concat(v_sys_query_text_add, '''%', v_filter::text, '%'' order by "displayName"');
-					v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sql::text, ' LIMIT 10)a');
+					v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sql::text, ' LIMIT ', v_limit, ')a');
 					EXECUTE v_sql INTO v_fields;
 
 					v_result = gw_fct_json_object_set_key (v_result, 'section', v_parameter);
@@ -137,7 +142,7 @@ BEGIN
 				'regexp_replace(', (v_tab_params->>'sys_display_name')::text, ',''[^0-9a-zA-Z]+'','''',''g'')'
 			);
 
-			v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sys_query_text::text, ' limit 10)a ;');
+			v_sql = concat('SELECT array_to_json(array_agg(a)) FROM (', v_sys_query_text::text, ' LIMIT ', v_limit, ')a ;');
 			EXECUTE v_sql INTO v_fields;
 
 			v_result = gw_fct_json_object_set_key (v_result, 'section', v_parameter);
