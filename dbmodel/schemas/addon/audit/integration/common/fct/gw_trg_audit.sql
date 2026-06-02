@@ -89,21 +89,24 @@ BEGIN
     IF row_to_json(NEW.*)::text != '{}' THEN
 
         v_new_data := row_to_json(NEW.*);
-        -- TODO: This line has been commented, waiting to resolve the management of labels when opening the audit form from the plugin
-        --v_new_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_new_data);
-        v_geometry := ST_AsText(NEW.the_geom);
-        v_new_data := jsonb_set(v_new_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
+        IF v_new_data::jsonb ? 'the_geom' THEN
+            -- TODO: This line has been commented, waiting to resolve the management of labels when opening the audit form from the plugin
+            --v_new_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_new_data);
+            v_geometry := ST_AsText(NEW.the_geom);
+            v_new_data := jsonb_set(v_new_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
+        END IF;
 
     END IF;
 
     IF row_to_json(OLD.*)::text != '{}' THEN
 
         v_old_data := row_to_json(OLD.*);
-        -- TODO: This line has been commented, waiting to resolve the management of labels when opening the audit form from the plugin
-        --v_old_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_old_data);
-        v_geometry := ST_AsText(OLD.the_geom);
-        v_old_data := jsonb_set(v_old_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
-
+        IF v_old_data::jsonb ? 'the_geom' THEN
+            -- TODO: This line has been commented, waiting to resolve the management of labels when opening the audit form from the plugin
+            --v_old_data := gw_fct_columns_to_labels(TG_TABLE_NAME::TEXT, v_old_data);
+            v_geometry := ST_AsText(OLD.the_geom);
+            v_old_data := jsonb_set(v_old_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
+        END IF;
     END IF;
 
     IF (TG_OP = 'INSERT') OR row_to_json(NEW.*)::text = row_to_json(OLD.*)::text THEN
@@ -112,7 +115,7 @@ BEGIN
         v_columns := string_agg(quote_ident(key), ', ') FROM json_each(v_new_data);
         v_values := string_agg(quote_literal(value), ', ') FROM json_each(v_new_data);
 
-        v_sql := format('INSERT INTO temp_PARENT_SCHEMA_%I (%s) VALUES (%s)', v_child_table, v_columns, v_values);
+        v_sql := format('INSERT INTO %I (%s) VALUES (%s)', v_child_table, v_columns, v_values);
         v_sql := REPLACE(regexp_replace(v_sql, '''(null|true|false|[0-9]+(\\.[0-9]+)?)''', '\1', 'g'), '"', '');
 
         INSERT INTO audit.log (schema, table_name, insert_by, action, new_value, query, sql, id_name, feature_id)
@@ -128,7 +131,7 @@ BEGIN
         WHERE n.value::text IS DISTINCT FROM o.value::text;
 
         IF v_sql IS NOT NULL THEN
-            v_sql := format('UPDATE temp_PARENT_SCHEMA_%I SET %s WHERE %I = ''%L''', v_child_table, v_sql, v_feature_idname, v_feature_id);
+            v_sql := format('UPDATE %I SET %s WHERE %I = ''%L''', v_child_table, v_sql, v_feature_idname, v_feature_id);
             v_sql := REPLACE(regexp_replace(v_sql, '''(null|true|false|[0-9]+(\\.[0-9]+)?)''', '\1', 'g'), '"', '');
         END IF;
 
@@ -138,7 +141,7 @@ BEGIN
 
     ELSIF (TG_OP = 'DELETE') THEN
 
-        v_sql := format('DELETE FROM temp_PARENT_SCHEMA_%I WHERE %I = %L', v_child_table, v_feature_idname, v_feature_id);
+        v_sql := format('DELETE FROM %I WHERE %I = %L', v_child_table, v_feature_idname, v_feature_id);
 
         INSERT INTO audit.log (schema, table_name, insert_by, action, old_value, query, sql, id_name, feature_id)
         VALUES (TG_TABLE_SCHEMA::TEXT, v_child_table, session_user::TEXT, 'D', v_old_data, current_query(), v_sql, v_feature_idname, v_feature_id);
