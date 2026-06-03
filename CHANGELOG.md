@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Update messages for arcs without start/final nodes.
+- Update `gw_fct_admin_manage_fields` function to use the correct schema name and table name.
 
 ## [4.12.0] - 2026-06-01
 
