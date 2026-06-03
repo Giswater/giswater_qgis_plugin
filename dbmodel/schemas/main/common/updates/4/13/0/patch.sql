@@ -46,3 +46,5 @@ FROM cat_feature ON CONFLICT DO NOTHING;
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
 SELECT child_layer, 'form_feature', 'tab_data', 'dataquality_obs', 'lyt_data_1', 58, 'text', 'text', 'Dataquality_obs', 'Observations supporting the assigned utility survey quality level.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
 FROM cat_feature ON CONFLICT DO NOTHING;
+
+ALTER TABLE man_valve ADD COLUMN turns_count NUMERIC;
