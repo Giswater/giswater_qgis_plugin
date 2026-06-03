@@ -622,7 +622,7 @@ AS WITH typevalue AS (
     c.uncertain,
     c.xyz_date,
     c.dataquality,
-    c.dataquality_obs,
+    c.dataquality_obs
    FROM connec c
      JOIN vf_connec vf ON vf.connec_id = c.connec_id
      JOIN cat_connec ON cat_connec.id::text = c.conneccat_id::text
