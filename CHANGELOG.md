@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.13.0] - 2026-06-03
+
 ### Added
 
 - Add new key `sys_limit` to `config_param_system` to set the limit of the search results, modify the `gw_fct_getsearch` function to use the new key, default to 10.
@@ -394,7 +396,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.12.0...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.0...main
+[4.13.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.12.0...v4.13.0
 [4.12.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.2...v4.12.0
 [4.11.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.1...v4.11.2
 [4.11.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.0...v4.11.1
