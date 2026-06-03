@@ -31,20 +31,23 @@ BEGIN
     FOR rec IN SELECT lower(id) as id FROM sys_feature_type --arc/node/connec/link/etc
     LOOP
 
-    EXECUTE format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS dataquality INTEGER', rec.id);
-    EXECUTE format('ALTER TABLE %s ADD COLUMN IF NOT EXISTS dataquality_obs _int4 DEFAULT ARRAY[0]', rec.id);
 
     END LOOP;
 
 END $$;
+ALTER TABLE arc ADD COLUMN IF NOT EXISTS dataquality INTEGER;
+ALTER TABLE arc ADD COLUMN IF NOT EXISTS dataquality_obs _int4 DEFAULT ARRAY[0];
 
+ALTER TABLE node ADD COLUMN IF NOT EXISTS dataquality INTEGER;
+ALTER TABLE node ADD COLUMN IF NOT EXISTS dataquality_obs _int4 DEFAULT ARRAY[0];
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-SELECT child_layer, 'form_feature', 'tab_data', 'dataquality', 'lyt_data_1', 56, 'integer', 'text', 'Dataquality', 'To indicate the number of closing-opening turns when operating the valve.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
-FROM cat_feature ON CONFLICT DO NOTHING;
+ALTER TABLE connec ADD COLUMN IF NOT EXISTS dataquality INTEGER;
+ALTER TABLE connec ADD COLUMN IF NOT EXISTS dataquality_obs _int4 DEFAULT ARRAY[0];
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-SELECT child_layer, 'form_feature', 'tab_data', 'dataquality_obs', 'lyt_data_1', 58, 'text', 'text', 'Dataquality_obs', 'Observations supporting the assigned utility survey quality level.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
-FROM cat_feature ON CONFLICT DO NOTHING;
+ALTER TABLE link ADD COLUMN IF NOT EXISTS dataquality INTEGER;
+ALTER TABLE link ADD COLUMN IF NOT EXISTS dataquality_obs _int4 DEFAULT ARRAY[0];
 
-ALTER TABLE man_valve ADD COLUMN turns_count NUMERIC;
+ALTER TABLE element ADD COLUMN IF NOT EXISTS dataquality INTEGER;
+ALTER TABLE element ADD COLUMN IF NOT EXISTS dataquality_obs _int4 DEFAULT ARRAY[0];
+
+ALTER TABLE man_valve ADD COLUMN turns_count numeric(12, 4);

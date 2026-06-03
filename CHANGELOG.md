@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add new key `sys_limit` to `config_param_system` to set the limit of the search results, modify the `gw_fct_getsearch` function to use the new key, default to 10.
+- Add new columns `dataquality` and `dataquality_obs` to the `node, arc, connec, link, element and gully` tables.
+- Add new column `turns_count` to the `man_valve` table.
 
 ### Changed
 

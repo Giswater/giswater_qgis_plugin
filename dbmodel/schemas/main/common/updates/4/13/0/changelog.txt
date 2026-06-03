@@ -1,2 +1,5 @@
 - Add new key `sys_limit` to `config_param_system` to set the limit of the search results, modify the `gw_fct_getsearch` function to use the new key, default to 10.
 - Update messages for arcs without start/final nodes.
+- Add new columns `dataquality` and `dataquality_obs` to the `node, arc, connec, link, element and gully` tables.
+- Add new column `turns_count` to the `man_valve` table.
+- Update `gw_fct_admin_manage_fields` function to use the correct schema name and table name.

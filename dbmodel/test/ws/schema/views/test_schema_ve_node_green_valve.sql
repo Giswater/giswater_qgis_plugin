@@ -214,7 +214,7 @@ SELECT col_type_is('ve_node_green_valve', 'greenvalve_param_2', 'text', 'Column 
 
 SELECT col_type_is('ve_node_green_valve', 'dataquality', 'int4', 'Column dataquality should be int4');
 SELECT col_type_is('ve_node_green_valve', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
-SELECT col_type_is('ve_node_green_valve', 'turns_count', 'numeric', 'Column turns_count should be numeric');
+SELECT col_type_is('ve_node_green_valve', 'turns_count', 'numeric(12,4)', 'Column turns_count should be numeric(12,4)');
 
 SELECT * FROM finish();
 

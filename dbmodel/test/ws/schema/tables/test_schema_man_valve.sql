@@ -56,7 +56,7 @@ SELECT col_type_is('man_valve', 'to_arc', 'int4', 'Column to_arc should be int4'
 SELECT col_type_is('man_valve', 'automated', 'bool', 'Column automated should be bool');
 SELECT col_type_is('man_valve', 'connection_type', 'int4', 'Column connection_type should be int4');
 SELECT col_type_is('man_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
-SELECT col_type_is('man_valve', 'turns_count', 'numeric', 'Column turns_count should be numeric');
+SELECT col_type_is('man_valve', 'turns_count', 'numeric(12,4)', 'Column turns_count should be numeric(12,4)');
 
 -- Check foreign keys
 SELECT has_fk('man_valve', 'Table man_valve should have foreign keys');

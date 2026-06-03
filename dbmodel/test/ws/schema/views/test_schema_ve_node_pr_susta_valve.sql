@@ -211,7 +211,7 @@ SELECT col_type_is('ve_node_pr_susta_valve', 'flowsetting', 'numeric(12,3)', 'Co
 
 SELECT col_type_is('ve_node_pr_susta_valve', 'dataquality', 'int4', 'Column dataquality should be int4');
 SELECT col_type_is('ve_node_pr_susta_valve', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
-SELECT col_type_is('ve_node_pr_susta_valve', 'turns_count', 'numeric', 'Column turns_count should be numeric');
+SELECT col_type_is('ve_node_pr_susta_valve', 'turns_count', 'numeric(12,4)', 'Column turns_count should be numeric(12,4)');
 
 SELECT * FROM finish();
 
