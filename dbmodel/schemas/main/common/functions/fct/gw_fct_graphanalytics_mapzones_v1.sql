@@ -3244,16 +3244,25 @@ BEGIN
 					SELECT DISTINCT mapzone_id FROM temp_pgr_old_mapzone
 				)
 				DELETE FROM %I mzg
-				WHERE EXISTS (SELECT 1 FROM affected_mapzone am WHERE mzg.mapzone_id = am.mapzone_id);
-			$sql$, v_mapzone_graph_table);
+				WHERE EXISTS (
+					SELECT 1
+					FROM affected_mapzone am
+					WHERE mzg.mapzone_type = %L
+					AND mzg.mapzone_id = am.mapzone_id
+				);
+			$sql$, v_mapzone_graph_table, v_class);
 
 			EXECUTE format($sql$
 				WITH affected_node AS (
 					SELECT DISTINCT node_id FROM temp_pgr_mapzone_graph
 				)
 				DELETE FROM %I mzg
-				WHERE EXISTS (SELECT 1 FROM affected_node an WHERE mzg.node_id = an.node_id);
-			$sql$, v_mapzone_graph_table);
+				WHERE EXISTS (
+					SELECT 1 
+					FROM affected_node an 
+					WHERE mzg.mapzone_type = %L
+					AND mzg.node_id = an.node_id);
+			$sql$, v_mapzone_graph_table, v_class);
 
 			IF v_netscenario IS NOT NULL THEN
 				INSERT INTO plan_netscenario_mapzone_graph (node_id, netscenario_id, mapzone_id, mapzone_type, flow_sign)
