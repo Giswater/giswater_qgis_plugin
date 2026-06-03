@@ -84,7 +84,7 @@ BEGIN
 		EXECUTE v_querytext;
 
 		-- manage config_form_fields only if column has been added to parent tables
-		IF v_table IN ('node', 'arc', 'connec', 'gully') THEN
+		IF v_target_table IN ('node', 'arc', 'connec', 'gully') THEN
 			EXECUTE 'SELECT COUNT(*) 
 			FROM config_typevalue 
 			WHERE typevalue = ''datatype_typevalue'' 
@@ -103,7 +103,7 @@ BEGIN
 				v_widgettype = 'text';
 			END IF;
 
-			FOR v_layers IN SELECT parent_layer, child_layer FROM cat_feature WHERE feature_type = UPPER(v_table)
+			FOR v_layers IN SELECT parent_layer, child_layer FROM cat_feature WHERE feature_type = UPPER(v_target_table)
 			LOOP
 				-- ve_feature
 				SELECT max(layoutorder)+1 into v_max_layoutorder from config_form_fields
@@ -126,37 +126,37 @@ BEGIN
 		END IF;
 
 
-	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL
-				AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_newname) IS NULL THEN
+	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_target_schemaname and table_name = v_target_table AND column_name = v_column) IS NOT NULL
+				AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_target_schemaname and table_name = v_target_table AND column_name = v_newname) IS NULL THEN
 
-		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' RENAME COLUMN '||quote_ident(v_column)||' TO '||quote_ident(v_newname);
+		v_querytext = 'ALTER TABLE '|| quote_ident(v_target_schemaname) || '.' || quote_ident(v_target_table) ||' RENAME COLUMN '||quote_ident(v_column)||' TO '||quote_ident(v_newname);
 		EXECUTE v_querytext;
 
 		-- manage config_form_fields
-		IF v_table IN ('node', 'arc', 'connec', 'gully') THEN
+		IF v_target_table IN ('node', 'arc', 'connec', 'gully') THEN
 
-			FOR v_layers IN SELECT DISTINCT parent_layer, child_layer FROM cat_feature WHERE feature_type = upper(v_table)
+			FOR v_layers IN SELECT DISTINCT parent_layer, child_layer FROM cat_feature WHERE feature_type = upper(v_target_table)
 			LOOP
 
 				-- edit all rows that have the old columname with the correct one, ve_*, ve_* ...
 				EXECUTE '
 				UPDATE config_form_fields 
 				SET	columnname = '||quote_literal(v_newname)||', tooltip = '||quote_literal(v_newname)||', label = '||quote_literal(concat(upper(left(v_newname, 1)), substring(v_newname, 2)))||' 
-				WHERE formname ILIKE ''%'||v_table||'%''
+				WHERE formname ILIKE ''%'||v_target_table||'%''
 				AND columnname = '||quote_literal(v_column)||'';
 
 			END LOOP;
 
 		END IF;
 
-	ELSIF v_action='DROP' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL THEN
+	ELSIF v_action='DROP' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_target_schemaname and table_name = v_target_table AND column_name = v_column) IS NOT NULL THEN
 
-		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' DROP COLUMN '||quote_ident(v_column);
+		v_querytext = 'ALTER TABLE '|| quote_ident(v_target_schemaname) || '.' || quote_ident(v_target_table) ||' DROP COLUMN '||quote_ident(v_column);
 		EXECUTE v_querytext;
 
-		if v_table in ('node', 'arc', 'connec', 'gully') then
+		if v_target_table in ('node', 'arc', 'connec', 'gully') then
 
-			for v_layers in select parent_layer, child_layer from cat_feature where feature_type = upper(v_table)
+			for v_layers in select parent_layer, child_layer from cat_feature where feature_type = upper(v_target_table)
 			loop
 				execute '
 				DELETE FROM config_form_fields 
@@ -171,18 +171,18 @@ BEGIN
 		end if;
 
 	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns
-		WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column AND data_type!=v_datatype) IS NOT NULL THEN
+		WHERE table_schema=v_target_schemaname and table_name = v_target_table AND column_name = v_column AND data_type!=v_datatype) IS NOT NULL THEN
 
 		IF v_datatype ILIKE '%int4[]%' OR v_datatype ILIKE '%integer[]%'  OR v_datatype ILIKE '%int8[]%' OR v_datatype ILIKE '%bigint[]%'THEN
-			v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING ARRAY['||quote_ident(v_column)||']';
+			v_querytext = 'ALTER TABLE '|| quote_ident(v_target_schemaname) || '.' || quote_ident(v_target_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING ARRAY['||quote_ident(v_column)||']';
 		ELSE
-			v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
+			v_querytext = 'ALTER TABLE '|| quote_ident(v_target_schemaname) || '.' || quote_ident(v_target_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
 		END IF;
 		
 		EXECUTE v_querytext;
 
 		-- manage config_form_fields
-		if v_table in ('node', 'arc', 'connec', 'gully') then
+		if v_target_table in ('node', 'arc', 'connec', 'gully') then
 
 			execute 'select count(*) from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
 			into v_count;
@@ -202,7 +202,7 @@ BEGIN
 			end if;
 
 
-			for v_layers in select parent_layer, child_layer from cat_feature where feature_type = upper(v_table)
+			for v_layers in select parent_layer, child_layer from cat_feature where feature_type = upper(v_target_table)
 			loop
 				execute '
 				UPDATE config_form_fields 
