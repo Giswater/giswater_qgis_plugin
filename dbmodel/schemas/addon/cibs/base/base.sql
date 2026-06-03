@@ -77,7 +77,7 @@ CREATE TABLE cibs.cat_hydrometer_type (
 );
 
 CREATE TABLE cibs.cat_hydrometer_category (
-    id character varying(16) NOT NULL,
+    id int4 NOT NULL,
     observ character varying(100),
     code text,
     pattern_id character varying(16),
@@ -149,7 +149,9 @@ CREATE TABLE cibs.hydrometer_period (
     submetering_value double precision,
     CONSTRAINT hydrometer_period_pkey PRIMARY KEY (id),
     CONSTRAINT hydrometer_period_hydrometer_id_cat_period_id_unique UNIQUE (hydrometer_id, cat_period_id),
-	CONSTRAINT hydrometer_period_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES hydrometer(hydrometer_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT hydrometer_period_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES hydrometer(hydrometer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT hydrometer_period_cat_period_id_fkey FOREIGN KEY (cat_period_id) REFERENCES cat_period(id) ON DELETE RESTRICT ON UPDATE CASCADE
+
 );
 
 
