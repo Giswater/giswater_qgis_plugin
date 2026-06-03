@@ -43,7 +43,7 @@ SELECT columns_are(
         'vel_min', 'vel_avg', 'result_id', 'sector_style', 'dma_style', 'presszone_style',
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date'
+        'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_vconnec should have the correct columns'
 );
@@ -186,6 +186,9 @@ SELECT col_type_is('ve_connec_vconnec', 'p_state', 'int2', 'Column p_state shoul
 SELECT col_type_is('ve_connec_vconnec', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_connec_vconnec', 'uncertain', 'bool', 'Column uncertain should be bool');
 SELECT col_type_is('ve_connec_vconnec', 'xyz_date', 'date', 'Column xyz_date should be date');
+
+SELECT col_type_is('ve_connec_vconnec', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_vconnec', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

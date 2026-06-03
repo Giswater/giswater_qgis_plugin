@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'inlet', 'bottom_channel', 'accessibility', 'name', 'sander_depth',
-        'inlet_medium', 'has_access'
+        'inlet_medium', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_netinit should have the correct columns'
 );
@@ -176,6 +176,9 @@ SELECT col_type_is('ve_node_netinit', 'name', 'varchar(50)', 'Column name should
 SELECT col_type_is('ve_node_netinit', 'sander_depth', 'numeric(12,3)', 'Column sander_depth should be numeric(12,3)');
 SELECT col_type_is('ve_node_netinit', 'inlet_medium', 'int4', 'Column inlet_medium should be int4');
 SELECT col_type_is('ve_node_netinit', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_netinit', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_netinit', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

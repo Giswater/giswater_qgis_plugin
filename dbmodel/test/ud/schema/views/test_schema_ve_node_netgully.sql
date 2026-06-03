@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'sander_depth',
         'gullycat_id', 'units', 'groove', 'siphon', 'gullycat2_id', 'groove_height',
-        'groove_length', 'units_placement', 'has_access'
+        'groove_length', 'units_placement', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_netgully should have the correct columns'
 );
@@ -177,6 +177,9 @@ SELECT col_type_is('ve_node_netgully', 'groove_height', 'float8', 'Column groove
 SELECT col_type_is('ve_node_netgully', 'groove_length', 'float8', 'Column groove_length should be float8');
 SELECT col_type_is('ve_node_netgully', 'units_placement', 'varchar(16)', 'Column units_placement should be varchar(16)');
 SELECT col_type_is('ve_node_netgully', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_netgully', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_netgully', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

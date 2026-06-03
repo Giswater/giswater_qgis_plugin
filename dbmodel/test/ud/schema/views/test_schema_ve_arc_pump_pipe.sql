@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'bottom_mat',
-        'conduit_code', 'pumpipe_param_1', 'pumpipe_param_2'
+        'conduit_code', 'pumpipe_param_1', 'pumpipe_param_2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_pump_pipe should have the correct columns'
 );
@@ -198,6 +198,9 @@ SELECT col_type_is('ve_arc_pump_pipe', 'bottom_mat', 'text', 'Column bottom_mat 
 SELECT col_type_is('ve_arc_pump_pipe', 'conduit_code', 'text', 'Column conduit_code should be text');
 SELECT col_type_is('ve_arc_pump_pipe', 'pumpipe_param_1', 'bool', 'Column pumpipe_param_1 should be bool');
 SELECT col_type_is('ve_arc_pump_pipe', 'pumpipe_param_2', 'text', 'Column pumpipe_param_2 should be text');
+
+SELECT col_type_is('ve_arc_pump_pipe', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_pump_pipe', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'length', 'width', 'height', 'max_volume', 'util_volume'
+        'muni_visibility', 'length', 'width', 'height', 'max_volume', 'util_volume', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_control_register should have the correct columns'
 );
@@ -187,6 +187,9 @@ SELECT col_type_is('ve_node_control_register', 'width', 'numeric(12,3)', 'Column
 SELECT col_type_is('ve_node_control_register', 'height', 'numeric(12,3)', 'Column height should be numeric(12,3)');
 SELECT col_type_is('ve_node_control_register', 'max_volume', 'numeric(12,3)', 'Column max_volume should be numeric(12,3)');
 SELECT col_type_is('ve_node_control_register', 'util_volume', 'numeric(12,3)', 'Column util_volume should be numeric(12,3)');
+
+SELECT col_type_is('ve_node_control_register', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_control_register', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

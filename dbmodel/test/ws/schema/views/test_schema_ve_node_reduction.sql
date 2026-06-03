@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'diam1', 'diam2'
+        'muni_visibility', 'diam1', 'diam2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_reduction should have the correct columns'
 );
@@ -184,6 +184,9 @@ SELECT col_type_is('ve_node_reduction', 'sector_visibility', 'int4[]', 'Column s
 SELECT col_type_is('ve_node_reduction', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_reduction', 'diam1', 'numeric(12,3)', 'Column diam1 should be numeric(12,3)');
 SELECT col_type_is('ve_node_reduction', 'diam2', 'numeric(12,3)', 'Column diam2 should be numeric(12,3)');
+
+SELECT col_type_is('ve_node_reduction', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_reduction', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

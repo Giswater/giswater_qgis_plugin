@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'has_treatment', 'sector_visibility', 'muni_visibility', 'name', 'wwtp_code',
         'wwtp_type', 'treatment_type', 'maxflow', 'opsflow', 'wwtp_function', 'served_hydrometer',
-        'efficiency', 'sludge_disposition', 'sludge_treatment', 'has_access'
+        'efficiency', 'sludge_disposition', 'sludge_treatment', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_wwtp should have the correct columns'
 );
@@ -178,6 +178,9 @@ SELECT col_type_is('ve_node_wwtp', 'efficiency', 'text', 'Column efficiency shou
 SELECT col_type_is('ve_node_wwtp', 'sludge_disposition', 'bool', 'Column sludge_disposition should be bool');
 SELECT col_type_is('ve_node_wwtp', 'sludge_treatment', 'bool', 'Column sludge_treatment should be bool');
 SELECT col_type_is('ve_node_wwtp', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_wwtp', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_wwtp', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

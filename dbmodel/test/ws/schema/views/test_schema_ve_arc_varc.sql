@@ -42,7 +42,7 @@ SELECT columns_are(
         'mincut_length', 'mincut_watervol', 'mincut_criticality', 'hydraulic_criticality', 'pipe_capacity', 'mincut_impact_topo',
         'mincut_impact_hydro', 'sector_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'the_geom', 'p_state', 'uuid', 'uncertain'
+        'the_geom', 'p_state', 'uuid', 'uncertain', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_varc should have the correct columns'
 );
@@ -178,6 +178,9 @@ SELECT col_type_is('ve_arc_varc', 'the_geom', 'geometry(linestring, SRID_VALUE)'
 SELECT col_type_is('ve_arc_varc', 'p_state', 'int2', 'Column p_state should be int2');
 SELECT col_type_is('ve_arc_varc', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_arc_varc', 'uncertain', 'bool', 'Column uncertain should be bool');
+
+SELECT col_type_is('ve_arc_varc', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_varc', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

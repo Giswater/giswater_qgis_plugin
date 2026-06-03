@@ -37,7 +37,7 @@ SELECT columns_are(
         'datasource', 'label_x', 'label_y', 'label_rotation', 'label_quadrant', 'inventory',
         'publish', 'is_scadamap', 'lock_level', 'initoverflowpath', 'inverted_slope', 'negative_offset',
         'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
-        'meandering', 'uuid', 'node_custom_top_elev_1', 'node_custom_elev_1', 'node_custom_top_elev_2', 'node_custom_elev_2'
+        'meandering', 'uuid', 'node_custom_top_elev_1', 'node_custom_elev_1', 'node_custom_top_elev_2', 'node_custom_elev_2', 'dataquality', 'dataquality_obs'
     ],
     'Table arc should have the correct columns'
 );
@@ -145,6 +145,9 @@ SELECT col_type_is('arc', 'node_custom_top_elev_1', 'numeric(12,3)', 'Column nod
 SELECT col_type_is('arc', 'node_custom_elev_1', 'numeric(12,3)', 'Column node_custom_elev_1 should be numeric(12,3)');
 SELECT col_type_is('arc', 'node_custom_top_elev_2', 'numeric(12,3)', 'Column node_custom_top_elev_2 should be numeric(12,3)');
 SELECT col_type_is('arc', 'node_custom_elev_2', 'numeric(12,3)', 'Column node_custom_elev_2 should be numeric(12,3)');
+
+SELECT col_type_is('arc', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('arc', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 -- Check foreign keys
 SELECT has_fk('arc', 'Table arc should have foreign keys');

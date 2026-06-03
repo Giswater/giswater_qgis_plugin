@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'linked_connec',
-        'greentap_type'
+        'greentap_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_greentap should have the correct columns'
 );
@@ -189,6 +189,9 @@ SELECT col_type_is('ve_connec_greentap', 'uncertain', 'bool', 'Column uncertain 
 SELECT col_type_is('ve_connec_greentap', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_connec_greentap', 'linked_connec', 'int4', 'Column linked_connec should be int4');
 SELECT col_type_is('ve_connec_greentap', 'greentap_type', 'text', 'Column greentap_type should be text');
+
+SELECT col_type_is('ve_connec_greentap', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_greentap', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

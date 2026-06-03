@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'sander_depth', 'prot_surface', 'inlet', 'bottom_channel', 'accessibility',
-        'bottom_mat', 'height', 'manhole_code', 'has_access'
+        'bottom_mat', 'height', 'manhole_code', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_out_manhole should have the correct columns'
 );
@@ -178,6 +178,9 @@ SELECT col_type_is('ve_node_out_manhole', 'bottom_mat', 'text', 'Column bottom_m
 SELECT col_type_is('ve_node_out_manhole', 'height', 'numeric(12,4)', 'Column height should be numeric(12,4)');
 SELECT col_type_is('ve_node_out_manhole', 'manhole_code', 'text', 'Column manhole_code should be text');
 SELECT col_type_is('ve_node_out_manhole', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_out_manhole', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_out_manhole', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

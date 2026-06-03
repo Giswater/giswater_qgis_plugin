@@ -45,7 +45,7 @@ SELECT columns_are(
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
         'muni_visibility', 'name', 'maxflow', 'opsflow', 'screening', 'desander',
         'chemical', 'oxidation', 'coagulation', 'floculation', 'presendiment', 'sediment',
-        'filtration', 'disinfection', 'storage', 'sludgeman', 'inlet_arc'
+        'filtration', 'disinfection', 'storage', 'sludgeman', 'inlet_arc', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_wtp should have the correct columns'
 );
@@ -200,6 +200,9 @@ SELECT col_type_is('ve_node_wtp', 'disinfection', 'int4', 'Column disinfection s
 SELECT col_type_is('ve_node_wtp', 'storage', 'int4', 'Column storage should be int4');
 SELECT col_type_is('ve_node_wtp', 'sludgeman', 'int4', 'Column sludgeman should be int4');
 SELECT col_type_is('ve_node_wtp', 'inlet_arc', 'int4[]', 'Column inlet_arc should be int4[]');
+
+SELECT col_type_is('ve_node_wtp', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_wtp', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

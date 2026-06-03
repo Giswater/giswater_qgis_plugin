@@ -40,7 +40,7 @@ SELECT columns_are(
         'inventory', 'publish', 'is_operative', 'inp_type', 'sector_style', 'omzone_style',
         'drainzone_style', 'dwfzone_style', 'lock_level', 'expl_visibility', 'created_at', 'created_by',
         'updated_at', 'updated_by', 'the_geom', 'p_state', 'uuid', 'treatment_type',
-        'xyz_date', 'has_treatment', 'grate_param_1', 'grate_param_2'
+        'xyz_date', 'has_treatment', 'grate_param_1', 'grate_param_2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_gully_pgully should have the correct columns'
 );
@@ -164,6 +164,9 @@ SELECT col_type_is('ve_gully_pgully', 'xyz_date', 'date', 'Column xyz_date shoul
 SELECT col_type_is('ve_gully_pgully', 'has_treatment', 'bool', 'Column has_treatment should be bool');
 SELECT col_type_is('ve_gully_pgully', 'grate_param_1', 'text', 'Column grate_param_1 should be text');
 SELECT col_type_is('ve_gully_pgully', 'grate_param_2', 'bool', 'Column grate_param_2 should be bool');
+
+SELECT col_type_is('ve_gully_pgully', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_gully_pgully', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'customer_code', 'top_floor', 'wjoin_type'
+        'muni_visibility', 'customer_code', 'top_floor', 'wjoin_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_water_connection should have the correct columns'
 );
@@ -185,6 +185,9 @@ SELECT col_type_is('ve_node_water_connection', 'muni_visibility', 'int4[]', 'Col
 SELECT col_type_is('ve_node_water_connection', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'top_floor', 'int4', 'Column top_floor should be int4');
 SELECT col_type_is('ve_node_water_connection', 'wjoin_type', 'text', 'Column wjoin_type should be text');
+
+SELECT col_type_is('ve_node_water_connection', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_water_connection', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

@@ -44,7 +44,7 @@ SELECT columns_are(
         'dwf_minflow', 'dwf_maxflow', 'dwf_minvel', 'dwf_maxvel', 'conduit_capacity', 'sector_style',
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type'
+        'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_varc should have the correct columns'
 );
@@ -193,6 +193,9 @@ SELECT col_type_is('ve_arc_varc', 'meandering', 'int4', 'Column meandering shoul
 SELECT col_type_is('ve_arc_varc', 'p_state', 'int2', 'Column p_state should be int2');
 SELECT col_type_is('ve_arc_varc', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_arc_varc', 'treatment_type', 'int4', 'Column treatment_type should be int4');
+
+SELECT col_type_is('ve_arc_varc', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_varc', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

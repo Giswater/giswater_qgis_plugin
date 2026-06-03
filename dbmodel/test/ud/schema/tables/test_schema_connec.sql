@@ -35,7 +35,7 @@ SELECT columns_are(
         'accessibility', 'asset_id', 'adate', 'adescript', 'verified', 'uncertain',
         'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation', 'label_quadrant',
         'inventory', 'publish', 'lock_level', 'expl_visibility', 'created_at', 'created_by',
-        'updated_at', 'updated_by', 'the_geom', 'diagonal', 'uuid', 'xyz_date'
+        'updated_at', 'updated_by', 'the_geom', 'diagonal', 'uuid', 'xyz_date', 'dataquality', 'dataquality_obs'
     ],
     'Table connec should have the correct columns'
 );
@@ -131,6 +131,9 @@ SELECT col_type_is('connec', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column 
 SELECT col_type_is('connec', 'diagonal', 'varchar(50)', 'Column diagonal should be varchar(50)');
 SELECT col_type_is('connec', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('connec', 'xyz_date', 'date', 'Column xyz_date should be date');
+
+SELECT col_type_is('connec', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('connec', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 -- Check foreign keys
 SELECT has_fk('connec', 'Table connec should have foreign keys');

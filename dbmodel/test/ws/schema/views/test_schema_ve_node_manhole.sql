@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'name'
+        'muni_visibility', 'name', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_manhole should have the correct columns'
 );
@@ -183,6 +183,9 @@ SELECT col_type_is('ve_node_manhole', 'to_arc', 'int4', 'Column to_arc should be
 SELECT col_type_is('ve_node_manhole', 'sector_visibility', 'int4[]', 'Column sector_visibility should be int4[]');
 SELECT col_type_is('ve_node_manhole', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_manhole', 'name', 'varchar(50)', 'Column name should be varchar(50)');
+
+SELECT col_type_is('ve_node_manhole', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_manhole', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

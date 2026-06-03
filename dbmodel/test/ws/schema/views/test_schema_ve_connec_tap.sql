@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'linked_connec',
-        'drain_diam', 'drain_exit', 'drain_gully', 'drain_distance', 'arq_patrimony', 'com_state'
+        'drain_diam', 'drain_exit', 'drain_gully', 'drain_distance', 'arq_patrimony', 'com_state', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_tap should have the correct columns'
 );
@@ -194,6 +194,9 @@ SELECT col_type_is('ve_connec_tap', 'drain_gully', 'varchar(100)', 'Column drain
 SELECT col_type_is('ve_connec_tap', 'drain_distance', 'numeric(12,3)', 'Column drain_distance should be numeric(12,3)');
 SELECT col_type_is('ve_connec_tap', 'arq_patrimony', 'bool', 'Column arq_patrimony should be bool');
 SELECT col_type_is('ve_connec_tap', 'com_state', 'varchar(254)', 'Column com_state should be varchar(254)');
+
+SELECT col_type_is('ve_connec_tap', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_tap', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

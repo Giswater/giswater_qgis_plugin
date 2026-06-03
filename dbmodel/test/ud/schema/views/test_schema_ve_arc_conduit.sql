@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'bottom_mat',
-        'conduit_code'
+        'conduit_code', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_conduit should have the correct columns'
 );
@@ -196,6 +196,9 @@ SELECT col_type_is('ve_arc_conduit', 'uuid', 'uuid', 'Column uuid should be uuid
 SELECT col_type_is('ve_arc_conduit', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('ve_arc_conduit', 'bottom_mat', 'text', 'Column bottom_mat should be text');
 SELECT col_type_is('ve_arc_conduit', 'conduit_code', 'text', 'Column conduit_code should be text');
+
+SELECT col_type_is('ve_arc_conduit', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_conduit', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

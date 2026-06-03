@@ -41,7 +41,7 @@ SELECT columns_are(
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'name',
-        'flowsetting', 'has_access'
+        'flowsetting', 'has_access', 'dataquality', 'dataquality_obs', 'turns_count'
     ],
     'View ve_node_valve should have the correct columns'
 );
@@ -169,6 +169,10 @@ SELECT col_type_is('ve_node_valve', 'muni_visibility', 'int4[]', 'Column muni_vi
 SELECT col_type_is('ve_node_valve', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_node_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
 SELECT col_type_is('ve_node_valve', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_valve', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_valve', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+SELECT col_type_is('ve_node_valve', 'turns_count', 'numeric', 'Column turns_count should be numeric');
+
 SELECT * FROM finish();
 
 ROLLBACK;

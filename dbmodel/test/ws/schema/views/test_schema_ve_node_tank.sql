@@ -45,7 +45,7 @@ SELECT columns_are(
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
         'muni_visibility', 'vmax', 'vutil', 'area', 'chlorination', 'name',
         'hmax', 'automated', 'length', 'width', 'shape', 'fence_type',
-        'fence_length', 'inlet_arc', 'invert_level', 'tank_param_1', 'tank_param_2', 'vnom'
+        'fence_length', 'inlet_arc', 'invert_level', 'tank_param_1', 'tank_param_2', 'vnom', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_tank should have the correct columns'
 );
@@ -202,6 +202,9 @@ SELECT col_type_is('ve_node_tank', 'tank_param_1', 'int4', 'Column tank_param_1 
 SELECT col_type_is('ve_node_tank', 'tank_param_2', 'date', 'Column tank_param_2 should be date');
 
 SELECT col_type_is('ve_node_tank', 'vnom', 'numeric(12,3)', 'Column vnom should be numeric(12,3)');
+SELECT col_type_is('ve_node_tank', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_tank', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

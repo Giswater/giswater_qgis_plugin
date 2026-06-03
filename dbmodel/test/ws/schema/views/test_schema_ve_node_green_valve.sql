@@ -47,7 +47,7 @@ SELECT columns_are(
         'depth_valveshaft', 'regulator_situation', 'regulator_location', 'regulator_observ', 'lin_meters', 'exit_type',
         'exit_code', 'drive_type', 'cat_valve2', 'ordinarystatus', 'shutter', 'brand2',
         'model2', 'valve_type', 'to_arc', 'automated', 'connection_type', 'flowsetting',
-        'greenvalve_param_1', 'greenvalve_param_2'
+        'greenvalve_param_1', 'greenvalve_param_2', 'dataquality', 'dataquality_obs', 'turns_count'
     ],
     'View ve_node_green_valve should have the correct columns'
 );
@@ -211,6 +211,10 @@ SELECT col_type_is('ve_node_green_valve', 'connection_type', 'int4', 'Column con
 SELECT col_type_is('ve_node_green_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
 SELECT col_type_is('ve_node_green_valve', 'greenvalve_param_1', 'bool', 'Column greenvalve_param_1 should be bool');
 SELECT col_type_is('ve_node_green_valve', 'greenvalve_param_2', 'text', 'Column greenvalve_param_2 should be text');
+
+SELECT col_type_is('ve_node_green_valve', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_green_valve', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+SELECT col_type_is('ve_node_green_valve', 'turns_count', 'numeric', 'Column turns_count should be numeric');
 
 SELECT * FROM finish();
 

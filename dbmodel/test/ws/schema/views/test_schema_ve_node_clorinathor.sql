@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'automated', 'fence_type'
+        'muni_visibility', 'automated', 'fence_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_clorinathor should have the correct columns'
 );
@@ -184,6 +184,9 @@ SELECT col_type_is('ve_node_clorinathor', 'sector_visibility', 'int4[]', 'Column
 SELECT col_type_is('ve_node_clorinathor', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_clorinathor', 'automated', 'bool', 'Column automated should be bool');
 SELECT col_type_is('ve_node_clorinathor', 'fence_type', 'int4', 'Column fence_type should be int4');
+
+SELECT col_type_is('ve_node_clorinathor', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_clorinathor', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

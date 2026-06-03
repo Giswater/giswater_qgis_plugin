@@ -41,7 +41,7 @@ SELECT columns_are(
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'name',
-        'outfall_medium', 'has_access'
+        'outfall_medium', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_outfall should have the correct columns'
 );
@@ -169,6 +169,9 @@ SELECT col_type_is('ve_node_outfall', 'muni_visibility', 'int4[]', 'Column muni_
 SELECT col_type_is('ve_node_outfall', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_node_outfall', 'outfall_medium', 'int4', 'Column outfall_medium should be int4');
 SELECT col_type_is('ve_node_outfall', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_outfall', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_outfall', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

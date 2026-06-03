@@ -44,7 +44,7 @@ SELECT columns_are(
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
         'muni_visibility', 'name', 'source_type', 'source_code', 'aquifer_type', 'aquifer_name',
-        'wtp_id', 'registered_flow', 'auth_code', 'basin_id', 'subbasin_id', 'inlet_arc'
+        'wtp_id', 'registered_flow', 'auth_code', 'basin_id', 'subbasin_id', 'inlet_arc', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_source should have the correct columns'
 );
@@ -194,6 +194,9 @@ SELECT col_type_is('ve_node_source', 'auth_code', 'text', 'Column auth_code shou
 SELECT col_type_is('ve_node_source', 'basin_id', 'int4', 'Column basin_id should be int4');
 SELECT col_type_is('ve_node_source', 'subbasin_id', 'int4', 'Column subbasin_id should be int4');
 SELECT col_type_is('ve_node_source', 'inlet_arc', 'int4[]', 'Column inlet_arc should be int4[]');
+
+SELECT col_type_is('ve_node_source', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_source', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

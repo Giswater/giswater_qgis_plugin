@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'custom_area', 'max_volume', 'util_volume', 'min_height', 'accessibility',
-        'name', 'sewstorage_param_1', 'sewstorage_param_2', 'has_access'
+        'name', 'sewstorage_param_1', 'sewstorage_param_2', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_sewer_storage should have the correct columns'
 );
@@ -178,6 +178,9 @@ SELECT col_type_is('ve_node_sewer_storage', 'name', 'varchar(255)', 'Column name
 SELECT col_type_is('ve_node_sewer_storage', 'sewstorage_param_1', 'text', 'Column sewstorage_param_1 should be text');
 SELECT col_type_is('ve_node_sewer_storage', 'sewstorage_param_2', 'text', 'Column sewstorage_param_2 should be text');
 SELECT col_type_is('ve_node_sewer_storage', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_sewer_storage', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_sewer_storage', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

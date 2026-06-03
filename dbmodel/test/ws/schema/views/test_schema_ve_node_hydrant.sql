@@ -44,7 +44,7 @@ SELECT columns_are(
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
         'muni_visibility', 'fire_code', 'communication', 'valve', 'geom1', 'geom2',
-        'customer_code', 'hydrant_type', 'security_cover', 'hydrant_param_1', 'hydrant_param_2'
+        'customer_code', 'hydrant_type', 'security_cover', 'hydrant_param_1', 'hydrant_param_2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_hydrant should have the correct columns'
 );
@@ -193,6 +193,9 @@ SELECT col_type_is('ve_node_hydrant', 'hydrant_type', 'int4', 'Column hydrant_ty
 SELECT col_type_is('ve_node_hydrant', 'security_cover', 'bool', 'Column security_cover should be bool');
 SELECT col_type_is('ve_node_hydrant', 'hydrant_param_1', 'text', 'Column hydrant_param_1 should be text');
 SELECT col_type_is('ve_node_hydrant', 'hydrant_param_2', 'int4', 'Column hydrant_param_2 should be int4');
+
+SELECT col_type_is('ve_node_hydrant', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_hydrant', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

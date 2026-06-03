@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'name',
-        'siphon_code'
+        'siphon_code', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_siphon should have the correct columns'
 );
@@ -196,6 +196,9 @@ SELECT col_type_is('ve_arc_siphon', 'uuid', 'uuid', 'Column uuid should be uuid'
 SELECT col_type_is('ve_arc_siphon', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('ve_arc_siphon', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_arc_siphon', 'siphon_code', 'text', 'Column siphon_code should be text');
+
+SELECT col_type_is('ve_arc_siphon', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_siphon', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

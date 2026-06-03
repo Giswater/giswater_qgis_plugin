@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'filter_param_1', 'filter_param_2'
+        'muni_visibility', 'filter_param_1', 'filter_param_2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_filter should have the correct columns'
 );
@@ -184,6 +184,9 @@ SELECT col_type_is('ve_node_filter', 'sector_visibility', 'int4[]', 'Column sect
 SELECT col_type_is('ve_node_filter', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_filter', 'filter_param_1', 'int4', 'Column filter_param_1 should be int4');
 SELECT col_type_is('ve_node_filter', 'filter_param_2', 'text', 'Column filter_param_2 should be text');
+
+SELECT col_type_is('ve_node_filter', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_filter', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

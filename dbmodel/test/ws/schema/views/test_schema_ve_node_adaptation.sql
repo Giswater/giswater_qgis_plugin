@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility'
+        'muni_visibility', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_adaptation should have the correct columns'
 );
@@ -182,6 +182,9 @@ SELECT col_type_is('ve_node_adaptation', 'xyz_date', 'date', 'Column xyz_date sh
 SELECT col_type_is('ve_node_adaptation', 'to_arc', 'int4', 'Column to_arc should be int4');
 SELECT col_type_is('ve_node_adaptation', 'sector_visibility', 'int4[]', 'Column sector_visibility should be int4[]');
 SELECT col_type_is('ve_node_adaptation', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
+
+SELECT col_type_is('ve_node_adaptation', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_adaptation', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

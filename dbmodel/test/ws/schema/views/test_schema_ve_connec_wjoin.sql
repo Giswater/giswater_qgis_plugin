@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'top_floor',
-        'wjoin_type'
+        'wjoin_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_wjoin should have the correct columns'
 );
@@ -189,6 +189,9 @@ SELECT col_type_is('ve_connec_wjoin', 'uncertain', 'bool', 'Column uncertain sho
 SELECT col_type_is('ve_connec_wjoin', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_connec_wjoin', 'top_floor', 'int4', 'Column top_floor should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'wjoin_type', 'text', 'Column wjoin_type should be text');
+
+SELECT col_type_is('ve_connec_wjoin', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_wjoin', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

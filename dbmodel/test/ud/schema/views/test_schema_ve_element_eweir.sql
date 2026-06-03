@@ -29,7 +29,7 @@ SELECT columns_are(
         'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation', 'inventory',
         'publish', 'trace_featuregeom', 'lock_level', 'expl_visibility', 'created_at', 'created_by',
         'updated_at', 'updated_by', 'the_geom', 'uuid', 'sector_visibility', 'muni_visibility',
-        'node_id', 'to_arc', 'flwreg_length'
+        'node_id', 'to_arc', 'flwreg_length', 'dataquality', 'dataquality_obs'
     ],
     'View ve_element_eweir should have the correct columns'
 );
@@ -86,6 +86,9 @@ SELECT col_type_is('ve_element_eweir', 'muni_visibility', 'int4[]', 'Column muni
 SELECT col_type_is('ve_element_eweir', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('ve_element_eweir', 'to_arc', 'int4', 'Column to_arc should be int4');
 SELECT col_type_is('ve_element_eweir', 'flwreg_length', 'numeric', 'Column flwreg_length should be numeric');
+
+SELECT col_type_is('ve_element_eweir', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_element_eweir', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

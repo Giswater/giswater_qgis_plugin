@@ -40,7 +40,7 @@ SELECT columns_are(
         'inventory', 'publish', 'is_operative', 'inp_type', 'sector_style', 'omzone_style',
         'drainzone_style', 'dwfzone_style', 'lock_level', 'expl_visibility', 'created_at', 'created_by',
         'updated_at', 'updated_by', 'the_geom', 'p_state', 'uuid', 'treatment_type',
-        'xyz_date', 'has_treatment'
+        'xyz_date', 'has_treatment', 'dataquality', 'dataquality_obs'
     ],
     'View ve_gully_ginlet should have the correct columns'
 );
@@ -162,6 +162,9 @@ SELECT col_type_is('ve_gully_ginlet', 'uuid', 'uuid', 'Column uuid should be uui
 SELECT col_type_is('ve_gully_ginlet', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('ve_gully_ginlet', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_gully_ginlet', 'has_treatment', 'bool', 'Column has_treatment should be bool');
+
+SELECT col_type_is('ve_gully_ginlet', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_gully_ginlet', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

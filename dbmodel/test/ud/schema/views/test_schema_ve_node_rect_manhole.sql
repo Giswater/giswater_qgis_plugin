@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'sander_depth', 'prot_surface', 'inlet', 'bottom_channel', 'accessibility',
-        'bottom_mat', 'height', 'manhole_code', 'recmanhole_param_1', 'recmanhole_param_2', 'has_access'
+        'bottom_mat', 'height', 'manhole_code', 'recmanhole_param_1', 'recmanhole_param_2', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_rect_manhole should have the correct columns'
 );
@@ -180,6 +180,9 @@ SELECT col_type_is('ve_node_rect_manhole', 'manhole_code', 'text', 'Column manho
 SELECT col_type_is('ve_node_rect_manhole', 'recmanhole_param_1', 'text', 'Column recmanhole_param_1 should be text');
 SELECT col_type_is('ve_node_rect_manhole', 'recmanhole_param_2', 'text', 'Column recmanhole_param_2 should be text');
 SELECT col_type_is('ve_node_rect_manhole', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_rect_manhole', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_rect_manhole', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

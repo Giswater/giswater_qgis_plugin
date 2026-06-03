@@ -44,7 +44,7 @@ SELECT columns_are(
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'sector_visibility', 'muni_visibility',
         'real_press_max', 'real_press_min', 'real_press_avg', 'meter_code', 'automated', 'closed',
-        'to_arc', 'meter_type', 'name', 'nominal_flowrate', 'pressmeter_param_1', 'pressmeter_param_2'
+        'to_arc', 'meter_type', 'name', 'nominal_flowrate', 'pressmeter_param_1', 'pressmeter_param_2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_pressure_meter should have the correct columns'
 );
@@ -194,6 +194,9 @@ SELECT col_type_is('ve_node_pressure_meter', 'name', 'text', 'Column name should
 SELECT col_type_is('ve_node_pressure_meter', 'nominal_flowrate', 'numeric(12,3)', 'Column nominal_flowrate should be numeric(12,3)');
 SELECT col_type_is('ve_node_pressure_meter', 'pressmeter_param_1', 'text', 'Column pressmeter_param_1 should be text');
 SELECT col_type_is('ve_node_pressure_meter', 'pressmeter_param_2', 'date', 'Column pressmeter_param_2 should be date');
+
+SELECT col_type_is('ve_node_pressure_meter', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_pressure_meter', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

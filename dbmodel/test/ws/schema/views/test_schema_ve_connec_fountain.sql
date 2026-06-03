@@ -45,7 +45,7 @@ SELECT columns_are(
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'linked_connec',
         'vmax', 'vtotal', 'container_number', 'pump_number', 'power', 'regulation_tank',
-        'chlorinator', 'arq_patrimony', 'name'
+        'chlorinator', 'arq_patrimony', 'name', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_fountain should have the correct columns'
 );
@@ -198,6 +198,9 @@ SELECT col_type_is('ve_connec_fountain', 'regulation_tank', 'varchar(150)', 'Col
 SELECT col_type_is('ve_connec_fountain', 'chlorinator', 'varchar(100)', 'Column chlorinator should be varchar(100)');
 SELECT col_type_is('ve_connec_fountain', 'arq_patrimony', 'bool', 'Column arq_patrimony should be bool');
 SELECT col_type_is('ve_connec_fountain', 'name', 'varchar(254)', 'Column name should be varchar(254)');
+
+SELECT col_type_is('ve_connec_fountain', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_fountain', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

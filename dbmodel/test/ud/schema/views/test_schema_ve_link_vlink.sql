@@ -33,7 +33,7 @@ SELECT columns_are(
         'private_linkcat_id', 'verified', 'uncertain', 'userdefined_geom', 'datasource', 'is_operative',
         'sector_style', 'omzone_style', 'drainzone_style', 'dwfzone_style', 'lock_level', 'expl_visibility',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
-        'uuid', 'omunit_id', 'treatment_type'
+        'uuid', 'omunit_id', 'treatment_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_link_vlink should have the correct columns'
 );
@@ -114,6 +114,9 @@ SELECT col_type_is('ve_link_vlink', 'p_state', 'int2', 'Column p_state should be
 SELECT col_type_is('ve_link_vlink', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_link_vlink', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_link_vlink', 'treatment_type', 'int4', 'Column treatment_type should be int4');
+
+SELECT col_type_is('ve_link_vlink', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_link_vlink', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

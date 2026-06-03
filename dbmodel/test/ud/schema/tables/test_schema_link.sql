@@ -30,7 +30,7 @@ SELECT columns_are(
         'builtdate', 'enddate', 'brand_id', 'model_id', 'private_linkcat_id', 'verified',
         'uncertain', 'userdefined_geom', 'datasource', 'is_operative', 'lock_level', 'expl_visibility',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid',
-        'omunit_id', 'treatment_type'
+        'omunit_id', 'treatment_type', 'dataquality', 'dataquality_obs'
     ],
     'Table link should have the correct columns'
 );
@@ -92,6 +92,9 @@ SELECT col_type_is('link', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Colu
 SELECT col_type_is('link', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('link', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('link', 'treatment_type', 'int4', 'Column treatment_type should be int4');
+
+SELECT col_type_is('link', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('link', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 -- Check foreign keys
 SELECT has_fk('link', 'Table link should have foreign keys');

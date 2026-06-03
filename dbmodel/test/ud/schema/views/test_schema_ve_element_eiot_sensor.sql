@@ -28,7 +28,7 @@ SELECT columns_are(
         'ownercat_id', 'brand_id', 'model_id', 'serial_number', 'asset_id', 'verified',
         'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation', 'inventory',
         'publish', 'trace_featuregeom', 'lock_level', 'expl_visibility', 'created_at', 'created_by',
-        'updated_at', 'updated_by', 'the_geom', 'uuid', 'sector_visibility', 'muni_visibility'
+        'updated_at', 'updated_by', 'the_geom', 'uuid', 'sector_visibility', 'muni_visibility', 'dataquality', 'dataquality_obs'
     ],
     'View ve_element_eiot_sensor should have the correct columns'
 );
@@ -82,6 +82,9 @@ SELECT col_type_is('ve_element_eiot_sensor', 'the_geom', 'geometry(point, SRID_V
 SELECT col_type_is('ve_element_eiot_sensor', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_element_eiot_sensor', 'sector_visibility', 'int4[]', 'Column sector_visibility should be int4[]');
 SELECT col_type_is('ve_element_eiot_sensor', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
+
+SELECT col_type_is('ve_element_eiot_sensor', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_element_eiot_sensor', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

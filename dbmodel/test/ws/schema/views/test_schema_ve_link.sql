@@ -34,7 +34,7 @@ SELECT columns_are(
         'model_id', 'verified', 'uncertain', 'userdefined_geom', 'datasource', 'is_operative',
         'sector_style', 'omzone_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'inp_type', 'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at',
-        'updated_by', 'the_geom', 'p_state', 'uuid'
+        'updated_by', 'the_geom', 'p_state', 'uuid', 'dataquality', 'dataquality_obs'
     ],
     'View ve_link should have the correct columns'
 );
@@ -122,6 +122,9 @@ SELECT col_type_is('ve_link', 'updated_by', 'varchar(50)', 'Column updated_by sh
 SELECT col_type_is('ve_link', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Column the_geom should be geometry(linestring, SRID_VALUE)');
 SELECT col_type_is('ve_link', 'p_state', 'int2', 'Column p_state should be int2');
 SELECT col_type_is('ve_link', 'uuid', 'uuid', 'Column uuid should be uuid');
+
+SELECT col_type_is('ve_link', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_link', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

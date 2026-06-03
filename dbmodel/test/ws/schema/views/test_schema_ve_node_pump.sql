@@ -44,7 +44,7 @@ SELECT columns_are(
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'sector_visibility', 'muni_visibility',
         'max_flow', 'min_flow', 'nom_flow', 'power', 'pressure_exit', 'elev_height',
-        'name', 'pump_number', 'to_arc', 'pump_type', 'engine_type'
+        'name', 'pump_number', 'to_arc', 'pump_type', 'engine_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_pump should have the correct columns'
 );
@@ -193,6 +193,9 @@ SELECT col_type_is('ve_node_pump', 'pump_number', 'int4', 'Column pump_number sh
 SELECT col_type_is('ve_node_pump', 'to_arc', 'int4', 'Column to_arc should be int4');
 SELECT col_type_is('ve_node_pump', 'pump_type', 'int4', 'Column pump_type should be int4');
 SELECT col_type_is('ve_node_pump', 'engine_type', 'int4', 'Column engine_type should be int4');
+
+SELECT col_type_is('ve_node_pump', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_pump', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

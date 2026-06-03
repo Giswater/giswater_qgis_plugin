@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'lab_code',
-        'place_name', 'cabinet'
+        'place_name', 'cabinet', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_samplepoint should have the correct columns'
 );
@@ -190,6 +190,9 @@ SELECT col_type_is('ve_connec_samplepoint', 'xyz_date', 'date', 'Column xyz_date
 SELECT col_type_is('ve_connec_samplepoint', 'lab_code', 'varchar(30)', 'Column lab_code should be varchar(30)');
 SELECT col_type_is('ve_connec_samplepoint', 'place_name', 'varchar(254)', 'Column place_name should be varchar(254)');
 SELECT col_type_is('ve_connec_samplepoint', 'cabinet', 'varchar(150)', 'Column cabinet should be varchar(150)');
+
+SELECT col_type_is('ve_connec_samplepoint', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_samplepoint', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

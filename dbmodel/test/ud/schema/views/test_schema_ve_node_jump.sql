@@ -41,7 +41,7 @@ SELECT columns_are(
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
-        'width', 'sander_depth', 'prot_surface', 'accessibility', 'name', 'wjump_code', 'has_access'
+        'width', 'sander_depth', 'prot_surface', 'accessibility', 'name', 'wjump_code', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_jump should have the correct columns'
 );
@@ -174,6 +174,9 @@ SELECT col_type_is('ve_node_jump', 'accessibility', 'varchar(16)', 'Column acces
 SELECT col_type_is('ve_node_jump', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_node_jump', 'wjump_code', 'text', 'Column wjump_code should be text');
 SELECT col_type_is('ve_node_jump', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_jump', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_jump', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
+
 SELECT * FROM finish();
 
 ROLLBACK;

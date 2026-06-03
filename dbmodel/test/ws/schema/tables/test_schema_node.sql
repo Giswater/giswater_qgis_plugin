@@ -34,7 +34,7 @@ SELECT columns_are(
         'verified', 'datasource', 'hemisphere', 'label_x', 'label_y', 'label_rotation',
         'rotation', 'label_quadrant', 'inventory', 'publish', 'is_scadamap', 'lock_level',
         'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
-        'uuid', 'uncertain', 'xyz_date'
+        'uuid', 'uncertain', 'xyz_date', 'dataquality', 'dataquality_obs'
     ],
     'Table node should have the correct columns'
 );
@@ -121,6 +121,9 @@ SELECT col_type_is('node', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column th
 SELECT col_type_is('node', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('node', 'uncertain', 'bool', 'Column uncertain should be bool');
 SELECT col_type_is('node', 'xyz_date', 'date', 'Column xyz_date should be date');
+
+SELECT col_type_is('node', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('node', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 -- Check foreign keys
 SELECT has_fk('node', 'Table node should have foreign keys');

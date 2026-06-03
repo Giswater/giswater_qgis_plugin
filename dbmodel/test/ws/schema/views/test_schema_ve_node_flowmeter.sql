@@ -44,7 +44,7 @@ SELECT columns_are(
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'sector_visibility', 'muni_visibility',
         'real_press_max', 'real_press_min', 'real_press_avg', 'meter_code', 'automated', 'closed',
-        'to_arc', 'meter_type', 'name', 'nominal_flowrate'
+        'to_arc', 'meter_type', 'name', 'nominal_flowrate', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_flowmeter should have the correct columns'
 );
@@ -192,6 +192,9 @@ SELECT col_type_is('ve_node_flowmeter', 'to_arc', 'int4', 'Column to_arc should 
 SELECT col_type_is('ve_node_flowmeter', 'meter_type', 'int4', 'Column meter_type should be int4');
 SELECT col_type_is('ve_node_flowmeter', 'name', 'text', 'Column name should be text');
 SELECT col_type_is('ve_node_flowmeter', 'nominal_flowrate', 'numeric(12,3)', 'Column nominal_flowrate should be numeric(12,3)');
+
+SELECT col_type_is('ve_node_flowmeter', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_flowmeter', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

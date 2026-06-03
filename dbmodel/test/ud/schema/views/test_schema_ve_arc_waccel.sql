@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'sander_length',
-        'sander_depth', 'prot_surface', 'accessibility', 'name', 'waccel_code'
+        'sander_depth', 'prot_surface', 'accessibility', 'name', 'waccel_code', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_waccel should have the correct columns'
 );
@@ -200,6 +200,9 @@ SELECT col_type_is('ve_arc_waccel', 'prot_surface', 'bool', 'Column prot_surface
 SELECT col_type_is('ve_arc_waccel', 'accessibility', 'varchar(16)', 'Column accessibility should be varchar(16)');
 SELECT col_type_is('ve_arc_waccel', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_arc_waccel', 'waccel_code', 'text', 'Column waccel_code should be text');
+
+SELECT col_type_is('ve_arc_waccel', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_waccel', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

@@ -43,7 +43,7 @@ SELECT columns_are(
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'sander_depth', 'max_volume', 'util_volume', 'inlet', 'bottom_channel',
         'accessibility', 'name', 'bottom_mat', 'slope', 'height', 'chamber_param_1',
-        'chamber_param_2', 'has_access'
+        'chamber_param_2', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_chamber should have the correct columns'
 );
@@ -183,6 +183,9 @@ SELECT col_type_is('ve_node_chamber', 'height', 'numeric(12,4)', 'Column height 
 SELECT col_type_is('ve_node_chamber', 'chamber_param_1', 'text', 'Column chamber_param_1 should be text');
 SELECT col_type_is('ve_node_chamber', 'chamber_param_2', 'date', 'Column chamber_param_2 should be date');
 SELECT col_type_is('ve_node_chamber', 'has_access', 'bool', 'Column has_access should be bool');
+
+SELECT col_type_is('ve_node_chamber', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_chamber', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 SELECT * FROM finish();
 

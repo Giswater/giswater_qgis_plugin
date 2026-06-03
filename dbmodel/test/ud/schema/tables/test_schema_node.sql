@@ -35,7 +35,7 @@ SELECT columns_are(
         'adescript', 'verified', 'xyz_date', 'uncertain', 'datasource', 'unconnected',
         'label_x', 'label_y', 'label_rotation', 'rotation', 'label_quadrant', 'hemisphere',
         'inventory', 'publish', 'is_scadamap', 'lock_level', 'expl_visibility', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid', 'has_access'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'Table node should have the correct columns'
 );
@@ -131,6 +131,9 @@ SELECT col_type_is('node', 'updated_by', 'varchar(50)', 'Column updated_by shoul
 SELECT col_type_is('node', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column the_geom should be geometry(point, SRID_VALUE)');
 SELECT col_type_is('node', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('node', 'has_access', 'bool', 'Column has_access should be bool');
+
+SELECT col_type_is('node', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('node', 'dataquality_obs', 'int4[]', 'Column dataquality_obs should be int4[]');
 
 -- Check foreign keys
 SELECT has_fk('node', 'Table node should have foreign keys');
