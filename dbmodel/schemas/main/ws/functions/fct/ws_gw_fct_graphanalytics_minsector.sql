@@ -536,7 +536,7 @@ BEGIN
 
     ELSE
 
-        -- First, SET minsector_id = 0 when the values don't exist anymore
+        -- First, SET minsector_id = 0 when the arcs are not connected to the cluster
         UPDATE arc a SET minsector_id = 0
         WHERE EXISTS (
             SELECT 1 FROM temp_pgr_old_mapzone m
@@ -545,8 +545,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
             WHERE ta.pgr_arc_id = a.arc_id
-        )
-        AND a.minsector_id IS DISTINCT FROM 0;
+        );
 
         UPDATE node n SET minsector_id = 0
         WHERE EXISTS (
@@ -556,8 +555,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_node tn
             WHERE tn.pgr_node_id = n.node_id
-        )
-        AND n.minsector_id IS DISTINCT FROM 0;
+        );
 
         UPDATE connec c SET minsector_id = 0
         WHERE EXISTS (
@@ -567,8 +565,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_connec tc
             WHERE tc.pgr_connec_id = c.connec_id
-        )
-        AND c.minsector_id IS DISTINCT FROM 0;
+        );
 
         UPDATE link l SET minsector_id = 0
         WHERE EXISTS (
@@ -578,8 +575,48 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_connec t
             WHERE t.pgr_connec_id = l.feature_id
+        );
+
+        -- SET minsector_id = 0 for the minsectors that don't exist anymore
+        UPDATE arc a SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE a.minsector_id = m.mapzone_id
         )
-        AND l.minsector_id IS DISTINCT FROM 0;
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_minsector tpm
+            WHERE a.minsector_id = tpm.minsector_id
+        );
+
+        UPDATE node n SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE n.minsector_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_minsector tpm
+            WHERE n.minsector_id = tpm.minsector_id
+        );
+
+        UPDATE connec c SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE c.minsector_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_minsector tpm
+            WHERE c.minsector_id = tpm.minsector_id
+        );
+
+        UPDATE link l SET minsector_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE l.minsector_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_minsector tpm
+            WHERE l.minsector_id = tpm.minsector_id
+        );
 
         -- Second, delete the minsectors that don't exist anymore;
         -- for these minsectors, will be done DELETE ON CASCADE  in the tables minsector_graph, minsector_mincut, minsector_mincut_valve
