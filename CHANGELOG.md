@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add new key `sys_limit` to `config_param_system` to set the limit of the search results, modify the `gw_fct_getsearch` function to use the new key, default to 10.
 
+### Changed
+
+- Ignore TCV valves on `sys_fprocess` process 368.
+
 ## [4.12.0] - 2026-06-01
 
 ### Added
