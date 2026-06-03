@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Ignore TCV valves on `sys_fprocess` process 368.
 
+### Fixed
+
+- Update messages for arcs without start/final nodes.
+
 ## [4.12.0] - 2026-06-01
 
 ### Added
