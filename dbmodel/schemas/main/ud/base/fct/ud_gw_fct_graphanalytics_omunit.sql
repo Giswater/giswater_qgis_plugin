@@ -653,7 +653,7 @@ BEGIN
         -- update TABLES
         -----------------
 
-        -- First, SET omunit_id = 0 when the values don't exist anymore
+        -- First, SET omunit_id = 0 when the arcs are not connected to the cluster
         UPDATE arc a SET omunit_id = 0
         WHERE EXISTS (
             SELECT 1 FROM temp_pgr_old_mapzone m
@@ -662,8 +662,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_arc ta 
             WHERE ta.pgr_arc_id = a.arc_id
-        )
-        AND a.omunit_id IS DISTINCT FROM 0;
+        );
 
         UPDATE node n SET omunit_id = 0
         WHERE EXISTS (
@@ -673,8 +672,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_node tn
             WHERE tn.pgr_node_id = n.node_id
-        )
-        AND n.omunit_id IS DISTINCT FROM 0;
+        );
 
         UPDATE connec c SET omunit_id = 0
         WHERE EXISTS (
@@ -684,8 +682,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_connec tc
             WHERE tc.pgr_connec_id = c.connec_id
-        )
-        AND c.omunit_id IS DISTINCT FROM 0;
+        );
 
         UPDATE link l SET omunit_id = 0
         WHERE EXISTS (
@@ -695,8 +692,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_connec t
             WHERE t.pgr_connec_id = l.feature_id
-        )
-        AND l.omunit_id IS DISTINCT FROM 0;
+        );
 
         UPDATE gully g SET omunit_id = 0
         WHERE EXISTS (
@@ -706,8 +702,7 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_gully tg
             WHERE tg.pgr_gully_id = g.gully_id
-        )
-        AND g.omunit_id IS DISTINCT FROM 0;
+        );
 
         UPDATE link l SET omunit_id = 0
         WHERE EXISTS (
@@ -717,8 +712,58 @@ BEGIN
         AND NOT EXISTS (
             SELECT 1 FROM temp_pgr_gully t
             WHERE t.pgr_gully_id = l.feature_id
+        );
+
+        -- SET omunit_id = 0 for the omunits that don't exist anymore
+        UPDATE arc a SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE a.omunit_id = m.mapzone_id
         )
-        AND l.omunit_id IS DISTINCT FROM 0;
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_omunit tpo
+            WHERE a.omunit_id = tpo.omunit_id
+        );
+
+        UPDATE node n SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE n.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_omunit tpo
+            WHERE n.omunit_id = tpo.omunit_id
+        );
+
+        UPDATE connec c SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE c.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_omunit tpo
+            WHERE c.omunit_id = tpo.omunit_id
+        );
+
+        UPDATE gully g SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE g.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_omunit tpo
+            WHERE g.omunit_id = tpo.omunit_id
+        );
+
+        UPDATE link l SET omunit_id = 0
+        WHERE EXISTS (
+            SELECT 1 FROM temp_pgr_old_mapzone m
+            WHERE l.omunit_id = m.mapzone_id
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM temp_pgr_omunit tpo
+            WHERE l.omunit_id = tpo.omunit_id
+        );
 
         -- Second, delete the omunits that don't exist anymore;
         DELETE FROM omunit m
