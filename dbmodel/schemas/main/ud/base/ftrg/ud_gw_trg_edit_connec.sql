@@ -487,7 +487,7 @@ BEGIN
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, brand_id, model_id,
 			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_id, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid,
-			treatment_type, has_treatment)
+			treatment_type, has_treatment, dataquality, dataquality_obs)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, COALESCE(NEW.sector_id, 0), NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, COALESCE(NEW.muni_id, 0), NEW.postcode, NEW.district_id,
@@ -496,7 +496,7 @@ BEGIN
 			NEW.accessibility, NEW.diagonal, COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.brand_id, NEW.model_id,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_id, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, COALESCE(NEW.omunit_id, 0), NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), NEW.uuid, 
-			COALESCE(NEW.treatment_type, 0), NEW.has_treatment);
+			COALESCE(NEW.treatment_type, 0), NEW.has_treatment, NEW.dataquality, NEW.dataquality_obs);
 		ELSE
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
 			"observ","comment",  omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
@@ -504,7 +504,7 @@ BEGIN
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, matcat_id, brand_id, model_id,
 			updated_at, updated_by, asset_id, expl_visibility, adate, adescript, plot_id, placement_type, label_quadrant, access_type, lock_level, block_code, n_inhabitants, n_hydrometer, omunit_id, drainzone_outfall, dwfzone_outfall, dma_id, uuid,
-			treatment_type, has_treatment)
+			treatment_type, has_treatment, dataquality, dataquality_obs)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, COALESCE(NEW.sector_id, 0), NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", COALESCE(NEW.omzone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, COALESCE(NEW.muni_id, 0), NEW.postcode, NEW.district_id,
@@ -513,7 +513,7 @@ BEGIN
 			NEW.accessibility, NEW.diagonal, COALESCE(NEW.expl_id, 0), NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.brand_id, NEW.model_id,
 			NEW.updated_at, NEW.updated_by, NEW.asset_id,  NEW.expl_visibility, NEW.adate, NEW.adescript, NEW.plot_id, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.lock_level, NEW.block_code, NEW.n_inhabitants, NEW.n_hydrometer, COALESCE(NEW.omunit_id, 0), NEW.drainzone_outfall, NEW.dwfzone_outfall, COALESCE(NEW.dma_id, 0), NEW.uuid, 
-			COALESCE(NEW.treatment_type, 0), NEW.has_treatment);
+			COALESCE(NEW.treatment_type, 0), NEW.has_treatment, NEW.dataquality, NEW.dataquality_obs);
 		END IF;
 
 		--check if feature is double geom
@@ -794,7 +794,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(), updated_by=current_user, asset_id=NEW.asset_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			plot_id=NEW.plot_id, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, 
-			omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, has_treatment=NEW.has_treatment
+			omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, has_treatment=NEW.has_treatment, dataquality=NEW.dataquality, dataquality_obs=NEW.dataquality_obs
 			WHERE connec_id = OLD.connec_id;
 		ELSE
 			UPDATE connec
@@ -809,7 +809,7 @@ BEGIN
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, updated_at=now(),
 			updated_by=current_user, matcat_id = NEW.matcat_id, asset_id=NEW.asset_id, expl_visibility=NEW.expl_visibility, adate=NEW.adate, adescript=NEW.adescript,
 			plot_id=NEW.plot_id, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, lock_level=NEW.lock_level, block_code=NEW.block_code, n_inhabitants=NEW.n_inhabitants, n_hydrometer=NEW.n_hydrometer, 
-			omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, has_treatment=NEW.has_treatment
+			omunit_id=NEW.omunit_id, drainzone_outfall=NEW.drainzone_outfall, dwfzone_outfall=NEW.dwfzone_outfall, dma_id=NEW.dma_id, has_treatment=NEW.has_treatment, dataquality=NEW.dataquality, dataquality_obs=NEW.dataquality_obs
 			WHERE connec_id = OLD.connec_id;
 		END IF;
 

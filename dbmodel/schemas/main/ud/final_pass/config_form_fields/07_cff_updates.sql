@@ -324,3 +324,15 @@ VALUES
 ('ve_node_wtp', 'form_feature', 'tab_data', 'has_access', 'lyt_data_1', 38, 'boolean', 'check', 'Has access:', 'Has access:', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL),
 ('ve_node_x', 'form_feature', 'tab_data', 'has_access', 'lyt_data_1', 38, 'boolean', 'check', 'Has access:', 'Has access:', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL)
 ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+SELECT child_layer, 'form_feature', 'tab_data', 'dataquality', 'lyt_data_2', 60, 'integer', 'text', 'Dataquality', 'Quality level of the utility infrastructure survey.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
+FROM cat_feature ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+SELECT child_layer, 'form_feature', 'tab_data', 'dataquality_obs', 'lyt_data_2', 62, 'text', 'text', 'Dataquality_obs', 'Observations supporting the assigned utility survey quality level.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
+FROM cat_feature ON CONFLICT DO NOTHING;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
+SELECT child_layer, 'form_feature', 'tab_data', 'turns_count', 'lyt_data_2', 64, 'numeric', 'text', 'Turns count', 'To indicate the number of closing-opening turns when operating the valve.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
+FROM cat_feature WHERE feature_class = 'VALVE' ON CONFLICT DO NOTHING;

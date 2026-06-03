@@ -550,7 +550,7 @@ BEGIN
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified,label_x,label_y,label_rotation,
 		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, updated_at, updated_by, asset_id,
 		om_state, conserv_state, access_type, placement_type, expl_visibility, brand_id, model_id, serial_number, label_quadrant, pavcat_id, lock_level, is_scadamap, uuid, minsector_id,
-		supplyzone_id, omzone_id)
+		supplyzone_id, omzone_id, dataquality, dataquality_obs)
 		VALUES (NEW.node_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW.custom_top_elev, NEW.datasource, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment, COALESCE(NEW.dma_id, 0), COALESCE(NEW.dqa_id, 0), COALESCE(NEW.presszone_id, 0), NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.streetaxis_id, NEW.streetaxis2_id, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id,
@@ -558,7 +558,7 @@ BEGIN
 		NEW.expl_id, NEW.publish, NEW.inventory, NEW.the_geom,  NEW.hemisphere, NEW.num_value,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id,
 		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_visibility, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.pavcat_id, NEW.lock_level, NEW.is_scadamap, NEW.uuid,
-		COALESCE(NEW.minsector_id, 0), COALESCE(NEW.supplyzone_id, 0), COALESCE(NEW.omzone_id, 0));
+		COALESCE(NEW.minsector_id, 0), COALESCE(NEW.supplyzone_id, 0), COALESCE(NEW.omzone_id, 0), NEW.dataquality, NEW.dataquality_obs);
 
 
 		-- Insert into node_add
@@ -625,10 +625,10 @@ BEGIN
 
 		ELSIF v_man_table='man_valve' THEN
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pressure_entry, pressure_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
-			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, automated, connection_type, flowsetting)
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, automated, connection_type, flowsetting, turns_count)
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pressure_entry, NEW.pressure_exit, NEW.depth_valveshaft, NEW.regulator_situation,
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
-			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.automated, COALESCE(NEW.connection_type, 0), NEW.flowsetting);
+			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.automated, COALESCE(NEW.connection_type, 0), NEW.flowsetting, NEW.turns_count);
 
 		ELSIF v_man_table='man_manhole' THEN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -988,7 +988,8 @@ BEGIN
 		publish=NEW.publish, inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, link=NEW.link, updated_at=now(), updated_by=current_user,
 		adate=NEW.adate, adescript=NEW.adescript, accessibility = NEW.accessibility, asset_id=NEW.asset_id,
 		om_state=NEW.om_state, conserv_state=NEW.conserv_state, access_type=NEW.access_type, placement_type=NEW.placement_type, expl_visibility=NEW.expl_visibility,
-		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+		brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, label_quadrant=NEW.label_quadrant, pavcat_id = NEW.pavcat_id, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap,
+		dataquality=NEW.dataquality, dataquality_obs=NEW.dataquality_obs
 		WHERE node_id = OLD.node_id;
 
 		-- Update node_add
@@ -1063,7 +1064,7 @@ BEGIN
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ,
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
 			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type, to_arc=NEW.to_arc, automated=NEW.automated, connection_type=NEW.connection_type,
-			flowsetting=NEW.flowsetting
+			flowsetting=NEW.flowsetting, turns_count=NEW.turns_count
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_register' THEN

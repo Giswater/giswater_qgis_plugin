@@ -535,7 +535,7 @@ BEGIN
 		muni_id, streetaxis2_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, updated_at, updated_by, asset_id, epa_type, om_state, conserv_state, priority,
-		access_type, placement_type, crmzone_id, expl_visibility, plot_id, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_code, n_hydrometer, uuid)
+		access_type, placement_type, crmzone_id, expl_visibility, plot_id, brand_id, model_id, serial_number, label_quadrant, n_inhabitants, lock_level, block_code, n_hydrometer, uuid, dataquality, dataquality_obs)
 		VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.datasource, NEW.top_elev, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.streetaxis_id, NEW.postnumber, NEW.postnumber2, NEW.muni_id, NEW.streetaxis2_id, NEW.postcode, NEW.district_id, NEW.postcomplement,
@@ -543,7 +543,7 @@ BEGIN
 		NEW.num_value, NEW.connec_length, NEW.arc_id, COALESCE(NEW.minsector_id, 0), COALESCE(NEW.dqa_id, 0), NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
 		NEW.access_type, NEW.placement_type, COALESCE(NEW.crmzone_id, 0), NEW.expl_visibility, NEW.plot_id, NEW.brand_id, NEW.model_id, NEW.serial_number,
-		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_code, NEW.n_hydrometer, NEW.uuid);
+		NEW.label_quadrant, NEW.n_inhabitants, NEW.lock_level, NEW.block_code, NEW.n_hydrometer, NEW.uuid, NEW.dataquality, NEW.dataquality_obs);
 
 		-- insert into connec_add table
 		INSERT INTO connec_add (connec_id, demand_base, demand_max,demand_min, demand_avg, press_max, press_min, press_avg, quality_max, quality_min, quality_avg,
@@ -895,7 +895,7 @@ BEGIN
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
 			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority, access_type = NEW.access_type, placement_type = NEW.placement_type,
 			crmzone_id=NEW.crmzone_id, expl_visibility=NEW.expl_visibility, plot_id=NEW.plot_id, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_code=NEW.block_code, n_hydrometer=NEW.n_hydrometer
+			label_quadrant=NEW.label_quadrant, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_code=NEW.block_code, n_hydrometer=NEW.n_hydrometer, dataquality=NEW.dataquality, dataquality_obs=NEW.dataquality_obs
 			WHERE connec_id=OLD.connec_id;
 
 		-- update connec_add table
