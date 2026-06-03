@@ -1105,14 +1105,14 @@ BEGIN
 
 			/* TO DO ARNAU
 
-			-- Check if nodeParent or toArc is null
-			SELECT string_agg(sub.mapzone_arcs, '')
+			-- Check if nodeParent
+			SELECT string_agg(sub.mapzone_nodes, '')
 			INTO message
 			FROM (
-				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ')\n') AS mapzone_nodes
 				FROM temp_pgr_graphconfig g
 				WHERE g.graph_type = 'use'
-				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL)
+				AND g.pgr_node_id IS NULL
 				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
 
@@ -1479,7 +1479,7 @@ BEGIN
 		-- put again cost/reverse_cost 1 from initoverflowpath
 		IF v_class = 'DWFZONE' THEN
 			UPDATE temp_pgr_arc_linegraph t
-			SET cost = 1, reverse_cost = 1
+			SET cost = 1, reverse_cost = -1
 			WHERE graph_delimiter = 'initoverflowpath';
 
 			INSERT INTO temp_pgr_drivingdistance_initoverflowpath (seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
@@ -1697,7 +1697,7 @@ BEGIN
 			FROM temp_pgr_arc a
 			JOIN temp_pgr_arc_linegraph l ON a.pgr_arc_id IN (l.pgr_node_1, l.pgr_node_2)
 			JOIN temp_pgr_node n ON l.pgr_node_id = n.pgr_node_id
-			WHERE l.graph_delimiter = 'nodeParent'
+			WHERE n.graph_delimiter = 'nodeParent'
 			AND a.mapzone_id > 0
 			AND a.mapzone_id = n.mapzone_id
 			AND a.node_parent IS DISTINCT FROM l.pgr_node_id
@@ -2047,7 +2047,6 @@ BEGIN
 
 			ELSE -- v_project_type
 
-				-- no selfConflict for UD
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
 				SELECT
 					a.mapzone_id,
@@ -2056,7 +2055,7 @@ BEGIN
 					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
 				WHERE a.node_parent IS NOT NULL
-				AND a.mapzone_id > 0;
+				AND a.mapzone_id <> 0;
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
 				SELECT
@@ -2065,7 +2064,7 @@ BEGIN
 					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
 				WHERE a.graph_delimiter = 'forceClosed'
-				AND a.mapzone_id > 0;
+				AND a.mapzone_id <> 0;
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
 				SELECT
@@ -2074,7 +2073,7 @@ BEGIN
 					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
 				WHERE a.graph_delimiter = 'forceOpen'
-				AND a.mapzone_id > 0;
+				AND a.mapzone_id <> 0;
 
 				-- update graphconfig for temp_pgr_mapzone
 				-- there are no selfConflict mapzones in case of UD project
