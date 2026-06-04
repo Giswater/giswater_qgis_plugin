@@ -670,7 +670,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (4416, 'No es permet eliminar entitats operatives en mode de planificació', 'Canvia al mode operatiu per eliminar l''entitat'),
     (4428, 'ANÀLISI DE QUALITAT DE DADES SEGONS LES REGLES D’O&M', NULL),
     (4430, 'El %feature_type% amb id %connec_id% ha sigut correctament connectat al arc amb id %arc_id%', NULL),
-    (4432, 'Si us plau, estableixi algún valor per el state_type d''objectes planificats (Diàleg de configuració)', NULL),
+    (4432, 'ESTABLEIX UN VALOR PER DEFECTE EN STATE_TYPE PER OBJECTES PLANIFICATS (FORMULARI CONFIG)', NULL),
     (4434, 'Intentant connectar %feature_type% amb id %connect_id% amb l''arc més proper.', NULL),
     (4436, 'Intentant connectar %feature_type% amb id %connect_id% amb l''arc més proper a una distància màxima de %max_distance% metres.', NULL),
     (4438, 'Intentant connectar %feature_type% amb id %connect_id% amb l''arc més proper amb un diàmetre menor que %check_arcdnom%.', NULL),
