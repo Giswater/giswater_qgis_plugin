@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `graphanalytics_mapzones` function by adding `mapzone_type` filter to graph delete queries in order to avoid deleting graph records belonging to other mapzone types stored in the same table.
+- Fix `cibs`.`cat_hydrometer_category` table by changing the id type to int4 and add foreign key constraint for cat_period_id in hydrometer_period table.
+- Fix `graphanalytics_mapzones` mapzones for ud can also be in SelfConflict, fix small bugs.
+- Fix `graphanalytics_omunit` function by resetting `omunit_id` to 0 when the referenced omunit no longer exists.
+
 ## [4.13.0] - 2026-06-03
 
 ### Added
