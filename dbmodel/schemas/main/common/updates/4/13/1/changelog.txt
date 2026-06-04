@@ -1,3 +1,4 @@
 - Fix `graphanalytics_mapzones` function by adding `mapzone_type` filter to graph delete queries in order to avoid deleting graph records belonging to other mapzone types stored in the same table.
 - Fix `graphanalytics_mapzones` mapzones for ud can also be in SelfConflict, fix small bugs.
 - Fix `graphanalytics_omunit` function by resetting `omunit_id` to 0 when the referenced omunit no longer exists.
+- Remove default value for `dataquality_obs` columns.
