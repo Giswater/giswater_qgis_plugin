@@ -1103,15 +1103,15 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			-- Check if nodeParent
-			SELECT string_agg(sub.mapzones, '')
+			-- Check if nodeParent or toArc is null
+			SELECT string_agg(sub.mapzone_arcs, '')
 			INTO message
 			FROM (
-				SELECT concat('mapzone_id: ', g.mapzone_id, '\n') AS mapzones
+				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ', arc_id: ', g.pgr_arc_id, ')\n') AS mapzone_arcs
 				FROM temp_pgr_graphconfig g
 				WHERE g.graph_type = 'use'
-				AND g.pgr_node_id IS NULL
-				ORDER BY g.mapzone_id
+				AND (g.pgr_node_id IS NULL OR g.pgr_arc_id IS NULL)
+				ORDER BY g.mapzone_id,  g.pgr_node_id
 			) sub;
 
 			IF message IS NOT NULL THEN
