@@ -1491,7 +1491,7 @@ UPDATE config_form_fields AS t SET label = v.label, tooltip = v.tooltip FROM (
     ('txt_infolog', 'mincut', 'form_mincut', 'tab_mincut', NULL, NULL),
     ('work_order', 'mincut', 'form_mincut', 'tab_mincut', 'Orden de trabajo:', 'Orden de trabajo:'),
     ('cancel', 'mincut_manager', 'form_mincut', 'tab_none', NULL, 'Cerrar'),
-    ('cancel_mincut', 'mincut_manager', 'form_mincut', 'tab_none', NULL, 'Cancelar mincut'),
+    ('cancel_mincut', 'mincut_manager', 'form_mincut', 'tab_none', NULL, 'Cancelar corte de red'),
     ('date_from', 'mincut_manager', 'form_mincut', 'tab_none', 'Desde:', 'De:'),
     ('date_to', 'mincut_manager', 'form_mincut', 'tab_none', 'Para:', 'Para:'),
     ('delete', 'mincut_manager', 'form_mincut', 'tab_none', NULL, 'Eliminar'),

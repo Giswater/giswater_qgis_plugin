@@ -490,7 +490,7 @@ UPDATE sys_message AS t SET error_message = v.error_message, hint_message = v.hi
     (3576, 'Hi ha %v_count% arcs duplicats.', NULL),
     (3578, 'No hi ha arcs amb el mateix node d''inici i final.', NULL),
     (3580, 'Hi ha %v_count% arcs amb el mateix node d''inici i final.', NULL),
-    (3582, 'No hi ha arcs sense nodes inici/finals.', NULL),
+    (3582, 'No hi ha arcs sense nodes inicis/finals.', NULL),
     (3584, 'El valor de nodes de cerca establert automàticament a %v_arcsearchnodes%', NULL),
     (3586, 'Hi ha %v_count_state1% arcs amb estat 1 sense nodes inici/finals.', NULL),
     (3588, 'Hi ha %v_count_state2% arcs amb estat 2 sense nodes inici/finals.', NULL),
