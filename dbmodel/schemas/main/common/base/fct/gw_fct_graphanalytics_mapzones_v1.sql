@@ -1103,25 +1103,22 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4526", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
 
-			/* TO DO ARNAU
-
 			-- Check if nodeParent
-			SELECT string_agg(sub.mapzone_nodes, '')
+			SELECT string_agg(sub.mapzones, '')
 			INTO message
 			FROM (
-				SELECT concat('mapzone_id: ', g.mapzone_id, ': (node_id: ', g.pgr_node_id, ')\n') AS mapzone_nodes
+				SELECT concat('mapzone_id: ', g.mapzone_id, '\n') AS mapzones
 				FROM temp_pgr_graphconfig g
 				WHERE g.graph_type = 'use'
 				AND g.pgr_node_id IS NULL
-				ORDER BY g.mapzone_id,  g.pgr_node_id
+				ORDER BY g.mapzone_id
 			) sub;
 
 			IF message IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4508", "function":"3508","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4634", "function":"3508","parameters":{"feature_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
 			ELSE
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4510", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4636", "function":"3508","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 			END IF;
-			*/
 
 			-- Check when 2 arcs make a circle
 			SELECT string_agg(concat('arc_1: ', lg.source, ' - arc_2: ', lg.target, '\n'), '') AS message
@@ -2735,6 +2732,7 @@ BEGIN
 					v_query_text_aux := '';
 					IF v_project_type = 'UD' THEN
 						v_query_text_aux := format($sql$
+							UNION ALL
 							SELECT exg.element_id, exg.gully_id AS feature_id, tg.mapzone_id
 							FROM element_x_gully exg
 							JOIN temp_pgr_element te ON te.pgr_element_id = exg.element_id
