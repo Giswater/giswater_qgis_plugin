@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `graphanalytics_mapzones` mapzones for ud can also be in SelfConflict, fix small bugs.
 - Fix `graphanalytics_omunit` function by resetting `omunit_id` to 0 when the referenced omunit no longer exists.
 
+### Removed
+
+- Remove default value for `dataquality_obs` columns.
+
 ## [4.13.0] - 2026-06-03
 
 ### Added
