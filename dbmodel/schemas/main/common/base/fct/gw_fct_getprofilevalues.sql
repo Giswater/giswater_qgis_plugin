@@ -202,6 +202,7 @@ BEGIN
 		state smallint,
 		expl_id integer,
 		sector_id integer,
+		omzone_id integer,
 		exit_topelev double precision,
 		exit_elev double precision,
 		the_geom geometry(LineString,SRID_VALUE),
@@ -214,6 +215,7 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 		ALTER TABLE temp_link ADD COLUMN dma_id integer;
+		ALTER TABLE temp_link ADD COLUMN supplyzone_id integer;
 	END IF;
 
 	CREATE TEMP TABLE temp_pgr_dijkstra(
@@ -356,77 +358,149 @@ BEGIN
 
 		END IF;
 
-		EXECUTE format($sql$
-			WITH dijkstra AS (
+		IF v_project_type = 'UD' THEN
+			EXECUTE format($sql$
+				WITH dijkstra AS (
+					SELECT 
+						seq,
+						node,
+						LAG(node) OVER (ORDER BY seq) AS pred,
+						cost,
+						route_agg_cost
+					FROM temp_pgr_dijkstra
+					WHERE edge <> -1
+				)
+				INSERT INTO temp_anl_arc (
+					fid,
+					arc_id,
+					code,
+					node_1,
+					node_2,
+					sys_type,
+					arccat_id,
+					cat_geom1,
+					length,
+					slope,
+					z1,
+					z2,
+					y1,
+					y2,
+					elev1,
+					elev2,
+					expl_id,
+					omunit_id,
+					the_geom,
+					total_length
+				)
 				SELECT 
-					seq,
-					node,
-					LAG(node) OVER (ORDER BY seq) AS pred,
-					cost,
-					route_agg_cost
-				FROM temp_pgr_dijkstra
-				WHERE edge <> -1
-			)
-			INSERT INTO temp_anl_arc (
-				fid,
-				arc_id,
-				code,
-				node_1,
-				node_2,
-				sys_type,
-				arccat_id,
-				cat_geom1,
-				length,
-				slope,
-				z1,
-				z2,
-				y1,
-				y2,
-				elev1,
-				elev2,
-				expl_id,
-				omunit_id,
-				the_geom,
-				total_length
-			)
-			SELECT 
-				222 AS fid,
-				a.arc_id,
-				COALESCE(a.code, a.arc_id::varchar),
-				d.pred AS node_1,
-				CASE 
-					WHEN d.pred = a.node_1 
-					THEN a.node_2 
-					ELSE a.node_1 
-				END AS node_2,
-				a.sys_type,
-				a.arccat_id,
-				%s AS cat_geom1,
-				a.gis_length AS length,
-				%s AS slope,
-				%s AS z1,
-				%s AS z2,
-				%s AS y1,
-				%s AS y2,
-				%s AS elev1,
-				%s AS elev2,
-				a.expl_id,
-				a.omunit_id,
-				a.the_geom,
-				d.cost + d.route_agg_cost AS total_length
-			FROM dijkstra d
-			JOIN ve_arc a ON d.node = a.arc_id
-			ORDER BY d.seq;
-		$sql$,
-			v_cat_geom1,
-			v_slope,
-			v_z1,
-			v_z2,
-			v_y1,
-			v_y2,
-			v_elev1,
-			v_elev2
-		);
+					222 AS fid,
+					a.arc_id,
+					COALESCE(a.code, a.arc_id::varchar),
+					d.pred AS node_1,
+					CASE 
+						WHEN d.pred = a.node_1 
+						THEN a.node_2 
+						ELSE a.node_1 
+					END AS node_2,
+					a.sys_type,
+					a.arccat_id,
+					%s AS cat_geom1,
+					a.gis_length AS length,
+					%s AS slope,
+					%s AS z1,
+					%s AS z2,
+					%s AS y1,
+					%s AS y2,
+					%s AS elev1,
+					%s AS elev2,
+					a.expl_id,
+					a.omunit_id,
+					a.the_geom,
+					d.cost + d.route_agg_cost AS total_length
+				FROM dijkstra d
+				JOIN ve_arc a ON d.node = a.arc_id
+				ORDER BY d.seq;
+			$sql$,
+				v_cat_geom1,
+				v_slope,
+				v_z1,
+				v_z2,
+				v_y1,
+				v_y2,
+				v_elev1,
+				v_elev2
+			);
+		ELSIF v_project_type = 'WS' THEN
+			EXECUTE format($sql$
+				WITH dijkstra AS (
+					SELECT 
+						seq,
+						node,
+						LAG(node) OVER (ORDER BY seq) AS pred,
+						cost,
+						route_agg_cost
+					FROM temp_pgr_dijkstra
+					WHERE edge <> -1
+				)
+				INSERT INTO temp_anl_arc (
+					fid,
+					arc_id,
+					code,
+					node_1,
+					node_2,
+					sys_type,
+					arccat_id,
+					cat_geom1,
+					length,
+					slope,
+					z1,
+					z2,
+					y1,
+					y2,
+					elev1,
+					elev2,
+					expl_id,
+					the_geom,
+					total_length
+				)
+				SELECT 
+					222 AS fid,
+					a.arc_id,
+					COALESCE(a.code, a.arc_id::varchar),
+					d.pred AS node_1,
+					CASE 
+						WHEN d.pred = a.node_1 
+						THEN a.node_2 
+						ELSE a.node_1 
+					END AS node_2,
+					a.sys_type,
+					a.arccat_id,
+					%s AS cat_geom1,
+					a.gis_length AS length,
+					%s AS slope,
+					%s AS z1,
+					%s AS z2,
+					%s AS y1,
+					%s AS y2,
+					%s AS elev1,
+					%s AS elev2,
+					a.expl_id,
+					a.the_geom,
+					d.cost + d.route_agg_cost AS total_length
+				FROM dijkstra d
+				JOIN ve_arc a ON d.node = a.arc_id
+				ORDER BY d.seq;
+			$sql$,
+				v_cat_geom1,
+				v_slope,
+				v_z1,
+				v_z2,
+				v_y1,
+				v_y2,
+				v_elev1,
+				v_elev2
+			);
+		END IF;
 
 		IF v_project_type = 'UD' THEN
 			v_fymax := 'ymax';
@@ -837,8 +911,13 @@ BEGIN
 		v_fymax||' = '||v_fymax||'*'||v_vs||' ';
 
 		-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
-		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2, omunit_id FROM temp_anl_arc ORDER BY total_length) row;
+		IF v_project_type = 'UD' THEN
+			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
+			FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2, omunit_id FROM temp_anl_arc ORDER BY total_length) row;
+		ELSE
+			SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
+			FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM temp_anl_arc ORDER BY total_length) row;
+		END IF;
 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT DISTINCT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, top_elev, elev, '||v_fymax||' AS ymax, total_distance FROM temp_anl_node WHERE nodecat_id != ''VNODE'' ORDER BY total_distance) row'
 				INTO v_node;
