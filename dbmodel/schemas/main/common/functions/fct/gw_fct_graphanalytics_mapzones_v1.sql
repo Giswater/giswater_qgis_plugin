@@ -2343,11 +2343,6 @@ BEGIN
 			) s
 			WHERE s.mapzone_id = m.mapzone_id;
 
-			-- UPDATE mapzone_graph
-			IF v_project_type = 'WS' AND v_netscenario IS NULL THEN
-				-- TODO
-			END IF;
-
 			-- UPDATE TABLES
 			-- ======================
 
