@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `gw_fct_getprofilevalues` function to use the correct columns for ud and ws.
+
 ## [4.13.1] - 2026-06-04
 
 ### Fixed

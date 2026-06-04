@@ -1,0 +1,1 @@
+- Fix `gw_fct_getprofilevalues` function to use the correct columns for ud and ws.
