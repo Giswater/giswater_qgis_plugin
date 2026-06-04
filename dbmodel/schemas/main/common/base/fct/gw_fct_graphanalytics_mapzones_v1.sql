@@ -1490,20 +1490,16 @@ BEGIN
 		v_query_text := '
 			WITH edges AS (
 				SELECT
-				start_vid AS source,
-				node AS target
+					start_vid AS source,
+					node AS target
 				FROM temp_pgr_drivingdistance
 				UNION ALL
 				SELECT
-				lg.pgr_node_1 AS source,
-				lg.pgr_node_2 AS target
-				FROM temp_pgr_arc_linegraph lg
-				JOIN temp_pgr_arc a1 ON a1.pgr_arc_id = lg.pgr_node_1
-				JOIN temp_pgr_arc a2 ON a2.pgr_arc_id = lg.pgr_node_2
-				WHERE lg.pgr_node_id IS NOT NULL
-				AND lg.graph_delimiter = ''nodeParent''
-				AND lg.pgr_node_id = a1.node_parent
-				AND lg.pgr_node_id = a2.node_parent
+					a1.pgr_arc_id AS source,
+					a2.pgr_arc_id AS target
+				FROM temp_pgr_arc a1 
+				JOIN temp_pgr_arc a2 ON a1.node_parent = a2.node_parent
+				WHERE a2.pgr_arc_id > a1.pgr_arc_id
 			)
 			SELECT
 				row_number() OVER () AS id,
@@ -1938,6 +1934,8 @@ BEGIN
 		END IF;
 
 		-- fill table temp_pgr_graphconfig when from_zero and graphconfig for temp_pgr_mapzone
+		-- it can be possible that there are new mapzones with selfConflict that have to be saved also
+		-- use mapzpne_ids[1] instead of mapzone_id because mapzone_id = -1 for selfConflict mapzones
 		IF v_from_zero = TRUE THEN
 
 			IF v_project_type = 'WS' THEN
@@ -1977,8 +1975,6 @@ BEGIN
 				AND m.mapzone_id <> 0;
 
 				-- update graphconfig 'use'
-				-- in the case of ws it can be possible that there are new mapzones with selfConflict that have to be saved also
-				-- use mapzpne_ids[1] instead of mapzone_id because mapzone_id = -1 for selfConflict mapzones
 				UPDATE temp_pgr_mapzone mz
 				SET graphconfig = json_build_object(
 				'use',         s.use_json,
@@ -2046,34 +2042,36 @@ BEGIN
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
 				SELECT
-					a.mapzone_id,
+					m.mapzone_ids[1] as mapzone_id,
 					'use' AS graph_type,
 					a.node_parent AS pgr_node_id,
 					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
+				JOIN temp_pgr_mapzone m ON a.component = m.component
 				WHERE a.node_parent IS NOT NULL
-				AND a.mapzone_id <> 0;
+				AND m.mapzone_id <> 0;
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
 				SELECT
-					a.mapzone_id,
+					m.mapzone_ids[1] AS mapzone_id,
 					'forceClosed' AS graph_type,
 					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
+				JOIN temp_pgr_mapzone m ON a.component = m.component
 				WHERE a.graph_delimiter = 'forceClosed'
 				AND a.mapzone_id <> 0;
 
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_arc_id)
 				SELECT
-					a.mapzone_id,
+					m.mapzone_ids[1] AS mapzone_id,
 					'forceOpen' AS graph_type,
 					a.pgr_arc_id AS pgr_arc_id
 				FROM temp_pgr_arc a
+				JOIN temp_pgr_mapzone m ON a.component = m.component
 				WHERE a.graph_delimiter = 'forceOpen'
 				AND a.mapzone_id <> 0;
 
 				-- update graphconfig for temp_pgr_mapzone
-				-- there are no selfConflict mapzones in case of UD project
 				UPDATE temp_pgr_mapzone mz
 				SET graphconfig = json_build_object(
 					'use',         s.use_json,
@@ -2096,7 +2094,7 @@ BEGIN
 					) g
 					GROUP BY g.mapzone_id
 				) s
-				WHERE mz.mapzone_id = s.mapzone_id;
+				WHERE mz.mapzone_ids[1] = s.mapzone_id;
 
 				-- forceClosed (arcs)
 				UPDATE temp_pgr_mapzone mz
@@ -2113,7 +2111,7 @@ BEGIN
 				WHERE graph_type = 'forceClosed'
 				GROUP BY mapzone_id
 				) t
-				WHERE mz.mapzone_id = t.mapzone_id;
+				WHERE mz.mapzone_ids[1] = t.mapzone_id;
 
 				--  ignore (arcs)
 				UPDATE temp_pgr_mapzone mz
@@ -2130,7 +2128,7 @@ BEGIN
 				WHERE graph_type = 'forceOpen'
 				GROUP BY mapzone_id
 				) t
-				WHERE mz.mapzone_id = t.mapzone_id;
+				WHERE mz.mapzone_ids[1] = t.mapzone_id;
 
 			END IF; -- v_project_type
 
