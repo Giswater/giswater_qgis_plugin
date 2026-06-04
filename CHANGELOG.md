@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.13.1] - 2026-06-04
+
 ### Fixed
 
 - Fix `graphanalytics_mapzones` function by adding `mapzone_type` filter to graph delete queries in order to avoid deleting graph records belonging to other mapzone types stored in the same table.
@@ -407,7 +409,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.0...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.1...release/4.13
+[4.13.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.0...v4.13.1
 [4.13.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.12.0...v4.13.0
 [4.12.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.2...v4.12.0
 [4.11.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.1...v4.11.2
