@@ -20,8 +20,6 @@ from typing import Literal, Dict, Optional, Union, Any, List, Tuple
 from qgis.PyQt.sip import isdeleted
 from osgeo import gdal
 
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 from collections import OrderedDict
 from functools import partial
 from datetime import datetime
@@ -220,19 +218,29 @@ def load_settings(dialog, plugin='core'):
         width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session", plugin=plugin)
         height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session", plugin=plugin)
 
-        v_screens = ctypes.windll.user32
-        screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
-        screen_y = v_screens.GetSystemMetrics(79)  # Height of virtual screen
-        monitors = v_screens.GetSystemMetrics(80)  # Will return an integer of the number of display monitors present.
-
-        if None in (x, y) or ((int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1)):
+        # Size can be restored on every platform
+        if None not in (width, height):
             dialog.resize(int(width), int(height))
-        else:
-            if int(x) > screen_x:
-                x = int(screen_x) - int(width)
-            if int(y) > screen_y:
-                y = int(screen_y)
-            dialog.setGeometry(int(x), int(y), int(width), int(height))
+
+        # Wayland forbids clients from setting their own absolute position: leave placement to the compositor
+        if None in (x, y) or QApplication.platformName() == 'wayland':
+            return
+
+        x, y = int(x), int(y)
+        screens = QApplication.screens()
+        # Bounding rectangle of all monitors (cross-platform replacement for the Windows virtual screen metrics)
+        virtual_geom = QApplication.primaryScreen().virtualGeometry()
+
+        # On a single monitor, negative coords mean the saved position is off-screen, so keep current position
+        if (x < 0 or y < 0) and len(screens) == 1:
+            return
+
+        # Clamp so the dialog doesn't end up beyond the virtual desktop
+        if x > virtual_geom.right():
+            x = virtual_geom.right() - dialog.width()
+        if y > virtual_geom.bottom():
+            y = virtual_geom.bottom()
+        dialog.move(x, y)
     except Exception:
         pass
 
@@ -248,10 +256,17 @@ def save_settings(dialog, plugin='core'):
         pass
 
     try:
-        x, y = dialog.frameGeometry().x(), dialog.frameGeometry().y()
-        w, h = dialog.geometry().width(), dialog.geometry().height()
+        geometry = dialog.geometry()
+        w, h = geometry.width(), geometry.height()
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}", plugin=plugin)
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}", plugin=plugin)
+
+        # Wayland reports the absolute position as (0, 0): don't overwrite valid stored values with garbage
+        if QApplication.platformName() == 'wayland':
+            return
+
+        frame_geometry = dialog.frameGeometry()
+        x, y = frame_geometry.x(), frame_geometry.y()
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}", plugin=plugin)
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}", plugin=plugin)
     except Exception:
