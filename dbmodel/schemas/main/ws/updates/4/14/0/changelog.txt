@@ -1,0 +1,1 @@
+- Refactor mapzone UI views to use `vf_exploitation` as base filter and add selector variants: `v_ui_presszone` / `_sel`, `v_ui_macrodma` / `_sel`, `v_ui_macrodqa` / `_sel`, `v_ui_dqa` / `_sel`, `v_ui_supplyzone` / `_sel`, `v_ui_crmzone` / `_sel` (`selector_expl` on `_sel`).
