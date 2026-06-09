@@ -248,7 +248,7 @@ def save_settings(dialog, plugin='core'):
         pass
 
     try:
-        x, y = dialog.geometry().x(), dialog.geometry().y()
+        x, y = dialog.frameGeometry().x(), dialog.frameGeometry().y()
         w, h = dialog.geometry().width(), dialog.geometry().height()
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}", plugin=plugin)
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}", plugin=plugin)
