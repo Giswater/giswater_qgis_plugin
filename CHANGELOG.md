@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add "Filter by selector" checkbox to mapzone manager to toggle between exploitation-permission scope and user selector scope.
+- Add `vf_exploitation` view (based on `cat_manager` and `admin_exploitation_x_user`).
+- Add `v_ui_*_sel` mapzone views for selector-based filtering (`selector_sector`, `selector_macrosector`, `selector_expl`).
+
+### Changed
+
+- Refactor mapzone `v_ui_*` views to filter by `vf_exploitation` instead of inline selector filters.
+
 ### Fixed
 
 - Fix `gw_fct_getprofilevalues` function to use the correct columns for ud and ws.
