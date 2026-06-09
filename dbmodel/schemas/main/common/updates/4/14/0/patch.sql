@@ -88,3 +88,6 @@ WITH all_exploitation AS (
 )
 SELECT *
 FROM permission_exploitation;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4638, 'This action cannot be performed because it affects a network you don''t have permissions to view', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;

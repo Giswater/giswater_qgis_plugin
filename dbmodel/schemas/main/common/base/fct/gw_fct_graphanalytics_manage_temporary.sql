@@ -33,6 +33,7 @@ DECLARE
     -- extra variables
     v_return_message TEXT;
     v_mapzone_field text;
+    v_query_text_exploitation TEXT;
 
     -- CHECKS
     v_arc_list TEXT;
@@ -306,6 +307,10 @@ BEGIN
             END IF;
         END IF;
 
+        IF v_fct_name <> 'MINCUT' THEN
+            v_query_text_exploitation := 'AND e.expl_id IN (SELECT expl_id FROM vf_exploitation)';
+        END IF;
+
         -- Create temporary views
         IF v_use_psector = 'true' THEN
             -- with psectors
@@ -336,10 +341,11 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = a.expl_id
                 WHERE COALESCE(pp.state, a.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND a.node_1 IS NOT NULL
                 AND a.node_2 IS NOT NULL;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -369,8 +375,9 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = n.expl_id
                 WHERE COALESCE(pp.state, n.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
@@ -398,8 +405,9 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = c.expl_id
                 WHERE COALESCE(pp.state, c.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             -- in psector mode elements does not change.
             EXECUTE format($sql$
@@ -413,8 +421,9 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = e.state_type
                 WHERE e.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND ex.active = TRUE;
-            $sql$);
+            $sql$, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
@@ -451,9 +460,10 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             IF v_project_type = 'UD' THEN
 
@@ -482,8 +492,9 @@ BEGIN
                     JOIN exploitation e ON e.expl_id = g.expl_id
                     WHERE COALESCE(pp.state, g.state) = 1
                     AND vst.is_operative = TRUE
+                    %s
                     AND e.active = TRUE;
-                $sql$, v_mapzone_field);
+                $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
@@ -520,9 +531,10 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND l.feature_type = 'GULLY';
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             END IF;
 
@@ -543,10 +555,11 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = a.expl_id
                 WHERE a.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND a.node_1 IS NOT NULL
                 AND a.node_2 IS NOT NULL;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -564,8 +577,9 @@ BEGIN
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
@@ -581,8 +595,9 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = c.expl_id
                 WHERE c.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_element AS
@@ -595,8 +610,9 @@ BEGIN
                 JOIN value_state_type vst ON vst.id = e.state_type
                 WHERE e.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND ex.active = TRUE;
-            $sql$);
+            $sql$, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
@@ -614,9 +630,10 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE l.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             IF v_project_type = 'UD' THEN
 
@@ -633,8 +650,9 @@ BEGIN
                     JOIN exploitation e ON e.expl_id = g.expl_id
                     WHERE g.state = 1
                     AND vst.is_operative = TRUE
+                    %s
                     AND e.active = TRUE;
-                $sql$, v_mapzone_field);
+                $sql$, v_mapzone_field, v_query_text_exploitation);
 
                 EXECUTE format($sql$
                     CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
@@ -652,9 +670,10 @@ BEGIN
                     JOIN exploitation e ON e.expl_id = l.expl_id
                     WHERE l.state = 1
                     AND vst.is_operative = TRUE
+                    %s
                     AND e.active = TRUE
                     AND l.feature_type = 'GULLY';
-                $sql$, v_mapzone_field);
+                $sql$, v_mapzone_field, v_query_text_exploitation);
 
             END IF;
 

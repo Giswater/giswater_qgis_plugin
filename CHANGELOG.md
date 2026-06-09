@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Refactor mapzone `v_ui_*` views to filter by `vf_exploitation` instead of inline selector filters.
+- Improve `gw_fct_graphanalytics_manage_temporary` now uses the new `vf_exploitation` view to filter with permissions.
 
 ### Fixed
 

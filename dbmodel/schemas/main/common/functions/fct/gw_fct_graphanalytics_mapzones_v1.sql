@@ -339,6 +339,18 @@ BEGIN
     $sql$, v_query_text)
     USING v_expl_id_array;
 
+
+	-- Check if the nodes are in exploitations that i am not having permissions to see with cat manager.
+	SELECT count(pgr_node_id) INTO v_nodes_count
+	FROM temp_pgr_node tn
+	JOIN node n ON tn.pgr_node_id = n.node_id
+	WHERE NOT EXISTS (SELECT 1 FROM vf_exploitation vfe WHERE vfe.expl_id = n.expl_id);
+
+	IF v_nodes_count > 0 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"4638", "function":"3508","parameters":null, "is_process":true}}$$)';
+	END IF;
+
 	INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
 	SELECT a.arc_id, a.node_1, a.node_2
 	FROM v_temp_arc a

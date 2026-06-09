@@ -2378,6 +2378,29 @@ BEGIN
 		INSERT INTO selector_mincut_result (result_id, cur_user, result_type)
 		VALUES (v_mincut_id, current_user, 'current') ON CONFLICT (result_id, cur_user) DO NOTHING;
 	END IF;
+
+	-- Check if arcs of the mincut are in exploitations that I don't have permissions to see with cat manager.
+	-- using selectors to see if the are conflicts with other exploitations...
+	SELECT EXISTS (
+		SELECT 1 
+		FROM om_mincut_arc oma
+		JOIN arc a ON oma.arc_id = a.arc_id
+		WHERE EXISTS (
+			SELECT 1 
+			FROM selector_mincut_result smr 
+			WHERE smr.result_id = oma.result_id 
+			AND smr.cur_user = current_user
+		)
+		AND NOT EXISTS (
+			SELECT 1 
+			FROM vf_exploitation vfe 
+			WHERE vfe.expl_id = a.expl_id
+		)
+	) INTO v_has_other_exploitations;
+
+	IF v_has_other_exploitations THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4638", "function":"2980","parameters":null, "is_process":true}}$$)';
+	END IF;
 	-- END CORE MINCUT CODE
 
 
