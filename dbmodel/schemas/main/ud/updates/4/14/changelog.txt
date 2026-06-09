@@ -1,1 +1,2 @@
+- Refactor `v_ui_sector`, `v_ui_macrosector`, `v_ui_dma` and `v_ui_macroomzone` to filter by `vf_exploitation`; add matching `v_ui_*_sel` views (UD column layout preserved).
 - Refactor `v_ui_drainzone` and `v_ui_dwfzone` to filter by `vf_exploitation`; add `v_ui_drainzone_sel` and `v_ui_dwfzone_sel` (`selector_expl`).

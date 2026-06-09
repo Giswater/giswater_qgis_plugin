@@ -1,5 +1,2 @@
 - Mapzone manager: add "Filter by selector" checkbox and layout fixes (labels without stretch, hspacer, button order).
 - Create `vf_exploitation` view (cat_manager + `admin_exploitation_x_user`).
-- Refactor `v_ui_sector` to filter by `vf_exploitation`; add `v_ui_sector_sel` (base + `selector_sector`).
-- Refactor `v_ui_macrosector` to filter by `vf_exploitation`; add `v_ui_macrosector_sel` (base + `selector_macrosector`).
-- Refactor `v_ui_dma` / `v_ui_macroomzone` to filter by `vf_exploitation`; add matching `v_ui_*_sel` views (`selector_expl`).
