@@ -149,6 +149,8 @@ v_srid integer;
 v_geom_param_update float := 10;
 v_geom_param_update_divide float;
 
+v_has_other_exploitations boolean := FALSE;
+
 BEGIN
 
 	-- Search path
