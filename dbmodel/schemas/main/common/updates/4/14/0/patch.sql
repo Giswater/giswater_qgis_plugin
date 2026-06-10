@@ -105,3 +105,8 @@ WHERE widgetcontrols::text ILIKE '%ve_municipality%' AND columnname = 'expl_visi
 
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'muni_id', 'expl_id')::json
 WHERE widgetcontrols::text ILIKE '%muni_id%' AND columnname = 'expl_visibility'AND formname ILIKE '%ve_element%';
+
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 've_exploitation', 'vf_exploitation')
+WHERE dv_querytext ILIKE '%ve_exploitation%';
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'exploitation', 'vf_exploitation')
+WHERE dv_querytext ILIKE '%exploitation%' AND dv_querytext NOT ILIKE '%vf_exploitation%' AND dv_querytext NOT ILIKE '%macroexploitation%';
