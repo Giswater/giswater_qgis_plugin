@@ -36,10 +36,15 @@ LEFT JOIN macrosector ms USING (macrosector_id)
 LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text
     AND et.typevalue = 'sector_type'
 WHERE s.sector_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (s.expl_id)
+  AND (
+      s.expl_id IS NULL
+      OR s.expl_id = '{}'::int4[]
+      OR 0 = ANY (s.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (s.expl_id)
+      )
   )
 ORDER BY s.sector_id;
 
@@ -74,10 +79,15 @@ SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
     m.updated_by
 FROM macrosector m
 WHERE m.macrosector_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (m.expl_id)
+  AND (
+      m.expl_id IS NULL
+      OR m.expl_id = '{}'::int4[]
+      OR 0 = ANY (m.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (m.expl_id)
+      )
   )
 ORDER BY m.macrosector_id;
 
@@ -122,10 +132,15 @@ LEFT JOIN macrodma md USING (macrodma_id)
 LEFT JOIN edit_typevalue et ON et.id::text = d.dma_type::text
     AND et.typevalue = 'dma_type'
 WHERE d.dma_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (d.expl_id)
+  AND (
+      d.expl_id IS NULL
+      OR d.expl_id = '{}'::int4[]
+      OR 0 = ANY (d.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (d.expl_id)
+      )
   );
 
 CREATE OR REPLACE VIEW v_ui_dma_sel
@@ -160,10 +175,15 @@ SELECT DISTINCT ON (m.macroomzone_id) m.macroomzone_id,
     m.updated_by
 FROM macroomzone m
 WHERE m.macroomzone_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (m.expl_id)
+  AND (
+      m.expl_id IS NULL
+      OR m.expl_id = '{}'::int4[]
+      OR 0 = ANY (m.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (m.expl_id)
+      )
   )
 ORDER BY m.macroomzone_id;
 
@@ -205,10 +225,15 @@ FROM presszone p
 LEFT JOIN edit_typevalue et ON et.id::text = p.presszone_type
     AND et.typevalue = 'presszone_type'
 WHERE p.presszone_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (p.expl_id)
+  AND (
+      p.expl_id IS NULL
+      OR p.expl_id = '{}'::int4[]
+      OR 0 = ANY (p.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (p.expl_id)
+      )
   )
 ORDER BY p.presszone_id;
 
@@ -244,10 +269,15 @@ SELECT DISTINCT ON (m.macrodma_id) m.macrodma_id,
     m.updated_by
 FROM macrodma m
 WHERE m.macrodma_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (m.expl_id)
+  AND (
+      m.expl_id IS NULL
+      OR m.expl_id = '{}'::int4[]
+      OR 0 = ANY (m.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (m.expl_id)
+      )
   )
 ORDER BY m.macrodma_id;
 
@@ -283,10 +313,15 @@ SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
     m.updated_by
 FROM macrodqa m
 WHERE m.macrodqa_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (m.expl_id)
+  AND (
+      m.expl_id IS NULL
+      OR m.expl_id = '{}'::int4[]
+      OR 0 = ANY (m.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (m.expl_id)
+      )
   )
 ORDER BY m.macrodqa_id;
 
@@ -330,10 +365,15 @@ LEFT JOIN macrodqa md USING (macrodqa_id)
 LEFT JOIN edit_typevalue et ON et.id::text = d.dqa_type::text
     AND et.typevalue = 'dqa_type'
 WHERE d.dqa_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (d.expl_id)
+  AND (
+      d.expl_id IS NULL
+      OR d.expl_id = '{}'::int4[]
+      OR 0 = ANY (d.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (d.expl_id)
+      )
   )
 ORDER BY d.dqa_id;
 
@@ -375,10 +415,15 @@ FROM supplyzone d
 LEFT JOIN edit_typevalue et ON et.id::text = d.supplyzone_type::text
     AND et.typevalue = 'supplyzone_type'
 WHERE d.supplyzone_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (d.expl_id)
+  AND (
+      d.expl_id IS NULL
+      OR d.expl_id = '{}'::int4[]
+      OR 0 = ANY (d.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (d.expl_id)
+      )
   )
 ORDER BY d.supplyzone_id;
 
@@ -412,10 +457,15 @@ SELECT DISTINCT ON (c.crmzone_id) c.crmzone_id,
 FROM crmzone c
 LEFT JOIN macrocrmzone mc USING (macrocrmzone_id)
 WHERE c.crmzone_id > 0
-  AND EXISTS (
-      SELECT 1
-      FROM vf_exploitation ve
-      WHERE ve.expl_id = ANY (c.expl_id)
+  AND (
+      c.expl_id IS NULL
+      OR c.expl_id = '{}'::int4[]
+      OR 0 = ANY (c.expl_id)
+      OR EXISTS (
+          SELECT 1
+          FROM vf_exploitation ve
+          WHERE ve.expl_id = ANY (c.expl_id)
+      )
   )
 ORDER BY c.crmzone_id;
 
