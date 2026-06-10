@@ -323,7 +323,7 @@ BEGIN
             OR EXISTS (
                 SELECT 1
                 FROM v_temp_arc v
-                WHERE v.expl_id = ANY($1)
+                WHERE v.expl_visibility && $1
                 AND v.node_1 = c.node
             )
             GROUP BY c.component
