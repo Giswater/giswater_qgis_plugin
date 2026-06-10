@@ -499,3 +499,47 @@ WHERE EXISTS (
     WHERE se.expl_id = ANY (d.expl_id)
       AND se.cur_user = CURRENT_USER
 );
+
+-- DRAINZONE
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT expl_id AS id, name AS idval FROM vf_exploitation WHERE expl_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_drainzone' AND formtype = 'form_feature' AND columnname = 'expl_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT muni_id AS id, name AS idval FROM ve_municipality WHERE muni_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_drainzone' AND formtype = 'form_feature' AND columnname = 'muni_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT sector_id AS id, name AS idval FROM ve_sector WHERE active IS TRUE',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_drainzone' AND formtype = 'form_feature' AND columnname = 'sector_id' AND tabname = 'tab_none';
+
+-- DWFZONE
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT expl_id AS id, name AS idval FROM vf_exploitation WHERE expl_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_dwfzone' AND formtype = 'form_feature' AND columnname = 'expl_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT muni_id AS id, name AS idval FROM ve_municipality WHERE muni_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_dwfzone' AND formtype = 'form_feature' AND columnname = 'muni_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT sector_id AS id, name AS idval FROM ve_sector WHERE active IS TRUE',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_dwfzone' AND formtype = 'form_feature' AND columnname = 'sector_id' AND tabname = 'tab_none';

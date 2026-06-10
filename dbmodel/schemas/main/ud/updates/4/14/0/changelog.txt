@@ -1,2 +1,3 @@
 - Refactor mapzone `v_ui_*` views to filter by `vf_exploitation` (including null/empty/`{0}` expl_id) and add `v_ui_*_sel` selector variants for sector, macrosector, dma, macroomzone, drainzone and dwfzone (UD column layout preserved).
 - Refactor mapzone `ve_*` edit views to filter by `vf_exploitation`: `ve_sector`, `ve_macrosector`, `ve_dma`, `ve_macroomzone`, `ve_drainzone`, `ve_dwfzone` (UD column layout preserved; no `ve_*_sel`).
+- Update `ve_*` form `expl_id` fields to use `vf_exploitation` in combo/valueRelation queries.

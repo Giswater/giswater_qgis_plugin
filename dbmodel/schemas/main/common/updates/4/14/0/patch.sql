@@ -133,3 +133,59 @@ WHERE dv_querytext ILIKE '%ve_exploitation%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'exploitation', 'vf_exploitation')
 WHERE dv_querytext ILIKE '%exploitation%' AND dv_querytext NOT ILIKE '%vf_exploitation%' AND dv_querytext NOT ILIKE '%macroexploitation%';
 
+-- MACROSECTOR
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT expl_id AS id, name AS idval FROM vf_exploitation WHERE expl_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_macrosector' AND formtype = 'form_feature' AND columnname = 'expl_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT muni_id AS id, name AS idval FROM ve_municipality WHERE muni_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_macrosector' AND formtype = 'form_feature' AND columnname = 'muni_id' AND tabname = 'tab_none';
+
+-- SECTOR
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    dv_querytext = 'SELECT expl_id AS id, name AS idval FROM vf_exploitation WHERE expl_id > 0'
+WHERE formname = 've_sector' AND formtype = 'form_feature' AND columnname = 'expl_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true
+WHERE formname = 've_sector' AND formtype = 'form_feature' AND columnname = 'muni_id' AND tabname = 'tab_none';
+
+-- DMA
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true
+WHERE formname = 've_dma' AND formtype = 'form_feature' AND columnname IN ('sector_id', 'muni_id') AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true, dv_querytext = 'SELECT expl_id AS id, name AS idval FROM vf_exploitation WHERE expl_id > 0'
+WHERE formname = 've_dma' AND formtype = 'form_feature' AND columnname = 'expl_id' AND tabname = 'tab_none';
+
+-- MACROOMZONE
+UPDATE config_form_fields
+SET placeholder = NULL,
+    iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT expl_id AS id, name AS idval FROM vf_exploitation WHERE expl_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_macroomzone' AND formtype = 'form_feature' AND columnname = 'expl_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT muni_id AS id, name AS idval FROM ve_municipality WHERE muni_id > 0',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_macroomzone' AND formtype = 'form_feature' AND columnname = 'muni_id' AND tabname = 'tab_none';
+
+UPDATE config_form_fields
+SET iseditable = true, ismandatory = true,
+    widgettype = 'multiple_option',
+    dv_querytext = 'SELECT sector_id AS id, name AS idval FROM ve_sector WHERE active IS TRUE',
+    widgetcontrols = '{"setMultiline": false, "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+WHERE formname = 've_macroomzone' AND formtype = 'form_feature' AND columnname = 'sector_id' AND tabname = 'tab_none';

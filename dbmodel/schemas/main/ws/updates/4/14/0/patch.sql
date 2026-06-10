@@ -797,3 +797,59 @@ WHERE EXISTS (
     WHERE se.expl_id = ANY (c.expl_id)
       AND se.cur_user = CURRENT_USER
 );
+
+-- PRESSZONE
+UPDATE config_form_fields
+	SET placeholder=NULL,dv_querytext='select expl_id AS id, name AS idval from vf_exploitation where expl_id > 0', ismandatory=true
+	WHERE formname='ve_presszone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='ve_presszone' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='ve_presszone' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+
+-- MACRODMA
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select expl_id AS id, name AS idval from vf_exploitation where expl_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_macrodma' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select muni_id AS id, name AS idval from ve_municipality where muni_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_macrodma' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select sector_id AS id, name AS idval from ve_sector where sector_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_macrodma' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+
+-- MACRODQA
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select expl_id AS id, name AS idval from vf_exploitation where expl_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_macrodqa' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select muni_id AS id, name AS idval from ve_municipality where muni_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_macrodqa' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select sector_id AS id, name AS idval from ve_sector where sector_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_macrodqa' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+
+
+-- DQA
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, dv_querytext='select expl_id AS id, name AS idval from vf_exploitation where expl_id > 0'
+	WHERE formname='ve_dqa' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='ve_dqa' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='ve_dqa' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+
+-- SUPPLYZONE
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select expl_id AS id, name AS idval from vf_exploitation where expl_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_supplyzone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select muni_id AS id, name AS idval from ve_municipality where muni_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_municipality", "activated": true, "keyColumn": "muni_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_supplyzone' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true, widgettype='multiple_option',dv_querytext='select sector_id AS id, name AS idval from ve_sector where sector_id > 0',widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "ve_sector", "activated": true, "keyColumn": "sector_id", "nullValue": false, "allowMulti": true, "nofColumns": 2, "valueColumn": "name", "filterExpression": null}}'::json
+	WHERE formname='ve_supplyzone' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
