@@ -88,7 +88,7 @@ BEGIN
 	v_dma_weight_factor :=  ((p_data ->>'data')::json->>'parameters')::json->>'export_weight';
 
 
-	v_percent_hydro := (SELECT "value" FROM config_param_user WHERE "parameter" = 'epa_dscenario_percent_hydro_threshold');
+	v_percent_hydro := (SELECT "value" FROM config_param_user WHERE "parameter" = 'epa_dscenario_percent_hydro_threshold' AND "cur_user" = current_user());
 	v_percent_hydro = coalesce(v_percent_hydro, '1');
 
 	IF v_expl = '99999' THEN
