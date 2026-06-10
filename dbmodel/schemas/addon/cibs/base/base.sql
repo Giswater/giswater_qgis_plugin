@@ -109,7 +109,7 @@ CREATE TABLE cibs.hydrometer (
     category_id integer,
     crmzone_id integer,
     crmzone_order integer,
-    wmeter_number integer,
+    wmeter_number text,
     wmeter_builtdate date,
     wmeter_instaldate date,
     plot_code character varying(100),
@@ -127,6 +127,8 @@ CREATE TABLE cibs.hydrometer (
     assessed_volume double precision,
     is_waterbal boolean DEFAULT true,
     link text,
+    wmeter_state text,
+    wmeter_brand text,
     CONSTRAINT hydrometer_pkey PRIMARY KEY (hydrometer_id),
     CONSTRAINT hydrometer_code_unique UNIQUE (code),
 	CONSTRAINT hydrometer_cat_hydrometer_priority_fk FOREIGN KEY (priority_id) REFERENCES cat_hydrometer_priority(id),
@@ -151,7 +153,6 @@ CREATE TABLE cibs.hydrometer_period (
     CONSTRAINT hydrometer_period_hydrometer_id_cat_period_id_unique UNIQUE (hydrometer_id, cat_period_id),
 	CONSTRAINT hydrometer_period_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES hydrometer(hydrometer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT hydrometer_period_cat_period_id_fkey FOREIGN KEY (cat_period_id) REFERENCES cat_period(id) ON DELETE RESTRICT ON UPDATE CASCADE
-
 );
 
 
