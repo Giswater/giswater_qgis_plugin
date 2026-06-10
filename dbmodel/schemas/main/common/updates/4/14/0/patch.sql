@@ -100,6 +100,28 @@ inputparams::text,
 )::json
 WHERE inputparams::text ILIKE '%SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC%'
 
+
+CREATE OR REPLACE VIEW ve_exploitation
+AS SELECT expl_id,
+    code,
+    name,
+    macroexpl_id,
+    owner_vdefault,
+    descript,
+    lock_level,
+    active,
+    the_geom,
+    created_at,
+    created_by,
+    updated_at,
+    updated_by
+FROM exploitation e
+WHERE EXISTS (
+        SELECT 1
+        FROM vf_exploitation ve
+        WHERE ve.expl_id = e.expl_id
+    );
+
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 've_municipality', 've_exploitation')::json
 WHERE widgetcontrols::text ILIKE '%ve_municipality%' AND columnname = 'expl_visibility'AND formname ILIKE '%ve_element%';
 
@@ -110,3 +132,4 @@ UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 've_exploitat
 WHERE dv_querytext ILIKE '%ve_exploitation%';
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'exploitation', 'vf_exploitation')
 WHERE dv_querytext ILIKE '%exploitation%' AND dv_querytext NOT ILIKE '%vf_exploitation%' AND dv_querytext NOT ILIKE '%macroexploitation%';
+
