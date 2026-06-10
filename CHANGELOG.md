@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `config_form_fields` `dv_querytext` to use `ve_exploitation` instead of `vf_exploitation` for `macroexpl_id` filter column.
 - Enable and require `sector_id` and `muni_id` on netscenario mapzone forms `plan_netscenario_dma` and `plan_netscenario_presszone`.
 - Fix netscenario mapzone Create/Update in `mapzone_manager` to upsert into `plan_netscenario_*` (not operative `ve_*`) and refresh the netscenario table after accept.
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to filter by `expl_id` in the graphconfig.
 
 ## [4.14.0] - 2026-06-10
 

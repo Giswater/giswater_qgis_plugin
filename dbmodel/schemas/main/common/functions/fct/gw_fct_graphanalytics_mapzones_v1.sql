@@ -339,18 +339,6 @@ BEGIN
     $sql$, v_query_text)
     USING v_expl_id_array;
 
-
-	-- Check if the nodes are in exploitations that i am not having permissions to see with cat manager.
-	SELECT count(pgr_node_id) INTO v_nodes_count
-	FROM temp_pgr_node tn
-	JOIN node n ON tn.pgr_node_id = n.node_id
-	WHERE NOT EXISTS (SELECT 1 FROM vf_exploitation vfe WHERE vfe.expl_id = n.expl_id);
-
-	IF v_nodes_count > 0 THEN
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"4638", "function":"3508","parameters":null, "is_process":true}}$$)';
-	END IF;
-
 	INSERT INTO temp_pgr_arc (pgr_arc_id, pgr_node_1, pgr_node_2)
 	SELECT a.arc_id, a.node_1, a.node_2
 	FROM v_temp_arc a
@@ -561,7 +549,13 @@ BEGIN
 					LEFT JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
+					AND (cardinality($1) = 0 OR t.expl_id && $1)
 					%s
+				), graphconfig_filtered AS (
+					SELECT g.* 
+					FROM graphconfig g
+					JOIN node n ON n.node_id = g.node_parent
+					WHERE EXISTS (SELECT 1 FROM vf_exploitation vfe WHERE vfe.expl_id = ANY(array_append(n.expl_visibility, n.expl_id)))
 				)
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
 				SELECT
@@ -569,10 +563,10 @@ BEGIN
 				'use',
 				node_parent,
 				to_arc
-				FROM graphconfig
+				FROM graphconfig_filtered
 				WHERE mapzone_id > 0
 				AND (node_parent IS DISTINCT FROM 0 OR to_arc IS DISTINCT FROM 0);
-			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux) USING v_expl_id_array;
 
 			-- forceClosed
 			EXECUTE format($sql$
@@ -693,6 +687,12 @@ BEGIN
 					JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
+					AND (cardinality($1) = 0 OR t.expl_id && $1)
+				), graphconfig_filtered AS (
+					SELECT g.* 
+					FROM graphconfig g
+					JOIN node n ON n.node_id = g.node_parent
+					WHERE EXISTS (SELECT 1 FROM vf_exploitation vfe WHERE vfe.expl_id = ANY(array_append(n.expl_visibility, n.expl_id)))
 				)
 				INSERT INTO temp_pgr_graphconfig (mapzone_id, graph_type, pgr_node_id, pgr_arc_id)
 				SELECT
@@ -700,11 +700,11 @@ BEGIN
 					'use',
 					g.node_parent,
 					a.arc_id
-				FROM graphconfig g
+				FROM graphconfig_filtered g
 				LEFT JOIN v_temp_arc a ON a.node_2 = g.node_parent
 				WHERE g.mapzone_id > 0
 				AND g.node_parent IS DISTINCT FROM 0
-			$sql$, v_mapzone_field, v_mapzone_table);
+			$sql$, v_mapzone_field, v_mapzone_table) USING v_expl_id_array;
 
 			-- forceClosed
 			EXECUTE format($sql$
