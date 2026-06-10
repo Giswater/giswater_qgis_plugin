@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `config_form_fields` `dv_querytext` to use `ve_exploitation` instead of `vf_exploitation` for 'macroexpl_id' filter column.
+
 ## [4.14.0] - 2026-06-10
 
 ### Added

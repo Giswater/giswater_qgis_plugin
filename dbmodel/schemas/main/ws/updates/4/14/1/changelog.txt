@@ -1,0 +1,1 @@
+- Fix `config_form_fields` `dv_querytext` to use `ve_exploitation` instead of `vf_exploitation` for 'macroexpl_id' filter column.
