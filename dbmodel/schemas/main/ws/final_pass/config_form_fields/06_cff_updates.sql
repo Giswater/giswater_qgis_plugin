@@ -325,3 +325,9 @@ FROM cat_feature ON CONFLICT DO NOTHING;
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
 SELECT child_layer, 'form_feature', 'tab_data', 'turns_count', 'lyt_data_2', (SELECT max(layoutorder)+1 FROM config_form_fields WHERE formname = child_layer AND formtype='form_feature' AND tabname='tab_data' AND layoutname='lyt_data_2'), 'numeric', 'text', 'Turns count', 'To indicate the number of closing-opening turns when operating the valve.', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL 
 FROM cat_feature WHERE feature_class = 'VALVE' ON CONFLICT DO NOTHING;
+
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 've_municipality', 've_exploitation')::json
+WHERE widgetcontrols::text ILIKE '%ve_municipality%' AND columnname = 'expl_visibility'AND formname ILIKE '%ve_element%';
+
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::text, 'muni_id', 'expl_id')::json
+WHERE widgetcontrols::text ILIKE '%muni_id%' AND columnname = 'expl_visibility'AND formname ILIKE '%ve_element%';
