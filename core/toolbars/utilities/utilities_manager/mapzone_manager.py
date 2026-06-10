@@ -74,8 +74,9 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         # Restore state
-        self._restore_last_tab()
         self._restore_show_inactive_state()
+        self._restore_filter_selector_state()
+        self._restore_last_tab()
 
         # Keep only lifecycle/non-config-driven signals in Python.
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
@@ -88,6 +89,8 @@ class GwMapzoneManager:
         if self.mapzone_mng_dlg.chk_filter_selector is not None:
             self.mapzone_mng_dlg.chk_filter_selector.stateChanged.connect(
                 partial(self._on_filter_selector_changed, self.mapzone_mng_dlg))
+            self.mapzone_mng_dlg.chk_filter_selector.stateChanged.connect(
+                self._save_filter_selector_state)
 
         self._manage_current_changed()
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg, None))
@@ -1972,3 +1975,30 @@ class GwMapzoneManager:
 
         is_checked = self.mapzone_mng_dlg.chk_active.isChecked()
         tools_gw.set_config_parser("dialogs", "mapzone_manager_show_inactive", str(is_checked), "user", "session")
+
+    def _restore_filter_selector_state(self):
+        """Restore filter-by-selector checkbox from last session choice."""
+
+        chk = getattr(self.mapzone_mng_dlg, 'chk_filter_selector', None)
+        if chk is None or isdeleted(chk):
+            return
+
+        filter_selector = tools_gw.get_config_parser(
+            "dialogs", "mapzone_manager_filter_selector", "user", "session")
+        if filter_selector is not None:
+            chk.setChecked(tools_os.set_boolean(filter_selector, default=True))
+
+    def _save_filter_selector_state(self):
+        """Persist filter-by-selector checkbox state for next dialog open."""
+
+        chk = getattr(self.mapzone_mng_dlg, 'chk_filter_selector', None)
+        if chk is None or isdeleted(chk):
+            return
+
+        tools_gw.set_config_parser(
+            "dialogs",
+            "mapzone_manager_filter_selector",
+            str(chk.isChecked()),
+            "user",
+            "session",
+        )
