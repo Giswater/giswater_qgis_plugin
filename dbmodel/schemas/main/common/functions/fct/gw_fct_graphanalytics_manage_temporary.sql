@@ -33,6 +33,7 @@ DECLARE
     -- extra variables
     v_return_message TEXT;
     v_mapzone_field text;
+    v_query_text_exploitation TEXT;
 
     -- CHECKS
     v_arc_list TEXT;
@@ -237,7 +238,7 @@ BEGIN
                 CREATE INDEX IF NOT EXISTS temp_pgr_gully_component_idx ON temp_pgr_gully USING btree (component);
             END IF;
 
-            CREATE TABLE IF NOT EXISTS temp_pgr_mapzone_graph (
+            CREATE TEMP TABLE IF NOT EXISTS temp_pgr_mapzone_graph (
                 node_id int4 NOT NULL,
                 netscenario_id int4 NULL,
                 mapzone_id int4 NOT NULL,
@@ -306,6 +307,10 @@ BEGIN
             END IF;
         END IF;
 
+        IF v_fct_name <> 'MINCUT' THEN
+            v_query_text_exploitation := 'AND e.expl_id IN (SELECT expl_id FROM vf_exploitation)';
+        END IF;
+
         -- Create temporary views
         IF v_use_psector = 'true' THEN
             -- with psectors
@@ -317,6 +322,7 @@ BEGIN
                     a.node_1,
                     a.node_2,
                     a.expl_id,
+                    array_append(a.expl_visibility, a.expl_id) AS expl_visibility,
                     a.%I,
                     a.the_geom
                 FROM arc a
@@ -336,10 +342,11 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = a.expl_id
                 WHERE COALESCE(pp.state, a.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND a.node_1 IS NOT NULL
                 AND a.node_2 IS NOT NULL;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -348,6 +355,7 @@ BEGIN
                     cn.node_type,
                     cf.graph_delimiter,
                     n.expl_id,
+                    array_append(n.expl_visibility, n.expl_id) AS expl_visibility,
                     n.%I,
                     n.the_geom
                 FROM node n
@@ -369,8 +377,9 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = n.expl_id
                 WHERE COALESCE(pp.state, n.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
@@ -379,6 +388,7 @@ BEGIN
                     COALESCE(pp.arc_id, c.arc_id) AS arc_id,
                     c.customer_code,
                     c.expl_id,
+                    array_append(c.expl_visibility, c.expl_id) AS expl_visibility,
                     c.%I,
                     c.the_geom
                 FROM connec c
@@ -398,8 +408,9 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = c.expl_id
                 WHERE COALESCE(pp.state, c.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             -- in psector mode elements does not change.
             EXECUTE format($sql$
@@ -407,14 +418,16 @@ BEGIN
                 SELECT
                     e.element_id,
                     e.expl_id,
+                    array_append(e.expl_visibility, e.expl_id) AS expl_visibility,
                     e.the_geom
                 FROM element e
                 JOIN exploitation ex ON ex.expl_id = e.expl_id
                 JOIN value_state_type vst ON vst.id = e.state_type
                 WHERE e.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND ex.active = TRUE;
-            $sql$);
+            $sql$, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
@@ -424,6 +437,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
+                    array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                     l.%I,
                     l.the_geom
                 FROM link l
@@ -451,9 +465,10 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             IF v_project_type = 'UD' THEN
 
@@ -463,6 +478,7 @@ BEGIN
                         g.gully_id,
                         COALESCE(pp.arc_id, g.arc_id) AS arc_id,
                         g.expl_id,
+                        array_append(g.expl_visibility, g.expl_id) AS expl_visibility,
                         g.%I,
                         g.the_geom
                     FROM gully g
@@ -482,8 +498,9 @@ BEGIN
                     JOIN exploitation e ON e.expl_id = g.expl_id
                     WHERE COALESCE(pp.state, g.state) = 1
                     AND vst.is_operative = TRUE
+                    %s
                     AND e.active = TRUE;
-                $sql$, v_mapzone_field);
+                $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
@@ -493,6 +510,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
+                    array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                     l.%I,
                     l.the_geom
                 FROM link l
@@ -520,9 +538,10 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE COALESCE(pp.state, l.state) = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND l.feature_type = 'GULLY';
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             END IF;
 
@@ -536,6 +555,7 @@ BEGIN
                     a.node_1,
                     a.node_2,
                     a.expl_id,
+                    array_append(a.expl_visibility, a.expl_id) AS expl_visibility,
                     a.%I,
                     a.the_geom
                 FROM arc a
@@ -543,10 +563,11 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = a.expl_id
                 WHERE a.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND a.node_1 IS NOT NULL
                 AND a.node_2 IS NOT NULL;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_node AS
@@ -555,6 +576,7 @@ BEGIN
                     cn.node_type,
                     cf.graph_delimiter,
                     n.expl_id,
+                    array_append(n.expl_visibility, n.expl_id) AS expl_visibility,
                     n.%I,
                     n.the_geom
                 FROM node n
@@ -564,8 +586,9 @@ BEGIN
                 JOIN cat_feature_node cf ON cf.id = cn.node_type
                 WHERE n.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_connec AS
@@ -574,6 +597,7 @@ BEGIN
                     c.arc_id,
                     c.customer_code,
                     c.expl_id,
+                    array_append(c.expl_visibility, c.expl_id) AS expl_visibility,
                     c.%I,
                     c.the_geom
                 FROM connec c
@@ -581,22 +605,25 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = c.expl_id
                 WHERE c.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE;
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_element AS
                 SELECT
                     e.element_id,
                     e.expl_id,
+                    array_append(e.expl_visibility, e.expl_id) AS expl_visibility,
                     e.the_geom
                 FROM element e
                 JOIN exploitation ex ON ex.expl_id = e.expl_id
                 JOIN value_state_type vst ON vst.id = e.state_type
                 WHERE e.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND ex.active = TRUE;
-            $sql$);
+            $sql$, v_query_text_exploitation);
 
             EXECUTE format($sql$
                 CREATE OR REPLACE TEMPORARY VIEW v_temp_link_connec AS
@@ -606,6 +633,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
+                    array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                     l.%I,
                     l.the_geom
                 FROM link l
@@ -614,9 +642,10 @@ BEGIN
                 JOIN exploitation e ON e.expl_id = l.expl_id
                 WHERE l.state = 1
                 AND vst.is_operative = TRUE
+                %s
                 AND e.active = TRUE
                 AND l.feature_type = 'CONNEC';
-            $sql$, v_mapzone_field);
+            $sql$, v_mapzone_field, v_query_text_exploitation);
 
             IF v_project_type = 'UD' THEN
 
@@ -626,6 +655,7 @@ BEGIN
                         g.gully_id,
                         g.arc_id,
                         g.expl_id,
+                        array_append(g.expl_visibility, g.expl_id) AS expl_visibility,
                         g.%I,
                         g.the_geom
                     FROM gully g
@@ -633,8 +663,9 @@ BEGIN
                     JOIN exploitation e ON e.expl_id = g.expl_id
                     WHERE g.state = 1
                     AND vst.is_operative = TRUE
+                    %s
                     AND e.active = TRUE;
-                $sql$, v_mapzone_field);
+                $sql$, v_mapzone_field, v_query_text_exploitation);
 
                 EXECUTE format($sql$
                     CREATE OR REPLACE TEMPORARY VIEW v_temp_link_gully AS
@@ -644,6 +675,7 @@ BEGIN
                         l.feature_id,
                         l.feature_type,
                         l.expl_id,
+                        array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                         l.%I,
                         l.the_geom
                     FROM link l
@@ -652,9 +684,10 @@ BEGIN
                     JOIN exploitation e ON e.expl_id = l.expl_id
                     WHERE l.state = 1
                     AND vst.is_operative = TRUE
+                    %s
                     AND e.active = TRUE
                     AND l.feature_type = 'GULLY';
-                $sql$, v_mapzone_field);
+                $sql$, v_mapzone_field, v_query_text_exploitation);
 
             END IF;
 

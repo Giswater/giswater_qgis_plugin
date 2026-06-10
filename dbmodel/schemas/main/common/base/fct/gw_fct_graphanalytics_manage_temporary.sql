@@ -322,6 +322,7 @@ BEGIN
                     a.node_1,
                     a.node_2,
                     a.expl_id,
+                    array_append(a.expl_visibility, a.expl_id) AS expl_visibility,
                     a.%I,
                     a.the_geom
                 FROM arc a
@@ -354,6 +355,7 @@ BEGIN
                     cn.node_type,
                     cf.graph_delimiter,
                     n.expl_id,
+                    array_append(n.expl_visibility, n.expl_id) AS expl_visibility,
                     n.%I,
                     n.the_geom
                 FROM node n
@@ -386,6 +388,7 @@ BEGIN
                     COALESCE(pp.arc_id, c.arc_id) AS arc_id,
                     c.customer_code,
                     c.expl_id,
+                    array_append(c.expl_visibility, c.expl_id) AS expl_visibility,
                     c.%I,
                     c.the_geom
                 FROM connec c
@@ -415,6 +418,7 @@ BEGIN
                 SELECT
                     e.element_id,
                     e.expl_id,
+                    array_append(e.expl_visibility, e.expl_id) AS expl_visibility,
                     e.the_geom
                 FROM element e
                 JOIN exploitation ex ON ex.expl_id = e.expl_id
@@ -433,6 +437,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
+                    array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                     l.%I,
                     l.the_geom
                 FROM link l
@@ -473,6 +478,7 @@ BEGIN
                         g.gully_id,
                         COALESCE(pp.arc_id, g.arc_id) AS arc_id,
                         g.expl_id,
+                        array_append(g.expl_visibility, g.expl_id) AS expl_visibility,
                         g.%I,
                         g.the_geom
                     FROM gully g
@@ -504,6 +510,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
+                    array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                     l.%I,
                     l.the_geom
                 FROM link l
@@ -548,6 +555,7 @@ BEGIN
                     a.node_1,
                     a.node_2,
                     a.expl_id,
+                    array_append(a.expl_visibility, a.expl_id) AS expl_visibility,
                     a.%I,
                     a.the_geom
                 FROM arc a
@@ -568,6 +576,7 @@ BEGIN
                     cn.node_type,
                     cf.graph_delimiter,
                     n.expl_id,
+                    array_append(n.expl_visibility, n.expl_id) AS expl_visibility,
                     n.%I,
                     n.the_geom
                 FROM node n
@@ -588,6 +597,7 @@ BEGIN
                     c.arc_id,
                     c.customer_code,
                     c.expl_id,
+                    array_append(c.expl_visibility, c.expl_id) AS expl_visibility,
                     c.%I,
                     c.the_geom
                 FROM connec c
@@ -604,6 +614,7 @@ BEGIN
                 SELECT
                     e.element_id,
                     e.expl_id,
+                    array_append(e.expl_visibility, e.expl_id) AS expl_visibility,
                     e.the_geom
                 FROM element e
                 JOIN exploitation ex ON ex.expl_id = e.expl_id
@@ -622,6 +633,7 @@ BEGIN
                     l.feature_id,
                     l.feature_type,
                     l.expl_id,
+                    array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                     l.%I,
                     l.the_geom
                 FROM link l
@@ -643,6 +655,7 @@ BEGIN
                         g.gully_id,
                         g.arc_id,
                         g.expl_id,
+                        array_append(g.expl_visibility, g.expl_id) AS expl_visibility,
                         g.%I,
                         g.the_geom
                     FROM gully g
@@ -662,6 +675,7 @@ BEGIN
                         l.feature_id,
                         l.feature_type,
                         l.expl_id,
+                        array_append(l.expl_visibility, l.expl_id) AS expl_visibility,
                         l.%I,
                         l.the_geom
                     FROM link l

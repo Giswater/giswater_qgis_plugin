@@ -1,1 +1,2 @@
 - Fix `gw_fct_graphanalytics_mapzones_v1` function to filter by `expl_id` in the graphconfig.
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to use `expl_visibility` with `expl_id` in the views.
