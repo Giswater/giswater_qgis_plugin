@@ -1660,8 +1660,8 @@ BEGIN
 		)
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
 		SELECT v_mincut_id, erh.hydrometer_id
-		FROM ext_rtc_hydrometer erh
-		JOIN connec c ON erh.customer_code = c.customer_code
+		FROM v_hydrometer erh
+		JOIN connec c ON erh.feature_customer_code = c.customer_code
 		WHERE erh.state_id IN (SELECT state_id FROM states)
 		AND EXISTS (
 			SELECT 1
@@ -2393,6 +2393,7 @@ BEGIN
 			WHERE smr.result_id = oma.result_id 
 			AND smr.cur_user = current_user
 		)
+		AND a.expl_id > 0
 		AND NOT EXISTS (
 			SELECT 1 
 			FROM vf_exploitation vfe 
