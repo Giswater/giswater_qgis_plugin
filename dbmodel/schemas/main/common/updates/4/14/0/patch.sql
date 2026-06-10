@@ -64,7 +64,8 @@ UPDATE config_form_fields SET layoutorder = 13 WHERE formname = 'mapzone_manager
 CREATE OR REPLACE VIEW vf_exploitation AS 
 WITH all_exploitation AS (
     SELECT 
-        e.expl_id, EXISTS (
+        e.expl_id,
+        e.name, EXISTS (
              SELECT 1
             FROM cat_manager cm
             WHERE (
@@ -91,3 +92,10 @@ FROM permission_exploitation;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
 VALUES(4638, 'This action cannot be performed because it affects a network you don''t have permissions to view', NULL, 2, true, 'utils', 'core', 'UI') ON CONFLICT DO NOTHING;
+
+UPDATE config_toolbox SET inputparams = replace(
+inputparams::text,
+'SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC',
+'SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM vf_exploitation ) a ORDER BY sort_order ASC, idval ASC'
+)::json
+WHERE inputparams::text ILIKE '%SELECT id, idval FROM ( SELECT -901 AS id, ''User selected expl'' AS idval, ''a'' AS sort_order UNION SELECT -902 AS id, ''All exploitations'' AS idval, ''b'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''c'' AS sort_order FROM exploitation WHERE active IS NOT FALSE ) a ORDER BY sort_order ASC, idval ASC%'
