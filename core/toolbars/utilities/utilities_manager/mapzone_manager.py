@@ -1008,7 +1008,7 @@ class GwMapzoneManager:
         """ Dialog from config button """
         if dialog is None:
             dialog = self.mapzone_mng_dlg
-        if self._is_readonly_mapzone():
+        if self._is_readonly_mapzone(dialog):
             return
 
         # Get selected row
