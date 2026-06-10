@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add "Filter by selector" checkbox to mapzone manager to toggle between exploitation-permission scope and user selector scope.
+- Persist mapzone manager "Filter by selector" checkbox state per user session (defaults to checked on first open).
 - Add `vf_exploitation` view (based on `cat_manager` and `admin_exploitation_x_user`).
 - Add `v_ui_*_sel` mapzone views for selector-based filtering (`selector_sector`, `selector_macrosector`, `selector_expl`).
 - New tests for `vf_exploitation` view and mapzones `_sel` views.
