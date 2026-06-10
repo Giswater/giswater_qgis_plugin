@@ -80,7 +80,7 @@ WITH all_exploitation AS (
       WHERE e.active 
       AND e.expl_id > 0
 ), permission_exploitation as (
-    SELECT expl_id
+    SELECT expl_id, name
     FROM all_exploitation
     WHERE (
         ((SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') AND has_permissions) 
