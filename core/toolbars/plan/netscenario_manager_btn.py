@@ -626,20 +626,14 @@ class GwNetscenarioManagerButton(GwAction):
     def _manage_create(self):
         self.mapzone_manager = GwMapzoneManager()
         self.mapzone_manager.netscenario_id = self.selected_netscenario_id
-        self.mapzone_manager.manage_create(self.dlg_netscenario)
-        try:
-            self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
-        except Exception:
-            pass
+        self.mapzone_manager.manage_create(
+            self.dlg_netscenario, on_close=partial(self._manage_current_changed))
 
     def _manage_update(self):
         self.mapzone_manager = GwMapzoneManager()
         self.mapzone_manager.netscenario_id = self.selected_netscenario_id
-        self.mapzone_manager.manage_update(self.dlg_netscenario)
-        try:
-            self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
-        except Exception:
-            pass
+        self.mapzone_manager.manage_update(
+            self.dlg_netscenario, on_close=partial(self._manage_current_changed))
 
     def _manage_toggle_active(self, tableview, view, is_manager):
 
