@@ -549,6 +549,7 @@ BEGIN
 					LEFT JOIN LATERAL json_array_elements_text(use_item->'toArc') AS elem_to_arc(value) ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
+					AND (cardinality($1) = 0 OR t.expl_id && $1)
 					%s
 				), graphconfig_filtered AS (
 					SELECT g.* 
@@ -565,7 +566,7 @@ BEGIN
 				FROM graphconfig_filtered
 				WHERE mapzone_id > 0
 				AND (node_parent IS DISTINCT FROM 0 OR to_arc IS DISTINCT FROM 0);
-			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux);
+			$sql$, v_mapzone_field, v_mapzone_table, v_query_text_aux) USING v_expl_id_array;
 
 			-- forceClosed
 			EXECUTE format($sql$
@@ -686,6 +687,7 @@ BEGIN
 					JOIN LATERAL json_array_elements(t.graphconfig->'use') AS use_item ON TRUE
 					WHERE t.graphconfig IS NOT NULL
 					AND t.active
+					AND (cardinality($1) = 0 OR t.expl_id && $1)
 				), graphconfig_filtered AS (
 					SELECT g.* 
 					FROM graphconfig g
@@ -702,7 +704,7 @@ BEGIN
 				LEFT JOIN v_temp_arc a ON a.node_2 = g.node_parent
 				WHERE g.mapzone_id > 0
 				AND g.node_parent IS DISTINCT FROM 0
-			$sql$, v_mapzone_field, v_mapzone_table);
+			$sql$, v_mapzone_field, v_mapzone_table) USING v_expl_id_array;
 
 			-- forceClosed
 			EXECUTE format($sql$
