@@ -10,3 +10,16 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext, 'vf_exploitation', 've_exploitation')
 WHERE dv_querytext ILIKE '%vf_exploitation%' AND dv_querytext_filterc ilike '%macroexpl_id%';
+
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='plan_netscenario_dma' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET iseditable=true, ismandatory=true
+	WHERE formname='plan_netscenario_presszone' AND formtype='form_feature' AND columnname='muni_id' AND tabname='tab_none';

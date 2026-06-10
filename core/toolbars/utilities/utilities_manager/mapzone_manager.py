@@ -322,6 +322,8 @@ class GwMapzoneManager:
             return object_name.replace('v_ui_', '', 1).replace('_sel', '').replace('_cat', '')
         if object_name.startswith('tbl_v_ui_'):
             return object_name.replace('tbl_v_ui_', '', 1).replace('_sel', '').replace('_cat', '')
+        if object_name.startswith('tbl_plan_netscenario_'):
+            return object_name.replace('tbl_plan_netscenario_', '', 1)
         return object_name.split('_')[-1]
 
     def _get_mapzone_view(self, mapzone_type=None):
@@ -334,10 +336,12 @@ class GwMapzoneManager:
         return f'v_ui_{mapzone_type}{suffix}'
 
     def _get_mapzone_edit_view(self, mapzone_type=None):
-        """Return ve_* view used for CRUD operations."""
+        """Return ve_* or plan_netscenario_* view used for CRUD operations."""
         mapzone_type = mapzone_type or self._get_mapzone_type()
         if not mapzone_type:
             return None
+        if self.netscenario_id is not None:
+            return f'plan_netscenario_{mapzone_type}'
         return f've_{mapzone_type}'
 
     def _load_main_tabs(self):
@@ -1708,15 +1712,28 @@ class GwMapzoneManager:
         # Refresh tableview
         self._manage_current_changed(clear_text=False)
 
-    def manage_create(self, dialog=None, tableview=None, *args, **kwargs):
+    def manage_create(self, dialog=None, tableview=None, on_close=None, *args, **kwargs):
         if dialog is None:
             dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone(dialog):
             return
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = self._get_mapzone_edit_view(tableview.property('mapzone_type'))
-        field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
+        mapzone_type = self._get_mapzone_type(tableview)
+        if not mapzone_type:
+            return
+        tablename = self._get_mapzone_edit_view(mapzone_type)
+        if not tablename:
+            return
+
+        col_name = f"{mapzone_type}_id"
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
+        if col_idx in (None, False):
+            field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
+        else:
+            field_id = tableview.model().headerData(col_idx, Qt.Orientation.Horizontal)
+        if field_id:
+            field_id = str(field_id).lower()
 
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
@@ -1726,11 +1743,11 @@ class GwMapzoneManager:
             return
         result = json_result
 
-        dlg_title = f"New {self._get_mapzone_type(tableview).capitalize()}"
+        dlg_title = f"New {mapzone_type.capitalize()}"
 
-        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT")
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT", on_close=on_close)
 
-    def manage_update(self, dialog=None, tableview=None, *args, **kwargs):
+    def manage_update(self, dialog=None, tableview=None, on_close=None, *args, **kwargs):
         if dialog is None:
             dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone(dialog):
@@ -1769,7 +1786,7 @@ class GwMapzoneManager:
 
         dlg_title = f"Update {mapzone_type.capitalize()} ({mapzone_id})"
 
-        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE", on_close=on_close)
 
     def _manage_delete(self, *args, **kwargs):
         if self._is_readonly_mapzone(self.mapzone_mng_dlg):
@@ -1808,7 +1825,7 @@ class GwMapzoneManager:
             # Refresh tableview
             self._manage_current_changed()
 
-    def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
+    def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None, on_close=None):
         # Build dlg
 
         self.add_dlg = GwInfoGenericUi(self)
@@ -1877,13 +1894,15 @@ class GwMapzoneManager:
         self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(self._manage_current_changed)
+        if on_close:
+            self.add_dlg.dlg_closed.connect(on_close)
         self.add_dlg.btn_accept.clicked.connect(
-            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action, on_close))
 
         # Open dlg
         tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
 
-    def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
+    def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action, on_close=None):
 
         if not my_json:
             return
@@ -1939,6 +1958,8 @@ class GwMapzoneManager:
         json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
         if json_result and json_result.get('status') == 'Accepted':
             tools_gw.close_dialog(dialog)
+            if on_close:
+                on_close()
             return
 
         msg = "Error"
