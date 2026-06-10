@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.14.0] - 2026-06-10
+
 ### Added
 
 - Add "Filter by selector" checkbox to mapzone manager to toggle between exploitation-permission scope and user selector scope.
@@ -426,7 +428,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.1...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.0...main
+[4.14.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.1...v4.14.0
 [4.13.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.0...v4.13.1
 [4.13.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.12.0...v4.13.0
 [4.12.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.11.2...v4.12.0
