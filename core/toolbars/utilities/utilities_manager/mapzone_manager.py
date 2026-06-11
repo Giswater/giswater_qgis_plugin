@@ -377,7 +377,7 @@ class GwMapzoneManager:
             qtableview.setProperty('mapzone_type', mapzone_type)
             qtableview.setObjectName(f'v_ui_{mapzone_type}')
             qtableview.clicked.connect(partial(self._manage_highlight, qtableview))
-            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
+            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, qtableview, None))
             qtableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
             self.mapzone_mng_dlg.main_tab.addTab(qtableview, tab_label)
