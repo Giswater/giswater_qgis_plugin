@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `gw_fct_graphanalytics_mapzones_v1` function to filter by `expl_id` in the graphconfig.
 - Fix `gw_fct_graphanalytics_mapzones_v1` function to use `expl_visibility` with `expl_id` in the views.
 - Add missing `cur_user` filter to `config_param_user` queries for `epa_dscenario_percent_hydro_threshold` parameter.
+- Fix netscenario views to use `vf_exploitation` to filter with permissions.
 
 ## [4.14.0] - 2026-06-10
 
