@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.14.1] - 2026-06-11
+
 ### Fixed
 
 - Fix `config_form_fields` `dv_querytext` to use `ve_exploitation` instead of `vf_exploitation` for `macroexpl_id` filter column.
@@ -438,7 +440,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.0...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.1...release/4.14
+[4.14.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.0...v4.14.1
 [4.14.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.1...v4.14.0
 [4.13.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.0...v4.13.1
 [4.13.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.12.0...v4.13.0
