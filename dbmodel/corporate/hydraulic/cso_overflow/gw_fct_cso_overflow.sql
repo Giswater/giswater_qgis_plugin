@@ -123,7 +123,7 @@ BEGIN
 	--v_daily_supply = (select value::numeric from config_param_system where "parameter" = 'cso_daily_supply');
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id ASC LIMIT 1;
 
-	select concat('M', macroexpl_id) INTO v_macroexpl from exploitation e where expl_id = v_expl_id LIMIT 1;
+	select concat('M', macroexpl_id) INTO v_macroexpl from ud.exploitation e where expl_id = v_expl_id LIMIT 1;
 	
 	RAISE NOTICE 'v_drainzone_id %', v_drainzone_id;
 
@@ -147,6 +147,7 @@ BEGIN
 
 	EXECUTE 'SELECT count(*) from ('||v_sql||')a' INTO v_count;
 
+
 	IF v_count = 0 THEN
 		return '{"status": "Failed", "message":{"level":1, "text":"No drainzones match with selected expl and/or drainzone"}}'::json;
 	ELSE
@@ -167,7 +168,7 @@ BEGIN
 		CREATE TEMP table cso_inp_rainfall as
 		select timser_id as rf_name, 60*v_tstep as rf_length, value as rf_volume, (value*6)::numeric as rf_intensity, "time" as rf_tstep
 		from inp_timeseries_value a 
-		JOIN inp_timeseries b ON a.timser_id = b.id
+		JOIN ud.inp_timeseries b ON a.timser_id = b.id
 		WHERE timser_type = 'Rainfall' AND active AND addparam IS NULL AND expl_id = v_expl_id ORDER BY 1, 5;
 	
 		v_filtercal = ' AND c.addparam is null ';
@@ -177,7 +178,7 @@ BEGIN
 		create TEMP table cso_inp_rainfall as
 		select timser_id as rf_name, 60*v_tstep as rf_length, value as rf_volume, (value*6)::numeric as rf_intensity, "time" as rf_tstep
 		from inp_timeseries_value a 
-		JOIN inp_timeseries b ON a.timser_id = b.id
+		JOIN ud.inp_timeseries b ON a.timser_id = b.id
 		WHERE timser_type = 'Rainfall' AND active AND addparam->>'mode'='CALIBRATION' AND expl_id = v_expl_id ORDER BY 1, 5;
 	
 		v_filtercal = ' AND c.addparam->>''mode''=''CALIBRATION''';
@@ -215,7 +216,7 @@ BEGIN
 				EXECUTE 'UPDATE cso_subc_dwf_all t SET consumption = a.su FROM (
 					SELECT c.id, sum(consumo) AS su FROM ws.man_connec_acometida a
 					LEFT JOIN ws.connec b USING (connec_id)
-					LEFT JOIN cso_subc_dwf_all c ON st_intersects(c.the_geom, b.the_geom)
+					LEFT JOIN ud.cso_subc_dwf_all c ON st_intersects(c.the_geom, b.the_geom)
 					WHERE consumo IS NOT NULL AND drainzone_id = '||rec.drainzone_id||'
 					GROUP BY id
 				)a WHERE t.id = a.id';
@@ -224,10 +225,10 @@ BEGIN
 		
 			-- update drainzone_id for each dwf triangle taking the drainzone of the triangle's source node_id	
 			EXECUTE '
-			UPDATE cso_subc_dwf_all t SET drainzone_id = a.drainzone_id FROM (
+			UPDATE ud.cso_subc_dwf_all t SET drainzone_id = a.drainzone_id FROM (
 				SELECT a.id, b.drainzone_id
-				FROM cso_subc_dwf_all a
-				LEFT JOIN node b USING (node_id)
+				FROM ud.cso_subc_dwf_all a
+				LEFT JOIN ud.node b USING (node_id)
 				WHERE (a.drainzone_id > 0 OR b.drainzone_id >0) 
 				AND a.drainzone_id<>b.drainzone_id AND b.drainzone_id > 0 
 				AND b.drainzone_id in ('||v_drainzone_array||')
@@ -235,10 +236,10 @@ BEGIN
 			';
 		
 			EXECUTE '
-			UPDATE cso_subc_wwf_all t SET drainzone_id = a.drainzone_id FROM (
+			UPDATE ud.cso_subc_wwf_all t SET drainzone_id = a.drainzone_id FROM (
 			SELECT a.id, b.drainzone_id
-				FROM cso_subc_wwf_all a
-				LEFT JOIN node b USING (node_id)
+				FROM ud.cso_subc_wwf_all a
+				LEFT JOIN ud.node b USING (node_id)
 				WHERE (a.drainzone_id > 0 OR b.drainzone_id >0) 
 				AND a.drainzone_id<>b.drainzone_id AND b.drainzone_id > 0 
 				AND b.drainzone_id in ('||v_drainzone_array||')
@@ -254,9 +255,9 @@ BEGIN
 				concat(m.muni_id, '' - '', m.name) AS muni_name,
 				concat(e.expl_id, '' - '', e.name) AS expl_name,
 				concat(me.macroexpl_id, '' - '', me.name) AS macroexpl_name
-				FROM cso_inp_weir a
-				JOIN drainzone c ON a.node_id = c.graphconfig::json ->''use''->0 ->>''nodeParent''
-				JOIN node b USING (node_id)
+				FROM ud.cso_inp_weir a
+				JOIN ud.drainzone c ON a.node_id = c.graphconfig::json ->''use''->0 ->>''nodeParent''
+				JOIN ud.node b USING (node_id)
 				LEFT JOIN ext_municipality m USING (muni_id)
 				LEFT JOIN exploitation e ON e.expl_id = b.expl_id
 				LEFT JOIN macroexploitation me ON e.macroexpl_id = me.macroexpl_id			
@@ -266,25 +267,10 @@ BEGIN
 			
 			-- imperv area 
 			execute '
-			update cso_inp_system_subc t set imperv_area = a.imperv from (
-				SELECT drainzone_id, sum(st_area(the_geom) * c_value) as imperv 
+			update cso_inp_system_subc t set imperv_area = a.imperv, thyssen_plv_area = a.area_thy, mean_coef_runoff = a.c_val from (
+				SELECT drainzone_id, sum(st_area(the_geom) * c_value) as imperv, sum(st_area(the_geom)) as area_thy, sum(st_area(the_geom) * c_value)/sum(st_area(the_geom)) as c_val
 				FROM cso_subc_wwf_all group by drainzone_id
 			)a where t.drainzone_id = a.drainzone_id and t.drainzone_id in ('||v_drainzone_array||');
-			';
-			
-			-- area of rainwater thyssen group by drainzone
-			execute '
-			update cso_inp_system_subc t set thyssen_plv_area = a.area_thy from (
-			select drainzone_id, sum(st_area(the_geom)) as area_thy 
-			from cso_subc_wwf_all group by drainzone_id
-			)a where t.drainzone_id = a.drainzone_id and t.drainzone_id in ('||v_drainzone_array||')
-			';
-			
-			-- mean_runoff_coef
-			execute '
-			update cso_inp_system_subc t set mean_coef_runoff = a.c_value from (
-			select drainzone_id, avg(ci_value) as c_value from cso_subc_wwf_all group by drainzone_id
-			)a where a.drainzone_id = t.drainzone_id and t.drainzone_id in ('||v_drainzone_array||')
 			';
 			
 			-- sum of demand (L/s) from sewage thyssen group by drainzone 
@@ -300,8 +286,7 @@ BEGIN
 
 		ELSIF v_sourcetables = 'SWMM' THEN
 	
-			-- TO DEVELOP FOR SWMM TABLES
-			-----------------------------
+			/*
 		
 			-- INP_DWF: create a dwfscenario if not exists
 			IF (SELECT EXISTS (SELECT idval FROM cat_dwf_scenario WHERE expl_id = v_expl_id)) IS NOT TRUE THEN
@@ -367,156 +352,159 @@ BEGIN
 		
 			EXECUTE '
 			UPDATE cso_inp_system_subc set lastupdate_process = ''SWMM'' WHERE drainzone_id in ('||v_drainzone_array||')';
+			
+			*/
+		
 		END IF;
 
-	-- set constant value of RD 665/2023
-	EXECUTE 'update cso_inp_system_subc set kb = 1.13 WHERE drainzone_id in ('||v_drainzone_array||')';
-
-	-- vret_imperv
-	EXECUTE 'update cso_inp_system_subc set vret_imperv = vret/imperv_area where drainzone_id in ('||v_drainzone_array||')';
-
-	-- set active drainzones
-	EXECUTE 'update cso_inp_system_subc set active = true AND drainzone_id in ('||v_drainzone_array||')';
+		-- set constant value of RD 665/2023
+		EXECUTE 'update cso_inp_system_subc set kb = 1.13 WHERE drainzone_id in ('||v_drainzone_array||')';
 	
-	-- set null to 0
-	EXECUTE 'update cso_inp_system_subc set thyssen_plv_area = 1 where thyssen_plv_area is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set imperv_area = 1 where imperv_area is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set mean_coef_runoff = 1 where mean_coef_runoff is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set demand = 0 where demand is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set vret_imperv = 0 where vret_imperv is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set q_max = 0 where q_max is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set vret = 0 where vret is NULL AND drainzone_id in ('||v_drainzone_array||')';
-	EXECUTE 'update cso_inp_system_subc set eq_inhab = 0 where eq_inhab is NULL AND drainzone_id in ('||v_drainzone_array||')';
-
-	-- START ALGORITHM
-	-- ===============
-
-	v_timeseries_list = coalesce(v_timeseries_list, '');
-	v_drainzone_array = coalesce(v_drainzone_array, '');
-
-	-- reset values
-	EXECUTE 'DELETE FROM cso_out_vol where drainzone_id in ('||v_drainzone_array||')';
-
-	-- Insert ALL values of the selected drainzone + its rainfall
-	v_sql = '
-	INSERT INTO cso_out_vol (drainzone_id, node_id, rf_name, rf_tstep, rf_volume, rf_intensity)
-	SELECT a.drainzone_id, (a.graphconfig::json ->''use''->0 ->>''nodeParent'')::text as node_id, 
-	b.timser_id AS rf_name, b."time" AS rf_tstep, b.value as rf_volume, (b.value*6)::numeric as rf_intensity
-	FROM drainzone a 
-	JOIN inp_timeseries c USING (expl_id)
-	JOIN inp_timeseries_value b ON b.timser_id = c.id
-	WHERE c.timser_type = ''Rainfall'' AND a.drainzone_id in ('||v_drainzone_array||') '||v_filtercal||' ORDER BY 1, 3, 4 
-	ON CONFLICT (drainzone_id, rf_name, rf_tstep) DO NOTHING;
-	';
-
-	EXECUTE v_sql;
-
-	-- for each subcatchment
-	FOR rec_drainzone in execute 'select * from cso_inp_system_subc where drainzone_id in ('||v_drainzone_array||') 
-	and thyssen_plv_area is not null'
-	LOOP
-			
-		v_last_vol = 0;
-		v_cur_vol = 0;
-		v_calib_imperv_area = (SELECT calib_imperv_area FROM cso_calibration WHERE drainzone_id = rec_drainzone.drainzone_id);
+		-- vret_imperv
+		EXECUTE 'update cso_inp_system_subc set vret_imperv = vret/imperv_area where drainzone_id in ('||v_drainzone_array||')';
+	
+		-- set active drainzones
+		EXECUTE 'update cso_inp_system_subc set active = true AND drainzone_id in ('||v_drainzone_array||')';
 		
-		RAISE NOTICE 'rec_drainzone.kb % rec_drainzone.thyssen_plv_area %', rec_drainzone.kb ,  rec_drainzone.thyssen_plv_area;
-		
-		-- for each rainfall that have volume:
-		FOR rec_rainfall in EXECUTE 'select *, (LEFT(rf_tstep,2)::integer +1)::INTEGER AS hourly from cso_inp_rainfall order by rf_name, rf_tstep'
+		-- set null to 0
+		EXECUTE 'update cso_inp_system_subc set thyssen_plv_area = 1 where thyssen_plv_area is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set imperv_area = 1 where imperv_area is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set mean_coef_runoff = 1 where mean_coef_runoff is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set demand = 0 where demand is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set vret_imperv = 0 where vret_imperv is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set q_max = 0 where q_max is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set vret = 0 where vret is NULL AND drainzone_id in ('||v_drainzone_array||')';
+		EXECUTE 'update cso_inp_system_subc set eq_inhab = 0 where eq_inhab is NULL AND drainzone_id in ('||v_drainzone_array||')';
+	
+		-- START ALGORITHM
+		-- ===============
+	
+		v_timeseries_list = coalesce(v_timeseries_list, '');
+		v_drainzone_array = coalesce(v_drainzone_array, '');
+	
+		-- reset values
+		EXECUTE 'DELETE FROM cso_out_vol where drainzone_id in ('||v_drainzone_array||')';
+	
+		-- Insert ALL values of the selected drainzone + its rainfall
+		v_sql = '
+		INSERT INTO cso_out_vol (drainzone_id, node_id, rf_name, rf_tstep, rf_volume, rf_intensity)
+		SELECT a.drainzone_id, (a.graphconfig::json ->''use''->0 ->>''nodeParent'')::text as node_id, 
+		b.timser_id AS rf_name, b."time" AS rf_tstep, b.value as rf_volume, (b.value*6)::numeric as rf_intensity
+		FROM drainzone a 
+		JOIN inp_timeseries c USING (expl_id)
+		JOIN inp_timeseries_value b ON b.timser_id = c.id
+		WHERE c.timser_type = ''Rainfall'' AND a.drainzone_id in ('||v_drainzone_array||') '||v_filtercal||' ORDER BY 1, 3, 4 
+		ON CONFLICT (drainzone_id, rf_name, rf_tstep) DO NOTHING;
+		';
+	
+		EXECUTE v_sql;
+	
+		-- for each subcatchment
+		FOR rec_drainzone in execute 'select * from cso_inp_system_subc where drainzone_id in ('||v_drainzone_array||') 
+		and thyssen_plv_area is not null'
 		LOOP
-			
-			i = i+1;
-			
-			RAISE NOTICE '-------------> rainfall: %  - drainzone: % - macroexpl: %   (%) ', rec_rainfall, rec_drainzone.drainzone_id, rec_drainzone.macroexpl_name, i;
-								
-			EXECUTE 'SELECT factor_'||rec_rainfall.hourly||' FROM inp_pattern_value JOIN inp_pattern USING (pattern_id) WHERE expl_id = '||v_expl_id
-			INTO v_residual_pattern;
-			
-			-- fill table cso_out_vol
-			update cso_out_vol
-				set 
-				vol_residual = round((coalesce(rec_drainzone.demand,1) * 1 *  rec_rainfall.rf_length*v_residual_pattern / 1000)::NUMERIC,3),
-				vol_max_epi = round((rec_drainzone.q_max * rec_rainfall.rf_length / 1000)::NUMERIC,3),
-				vol_rainfall = round((1000 * rec_drainzone.kb * rec_rainfall.rf_volume * rec_drainzone.thyssen_plv_area/(1000*1000))::NUMERIC,3)
-				where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			
-			IF v_calib_imperv_area > 0 THEN				
-				update cso_out_vol
-				set vol_total = round((vol_residual + vol_rainfall)::NUMERIC, 3),
-				vol_runoff = round((vol_rainfall * v_calib_imperv_area / rec_drainzone.thyssen_plv_area)::NUMERIC, 3)
-				where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
-			ELSE 
-				update cso_out_vol
-				set vol_total = round((vol_residual + vol_rainfall)::NUMERIC, 3),
-				vol_runoff = round((vol_rainfall * rec_drainzone.imperv_area / rec_drainzone.thyssen_plv_area)::NUMERIC, 3)
-				where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;		
-			END IF;
-					
-			update cso_out_vol
-				set vol_infiltr = round((vol_rainfall - vol_runoff )::NUMERIC, 3),
-				vol_circ = round((vol_runoff + vol_residual)::NUMERIC, 3)
-				where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
-											
-			-- take into account accumulated volume in dep							
-			SELECT vol_circ, vol_max_epi, (vol_circ - vol_max_epi) 
-			INTO v_vol_circ, v_vol_max_epi, v_delta_vol
-			FROM cso_out_vol where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
-		
-			--RAISE NOTICE 'circ: %, maxQ: %, maxV: %, delta: % ', v_vol_circ, v_vol_max_epi, rec_drainzone.vret, v_delta_vol;
-		
-			v_cur_vol = GREATEST(v_delta_vol + v_last_vol, 0);		
-			
-		
-			IF v_cur_vol < rec_drainzone.vret THEN
-			
-				IF v_last_vol = 0 THEN
-					v_non_leaked_vol = v_vol_circ;
-				ELSE 
-					
-					v_non_leaked_vol = least((v_last_vol + v_vol_circ),v_vol_max_epi);
-				END IF;
-			
-				IF v_vol_circ > v_vol_max_epi THEN
-					v_non_leaked_vol = v_vol_max_epi;
-				END IF;
-				v_leaked_vol = 0;
-			
-			elsif v_cur_vol > rec_drainzone.vret THEN
-				v_leaked_vol = v_cur_vol - rec_drainzone.vret;
-				v_non_leaked_vol = v_vol_max_epi;
-				v_cur_vol = rec_drainzone.vret;
-				
-			end if;	
 						
-			update cso_out_vol set 
-				vol_circ_red = round((v_vol_circ -(v_cur_vol-v_last_vol))::numeric,3),
-				vol_circ_dep = round(v_cur_vol::numeric,3),
-				vol_non_leaked = round(v_non_leaked_vol::numeric,3),
-				vol_leaked = round(v_leaked_vol::numeric,3),
-				vol_wwtp = round(v_non_leaked_vol::NUMERIC,3),
-				vol_treated = round((vol_infiltr + v_non_leaked_vol)::NUMERIC, 3)
-			where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;	
+			v_last_vol = 0;
+			v_cur_vol = 0;
+			v_calib_imperv_area = (SELECT calib_imperv_area FROM cso_calibration WHERE drainzone_id = rec_drainzone.drainzone_id);
+			
+			RAISE NOTICE 'rec_drainzone.kb % rec_drainzone.thyssen_plv_area %', rec_drainzone.kb ,  rec_drainzone.thyssen_plv_area;
+			
+			-- for each rainfall that have volume:
+			FOR rec_rainfall in EXECUTE 'select *, (LEFT(rf_tstep,2)::integer +1)::INTEGER AS hourly from cso_inp_rainfall order by rf_name, rf_tstep'
+			LOOP
+				
+				i = i+1;
+				
+				RAISE NOTICE '-------------> rainfall: %  - drainzone: % - macroexpl: %   (%) ', rec_rainfall, rec_drainzone.drainzone_id, rec_drainzone.macroexpl_name, i;
+									
+				EXECUTE 'SELECT factor_'||rec_rainfall.hourly||' FROM inp_pattern_value JOIN inp_pattern USING (pattern_id) WHERE expl_id = '||v_expl_id
+				INTO v_residual_pattern;
+				
+				-- fill table cso_out_vol
+				update cso_out_vol
+					set 
+					vol_residual = round((coalesce(rec_drainzone.demand,1) * 1 *  rec_rainfall.rf_length*v_residual_pattern / 1000)::NUMERIC,3),
+					vol_max_epi = round((rec_drainzone.q_max * rec_rainfall.rf_length / 1000)::NUMERIC,3),
+					vol_rainfall = round((1000 * rec_drainzone.kb * rec_rainfall.rf_volume * rec_drainzone.thyssen_plv_area/(1000*1000))::NUMERIC,3)
+					where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
+				
+				IF v_calib_imperv_area > 0 THEN				
+					update cso_out_vol
+					set vol_total = round((vol_residual + vol_rainfall)::NUMERIC, 3),
+					vol_runoff = round((vol_rainfall * v_calib_imperv_area / rec_drainzone.thyssen_plv_area)::NUMERIC, 3)
+					where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;
+				ELSE 
+					update cso_out_vol
+					set vol_total = round((vol_residual + vol_rainfall)::NUMERIC, 3),
+					vol_runoff = round((vol_rainfall * rec_drainzone.imperv_area / rec_drainzone.thyssen_plv_area)::NUMERIC, 3)
+					where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;		
+				END IF;
+						
+				update cso_out_vol
+					set vol_infiltr = round((vol_rainfall - vol_runoff )::NUMERIC, 3),
+					vol_circ = round((vol_runoff + vol_residual)::NUMERIC, 3)
+					where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
+												
+				-- take into account accumulated volume in dep							
+				SELECT vol_circ, vol_max_epi, (vol_circ - vol_max_epi) 
+				INTO v_vol_circ, v_vol_max_epi, v_delta_vol
+				FROM cso_out_vol where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep; 
+			
+				--RAISE NOTICE 'circ: %, maxQ: %, maxV: %, delta: % ', v_vol_circ, v_vol_max_epi, rec_drainzone.vret, v_delta_vol;
+			
+				v_cur_vol = GREATEST(v_delta_vol + v_last_vol, 0);		
+				
+			
+				IF v_cur_vol < rec_drainzone.vret THEN
+				
+					IF v_last_vol = 0 THEN
+						v_non_leaked_vol = v_vol_circ;
+					ELSE 
+						
+						v_non_leaked_vol = least((v_last_vol + v_vol_circ),v_vol_max_epi);
+					END IF;
+				
+					IF v_vol_circ > v_vol_max_epi THEN
+						v_non_leaked_vol = v_vol_max_epi;
+					END IF;
+					v_leaked_vol = 0;
+				
+				elsif v_cur_vol > rec_drainzone.vret THEN
+					v_leaked_vol = v_cur_vol - rec_drainzone.vret;
+					v_non_leaked_vol = v_vol_max_epi;
+					v_cur_vol = rec_drainzone.vret;
+					
+				end if;	
 							
-			RAISE NOTICE 'curVol: %, lastVol: %, leak: %, nonLeak: %',  v_cur_vol, v_last_vol, v_leaked_vol, v_non_leaked_vol;
+				update cso_out_vol set 
+					vol_circ_red = round((v_vol_circ -(v_cur_vol-v_last_vol))::numeric,3),
+					vol_circ_dep = round(v_cur_vol::numeric,3),
+					vol_non_leaked = round(v_non_leaked_vol::numeric,3),
+					vol_leaked = round(v_leaked_vol::numeric,3),
+					vol_wwtp = round(v_non_leaked_vol::NUMERIC,3),
+					vol_treated = round((vol_infiltr + v_non_leaked_vol)::NUMERIC, 3)
+				where node_id = rec_drainzone.node_id and rf_name = rec_rainfall.rf_name and rf_tstep=rec_rainfall.rf_tstep;	
+								
+				--RAISE NOTICE 'curVol: %, lastVol: %, leak: %, nonLeak: %',  v_cur_vol, v_last_vol, v_leaked_vol, v_non_leaked_vol;
+			
+				v_last_vol = v_cur_vol;
+			END LOOP;
 		
-			v_last_vol = v_cur_vol;
+			v_calib_imperv_area = 0;
+		
 		END LOOP;
 	
-		v_calib_imperv_area = 0;
-	
-	END LOOP;
-
-	EXECUTE 'UPDATE cso_out_vol SET lastupdate = now() WHERE drainzone_id IN ('||v_drainzone_array||')';
+		EXECUTE 'UPDATE cso_out_vol SET lastupdate = now() WHERE drainzone_id IN ('||v_drainzone_array||')';
 
 	END IF; -- FINISH CALCULATION PROCESS
 	
 	IF v_step_dscenario THEN 
-		
+
 		IF NULLIF(TRIM(v_inflows_dscenario), '') IS NOT NULL THEN -- CREATE inflow dscenario
-		
-			-- delete previous 
-			--DELETE FROM inp_dscenario_inflows WHERE timser_id IN (SELECT id FROM inp_timeseries WHERE log = 'Created by CSO ALGORTHIM' AND expl_id = v_expl_id);
+	
+					
+			-- delete previous timeseries values. We keep values on inp_timeseries if exists and on inp_dscenario_inflows
 			EXECUTE 'DELETE FROM inp_timeseries_value WHERE timser_id in (
 				SELECT concat(rf_name, ''_'', node_id)
 				FROM cso_out_vol WHERE drainzone_id in ('||v_drainzone_array||')
@@ -533,33 +521,33 @@ BEGIN
 			FROM mec
 			ON CONFLICT DO NOTHING
 			';
-		
+			
 			-- insert values of inflows into inp_timeseries_values (vol_non_leaked is in m3/10 min and we pass it to m3/s)
 			EXECUTE '
 			INSERT INTO inp_timeseries_value (timser_id, time, value)
 			SELECT concat(rf_name, ''_'', node_id) AS lluvia, rf_tstep, (vol_non_leaked/(60*'||v_tstep||'))
-			FROM cso_out_vol JOIN drainzone d USING (drainzone_id) WHERE d.drainzone_id in ('||v_drainzone_array||') AND drainzone_type !=''DESCONECTADA''
+			FROM cso_out_vol WHERE drainzone_id in ('||v_drainzone_array||')
 			order by concat(rf_name, ''_'', node_id), to_timestamp(rf_tstep, ''HH24:MI'')
 			';
 			
 			UPDATE inp_timeseries_value SET value=0 WHERE value IS null;
-
+			
 			-- create an 10 inflows dscenario for 10 rainfall episodes if not exists
 			INSERT INTO cat_dscenario ("name", dscenario_type, expl_id) 
 			SELECT concat(v_inflows_dscenario, '_EP', to_char(n, 'FM00')), 'INFLOWS', v_expl_id::integer
 			FROM generate_series(1, 10) AS n
 			ON CONFLICT DO NOTHING;
-					
+			
 			execute 'INSERT INTO inp_dscenario_inflows (dscenario_id, node_id, order_id, timser_id, sfactor, base, active)
 			SELECT DISTINCT b.dscenario_id, a.node_id, substring(split_part(rf_name, ''_'', 2) from ''[0-9]+'')::int AS order_id,
 			concat(rf_name, ''_'', node_id) AS timser_id, 1 AS sfactor, 0 AS base, TRUE
 			FROM cso_out_vol a
-			LEFT JOIN cat_dscenario b ON split_part(a.rf_name, ''_'', -1) = split_part(b.name, ''_'', -1)
+			LEFT JOIN ud.cat_dscenario b ON split_part(a.rf_name, ''_'', -1) = split_part(b.name, ''_'', -1)
 			WHERE drainzone_id IN ('||v_drainzone_array||')
 			and b.expl_id = '||v_expl_id||' and rf_name ilike ''%'||v_macroexpl||'%''
 			ON CONFLICT (dscenario_id, node_id, order_id) DO NOTHING
 			';
-	
+			
 		END IF;
 
 	END IF; -- FINISH DSENARIO INFLOWS
@@ -571,14 +559,14 @@ BEGIN
 	LOOP
 		 EXECUTE '
 		 UPDATE man_node_'||lower(rec.featurecat_id)||' t SET '||rec.column_id||' = a.'||rec.parameter_id||' FROM (
-		 	SELECT a.outfall_id, a.efficiency, b.qmax, b.vmax as vret, a.vol_dwf, '||v_pd80||' as pd80 FROM v_cso_drainzone a
-			LEFT JOIN cso_inp_weir b ON a.outfall_id = b.node_id
+		 	SELECT a.outfall_id, a.efficiency, b.qmax, b.vmax as vret, round(a.vol_dwf/(3600*24*10), 4) as vol_dwf, '||v_pd80||' as pd80 FROM v_cso_drainzone a
+			LEFT JOIN cso_inp_weir b ON a.outfall_id = b.node_id where a.expl_id = '||v_expl_id||'
 		 )a WHERE t.node_id = a.outfall_id';
 	
+		
 	END LOOP;
 
 	-- UPDATE addparam.drainzone with the calculated data
-
 	-- areatotal (total_area.v_cso_drainzone)
 	UPDATE drainzone t SET addparam = a.new_addparam FROM (
 		WITH mec AS (
@@ -626,7 +614,6 @@ BEGIN
 		JOIN v_cso_drainzone USING (drainzone_id)
 	)a WHERE t.drainzone_id = a.drainzone_id;
 	
-	
 	-- factor calibrado de escorrentía (calib_runoffc.v_cso_drainzone)
 	UPDATE drainzone t SET addparam = a.new_addparam FROM (
 		WITH mec AS (
@@ -646,8 +633,7 @@ BEGIN
 		FROM mec
 	)a WHERE t.drainzone_id = a.drainzone_id;
 	
-	
-	-- caudal residual que llega a ese punto (dwf_pd80_percent.v_cso_drainzone)
+	-- caudal residual que llega a ese punto, en % (dwf_pd80_percent.v_cso_drainzone)
 	UPDATE drainzone t SET addparam = a.new_addparam FROM (
 		WITH mec AS (
 			SELECT drainzone_id,
@@ -666,14 +652,11 @@ BEGIN
 		JOIN v_cso_drainzone USING (drainzone_id)
 	)a WHERE t.drainzone_id = a.drainzone_id;
 
-
 	-- caudal residual que sale por el aliviadero en L/s (vol_res/(3600*24*10))
  	UPDATE ud.drainzone t SET addparam = a.new_addparam FROM (
 			WITH mec AS (
-			 SELECT drainzone_id, round((sum(vol_residual)/(3600*24*10))::numeric, 6) AS dwf_avg FROM ud.cso_out_vol WHERE drainzone_id IN ( 
-			 SELECT drainzone_id FROM ud.v_cso_drainzone
-			 ) GROUP BY drainzone_id
-		)
+			 SELECT drainzone_id, round(vol_dwf/(3600*24*10), 4) AS dwf_avg FROM ud.v_cso_drainzone WHERE expl_id = v_expl_id
+			 )
 		SELECT mec.drainzone_id, jsonb_set(COALESCE(addparam, '{}')::jsonb, '{dwfAvg}', to_jsonb(dwf_avg), TRUE) AS new_addparam FROM mec 
 		JOIN drainzone USING (drainzone_id)
 		JOIN v_cso_drainzone USING (drainzone_id)
@@ -682,7 +665,7 @@ BEGIN
 	--pd80
  	UPDATE ud.drainzone t SET addparam = a.new_addparam FROM (
 	 WITH mec AS (
-			 SELECT drainzone_id, v_pd80 AS pd80 FROM ud.v_cso_drainzone
+			 SELECT drainzone_id, v_pd80 AS pd80 FROM ud.v_cso_drainzone WHERE expl_id = v_expl_id
 		)
 	SELECT mec.drainzone_id, jsonb_set(COALESCE(addparam, '{}')::jsonb, '{pd80}', to_jsonb(pd80), TRUE) AS new_addparam 
 	FROM mec 
@@ -698,6 +681,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, criticity, error_message, cur_user) SELECT DISTINCT 990, 1, '------------------------', current_user;
 	INSERT INTO audit_check_data (fid, criticity, error_message, cur_user) SELECT DISTINCT 990, 1, '', current_user;
 	INSERT INTO audit_check_data (fid, criticity, error_message, cur_user) SELECT DISTINCT 990, 1, '', current_user;
+
 
 	INSERT INTO audit_check_data (fid, criticity, error_message, cur_user) SELECT DISTINCT 990, 2, 'CALCULATED DRAINZONES ', current_user;
 	INSERT INTO audit_check_data (fid, criticity, error_message, cur_user) SELECT DISTINCT 990, 2, '--------------------------------', current_user;
@@ -734,7 +718,10 @@ BEGIN
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}, "data":{"info":'||v_result_info||',"polygon":'||v_result_polygon||'}}}')::json, 9997, null, null, null);     
+             ',"body":{"form":{}, "data":{"info":'||v_result_info||',"polygon":{}}}}')::json, 9997, null, null, null);
+            
 END;
 $function$
 ;
+
+
