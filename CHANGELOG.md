@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to set `expl_visibility` and `expl_id` in mapzones expl_ids.
+
 ## [4.14.1] - 2026-06-11
 
 ### Fixed

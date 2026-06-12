@@ -1,0 +1,1 @@
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to set `expl_visibility` and `expl_id` in mapzones expl_ids.
