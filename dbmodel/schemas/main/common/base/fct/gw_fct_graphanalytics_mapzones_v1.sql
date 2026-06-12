@@ -2300,10 +2300,12 @@ BEGIN
 			FROM (
 			SELECT
 				ta.mapzone_id,
-				array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_ids
+				array_agg(DISTINCT e.expl_id ORDER BY e.expl_id) AS expl_ids
 			FROM temp_pgr_arc ta
 			JOIN arc a ON a.arc_id = ta.pgr_arc_id
+			CROSS JOIN LATERAL unnest(array_append(a.expl_visibility, a.expl_id)) AS e(expl_id)
 			WHERE ta.mapzone_id > 0
+			AND EXISTS (SELECT 1 FROM vf_exploitation vfe WHERE vfe.expl_id = e.expl_id)
 			GROUP BY ta.mapzone_id
 			) s
 			WHERE m.mapzone_id = s.mapzone_id;
@@ -2454,13 +2456,15 @@ BEGIN
 				FROM (
 					SELECT
 						g.mapzone_id,
-						array_agg(DISTINCT a.expl_id ORDER BY a.expl_id) AS expl_ids
+						array_agg(DISTINCT e.expl_id ORDER BY e.expl_id) AS expl_ids
 					FROM temp_pgr_graphconfig g
 					JOIN arc a ON a.arc_id = g.pgr_arc_id
+					CROSS JOIN LATERAL unnest(array_append(a.expl_visibility::integer[], a.expl_id)) AS e(expl_id)
 					WHERE EXISTS (
 						SELECT 1 FROM temp_pgr_mapzone tm WHERE tm.mapzone_id = -1 AND g.mapzone_id = ANY (tm.mapzone_ids)
 					)
 					AND g.graph_type = 'use'
+					AND EXISTS (SELECT 1 FROM vf_exploitation vfe WHERE vfe.expl_id = e.expl_id)
 					GROUP BY g.mapzone_id
 				) t
 				WHERE m.%I = t.mapzone_id
