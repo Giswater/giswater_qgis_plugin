@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.14.3] - 2026-06-15
+
 ### Fixed
 
 - Fix `add_demand_check`, initialize cur_step correctly.
@@ -450,7 +452,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.2...release/4.14
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.3...release/4.14
+[4.14.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.2...v4.14.3
 [4.14.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.1...v4.14.2
 [4.14.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.0...v4.14.1
 [4.14.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.13.1...v4.14.0
