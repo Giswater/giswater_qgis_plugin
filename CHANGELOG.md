@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `add_demand_check`, initialize cur_step correctly.
+
 ## [4.14.2] - 2026-06-12
 
 ### Fixed
