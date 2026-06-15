@@ -568,7 +568,7 @@ class GwSchemaI18NManager:
                     value = clean_row.get(col_name, '')
                     if value is None:
                         clean_row[col_name] = ''
-                    if col_name == "project_type" and ((value == "utils" and self.project_type in ['ws', 'ud']) or value == None):
+                    if col_name == "project_type" and ((value == "utils" and self.project_type in ['ws', 'ud']) or value is None):
                         clean_row[col_name] = self.project_type
                     if self.project_type == "cm" and col_name == "source" and table_i18n == "dbtable":
                         values = value.split("_")
@@ -1185,7 +1185,7 @@ class GwSchemaI18NManager:
                     text.append(f"{column} = '" + str(row[column]).replace("'", "''") + "'")
 
             where_clause = " AND ".join(text)
-            where_clause += f" AND project_type = 'utils'"
+            where_clause += " AND project_type = 'utils'"
 
             delete_query += f"""
                 DELETE FROM {table} WHERE {where_clause};\n
@@ -1193,7 +1193,7 @@ class GwSchemaI18NManager:
         try:
             self.cursor_i18n.execute(delete_query)
             self.conn_i18n.commit()
-        except Exception as e:
+        except Exception:
             self.conn_i18n.rollback()
 
     # endregion
@@ -1219,7 +1219,7 @@ class GwSchemaI18NManager:
             if coincidencias:
                 for num_line, content in coincidencias:
                     dialog_name, toolbar_name, source = self._search_dialog_info(file, keys[1], keys[2], num_line, avoid_keys)
-                    if source == False:
+                    if source is False:
                         continue
                     pattern = r'>(.*?)<'
                     match = re.search(pattern, content)
@@ -1396,7 +1396,7 @@ class GwSchemaI18NManager:
                 try:
                     self.cursor_i18n.execute(query)
                 except Exception:
-                    msg += f"{tools_qt.tr('Error updating')}: {e}.\n"
+                    msg += f"{tools_qt.tr('Error updating')}: {Exception}.\n"
                     break
 
         if len(msg) > 1:
@@ -1653,7 +1653,7 @@ class GwSchemaI18NManager:
         """ Detect if the table exists """
 
         sql = f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';"
-        cursor.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
+        cursor.execute(sql)
         result = cursor.fetchone()
         existing_table = result[0] > 0  # Check if count is greater than 0
         return existing_table
@@ -2002,3 +2002,4 @@ class GwSchemaI18NManager:
         message = "Hydrology scenario manager"
         message = "DWF scenario manager"
         message = "Psector could not be updated because of the following errors: "
+        return message
