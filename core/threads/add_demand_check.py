@@ -31,6 +31,7 @@ class GwAddDemandCheck(GwTask):
         self.file_name = file_name
         self.partial_file = Path(output_folder) / f"{file_name}-partial.json"
         self.results = results
+        self.cur_step = ""
         self.accuracy = 0.001
         self.executed_simulations = 0
         self.qtd_nodes = len(self.config.junctions)
