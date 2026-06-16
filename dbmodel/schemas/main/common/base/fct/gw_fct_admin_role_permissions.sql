@@ -37,7 +37,7 @@ HANDLES:
     - Database: CONNECT, TEMPORARY (not CREATE via ALL)
     - Schema: USAGE (not CREATE via ALL)
     - Table/View SELECT for role_basic; per sys_table.sys_role grants below
-    - Tables per sys_role: SELECT for role_basic; SELECT/INSERT/UPDATE/DELETE for other roles
+    - Tables per sys_table.sys_role: SELECT/INSERT/UPDATE/DELETE to the specified role
     - Sequences: USAGE, SELECT, UPDATE
     - Functions: EXECUTE only
     - Special handling for VPN database users (per admin_vpn_permissions config)
