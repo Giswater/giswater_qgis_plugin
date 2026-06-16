@@ -79,6 +79,7 @@ def test_role_system_only_on_ddl_phases(tmp_path: Path):
     assert result.ok
 
     joined = "\n".join(conn.sql)
+    assert "EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system')" in joined
     assert joined.count("SET ROLE role_system") == 1
     assert joined.count("RESET ROLE") == 1
     assert joined.index("SET ROLE role_system") < joined.index("-- init")

@@ -28,15 +28,23 @@ ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
 # requires superuser to touch RI_ConstraintTrigger system triggers.
 _ROLE_SYSTEM_PHASES = frozenset({"load_base", "reload_fct_ftrg"})
 
+# On a fresh database role_system does not exist yet; init.sql creates it.
+# pg_has_role(..., 'role_system', ...) errors if the role is missing — guard first.
 _ENSURE_ROLE_SYSTEM_SQL = """
 DO $$
 BEGIN
-  IF NOT pg_has_role(current_user, 'role_system', 'member')
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system')
+     AND NOT pg_has_role(current_user, 'role_system', 'member')
      AND (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) IS TRUE THEN
     EXECUTE 'GRANT role_system TO ' || quote_ident(current_user);
   END IF;
 END $$;
-SET ROLE role_system;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system') THEN
+    EXECUTE 'SET ROLE role_system';
+  END IF;
+END $$;
 """
 
 _RESET_ROLE_SQL = "RESET ROLE;"
