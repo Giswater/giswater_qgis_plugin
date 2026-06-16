@@ -491,7 +491,7 @@ BEGIN
 
 		-- last process
 		PERFORM gw_fct_admin_role_permissions();
-		PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
+		PERFORM gw_fct_setowner($${"data":{"owner":"role_system"}}$$);
 
 		--build return with log table
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result

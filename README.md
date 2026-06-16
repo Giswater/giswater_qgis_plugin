@@ -56,17 +56,111 @@ Since Giswater functions as server-client software, installation is done across 
 
 Compatible with Windows, Mac, and Linux OS.
 
-- Install PostgreSQL (versions 9.5 to 17).
-- Install PostGIS, pgRouting, and other required PostgreSQL extensions:
+- Install PostgreSQL (versions 9.5 to 18).
+- Install PostGIS, pgRouting, and other required PostgreSQL extensions (database-level, once per database):
 
-  ```postgresql
-  CREATE EXTENSION postgis;
-  CREATE EXTENSION pgrouting;
-  CREATE EXTENSION tablefunc;
-  CREATE EXTENSION unaccent;
-  CREATE EXTENSION postgis_raster;
-  CREATE EXTENSION fuzzystrmatch;
+  ```sql
+  CREATE EXTENSION IF NOT EXISTS postgis;
+  CREATE EXTENSION IF NOT EXISTS pgrouting;
+  CREATE EXTENSION IF NOT EXISTS tablefunc;
+  CREATE EXTENSION IF NOT EXISTS unaccent;
+  CREATE EXTENSION IF NOT EXISTS postgis_raster;
+  CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
   ```
+
+  `postgis`, `pgrouting`, `tablefunc`, and `unaccent` are also created automatically when you build a WS/UD schema ([`dbmodel/schemas/main/common/base/init.sql`](dbmodel/schemas/main/common/base/init.sql)). Install the packages on the server first; the extension objects must exist at the OS level.
+
+- **PostgreSQL roles** — Giswater uses a fixed role hierarchy. You do **not** need to run separate corporate DDL scripts: roles are created idempotently during schema creation and permissions are applied by `gw_fct_admin_role_permissions()` at the end of `lastprocess`.
+
+  | Role | Purpose | Inherits |
+  |------|---------|----------|
+  | `role_basic` | Read-only base (`SELECT` on catalogued tables/views) | — |
+  | `role_om` | Operations & maintenance | `role_basic` |
+  | `role_edit` | Network editing | `role_om` |
+  | `role_epa` | EPA / SWMM modelling | `role_edit` |
+  | `role_plan` | Planning (psectors, etc.) | `role_epa` |
+  | `role_admin` | Schema administration (no superuser) | `role_plan` |
+  | `role_system` | Owns schema objects; used for DDL during build | `role_admin` |
+  | `role_crm` | CRM integration (standalone, no inheritance chain) | — |
+
+  Inheritance chain (each role is granted to the one below; higher roles inherit all lower permissions):
+
+  ```
+  role_system
+    └── role_admin
+          └── role_plan
+                └── role_epa
+                      └── role_edit
+                            └── role_om
+                                  └── role_basic
+
+  role_crm   (standalone)
+  ```
+
+  **Installer requirements:** connect as a PostgreSQL superuser (or equivalent: `CREATEROLE` + `CREATE` on the target database). The build creates missing roles, (re)applies the role hierarchy on every schema create (`GRANT` is idempotent), grants `role_system` to the installer when superuser, creates the project schema `AUTHORIZATION role_system`, and runs restrictive grants (no blanket `ALL` on tables — see [`gw_fct_admin_role_permissions`](dbmodel/schemas/main/common/base/fct/gw_fct_admin_role_permissions.sql)).
+
+  **Manual bootstrap** (only if you must prepare roles before the first schema build, e.g. restricted DBA workflow):
+
+  ```sql
+  DO $$
+  DECLARE
+    v_role_exists boolean;
+  BEGIN
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_basic') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_basic NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_om') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_om NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_edit') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_edit NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_epa') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_epa NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_plan') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_plan NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_admin') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_admin NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_system NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_crm') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    GRANT role_basic TO role_om;
+    GRANT role_om TO role_edit;
+    GRANT role_edit TO role_epa;
+    GRANT role_epa TO role_plan;
+    GRANT role_plan TO role_admin;
+    GRANT role_admin TO role_system;
+
+    IF NOT pg_has_role(current_user, 'role_system', 'member')
+       AND (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) IS TRUE THEN
+      GRANT role_system TO current_user;
+    END IF;
+  END$$;
+  ```
+
+  Map QGIS/PostgreSQL logins to the appropriate role (e.g. `GRANT role_edit TO gis_user`). Object-level grants on each project schema are (re)applied by `gw_fct_admin_role_permissions()` during create and upgrade (`lastprocess`).
 
 ### Frontend environment:
 

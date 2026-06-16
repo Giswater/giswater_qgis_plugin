@@ -28,6 +28,7 @@ class Psycopg2Adapter:
     def __init__(self, conn: Any) -> None:
         self._conn = conn
         self._error = ""
+        self._statement_position = 0
         self._notice_sink: Optional[Callable[[str], None]] = None
 
     # ---------------------------------------------------------- construction
@@ -90,7 +91,7 @@ class Psycopg2Adapter:
             self._error = ""
             return (row[0] if row else None, True)
         except psycopg2.Error as e:
-            self._error = self._format_error(e, filepath)
+            self._error = self._capture_error(e, filepath)
             try:
                 self._conn.rollback()
             except psycopg2.Error:
@@ -105,7 +106,7 @@ class Psycopg2Adapter:
             self._error = ""
             return True
         except psycopg2.Error as e:
-            self._error = self._format_error(e, filepath)
+            self._error = self._capture_error(e, filepath)
             # psycopg2 puts the connection into an unusable state on
             # error inside a transaction; rolling back here keeps the
             # session alive for the engine's final commit/rollback.
@@ -117,6 +118,9 @@ class Psycopg2Adapter:
 
     def last_error(self) -> str:
         return self._error
+
+    def last_statement_position(self) -> int:
+        return self._statement_position
 
     def commit(self) -> None:
         self._conn.commit()
@@ -139,7 +143,23 @@ class Psycopg2Adapter:
 
     @staticmethod
     def _format_error(err: psycopg2.Error, filepath: str | None) -> str:
+        del filepath  # path is shown by format_failure / format_sql_error
         diag = getattr(err, "diag", None)
-        msg = (diag.message_primary if diag else None) or str(err).strip()
-        suffix = f" [{filepath}]" if filepath else ""
-        return f"{msg}{suffix}"
+        parts: list[str] = []
+        if diag and diag.message_primary:
+            parts.append(str(diag.message_primary).strip())
+        else:
+            parts.append(str(err).strip())
+        if diag:
+            if diag.message_detail:
+                parts.append(f"DETAIL: {str(diag.message_detail).strip()}")
+            if diag.message_hint:
+                parts.append(f"HINT: {str(diag.message_hint).strip()}")
+            if diag.context:
+                parts.append(f"CONTEXT: {str(diag.context).strip()}")
+        return "\n".join(p for p in parts if p)
+
+    def _capture_error(self, err: psycopg2.Error, filepath: str | None) -> str:
+        diag = getattr(err, "diag", None)
+        self._statement_position = int(diag.statement_position or 0) if diag else 0
+        return self._format_error(err, filepath)

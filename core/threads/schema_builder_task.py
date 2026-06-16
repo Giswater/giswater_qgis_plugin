@@ -112,21 +112,17 @@ class GwSchemaBuilderTask(GwTask):
             if failure is not None:
                 err = lib_vars.session_vars.get("last_error") or failure.error or ""
                 lib_vars.session_vars["last_error"] = err
-                if err and not lib_vars.session_vars.get("last_error_msg"):
-                    lib_vars.session_vars["last_error_msg"] = format_failure(
-                        failure.path,
-                        str(err),
-                        sql_root=self._log_style.sql_root,
-                    )
-                self.db_exception = (err, "", failure.path)
-                tools_log.log_warning(
-                    "SchemaBuilder failed",
-                    parameter=format_failure(
-                        failure.path,
-                        str(failure.error or err),
-                        sql_root=self._log_style.sql_root,
-                    ),
+                msg = format_failure(
+                    failure.path,
+                    str(failure.error or err),
+                    sql_root=self._log_style.sql_root,
+                    sql=getattr(failure, "sql", "") or "",
+                    statement_position=getattr(failure, "statement_position", 0) or 0,
                 )
+                if err and not lib_vars.session_vars.get("last_error_msg"):
+                    lib_vars.session_vars["last_error_msg"] = msg
+                self.db_exception = (err, "", failure.path)
+                tools_log.log_warning("SchemaBuilder failed", parameter=msg)
             else:
                 tools_log.log_warning("SchemaBuilder failed without first_failure")
             return False

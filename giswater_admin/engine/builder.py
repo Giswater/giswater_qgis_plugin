@@ -23,6 +23,24 @@ logger = logging.getLogger(__name__)
 
 ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
 
+# DDL phases run as role_system so created objects are owned by role_system.
+# updates/load_sample are excluded: legacy patches use DISABLE TRIGGER ALL, which
+# requires superuser to touch RI_ConstraintTrigger system triggers.
+_ROLE_SYSTEM_PHASES = frozenset({"load_base", "reload_fct_ftrg"})
+
+_ENSURE_ROLE_SYSTEM_SQL = """
+DO $$
+BEGIN
+  IF NOT pg_has_role(current_user, 'role_system', 'member')
+     AND (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) IS TRUE THEN
+    EXECUTE 'GRANT role_system TO ' || quote_ident(current_user);
+  END IF;
+END $$;
+SET ROLE role_system;
+"""
+
+_RESET_ROLE_SQL = "RESET ROLE;"
+
 
 @dataclass
 class BuildParams:
@@ -35,7 +53,7 @@ class BuildParams:
     plugin_version: str = "0.0.0"
     project_version: str = "0.0.0"
     run_mode: str = "new_project"  # new_project | upgrade
-    db_user: str = "postgres"
+    db_user: str = ""
 
     sql_root: str = ""
     today: str = ""
@@ -264,19 +282,44 @@ class SchemaBuilder:
     # ------------------------------------------------------------------- phases
 
     def _run_phase(self, phase: Phase, seen: int, total: int) -> PhaseResult:
-        if phase.type == "sql_dir":
-            return self._run_sql_dir(phase, seen, total)
-        if phase.type == "version_walk":
-            return self._run_version_walk(phase, seen, total)
-        if phase.type == "dir_walk":
-            return self._run_dir_walk(phase, seen, total)
-        if phase.type == "sql_file":
-            return self._run_sql_file(phase, seen, total)
-        if phase.type == "sql_function":
-            return self._run_sql_function(phase, seen, total)
-        if phase.type == "sql_inline":
-            return self._run_sql_inline(phase, seen, total)
-        raise ValueError(f"Unsupported phase type: {phase.type}")
+        use_role_system = phase.id in _ROLE_SYSTEM_PHASES
+        if use_role_system:
+            fx = sql_runner.execute_inline(
+                self.conn,
+                _ENSURE_ROLE_SYSTEM_SQL,
+                label=f"phase:{phase.id}:set_role_system",
+                commit=self.commit_each_file,
+            )
+            if not fx.ok:
+                return PhaseResult(phase_id=phase.id, files=[fx])
+
+        pr: PhaseResult | None = None
+        try:
+            if phase.type == "sql_dir":
+                pr = self._run_sql_dir(phase, seen, total)
+            elif phase.type == "version_walk":
+                pr = self._run_version_walk(phase, seen, total)
+            elif phase.type == "dir_walk":
+                pr = self._run_dir_walk(phase, seen, total)
+            elif phase.type == "sql_file":
+                pr = self._run_sql_file(phase, seen, total)
+            elif phase.type == "sql_function":
+                pr = self._run_sql_function(phase, seen, total)
+            elif phase.type == "sql_inline":
+                pr = self._run_sql_inline(phase, seen, total)
+            else:
+                raise ValueError(f"Unsupported phase type: {phase.type}")
+        finally:
+            if use_role_system and pr is not None:
+                reset_fx = sql_runner.execute_inline(
+                    self.conn,
+                    _RESET_ROLE_SQL,
+                    label=f"phase:{phase.id}:reset_role",
+                    commit=self.commit_each_file,
+                )
+                pr.files.append(reset_fx)
+        assert pr is not None
+        return pr
 
     def _run_sql_dir(self, phase: Phase, seen: int, total: int) -> PhaseResult:
         pr = PhaseResult(phase_id=phase.id)

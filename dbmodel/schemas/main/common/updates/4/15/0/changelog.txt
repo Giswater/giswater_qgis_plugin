@@ -1,0 +1,2 @@
+Restrict role permissions and transfer schema ownership to role_system.
+Re-apply permissions and ownership on upgrade.

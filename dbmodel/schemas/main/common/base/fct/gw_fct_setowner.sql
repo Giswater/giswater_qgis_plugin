@@ -30,23 +30,22 @@ RETURN:
 
 HANDLES:
   - Schema ownership
-  - Tables (processed from sys_table catalog)
-  - Views (processed from sys_table catalog)
-  - Sequences (all sequences in the schema)
-  - Functions (project-type specific functions from sys_function)
+  - Tables, views and materialized views (sys_table joined to pg_class)
+  - Standalone sequences (pg_class, excluding owned-by-column)
+  - Functions (pg_proc identity signatures)
 
 EXAMPLE USAGE:
-  SELECT SCHEMA_NAME.gw_fct_setowner($${"client":{"lang":"ES"}, "data":{"owner":"role_admin"}}$$);
+  SELECT SCHEMA_NAME.gw_fct_setowner($${"data":{"owner":"role_system"}}$$);
 
 NOTES:
   - The executing user must have sufficient privileges to change ownership
   - The target role must already exist in the database
   - sys_table is processed first to ensure catalog integrity
-  - Function signatures are normalized (CHARACTER VARYING → VARCHAR, BOOLEAN → BOOL)
-  - Only functions matching the current project_type are processed
+  - Object discovery uses pg_catalog (pg_class, pg_proc), not information_schema
+  - Function ownership uses pg_proc identity signatures (avoids sys_function type-name drift)
   - Returns Giswater-standard JSON response for client integration
-  - INCONSISTENCY: Sequences use GRANT ALL instead of ALTER OWNER (unlike tables/views),
-    which grants privileges rather than transferring ownership.
+  - Sequences owned by table columns (SERIAL/IDENTITY) transfer via ALTER TABLE ... OWNER TO
+  - Standalone sequences are transferred with ALTER SEQUENCE ... OWNER TO
 */
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setowner(p_data json)
@@ -57,12 +56,10 @@ $BODY$
 
 DECLARE
 
-rec text;
+rec record;
 v_owner text;
 v_schema text;
 v_version text;
-v_error_context text;
-v_project_type text;
 
 BEGIN
 
@@ -72,69 +69,57 @@ BEGIN
 	v_owner = ((p_data ->>'data')::json->>'owner')::text;
 	v_schema = 'SCHEMA_NAME';
 
-
-	SELECT lower(project_type) into v_project_type from sys_version order by id desc limit 1;
-
 	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
 
-	EXECUTE 'ALTER SCHEMA '|| v_schema ||' OWNER TO '|| v_owner ||';';
+	EXECUTE format('ALTER SCHEMA %I OWNER TO %I', v_schema, v_owner);
 
 	-- force change sys_table owner before
-	EXECUTE 'ALTER TABLE IF EXISTS '|| v_schema ||'."sys_table" OWNER TO '|| v_owner ||';';
+	EXECUTE format('ALTER TABLE IF EXISTS %I.sys_table OWNER TO %I', v_schema, v_owner);
+
 	FOR rec IN
-		EXECUTE 'SELECT s.id 
-				FROM sys_table s
-				left join information_schema.tables t
-				on s.id = t.table_name
-				where t.table_schema = '|| quote_literal(v_schema)||'
-				and t.table_type ilike ''%table%''
-				ORDER BY id;'
+		SELECT c.relname, c.relkind
+		FROM sys_table s
+		JOIN pg_class c ON c.relname = s.id
+		JOIN pg_namespace n ON n.oid = c.relnamespace
+		WHERE n.nspname = v_schema
+		AND c.relkind IN ('r', 'p', 'f', 'v', 'm')
+		ORDER BY s.id
 	LOOP
-		IF rec <> 'sys_table' THEN
-			EXECUTE 'ALTER TABLE IF EXISTS '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
+		IF rec.relname = 'sys_table' THEN
+			CONTINUE;
+		END IF;
+		IF rec.relkind IN ('r', 'p', 'f') THEN
+			EXECUTE format('ALTER TABLE IF EXISTS %I.%I OWNER TO %I', v_schema, rec.relname, v_owner);
+		ELSIF rec.relkind = 'v' THEN
+			EXECUTE format('ALTER VIEW IF EXISTS %I.%I OWNER TO %I', v_schema, rec.relname, v_owner);
+		ELSIF rec.relkind = 'm' THEN
+			EXECUTE format('ALTER MATERIALIZED VIEW IF EXISTS %I.%I OWNER TO %I', v_schema, rec.relname, v_owner);
 		END IF;
 	END LOOP;
 
 	FOR rec IN
-		EXECUTE 'SELECT s.id 
-				FROM sys_table s
-				left join information_schema.views v
-				on s.id = v.table_name
-				where v.table_schema = '|| quote_literal(v_schema)||'
-				ORDER BY id;'
+		SELECT c.relname
+		FROM pg_class c
+		JOIN pg_namespace n ON n.oid = c.relnamespace
+		WHERE n.nspname = v_schema
+		AND c.relkind = 'S'
+		AND NOT EXISTS (
+			SELECT 1 FROM pg_depend d
+			WHERE d.objid = c.oid
+			AND d.deptype = 'a'
+			AND d.refobjsubid <> 0
+		)
 	LOOP
-		EXECUTE 'ALTER VIEW IF EXISTS '|| v_schema ||'."'|| rec ||'" OWNER TO '|| v_owner ||';';
+		EXECUTE format('ALTER SEQUENCE IF EXISTS %I.%I OWNER TO %I', v_schema, rec.relname, v_owner);
 	END LOOP;
 
 	FOR rec IN
-		EXECUTE 'SELECT sequence_name FROM information_schema.SEQUENCES WHERE sequence_schema = '|| quote_literal(v_schema)||''
-	LOOP
-		EXECUTE 'GRANT ALL ON SEQUENCE '|| v_schema ||'."'|| rec ||'" TO '|| v_owner ||';';
-	END LOOP;
-
-	FOR rec IN
-		EXECUTE 'SELECT CASE WHEN input_params IS NULL OR input_params = ''void'' THEN CONCAT(function_name, ''()'') 
-		ELSE CONCAT(function_name, ''('', input_params, '')'') END FROM sys_function
-		WHERE project_type = ' || QUOTE_LITERAL(v_project_type) || ''
-	LOOP
-		-- Replace specific data types for function signature
-		IF rec ILIKE '%CHARACTER VARYING%' THEN
-			rec = REPLACE(rec, 'CHARACTER VARYING', 'VARCHAR');
-		ELSIF rec ILIKE '%BOOLEAN%' THEN
-			rec = REPLACE(rec, 'BOOLEAN', 'BOOL');
-		END IF;
-
-		-- Check if the function exists in the schema
-		PERFORM 1
+		SELECT p.oid::regprocedure::text AS func_sig
 		FROM pg_proc p
-		JOIN pg_namespace n ON p.pronamespace = n.oid
-		WHERE n.nspname = QUOTE_LITERAL(v_schema)
-		AND p.proname = SPLIT_PART(rec, '(', 1);
-
-		-- If the function exists, alter its owner
-		IF FOUND THEN
-			EXECUTE 'ALTER FUNCTION ' || v_schema || '.' || rec || ' OWNER TO ' || v_owner || ';';
-		END IF;
+		JOIN pg_namespace n ON n.oid = p.pronamespace
+		WHERE n.nspname = v_schema
+	LOOP
+		EXECUTE format('ALTER FUNCTION %s OWNER TO %I', rec.func_sig, v_owner);
 	END LOOP;
 
 	--  Return

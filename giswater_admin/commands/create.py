@@ -184,8 +184,8 @@ def _conn_user(args: argparse.Namespace) -> str:
     try:
         info = conn_mod.resolve(args.conn, args.config)
     except RuntimeError:
-        return "postgres"
-    return info.user or "postgres"
+        return ""
+    return info.user or ""
 
 
 def _auto_am_target(dbmodel_path: str) -> str:

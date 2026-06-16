@@ -311,7 +311,7 @@ class GwAdminButton:
             profile=profile,
             creation_profile={'empty': 'empty', 'sample_inv': 'inventory', 'sample_full': 'sample'}.get(profile, 'empty'),
             run_mode='new_project',
-            db_user=self.username if hasattr(self, 'username') else 'postgres',
+            db_user=getattr(self, 'username', '') or '',
             sql_root=self.sql_dir,
         )
         is_test = bool(params.get('is_test', False))

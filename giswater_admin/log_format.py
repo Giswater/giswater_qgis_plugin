@@ -254,9 +254,55 @@ def format_timing_summary(
     return lines
 
 
-def format_failure(path: str, error: str, *, sql_root: str = "") -> str:
-    short = shorten_path(path, sql_root)
-    err = (error or "").strip().replace("\n", " ")
-    if len(err) > 120:
-        err = err[:117] + "..."
-    return f"FAILED  {short}  —  {err}"
+def sql_line_at_offset(text: str, pos: int) -> int:
+    """Map a 0-based byte offset in executed SQL to a 1-based line number."""
+    if pos <= 0 or not text:
+        return 0
+    if pos > len(text):
+        pos = len(text)
+    return text[:pos].count("\n") + 1
+
+
+def format_sql_error(
+    error: str,
+    *,
+    filepath: str = "",
+    sql_root: str = "",
+    sql: str = "",
+    statement_position: int = 0,
+) -> str:
+    """Full multiline SQL failure message (no truncation)."""
+    lines: list[str] = []
+    short = shorten_path(filepath, sql_root) if filepath else ""
+    if short:
+        header = f"FAILED  {short}"
+        if statement_position > 0 and sql:
+            line_no = sql_line_at_offset(sql, statement_position)
+            if line_no > 0:
+                header += f"  (line ~{line_no})"
+        lines.append(header)
+
+    err = (error or "").strip()
+    if err:
+        lines.extend(err.splitlines())
+    elif not lines:
+        lines.append("FAILED  (unknown error)")
+
+    return "\n".join(lines)
+
+
+def format_failure(
+    path: str,
+    error: str,
+    *,
+    sql_root: str = "",
+    sql: str = "",
+    statement_position: int = 0,
+) -> str:
+    return format_sql_error(
+        error,
+        filepath=path,
+        sql_root=sql_root,
+        sql=sql,
+        statement_position=statement_position,
+    )

@@ -25,6 +25,13 @@ from .templating import apply_subs
 log = logging.getLogger(__name__)
 
 
+def _statement_position(conn: ConnectionLike) -> int:
+    getter = getattr(conn, "last_statement_position", None)
+    if callable(getter):
+        return int(getter() or 0)
+    return 0
+
+
 def _preview_sql(sql: str, limit: int = 480) -> str:
     collapsed = " ".join(sql.split())
     if len(collapsed) > limit:
@@ -39,6 +46,8 @@ class FileExec:
     path: str
     ok: bool = False
     error: str = ""
+    sql: str = ""
+    statement_position: int = 0
     duration_ms: int = 0
 
 
@@ -106,12 +115,13 @@ def execute_file(
     sql = apply_subs(raw, subs)
     log.debug("execute_file path=%s sql_preview=%s", path, _preview_sql(sql))
 
-    fx = FileExec(path=path)
+    fx = FileExec(path=path, sql=sql)
     t0 = time.perf_counter()
     try:
         fx.ok = conn.execute(sql, filepath=path)
         if not fx.ok:
             fx.error = conn.last_error() or "execute returned False"
+            fx.statement_position = _statement_position(conn)
         elif commit:
             conn.commit()
     except Exception as e:  # noqa: BLE001 - boundary
@@ -130,12 +140,13 @@ def execute_inline(
     commit: bool = False,
 ) -> FileExec:
     log.debug("execute_inline label=%s sql_preview=%s", label, _preview_sql(sql))
-    fx = FileExec(path=f"<{label}>")
+    fx = FileExec(path=f"<{label}>", sql=sql)
     t0 = time.perf_counter()
     try:
         fx.ok = conn.execute(sql)
         if not fx.ok:
             fx.error = conn.last_error() or "execute returned False"
+            fx.statement_position = _statement_position(conn)
         elif commit:
             conn.commit()
     except Exception as e:  # noqa: BLE001
@@ -163,12 +174,13 @@ def execute_function_call(
     body_json = json.dumps(payload, ensure_ascii=False) if not isinstance(payload, str) else payload
     sql = f"SELECT {function}($${body_json}$$);"
     log.debug("execute_function_call fn=%s sql_preview=%s", function, _preview_sql(sql))
-    fx = FileExec(path=f"<fn:{function}>")
+    fx = FileExec(path=f"<fn:{function}>", sql=sql)
     t0 = time.perf_counter()
     try:
         fx.ok = conn.execute(sql)
         if not fx.ok:
             fx.error = conn.last_error() or "function returned False"
+            fx.statement_position = _statement_position(conn)
         if fx.ok and commit:
             conn.commit()
     except Exception as e:  # noqa: BLE001
