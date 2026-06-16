@@ -139,11 +139,7 @@ BEGIN
 	SELECT viewname FROM pg_catalog.pg_views WHERE schemaname != 'pg_catalog' AND schemaname = 'SCHEMA_NAME')
 
 	LOOP
-		IF v_tablerecord.sys_role = 'role_basic' THEN
-			v_query_text:= 'GRANT SELECT ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-		ELSE
-			v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-		END IF;
+		v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 		EXECUTE v_query_text;
 	END LOOP;
 
@@ -203,11 +199,7 @@ BEGIN
 		(SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname = 'utils'
 		UNION
 		SELECT viewname FROM pg_catalog.pg_views WHERE schemaname != 'pg_catalog' AND schemaname = 'utils') LOOP
-			IF v_tablerecord.sys_role = 'role_basic' THEN
-				v_query_text:= 'GRANT SELECT ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-			ELSE
-				v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-			END IF;
+			v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 			EXECUTE v_query_text;
 		END LOOP;
 

@@ -12,8 +12,7 @@ FUNCTION: gw_fct_admin_role_permissions()
 
 PURPOSE:
   Establishes and maintains the complete role hierarchy and permission structure for a
-  Giswater database schema. This administrative function creates all standard Giswater
-  roles if they don't exist, configures their hierarchical relationships, and grants
+  Giswater database schema. Configures hierarchical role relationships and grants
   appropriate permissions on database objects (tables, views, sequences, functions).
   Essential for initial database setup and permission maintenance.
 
@@ -24,7 +23,7 @@ RETURN:
   void: Function completes silently on success, raises exception on failure
 
 HANDLES:
-  Roles (created with hierarchical inheritance):
+  Roles (hierarchical inheritance):
     - role_basic: Base role with SELECT permissions (all other roles inherit from this)
     - role_om: Operations & Maintenance (inherits: role_basic)
     - role_edit: Editing capabilities (inherits: role_om)
@@ -50,7 +49,7 @@ EXAMPLE USAGE:
 NOTES:
   - Must be executed by a superuser or role owner
   - Role hierarchy ensures cascading permissions (e.g., role_admin inherits all lower permissions)
-  - Creates Giswater roles when missing; grants role_system to current superuser installer only (no hardcoded login names)
+  - Grants role_system to current superuser installer only (no hardcoded login names)
   - VPN mode (admin_vpn_permissions): revokes database access from role_basic, grants CONNECT per cat_users
   - Publish user receives CONNECT, USAGE and SELECT permissions
   - Processes optional utils schema if admin_utils_schema config is enabled
@@ -65,7 +64,6 @@ $BODY$
 
 DECLARE
 
-v_roleexists text;
 v_dbnname varchar;
 v_schema_array name[];
 v_schemaname varchar;
@@ -93,60 +91,6 @@ BEGIN
 	v_schemaname :=v_schema_array[1];
 
 	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_vpn_permissions');
-
-	-- Create roles if missing; always (re)apply hierarchy grants (idempotent)
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_basic';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_basic" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_om';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_om" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_edit';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_edit" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_epa';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_epa" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_plan';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_plan" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_admin';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_admin" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_system';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_system" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_crm';
-	IF v_roleexists is null THEN
-		CREATE ROLE "role_crm" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-	END IF;
-
-	GRANT role_basic TO role_om;
-	GRANT role_om TO role_edit;
-	GRANT role_edit TO role_epa;
-	GRANT role_epa TO role_plan;
-	GRANT role_plan TO role_admin;
-	GRANT role_admin TO role_system;
-
-	-- Assign role_system to current superuser
-	IF 'role_system' NOT IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member'))
-		AND (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) IS TRUE THEN
-		GRANT role_system TO current_user;
-	END IF;
 
 	ALTER DEFAULT PRIVILEGES IN SCHEMA SCHEMA_NAME GRANT SELECT ON TABLES TO role_basic;
 
@@ -195,11 +139,7 @@ BEGIN
 	SELECT viewname FROM pg_catalog.pg_views WHERE schemaname != 'pg_catalog' AND schemaname = 'SCHEMA_NAME')
 
 	LOOP
-		IF v_tablerecord.sys_role = 'role_basic' THEN
-			v_query_text:= 'GRANT SELECT ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-		ELSE
-			v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-		END IF;
+		v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE '||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 		EXECUTE v_query_text;
 	END LOOP;
 
@@ -259,11 +199,7 @@ BEGIN
 		(SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname = 'utils'
 		UNION
 		SELECT viewname FROM pg_catalog.pg_views WHERE schemaname != 'pg_catalog' AND schemaname = 'utils') LOOP
-			IF v_tablerecord.sys_role = 'role_basic' THEN
-				v_query_text:= 'GRANT SELECT ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-			ELSE
-				v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
-			END IF;
+			v_query_text:= 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE utils.'||v_tablerecord.id||' TO '||v_tablerecord.sys_role||';';
 			EXECUTE v_query_text;
 		END LOOP;
 
