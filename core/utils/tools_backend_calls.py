@@ -213,6 +213,8 @@ def open_visit(**kwargs):
     feature_type = complet_result['body']['feature']['featureType']
     feature_id = complet_result['body']['feature']['id']
     qtable = kwargs['qtable'] if 'qtable' in kwargs else tools_qt.get_widget(dialog, f"{func_params['targetwidget']}")
+    if qtable is None or qtable.selectionModel() is None:
+        return
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -279,7 +281,7 @@ def manage_visit_class(**kwargs):
 
     # Get visit class
     current_visit_class = tools_gw.get_values(dialog, widget)
-    if current_visit_class[columnname] in (None, -1, '-1'):
+    if current_visit_class[columnname] in (None, -1, '-1', ''):
         return
     # Get table name
     sql = (f"SELECT ui_tablename FROM config_visit_class where id = {current_visit_class[columnname]}")
@@ -309,44 +311,35 @@ def manage_visit_class(**kwargs):
         widget.removeItem(widget.currentIndex())
         return False, False
 
-    # headers
     headers = complet_list['body']['form'].get('headers')
-    # non_editable_columns = []
-    if headers:
-        model = table_view.model()
-        if model is None:
-            model = QStandardItemModel()
+    data = complet_list['body']['data']
+    fields = data['fields']
+    if data.get('hidden'):
+        return
 
-        # Related by Qtable
-        model.clear()
+    visible_fields = [field for field in fields if not field.get('hidden')]
+    model = table_view.model()
+    if model is None:
+        model = QStandardItemModel()
         table_view.setModel(model)
-        table_view.horizontalHeader().setStretchLastSection(True)
-        # Non-editable columns
-        # non_editable_columns = [item['header'] for item in headers if item.get('editable') is False]
-
-    # values
-    for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']:
-            continue
-        model = table_view.model()
-        if model is None:
-            model = QStandardItemModel()
-            table_view.setModel(model)
+    if not visible_fields:
         model.removeRows(0, model.rowCount())
+        return
 
-        table_view = tools_gw.add_tableview_header(table_view, field, headers)
-        table_view = tools_gw.fill_tableview_rows(table_view, field)
-        tools_qt.set_tableview_config(table_view)
+    model.clear()
+    table_view = tools_gw.add_tableview_header(table_view, visible_fields, headers)
+    table_view = tools_gw.fill_tableview_rows(table_view, visible_fields)
+    tools_qt.set_tableview_config(table_view)
 
-        # Get tab's widgets
-        widget_list = []
-        tab_name = info.tab_main.currentWidget().objectName().replace('tab_', "")
-        widget_list.extend(info.tab_main.currentWidget().findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
-        widget_list.extend(info.tab_main.currentWidget().findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
-        widget_list.extend(info.tab_main.currentWidget().findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
-        widget_list.extend(info.tab_main.currentWidget().findChildren(QgsDateTimeEdit, QRegularExpression(f"{tab_name}_")))
-        # Set filter listeners
-        tools_gw.set_filter_listeners(complet_result, info.dlg_cf, widget_list, columnname, ui_tablename[0], info.feature_id)
+    # Get tab's widgets
+    widget_list = []
+    tab_name = info.tab_main.currentWidget().objectName().replace('tab_', "")
+    widget_list.extend(info.tab_main.currentWidget().findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(info.tab_main.currentWidget().findChildren(QTableView, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(info.tab_main.currentWidget().findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
+    widget_list.extend(info.tab_main.currentWidget().findChildren(QgsDateTimeEdit, QRegularExpression(f"{tab_name}_")))
+    # Set filter listeners
+    tools_gw.set_filter_listeners(complet_result, info.dlg_cf, widget_list, columnname, ui_tablename[0], info.feature_id)
 
 
 def open_selected_path(**kwargs):

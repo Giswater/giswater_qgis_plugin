@@ -2581,26 +2581,34 @@ class GwInfo(QObject):
             sql = (f"select distinct(class_id) from v_ui_om_visit_x_{self.feature_type} where {self.field_id} = '{self.feature_id}' ")
             rows = tools_db.get_rows(sql)
             if rows is None:
-                cmb_visit_class.clear()
-                return
+                rows = []
             rows_int = [set(int(x) for x in row if x is not None) for row in rows]
-            index_to_remove = []
-            for i in range(cmb_visit_class.count() - 1, -1, -1):
-                visit_class_id = int(cmb_visit_class.itemData(i)[0])
-                if not any(visit_class_id in row for row in rows_int):
-                    index_to_remove.append(i)
-            for i in index_to_remove:
-                cmb_visit_class.removeItem(i)
+            if cmb_visit_class is not None:
+                index_to_remove = []
+                for i in range(cmb_visit_class.count() - 1, -1, -1):
+                    item_data = cmb_visit_class.itemData(i)
+                    if not item_data or item_data[0] in ('', None):
+                        continue
+                    visit_class_id = int(item_data[0])
+                    if not any(visit_class_id in row for row in rows_int):
+                        index_to_remove.append(i)
+                for i in index_to_remove:
+                    cmb_visit_class.removeItem(i)
 
-            current_index = cmb_visit_class.currentIndex()
-            cmb_visit_class.currentIndexChanged.emit(current_index)
+                current_index = cmb_visit_class.currentIndex()
+                cmb_visit_class.currentIndexChanged.emit(current_index)
 
             # Manage btn_open_gallery
             btn_open_gallery = self.dlg_cf.findChild(QPushButton, 'tab_visit_open_gallery')
             tbl_visits = self.dlg_cf.findChild(QTableView, 'tab_visit_tbl_visits')
+            if tbl_visits is None:
+                tables = self.tab_main.widget(index_tab).findChildren(QTableView)
+                tbl_visits = tables[0] if tables else None
 
-            btn_open_gallery.setEnabled(False)
-            tbl_visits.selectionModel().selectionChanged.connect(partial(self._manage_gallery_status, tbl_visits, btn_open_gallery))
+            if btn_open_gallery is not None and tbl_visits is not None and tbl_visits.selectionModel() is not None:
+                btn_open_gallery.setEnabled(False)
+                tbl_visits.selectionModel().selectionChanged.connect(
+                    partial(self._manage_gallery_status, tbl_visits, btn_open_gallery))
 
             self.tab_visit_loaded = True
         # Tab 'Event'
@@ -4295,6 +4303,8 @@ def open_hydro_url(**kwargs):
 def open_visit_files(**kwargs):
     func_params = kwargs['func_params']
     qtable = tools_qt.get_widget(kwargs['dialog'], f"{func_params.get('targetwidget')}")
+    if qtable is None or qtable.selectionModel() is None:
+        return
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
