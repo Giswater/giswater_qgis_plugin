@@ -26,6 +26,7 @@ DELETE FROM sys_table WHERE id = 'ext_hydrometer_period';
 DELETE FROM sys_table WHERE id = 'ext_cat_period_type';
 DELETE FROM sys_table WHERE id = 'ext_cat_period';
 
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP", "rootViews":["v_hydrometer"], "batchId":1}}$$);
 
 CREATE OR REPLACE VIEW v_hydrometer AS
 SELECT * FROM cibs.hydrometer;
@@ -53,6 +54,8 @@ SELECT * FROM cibs.cat_hydrometer_type;
 
 CREATE OR REPLACE VIEW v_cat_hydrometer_category AS
 SELECT * FROM cibs.cat_hydrometer_category;
+
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"RESTORE", "batchId":1}}$$);
 
 SELECT "SCHEMA_NAME".gw_fct_admin_sys_version_register(json_build_object(
 	'data', json_build_object(

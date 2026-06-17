@@ -12,9 +12,11 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
-SET ROLE role_system;
+RESET ROLE;
 
 CREATE SCHEMA IF NOT EXISTS cibs AUTHORIZATION role_system;
+
+SET ROLE role_system;
 
 GRANT ALL ON SCHEMA cibs TO role_system;
 GRANT ALL ON SCHEMA cibs TO role_basic;

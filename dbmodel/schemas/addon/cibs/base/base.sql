@@ -135,27 +135,6 @@ CREATE TABLE cibs.hydrometer (
 	CONSTRAINT hydrometer_cat_hydrometer_state_fk FOREIGN KEY (state_id) REFERENCES cat_hydrometer_state(id)
 );
 
-CREATE TABLE cibs.hydrometer_period (
-    id bigint NOT NULL DEFAULT nextval('cibs.hydrometer_period_id_seq'::regclass),
-    hydrometer_id integer,
-    wmeter_number text,
-    cat_period_id character varying(16),
-    billed_volume double precision,
-    value_date date,
-    value_type integer,
-    value_status integer,
-    value_state integer,
-    fraud_type integer,
-    fraud_status integer,
-    fraud_probability numeric(12,2),
-    submetering_value double precision,
-    CONSTRAINT hydrometer_period_pkey PRIMARY KEY (id),
-    CONSTRAINT hydrometer_period_hydrometer_id_cat_period_id_unique UNIQUE (hydrometer_id, cat_period_id),
-	CONSTRAINT hydrometer_period_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES hydrometer(hydrometer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT hydrometer_period_cat_period_id_fkey FOREIGN KEY (cat_period_id) REFERENCES cat_period(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-
 CREATE TABLE cat_period_type (
 	id serial4 NOT NULL,
 	idval varchar(16) NOT NULL,
@@ -177,6 +156,26 @@ CREATE TABLE cat_period (
 	expl_id _int4 NULL,
 	CONSTRAINT cat_period_pkey PRIMARY KEY (id),
 	CONSTRAINT cat_period_period_type_fkey FOREIGN KEY (period_type) REFERENCES cat_period_type(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE cibs.hydrometer_period (
+    id bigint NOT NULL DEFAULT nextval('cibs.hydrometer_period_id_seq'::regclass),
+    hydrometer_id integer,
+    wmeter_number text,
+    cat_period_id character varying(16),
+    billed_volume double precision,
+    value_date date,
+    value_type integer,
+    value_status integer,
+    value_state integer,
+    fraud_type integer,
+    fraud_status integer,
+    fraud_probability numeric(12,2),
+    submetering_value double precision,
+    CONSTRAINT hydrometer_period_pkey PRIMARY KEY (id),
+    CONSTRAINT hydrometer_period_hydrometer_id_cat_period_id_unique UNIQUE (hydrometer_id, cat_period_id),
+	CONSTRAINT hydrometer_period_hydrometer_id_fkey FOREIGN KEY (hydrometer_id) REFERENCES hydrometer(hydrometer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT hydrometer_period_cat_period_id_fkey FOREIGN KEY (cat_period_id) REFERENCES cat_period(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 ALTER SEQUENCE cibs.cat_hydrometer_state_id_seq OWNED BY cibs.cat_hydrometer_state.id;

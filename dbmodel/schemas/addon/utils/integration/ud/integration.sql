@@ -89,38 +89,56 @@ DELETE FROM sys_table WHERE id = 'ext_type_street';
 
 DO $gw$
 BEGIN
+	-- Copy ext_* → utils in FK dependency order (province/region → municipality → streetaxis → plot → address).
 	IF to_regclass('ext_province_old') IS NOT NULL THEN
-		INSERT INTO utils.province SELECT * FROM ext_province_old ON CONFLICT DO NOTHING;
+		INSERT INTO utils.province (province_id, name, descript, the_geom, active, code)
+		SELECT province_id, name, descript, the_geom, active, code
+		FROM ext_province_old ON CONFLICT (province_id) DO NOTHING;
 	END IF;
 	IF to_regclass('ext_region_old') IS NOT NULL THEN
-		INSERT INTO utils.region SELECT * FROM ext_region_old ON CONFLICT DO NOTHING;
+		INSERT INTO utils.region (region_id, name, descript, the_geom, active, code)
+		SELECT region_id, name, descript, the_geom, active, code
+		FROM ext_region_old ON CONFLICT (region_id) DO NOTHING;
 	END IF;
 	IF to_regclass('ext_region_x_province_old') IS NOT NULL THEN
-		INSERT INTO utils.region_x_province SELECT * FROM ext_region_x_province_old ON CONFLICT DO NOTHING;
+		INSERT INTO utils.region_x_province (region_id, province_id)
+		SELECT region_id, province_id
+		FROM ext_region_x_province_old ON CONFLICT (region_id, province_id) DO NOTHING;
 	END IF;
 	IF to_regclass('ext_municipality_old') IS NOT NULL THEN
-		INSERT INTO utils.municipality SELECT * FROM ext_municipality_old ON CONFLICT DO NOTHING;
+		INSERT INTO utils.municipality (muni_id, name, observ, the_geom, active, region_id, province_id, code)
+		SELECT muni_id, name, observ, the_geom, active, region_id, province_id, code
+		FROM ext_municipality_old ON CONFLICT (muni_id) DO NOTHING;
 	END IF;
 	IF to_regclass('ext_district_old') IS NOT NULL THEN
-		INSERT INTO utils.district SELECT * FROM ext_district_old ON CONFLICT DO NOTHING;
+		INSERT INTO utils.district (district_id, name, muni_id, observ, active, the_geom, code)
+		SELECT district_id, name, muni_id, observ, active, the_geom, code
+		FROM ext_district_old ON CONFLICT (district_id) DO NOTHING;
+	END IF;
+	IF to_regclass('ext_type_street_old') IS NOT NULL THEN
+		INSERT INTO utils.type_street (id, observ)
+		SELECT id, observ FROM ext_type_street_old ON CONFLICT (id) DO NOTHING;
+	END IF;
+	IF to_regclass('ext_streetaxis_old') IS NOT NULL THEN
+		INSERT INTO utils.streetaxis (id, code, type, name, text, the_geom, muni_id, source)
+		SELECT id, code, type, name, text, the_geom, muni_id, source
+		FROM ext_streetaxis_old ON CONFLICT (id) DO NOTHING;
+	END IF;
+	IF to_regclass('ext_plot_old') IS NOT NULL THEN
+		INSERT INTO utils.plot (id, code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ, text, the_geom)
+		SELECT id, code, muni_id, postcode, streetaxis_id, postnumber, complement, placement, square, observ, text, the_geom
+		FROM ext_plot_old ON CONFLICT (id) DO NOTHING;
+	END IF;
+	IF to_regclass('ext_address_old') IS NOT NULL THEN
+		INSERT INTO utils.address (id, muni_id, postcode, streetaxis_id, postnumber, plot_id, the_geom, postcomplement, code, source)
+		SELECT id, muni_id, postcode, streetaxis_id, postnumber, plot_id, the_geom, postcomplement, code, source
+		FROM ext_address_old ON CONFLICT (id) DO NOTHING;
 	END IF;
 	IF to_regclass('ext_cat_raster_old') IS NOT NULL THEN
 		INSERT INTO utils.cat_raster SELECT * FROM ext_cat_raster_old ON CONFLICT DO NOTHING;
 	END IF;
 	IF to_regclass('ext_raster_dem_old') IS NOT NULL THEN
 		INSERT INTO utils.raster_dem SELECT * FROM ext_raster_dem_old ON CONFLICT DO NOTHING;
-	END IF;
-	IF to_regclass('ext_type_street_old') IS NOT NULL THEN
-		INSERT INTO utils.type_street SELECT * FROM ext_type_street_old ON CONFLICT DO NOTHING;
-	END IF;
-	IF to_regclass('ext_streetaxis_old') IS NOT NULL THEN
-		INSERT INTO utils.streetaxis SELECT * FROM ext_streetaxis_old ON CONFLICT DO NOTHING;
-	END IF;
-	IF to_regclass('ext_plot_old') IS NOT NULL THEN
-		INSERT INTO utils.plot SELECT * FROM ext_plot_old ON CONFLICT DO NOTHING;
-	END IF;
-	IF to_regclass('ext_address_old') IS NOT NULL THEN
-		INSERT INTO utils.address SELECT * FROM ext_address_old ON CONFLICT DO NOTHING;
 	END IF;
 END
 $gw$;
