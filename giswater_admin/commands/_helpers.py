@@ -15,6 +15,19 @@ from ..log_format import format_done, format_file, format_phase
 from ..output import Out
 
 
+class SuperuserRequired(RuntimeError):
+    """Raised when a CLI command requires a PostgreSQL superuser session."""
+
+
+_SUPERUSER_SQL = """
+SELECT
+  current_user,
+  COALESCE((
+    SELECT rolsuper FROM pg_roles WHERE rolname = current_user
+  ), FALSE)
+"""
+
+
 def manifest_for(args: argparse.Namespace, kind: str) -> Manifest:
     path = os.path.join(args.dbmodel_path, "manifests", f"{kind}.yaml")
     return load_manifest(path)
@@ -29,9 +42,43 @@ def needs_connection(args: argparse.Namespace) -> bool:
     return bool(args.conn or args.config or conn_mod.has_pg_env())
 
 
-def open_conn(args: argparse.Namespace, out: Out | None = None) -> ConnectionLike:
+def open_conn(
+    args: argparse.Namespace,
+    out: Out | None = None,
+    *,
+    require_superuser: bool = True,
+) -> ConnectionLike:
     info = conn_mod.resolve(args.conn, args.config)
-    return conn_mod.open_connection(info, autocommit=False)
+    conn = conn_mod.open_connection(info, autocommit=False)
+    if require_superuser:
+        user, is_super = user_is_superuser(conn)
+        if not is_super:
+            conn.close()
+            msg = (
+                "Giswater CLI requires a PostgreSQL superuser. "
+                f"Connected as '{user}' (superuser=false)."
+            )
+            if out is not None:
+                out.error(msg)
+            raise SuperuserRequired(msg)
+    return conn
+
+
+def user_is_superuser(conn: Any) -> tuple[str, bool]:
+    """Return ``(current_user, is_superuser)``."""
+    try:
+        with conn.raw.cursor() as cur:  # type: ignore[attr-defined]
+            cur.execute(_SUPERUSER_SQL)
+            row = cur.fetchone()
+    except Exception:  # noqa: BLE001
+        try:
+            conn.rollback()
+        except Exception:  # noqa: BLE001
+            pass
+        return ("", False)
+    if not row:
+        return ("", False)
+    return (str(row[0]), bool(row[1]))
 
 
 def safe_target_repr(args: argparse.Namespace) -> str:
@@ -129,14 +176,27 @@ def report_result(
 
 def cm_parent_supported(dbmodel_path: str, parent_type: str) -> bool:
     """
-    Return ``True`` when `dbmodel/schemas/cm/parent_schema/<parent_type>/ddl.sql`
-    exists. WS uses cm/base + parent_schema/utils; UD adds gully SQL under
-    parent_schema/ud/.
+    Return ``True`` when cm integration SQL exists for ``parent_type``.
     """
     if not parent_type:
         return False
     ddl = os.path.join(
         dbmodel_path, "schemas", "addon", "cm", "integration", parent_type, "integration.sql"
+    )
+    return os.path.isfile(ddl)
+
+
+def cibs_parent_supported(dbmodel_path: str, parent_type: str) -> bool:
+    if not parent_type:
+        return False
+    ddl = os.path.join(
+        dbmodel_path,
+        "schemas",
+        "addon",
+        "cibs",
+        "integration",
+        parent_type,
+        "integration.sql",
     )
     return os.path.isfile(ddl)
 

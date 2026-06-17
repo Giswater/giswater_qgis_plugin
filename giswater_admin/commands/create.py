@@ -27,12 +27,26 @@ def run(args: argparse.Namespace, out: Out) -> int:
         if args.profile == "integrate_ud" and not args.ud_schema:
             out.error("kind=utils profile=integrate_ud requires --ud-schema.")
             return 1
-    if args.kind == "cm" and not args.parent_schema:
-        out.error("kind=cm requires --parent-schema.")
+    if args.kind == "cm" and args.profile not in ("update", "empty", "bootstrap") and not args.parent_schema:
+        out.error("kind=cm requires --parent-schema (except profile=empty|update).")
         return 1
-    if args.kind == "am" and not args.parent_schema:
+    if args.kind == "cibs" and args.profile == "integrate" and not args.parent_schema:
+        out.error("kind=cibs profile=integrate requires --parent-schema.")
+        return 1
+    if args.kind == "audit":
+        if args.profile == "integrate":
+            args.profile = "activate"
+        if args.profile in ("activate",) and not args.parent_schema:
+            out.error("kind=audit profile=integrate requires --parent-schema.")
+            return 1
+        if args.schema != "audit":
+            out.warn("kind=audit usually uses schema name 'audit'.")
+
+    if args.kind == "cibs" and args.schema != "cibs":
+        out.warn("kind=cibs usually uses schema name 'cibs' (singleton satellite).")
+    if args.kind == "am" and args.profile not in ("update", "empty", "bootstrap") and not args.parent_schema:
         out.error(
-            "kind=am requires --parent-schema (ws network schema with ve_arc/ve_node)."
+            "kind=am requires --parent-schema (except profile=empty|update)."
         )
         return 1
 
@@ -42,13 +56,15 @@ def run(args: argparse.Namespace, out: Out) -> int:
     out.info(f"manifest: {manifest.path}")
     out.info(f"profile: {args.profile}")
 
-    am_target = args.am_target or ""
-    if am_target:
-        out.warn("--am-target is deprecated; AM now uses --plugin-version (semver).")
+    am_target = getattr(args, "am_target", None) or ""
 
     parent_type = ""
     conn = None
-    if h.needs_connection(args) and not args.check:
+    needs_detect_in_check = args.check and h.needs_connection(args) and (
+        (args.kind in ("cm", "cibs", "am") and args.parent_schema and not args.parent_type)
+        or (args.kind == "utils" and not args.main_version and (args.ws_schema or args.ud_schema))
+    )
+    if (h.needs_connection(args) and not args.check) or needs_detect_in_check:
         conn = h.open_conn(args, out)
 
     # am / cm parent_type auto-detect
@@ -63,11 +79,11 @@ def run(args: argparse.Namespace, out: Out) -> int:
     if args.kind == "cm":
         if args.parent_type:
             parent_type = args.parent_type.lower()
-        elif conn is not None:
+        elif conn is not None and args.parent_schema:
             parent_type = h.detect_project_type(conn, args.parent_schema)
             if parent_type:
                 out.info(f"parent_type auto-detected: {parent_type}")
-        if not parent_type:
+        if args.profile != "update" and not parent_type:
             out.error(
                 "kind=cm: could not detect parent_type. "
                 "Pass --parent-type ws|ud or ensure parent has sys_version.project_type."
@@ -75,10 +91,34 @@ def run(args: argparse.Namespace, out: Out) -> int:
             if conn is not None:
                 conn.close()
             return 1
-        if not h.cm_parent_supported(args.dbmodel_path, parent_type):
+        if parent_type and not h.cm_parent_supported(args.dbmodel_path, parent_type):
             out.error(
                 f"kind=cm: parent_type='{parent_type}' is not supported in this dbmodel. "
                 f"Missing 'schemas/addon/cm/integration/{parent_type}/integration.sql'."
+            )
+            if conn is not None:
+                conn.close()
+            return 1
+
+    if args.kind == "cibs" and args.profile == "integrate":
+        if args.parent_type:
+            parent_type = args.parent_type.lower()
+        elif conn is not None:
+            parent_type = h.detect_project_type(conn, args.parent_schema)
+            if parent_type:
+                out.info(f"parent_type auto-detected: {parent_type}")
+        if not parent_type:
+            out.error(
+                "kind=cibs profile=integrate: could not detect parent_type. "
+                "Pass --parent-type ws|ud."
+            )
+            if conn is not None:
+                conn.close()
+            return 1
+        if not h.cibs_parent_supported(args.dbmodel_path, parent_type):
+            out.error(
+                f"kind=cibs: parent_type='{parent_type}' is not supported. "
+                f"Missing schemas/addon/cibs/integration/{parent_type}/integration.sql."
             )
             if conn is not None:
                 conn.close()
@@ -121,6 +161,25 @@ def run(args: argparse.Namespace, out: Out) -> int:
         elif args.profile == "integrate_ud":
             register_parent = args.ud_schema or ""
             parent_type = "ud"
+    elif args.kind == "cibs":
+        if args.profile == "empty":
+            register_is_new = "true"
+        elif args.profile in ("integrate", "update"):
+            infer_parents = "true"
+        if args.profile == "integrate":
+            register_parent = args.parent_schema or ""
+    elif args.kind == "audit":
+        if args.profile in ("empty", "structure", "full", "bootstrap"):
+            register_is_new = "true"
+        elif args.profile in ("activate", "integrate", "update"):
+            infer_parents = "true"
+        if args.profile in ("activate", "integrate"):
+            register_parent = args.parent_schema or ""
+    elif args.kind in ("cm", "am"):
+        if args.profile in ("bootstrap", "empty"):
+            register_is_new = "true"
+        elif args.profile in ("integrate", "update"):
+            infer_parents = "true"
 
     params = BuildParams(
         schema_name=args.schema,

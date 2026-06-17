@@ -4,6 +4,7 @@
 *.py[co]
 dist/
 build/
+*.egg-info/
 .installed.cfg
 .idea/
 .vscode/

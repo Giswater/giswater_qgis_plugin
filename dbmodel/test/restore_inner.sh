@@ -12,8 +12,8 @@ if [[ ! -f "${GW_SCHEMA_DUMP}" ]]; then
   exit 1
 fi
 
-echo "==> giswater_admin init-db"
-python3 -m giswater_admin init-db --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" \
+echo "==> giswater_admin db init"
+python3 -m giswater_admin db init --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" \
   ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
 
 echo "==> create Giswater roles (for security/function tests)"

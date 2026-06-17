@@ -25,35 +25,54 @@ Headless CLI and engine for the Giswater database schema lifecycle (create, upgr
 
 ## Overview
 
+| Layer | Path | Role |
+|-------|------|------|
+| CLI entry | `giswater_admin/cli/` | Argument parsing, dispatch, context |
+| Commands | `giswater_admin/commands/` | Subcommand handlers (`create`, `dbmodel`, …) |
+| Install | `giswater_admin/install/` | User config, dbmodel cache, release downloads |
+| Engine | `giswater_admin/engine/` | `SchemaBuilder`, manifests, SQL runner (shared with QGIS) |
+| Shared I/O | `conn.py`, `output.py`, `log_format.py` | Connection, stdout/stderr formatting |
+
+Legacy shims at package root (`paths.py`, `user_config.py`, `releases.py`) re-export from `install/` for backward compatibility.
+
 | Piece | Role |
 |-------|------|
-| `giswater_admin/cli.py` | Argument parsing and dispatch |
-| `giswater_admin/commands/` | Subcommand handlers (`create`, `update`, …) |
-| `giswater_admin/engine/` | `SchemaBuilder`, manifest loader, `sql_runner` |
+| `cli/parser/` | Subcommand registration split by domain |
+| `cli/context.py` | Resolve dbmodel path and schema version before dispatch |
+| `cli/main.py` | `main()` entrypoint |
 | `dbmodel/manifests/*.yaml` | Phase graphs per schema kind |
 | `dbmodel/schemas/` | SQL sources (DDL, functions, updates, samples) |
 
 Typical flow for a new database:
 
 1. Create an empty PostgreSQL database (outside this CLI).
-2. `init-db` — cluster extensions once per database.
-3. `create` — build a project schema (`ws`, `ud`, …) from a manifest profile.
-4. Optionally `update`, `status`, `drop`.
+2. `db init` — cluster extensions once per database.
+3. `schema main create` / `schema addon create` — build project and satellite schemas.
+4. `schema addon integrate` — wire satellites into ws/ud parents.
+5. `network show` — inspect topology; `network update` — lockstep upgrade.
 
 ---
 
 ## Where to run it
 
-| Context | Working directory | Command |
-|---------|-----------------|---------|
-| Plugin repo (recommended) | Repository root (`giswater/`, sibling of `dbmodel/` and `giswater_admin/`) | `python3 -m giswater_admin …` |
-| Custom dbmodel tree | Any | Add `--dbmodel-path /path/to/dbmodel` |
-| CI / Docker tests | Inside `runner` container | See [dbmodel testing](../dbmodel/README.md#testing) |
+| Context | Command |
+|---------|---------|
+| **Global CLI (recommended)** | `gw create …` after `pipx install giswater-cli` |
+| Plugin repo checkout | `python3 -m giswater_admin …` or `gw …` with dev dbmodel |
+| Custom dbmodel tree | `gw create … --dbmodel-path /path/to/dbmodel` |
+| CI / Docker tests | See [dbmodel testing](../dbmodel/README.md#testing) |
 | QGIS | N/A (in-process) | `GwSchemaBuilderTask` — no subprocess |
 
-**Requirements:** Python 3.9+, `PyYAML`, `psycopg2-binary` ([requirements.txt](requirements.txt)). PostgreSQL with PostGIS/pgRouting packages on the **server** (not installed by `pip`).
+**Requirements:** Python 3.9+, PostgreSQL with PostGIS/pgRouting on the **server**.
 
-Default `--dbmodel-path` resolves to `../dbmodel` relative to this package (the plugin repo’s `dbmodel/` folder).
+**dbmodel resolution order** (when `--dbmodel-path` is omitted):
+
+1. `--dbmodel-path`
+2. `GW_DBMODEL_PATH` environment variable
+3. User config (`gw dbmodel use …`)
+4. Sibling `dbmodel/` in a plugin repo checkout
+
+If nothing matches, run `gw dbmodel install latest` or `gw dbmodel use dev --root /path/to/repo`.
 
 ---
 
@@ -62,7 +81,7 @@ Default `--dbmodel-path` resolves to `../dbmodel` relative to this package (the 
 ```mermaid
 flowchart TB
   subgraph hosts [Execution contexts]
-    CLI["python -m giswater_admin"]
+    CLI["gw / python -m giswater_admin"]
     QGIS["GwSchemaBuilderTask + QtDbAdapter"]
     CI["dbmodel/test/bootstrap_inner.sh"]
   end
@@ -100,10 +119,56 @@ flowchart TB
 
 ## Install
 
-From the **plugin repository root**:
+### Global CLI (Windows / Linux / macOS)
+
+Install [pipx](https://pipx.pypa.io/) once, then install the CLI package:
 
 ```bash
-cd /path/to/giswater
+# macOS
+brew install pipx && pipx ensurepath
+
+# Windows / Linux (if pipx is not installed yet)
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+
+# All platforms
+pipx install giswater-cli
+```
+
+Download a published dbmodel (from the same plugin ZIP used by QGIS):
+
+```bash
+gw dbmodel install latest --set-active
+gw version
+```
+
+Typical first run:
+
+```bash
+gw db init --conn "postgresql://user:pass@127.0.0.1:5432/mydb"
+gw schema main create --type ws --name demo --profile empty --conn "postgresql://user:pass@127.0.0.1:5432/mydb"
+```
+
+**Development without a release** (use your local checkout):
+
+```bash
+gw dbmodel use dev --root /path/to/giswater_qgis_plugin
+gw schema main create --type ws --name test_dev --conn "$CONN" --check
+```
+
+Config and cache locations:
+
+| OS | Config | Release cache |
+|----|--------|---------------|
+| Linux / macOS | `~/.config/giswater/config.yaml` | `~/.local/share/giswater/releases/` |
+| Windows | `%APPDATA%/giswater/config.yaml` | `%LOCALAPPDATA%/giswater/releases/` |
+
+### From the plugin repository (contributors)
+
+```bash
+cd /path/to/giswater_qgis_plugin
+python3 -m pip install -e .
+# or legacy:
 python3 -m pip install -r giswater_admin/requirements.txt
 ```
 
@@ -111,7 +176,7 @@ Optional virtualenv:
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r giswater_admin/requirements.txt
+pip install -e .
 ```
 
 **OS packages (server side)** — names vary by distro; install PostGIS and pgRouting for your PostgreSQL major version:
@@ -123,7 +188,82 @@ pip install -r giswater_admin/requirements.txt
 Verify:
 
 ```bash
+gw --help
+# or
 python3 -m giswater_admin --help
+```
+
+### dbmodel management commands
+
+| Command | Purpose |
+|---------|---------|
+| `gw dbmodel install latest` | Download plugin ZIP and cache `dbmodel/` |
+| `gw dbmodel install 4.9.0` | Install a specific release |
+| `gw dbmodel list` | Cached versions + remote latest |
+| `gw dbmodel use latest` | Activate latest cached/remote version |
+| `gw dbmodel use dev --root PATH` | Use `PATH/dbmodel` from a checkout |
+| `gw config get` / `gw config set KEY VALUE` | Persistent settings |
+
+---
+
+## Versioning
+
+Two independent version numbers:
+
+| Version | Example | Meaning |
+|---------|---------|---------|
+| **CLI** (`gw version` → `cli`) | `0.1.0` | The `giswater-cli` tool: commands, fixes, packaging. Bump with [`scripts/bump_cli_version.py`](../scripts/bump_cli_version.py). |
+| **Schema / dbmodel** (`gw version` → `dbmodel-version`) | `4.15.0` | Giswater release whose SQL and `updates/` patches are applied. Comes from the active dbmodel, not from the CLI version. |
+
+A single CLI release can create or upgrade schemas for any installed dbmodel version:
+
+```bash
+gw dbmodel install 4.14.0 && gw dbmodel use 4.14.0
+gw create --kind ws --schema legacy --conn "$CONN"
+
+gw dbmodel install 4.16.0 && gw dbmodel use 4.16.0
+gw create --kind ws --schema current --conn "$CONN"
+```
+
+Use `--plugin-version X.Y.Z` to override the schema release when auto-detection is not possible (e.g. a custom `--dbmodel-path` without `metadata.txt`).
+
+### CLI releases (`cli-v*`)
+
+The CLI is released **independently** from the QGIS plugin:
+
+| Event | Tag example | Publishes |
+|-------|-------------|-----------|
+| Plugin Giswater | `4.16.0` | `giswater.zip` + dbmodel (see repo `release-plugin.yml`) |
+| CLI `gw` | `cli-v0.2.0` | PyPI `giswater-cli` + wheel on GitHub Release |
+
+Release process:
+
+```bash
+python3 scripts/bump_cli_version.py 0.2.0
+git commit -am "chore(cli): release 0.2.0"
+git tag cli-v0.2.0
+git push origin main cli-v0.2.0
+```
+
+CI (`.github/workflows/release-cli.yml`) validates that the tag matches `pyproject.toml` and `giswater_admin/__version__.py`, then publishes to PyPI and attaches `dist/*` to the GitHub Release.
+
+Users install the tool once (`pipx install giswater-cli`) and refresh schema SQL with `gw dbmodel install` when a new plugin version ships.
+
+### Testing locally
+
+```bash
+cd /path/to/giswater_qgis_plugin
+python3 -m pip install -e .
+
+# Ensure gw is on PATH (macOS user install example)
+export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+
+gw version
+python3 -m pytest test/cli/ -q
+
+# Offline schema plan (no DB)
+gw create --kind ws --schema test --profile empty --check \
+  --conn "postgresql://user@127.0.0.1:5432/mydb"
 ```
 
 ---
@@ -135,6 +275,8 @@ Resolution order (first match wins):
 1. `--conn` — `postgresql://user:pass@host:port/dbname` (or `postgres://…`)
 2. `--config` — YAML with `host`, `port`, `user`, `password`, `dbname`, and/or `service`
 3. Environment — `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGSERVICE`
+
+**Superuser:** mutating commands (`db init`, `schema` create/integrate/update/drop, `network update`, and `--check` with a live connection) require a PostgreSQL **superuser**. Read-only commands (`schema list`, `network show`) work with any role that can `SELECT` Giswater schemas and `pg_catalog`.
 
 ### Linux / macOS
 
@@ -164,7 +306,7 @@ dbname: giswater_cli
 python3 -m giswater_admin status --config /path/conn.yaml
 ```
 
-**`--check`:** many subcommands only print the plan or SQL and do not write to the database. `init-db --check` does not require a connection.
+**`--check`:** many subcommands only print the plan or SQL and do not write to the database. `db init --check` does not require a connection.
 
 ---
 
@@ -174,7 +316,7 @@ Global options are on the **parent parser of each subcommand**. They must appear
 
 ```bash
 # Correct
-python3 -m giswater_admin create --kind ws --schema demo --profile empty --json
+python3 -m giswater_admin schema main create --type ws --name demo --profile empty --json
 
 # Wrong (root parser does not define --json)
 python3 -m giswater_admin --json create ...
@@ -184,7 +326,7 @@ python3 -m giswater_admin --json create ...
 
 ## Global options
 
-Available on subcommands that include the shared parent parser (`create`, `update`, `status`, `drop`, `init-db`, `audit …`, `manifest list|validate`).
+Available on subcommands that include the shared parent parser (`schema …`, `network …`, `db init`, legacy aliases, `manifest list|validate`).
 
 | Option | Description |
 |--------|-------------|
@@ -217,164 +359,219 @@ python3 -m giswater_admin <subcommand> [subcommand options] [global options]
 
 Exit codes: **0** success, **1** failure (parse, I/O, PostgreSQL, SQL, invalid plan).
 
-### `init-db`
+### Command tree
 
-Creates extensions in order: `postgis` → `postgis_raster` → `tablefunc` → `pgrouting` → `unaccent` (optional `postgres_fdw` with `--with-fdw`). Run **once per database** before the first `create`.
+```text
+gw db init
+gw schema main   create | update | drop
+gw schema addon  create | integrate | update | drop
+gw network       show | update
+```
+
+Legacy aliases (`create`, `update`, `drop`, `status`, `init-db`, `update-network`, `audit …`) still work but print a deprecation warning to stderr and are hidden from `--help`.
+
+| Old | New |
+|-----|-----|
+| `gw create --kind ws --schema x` | `gw schema main create --type ws --name x` |
+| `gw update --schema ws` | `gw schema main update --name ws` |
+| `gw status` | `gw network show --flat` |
+| `gw init-db` | `gw db init` |
+| `gw update-network` | `gw network update` |
+| `gw audit structure` | `gw schema addon create --type audit` |
+| `gw audit activate --schema ws` | `gw schema addon integrate --type audit --parent ws` |
+
+Use `--version X.Y.Z` everywhere (replaces `--plugin-version` / `--to-version`).
+
+---
+
+### `db init`
+
+Creates extensions in order: `postgis` → `postgis_raster` → `tablefunc` → `pgrouting` → `unaccent` (optional `postgres_fdw` with `--with-fdw`). Run **once per database** before the first schema create.
 
 | Option | Description |
 |--------|-------------|
 | `--with-fdw` | Also `CREATE EXTENSION postgres_fdw`. |
+| `--with-pgtap` | Also `CREATE EXTENSION pgtap` (for dbmodel tests). |
 | `--continue-on-error` | Try all extensions after a failure (default: stop on first error). |
 | `--check` | Print SQL only; no connection required. |
 | `--conn` / `--config` | Connection (optional with `--check`). |
 
 ```bash
-python3 -m giswater_admin init-db --conn "$CONN"
-python3 -m giswater_admin init-db --conn "$CONN" --with-fdw
-python3 -m giswater_admin init-db --check --json
+gw db init --conn "$CONN"
+gw db init --conn "$CONN" --with-fdw --with-pgtap
 ```
 
 ---
 
-### `create`
+### `schema main`
 
-Builds a schema from `dbmodel/manifests/<kind>.yaml` and the chosen profile.
+ws/ud project schemas.
+
+#### `schema main create`
 
 | Option | Description |
 |--------|-------------|
-| `--kind` | **Required.** `ws` \| `ud` \| `utils` \| `am` \| `cm` |
-| `--schema` | **Required.** Target schema name. |
+| `--type` | **Required.** `ws` \| `ud` |
+| `--name` | Schema name (default: same as `--type`, e.g. `ws`). |
+| `--profile` | `empty` \| `sample` \| `inventory` (maps to manifest `empty`, `sample_full`, `sample_inv`). |
+| `--lang` | Locale folder (default `en_US`). |
 | `--srid` | EPSG code (default `25831`). |
-| `--profile` | Manifest profile (default `empty`). |
-| `--locale` | i18n folder (default `en_US`). |
-| `--plugin-version` | Upper bound for `updates/` patches (default `4.9.0`). |
-| `--db-user` | Author in `lastprocess` (default: connection user). |
-| `--ws-schema` | Parent ws schema (`utils` profiles `integrate_ws` / optional context). |
-| `--ud-schema` | Parent ud schema (`utils` profiles `integrate_ud` / optional context). |
-| `--copy-source-schema` | Parent schema for `utils` profile `copy_data`. |
-| `--parent-schema` | Parent ws/ud schema (**required** for `kind=cm`). |
-| `--parent-type` | `ws` \| `ud` — override auto-detection for `cm`. |
-| `--main-version` | Legacy alias; utils version is stored in `utils.sys_version.giswater`. |
-| `--check` | Plan only; no SQL execution. |
-| `--conn` / `--config` | Connection. |
-
-```bash
-python3 -m giswater_admin create --kind ws --schema ws1 --srid 25831 --profile sample_full --conn "$CONN"
-python3 -m giswater_admin create --kind ud --schema ud1 --profile empty --conn "$CONN"
-python3 -m giswater_admin create --kind utils --schema utils --profile empty --conn "$CONN"
-python3 -m giswater_admin create --kind utils --schema utils --profile integrate_ws --ws-schema ws1 --conn "$CONN"
-python3 -m giswater_admin create --kind cm --schema cm1 --parent-schema ws1 --parent-type ws --conn "$CONN"
-python3 -m giswater_admin create --kind ws --schema x --profile empty --check --json
-```
-
----
-
-### `update`
-
-Applies the manifest `update` profile to an existing schema (patches between `sys_version.giswater` and target version).
-
-| Option | Description |
-|--------|-------------|
-| `--schema` | **Required.** Existing schema. |
-| `--kind` | Optional override; else inferred from `sys_version.project_type`. |
-| `--to-version` | Target version (default: `--plugin-version`). |
-| `--plugin-version` | Default `4.9.0`. |
-| `--locale` | Default `en_US`. |
+| `--version` | Giswater schema release X.Y.Z (default: from active dbmodel). |
 | `--check` | Plan only. |
 | `--conn` / `--config` | Connection. |
 
 ```bash
-python3 -m giswater_admin update --schema ws_legacy --conn "$CONN"
-python3 -m giswater_admin update --schema ws_legacy --to-version 4.9.0 --conn "$CONN"
-python3 -m giswater_admin update --schema ws_legacy --kind ws --check --json
+gw schema main create --type ws --name ws1 --profile sample --lang es_ES --conn "$CONN"
+gw schema main create --type ud --profile empty --conn "$CONN"
 ```
 
----
+#### `schema main update`
 
-### `status`
-
-Lists schemas that expose `sys_version`, or details for one schema.
+Upgrades one isolated ws/ud schema. **Blocked** if the schema belongs to an interconnected network (use `network update`). **Downgrades forbidden.**
 
 | Option | Description |
 |--------|-------------|
-| `--schema` | If omitted, list all candidates. |
-| `--conn` / `--config` | Connection. |
-
-```bash
-python3 -m giswater_admin status --conn "$CONN"
-python3 -m giswater_admin status --schema ws_demo --conn "$CONN" --json
-```
-
----
-
-### `drop`
-
-Drops a schema. Irreversible.
-
-| Option | Description |
-|--------|-------------|
-| `--schema` | **Required.** |
-| `--yes` | **Required** to execute (confirmation). |
-| `--cascade` | `DROP SCHEMA … CASCADE` (default `RESTRICT`). |
-| `--check` | Show SQL without executing. |
-| `--conn` / `--config` | Connection. |
-
-```bash
-python3 -m giswater_admin drop --schema old_ws --yes --conn "$CONN"
-python3 -m giswater_admin drop --schema old_ws --yes --cascade --conn "$CONN"
-python3 -m giswater_admin drop --schema old_ws --yes --check
-```
-
----
-
-### `audit`
-
-Subcommands: `structure` | `activate` | `drop` (required third level).
-
-#### `audit structure`
-
-Builds the `audit` schema.
-
-| Option | Description |
-|--------|-------------|
-| `--with-checkproject` | Also load `audit_checkproject` helpers. |
-| `--locale` | Default `en_US`. |
-| `--plugin-version` | Default `4.9.0`. |
+| `--name` | **Required.** Existing schema. |
+| `--version` | Target version (default: active dbmodel). |
 | `--check` | Plan only. |
 | `--conn` / `--config` | Connection. |
 
 ```bash
-python3 -m giswater_admin audit structure --conn "$CONN"
-python3 -m giswater_admin audit structure --with-checkproject --conn "$CONN"
+gw schema main update --name ws1 --version 4.16.0 --conn "$CONN"
 ```
 
-#### `audit activate`
-
-Wires audit triggers into a ws/ud project schema.
+#### `schema main drop`
 
 | Option | Description |
 |--------|-------------|
-| `--schema` | **Required.** Target ws/ud schema. |
-| `--locale` | Default `en_US`. |
-| `--plugin-version` | Default `4.9.0`. |
-| `--check` | Plan only. |
-| `--conn` / `--config` | Connection. |
-
-```bash
-python3 -m giswater_admin audit activate --schema ws_demo --conn "$CONN"
-```
-
-#### `audit drop`
-
-| Option | Description |
-|--------|-------------|
-| `--yes` | Confirm drop. |
+| `--name` | **Required.** |
+| `--yes` | **Required** to execute. |
+| `--cascade` | `DROP SCHEMA … CASCADE`. |
 | `--check` | SQL only. |
+
+---
+
+### `schema addon`
+
+Shared satellite schemas (`utils`, `cibs`, `cm`, `am`, `audit`).
+
+#### `schema addon create`
+
+Bootstrap a standalone addon (no parent wiring yet).
+
+```bash
+gw schema addon create --type utils --conn "$CONN"
+gw schema addon create --type cibs --name cibs --conn "$CONN"
+gw schema addon create --type audit --conn "$CONN"
+```
+
+#### `schema addon integrate`
+
+Wire an addon into one ws/ud parent. Run once per parent (e.g. integrate utils with `ws`, then again with `ud`).
+
+| Option | Description |
+|--------|-------------|
+| `--type` | **Required.** `utils` \| `cibs` \| `cm` \| `am` \| `audit` |
+| `--parent` | **Required.** Parent ws or ud schema name. |
+| `--name` | Addon schema name (default: same as `--type`). |
+
+```bash
+gw schema addon integrate --type utils --parent ws --conn "$CONN"
+gw schema addon integrate --type cibs --parent ud --conn "$CONN"
+gw schema addon integrate --type audit --parent ws --conn "$CONN"
+```
+
+#### `schema addon update`
+
+Upgrades a **standalone** addon only. If integrated in a network → use `network update`. Downgrades forbidden.
+
+```bash
+gw schema addon update --type cibs --version 4.16.0 --conn "$CONN"
+```
+
+#### `schema addon drop`
+
+```bash
+gw schema addon drop --type utils --yes --cascade --conn "$CONN"
+```
+
+#### `schema list`
+
+Read-only inventory of schemas with `sys_version`. No superuser required.
+
+| Option | Description |
+|--------|-------------|
+| `--tier` | `all` (default), `main` (ws/ud), or `addon` (utils, cibs, am, cm, audit). |
+| `--type` | Repeatable filter: `ws`, `ud`, `utils`, `cibs`, `am`, `cm`, `audit`. |
+| `--conn` / `--config` | Connection. |
+| `--json` | Machine-readable output. |
+
+```bash
+gw schema list --conn "$CONN"
+gw schema list --conn "$CONN" --tier main
+gw schema list --conn "$CONN" --tier addon --type cibs --json
+```
+
+---
+
+### `network show`
+
+Scans the whole database (all schemas with `sys_version`) and shows the interconnected Giswater network: ws/ud networks, shared satellites, integration links, version skew, and unlinked schemas.
+
+| Option | Description |
+|--------|-------------|
+| `--flat` | Deprecated; use `schema list` instead. |
+| `--schema` | Optional. Focus on the cluster containing this schema. |
 | `--conn` / `--config` | Connection. |
 
 ```bash
-python3 -m giswater_admin audit drop --yes --conn "$CONN"
+gw network show --conn "$CONN"
+gw network show --flat --conn "$CONN" --json
 ```
+
+---
+
+### `network update`
+
+Lockstep upgrade of the discovered network. For each semver folder (e.g. 4.16.0), runs `utils → cibs → ws → ud → …` before advancing. **Downgrades forbidden** (target must be ≥ every member version).
+
+| Option | Description |
+|--------|-------------|
+| `--version` | Target version (default: active dbmodel). |
+| `--locale` | Default `en_US`. |
+| `--check` | Print lockstep plan only. |
+| `--conn` / `--config` | Connection. |
+
+```bash
+gw network update --version 4.16.0 --conn "$CONN" --check
+gw network update --version 4.16.0 --conn "$CONN"
+```
+
+**E2E smoke** (empty DB, create @ 4.15.0, upgrade @ 4.16.0):
+
+```bash
+export CONN='postgresql://user@host:port/giswater_admin_cli'
+chmod +x scripts/gw_e2e_satellites.sh scripts/gw_e2e_network_update.sh
+./scripts/gw_e2e_network_update.sh
+```
+
+Fixtures under `dbmodel/schemas/**/updates/4/16/0/` (`gw_lockstep_*`) validate cross-schema ordering.
+
+---
+
+### Legacy commands (deprecated)
+
+The following still work with stderr warnings:
+
+- **`create`** — use `schema main create` or `schema addon create` / `integrate`
+- **`update`** — use `schema main update` or `schema addon update`
+- **`drop`** — use `schema main drop` or `schema addon drop`
+- **`status`** — use `network show --flat`
+- **`init-db`** — use `db init`
+- **`update-network`** — use `network update`
+- **`audit structure|activate|drop`** — use `schema addon create|integrate|drop --type audit`
+
+See the migration table at the top of this section.
 
 ---
 
@@ -410,12 +607,12 @@ python3 -m giswater_admin manifest validate dbmodel/manifests/ws.yaml --json
 set -e
 export CONN='postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli'
 
-python3 -m giswater_admin init-db --conn "$CONN"
-python3 -m giswater_admin create --kind ws --schema ws_test --srid 25831 --profile sample_full --conn "$CONN"
-python3 -m giswater_admin create --kind ud --schema ud_test --srid 25831 --profile sample_full --conn "$CONN"
-python3 -m giswater_admin create --kind utils --schema utils --profile empty --conn "$CONN"
-python3 -m giswater_admin create --kind utils --schema utils --profile integrate_ws --ws-schema ws_test --conn "$CONN"
-python3 -m giswater_admin status --conn "$CONN" --json | python3 -m json.tool
+gw db init --conn "$CONN"
+gw schema main create --type ws --name ws_test --profile sample --conn "$CONN"
+gw schema main create --type ud --name ud_test --profile sample --conn "$CONN"
+gw schema addon create --type utils --conn "$CONN"
+gw schema addon integrate --type utils --parent ws_test --conn "$CONN"
+gw network show --flat --conn "$CONN" --json | python3 -m json.tool
 ```
 
 ---
@@ -428,8 +625,8 @@ python3 -m giswater_admin status --conn "$CONN" --json | python3 -m json.tool
 | **ud** | same as ws | Sewerage. Updates: common then `schemas/main/ud/updates`. |
 | **utils** | `empty`, `integrate_ws`, `integrate_ud`, `copy_data`, `update` | Standalone create; integrate ws/ud separately; version in `utils.sys_version`. |
 | **am** | `empty`, `update` | Asset management singleton. |
-| **cm** | `empty`, `with_sample`, `update` | Requires `--parent-schema`; uses `parent_schema/ws` or `ud`. |
-| **audit** | CLI subcommands | No semver `updates/` tree; `structure` once, `activate` per project. |
+| **cm** | `bootstrap`, `integrate`, `update` | Bootstrap standalone, then `schema addon integrate --parent …`. |
+| **audit** | `empty`, `integrate`, `update` | Same flow as other addons via `schema addon create|integrate`. |
 
 **ws/ud profiles** (from [manifests/ws.yaml](../dbmodel/manifests/ws.yaml)):
 
@@ -495,7 +692,7 @@ No Docker required:
 
 ```bash
 # From plugin repo root
-python3 -m pytest test/engine -v
+python3 -m pytest test/cli test/engine -v
 ```
 
 Optional smoke tests against a real cluster (skipped without `PGSERVICE` / `PGDATABASE`):

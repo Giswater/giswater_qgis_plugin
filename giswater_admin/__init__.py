@@ -29,6 +29,8 @@ from .engine import (
 )
 from .output import Out, configure_stderr_logging
 
+from .__version__ import __version__
+
 __all__ = [
     "BuildParams",
     "BuildResult",
@@ -38,9 +40,8 @@ __all__ = [
     "Out",
     "PhaseResult",
     "SchemaBuilder",
+    "__version__",
     "configure_stderr_logging",
     "drop_schema",
     "load_manifest",
 ]
-
-__version__ = "0.1.0"

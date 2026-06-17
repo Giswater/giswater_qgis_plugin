@@ -24,9 +24,11 @@ logger = logging.getLogger(__name__)
 ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
 
 # DDL phases run as role_system so created objects are owned by role_system.
+# load_base is excluded: init.sql creates roles/schema as the installer (needs CREATE
+# on the database) and ends with SET ROLE role_system for the rest of the phase.
 # updates/load_sample are excluded: legacy patches use DISABLE TRIGGER ALL, which
 # requires superuser to touch RI_ConstraintTrigger system triggers.
-_ROLE_SYSTEM_PHASES = frozenset({"load_base", "reload_fct_ftrg"})
+_ROLE_SYSTEM_PHASES = frozenset({"reload_fct_ftrg"})
 
 # On a fresh database role_system does not exist yet; init.sql creates it.
 # pg_has_role(..., 'role_system', ...) errors if the role is missing — guard first.
@@ -60,7 +62,7 @@ class BuildParams:
     profile: str = "empty"
     plugin_version: str = "0.0.0"
     project_version: str = "0.0.0"
-    run_mode: str = "new_project"  # new_project | upgrade
+    run_mode: str = "new_project"  # new_project | upgrade | upgrade_step
     db_user: str = ""
 
     sql_root: str = ""
@@ -581,6 +583,9 @@ class SchemaBuilder:
                     continue
             elif mode == "upgrade":
                 if not (project_v < v <= plugin_v):
+                    continue
+            elif mode == "upgrade_step":
+                if v != plugin_v or not (project_v < v):
                     continue
             elif mode == "all":
                 pass

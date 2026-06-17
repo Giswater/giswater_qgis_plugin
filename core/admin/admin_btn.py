@@ -45,7 +45,15 @@ from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
 from ..threads.admin_load_task import GwAdminLoadTask, AdminLoadResult, READ_EXTENSIONS
-from ...giswater_admin.engine import BuildParams, drop_schema as engine_drop_schema, format_upgrade_changelog
+from ...giswater_admin.engine import (
+    BuildParams,
+    drop_schema as engine_drop_schema,
+    format_upgrade_changelog,
+    graph_has_linked_dependents,
+    plan_lockstep,
+    resolve_network_graph,
+)
+from ...giswater_admin.engine.network_update import LockstepStep
 from ...giswater_admin.log_format import format_elapsed_mmss, format_lbl_time_status
 from ._qt_db_adapter import QtDbAdapter
 from . import _admin_catalog as admin_catalog
@@ -814,6 +822,33 @@ class GwAdminButton:
             on_done=callback,
         )
 
+    def _run_lockstep_step(self, step: LockstepStep, on_done=None):
+        """Run one lockstep network upgrade step via the engine."""
+        profile = "update_step" if step.action == "upgrade" else "version_bump"
+        row = tools_db.get_row(
+            f"SELECT giswater, language, epsg FROM {step.schema}.sys_version "
+            "ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else step.from_version
+        bp = BuildParams(
+            schema_name=step.schema,
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
+            locale=str(row[1] if row and row[1] else self.locale),
+            plugin_version=str(step.target_version),
+            project_version=str(current_version or step.from_version),
+            run_mode="upgrade_step" if step.action == "upgrade" else "upgrade",
+            profile=profile,
+            sql_root=self.sql_dir,
+            infer_parents_from_config="true" if step.kind == "utils" else "false",
+        )
+        callback = on_done if on_done is not None else self._on_builder_done_update
+        self._submit_builder(
+            step.kind,
+            bp,
+            description=f"Update {step.schema} -> {step.target_version}",
+            on_done=callback,
+        )
+
     def _update_network(self, anchor_schema=None):
         """Sequentially update anchor WS/UD and linked satellites."""
         anchor = anchor_schema or self._get_schema_name() or ""
@@ -833,9 +868,12 @@ class GwAdminButton:
             )
             return
 
-        plan = admin_catalog.build_network_update_plan(anchor, str(self.plugin_version))
-        pending = [step for step in plan if step.get("needs_update")]
-        if not pending:
+        plan = plan_lockstep(
+            resolve_network_graph(anchor, admin_catalog._tools_db_fetch),
+            self.sql_dir,
+            str(self.plugin_version),
+        )
+        if not plan:
             tools_qgis.show_message(
                 "Network is already up to date.",
                 Qgis.MessageLevel.Info,
@@ -843,16 +881,17 @@ class GwAdminButton:
             return
 
         summary = "\n".join(
-            f"- {step['schema']} ({step['kind']}): {step['version']} -> {self.plugin_version}"
-            for step in pending
+            f"- {step.target_version}  {step.kind}  {step.schema}  "
+            f"{step.action}  ({step.from_version})"
+            for step in plan
         )
         if not tools_qt.show_question(
-            f"Update the following schemas?\n\n{summary}",
+            f"Lockstep update the following steps?\n\n{summary}",
             "Update network",
         ):
             return
 
-        self._update_plan_queue = pending
+        self._update_plan_queue = plan
         self._open_schema_build_message_log()
         self.schema_build_progress_hint = ""
         self.error_count = 0
@@ -869,6 +908,10 @@ class GwAdminButton:
 
         step = queue[index]
         on_done = partial(self._chain_update_done, index)
+        if isinstance(step, LockstepStep):
+            self._run_lockstep_step(step, on_done=on_done)
+            return
+
         kind = str(step.get("kind") or "").lower()
         schema_name = str(step.get("schema") or "")
         parent_schema = step.get("parent_schema")
@@ -947,6 +990,24 @@ class GwAdminButton:
                 parameter=project_type,
             )
             return
+
+        schema_name = self._get_schema_name()
+        if schema_name:
+            graph = resolve_network_graph(schema_name, admin_catalog._tools_db_fetch)
+            if graph_has_linked_dependents(graph, schema_name):
+                peers = ", ".join(
+                    sorted(
+                        node.schema
+                        for node in graph.nodes
+                        if node.schema != schema_name
+                    )
+                )
+                tools_qgis.show_warning(
+                    "This schema is part of an interconnected network. "
+                    "Use Update network instead.",
+                    parameter=peers,
+                )
+                return
 
         msg = "Are you sure to update the project schema to last version?"
         title = "Info"

@@ -65,6 +65,10 @@ phases:
         mergeAddparam: {}
 
 profiles:
+  bootstrap:
+    phases: [load_base, load_updates, load_i18n, register_version]
+  integrate:
+    phases: [integrate_am, load_updates, load_i18n, register_version]
   empty:
     phases: [load_base, integrate_am, load_updates, load_i18n, register_version]
   with_sample:

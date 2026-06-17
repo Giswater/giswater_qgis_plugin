@@ -182,7 +182,7 @@ Compatible with Windows, Mac, and Linux, but EPA models are only supported on Wi
 
 **Database model (pgTAP, Docker):** [dbmodel/README.md — Testing](dbmodel/README.md#testing) — `./dbmodel/test/run_tests.sh ws` (PostgreSQL 16–18 via `PG_MAJOR`).
 
-**Schema CLI (no QGIS):** [giswater_admin/README.md](giswater_admin/README.md) — `python3 -m giswater_admin create --kind ws …`
+**Schema CLI (no QGIS):** [giswater_admin/README.md](giswater_admin/README.md) — `pipx install giswater-cli` then `gw create --kind ws …`
 
 **Python unit tests:** `python3 -m pytest test/engine -v` (from plugin repo root).
 

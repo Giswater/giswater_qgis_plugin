@@ -49,10 +49,14 @@ phases:
         mergeAddparam: {}
 
 profiles:
+  empty:
+    phases: [load_structure, load_updates, register_version]
   structure:
     phases: [load_structure, load_updates, register_version]
+  integrate:
+    phases: [load_activate, register_version]
   activate:
-    phases: [load_activate]
+    phases: [load_activate, register_version]
   update:
     phases: [load_updates, register_version]
   full:

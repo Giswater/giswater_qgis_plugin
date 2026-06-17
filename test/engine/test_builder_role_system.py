@@ -32,6 +32,8 @@ class _SqlCaptureConn:
 def _seed(root: Path) -> None:
     (root / "base").mkdir(parents=True)
     (root / "base" / "init.sql").write_text("-- init", encoding="utf-8")
+    (root / "reload").mkdir(parents=True)
+    (root / "reload" / "fn.sql").write_text("-- reload fn", encoding="utf-8")
     (root / "updates" / "4" / "15" / "0" / "ws").mkdir(parents=True)
     (root / "updates" / "4" / "15" / "0" / "ws" / "patch.sql").write_text(
         "-- update patch", encoding="utf-8"
@@ -47,6 +49,7 @@ def _manifest() -> Manifest:
         substitutions={},
         phases=(
             Phase(id="load_base", type="sql_dir", steps=(Step(source="base"),)),
+            Phase(id="reload_fct_ftrg", type="sql_dir", steps=(Step(source="reload"),)),
             Phase(
                 id="updates",
                 type="version_walk",
@@ -60,13 +63,13 @@ def _manifest() -> Manifest:
         profiles={
             "sample_full": Profile(
                 name="sample_full",
-                phases=("load_base", "updates", "load_sample", "final_pass"),
+                phases=("load_base", "reload_fct_ftrg", "updates", "load_sample", "final_pass"),
             ),
         },
     )
 
 
-def test_role_system_only_on_ddl_phases(tmp_path: Path):
+def test_load_base_runs_as_installer_init_sql_sets_role(tmp_path: Path):
     _seed(tmp_path)
     conn = _SqlCaptureConn()
     params = BuildParams(
@@ -79,11 +82,12 @@ def test_role_system_only_on_ddl_phases(tmp_path: Path):
     assert result.ok
 
     joined = "\n".join(conn.sql)
-    assert "EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system')" in joined
+    init_pos = joined.index("-- init")
+    reload_pos = joined.index("-- reload fn")
     assert joined.count("SET ROLE role_system") == 1
     assert joined.count("RESET ROLE") == 1
-    assert joined.index("SET ROLE role_system") < joined.index("-- init")
-    assert joined.index("-- init") < joined.index("RESET ROLE")
+    # load_base runs as installer; role_system wrap only applies to reload_fct_ftrg.
+    assert init_pos < joined.index("SET ROLE role_system") < reload_pos
     # updates/load_sample need superuser (DISABLE TRIGGER ALL in legacy patches)
     assert "-- update patch" in joined
     update_pos = joined.index("-- update patch")

@@ -22,7 +22,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         out.result({"ok": True, "mode": "check", "sql": sql})
         return 0
 
-    conn = h.open_conn(args)
+    conn = h.open_conn(args, out)
     try:
         fx = drop_schema(conn, safe, cascade=cascade, commit=True)
         if not fx.ok:

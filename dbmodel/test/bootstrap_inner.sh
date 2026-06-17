@@ -6,8 +6,8 @@ set -euo pipefail
 _TEST_ROOT="${GW_TEST_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 source "${_TEST_ROOT}/_env_inner.sh" "${1:?Usage: bootstrap_inner.sh ws|ud}"
 
-echo "==> giswater_admin init-db"
-python3 -m giswater_admin init-db --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" \
+echo "==> giswater_admin db init"
+python3 -m giswater_admin db init --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" \
   ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
 
 echo "==> drop schema ${SCHEMA} (if exists)"

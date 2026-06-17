@@ -65,6 +65,20 @@ phases:
         projectType: "UD"
         epsg: "{{ srid }}"
 
+  - id: register_version
+    type: sql_function
+    description: "Append sys_version row on upgrade (lightweight lockstep bump)."
+    function: "{{ schema_name }}.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "UD"
+        isNewProject: "FALSE"
+        inferParentsFromConfig: "true"
+        mergeAddparam: {}
+
   - id: load_sample
     type: sql_dir
     optional: true
@@ -105,3 +119,7 @@ profiles:
     phases: [load_base, updates, lastprocess, load_sample, final_pass]
   update:
     phases: [reload_fct_ftrg, updates, lastprocess_upgrade]
+  update_step:
+    phases: [updates, register_version]
+  version_bump:
+    phases: [register_version]

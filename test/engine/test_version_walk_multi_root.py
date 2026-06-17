@@ -145,3 +145,22 @@ def test_root_and_roots_mutually_exclusive(tmp_path: Path):
     )
     with pytest.raises(ManifestError, match="mutually exclusive"):
         load_manifest(str(p))
+
+
+def test_upgrade_step_applies_single_version(tmp_path: Path):
+    _write(tmp_path / "common" / "updates" / "4" / "15" / "0" / "skip.sql")
+    _write(tmp_path / "common" / "updates" / "4" / "16" / "0" / "apply.sql")
+    _write(tmp_path / "ws" / "updates" / "4" / "16" / "0" / "ws.sql")
+
+    params = BuildParams(
+        schema_name="ws_demo",
+        sql_root=str(tmp_path),
+        plugin_version="4.16.0",
+        project_version="4.15.0",
+        run_mode="upgrade_step",
+        profile="u",
+    )
+    conn = _FakeConn()
+    SchemaBuilder(conn, _multi_root_manifest(), params).run()
+    executed = [Path(p).name for p in conn.executed]
+    assert executed == ["apply.sql", "ws.sql"]

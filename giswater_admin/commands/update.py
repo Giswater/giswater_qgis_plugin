@@ -5,14 +5,38 @@ from __future__ import annotations
 import argparse
 
 from ..engine import BuildParams, SchemaBuilder, changelog_versions_as_dicts, format_upgrade_changelog
+from ..engine.schema_catalog import (
+    discover_database_network,
+    graph_has_linked_dependents,
+    make_conn_fetcher,
+)
 from ..output import Out
 from . import _helpers as h
 
 
 def run(args: argparse.Namespace, out: Out) -> int:
-    conn = None
-    if not args.check:
-        conn = h.open_conn(args, out)
+    conn = h.open_conn(args, out) if h.needs_connection(args) else None
+
+    if conn is not None and not getattr(args, "force", False):
+        fetcher = make_conn_fetcher(conn)
+        db = discover_database_network(fetcher, schema_filter=args.schema)
+        graph = db.cluster
+        if graph_has_linked_dependents(graph, args.schema):
+            peers = sorted(
+                {
+                    node.schema
+                    for node in graph.nodes
+                    if node.schema != args.schema
+                }
+            )
+            target = args.to_version or args.plugin_version or ""
+            out.error(
+                f"Schema '{args.schema}' is part of an interconnected network "
+                f"({', '.join(peers)}). "
+                f"Use {graph.suggested_update_command(target)} instead, or pass --force."
+            )
+            conn.close()
+            return 1
 
     # Infer kind + project_version from sys_version unless overridden.
     kind = args.kind
@@ -30,6 +54,17 @@ def run(args: argparse.Namespace, out: Out) -> int:
             out.info(f"kind auto-detected: {kind}")
         project_version = h.detect_project_version(conn, args.schema) or "0.0.0"
         out.info(f"current project_version: {project_version}")
+        from ..engine.version_guard import assert_no_downgrade
+
+        err = assert_no_downgrade(
+            project_version,
+            args.to_version or args.plugin_version or getattr(args, "version", "") or "",
+            label=f"schema '{args.schema}'",
+        )
+        if err:
+            out.error(err)
+            conn.close()
+            return 1
 
     if not kind:
         out.error("kind is required when running with --check and no connection.")
@@ -42,7 +77,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
             conn.close()
         return 1
 
-    target_version = args.to_version or args.plugin_version
+    target_version = args.to_version or args.plugin_version or getattr(args, "version", None)
     infer_parents = "true" if kind == "utils" else "false"
     params = BuildParams(
         schema_name=args.schema,
@@ -86,6 +121,8 @@ def run(args: argparse.Namespace, out: Out) -> int:
             if payload["changelog"]:
                 out.info(payload["changelog"])
         out.result(payload)
+        if conn is not None:
+            conn.close()
         return 0
 
     assert conn is not None

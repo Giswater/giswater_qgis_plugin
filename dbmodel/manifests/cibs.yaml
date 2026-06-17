@@ -56,3 +56,7 @@ profiles:
     phases: [integrate_cibs, updates, register_version]
   update:
     phases: [updates, register_version]
+  update_step:
+    phases: [updates, register_version]
+  version_bump:
+    phases: [register_version]
