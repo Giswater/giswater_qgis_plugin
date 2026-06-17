@@ -4376,7 +4376,8 @@ def get_project_info(schemaname=None, order_direction="DESC"):
         tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
-    sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
+    sql = (f"SELECT lower(project_type), epsg, giswater, language, date, "
+           f"addparam -> 'environment' ->> 'creation_profile' "
            f"FROM {schemaname}.{tablename} "
            f"ORDER BY id {order_direction} LIMIT 1")
     row = tools_db.get_row(sql)
@@ -4385,7 +4386,8 @@ def get_project_info(schemaname=None, order_direction="DESC"):
                              'project_epsg': row[1],
                              'project_version': row[2],
                              'project_language': row[3],
-                             'project_date': row[4]
+                             'project_date': row[4],
+                             'creation_profile': row[5],
                              }
 
     return project_info_dict

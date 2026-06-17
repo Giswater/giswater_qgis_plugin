@@ -7,11 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Improve giswater CLI, invoke now with `gw` command.
-- Add new commands to the CLI and ordered them in a logical way.
-
 ### Fixed
 
 - Fix schema integration of `cibs` and `utils`.

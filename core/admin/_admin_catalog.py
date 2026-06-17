@@ -37,6 +37,14 @@ def _tools_db_fetch(sql: str, params: Optional[list] = None) -> Optional[list[tu
     return rows
 
 
+def _tools_db_fetch_per_schema(sql: str, params: Optional[list] = None) -> Optional[list[tuple]]:
+    """Like _tools_db_fetch but skips permission errors on individual schema probes."""
+    rows = tools_db.get_rows(sql, commit=False, params=params, log_info=False, is_thread=True)
+    if rows is None and tools_db.dao and tools_db.dao.last_error:
+        tools_db.dao.rollback()
+    return rows
+
+
 def _quote_ident(name: str) -> str:
     return '"' + str(name).replace('"', '""') + '"'
 
@@ -56,21 +64,21 @@ def fetch_sys_version_schemas(
     project_type: Optional[str] = None,
     fetcher: RowFetcher = _tools_db_fetch,
 ) -> list[tuple[str, str]]:
-    """Return [(schema_name, project_type), ...] in at most two round-trips."""
+    """Return [(schema_name, project_type), ...] for accessible ws/ud-like schemas."""
     schema_names = fetch_schema_names_with_sys_version(fetcher)
     if not schema_names:
         return []
 
-    parts = [
-        f"(SELECT {_quote_literal(s)} AS schema_name, project_type "
-        f"FROM {_quote_ident(s)}.sys_version LIMIT 1)"
-        for s in schema_names
-    ]
-    rows = fetcher(" UNION ALL ".join(parts), None)
-    if not rows:
-        return []
+    result: list[tuple[str, str]] = []
+    for schema_name in schema_names:
+        if schema_name in _SATELLITE_SCHEMAS:
+            continue
+        rows = _tools_db_fetch_per_schema(
+            f"SELECT project_type FROM {_quote_ident(schema_name)}.sys_version LIMIT 1",
+        )
+        if rows and rows[0] and rows[0][0] is not None:
+            result.append((str(schema_name), str(rows[0][0])))
 
-    result = [(str(schema_name), str(project_type)) for schema_name, project_type in rows]
     if project_type is None:
         return result
 
@@ -138,6 +146,25 @@ def combo_items_for_project_type(
 ) -> list[list[str]]:
     want = project_type.upper()
     return [[s, s] for s, pt in schemas if str(pt).upper() == want]
+
+
+def combo_items_all_schemas(schemas: Iterable[tuple[str, str]]) -> list[list[str]]:
+    """Return [[schema_name, display_label], ...] for ws/ud schemas."""
+    return [
+        [name, f"({str(pt).upper()}) - {name}"]
+        for name, pt in schemas
+        if str(pt).upper() in ("WS", "UD")
+    ]
+
+
+def project_type_for_schema(
+    schemas: Iterable[tuple[str, str]],
+    schema_name: str,
+) -> Optional[str]:
+    for name, pt in schemas:
+        if str(name) == str(schema_name):
+            return str(pt).lower()
+    return None
 
 
 _SATELLITE_SCHEMAS = frozenset({"utils", "cibs", "am", "cm", "audit"})
@@ -493,6 +520,28 @@ def _fetch_schema_sys_version_entry(
         "version": str(values[1] or ""),
         "addparam": _parse_addparam(addparam),
     }
+
+
+def linked_satellites_for_parent(
+    schema_name: str,
+    fetcher: RowFetcher = _tools_db_fetch,
+) -> str:
+    """Comma-separated satellite schemas linked to a WS/UD parent (addparam + legacy flags)."""
+    entry = _fetch_schema_sys_version_entry(schema_name, fetcher)
+    kind = str(entry.get("kind") or "").upper()
+    if kind not in ("WS", "UD"):
+        return ""
+
+    row_entry = _entry_from_sys_version_row(
+        schema_name,
+        entry.get("kind"),
+        entry.get("version"),
+        entry.get("addparam") or {},
+    )
+    linked = str(row_entry.get("linked") or "")
+    for satellite, sat_schema in _legacy_parent_satellites(schema_name, fetcher):
+        linked = _append_linked_satellite(linked, satellite, sat_schema)
+    return linked
 
 
 def get_anchor_satellites(

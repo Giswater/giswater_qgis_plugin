@@ -1902,6 +1902,10 @@
 			<translation>Empty coordinate list</translation>
 		</message>
 		<message>
+			<source>Empty data</source>
+			<translation>Empty data</translation>
+		</message>
+		<message>
 			<source>Empty value detected in &apos;Diameter&apos; tab. Please enter a value for diameter.</source>
 			<translation>Empty value detected in &apos;Diameter&apos; tab. Please enter a value for diameter.</translation>
 		</message>
@@ -2674,6 +2678,10 @@
 			<translation>From {0}, updating {1}...</translation>
 		</message>
 		<message>
+			<source>Full Example</source>
+			<translation>Full Example</translation>
+		</message>
+		<message>
 			<source>Function {0} error: {1} from last function is invalid</source>
 			<translation>Function {0} error: {1} from last function is invalid</translation>
 		</message>
@@ -3206,6 +3214,10 @@
 			<translation>INVENTORY</translation>
 		</message>
 		<message>
+			<source>Inventory Example</source>
+			<translation>Inventory Example</translation>
+		</message>
+		<message>
 			<source>is not defined in table cat_feature</source>
 			<translation>is not defined in table cat_feature</translation>
 		</message>
@@ -3732,6 +3744,10 @@
 		<message>
 			<source>No municipalities selected</source>
 			<translation>No municipalities selected</translation>
+		</message>
+		<message>
+			<source>None</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>No new features to insert. All selected features already exist in the table.</source>
@@ -4386,6 +4402,10 @@
 			<translation>Processing muni_id {0}</translation>
 		</message>
 		<message>
+			<source>Profile</source>
+			<translation>Profile</translation>
+		</message>
+		<message>
 			<source>Profile deleted</source>
 			<translation>Profile deleted</translation>
 		</message>
@@ -4408,6 +4428,10 @@
 		<message>
 			<source>Project read successfully</source>
 			<translation>Project read successfully</translation>
+		</message>
+		<message>
+			<source>Project type</source>
+			<translation>Project type</translation>
 		</message>
 		<message>
 			<source>PSECTOR</source>
@@ -4634,6 +4658,10 @@
 			<translation>\r(This decision will not cancel the other selections, the process will keep running)</translation>
 		</message>
 		<message>
+			<source>Satellite schemas</source>
+			<translation>Satellite schemas</translation>
+		</message>
+		<message>
 			<source>Save as</source>
 			<translation>Save as</translation>
 		</message>
@@ -4670,8 +4698,16 @@
 			<translation>Schema vacuum executed</translation>
 		</message>
 		<message>
+			<source>(Schema version is higher than plugin version. Please contact your administrator to update the plugin)</source>
+			<translation>(Schema version is higher than plugin version. Please contact your administrator to update the plugin)</translation>
+		</message>
+		<message>
 			<source>(Schema version is higher than plugin version, please update plugin)</source>
 			<translation>(Schema version is higher than plugin version, please update plugin)</translation>
+		</message>
+		<message>
+			<source>(Schema version is lower than plugin version. Please contact your administrator to update the schema)</source>
+			<translation>(Schema version is lower than plugin version. Please contact your administrator to update the schema)</translation>
 		</message>
 		<message>
 			<source>(Schema version is lower than plugin version, please update schema)</source>
@@ -5938,6 +5974,10 @@
 			<translation>    type = {Working paper},</translation>
 		</message>
 		<message>
+			<source>Uknown</source>
+			<translation>Uknown</translation>
+		</message>
+		<message>
 			<source>Unable to create &apos;{extension}&apos; extension. Packages must be installed, consult your administrator.</source>
 			<translation>Unable to create &apos;{extension}&apos; extension. Packages must be installed, consult your administrator.</translation>
 		</message>
@@ -6320,6 +6360,22 @@
 		<message>
 			<source>You closed a valve, this will modify the current mapzones and it may take a little bit of time.Would you like to continue?</source>
 			<translation>You closed a valve, this will modify the current mapzones and it may take a little bit of time.Would you like to continue?</translation>
+		</message>
+		<message>
+			<source>You do not have any connection to PostGIS database configurated.</source>
+			<translation>You do not have any connection to PostGIS database configurated.</translation>
+		</message>
+		<message>
+			<source>You do not have any connection to PostGIS database configurated. Check your QGIS data source manager and create at least one</source>
+			<translation>You do not have any connection to PostGIS database configurated. Check your QGIS data source manager and create at least one</translation>
+		</message>
+		<message>
+			<source>You do not have permissions to administrate project schemas on this connection</source>
+			<translation>You do not have permissions to administrate project schemas on this connection</translation>
+		</message>
+		<message>
+			<source>(You do not have permissions to administrate project schemas. Please contact your administrator)</source>
+			<translation>(You do not have permissions to administrate project schemas. Please contact your administrator)</translation>
 		</message>
 		<message>
 			<source>You do not have permission to execute this application</source>
@@ -7903,7 +7959,7 @@
 		</message>
 		<message>
 			<source>btn_gis_create</source>
-			<translation>Create QGIS project file</translation>
+			<translation>Create</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_gis_create</source>
@@ -7927,7 +7983,7 @@
 		</message>
 		<message>
 			<source>btn_info</source>
-			<translation>Update Project Schema</translation>
+			<translation>Update</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_info</source>
@@ -7959,7 +8015,7 @@
 		</message>
 		<message>
 			<source>btn_schema_create</source>
-			<translation>Create DB project schema</translation>
+			<translation>Create</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_create</source>
@@ -8071,7 +8127,7 @@
 		</message>
 		<message>
 			<source>grb_project_scin</source>
-			<translation>Project schema information</translation>
+			<translation>Project schema</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_project_scin</source>
@@ -8079,7 +8135,7 @@
 		</message>
 		<message>
 			<source>grb_schema_manager</source>
-			<translation>Schema management</translation>
+			<translation>QGIS project management</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_manager</source>
@@ -10230,7 +10286,7 @@
 		</message>
 		<message>
 			<source>btn_gis_create</source>
-			<translation>Create QGIS project file</translation>
+			<translation>Create</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_gis_create</source>
@@ -10254,7 +10310,7 @@
 		</message>
 		<message>
 			<source>btn_schema_create</source>
-			<translation>Create DB project schema</translation>
+			<translation>btn_schema_create</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_create</source>
@@ -10390,7 +10446,7 @@
 		</message>
 		<message>
 			<source>grb_project_scin</source>
-			<translation>Project schema information</translation>
+			<translation>Project schema</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_project_scin</source>
@@ -10398,7 +10454,7 @@
 		</message>
 		<message>
 			<source>grb_schema_manager</source>
-			<translation>Schema management</translation>
+			<translation>QGIS project management</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_manager</source>

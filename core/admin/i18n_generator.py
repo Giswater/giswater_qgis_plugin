@@ -23,6 +23,7 @@ File layout
 import io
 import os
 import re
+import shutil
 import subprocess
 from functools import partial
 import json
@@ -445,8 +446,10 @@ class GwI18NGenerator:
 
         if self.language == 'All':
             sql = f"SELECT id FROM {self.schema_i18n}.cat_language WHERE idval != 'no_TR' and idval != 'All' and idval != 'pl_PL'"
-            self.languages = self._get_rows(sql)
-            self.languages = [language['id'] for language in self.languages]
+            lang_rows = self._get_rows(sql) or []
+            if self._i18n_query_failed("cat_language"):
+                return
+            self.languages = [language['id'] for language in lang_rows]
             self.multiple_languages = True
         else:
             self.languages = [self.language]
@@ -573,6 +576,22 @@ class GwI18NGenerator:
         lang_columns.extend(extra_cols)
         return lang_columns
 
+    def _pydialog_order_by(self) -> str:
+        """ORDER BY clause adapted to columns present in i18n.pydialog."""
+        if "pydialog" not in self._column_cache:
+            self._get_matching_columns("pydialog", "lb_en_us")
+        columns = set(self._column_cache.get("pydialog") or [])
+        parts = [col for col in ("dialog_name", "source", "toolbar_name", "id") if col in columns]
+        return ", ".join(parts) if parts else "dialog_name, source"
+
+    def _i18n_query_failed(self, sql: str) -> bool:
+        if not self.last_error:
+            return False
+        tools_log.log_warning(f"i18n SQL failed: {self.last_error}", parameter=sql)
+        if self.dlg_qm:
+            tools_qt.set_widget_text(self.dlg_qm, "lbl_info", f"{self.last_error}")
+        return True
+
     # --- Qt export (.ts) ---
 
     def _deduplicate_py_dialogs(self, py_dialogs):
@@ -580,6 +599,8 @@ class GwI18NGenerator:
         Merge duplicate pydialog rows (same dialog_name + source, different toolbar_name).
         Keeps the newest row and fills empty translation columns from older duplicates.
         """
+        if not py_dialogs:
+            return []
         groups = {}
         order = []
         for row in py_dialogs:
@@ -617,13 +638,20 @@ class GwI18NGenerator:
         key_tooltip = f"tt_{self.lower_lang}"
         key_message = f"ms_{self.lower_lang}"
         sch = SCHEMA_I18N
+        order_by = self._pydialog_order_by()
 
         if self.lower_lang == "en_us":
             py_messages = self._get_rows(f"SELECT source, ms_en_us FROM {sch}.pymessage ORDER BY source;")
+            if self._i18n_query_failed("pymessage"):
+                return False
             py_toolbars = self._get_rows(f"SELECT source, lb_en_us FROM {sch}.pytoolbar ORDER BY source;")
+            if self._i18n_query_failed("pytoolbar"):
+                return False
             sql = (f"SELECT dialog_name, source, lb_en_us, tt_en_us FROM {sch}.pydialog "
-                   f"ORDER BY {PYDIALOG_ORDER_BY};")
+                   f"ORDER BY {order_by};")
             py_dialogs = self._deduplicate_py_dialogs(self._get_rows(sql))
+            if self._i18n_query_failed("pydialog"):
+                return False
         else:
             extra_ms = self._get_matching_columns("pymessage", key_message)
             extra_ms_str = ", " + ", ".join(extra_ms) if extra_ms else ""
@@ -631,12 +659,16 @@ class GwI18NGenerator:
                 f"SELECT source, ms_en_us, {key_message}, auto_{key_message}{extra_ms_str} "
                 f"FROM {sch}.pymessage ORDER BY source;"
             )
+            if self._i18n_query_failed("pymessage"):
+                return False
             extra_lb = self._get_matching_columns("pytoolbar", key_label)
             extra_lb_str = ", " + ", ".join(extra_lb) if extra_lb else ""
             py_toolbars = self._get_rows(
                 f"SELECT source, lb_en_us, {key_label}, auto_{key_label}{extra_lb_str} "
                 f"FROM {sch}.pytoolbar ORDER BY source;"
             )
+            if self._i18n_query_failed("pytoolbar"):
+                return False
             extra_dlg_lb = self._get_matching_columns("pydialog", key_label)
             extra_dlg_lb_str = ", " + ", ".join(extra_dlg_lb) if extra_dlg_lb else ""
             extra_dlg_tt = self._get_matching_columns("pydialog", key_tooltip)
@@ -644,9 +676,11 @@ class GwI18NGenerator:
             sql = (
                 f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}{extra_dlg_lb_str}, "
                 f"tt_en_us, {key_tooltip}, auto_{key_tooltip}{extra_dlg_tt_str} "
-                f"FROM {sch}.pydialog ORDER BY {PYDIALOG_ORDER_BY};"
+                f"FROM {sch}.pydialog ORDER BY {order_by};"
             )
             py_dialogs = self._deduplicate_py_dialogs(self._get_rows(sql))
+            if self._i18n_query_failed("pydialog"):
+                return False
 
         ts_path = os.path.join(self.plugin_dir, "i18n", f"giswater_{self.language}.ts")
         if os.path.exists(ts_path) and not self.multiple_languages:
@@ -710,7 +744,14 @@ class GwI18NGenerator:
             tools_log.log_info(f"TS unchanged, skipping lrelease: {ts_path}")
             return True
 
-        lrelease = os.path.join(self.plugin_dir, "resources", "i18n", "lrelease.exe")
+        lrelease = shutil.which("lrelease")
+        if not lrelease:
+            bundled = os.path.join(self.plugin_dir, "resources", "i18n", "lrelease.exe")
+            if os.path.isfile(bundled):
+                lrelease = bundled
+        if not lrelease:
+            tools_log.log_warning("lrelease not found; .ts written but .qm not generated")
+            return True
         try:
             proc = subprocess.run([lrelease, ts_path], capture_output=True, text=True)
             if proc.returncode == 0:
@@ -1220,6 +1261,7 @@ class GwI18NGenerator:
             self.last_error = e
             if commit:
                 self._rollback()
+            rows = []
         return rows
 
     def _replace_invalid_characters(self, param):

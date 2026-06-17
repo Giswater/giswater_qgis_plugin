@@ -28,7 +28,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, \
+    GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, \
     GwAdminMarkdownGeneratorUi  # noqa: F401
 
 from ..utils import tools_gw
@@ -71,6 +71,38 @@ def _admin_version_tuple(version) -> tuple:
         except ValueError:
             nums.append(0)
     return tuple(nums) if nums else (0,)
+
+
+_GIS_FORM_WIDGETS = (
+    'txt_gis_file', 'txt_gis_folder', 'btn_gis_folder', 'chk_export_passwd', 'btn_gis_create',
+)
+
+_SCHEMA_CRUD_BUTTONS = (
+    'btn_schema_create', 'btn_info', 'btn_schema_rename', 'btn_delete', 'btn_copy',
+)
+
+# Admin lbl_status_text sources (i18n context "giswater", i18n/giswater_*.ts)
+_ADMIN_SCHEMA_OUTDATED_MESSAGE = "(Schema version is lower than plugin version, please update schema)"
+_ADMIN_PLUGIN_OUTDATED_MESSAGE = "(Schema version is higher than plugin version, please update plugin)"
+_ADMIN_SCHEMA_OUTDATED_NONADMIN_MESSAGE = (
+    "(Schema version is lower than plugin version. Please contact your administrator to update the schema)"
+)
+_ADMIN_PLUGIN_OUTDATED_NONADMIN_MESSAGE = (
+    "(Schema version is higher than plugin version. Please contact your administrator to update the plugin)"
+)
+_ADMIN_PERMISSION_MESSAGE = (
+    "(You don't have permissions to administrate project schemas. Please contact your administrator)"
+)
+_ADMIN_EXTENSION_ERROR_MESSAGE = (
+    "(Unable to create one extension. Packages must be installed, consult your administrator)"
+)
+
+
+def _admin_connection_ignore_widgets():
+    return [
+        'cmb_connection', 'project_schema_name', 'btn_close', 'btn_help',
+        *_GIS_FORM_WIDGETS,
+    ]
 
 
 class GwAdminButton:
@@ -416,14 +448,12 @@ class GwAdminButton:
         """
         cm_schema = getattr(self, 'cm_schema_name', None) or self._get_cm_schema_name() or "cm"
         if parent_schema is None and getattr(self, 'dlg_readsql', None) is not None:
-            parent_schema = tools_qt.get_text(
-                self.dlg_readsql, self.dlg_readsql.project_schema_name
-            )
+            parent_schema = self._get_selected_schema_name()
         parent_schema = parent_schema or ""
         if parent_type is None:
             parent_type = self.project_type_selected or ""
         if not parent_type and getattr(self, 'dlg_readsql', None) is not None:
-            parent_type = tools_qt.get_text(self.dlg_readsql, self.cmb_project_type)
+            parent_type = self._get_selected_project_type()
         pt_norm = (parent_type or "").lower()
         if pt_norm and not os.path.isfile(
             os.path.join(
@@ -598,11 +628,13 @@ class GwAdminButton:
                 self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self._refresh_admin_catalog_cache()
-                self._populate_data_schema_name(self.cmb_project_type)
+                self._populate_data_schema_name()
                 self._manage_utils()
                 if project_name is not None and is_utils is False and is_cibs is False:
-                    tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', project_type)
-                    tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, project_name)
+                    tools_qt.set_combo_value(
+                        self.dlg_readsql.project_schema_name, project_name, 0
+                    )
+                    self._sync_project_type_from_schema()
                     self._set_info_project()
         else:
             tools_db.dao.rollback()
@@ -780,8 +812,8 @@ class GwAdminButton:
 
     def _resolve_update_kind(self) -> str:
         kind = self.project_type_selected or self.project_type
-        if not kind and hasattr(self, 'cmb_project_type'):
-            kind = tools_qt.get_text(self.dlg_readsql, self.cmb_project_type)
+        if not kind:
+            kind = self._get_selected_project_type()
         return str(kind or 'ws').lower()
 
     def _resolve_parent_context(self, parent_schema=None, parent_type=None):
@@ -792,9 +824,7 @@ class GwAdminButton:
                 pt = str(entry.get("kind") or "ws").lower()
             return str(parent_schema), str(pt or "ws").lower()
         schema_name = self._get_schema_name() or ""
-        pt = ""
-        if hasattr(self, 'dlg_readsql') and self.dlg_readsql:
-            pt = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        pt = self._get_selected_project_type() if schema_name else ""
         return schema_name, str(pt or "ws").lower()
 
     def _run_schema_upgrade(self, schema_name, project_type, on_done=None):
@@ -1250,7 +1280,7 @@ class GwAdminButton:
         """ Set a model with selected filter.
         Attach that model to selected table """
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = self._get_selected_schema_name()
         if schema_name not in table_name:
             table_name = schema_name + "." + table_name
 
@@ -1350,7 +1380,7 @@ class GwAdminButton:
 
     def _show_admin_loading_state(self):
         self._admin_loading = True
-        ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
+        ignore_widgets = _admin_connection_ignore_widgets()
         tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', tools_qt.tr('Connecting...'))
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -1362,7 +1392,7 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql)
             self._create_credentials_form(set_connection=connection_name)
             return
-        ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
+        ignore_widgets = _admin_connection_ignore_widgets()
         tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
         self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
@@ -1379,7 +1409,7 @@ class GwAdminButton:
             return
 
         cached = self._schema_cache.get(connection_name)
-        if cached and cached.ok and lib_vars.session_vars.get('logged_status'):
+        if cached and cached.ok and lib_vars.session_vars.get('logged_status') and not try_set_connection:
             self._apply_admin_load_result(cached, connection_name)
             return
 
@@ -1568,19 +1598,18 @@ class GwAdminButton:
         self._set_last_connection(connection_name)
         self.username = self._get_user_connection(connection_name)
 
-        self.cmb_project_type.blockSignals(True)
         self.dlg_readsql.project_schema_name.blockSignals(True)
-        self._change_project_type(self.cmb_project_type)
-        self._populate_data_schema_name(self.cmb_project_type)
-        self.cmb_project_type.blockSignals(False)
+        self._populate_data_schema_name()
         self.dlg_readsql.project_schema_name.blockSignals(False)
 
         self._ensure_extensions_checked()
         self._finalize_admin_permissions_and_status()
         self._set_info_project()
+        self._update_admin_status_bar()
         self._update_manage_ui()
         self._manage_utils()
         self._set_buttons_enabled()
+        self._init_gis_project_form()
 
         refresh = getattr(self, "_manage_schemas_refresh", None)
         if refresh:
@@ -1597,53 +1626,36 @@ class GwAdminButton:
         if not tools_db.check_role(self.username, is_admin=True) and not getattr(self, '_admin_show_dialog', False):
             msg = "User not found"
             tools_log.log_warning(msg, parameter=self.username)
-            return
+            self.form_enabled = False
 
         if self.postgresql_version and int(self.postgresql_version) not in range(
                 self.lower_postgresql_version, self.upper_postgresql_version) and self.form_enabled:
             message = "Incompatible version of PostgreSQL"
             self.form_enabled = False
 
-        super_user = tools_db.check_super_user(self.username)
-        force_superuser = tools_gw.get_config_parser(
-            'system', 'force_superuser', 'user', 'init', False, force_reload=True
-        )
-        if not super_user and not force_superuser:
-            message = "You don't have permissions to administrate project schemas on this connection"
+        if not self._can_administer_schemas():
+            message = _ADMIN_PERMISSION_MESSAGE
             self.form_enabled = False
         elif self.form_enabled:
             plugin_tuple = _admin_version_tuple(self.plugin_version)
             project_tuple = _admin_version_tuple(self.project_version)
-            schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+            schema_name = self._get_selected_schema_name() or 'null'
             db_name = tools_db.dao_db_credentials.get('db') if tools_db.dao_db_credentials else ''
             if any(x in str(db_name) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
                 self.form_enabled = False
             elif schema_name == 'null':
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
-            elif plugin_tuple > project_tuple:
-                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                msg = '(Schema version is lower than plugin version, please update schema)'
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-                self.dlg_readsql.btn_info.setEnabled(True)
-            elif plugin_tuple < project_tuple:
-                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                msg = '(Schema version is higher than plugin version, please update plugin)'
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-                self.dlg_readsql.btn_info.setEnabled(False)
-            else:
-                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-                self.dlg_readsql.btn_info.setEnabled(False)
             tools_qt.enable_dialog(self.dlg_readsql, True)
 
-        if self.form_enabled is False:
-            ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
-            tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
+        if self.form_enabled is False and message and message != _ADMIN_PERMISSION_MESSAGE:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            ignore_widgets = _admin_connection_ignore_widgets()
+            tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
+
+        self._update_advanced_tab_visibility()
 
     def _init_show_database(self):
         """ Initialization code of the form (to be executed only once) """
@@ -1711,12 +1723,12 @@ class GwAdminButton:
         # Create dialog object
         self.dlg_readsql = GwAdminUi(self)
         tools_gw.load_settings(self.dlg_readsql)
-        self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
-        if lib_vars.user_level['level'] not in lib_vars.user_level['showadminadvanced']:
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
-        if global_vars.gw_dev_mode is not True:
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
+        # DEPRECATED tab_dev — widgets/handlers kept for migration to another repo.
+        # See: btn_create_utils, btn_update_utils, cmb_utils_ws/ud, btn_create_cibs,
+        # btn_adapt_cibs, cmb_cibs, btn_i18n, btn_translation, btn_create_qgis_template,
+        # btn_markdown_generator (tab_dev in admin.ui).
+        tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_dev")
 
         for _gb_name in ('groupBox_2', 'groupBox', 'groupBox_cibs'):
             _gb = self.dlg_readsql.findChild(QGroupBox, _gb_name)
@@ -1726,11 +1738,6 @@ class GwAdminButton:
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
         self.project_types = self.project_types.split(',')
-
-        # Populate combo types
-        self.cmb_project_type.clear()
-        for aux in self.project_types:
-            self.cmb_project_type.addItem(str(aux))
 
         # Get widgets form
         self.cmb_connection = self.dlg_readsql.findChild(QComboBox, 'cmb_connection')
@@ -1750,11 +1757,8 @@ class GwAdminButton:
         # Set shortcut keys
         self.dlg_readsql.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql))
 
-        # Set default project type
-        tools_qt.set_widget_text(self.dlg_readsql, self.cmb_project_type, 'ws')
-
-        # Update folderSoftware
-        self._change_project_type(self.cmb_project_type)
+        self._update_advanced_tab_visibility()
+        self._set_schema_crud_visible(False)
 
     def _set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
@@ -1766,21 +1770,22 @@ class GwAdminButton:
         self.dlg_readsql.btn_reload_fct_ftrg.clicked.connect(partial(self._reload_fct_ftrg))
         self.dlg_readsql.btn_vacuum.clicked.connect(partial(self.execute_vacuum, True, True))
         self.dlg_readsql.btn_info.clicked.connect(partial(self._open_update_info))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._sync_project_type_from_schema))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._update_manage_ui))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.cmb_project_type))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self._change_project_type, self.cmb_project_type))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self._set_info_project))
-        self.cmb_project_type.currentIndexChanged.connect(partial(self._update_manage_ui))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._init_gis_project_form))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._set_buttons_enabled))
+        self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._update_admin_status_bar))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self._event_change_connection))
-        self.cmb_connection.currentIndexChanged.connect(partial(self._set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self._open_rename))
         self.dlg_readsql.btn_delete.clicked.connect(partial(self._delete_schema))
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
-        self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
+        self.dlg_readsql.btn_gis_folder.clicked.connect(
+            partial(tools_qt.get_folder_path, self.dlg_readsql, "txt_gis_folder"))
+        self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._gis_create_project))
         self.dlg_readsql.btn_manage_schemas.clicked.connect(partial(self._open_manage_schemas))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
@@ -1901,7 +1906,6 @@ class GwAdminButton:
         self.dlg_readsql.lbl_status_text.setStyleSheet("QLabel {color:red;}")
 
         self.cmb_connection.blockSignals(True)
-        self.cmb_project_type.blockSignals(True)
         self.dlg_readsql.project_schema_name.blockSignals(True)
 
         self._populate_combo_connections()
@@ -1912,14 +1916,11 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        tools_qt.set_widget_text(
-            self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-            tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session", False, force_reload=True),
+        saved_schema = tools_gw.get_config_parser(
+            'btn_admin', 'schema_name', "user", "session", False, force_reload=True
         )
-        tools_qt.set_widget_text(
-            self.dlg_readsql, self.dlg_readsql.project_schema_name,
-            tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False, force_reload=True),
-        )
+        if saved_schema:
+            tools_qt.set_combo_value(self.dlg_readsql.project_schema_name, saved_schema, 0)
 
         folder_path = tools_gw.get_config_parser(
             "btn_admin", "custom_sql_path", "user", "session", force_reload=True
@@ -1927,7 +1928,6 @@ class GwAdminButton:
         tools_qt.set_widget_text(self.dlg_readsql, "custom_path_folder", folder_path)
 
         self.cmb_connection.blockSignals(False)
-        self.cmb_project_type.blockSignals(False)
         self.dlg_readsql.project_schema_name.blockSignals(False)
 
         if show_dialog:
@@ -1974,58 +1974,104 @@ class GwAdminButton:
         self.init_sql(True)
 
     def _gis_create_project(self):
-        """"""
+        """Create a QGIS project from the inline form on the admin dialog."""
 
-        # Get gis folder, gis file, project type and schema
-        gis_folder = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_folder')
+        schema_name = self._get_selected_schema_name()
+        if not schema_name:
+            msg = "In order to create a qgis project you have to create a schema first."
+            tools_qt.show_info_box(msg)
+            return
+
+        gis_folder = tools_qt.get_text(self.dlg_readsql, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
             msg = "GIS folder not set"
             tools_qgis.show_warning(msg)
             return
 
         tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
-        qgis_file_export = self.dlg_create_gis_project.chk_export_passwd.isChecked()
+        qgis_file_export = self.dlg_readsql.chk_export_passwd.isChecked()
         tools_gw.set_config_parser('btn_admin', 'qgis_file_export', qgis_file_export, prefix=False)
 
-        gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
+        gis_file = tools_qt.get_text(self.dlg_readsql, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
             msg = "GIS file name not set"
             tools_qgis.show_warning(msg)
             return
 
-        project_type = tools_qt.get_text(self.dlg_readsql, 'cmb_project_type')
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-
-        # Get roletype and export password
-        roletype = tools_qt.get_text(self.dlg_create_gis_project, 'txt_roletype')
-        export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
+        project_type = self._get_selected_project_type() or 'ws'
+        roletype = tools_qt.get_text(self.dlg_readsql, 'txt_roletype')
+        export_passwd = tools_qt.is_checked(self.dlg_readsql, 'chk_export_passwd')
 
         if export_passwd and not self.is_service:
-            msg = "Credentials will be stored in the GIS project file as plain text, and will apply to both existing and future layers. Do you want to proceed?"
+            msg = ("Credentials will be stored in the GIS project file as plain text, and will apply to "
+                   "both existing and future layers. Do you want to proceed?")
             title = "Warning"
             answer = tools_qt.show_question(msg, title)
             if not answer:
                 return
 
-        # Generate QGIS project
-        self._generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype)
+        layer_project_type = self._get_layer_project_type(schema_name)
+        self._generate_qgis_project(
+            gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, layer_project_type
+        )
 
-    def _generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype):
-        """ Generate QGIS project """
+    def _generate_qgis_project(
+        self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, layer_project_type
+    ):
+        """Generate QGIS project."""
 
         gis = GwGisFileCreate(self.plugin_dir)
-        result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-                                                    roletype, layer_project_type=tools_qt.get_combo_value(self.dlg_create_gis_project, 'cmb_project_type', 1),
-                                                    is_cm=self.is_cm_project)
+        result, qgs_path = gis.gis_project_database(
+            gis_folder, gis_file, project_type, schema_name, export_passwd,
+            roletype, layer_project_type=layer_project_type, is_cm=self.is_cm_project,
+        )
 
         if self.is_cm_project:
             self.is_cm_project = False
 
-        self._close_dialog_admin(self.dlg_create_gis_project)
         self._close_dialog_admin(self.dlg_readsql)
 
         if result:
             self._open_project(qgs_path)
+
+    def _get_layer_project_type(self, schema_name: str) -> str:
+        rows = tools_db.execute_returning(
+            f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'"
+        )
+        if not rows:
+            return self._get_selected_project_type() or 'ws'
+        try:
+            result = {rows[i]: rows[i + 1] for i in range(0, len(rows), 2)}
+        except Exception:
+            return self._get_selected_project_type() or 'ws'
+        if len(result) == 1:
+            return str(next(iter(result.values())))
+        return self._get_selected_project_type() or 'ws'
+
+    def _init_gis_project_form(self):
+        """Load inline GIS project form defaults from session and selected schema."""
+        if not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
+            return
+
+        schema_name = self._get_selected_schema_name()
+        if schema_name:
+            tools_qt.set_widget_text(self.dlg_readsql, 'txt_gis_file', schema_name)
+
+        qgis_file_path = tools_gw.get_config_parser(
+            'btn_admin', 'qgis_file_path', "user", "session", prefix=False, force_reload=True
+        )
+        if qgis_file_path is None:
+            qgis_file_path = os.path.expanduser("~")
+        tools_qt.set_widget_text(self.dlg_readsql, 'txt_gis_folder', qgis_file_path)
+
+        qgis_file_export = tools_gw.get_config_parser(
+            'btn_admin', 'qgis_file_export', "user", "session", prefix=False, force_reload=True
+        )
+        self.dlg_readsql.chk_export_passwd.setChecked(tools_os.set_boolean(qgis_file_export, False))
+
+        if getattr(self, 'is_service', False):
+            self.dlg_readsql.lbl_export_user_pass.setVisible(False)
+            self.dlg_readsql.chk_export_passwd.setVisible(False)
 
     def _open_project(self, qgs_path):
         """ Open a QGis project """
@@ -2036,62 +2082,6 @@ class GwAdminButton:
         # Load Giswater plugin
         file_name = os.path.basename(self.plugin_dir)
         reloadPlugin(f"{file_name}")
-
-    def _open_form_create_gis_project(self):
-        """"""
-
-        # Check if exist schema
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        if schema_name is None:
-            msg = "In order to create a qgis project you have to create a schema first."
-            tools_qt.show_info_box(msg)
-            return
-
-        # Create GIS project dialog
-        self.dlg_create_gis_project = GwAdminGisProjectUi(self)
-        tools_gw.load_settings(self.dlg_create_gis_project)
-
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
-        qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False,
-                                                    force_reload=True)
-        if qgis_file_path is None:
-            qgis_file_path = os.path.expanduser("~")
-        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', qgis_file_path)
-        qgis_file_export = tools_gw.get_config_parser('btn_admin', 'qgis_file_export', "user", "session", prefix=False,
-                                                      force_reload=True)
-        qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
-
-        self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
-        self.dlg_create_gis_project.txt_gis_folder.setEnabled(False)
-        if self.is_service:
-            self.dlg_create_gis_project.lbl_export_user_pass.setVisible(False)
-            self.dlg_create_gis_project.chk_export_passwd.setVisible(False)
-
-        # Set listeners
-        self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
-            partial(tools_qt.get_folder_path, self.dlg_create_gis_project, "txt_gis_folder"))
-        self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self._gis_create_project))
-        self.dlg_create_gis_project.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
-        self.dlg_create_gis_project.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
-
-        # Set shortcut keys
-        self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
-
-        # Manage cmb Project Type visibility
-        self.dlg_create_gis_project.lbl_project_type.setVisible(False)
-        self.dlg_create_gis_project.cmb_project_type.setVisible(False)
-        list_project_type = tools_db.execute_returning(f"SELECT id, idval FROM {schema_name}.config_typevalue WHERE typevalue = 'project_type'")
-        try:
-            result = {list_project_type[i]: list_project_type[i + 1] for i in range(0, len(list_project_type), 2)}
-        except Exception:
-            result = {}
-        tools_qt.fill_combo_values(self.dlg_create_gis_project.cmb_project_type, list(result.items()))
-        if len(list(result.items())) <= 1:
-            self.dlg_create_gis_project.cmb_project_type.setEnabled(False)
-
-        # Open MainWindow
-        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
 
     def _load_sql(self, path_folder: str, no_ct: bool = False, utils_schema_name: Union[str, None] = None, set_progress_bar: bool = False) -> bool:
         """
@@ -2239,20 +2229,128 @@ class GwAdminButton:
         # Reset count error variable to 0
         self.error_count = 0
 
+    def _get_selected_schema_name(self) -> str:
+        if not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
+            return ''
+        schema_name = tools_qt.get_combo_value(
+            self.dlg_readsql, self.dlg_readsql.project_schema_name, 0
+        )
+        if not isinstance(schema_name, str) or not schema_name or schema_name == 'null':
+            return ''
+        return schema_name
+
+    def _get_selected_project_type(self) -> str:
+        if getattr(self, 'project_type', None):
+            return str(self.project_type).lower()
+        schema_name = self._get_selected_schema_name()
+        if not schema_name:
+            return str(getattr(self, 'project_type_selected', '') or '').lower()
+        if self._admin_catalog_cache and self._admin_catalog_cache.sys_version_schemas:
+            schemas = self._admin_catalog_cache.sys_version_schemas
+        else:
+            schemas = admin_catalog.fetch_sys_version_schemas()
+        pt = admin_catalog.project_type_for_schema(schemas, schema_name)
+        return str(pt or getattr(self, 'project_type_selected', '') or '').lower()
+
+    def _set_project_type_paths(self, project_type: str):
+        self.project_type_selected = project_type
+        self.folder_software = os.path.join(self.sql_dir, 'schemas', 'main', project_type)
+
+    def _sync_project_type_from_schema(self):
+        if getattr(self, '_admin_loading', False):
+            return
+        project_type = self._get_selected_project_type()
+        if project_type:
+            self._set_project_type_paths(project_type)
+
+    def _can_administer_schemas(self) -> bool:
+        """True only for the connection superuser (or force_superuser override)."""
+        force_superuser = tools_gw.get_config_parser(
+            'system', 'force_superuser', 'user', 'init', False, force_reload=True
+        )
+        if tools_os.set_boolean(force_superuser, False):
+            return True
+        conn_user = getattr(self, 'username', None)
+        if conn_user:
+            return tools_db.check_super_user(conn_user)
+        db_user = tools_db.get_current_user()
+        return bool(db_user) and tools_db.check_super_user(db_user)
+
+    def _update_admin_status_bar(self):
+        """Single source of truth for lbl_status / lbl_status_text."""
+        if getattr(self, '_admin_loading', False) or not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
+            return
+
+        schema_name = self._get_selected_schema_name() or 'null'
+        plugin_tuple = _admin_version_tuple(self.plugin_version)
+        project_tuple = _admin_version_tuple(getattr(self, 'project_version', None) or '0')
+
+        if self.postgresql_version is None or self.postgis_version is None or self.pgrouting_version is None:
+            ignore_widgets = _admin_connection_ignore_widgets()
+            tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            msg = _ADMIN_EXTENSION_ERROR_MESSAGE
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+            return
+
+        if not self._can_administer_schemas():
+            if plugin_tuple > project_tuple:
+                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                status_msg = _ADMIN_SCHEMA_OUTDATED_NONADMIN_MESSAGE
+            elif plugin_tuple < project_tuple:
+                self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+                status_msg = _ADMIN_PLUGIN_OUTDATED_NONADMIN_MESSAGE
+            else:
+                self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+                status_msg = ''
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, status_msg)
+            if schema_name != 'null':
+                self.lbl_schema_name.setText(str(schema_name))
+            return
+
+        if not self.form_enabled:
+            return
+
+        if schema_name == 'null':
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+        elif plugin_tuple > project_tuple:
+            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+            tools_qt.set_widget_text(
+                self.dlg_readsql, self.dlg_readsql.lbl_status_text, _ADMIN_SCHEMA_OUTDATED_MESSAGE
+            )
+        elif plugin_tuple < project_tuple:
+            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
+            tools_qt.set_widget_text(
+                self.dlg_readsql, self.dlg_readsql.lbl_status_text, _ADMIN_PLUGIN_OUTDATED_MESSAGE
+            )
+        else:
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+
+    def _should_show_advanced_tab(self) -> bool:
+        level_ok = lib_vars.user_level['level'] in lib_vars.user_level['showadminadvanced']
+        return level_ok and self._can_administer_schemas()
+
+    def _update_advanced_tab_visibility(self):
+        if not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
+            return
+        tab_widget = self.dlg_readsql.tab_main
+        visible = self._should_show_advanced_tab()
+        for i in range(tab_widget.count()):
+            if tab_widget.widget(i).objectName() == 'tab_advanced':
+                tab_widget.setTabVisible(i, visible)
+                break
+
     def _get_schema_name(self) -> str:
         """
         Get the schema name from the dialog.
 
         :return str: The schema name.
         """
-        if not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
-            return ''
-
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        if not isinstance(schema_name, str) or not schema_name:
-            return ''
-
-        return schema_name
+        return self._get_selected_schema_name()
 
     def _load_fct_ftrg(self) -> bool:
         """
@@ -2292,6 +2390,8 @@ class GwAdminButton:
         self._cached_pg_versions = None
         self._extensions_checked = False
         connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
+        self.username = self._get_user_connection(connection_name)
+        tools_db.current_user = None
         self._schema_cache.pop(connection_name, None)
         self._start_admin_load(connection_name, try_set_connection=True, show_dialog=True)
 
@@ -2411,16 +2511,10 @@ class GwAdminButton:
         # context exists, so we point at the project-type-agnostic common tree.
         self.folder_locale = os.path.join(self.sql_dir, 'schemas', 'main', 'common')
 
-    def _populate_data_schema_name(self, widget):
+    def _populate_data_schema_name(self, widget=None):
         """Fill project schema combo from cached catalog or pg_catalog."""
 
         if getattr(self, '_admin_loading', False):
-            return
-
-        filter_ = tools_qt.get_text(self.dlg_readsql, widget)
-        if filter_ in (None, 'null') and self.schema_type:
-            filter_ = self.schema_type
-        if filter_ is None:
             return
 
         if self._admin_catalog_cache and self._admin_catalog_cache.sys_version_schemas:
@@ -2428,13 +2522,22 @@ class GwAdminButton:
         else:
             schemas = admin_catalog.fetch_sys_version_schemas()
 
-        result_list = admin_catalog.combo_items_for_project_type(schemas, filter_)
+        result_list = admin_catalog.combo_items_all_schemas(schemas)
+        current_schema = self._get_selected_schema_name()
+        if not current_schema:
+            current_schema = tools_gw.get_config_parser(
+                'btn_admin', 'schema_name', "user", "session", False, force_reload=True
+            )
+
         if not result_list:
             self.dlg_readsql.project_schema_name.clear()
             self._set_buttons_enabled()
             return
 
         tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list)
+        if current_schema:
+            tools_qt.set_combo_value(self.dlg_readsql.project_schema_name, current_schema, 0)
+        self._sync_project_type_from_schema()
         self._set_buttons_enabled()
 
     def _manage_srid(self):
@@ -2484,7 +2587,7 @@ class GwAdminButton:
             return
 
         # set variables from table version
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = self._get_selected_schema_name() or 'null'
 
         # Cache PG versions and extensions: they don't change within a connection
         if not hasattr(self, '_cached_pg_versions') or self._cached_pg_versions is None:
@@ -2520,21 +2623,29 @@ class GwAdminButton:
             project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
             if project_date_create == project_date_update:
                 project_date_update = ''
-            creation_profile = last_dict_info.get('creation_profile')
+            creation_profile = first_dict_info.get('creation_profile') or last_dict_info.get('creation_profile')
             creation_profile_labels = {
                 'empty': tools_qt.tr("Empty data"),
                 'inventory': tools_qt.tr("Inventory Example"),
                 'sample': tools_qt.tr("Full Example"),
             }
+            project_type_label = str(self.project_type or '').upper()
+            profile_label = creation_profile_labels.get(
+                creation_profile, creation_profile or tools_qt.tr("Unknown")
+            )
             msg = (f'''{tools_qt.tr("PostgreSQL version")}: {self.postgresql_version}\n'''
                    f'''{tools_qt.tr("PostGis version")}: {self.postgis_version}\n'''
                    f'''{tools_qt.tr("PgRouting version")}: {self.pgrouting_version}\n \n'''
                    f'''{tools_qt.tr("Schema name")}: {schema_name}\n'''
+                   f'''{tools_qt.tr("Project type")}: {project_type_label}\n'''
+                   f'''{tools_qt.tr("Profile")}: {profile_label}\n'''
                    f'''{tools_qt.tr("Version")}: {self.project_version}\n'''
                    f'''EPSG: {self.project_epsg}\n'''
                    f'''{tools_qt.tr("Language")}: {self.project_language}\n''')
-            if creation_profile:
-                msg += f'''{tools_qt.tr("Creation type")}: {creation_profile_labels.get(creation_profile, creation_profile)}\n'''
+            if self._can_administer_schemas():
+                linked = admin_catalog.linked_satellites_for_parent(schema_name)
+                linked_label = linked if linked else tools_qt.tr("None")
+                msg += f'''{tools_qt.tr("Satellite schemas")}: {linked_label}\n'''
             msg += (f'''{tools_qt.tr("Date of creation")}: {project_date_create}\n'''
                     f'''{tools_qt.tr("Date of last update")}: {project_date_update}\n''')
 
@@ -2548,37 +2659,11 @@ class GwAdminButton:
         window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
-        plugin_tuple = _admin_version_tuple(self.plugin_version)
-        project_tuple = _admin_version_tuple(self.project_version)
-
-        if schema_name == 'null' and self.form_enabled:
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
-
-        elif plugin_tuple > project_tuple and self.form_enabled:
-            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            msg = '(Schema version is lower than plugin version, please update schema)'
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-            self.dlg_readsql.btn_info.setEnabled(True)
-
-        elif plugin_tuple < project_tuple and self.form_enabled:
-            self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            msg = '(Schema version is higher than plugin version, please update plugin)'
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-            self.dlg_readsql.btn_info.setEnabled(False)
-
-        elif self.postgresql_version is None or self.postgis_version is None or self.pgrouting_version is None:
-            ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
-            tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            msg = '(Unable to create one extension. Packages must be installed, consult your administrator)'
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
-            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-
-        elif self.form_enabled:
-            self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
-            self.dlg_readsql.btn_info.setEnabled(False)
+    def _set_schema_crud_visible(self, visible: bool):
+        for name in _SCHEMA_CRUD_BUTTONS:
+            widget = getattr(self.dlg_readsql, name, None)
+            if widget is not None:
+                widget.setVisible(visible)
 
     def _process_folder(self, folderpath: str, filepattern: str = '') -> bool:
         """
@@ -2657,10 +2742,10 @@ class GwAdminButton:
 
         self._filter_srid_changed()
 
-        # Get project_type from previous dialog
-        self.cmb_project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type, self.cmb_project_type)
-        self._change_project_type(self.cmb_create_project_type)
+        # Get project_type from selected schema
+        project_type = self._get_selected_project_type() or 'ws'
+        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
+        self._set_project_type_paths(project_type)
         self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
         self._update_time_elapsed("", self.dlg_readsql_create_project)
@@ -2688,7 +2773,7 @@ class GwAdminButton:
     def _open_rename(self, schema_name=None, schema_version=None):
         """"""
 
-        schema = schema_name or tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema = schema_name or self._get_selected_schema_name()
         if not schema or schema == "null":
             msg = "Please, select a project to rename"
             tools_qt.show_info_box(msg, "Info")
@@ -2735,7 +2820,7 @@ class GwAdminButton:
         if utils_schema_name:
             schema_name = utils_schema_name
         elif self.schema is None:
-            schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            schema_name = self._get_selected_schema_name()
             schema_name = schema_name.replace('"', '')
         else:
             schema_name = self.schema.replace('"', '')
@@ -2852,7 +2937,7 @@ class GwAdminButton:
         self.dlg_readsql_copy = GwAdminRenameProjUi(self)
         tools_gw.load_settings(self.dlg_readsql_copy)
 
-        schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema = self._get_selected_schema_name()
 
         # Set listeners
         self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self._copy_project_start, schema))
@@ -2890,7 +2975,7 @@ class GwAdminButton:
     def _delete_schema(self, schema_name=None):
         """"""
 
-        project_name = schema_name or tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_name = schema_name or self._get_selected_schema_name()
         if project_name is None:
             msg = "Please, select a project to delete"
             tools_qt.show_info_box(msg, "Info")
@@ -2914,7 +2999,7 @@ class GwAdminButton:
                 msg = "Process finished successfully: Delete schema"
                 tools_qt.show_info_box(msg, "Info")
                 self._refresh_admin_catalog_cache()
-                self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
+                self._populate_data_schema_name()
                 self._manage_utils()
                 self._set_info_project()
                 refresh = getattr(self, '_manage_schemas_refresh', None)
@@ -3159,7 +3244,7 @@ class GwAdminButton:
     def _update_manage_ui(self):
         """"""
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = self._get_selected_schema_name()
         if schema_name in (None, 'null', ''):
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
@@ -3298,7 +3383,7 @@ class GwAdminButton:
     def _manage_create_field(self, form_name, is_multi_addfield):
         """"""
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = self._get_selected_schema_name()
 
         # Alter visibility on widget that is only for multicreate action
         self.dlg_manage_fields.lbl_multifeaturetype.setVisible(is_multi_addfield)
@@ -3338,7 +3423,7 @@ class GwAdminButton:
         if form_name is None:
             return
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = self._get_selected_schema_name()
         if schema_name is None:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
@@ -3360,7 +3445,7 @@ class GwAdminButton:
     def _manage_delete_field(self, form_name, is_multi_addfield):
         """"""
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = self._get_selected_schema_name()
         if schema_name is None:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
@@ -3390,7 +3475,7 @@ class GwAdminButton:
     def _manage_accept(self, action, form_name, is_multi=False):
         """"""
 
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        schema_name = self._get_selected_schema_name()
         # save prev user value
         sql = f"SELECT value FROM {schema_name}.config_param_system WHERE parameter = 'admin_config_control_trigger'"
         row = tools_db.get_row(sql)
@@ -3548,10 +3633,11 @@ class GwAdminButton:
         tools_db.execute_sql(sql)
 
     def _change_project_type(self, widget):
-        """ Take current project type changed """
+        """Update SQL paths when project type changes (create-project dialog)."""
 
-        self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
-        self.folder_software = os.path.join(self.sql_dir, 'schemas', 'main', self.project_type_selected)
+        project_type = tools_qt.get_text(self.dlg_readsql, widget)
+        if project_type and project_type != 'null':
+            self._set_project_type_paths(project_type)
 
     def _populate_functions_dlg(self, dialog, result):
         """"""
@@ -3631,9 +3717,7 @@ class GwAdminButton:
         """"""
 
         # Save last Project schema name and type selected
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, False, False)
-        project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        tools_gw.set_config_parser('btn_admin', 'project_type', f'{project_type}', prefix=False)
+        schema_name = self._get_selected_schema_name() or 'null'
         tools_gw.set_config_parser('btn_admin', 'schema_name', f'{schema_name}', prefix=False)
 
     def _create_credentials_form(self, set_connection):
@@ -3705,18 +3789,27 @@ class GwAdminButton:
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin')
 
     def _set_buttons_enabled(self):
-        """ Disable/enable buttons """
+        """Hide schema CRUD for non-superusers; enable/disable when visible."""
+
+        can_admin = self.form_enabled and self._can_administer_schemas()
+        self._set_schema_crud_visible(can_admin)
+        if not can_admin:
+            return
 
         # Check schema name
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = self._get_selected_schema_name() or 'null'
 
         # Buttons delete, rename and copy schema
         self.dlg_readsql.btn_delete.setEnabled(schema_name != "null")
         self.dlg_readsql.btn_schema_rename.setEnabled(schema_name != "null")
         self.dlg_readsql.btn_copy.setEnabled(schema_name != "null")
+        self.dlg_readsql.btn_schema_create.setEnabled(True)
 
-        # Check project type
-        project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        plugin_tuple = _admin_version_tuple(self.plugin_version)
+        project_tuple = _admin_version_tuple(getattr(self, 'project_version', None) or '0')
+        self.dlg_readsql.btn_info.setEnabled(plugin_tuple > project_tuple)
+
+        project_type = self._get_selected_project_type()
 
         # Buttons to manage am / cm / audit (single catalog query when possible)
         if self._admin_catalog_cache and self._admin_catalog_cache.aux_flags:
