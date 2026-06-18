@@ -11,17 +11,17 @@ python3 -m giswater_admin db init --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_
   ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
 
 echo "==> drop schema ${SCHEMA} (if exists)"
-python3 -m giswater_admin drop --schema "${SCHEMA}" --yes --cascade \
+python3 -m giswater_admin schema main drop --name "${SCHEMA}" --yes --cascade \
   --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" >/dev/null 2>&1 || true
 
-echo "==> giswater_admin create --profile ci (schema ${SCHEMA})"
-python3 -m giswater_admin create \
-  --kind "${PROJECT}" \
-  --schema "${SCHEMA}" \
+echo "==> giswater_admin schema main create --profile ci (schema ${SCHEMA})"
+python3 -m giswater_admin schema main create \
+  --type "${PROJECT}" \
+  --name "${SCHEMA}" \
   --profile ci \
   --srid 25831 \
   --locale en_US \
-  --plugin-version "${GW_PLUGIN_VERSION}" \
+  --version "${GW_PLUGIN_VERSION}" \
   --conn "${GW_CONN}" \
   --dbmodel-path "${DBMODEL_DIR}" \
   ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}

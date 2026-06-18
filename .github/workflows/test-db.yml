@@ -60,7 +60,7 @@ jobs:
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml up -d postgres --wait
 
-      - name: Bootstrap schema (giswater_admin create ci)
+      - name: Bootstrap schema (gw schema main create ci)
         working-directory: dbmodel
         run: |
           chmod +x test/*.sh
