@@ -29,6 +29,8 @@ ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
 # updates/load_sample are excluded: legacy patches use DISABLE TRIGGER ALL, which
 # requires superuser to touch RI_ConstraintTrigger system triggers.
 _ROLE_SYSTEM_PHASES = frozenset({"reload_fct_ftrg"})
+# init.sql ends with SET ROLE role_system; restore installer before superuser phases.
+_RESET_ROLE_AFTER_PHASES = frozenset({"load_base"})
 
 # On a fresh database role_system does not exist yet; init.sql creates it.
 # pg_has_role(..., 'role_system', ...) errors if the role is missing — guard first.
@@ -320,7 +322,17 @@ class SchemaBuilder:
             else:
                 raise ValueError(f"Unsupported phase type: {phase.type}")
         finally:
-            if use_role_system and pr is not None:
+            if pr is None:
+                pass
+            elif use_role_system:
+                reset_fx = sql_runner.execute_inline(
+                    self.conn,
+                    _RESET_ROLE_SQL,
+                    label=f"phase:{phase.id}:reset_role",
+                    commit=self.commit_each_file,
+                )
+                pr.files.append(reset_fx)
+            elif phase.id in _RESET_ROLE_AFTER_PHASES and pr.files:
                 reset_fx = sql_runner.execute_inline(
                     self.conn,
                     _RESET_ROLE_SQL,
