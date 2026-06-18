@@ -33,6 +33,7 @@ def test_resolve_repo_sibling_without_config(repo_dbmodel: str, monkeypatch: pyt
     cfg_path = config.config_file()
     if cfg_path.is_file():
         cfg_path.unlink()
+    monkeypatch.setattr(dbmodel_paths, "list_cached_versions", lambda: [])
     resolved = dbmodel_paths.resolve_dbmodel_path(None)
     assert resolved == os.path.abspath(repo_dbmodel)
 
@@ -42,6 +43,7 @@ def test_resolve_missing_bootstrap(monkeypatch: pytest.MonkeyPatch, tmp_path: Pa
     cfg_path = config.config_file()
     if cfg_path.is_file():
         cfg_path.unlink()
+    monkeypatch.setattr(dbmodel_paths, "list_cached_versions", lambda: [])
     monkeypatch.setattr(dbmodel_paths, "DEV_DBMODEL", tmp_path / "missing")
     with pytest.raises(RuntimeError, match="No dbmodel found"):
         dbmodel_paths.resolve_dbmodel_path(None)

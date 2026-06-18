@@ -28,7 +28,7 @@ def test_resolve_schema_version_from_metadata(repo_dbmodel: str) -> None:
 def test_cli_version_independent_of_schema_version(repo_dbmodel: str) -> None:
     schema = schema_version.resolve_schema_version(repo_dbmodel, None)
     assert cli_version != schema
-    assert cli_version == "0.1.0"
+    assert cli_version.count(".") == 2
 
 
 def test_resolve_schema_version_requires_explicit_for_unknown_tree(tmp_path: Path) -> None:

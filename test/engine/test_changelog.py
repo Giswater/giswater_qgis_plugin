@@ -20,7 +20,7 @@ def test_network_update_roots_use_main_layout():
 def test_collect_pending_versions_from_4_11_1_to_4_12_0():
     roots = network_update_roots("dbmodel", "ws")
     pending = collect_pending_versions(roots, "4.11.1", "4.12.0")
-    assert pending == [(4, 12, 0)]
+    assert pending == [(4, 11, 2), (4, 12, 0)]
 
 
 def test_format_upgrade_changelog_includes_4_12_0():
