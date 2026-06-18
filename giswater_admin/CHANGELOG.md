@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-18
+
 ### Fixed
 
 - Schema builds failing on legacy update patches that use `DISABLE TRIGGER ALL` when the manifest profile skips `reload_fct_ftrg` (e.g. `ci`, `empty`): reset the database role to the installer after `load_base` so `updates` and `load_sample` run as superuser.
@@ -35,5 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Timing reports and structured log output for automation and CI.
 - Legacy command aliases (`create`, `update`, `drop`, `status`, `init-db`, `update-network`, `audit …`) with stderr deprecation warnings.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/cli-v0.1.0...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/cli-v0.1.1...main
+[0.1.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/cli-v0.1.0...cli-v0.1.1
 [0.1.0]: https://github.com/Giswater/giswater_qgis_plugin/releases/tag/cli-v0.1.0
