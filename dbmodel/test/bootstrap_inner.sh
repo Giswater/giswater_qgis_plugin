@@ -8,6 +8,7 @@ source "${_TEST_ROOT}/_env_inner.sh" "${1:?Usage: bootstrap_inner.sh ws|ud}"
 
 echo "==> giswater_admin db init"
 python3 -m giswater_admin db init --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" \
+  --with-pgtap \
   ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
 
 echo "==> drop schema ${SCHEMA} (if exists)"
