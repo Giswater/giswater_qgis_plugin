@@ -1,0 +1,10 @@
+include LICENSE
+include pyproject.toml
+include giswater_admin/README.md
+prune test
+prune dbmodel
+prune core
+prune scripts
+prune libs
+prune .github
+global-exclude README.md

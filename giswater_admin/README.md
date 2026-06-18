@@ -233,19 +233,32 @@ The CLI is released **independently** from the QGIS plugin:
 
 | Event | Tag example | Publishes |
 |-------|-------------|-----------|
-| Plugin Giswater | `4.16.0` | `giswater.zip` + dbmodel (see repo `release-plugin.yml`) |
-| CLI `gw` | `cli-v0.2.0` | PyPI `giswater-cli` + wheel on GitHub Release |
+| Plugin Giswater | `v4.16.0` | `giswater.zip` + dbmodel (see repo `release-plugin.yml`) |
+| CLI `gw` | `cli-v0.1.0` | PyPI `giswater-cli` + wheel on GitHub Release |
 
-Release process:
+Maintain [`giswater_admin/CHANGELOG.md`](CHANGELOG.md) (Keep a Changelog format) before each release.
+
+**First release (`0.1.0`)** — document changes under `## [Unreleased]`, then:
+
+```bash
+python3 scripts/prepare_cli_release.py 0.1.0 --create-github-release
+python3 scripts/prepare_cli_release.py 0.1.0 --execute --create-github-release
+```
+
+(`pyproject.toml` and `giswater_admin/__version__.py` must already be `0.1.0`.)
+
+**Subsequent releases** (e.g. `0.2.0`):
 
 ```bash
 python3 scripts/bump_cli_version.py 0.2.0
-git commit -am "chore(cli): release 0.2.0"
-git tag cli-v0.2.0
-git push origin main cli-v0.2.0
+# Add changes under ## [Unreleased] in giswater_admin/CHANGELOG.md
+python3 scripts/prepare_cli_release.py 0.2.0 --create-github-release
+python3 scripts/prepare_cli_release.py 0.2.0 --execute --create-github-release
 ```
 
-CI (`.github/workflows/release-cli.yml`) validates that the tag matches `pyproject.toml` and `giswater_admin/__version__.py`, then publishes to PyPI and attaches `dist/*` to the GitHub Release.
+When the GitHub Release is published, CI (`.github/workflows/release-cli.yml`) runs tests, validates versions, builds `dist/*`, publishes to PyPI via OIDC (Trusted Publisher, environment `pypi`), and attaches wheels to the release.
+
+**One-time PyPI setup:** register a pending publisher at https://pypi.org/manage/account/publishing/ with project `giswater-cli`, owner `Giswater`, repository `giswater_qgis_plugin`, workflow `release-cli.yml`, environment `pypi`. Create the matching `pypi` environment in GitHub repo settings.
 
 Users install the tool once (`pipx install giswater-cli`) and refresh schema SQL with `gw dbmodel install` when a new plugin version ships.
 
