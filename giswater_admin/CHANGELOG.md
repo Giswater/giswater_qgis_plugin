@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Schema builds failing on legacy update patches that use `DISABLE TRIGGER ALL` when the manifest profile skips `reload_fct_ftrg` (e.g. `ci`, `empty`): reset the database role to the installer after `load_base` so `updates` and `load_sample` run as superuser.
+
+### Added
+
+- `ci` and `dev` as valid `--profile` choices for `gw schema main create`.
+
 ## [0.1.0] - 2026-06-18
 
 ### Added
