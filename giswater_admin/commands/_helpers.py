@@ -205,6 +205,58 @@ def cibs_parent_supported(dbmodel_path: str, parent_type: str) -> bool:
     return os.path.isfile(ddl)
 
 
+def am_parent_supported(dbmodel_path: str, parent_type: str) -> bool:
+    """Return ``True`` when am integration SQL exists for ``parent_type``."""
+    if not parent_type:
+        return False
+    ddl = os.path.join(
+        dbmodel_path,
+        "schemas",
+        "addon",
+        "am",
+        "integration",
+        parent_type,
+        "integration.sql",
+    )
+    return os.path.isfile(ddl)
+
+
+def detect_am_linked_parent(conn: Any, schema: str = "am") -> str:
+    """
+    Return the WS parent schema name already linked to ``am``, or empty.
+
+    Reads ``parentSchema`` / ``parent_schemas`` from the latest ``sys_version`` row.
+    """
+    try:
+        with conn.raw.cursor() as cur:  # type: ignore[attr-defined]
+            cur.execute(
+                f'SELECT addparam FROM "{schema}".sys_version '
+                "ORDER BY id DESC LIMIT 1"
+            )
+            row = cur.fetchone()
+            if not row or not row[0]:
+                return ""
+            addparam = row[0]
+            if isinstance(addparam, str):
+                import json
+
+                addparam = json.loads(addparam)
+            if not isinstance(addparam, dict):
+                return ""
+            parent = addparam.get("parentSchema") or addparam.get("parent_schema")
+            if parent:
+                return str(parent)
+            parents = addparam.get("parent_schemas") or []
+            if isinstance(parents, list) and parents:
+                return str(parents[-1])
+    except Exception:  # noqa: BLE001
+        try:
+            conn.rollback()
+        except Exception:  # noqa: BLE001
+            pass
+    return ""
+
+
 class NoopConn:
     """``ConnectionLike`` stub used in ``--check`` paths (no DB calls)."""
 

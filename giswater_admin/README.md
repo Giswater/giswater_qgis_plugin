@@ -69,8 +69,9 @@ Typical flow for a new database:
 
 1. `--dbmodel-path`
 2. `GW_DBMODEL_PATH` environment variable
-3. User config (`gw dbmodel use …`)
-4. Sibling `dbmodel/` in a plugin repo checkout
+3. User config with `source: dev` (`gw dbmodel use dev …`)
+4. Sibling `dbmodel/` in a plugin repo checkout (overrides stale release cache)
+5. Release cache (`gw dbmodel install …`)
 
 If nothing matches, run `gw dbmodel install latest` or `gw dbmodel use dev --root /path/to/repo`.
 
@@ -638,8 +639,10 @@ export CONN='postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli'
 gw db init --conn "$CONN"
 gw schema main create --type ws --name ws_test --profile sample --conn "$CONN"
 gw schema main create --type ud --name ud_test --profile sample --conn "$CONN"
-gw schema addon create --type utils --conn "$CONN"
-gw schema addon integrate --type utils --parent ws_test --conn "$CONN"
+gw schema addon create --type am --profile empty --conn "$CONN"
+gw schema addon create --type am --profile sample --conn "$CONN"
+gw schema addon integrate --type am --parent ws_test --conn "$CONN"
+gw schema addon integrate --type am --profile sample --parent ws_test --conn "$CONN"
 gw network show --flat --conn "$CONN" --json | python3 -m json.tool
 ```
 
@@ -652,8 +655,8 @@ gw network show --flat --conn "$CONN" --json | python3 -m json.tool
 | **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `ci`, `update` | Water supply. Updates: `schemas/main/common/updates` then `schemas/main/ws/updates`. |
 | **ud** | same as ws | Sewerage. Updates: common then `schemas/main/ud/updates`. |
 | **utils** | `empty`, `integrate_ws`, `integrate_ud`, `copy_data`, `update` | Standalone create; integrate ws/ud separately; version in `utils.sys_version`. |
-| **am** | `empty`, `update` | Asset management singleton. |
-| **cm** | `bootstrap`, `integrate`, `update` | Bootstrap standalone, then `schema addon integrate --parent …`. |
+| **am** | `empty`, `sample`, `integrate`, `integrate_sample`, `update` | WS parent only; singleton; create then integrate |
+| **cm** | `bootstrap`, `integrate`, `update` | Bootstrap standalone, then `schema addon integrate --parent …` |
 | **audit** | `empty`, `integrate`, `update` | Same flow as other addons via `schema addon create|integrate`. |
 
 **ws/ud profiles** (from [manifests/ws.yaml](../dbmodel/manifests/ws.yaml)):

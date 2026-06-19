@@ -19,22 +19,23 @@ INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, c
 
 
 -- trigger
-drop trigger if exists gw_trg_asset_cat_arc on PARENT_SCHEMA.cat_arc;
+DROP TRIGGER IF EXISTS gw_trg_asset_cat_arc ON PARENT_SCHEMA.cat_arc;
 CREATE TRIGGER gw_trg_asset_cat_arc AFTER INSERT OR UPDATE OF dnom ON PARENT_SCHEMA.cat_arc
 FOR EACH ROW EXECUTE PROCEDURE PARENT_SCHEMA.gw_trg_asset_cat_arc();
 
--- fk
-ALTER TABLE config_catalog_def ADD CONSTRAINT config_catalog_def_fk FOREIGN KEY (arccat_id)
+ALTER TABLE am.config_catalog_def DROP CONSTRAINT IF EXISTS config_catalog_def_fk;
+ALTER TABLE am.config_catalog_def ADD CONSTRAINT config_catalog_def_fk FOREIGN KEY (arccat_id)
 REFERENCES PARENT_SCHEMA.cat_arc (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 -- trigger
-drop trigger if exists gw_trg_asset_cat_material on PARENT_SCHEMA.cat_material;
+DROP TRIGGER IF EXISTS gw_trg_asset_cat_material ON PARENT_SCHEMA.cat_material;
 CREATE TRIGGER gw_trg_asset_cat_material AFTER INSERT ON PARENT_SCHEMA.cat_material
 FOR EACH ROW EXECUTE PROCEDURE PARENT_SCHEMA.gw_trg_asset_cat_material();
 
 -- fk
-ALTER TABLE config_material_def ADD CONSTRAINT config_material_def_fk FOREIGN KEY (material)
+ALTER TABLE am.config_material_def DROP CONSTRAINT IF EXISTS config_material_def_fk;
+ALTER TABLE am.config_material_def ADD CONSTRAINT config_material_def_fk FOREIGN KEY (material)
 REFERENCES PARENT_SCHEMA.cat_material (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 
@@ -15182,6 +15183,8 @@ INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, c
 ('config_engine_def', 'Table to define engines configuration', 'role_om', NULL, '34', NULL, 'Config engine', NULL, NULL, NULL, 'am', NULL),
 ('config_material_def', 'Table to define the materials', 'role_om', NULL, '34', NULL, 'Config material', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO NOTHING;
+
+SET search_path = am, public;
 
 CREATE VIEW v_asset_arc_input AS
  SELECT a.arc_id,

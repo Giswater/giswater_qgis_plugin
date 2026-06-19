@@ -61,13 +61,29 @@ def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -
     sp_ac = asub.add_parser("create", help="Bootstrap an addon schema.", parents=[parent])
     sp_ac.add_argument("--type", required=True, choices=["utils", "cibs", "cm", "am", "audit"])
     sp_ac.add_argument("--name", default=None)
+    sp_ac.add_argument(
+        "--profile",
+        default="empty",
+        choices=["empty", "sample", "inventory"],
+        help="empty|sample for am; ignored for most other addons.",
+    )
     _add_schema_common(sp_ac)
     set_command_spec(sp_ac, _spec(schema_cmd.run_addon_create))
 
     sp_ai = asub.add_parser("integrate", help="Wire an addon into a ws/ud parent.", parents=[parent])
     sp_ai.add_argument("--type", required=True, choices=["utils", "cibs", "cm", "am", "audit"])
-    sp_ai.add_argument("--parent", required=True, help="Parent ws or ud schema name.")
+    sp_ai.add_argument(
+        "--parent",
+        required=True,
+        help="Parent schema name (WS or UD; am requires WS project_type in sys_version).",
+    )
     sp_ai.add_argument("--name", default=None)
+    sp_ai.add_argument(
+        "--profile",
+        default="empty",
+        choices=["empty", "sample", "inventory"],
+        help="empty|sample for am integrate (sample seeds parent catalogs).",
+    )
     _add_schema_common(sp_ai)
     set_command_spec(sp_ai, _spec(schema_cmd.run_addon_integrate))
 

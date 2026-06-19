@@ -195,6 +195,9 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_cibs_copy.clicked.connect(partial(self._adapt_cibs_copy))
         self.btn_cibs_update.clicked.connect(partial(self.admin._update_cibs))
         self.btn_create_am.clicked.connect(partial(self._create_am))
+        self.btn_create_am_sample.clicked.connect(partial(self._create_am_sample))
+        self.btn_integrate_am.clicked.connect(partial(self._integrate_am))
+        self.btn_integrate_am_sample.clicked.connect(partial(self._integrate_am_sample))
         self.btn_update_am.clicked.connect(partial(self._update_am))
         self.btn_delete_am.clicked.connect(partial(self.admin._delete_other_schema, 'am'))
         self.btn_create_cm.clicked.connect(partial(self._create_cm))
@@ -461,7 +464,20 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         )
         self.btn_cibs_copy.setEnabled(has_network_parent and cibs_exists)
 
-        self.btn_create_am.setEnabled(not am_exists and has_network_parent and parent_kind == "WS")
+        am_integrated = admin_catalog.am_is_integrated(am_row, self._inventory_rows)
+
+        self.btn_create_am.setEnabled(not am_exists)
+        self.btn_create_am_sample.setEnabled(not am_exists)
+        self.btn_integrate_am.setEnabled(
+            am_exists
+            and parent_kind == "WS"
+            and not am_integrated
+        )
+        self.btn_integrate_am_sample.setEnabled(
+            am_exists
+            and parent_kind == "WS"
+            and not am_integrated
+        )
         self.btn_update_am.setEnabled(
             am_exists and self._needs_update(str((am_row or {}).get("version") or ""))
         )
@@ -529,12 +545,29 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.admin._update_network(anchor_schema=parent)
 
     def _create_am(self) -> None:
+        self.admin._create_am_schema(profile="empty")
+
+    def _create_am_sample(self) -> None:
+        self.admin._create_am_schema(profile="sample")
+
+    def _integrate_am(self) -> None:
         parent, parent_type = self._parent_context()
         if not parent or parent_type != "WS":
             tools_qt.show_info_box("Select a WS anchor in the network table.")
             return
-        self.admin.create_project_data_other_schema(
-            'am',
+        self.admin._integrate_am_schema(
+            profile="integrate",
+            parent_schema=parent,
+            parent_type=parent_type.lower(),
+        )
+
+    def _integrate_am_sample(self) -> None:
+        parent, parent_type = self._parent_context()
+        if not parent or parent_type != "WS":
+            tools_qt.show_info_box("Select a WS anchor in the network table.")
+            return
+        self.admin._integrate_am_schema(
+            profile="integrate_sample",
             parent_schema=parent,
             parent_type=parent_type.lower(),
         )

@@ -44,11 +44,22 @@ def run(args: argparse.Namespace, out: Out) -> int:  # noqa: C901
 
     if args.kind == "cibs" and args.schema != "cibs":
         out.warn("kind=cibs usually uses schema name 'cibs' (singleton satellite).")
-    if args.kind == "am" and args.profile not in ("update", "empty", "bootstrap") and not args.parent_schema:
-        out.error(
-            "kind=am requires --parent-schema (except profile=empty|update)."
-        )
-        return 1
+
+    _AM_CREATE_PROFILES = frozenset({"empty", "sample"})
+    _AM_INTEGRATE_PROFILES = frozenset({"integrate", "integrate_sample"})
+
+    if args.kind == "am":
+        if args.profile in _AM_INTEGRATE_PROFILES and not args.parent_schema:
+            out.error(
+                "kind=am profile=integrate|integrate_sample requires --parent-schema."
+            )
+            return 1
+        if args.profile not in _AM_CREATE_PROFILES | _AM_INTEGRATE_PROFILES | {"update"}:
+            out.error(
+                f"Unknown profile '{args.profile}' for kind=am. "
+                f"Known: {sorted(_AM_CREATE_PROFILES | _AM_INTEGRATE_PROFILES | {'update'})}"
+            )
+            return 1
 
     target_repr = h.safe_target_repr(args)
     if target_repr:
@@ -61,20 +72,62 @@ def run(args: argparse.Namespace, out: Out) -> int:  # noqa: C901
     parent_type = ""
     conn = None
     needs_detect_in_check = args.check and h.needs_connection(args) and (
-        (args.kind in ("cm", "cibs", "am") and args.parent_schema and not args.parent_type)
+        (
+            args.kind in ("cm", "cibs")
+            and args.parent_schema
+            and not args.parent_type
+        )
+        or (
+            args.kind == "am"
+            and args.profile in _AM_INTEGRATE_PROFILES
+            and args.parent_schema
+            and not args.parent_type
+        )
         or (args.kind == "utils" and not args.main_version and (args.ws_schema or args.ud_schema))
     )
     if (h.needs_connection(args) and not args.check) or needs_detect_in_check:
         conn = h.open_conn(args, out)
 
-    # am / cm parent_type auto-detect
-    if args.kind == "am":
-        parent_type = (args.parent_type or "ws").lower()
-        if conn is not None and not args.parent_type:
-            detected = h.detect_project_type(conn, args.parent_schema)
-            if detected:
-                parent_type = detected
+    # am parent_type: only required for integrate profiles (from sys_version).
+    if args.kind == "am" and args.profile in _AM_INTEGRATE_PROFILES:
+        if args.parent_type:
+            parent_type = args.parent_type.lower()
+        elif conn is not None and args.parent_schema:
+            parent_type = h.detect_project_type(conn, args.parent_schema)
+            if parent_type:
                 out.info(f"parent_type auto-detected: {parent_type}")
+        if not parent_type:
+            out.error(
+                "kind=am: could not detect parent_type. "
+                "Pass --parent-type ws or ensure parent has sys_version.project_type."
+            )
+            if conn is not None:
+                conn.close()
+            return 1
+        if parent_type == "ud":
+            out.error(
+                "kind=am: parent project is UD. AM only integrates with WS parent schemas."
+            )
+            if conn is not None:
+                conn.close()
+            return 1
+        if not h.am_parent_supported(args.dbmodel_path, parent_type):
+            out.error(
+                f"kind=am: parent_type='{parent_type}' is not supported in this dbmodel. "
+                f"Missing 'schemas/addon/am/integration/{parent_type}/integration.sql'."
+            )
+            if conn is not None:
+                conn.close()
+            return 1
+        if conn is not None and not args.check:
+            linked = h.detect_am_linked_parent(conn, args.schema or "am")
+            if linked:
+                out.error(
+                    f"kind=am: already integrated with parent '{linked}'. "
+                    "AM is a singleton satellite (one parent per database)."
+                )
+                conn.close()
+                return 1
 
     if args.kind == "cm":
         if args.parent_type:
@@ -175,7 +228,14 @@ def run(args: argparse.Namespace, out: Out) -> int:  # noqa: C901
             infer_parents = "true"
         if args.profile in ("activate", "integrate"):
             register_parent = args.parent_schema or ""
-    elif args.kind in ("cm", "am"):
+    elif args.kind == "am":
+        if args.profile in ("empty", "sample"):
+            register_is_new = "true"
+        elif args.profile in ("integrate", "integrate_sample", "update"):
+            infer_parents = "true"
+        if args.profile in ("integrate", "integrate_sample"):
+            register_parent = args.parent_schema or ""
+    elif args.kind == "cm":
         if args.profile in ("bootstrap", "empty"):
             register_is_new = "true"
         elif args.profile in ("integrate", "update"):

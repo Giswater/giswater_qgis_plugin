@@ -118,8 +118,8 @@ Satellite schemas walk a single updates/ tree:
 
 5) I18N:
    Network (ws/ud): schemas/main/{ws,ud}/final_pass/i18n/<locale>/
-   CM: schemas/addon/cm/i18n/<locale>/
-   AM: schemas/addon/am/i18n/<locale>/
+   CM: schemas/addon/cm/final_pass/i18n/<locale>/
+   AM: schemas/addon/am/final_pass/i18n/<locale>/
    Do not edit en_US base strings in place for version bumps; add/update via patch.sql or
    locale files as appropriate for the manifest final_pass / load_locale phase.
 

@@ -24,6 +24,14 @@ _MAIN_PROFILE_MAP = {
     "sample": "sample_full",
     "inventory": "sample_inv",
 }
+_AM_CREATE_PROFILE_MAP = {
+    "empty": "empty",
+    "sample": "sample",
+}
+_AM_INTEGRATE_PROFILE_MAP = {
+    "empty": "integrate",
+    "sample": "integrate_sample",
+}
 
 # Fields that legacy ``create`` expects but new ``schema`` parsers omit.
 _CREATE_LEGACY_DEFAULTS = {
@@ -94,10 +102,22 @@ def run_addon_create(args: argparse.Namespace, out: Out) -> int:
         )
         return 1
     name = _resolve_name(args, schema_type)
+    cli_profile = getattr(args, "profile", None) or "empty"
     if schema_type == "audit":
         profile = "empty"
-    elif schema_type in ("cm", "am"):
+    elif schema_type == "cm":
         profile = "bootstrap"
+    elif schema_type == "am":
+        if cli_profile == "inventory":
+            out.error("schema addon create: inventory profile is not supported for am.")
+            return 1
+        profile = _AM_CREATE_PROFILE_MAP.get(cli_profile)
+        if profile is None:
+            out.error(
+                f"schema addon create --type am: --profile must be "
+                f"{sorted(_AM_CREATE_PROFILE_MAP)}, got '{cli_profile}'."
+            )
+            return 1
     else:
         profile = "empty"
     legacy = _legacy_args(args, kind=schema_type, schema=name, profile=profile)
@@ -135,7 +155,19 @@ def run_addon_integrate(args: argparse.Namespace, out: Out) -> int:
             ws_schema = parent
     elif schema_type == "audit":
         profile = "integrate"
-    elif schema_type in ("cibs", "cm", "am"):
+    elif schema_type == "am":
+        cli_profile = getattr(args, "profile", None) or "empty"
+        if cli_profile == "inventory":
+            out.error("schema addon integrate: inventory profile is not supported for am.")
+            return 1
+        profile = _AM_INTEGRATE_PROFILE_MAP.get(cli_profile)
+        if profile is None:
+            out.error(
+                f"schema addon integrate --type am: --profile must be "
+                f"{sorted(_AM_INTEGRATE_PROFILE_MAP)}, got '{cli_profile}'."
+            )
+            return 1
+    elif schema_type in ("cibs", "cm"):
         profile = "integrate"
 
     legacy = _legacy_args(

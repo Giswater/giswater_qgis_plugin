@@ -522,6 +522,54 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="btn_create_am_sample">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Create am schema with sample leaks data</string>
+              </property>
+              <property name="text">
+               <string>+ Sample</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_integrate_am">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Wire am into the selected WS network schema</string>
+              </property>
+              <property name="text">
+               <string>Integrate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_integrate_am_sample">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Integrate am and seed config from parent WS catalogs</string>
+              </property>
+              <property name="text">
+               <string>Int. + Sample</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="btn_update_am">
               <property name="minimumSize">
                <size>

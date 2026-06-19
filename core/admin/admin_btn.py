@@ -377,25 +377,10 @@ class GwAdminButton:
         `audit_activation`) to a manifest kind + profile.
         """
         if process_name == "am":
-            parent_schema, parent_type = self._resolve_parent_context(parent_schema, parent_type)
-            if not parent_schema:
-                tools_qgis.show_warning(
-                    "Select a ws project schema before creating the am schema."
-                )
-                return
-            bp = BuildParams(
-                schema_name="am",
-                srid=str(self.project_epsg or "25831"),
-                locale=self.locale,
-                plugin_version=str(self.plugin_version),
-                profile="empty",
-                parent_schema=parent_schema,
-                parent_type=parent_type,
-                sql_root=self.sql_dir,
+            tools_qgis.show_warning(
+                "Use Manage Schemas to create and integrate the am schema."
             )
-            self._submit_builder("am", bp,
-                                 description="Create am schema",
-                                 on_done=self._on_builder_done_other)
+            return
         elif process_name in ("audit", "audit_activation"):
             profile = "structure" if process_name == "audit" else "activate"
             schema_name = "audit"
@@ -429,6 +414,62 @@ class GwAdminButton:
         if not result.ok:
             self.error_count += 1
         self.manage_other_process_result()
+
+    def _create_am_schema(self, profile: str = "empty") -> None:
+        """Create the singleton am schema (no parent integration)."""
+        msg = "This process will take time (few minutes). Are you sure to continue?"
+        title = "Create am schema"
+        if profile == "sample":
+            title = "Create am schema with sample data"
+        if not tools_qt.show_question(msg, title):
+            return
+        bp = BuildParams(
+            schema_name="am",
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            profile=profile,
+            register_is_new="true",
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder(
+            "am",
+            bp,
+            description=f"Create am ({profile})",
+            on_done=self._on_builder_done_other,
+        )
+
+    def _integrate_am_schema(
+        self,
+        profile: str,
+        parent_schema: str,
+        parent_type: str,
+    ) -> None:
+        """Wire am into a WS parent schema."""
+        msg = (
+            "You are about to integrate am with the following WS schema: {0}\n\n"
+            "Are you sure you want to continue?"
+        )
+        if not tools_qt.show_question(msg, "Integrate am", msg_params=(parent_schema,)):
+            return
+        bp = BuildParams(
+            schema_name="am",
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            profile=profile,
+            parent_schema=parent_schema,
+            parent_type=(parent_type or "ws").lower(),
+            register_parent_schema=parent_schema,
+            infer_parents_from_config="true",
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder(
+            "am",
+            bp,
+            description=f"Integrate am ({profile})",
+            on_done=self._on_builder_done_other,
+        )
 
     def _run_create_cm_task(
         self,
@@ -1694,7 +1735,7 @@ class GwAdminButton:
         self.folder_sample = os.path.join(self.folder_software, 'sample')
 
         # Declare asset db folders
-        self.sql_asset_dir = os.path.join(self.sql_dir, 'schemas', 'am')
+        self.sql_asset_dir = os.path.join(self.sql_dir, 'schemas', 'addon', 'am')
         self.folder_base = os.path.join(self.sql_asset_dir, 'base')
         self.folder_i18n = os.path.join(self.sql_asset_dir, self.file_pattern_i18n)
         self.folder_asset_updates = os.path.join(self.sql_asset_dir, 'updates')
@@ -3818,7 +3859,12 @@ class GwAdminButton:
         cm_exists = aux.get('cm', False)
         audit_exists = aux.get('audit', False)
 
-        self.dlg_readsql.btn_create_asset.setEnabled(project_type == "ws" and schema_name != "null" and not am_exists)
+        self.dlg_readsql.btn_create_asset.setEnabled(
+            project_type == "ws" and schema_name != "null" and not am_exists
+        )
+        self.dlg_readsql.btn_create_asset.setToolTip(
+            tools_qt.tr("Open Manage Schemas to create and integrate am")
+        )
         self.dlg_readsql.btn_update_asset.setEnabled(am_exists)
         self.dlg_readsql.btn_delete_asset.setEnabled(am_exists)
 

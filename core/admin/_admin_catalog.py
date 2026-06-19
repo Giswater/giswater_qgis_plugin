@@ -639,6 +639,28 @@ def parent_satellite_linked(
     return False
 
 
+def am_is_integrated(
+    am_row: Optional[dict[str, Any]],
+    inventory: list[dict[str, Any]],
+) -> bool:
+    """True when the singleton ``am`` schema is already linked to a WS parent."""
+    if not am_row:
+        return False
+    addparam = am_row.get("addparam") or {}
+    if isinstance(addparam, dict):
+        if addparam.get("parentSchema") or addparam.get("parent_schema"):
+            return True
+        parents = addparam.get("parent_schemas") or []
+        if isinstance(parents, list) and parents:
+            return True
+    for row in inventory:
+        kind = str(row.get("kind") or "").upper()
+        schema = str(row.get("schema") or "")
+        if kind == "WS" and schema and parent_satellite_linked(inventory, schema, "am"):
+            return True
+    return False
+
+
 def find_inventory_row(
     inventory: list[dict[str, Any]],
     *,

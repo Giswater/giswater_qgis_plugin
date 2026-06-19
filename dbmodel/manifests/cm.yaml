@@ -50,8 +50,8 @@ phases:
     type: sql_dir
     description: "cm i18n. Falls back to en_US when locale folder missing."
     steps:
-      - source: "schemas/addon/cm/i18n/{{ locale }}"
-        fallback_source: "schemas/addon/cm/i18n/en_US"
+      - source: "schemas/addon/cm/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/addon/cm/final_pass/i18n/en_US"
         recursive: false
 
   - id: register_version

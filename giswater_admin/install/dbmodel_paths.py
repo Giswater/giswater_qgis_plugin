@@ -57,8 +57,9 @@ def resolve_dbmodel_path(explicit: str | None) -> str:
     Priority:
       1. explicit ``--dbmodel-path``
       2. ``GW_DBMODEL_PATH`` environment variable
-      3. user config (release cache or dev root)
-      4. sibling ``dbmodel/`` in a plugin repo checkout
+      3. user config with ``source: dev`` (``gw dbmodel use dev``)
+      4. sibling ``dbmodel/`` in a plugin repo checkout (local dev)
+      5. user config release cache (``gw dbmodel install``)
     """
     if explicit:
         path = os.path.abspath(explicit)
@@ -77,13 +78,19 @@ def resolve_dbmodel_path(explicit: str | None) -> str:
             )
         return path
 
-    configured = _from_config()
-    if configured:
-        return configured
+    dbmodel_cfg = (load_config().get("dbmodel") or {})
+    if dbmodel_cfg.get("source") == "dev":
+        configured_dev = _from_config()
+        if configured_dev:
+            return configured_dev
 
     repo_dev = _repo_dev_dbmodel()
     if repo_dev:
         return repo_dev
+
+    configured = _from_config()
+    if configured:
+        return configured
 
     raise RuntimeError(_bootstrap_message())
 

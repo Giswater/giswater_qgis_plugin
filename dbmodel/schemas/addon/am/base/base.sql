@@ -21,6 +21,7 @@ CREATE TABLE sys_version (
 	"date" timestamp(6) DEFAULT now() NOT NULL,
 	"language" varchar(50) NOT NULL,
 	epsg int4 NOT NULL,
+	addparam jsonb NULL,
 	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
 );
 

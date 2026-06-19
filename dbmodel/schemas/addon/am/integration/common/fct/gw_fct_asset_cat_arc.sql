@@ -23,7 +23,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' THEN
 
-		INSERT INTO config_catalog_def (arccat_id, dnom)
+		INSERT INTO am.config_catalog_def (arccat_id, dnom)
 		VALUES (NEW.id, NEW.dnom::numeric)
 		ON CONFLICT (arccat_id) DO NOTHING;
 
@@ -31,7 +31,7 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		UPDATE config_catalog_def SET dnom = NEW.dnom::numeric
+		UPDATE am.config_catalog_def SET dnom = NEW.dnom::numeric
 		WHERE arccat_id = OLD.id;
 
 		RETURN NEW;

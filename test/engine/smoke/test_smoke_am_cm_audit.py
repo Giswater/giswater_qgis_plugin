@@ -34,16 +34,41 @@ def parent_ws_for_am(adapter, temp_schema_name):
 
 def test_am_empty(adapter, temp_schema_name, parent_ws_for_am):
     manifest = load_manifest(os.path.join(DBMODEL, "manifests", "am.yaml"))
-    params = BuildParams(
+    create_params = BuildParams(
         schema_name=temp_schema_name, srid="25831",
         plugin_version="4.9.0", profile="empty",
+        sql_root=DBMODEL,
+    )
+    integrate_params = BuildParams(
+        schema_name=temp_schema_name, srid="25831",
+        plugin_version="4.9.0", profile="integrate",
         parent_schema=parent_ws_for_am, parent_type="ws",
         sql_root=DBMODEL,
     )
     try:
-        result = SchemaBuilder(adapter, manifest, params).run()
-        assert result.ok, f"am build: {result.first_failure()}"
+        r1 = SchemaBuilder(adapter, manifest, create_params).run()
+        assert r1.ok, f"am create: {r1.first_failure()}"
         adapter.commit()
+        r2 = SchemaBuilder(adapter, manifest, integrate_params).run()
+        assert r2.ok, f"am integrate: {r2.first_failure()}"
+        adapter.commit()
+    finally:
+        drop_schema(adapter, temp_schema_name, cascade=True, commit=True)
+
+
+def test_am_create_sample(adapter, temp_schema_name):
+    manifest = load_manifest(os.path.join(DBMODEL, "manifests", "am.yaml"))
+    params = BuildParams(
+        schema_name=temp_schema_name, srid="25831",
+        plugin_version="4.9.0", profile="sample",
+        sql_root=DBMODEL,
+    )
+    try:
+        result = SchemaBuilder(adapter, manifest, params).run()
+        assert result.ok, f"am sample create: {result.first_failure()}"
+        adapter.commit()
+        load_user = next(p for p in result.phases if p.phase_id == "load_sample_user")
+        assert len(load_user.files) >= 1
     finally:
         drop_schema(adapter, temp_schema_name, cascade=True, commit=True)
 
@@ -58,12 +83,21 @@ def test_am_update_replays_no_legacy_patches(adapter, temp_schema_name, parent_w
     create_params = BuildParams(
         schema_name=temp_schema_name, srid="25831",
         plugin_version="4.0.0", profile="empty",
-        parent_schema=parent_ws_for_am, parent_type="ws",
         sql_root=DBMODEL,
     )
     try:
         r1 = SchemaBuilder(adapter, manifest, create_params).run()
         assert r1.ok, f"am create-at-4.0.0: {r1.first_failure()}"
+        adapter.commit()
+
+        integrate_params = BuildParams(
+            schema_name=temp_schema_name, srid="25831",
+            plugin_version="4.0.0", profile="integrate",
+            parent_schema=parent_ws_for_am, parent_type="ws",
+            sql_root=DBMODEL,
+        )
+        r_int = SchemaBuilder(adapter, manifest, integrate_params).run()
+        assert r_int.ok, f"am integrate-at-4.0.0: {r_int.first_failure()}"
         adapter.commit()
 
         upgrade_params = BuildParams(

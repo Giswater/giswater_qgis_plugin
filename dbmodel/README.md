@@ -171,6 +171,25 @@ schemas/addon/<kind>/updates/<major>/<minor>/<patch>/patch.sql
 
 `am` once used calendar folders `am/updates/<YYYY-MM>/`. Historical SQL was collapsed into `schemas/addon/am/updates/0/0/0/` with date-prefixed filenames. New patches use normal semver folders.
 
+### AM layout (WS-only parent link)
+
+| Path | Role |
+|------|------|
+| `schemas/addon/am/base/` | Core `am` DDL + `fct/` (incl. version register) |
+| `schemas/addon/am/integration/ws/` | **Only** WS integration (`integration.sql`, `sample.sql`) |
+| `schemas/addon/am/integration/common/fct/` | Trigger functions installed on the parent WS schema |
+| `schemas/addon/am/final_pass/i18n/` | Locale folders (fallback `en_US`) |
+| `schemas/addon/am/sample/user/` | Optional am-side sample (leaks, …) |
+
+AM is a **singleton** satellite: one `am` schema per database, linked to **one WS parent** (parent type from `sys_version.project_type`, not schema name). Create and integrate are separate steps (Manage Schemas or CLI).
+
+```bash
+gw schema addon create --type am --profile empty --conn "$CONN"
+gw schema addon create --type am --profile sample --conn "$CONN"
+gw schema addon integrate --type am --parent <ws_schema> --conn "$CONN"
+gw schema addon integrate --type am --profile sample --parent <ws_schema> --conn "$CONN"
+```
+
 ### CM layout (parent-linked)
 
 | Path | Role |
@@ -178,7 +197,7 @@ schemas/addon/<kind>/updates/<major>/<minor>/<patch>/patch.sql
 | `schemas/addon/cm/base/` | Core `cm` DDL + `fct/` + `ftrg/` |
 | `schemas/addon/cm/integration/common/` | Shared parent-link SQL |
 | `schemas/addon/cm/integration/ws` \| `ud/` | Type-specific integration hooks |
-| `schemas/addon/cm/i18n/` | Locale folders (fallback `en_US`) |
+| `schemas/addon/cm/final_pass/i18n/` | Locale folders (fallback `en_US`) |
 | `schemas/addon/cm/sample/` | Optional seed catalogues |
 
 Prerequisite: parent `ws` or `ud` project already created. CLI: `create --kind cm --parent-schema <parent> [--parent-type ws|ud]`.
@@ -188,7 +207,7 @@ Prerequisite: parent `ws` or `ud` project already created. CLI: `create --kind c
 | Kind | Create requirements |
 |------|---------------------|
 | **utils** | Standalone create; integrate each parent with `--ws-schema` / `--ud-schema` |
-| **am** | Standalone |
+| **am** | Create (`empty`\|`sample`); integrate WS parent separately; singleton |
 | **cm** | `--parent-schema` + `--parent-type ws\|ud` |
 | **audit** | `structure` profile once; `activate` per parent project |
 | **cibs** | Standalone create; `integrate` profile wires parent ws/ud |
