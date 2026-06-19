@@ -7,7 +7,7 @@ import os
 from typing import Any, Optional
 
 from .. import conn as conn_mod
-from ..engine import BuildParams, Manifest, load_manifest
+from ..engine import BuildParams, Manifest
 from ..engine.manifest_registry import (
     addon_kinds,
     all_kinds,
