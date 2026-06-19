@@ -10,12 +10,18 @@ from .sql_runner import ConnectionLike
 
 RowFetcher = Callable[[str, Optional[list]], Optional[list[tuple]]]
 
-_SATELLITE_KINDS = ("utils", "cibs", "am", "cm", "audit")
 _NETWORK_KINDS = ("ws", "ud")
 MAIN_KINDS = _NETWORK_KINDS
-ADDON_KINDS = _SATELLITE_KINDS
-_UPDATE_KIND_ORDER = ("utils", "cibs", "ws", "ud", "am", "cm", "audit")
-UPDATE_KIND_ORDER = _UPDATE_KIND_ORDER
+# Backward-compatible defaults when dbmodel_path is unavailable (tests, legacy imports).
+_FALLBACK_ADDON_KINDS = ("utils", "cibs", "am", "cm", "audit")
+ADDON_KINDS = _FALLBACK_ADDON_KINDS
+_FALLBACK_UPDATE_KIND_ORDER = ("utils", "cibs", "ws", "ud", "am", "cm", "audit")
+UPDATE_KIND_ORDER = _FALLBACK_UPDATE_KIND_ORDER
+
+
+def _is_addon_kind(kind: str) -> bool:
+    normalized = _normalize_kind(kind)
+    return bool(normalized) and normalized not in _NETWORK_KINDS
 
 
 @dataclass
@@ -100,7 +106,7 @@ def _kind_tier(kind: str) -> str:
     normalized = _normalize_kind(kind)
     if normalized in _NETWORK_KINDS:
         return "main"
-    if normalized in _SATELLITE_KINDS:
+    if normalized:
         return "addon"
     return "other"
 
@@ -311,7 +317,7 @@ def fetch_schema_names_with_sys_version(fetcher: RowFetcher) -> list[str]:
 
 
 def _version_column_for_schema(schema_name: str, columns: set[str]) -> str:
-    if schema_name in _SATELLITE_KINDS:
+    if schema_name.lower() not in _NETWORK_KINDS:
         if "version" in columns:
             return "version"
         if "giswater" in columns:
@@ -422,10 +428,13 @@ def _expand_satellites_from_parent(
     out: list[tuple[str, str, str]] = []
     satellites = addparam.get("satellites") or {}
     if isinstance(satellites, dict):
-        for kind in _SATELLITE_KINDS:
-            schema_name = _satellite_schema_name(kind, satellites, fetcher)
+        for kind in satellites:
+            kind_norm = _normalize_kind(str(kind))
+            if not kind_norm or kind_norm in _NETWORK_KINDS:
+                continue
+            schema_name = _satellite_schema_name(kind_norm, satellites, fetcher)
             if schema_name:
-                out.append((kind, schema_name, parent_schema))
+                out.append((kind_norm, schema_name, parent_schema))
 
     kind = str(addparam.get("kind") or "").upper()
     if kind in ("WS", "UD"):
@@ -525,7 +534,7 @@ def _collect_edges_from_entries(
                 _add_edge(parent_schema, sat_schema, f"satellite:{kind}")
                 _add_edge(sat_schema, parent_schema, f"parent_of:{kind}")
 
-        if node_kind in _SATELLITE_KINDS:
+        if _is_addon_kind(node_kind):
             for parent_kind, parent_schema, sat_schema in _expand_parents_from_satellite(
                 schema_name, ap, fetcher
             ):
@@ -578,7 +587,7 @@ def _pick_main_cluster(
         }
         has_utils = "utils" in component or "utils" in kinds
         has_network = bool(set(_NETWORK_KINDS) & kinds)
-        has_satellite = bool(set(_SATELLITE_KINDS) & kinds)
+        has_satellite = bool(kinds - set(_NETWORK_KINDS))
         return (
             1 if has_utils else 0,
             1 if has_network and has_satellite else 0,
@@ -676,15 +685,33 @@ def resolve_network_graph(
     return graph
 
 
-def discover_cluster(graph: NetworkGraph) -> list[ClusterMember]:
+def discover_cluster(
+    graph: NetworkGraph,
+    dbmodel_path: str | None = None,
+) -> list[ClusterMember]:
     """Ordered cluster members for lockstep updates."""
     by_kind: dict[str, ClusterMember] = {}
     for node in graph.nodes:
         kind = node.kind.lower()
         if kind not in by_kind:
             by_kind[kind] = ClusterMember(kind=kind, schema=node.schema, version=node.version)
+
+    if dbmodel_path:
+        from .manifest_registry import all_kinds, update_kind_order
+
+        if all_kinds(dbmodel_path):
+            kind_order = list(update_kind_order(dbmodel_path))
+        else:
+            kind_order = list(_FALLBACK_UPDATE_KIND_ORDER)
+    else:
+        kind_order = list(_FALLBACK_UPDATE_KIND_ORDER)
+
+    for kind in by_kind:
+        if kind not in kind_order:
+            kind_order.append(kind)
+
     out: list[ClusterMember] = []
-    for kind in _UPDATE_KIND_ORDER:
+    for kind in kind_order:
         member = by_kind.get(kind)
         if member is not None:
             out.append(member)
@@ -702,7 +729,7 @@ def graph_has_linked_dependents(graph: NetworkGraph, schema: str) -> bool:
 
 
 def _satellites_of_network(graph: NetworkGraph, network_schema: str) -> list[str]:
-    satellite_schemas = {n.schema for n in graph.nodes if n.kind in _SATELLITE_KINDS}
+    satellite_schemas = {n.schema for n in graph.nodes if _is_addon_kind(n.kind)}
     return sorted(
         {
             edge.target
@@ -734,7 +761,7 @@ def summarize_network_links(graph: NetworkGraph) -> dict[str, Any]:
         key=lambda n: n.schema,
     )
     satellites = sorted(
-        (n for n in graph.nodes if n.kind in _SATELLITE_KINDS),
+        (n for n in graph.nodes if _is_addon_kind(n.kind)),
         key=lambda n: n.schema,
     )
     return {

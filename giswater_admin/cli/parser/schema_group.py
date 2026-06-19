@@ -59,7 +59,12 @@ def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -
     asub = addon.add_subparsers(dest="schema_action", required=True)
 
     sp_ac = asub.add_parser("create", help="Bootstrap an addon schema.", parents=[parent])
-    sp_ac.add_argument("--type", required=True, choices=["utils", "cibs", "cm", "am", "audit"])
+    sp_ac.add_argument(
+        "--type",
+        required=True,
+        metavar="KIND",
+        help="Addon kind (any manifest under dbmodel/manifests/, e.g. utils, publi).",
+    )
     sp_ac.add_argument("--name", default=None)
     sp_ac.add_argument(
         "--profile",
@@ -71,7 +76,12 @@ def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -
     set_command_spec(sp_ac, _spec(schema_cmd.run_addon_create))
 
     sp_ai = asub.add_parser("integrate", help="Wire an addon into a ws/ud parent.", parents=[parent])
-    sp_ai.add_argument("--type", required=True, choices=["utils", "cibs", "cm", "am", "audit"])
+    sp_ai.add_argument(
+        "--type",
+        required=True,
+        metavar="KIND",
+        help="Addon kind (see `gw manifest list`).",
+    )
     sp_ai.add_argument(
         "--parent",
         required=True,
@@ -88,13 +98,23 @@ def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -
     set_command_spec(sp_ai, _spec(schema_cmd.run_addon_integrate))
 
     sp_au = asub.add_parser("update", help="Upgrade a standalone addon.", parents=[parent])
-    sp_au.add_argument("--type", required=True, choices=["utils", "cibs", "cm", "am", "audit"])
+    sp_au.add_argument(
+        "--type",
+        required=True,
+        metavar="KIND",
+        help="Addon kind (see `gw manifest list`).",
+    )
     sp_au.add_argument("--name", default=None)
     _add_schema_common(sp_au)
     set_command_spec(sp_au, _spec(schema_cmd.run_addon_update))
 
     sp_ad = asub.add_parser("drop", help="Drop an addon schema.", parents=[parent])
-    sp_ad.add_argument("--type", required=True, choices=["utils", "cibs", "cm", "am", "audit"])
+    sp_ad.add_argument(
+        "--type",
+        required=True,
+        metavar="KIND",
+        help="Addon kind (see `gw manifest list`).",
+    )
     sp_ad.add_argument("--name", default=None)
     sp_ad.add_argument("--yes", action="store_true")
     sp_ad.add_argument("--cascade", action="store_true")
@@ -112,15 +132,14 @@ def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -
         "--tier",
         default="all",
         choices=["all", "main", "addon"],
-        help="main=ws/ud, addon=utils/cibs/am/cm/audit.",
+        help="main=ws/ud, addon=any non-main manifest kind.",
     )
     sp_list.add_argument(
         "--type",
         action="append",
         dest="schema_types",
-        choices=["ws", "ud", "utils", "cibs", "am", "cm", "audit"],
         metavar="KIND",
-        help="Filter by project type (repeatable).",
+        help="Filter by project type (repeatable; see `gw manifest list`).",
     )
     add_conn_args(sp_list)
     set_command_spec(

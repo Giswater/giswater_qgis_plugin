@@ -7,10 +7,10 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from .builder import BuildParams, BuildResult, SchemaBuilder, _parse_version
-from .changelog import iter_semver_under, network_update_roots
+from .changelog import iter_semver_under
 from .manifest import load_manifest
+from .manifest_registry import infer_parents_on_update, kind_update_roots
 from .schema_catalog import (
-    UPDATE_KIND_ORDER,
     ClusterMember,
     NetworkGraph,
     discover_cluster,
@@ -41,12 +41,7 @@ class NetworkUpdateResult:
 
 
 def _kind_update_roots(dbmodel_path: str, kind: str) -> list[str]:
-    k = kind.lower()
-    if k in ("ws", "ud"):
-        return network_update_roots(dbmodel_path, k)
-    if k in ("utils", "cibs", "am", "cm", "audit"):
-        return [os.path.join(dbmodel_path, "schemas", "addon", k, "updates")]
-    return []
+    return kind_update_roots(dbmodel_path, kind)
 
 
 def has_patch_at_version(dbmodel_path: str, kind: str, version: tuple[int, int, int]) -> bool:
@@ -85,7 +80,7 @@ def plan_lockstep(
     dbmodel_path: str,
     target_version: str,
 ) -> list[LockstepStep]:
-    cluster = discover_cluster(graph)
+    cluster = discover_cluster(graph, dbmodel_path)
     if not cluster:
         return []
 
@@ -95,10 +90,8 @@ def plan_lockstep(
 
     for version in versions:
         version_label = version_text(version)
-        for kind in UPDATE_KIND_ORDER:
-            member = next((m for m in cluster if m.kind == kind), None)
-            if member is None:
-                continue
+        for member in cluster:
+            kind = member.kind
             node = by_schema.get(member.schema)
             current = node.version if node else member.version
             if _parse_version(current) >= version:
@@ -119,7 +112,7 @@ def plan_lockstep(
 
 
 def _infer_parents_for_kind(kind: str) -> str:
-    return "true" if kind in ("utils", "ws", "ud") else "false"
+    return "true" if infer_parents_on_update(kind) else "false"
 
 
 def _run_step(

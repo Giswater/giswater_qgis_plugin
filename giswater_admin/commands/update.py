@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 
 from ..engine import BuildParams, SchemaBuilder, changelog_versions_as_dicts, format_upgrade_changelog
+from ..engine.manifest_registry import infer_parents_on_update
 from ..engine.schema_catalog import (
     discover_database_network,
     graph_has_linked_dependents,
@@ -78,7 +79,6 @@ def run(args: argparse.Namespace, out: Out) -> int:
         return 1
 
     target_version = args.to_version or args.plugin_version or getattr(args, "version", None)
-    infer_parents = "true" if kind == "utils" else "false"
     params = BuildParams(
         schema_name=args.schema,
         srid="0",  # irrelevant for upgrade phases (they don't touch SRID)
@@ -89,7 +89,7 @@ def run(args: argparse.Namespace, out: Out) -> int:
         profile="update",
         db_user=_safe_user(args),
         sql_root=args.dbmodel_path,
-        infer_parents_from_config=infer_parents,
+        infer_parents_from_config="true" if infer_parents_on_update(kind) else "false",
     )
 
     if args.check:

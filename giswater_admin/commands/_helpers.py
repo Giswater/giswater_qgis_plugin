@@ -8,6 +8,12 @@ from typing import Any, Optional
 
 from .. import conn as conn_mod
 from ..engine import BuildParams, Manifest, load_manifest
+from ..engine.manifest_registry import (
+    addon_kinds,
+    all_kinds,
+    load_kind_manifest,
+    main_kinds,
+)
 from ..engine.builder import ProgressCb
 from ..engine.sql_runner import ConnectionLike, FileExec
 from ..engine.timing_report import all_files, summarize_build
@@ -29,8 +35,35 @@ SELECT
 
 
 def manifest_for(args: argparse.Namespace, kind: str) -> Manifest:
-    path = os.path.join(args.dbmodel_path, "manifests", f"{kind}.yaml")
-    return load_manifest(path)
+    try:
+        return load_kind_manifest(args.dbmodel_path, kind)
+    except Exception as e:
+        from ..engine.manifest import ManifestError
+
+        if isinstance(e, ManifestError):
+            raise
+        raise ManifestError(str(e)) from e
+
+
+def validate_tier_kind(
+    dbmodel_path: str,
+    kind: str,
+    *,
+    tier: str,
+    out: Out,
+) -> bool:
+    known_fn = {
+        "main": main_kinds,
+        "addon": addon_kinds,
+    }.get(tier, all_kinds)
+    allowed = known_fn(dbmodel_path)
+    if kind.lower() not in allowed:
+        out.error(
+            f"Unknown kind '{kind}' for tier '{tier}'. "
+            f"Known: {sorted(allowed)}. Run `gw manifest list`."
+        )
+        return False
+    return True
 
 
 def needs_connection(args: argparse.Namespace) -> bool:

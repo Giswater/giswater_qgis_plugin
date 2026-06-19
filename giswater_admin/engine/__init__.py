@@ -17,6 +17,14 @@ from .changelog import (
     read_version_sections,
 )
 from .manifest import Manifest, Phase, Step, load_manifest
+from .manifest_registry import (
+    addon_kinds,
+    all_kinds,
+    kind_update_roots,
+    load_kind_manifest,
+    main_kinds,
+    update_kind_order,
+)
 from .network_update import (
     LockstepStep,
     NetworkUpdateResult,
@@ -37,6 +45,8 @@ from .schema_catalog import (
 from .sql_runner import ConnectionLike, FileExec
 
 __all__ = [
+    "addon_kinds",
+    "all_kinds",
     "BuildParams",
     "BuildResult",
     "CancelToken",
@@ -52,6 +62,7 @@ __all__ = [
     "PhaseResult",
     "SchemaBuilder",
     "Step",
+    "update_kind_order",
     "VersionChangelog",
     "changelog_versions_as_dicts",
     "collect_pending_versions",
@@ -62,7 +73,10 @@ __all__ = [
     "format_upgrade_changelog",
     "graph_has_linked_dependents",
     "has_patch_at_version",
+    "kind_update_roots",
+    "load_kind_manifest",
     "load_manifest",
+    "main_kinds",
     "make_conn_fetcher",
     "network_update_roots",
     "parse_changelog_file",
