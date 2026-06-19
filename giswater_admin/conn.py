@@ -1,9 +1,10 @@
 """
-Connection resolution. Three layered sources, evaluated in order:
+Connection resolution. Layered sources, evaluated in order:
 
   1. ``--conn 'postgres://user:pass@host:port/dbname'``
   2. ``--config /path/to/yaml`` with host/port/user/password/dbname
-  3. Environment: PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE,
+  3. User config (``gw config set database.conn`` or ``database.config``)
+  4. Environment: PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE,
      PGSERVICE (psycopg2 will read PGSERVICE for free when nothing else
      is set)
 
@@ -17,6 +18,12 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from urllib.parse import unquote, urlparse
+
+_NO_CONNECTION_MSG = (
+    "No connection info. Pass --conn, --config, run "
+    "'gw config set database.conn URL' (or database.config PATH), "
+    "or set PGDATABASE/PGSERVICE."
+)
 
 
 @dataclass
@@ -44,11 +51,15 @@ def resolve(conn_url: str | None, config_path: str | None) -> ConnInfo:
         return _from_url(conn_url)
     if config_path:
         return _from_config(config_path)
+    user_conn = _user_config_conn_url()
+    if user_conn:
+        return _from_url(user_conn)
+    user_config = _user_config_file()
+    if user_config:
+        return _from_config(user_config)
     info = _from_env()
     if not info.dbname and not info.service:
-        raise RuntimeError(
-            "No connection info. Pass --conn, --config, set PGDATABASE/PGSERVICE."
-        )
+        raise RuntimeError(_NO_CONNECTION_MSG)
     return info
 
 
@@ -58,9 +69,18 @@ def _from_url(url: str) -> ConnInfo:
     p = urlparse(url)
     if p.scheme not in ("postgres", "postgresql"):
         raise RuntimeError(f"--conn scheme must be postgres[ql] (got: {p.scheme!r})")
+    if "@" not in (p.netloc or "") and ":" in (p.netloc or ""):
+        raise RuntimeError(
+            "Connection URL must include host after '@'. "
+            "Expected: postgresql://user:password@host:port/dbname "
+            f"(got: {url!r})"
+        )
+    port = ""
+    if p.port is not None:
+        port = str(p.port)
     return ConnInfo(
         host=p.hostname or "",
-        port=str(p.port) if p.port else "",
+        port=port,
         user=unquote(p.username) if p.username else "",
         password=unquote(p.password) if p.password else "",
         dbname=(p.path or "").lstrip("/"),
@@ -99,12 +119,38 @@ def _from_env() -> ConnInfo:
     )
 
 
+def _user_config_conn_url() -> str | None:
+    from .install.config import get_config_value
+
+    value = get_config_value("database.conn")
+    if value is None or value == "":
+        return None
+    return str(value)
+
+
+def _user_config_file() -> str | None:
+    from .install.config import get_config_value
+
+    value = get_config_value("database.config")
+    if value is None or value == "":
+        return None
+    return str(value)
+
+
 def has_pg_env() -> bool:
     return bool(
         os.environ.get("PGUSER")
         or os.environ.get("PGDATABASE")
         or os.environ.get("PGSERVICE")
     )
+
+
+def has_user_config() -> bool:
+    return bool(_user_config_conn_url() or _user_config_file())
+
+
+def has_connection_source() -> bool:
+    return has_pg_env() or has_user_config()
 
 
 def open_connection(info: ConnInfo, *, autocommit: bool = False):

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Persistent database connection in user config: `gw config set database.conn URL` or `database.config /path/to/conn.yaml` (used when `--conn` / `--config` are omitted).
+
 ## [0.1.1] - 2026-06-18
 
 ### Fixed

@@ -202,7 +202,7 @@ python3 -m giswater_admin --help
 | `gw dbmodel list` | Cached versions + remote latest |
 | `gw dbmodel use latest` | Activate latest cached/remote version |
 | `gw dbmodel use dev --root PATH` | Use `PATH/dbmodel` from a checkout |
-| `gw config get` / `gw config set KEY VALUE` | Persistent settings |
+| `gw config get` / `gw config set KEY VALUE` | Persistent settings (`dbmodel.*`, `database.conn`, `database.config`, …) |
 
 ---
 
@@ -287,7 +287,19 @@ Resolution order (first match wins):
 
 1. `--conn` — `postgresql://user:pass@host:port/dbname` (or `postgres://…`)
 2. `--config` — YAML with `host`, `port`, `user`, `password`, `dbname`, and/or `service`
-3. Environment — `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGSERVICE`
+3. User config — `gw config set database.conn …` or `database.config /path/to/conn.yaml`
+4. Environment — `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`, `PGDATABASE`, `PGSERVICE`
+
+**Persist a default connection** (no `--conn` on every command):
+
+```bash
+gw config set database.conn "postgresql://gisadmin:secret@127.0.0.1:5432/giswater_cli"
+gw schema list
+
+# or point at a separate YAML (keeps passwords out of config.yaml)
+gw config set database.config /path/conn.yaml
+gw config set database.conn null   # clear URL
+```
 
 **Superuser:** mutating commands (`db init`, `schema` create/integrate/update/drop, `network update`, and `--check` with a live connection) require a PostgreSQL **superuser**. Read-only commands (`schema list`, `network show`) work with any role that can `SELECT` Giswater schemas and `pg_catalog`.
 

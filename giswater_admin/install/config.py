@@ -22,6 +22,10 @@ _DEFAULTS: dict[str, Any] = {
         "version": None,
         "dev_root": None,
     },
+    "database": {
+        "conn": None,
+        "config": None,
+    },
     "download": {
         "base_url": DEFAULT_BASE_URL,
         "major": DEFAULT_MAJOR,

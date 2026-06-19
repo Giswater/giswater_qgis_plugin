@@ -39,7 +39,11 @@ def needs_connection(args: argparse.Namespace) -> bool:
         return True
     # Even in check mode, if user passed --conn/--config/PG*, honour it
     # so they get the safe_repr() in the output.
-    return bool(args.conn or args.config or conn_mod.has_pg_env())
+    return bool(
+        args.conn
+        or args.config
+        or conn_mod.has_connection_source()
+    )
 
 
 def open_conn(
