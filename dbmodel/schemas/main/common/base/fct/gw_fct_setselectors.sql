@@ -151,14 +151,14 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"CREATE", "group":"SELECTOR"}}}$$)';
 
-	-- create auxiliar table temp_aux_sector_muni
-	CREATE TEMP TABLE temp_muni_sector_expl AS
-	SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
-	UNION
-	SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0)
-	WHERE expl_id IS NOT NULL;
-	
 	IF v_expl_x_user is false THEN
+		-- create auxiliar table temp_aux_sector_muni
+		CREATE TEMP TABLE temp_muni_sector_expl AS
+		SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
+		UNION
+		SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0)
+		WHERE expl_id IS NOT NULL;
+
 		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
 		SELECT expl_id, code, name, descript, macroexpl_id, active 
 		FROM exploitation 
@@ -207,15 +207,26 @@ BEGIN
 			WHERE id > 0 
 			ORDER BY id;
 		END IF;
-	ELSE	
-		-- populate temp_exploitation with the cat_manager configuration
-		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
-		SELECT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
-		FROM exploitation e WHERE e.active AND e.expl_id > 0
+	ELSE
+		-- create auxiliar table temp_aux_sector_muni
+		CREATE TEMP TABLE temp_muni_sector_expl AS
+		SELECT DISTINCT muni_id, sector_id, expl_id FROM (
+			SELECT muni_id, sector_id, expl_id FROM node WHERE state > 0
+			UNION
+			SELECT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0
+		) n
+		WHERE expl_id IS NOT NULL
 		AND EXISTS (SELECT 1 FROM cat_manager cm
-		WHERE e.expl_id = ANY (cm.expl_id)
+		WHERE n.expl_id = ANY (cm.expl_id)
 		AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
-		WHERE pg_has_role(current_user, r.role, 'member'))) ORDER BY 1;
+		WHERE pg_has_role(current_user, r.role, 'member')));
+
+		INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+		SELECT DISTINCT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
+		FROM temp_muni_sector_expl t
+		JOIN exploitation e ON e.expl_id = t.expl_id
+		WHERE e.active AND e.expl_id > 0
+		ORDER BY 1;
 
 		-- populate temp_network
 		INSERT INTO temp_network (network_id, name, active)

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix schema integration of `cibs` and `utils`.
+- Fix `gw_fct_setselectors` and `gw_fct_getselectors` functions using cat_manager configuration.
 
 ## [4.14.3] - 2026-06-15
 
