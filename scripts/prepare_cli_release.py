@@ -26,6 +26,7 @@ from release_lib import (
     ensure_clean,
     ensure_expected_branch,
     ensure_tag_available,
+    ensure_ruff,
     extract_release_section,
     git,
     initial_release_notes,
@@ -54,6 +55,7 @@ def prepare_initial_cli_release(args: argparse.Namespace, root: Path, version) -
     execute = args.execute
     ensure_expected_branch(root, "main", execute=execute)
     ensure_clean(root, execute=execute)
+    ensure_ruff(root)
 
     changelog_path = root / "giswater_admin" / "CHANGELOG.md"
     pyproject_path = root / "pyproject.toml"
@@ -118,6 +120,7 @@ def prepare_standard_cli_release(args: argparse.Namespace, root: Path, version) 
     execute = args.execute
     ensure_expected_branch(root, "main", execute=execute)
     ensure_clean(root, execute=execute)
+    ensure_ruff(root)
 
     changelog_path = root / "giswater_admin" / "CHANGELOG.md"
     pyproject_path = root / "pyproject.toml"
@@ -202,6 +205,8 @@ def prepare_standard_cli_release(args: argparse.Namespace, root: Path, version) 
 
 def create_release_only(args: argparse.Namespace, root: Path, version) -> None:
     from release_lib import initial_release_notes, previous_release_for
+
+    ensure_ruff(root)
 
     changelog_path = root / "giswater_admin" / "CHANGELOG.md"
     changelog = read_text(changelog_path)

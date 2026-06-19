@@ -1,0 +1,38 @@
+# Aligned with .flake8 / lint-flake8.yml (dbmodel and test/ excluded).
+line-length = 120
+
+exclude = [
+    "__pycache__",
+    ".git",
+    ".pytest_cache",
+    ".idea",
+    "i18n",
+    "icons",
+    "packages",
+    "dbmodel",
+    "test",
+    "i18n_manager.py",
+    "schema_i18n_update.py",
+    "i18n_generator.py",
+    "markdown_generator.py",
+]
+
+[lint]
+select = [
+    "E4",
+    "E7",
+    "E9",
+    "F",
+    "N8",
+    "C90",
+]
+ignore = [
+    "N818",  # legacy Exception names (flake8 N8 does not require *Error suffix)
+    "N802",  # QGIS API methods (initGui, etc.)
+]
+
+[lint.mccabe]
+max-complexity = 40
+
+[lint.per-file-ignores]
+"giswater_admin/commands/create.py" = ["C901"]

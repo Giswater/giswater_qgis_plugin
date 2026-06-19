@@ -250,11 +250,14 @@ python3 scripts/prepare_cli_release.py 0.1.0 --execute --create-github-release
 **Subsequent releases** (e.g. `0.2.0`):
 
 ```bash
+pip install ruff   # required: prepare_cli_release runs ruff before tagging
 python3 scripts/bump_cli_version.py 0.2.0
 # Add changes under ## [Unreleased] in giswater_admin/CHANGELOG.md
 python3 scripts/prepare_cli_release.py 0.2.0 --create-github-release
 python3 scripts/prepare_cli_release.py 0.2.0 --execute --create-github-release
 ```
+
+`prepare_cli_release.py` runs `ruff check giswater_admin scripts` (see repo `ruff.toml`) before creating the tag or GitHub release. Fix lint issues first; the script aborts on failure.
 
 When the GitHub Release is published, CI (`.github/workflows/release-cli.yml`) runs tests, validates versions, builds `dist/*`, publishes to PyPI via OIDC (Trusted Publisher, environment `pypi`), and attaches wheels to the release.
 

@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import urllib.error
 import urllib.request
@@ -18,6 +19,7 @@ from pathlib import Path
 REPO_URL = "https://github.com/Giswater/giswater_qgis_plugin"
 GH_REPO = "Giswater/giswater_qgis_plugin"
 DOCS_URL = "https://docs.giswater.org/latest/en/docs/index.html"
+CLI_RUFF_PATHS = ("giswater_admin", "scripts")
 
 
 @dataclass(frozen=True)
@@ -152,6 +154,40 @@ def ensure_clean(root: Path, *, execute: bool) -> None:
     print("WARNING: working tree is not clean; dry-run continues:\n" + status)
 
 
+def ensure_ruff(root: Path, *, paths: tuple[str, ...] = CLI_RUFF_PATHS) -> None:
+    """Run ruff on CLI-related paths before tagging or publishing."""
+    config = root / "ruff.toml"
+    if not config.is_file():
+        raise ReleaseError(f"Missing ruff config: {config}")
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "ruff", "--version"],
+            cwd=str(root),
+            capture_output=True,
+            check=True,
+            text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        raise ReleaseError(
+            "ruff is required for CLI releases. Install with: pip install ruff"
+        ) from exc
+    result = subprocess.run(
+        [sys.executable, "-m", "ruff", "check", *paths, "--config", str(config)],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        output = "\n".join(
+            line for line in (result.stdout + result.stderr).splitlines() if line.strip()
+        )
+        raise ReleaseError(
+            f"ruff check failed ({', '.join(paths)}). "
+            f"Fix lint issues before releasing.\n{output}"
+        )
+    print(f"== ruff check OK ({', '.join(paths)})")
+
+
 def ensure_expected_branch(root: Path, expected: str, *, execute: bool) -> None:
     branch = current_branch(root)
     if branch == expected:
@@ -224,7 +260,7 @@ def split_changelog_link_block(changelog: str) -> tuple[str, str]:
     match = re.search(r"\n\[unreleased\]: .*\Z", changelog, re.S | re.I)
     if not match:
         raise ReleaseError("CHANGELOG.md has no [unreleased] link block")
-    return changelog[: match.start()].rstrip() + "\n", changelog[match.start() + 1 :]
+    return changelog[: match.start()].rstrip() + "\n", changelog[match.start() + 1:]
 
 
 def rebuild_changelog_links(
@@ -284,8 +320,7 @@ def close_unreleased_section(
 
     if len(headings) == 1:
         unreleased_content = body[
-            unreleased_start + len(header_match.group(0)) :
-        ].strip()
+            unreleased_start + len(header_match.group(0)):].strip()
         if not unreleased_content:
             raise ReleaseError("Unreleased section is empty; nothing to release")
         new_body = (
@@ -305,7 +340,7 @@ def close_unreleased_section(
     previous_version = parse_version(headings[1][0], tag_prefix=version.tag_prefix)
     next_heading_start = headings[1][1]
     unreleased_content = body[
-        unreleased_start + len(header_match.group(0)) : next_heading_start
+        unreleased_start + len(header_match.group(0)):next_heading_start
     ].strip()
     suffix = body[next_heading_start:].lstrip("\n")
 
@@ -334,9 +369,9 @@ def extract_release_section(changelog: str, version: Version) -> str:
     match = pattern.search(body)
     if not match:
         raise ReleaseError(f"Could not find CHANGELOG.md section for {version.text}")
-    next_match = re.search(r"^## \[", body[match.end() :], re.M)
+    next_match = re.search(r"^## \[", body[match.end():], re.M)
     end = match.end() + next_match.start() if next_match else len(body)
-    section = body[match.end() : end].strip()
+    section = body[match.end():end].strip()
     if not section:
         raise ReleaseError(f"CHANGELOG.md section for {version.text} is empty")
     return section

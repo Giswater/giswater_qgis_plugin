@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `prepare_cli_release.py` runs `ruff check` on `giswater_admin/` and `scripts/` before tagging or publishing.
+
 ## [0.2.0] - 2026-06-19
 
 ### Added
