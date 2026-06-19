@@ -1637,8 +1637,6 @@ class GwAdminButton:
             message = _ADMIN_PERMISSION_MESSAGE
             self.form_enabled = False
         elif self.form_enabled:
-            plugin_tuple = _admin_version_tuple(self.plugin_version)
-            project_tuple = _admin_version_tuple(self.project_version)
             schema_name = self._get_selected_schema_name() or 'null'
             db_name = tools_db.dao_db_credentials.get('db') if tools_db.dao_db_credentials else ''
             if any(x in str(db_name) for x in ('.', ',')):

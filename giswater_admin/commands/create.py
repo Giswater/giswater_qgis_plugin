@@ -11,7 +11,7 @@ from ..output import Out
 from . import _helpers as h
 
 
-def run(args: argparse.Namespace, out: Out) -> int:
+def run(args: argparse.Namespace, out: Out) -> int:  # noqa: C901
     manifest = h.manifest_for(args, args.kind)
     if args.profile not in manifest.profiles:
         out.error(

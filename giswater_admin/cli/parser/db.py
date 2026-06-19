@@ -6,7 +6,7 @@ import argparse
 
 from ...commands import init_db as cmd_init_db
 from ..context import CommandSpec, set_command_spec
-from .global_ import add_conn_args, global_parent
+from .global_ import add_conn_args
 
 
 def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -> None:  # noqa: SLF001

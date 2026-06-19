@@ -7,7 +7,7 @@ import argparse
 from ...commands import network as cmd_network
 from ...commands import update_network as cmd_update_network
 from ..context import CommandSpec, set_command_spec
-from .global_ import add_conn_args, add_version_arg, global_parent
+from .global_ import add_conn_args, add_version_arg
 
 
 def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -> None:  # noqa: SLF001

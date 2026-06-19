@@ -6,7 +6,6 @@ import os
 from dataclasses import dataclass, field
 from typing import Literal
 
-from . import sql_runner
 from .builder import BuildParams, BuildResult, SchemaBuilder, _parse_version
 from .changelog import iter_semver_under, network_update_roots
 from .manifest import load_manifest
@@ -17,7 +16,6 @@ from .schema_catalog import (
     discover_cluster,
     fetch_schema_sys_version_entry,
     make_conn_fetcher,
-    resolve_network_graph,
     version_text,
 )
 from .sql_runner import ConnectionLike
@@ -137,7 +135,6 @@ def _run_step(
     if profile not in manifest.profiles:
         profile = "update"
 
-    entry = fetch_schema_sys_version_entry(step.schema, make_conn_fetcher(conn))
     srid = "25831"
     try:
         with conn.raw.cursor() as cur:  # type: ignore[attr-defined]

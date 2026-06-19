@@ -160,7 +160,6 @@ def _schema_version_message() -> str:
 
 
 __all__ = [
-    "REPO_ROOT",
     "active_dbmodel_info",
     "resolve_plugin_version",
     "resolve_schema_version",

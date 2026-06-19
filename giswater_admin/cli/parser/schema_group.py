@@ -6,7 +6,7 @@ import argparse
 
 from ...commands import schema_cmd
 from ..context import CommandSpec, set_command_spec
-from .global_ import add_conn_args, add_version_arg, global_parent
+from .global_ import add_conn_args, add_version_arg
 
 
 def _spec(handler, *, needs_dbmodel=True, needs_schema_version=True) -> CommandSpec:

@@ -26,7 +26,6 @@ from .network_update import (
 )
 from .schema_catalog import (
     ClusterMember,
-    NetworkEdge,
     NetworkGraph,
     NetworkNode,
     discover_cluster,
