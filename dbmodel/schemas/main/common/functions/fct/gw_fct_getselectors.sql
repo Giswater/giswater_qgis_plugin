@@ -185,14 +185,16 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"DROP", "group":"SELECTOR"}}}$$)';
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"project_type":"'||v_project_type||'", "action":"CREATE", "group":"SELECTOR"}}}$$)';
 
-		-- create auxiliar table temp_aux_sector_muni
-		CREATE TEMP TABLE temp_muni_sector_expl AS
-		SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
-		UNION
-		SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0) sub
-		WHERE expl_id is not null;
+
 
 		IF v_expl_x_user is false then
+			-- create auxiliar table temp_aux_sector_muni
+			CREATE TEMP TABLE temp_muni_sector_expl AS
+			SELECT DISTINCT muni_id, sector_id, expl_id FROM node WHERE state > 0
+			UNION
+			SELECT * FROM (SELECT DISTINCT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0) sub
+			WHERE expl_id is not null;
+
 			INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
 			SELECT expl_id, code, name, descript, macroexpl_id, active
 			FROM exploitation
@@ -235,20 +237,31 @@ BEGIN
 			ORDER BY id;
 
 			IF v_project_type = 'WS' THEN
-				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
-				SELECT id, expl_id, macroexpl_id, muni_id, minsector_id
+				INSERT INTO temp_t_mincut (id, work_order, expl_id, macroexpl_id, muni_id, minsector_id, forecast_start, forecast_end)
+				SELECT id, work_order, expl_id, macroexpl_id, muni_id, minsector_id, forecast_start, forecast_end
 				FROM om_mincut
 				WHERE id > 0
 				ORDER BY id;
 			END IF;
 		ELSE
-			INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
-			SELECT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
-			FROM exploitation e WHERE e.active AND e.expl_id > 0
+			CREATE TEMP TABLE temp_muni_sector_expl AS
+			SELECT DISTINCT muni_id, sector_id, expl_id FROM (
+				SELECT muni_id, sector_id, expl_id FROM node WHERE state > 0
+				UNION
+				SELECT muni_id, sector_id, unnest(expl_visibility) AS expl_id FROM node WHERE state > 0
+			) n
+			WHERE expl_id IS NOT NULL
 			AND EXISTS (SELECT 1 FROM cat_manager cm
-			WHERE e.expl_id = ANY (cm.expl_id)
+			WHERE n.expl_id = ANY (cm.expl_id)
 			AND EXISTS (SELECT 1 FROM unnest(cm.rolename) r(role)
-			WHERE pg_has_role(current_user, r.role, 'member'))) ORDER BY 1;
+			WHERE pg_has_role(current_user, r.role, 'member')));
+
+			INSERT INTO temp_exploitation (expl_id, code, name, descript, macroexpl_id, active)
+			SELECT DISTINCT e.expl_id, e.code, e.name, e.descript, e.macroexpl_id, e.active
+			FROM temp_muni_sector_expl t
+			JOIN exploitation e ON e.expl_id = t.expl_id
+			WHERE e.active AND e.expl_id > 0
+			ORDER BY 1;
 
 			-- populate temp_network
 			INSERT INTO temp_network (network_id, name, active)
@@ -294,8 +307,8 @@ BEGIN
 			ON CONFLICT (muni_id) DO NOTHING;
 
 			IF v_project_type = 'WS' THEN
-				INSERT INTO temp_t_mincut (id, expl_id, macroexpl_id, muni_id, minsector_id)
-				SELECT DISTINCT ON (m.id) m.id, m.expl_id, m.macroexpl_id, m.muni_id, m.minsector_id
+				INSERT INTO temp_t_mincut (id, work_order, expl_id, macroexpl_id, muni_id, minsector_id, forecast_start, forecast_end)
+				SELECT DISTINCT ON (m.id) m.id, m.work_order, m.expl_id, m.macroexpl_id, m.muni_id, m.minsector_id, m.forecast_start, m.forecast_end
 				FROM om_mincut m
 				WHERE m.id > 0 AND EXISTS (SELECT 1 FROM cat_manager cm
 				WHERE m.expl_id = ANY (cm.expl_id)
