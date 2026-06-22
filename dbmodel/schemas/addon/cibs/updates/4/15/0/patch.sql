@@ -7,10 +7,11 @@ or (at your option) any later version.
 
 SET search_path = cibs, public, pg_catalog;
 
-DO $$
+DO $patch$
 DECLARE
     rec_schema text;
     v_parent_schemas jsonb;
+    v_payload json;
 BEGIN
     SELECT addparam -> 'parent_schemas'
     INTO v_parent_schemas
@@ -19,30 +20,50 @@ BEGIN
     LIMIT 1;
 
     IF v_parent_schemas IS NOT NULL THEN
+        v_payload := json_build_object(
+            'data', json_build_object(
+                'action', 'SAVE-DROP',
+                'rootViews', json_build_array('v_hydrometer'),
+                'batchId', 1
+            )
+        );
+
         FOR rec_schema IN
             SELECT jsonb_array_elements_text(v_parent_schemas)
         LOOP
             CONTINUE WHEN to_regclass(format('%I.v_hydrometer', rec_schema)) IS NULL;
 
             EXECUTE format(
-                'SELECT %I.gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP","rootViews":["v_hydrometer"],"batchId":1}}$$)::JSON',
+                'SELECT %I.gw_fct_admin_manage_view_dependencies($1)',
                 rec_schema
-            );
+            ) USING v_payload;
         END LOOP;
     END IF;
 
     ALTER TABLE cibs.hydrometer ALTER COLUMN wmeter_number TYPE text USING wmeter_number::text;
 
     IF v_parent_schemas IS NOT NULL THEN
+        EXECUTE format('
+            CREATE OR REPLACE VIEW %I.v_hydrometer AS SELECT * FROM cibs.hydrometer;
+        ', rec_schema);
+
+        v_payload := json_build_object(
+            'data', json_build_object(
+                'action', 'RESTORE',
+                'rootViews', json_build_array('v_hydrometer'),
+                'batchId', 1
+            )
+        );
+
         FOR rec_schema IN
             SELECT jsonb_array_elements_text(v_parent_schemas)
         LOOP
             CONTINUE WHEN to_regclass(format('%I.v_hydrometer', rec_schema)) IS NULL;
 
             EXECUTE format(
-                'SELECT %I.gw_fct_admin_manage_view_dependencies($${"data":{"action":"RESTORE","rootViews":["v_hydrometer"],"batchId":1}}$$)::JSON',
+                'SELECT %I.gw_fct_admin_manage_view_dependencies($1)',
                 rec_schema
-            );
+            ) USING v_payload;
         END LOOP;
     END IF;
-END $$;
+END $patch$;

@@ -21,6 +21,7 @@ BEGIN
             )
         );
         ALTER TABLE ext_hydrometer ALTER COLUMN wmeter_number TYPE text USING wmeter_number::text;
+        CREATE OR REPLACE VIEW v_hydrometer AS SELECT * FROM ext_hydrometer;
         PERFORM gw_fct_admin_manage_view_dependencies(
             json_build_object(
                 'data', json_build_object(
