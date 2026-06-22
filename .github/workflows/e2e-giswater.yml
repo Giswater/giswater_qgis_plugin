@@ -1,4 +1,4 @@
-name: E2E Giswater (reusable)
+name: 🌊 E2E Giswater (reusable)
 
 on:
   workflow_call:

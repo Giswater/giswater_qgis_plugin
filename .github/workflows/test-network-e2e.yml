@@ -1,4 +1,4 @@
-name: Network E2E (Giswater)
+name: 🌊 Network E2E (Giswater)
 
 on:
   workflow_dispatch:
