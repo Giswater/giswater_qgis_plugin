@@ -48,7 +48,7 @@ SELECT col_type_is('ext_hydrometer', 'catalog_id', 'int4', 'Column catalog_id sh
 SELECT col_type_is('ext_hydrometer', 'category_id', 'int4', 'Column category_id should be int4');
 SELECT col_type_is('ext_hydrometer', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
 SELECT col_type_is('ext_hydrometer', 'crmzone_order', 'int4', 'Column crmzone_order should be int4');
-SELECT col_type_is('ext_hydrometer', 'wmeter_number', 'int4', 'Column wmeter_number should be int4');
+SELECT col_type_is('ext_hydrometer', 'wmeter_number', 'text', 'Column wmeter_number should be text');
 SELECT col_type_is('ext_hydrometer', 'wmeter_builtdate', 'date', 'Column wmeter_builtdate should be date');
 SELECT col_type_is('ext_hydrometer', 'wmeter_instaldate', 'date', 'Column wmeter_instaldate should be date');
 SELECT col_type_is('ext_hydrometer', 'plot_code', 'varchar(100)', 'Column plot_code should be varchar(100)');
