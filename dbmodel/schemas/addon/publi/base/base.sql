@@ -7,7 +7,7 @@ or (at your option) any later version.
 
 SET search_path = publi, public;
 
-CREATE TABLE publi.sys_version (
+CREATE TABLE sys_version (
 	id serial4 NOT NULL,
 	giswater varchar(16) NOT NULL,
 	project_type varchar(16) NOT NULL,
@@ -20,10 +20,10 @@ CREATE TABLE publi.sys_version (
 	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE publi.vm_refresh_list (
-	id serial4 NOT NULL,
-	mv_name text NOT NULL,
-	CONSTRAINT vm_refresh_list_mv_name_key UNIQUE (mv_name),
-	CONSTRAINT vm_refresh_list_pkey PRIMARY KEY (id)
+CREATE TABLE config_matviews_refresh (
+	viewname text NOT NULL,
+	description text NULL,
+	active bool NOT NULL DEFAULT true,
+	CONSTRAINT config_matviews_refresh_pkey PRIMARY KEY (viewname)
 );
 
