@@ -1,2 +1,3 @@
 Restrict role permissions and transfer schema ownership to role_system.
 Re-apply permissions and ownership on upgrade.
+Change wmeter_number type to text in ext_hydrometer table.

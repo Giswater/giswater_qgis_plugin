@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix schema integration of `cibs` and `utils`.
+- Change wmeter_number type to text in ext_hydrometer table.
 
 ## [4.14.4] - 2026-06-19
 
