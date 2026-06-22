@@ -278,6 +278,18 @@ PG_MAJOR=18 ./dbmodel/test/run_tests.sh ud
 
 `PG_MAJOR=18` uses PostGIS **3.6**; 16 and 17 use **3.5**.
 
+### Network E2E and satellite pgTAP
+
+CLI lifecycle tests (profiles, upgrades, addon integration, lockstep network) and optional satellite pgTAP:
+
+```bash
+./dbmodel/test/run_e2e.sh update_all       # release gate suite
+./dbmodel/test/run_satellite_tests.sh cibs # pgTAP on cibs schema
+./dbmodel/test/run_satellite_tests.sh network_ws
+```
+
+See [giswater_admin README — Network E2E](../giswater_admin/README.md#network-e2e-optional--release-gate).
+
 ### Environment variables
 
 | Variable | Default | Effect |

@@ -283,6 +283,47 @@ gw create --kind ws --schema test --profile empty --check \
   --conn "postgresql://user@127.0.0.1:5432/mydb"
 ```
 
+### Network E2E (optional / release gate)
+
+Full lifecycle tests (profiles, isolated upgrades, addon integration, lockstep network update). **Required before PyPI / plugin deploy** on `cli-v*` and `v*` releases.
+
+**Local (direct, needs Postgres + `CONN`):**
+
+```bash
+export CONN='postgresql://postgres:postgres@127.0.0.1:5432/gw_db'
+chmod +x scripts/gw_e2e_*.sh scripts/gw_bootstrap_network.sh
+
+./scripts/gw_e2e_profiles.sh              # ws/ud × empty|sample|inventory
+./scripts/gw_e2e_update_isolated.sh       # ws + ud solo @ FROM→TO
+SATELLITES=utils,cibs ./scripts/gw_e2e_addons_integrate.sh
+./scripts/gw_e2e_network_update.sh        # guards + lockstep
+./scripts/gw_e2e_update_all.sh            # full release suite
+```
+
+**Local (Docker, same stack as CI):**
+
+```bash
+./dbmodel/test/run_e2e.sh update_all
+./dbmodel/test/run_e2e.sh profiles
+PG_MAJOR=17 ./dbmodel/test/run_e2e.sh update_network
+
+# Satellite pgTAP (phase 2)
+./dbmodel/test/run_satellite_tests.sh utils
+./dbmodel/test/run_satellite_tests.sh network_ws
+```
+
+**CI:** GitHub Actions → *Network E2E (Giswater)* (`workflow_dispatch`) or automatic on tag push (`v*`, `cli-v*`).
+
+| Scenario | Script / input |
+|----------|----------------|
+| `profiles` | ws/ud × empty, sample, inventory |
+| `update_isolated` | `schema main update` on ws and ud alone |
+| `addons` | utils+cibs create + integrate (`SATELLITES` env) |
+| `update_network` | blocked single updates + `network update` |
+| `update_all` | all of the above (release gate) |
+
+Env: `SATELLITES=utils,cibs`, `PARENT_PROFILE=empty|sample|inventory`, `PLUGIN_VER` / `TARGET_VER` (default: last two semver patches).
+
 ---
 
 ## Connection
@@ -576,12 +617,14 @@ gw network update --version 4.16.0 --conn "$CONN" --check
 gw network update --version 4.16.0 --conn "$CONN"
 ```
 
-**E2E smoke** (empty DB, create @ 4.15.0, upgrade @ 4.16.0):
+**E2E smoke** (linked network @ FROM, lockstep upgrade @ TO — see [Network E2E](#network-e2e-optional--release-gate)):
 
 ```bash
 export CONN='postgresql://user@host:port/giswater_admin_cli'
-chmod +x scripts/gw_e2e_satellites.sh scripts/gw_e2e_network_update.sh
+chmod +x scripts/gw_e2e_*.sh scripts/gw_bootstrap_network.sh
 ./scripts/gw_e2e_network_update.sh
+# or full release suite:
+./scripts/gw_e2e_update_all.sh
 ```
 
 Fixtures under `dbmodel/schemas/**/updates/4/16/0/` (`gw_lockstep_*`) validate cross-schema ordering.

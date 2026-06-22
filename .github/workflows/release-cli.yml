@@ -5,7 +5,14 @@ on:
     types: [published]
 
 jobs:
+  e2e:
+    uses: ./.github/workflows/e2e-giswater.yml
+    with:
+      scenario: update_all
+      pg_version: "18"
+
   publish:
+    needs: [e2e]
     runs-on: ubuntu-latest
     if: startsWith(github.event.release.tag_name, 'cli-v')
     environment: pypi

@@ -3,7 +3,16 @@
 set -euo pipefail
 
 PROJECT="${1:-${PROJECT:?set PROJECT or pass as first argument}}"
-SCHEMA="${PROJECT}_40"
+case "${PROJECT}" in
+  ws|ud) SCHEMA="${PROJECT}_40" ;;
+  utils|cibs) SCHEMA="${PROJECT}" ;;
+  network_ws) SCHEMA="ws_40" ;;
+  network_ud) SCHEMA="ud_40" ;;
+  *)
+    echo "error: unknown PROJECT=${PROJECT} (ws|ud|utils|cibs|network_ws|network_ud)" >&2
+    exit 1
+    ;;
+esac
 TEST_GROUPS="${TEST_GROUPS:-all}"
 PG_PROVE_JOBS="${PG_PROVE_JOBS:-4}"
 GW_CONN="${GW_CONN:-postgresql://postgres:postgres@127.0.0.1:5432/gw_db}"
