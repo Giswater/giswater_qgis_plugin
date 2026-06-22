@@ -19,6 +19,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 bootstrap_args=("$@")
 
+run_drop=true
+for arg in "$@"; do
+  case "$arg" in
+    --check|--drop) run_drop=false ;;
+  esac
+done
+if [[ "$run_drop" == true ]]; then
+  SATELLITES="${SATELLITES:-utils,cibs}" WS="${WS}" UD="${UD}" \
+    "$SCRIPT_DIR/gw_bootstrap_network.sh" --drop >/dev/null 2>&1 || true
+fi
+
 "$SCRIPT_DIR/gw_bootstrap_network.sh" "${bootstrap_args[@]}"
 
 for arg in "$@"; do
