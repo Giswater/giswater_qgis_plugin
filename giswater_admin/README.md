@@ -285,7 +285,7 @@ gw create --kind ws --schema test --profile empty --check \
 
 ### Network E2E (optional / release gate)
 
-Full lifecycle tests (profiles, isolated upgrades, addon integration, lockstep network update). **Required before PyPI / plugin deploy** on `cli-v*` and `v*` releases.
+Release gate E2E (isolated ws/ud upgrades + linked network lockstep update). **Required before PyPI / plugin deploy** on `cli-v*` and `v*` releases. Profile creates and standalone addon integrate run separately (`run_e2e.sh profiles|addons`) or via pgTAP on PR.
 
 **Local (direct, needs Postgres + `CONN`):**
 
@@ -320,7 +320,7 @@ PG_MAJOR=17 ./dbmodel/test/run_e2e.sh update_network
 | `update_isolated` | `schema main update` on ws and ud alone |
 | `addons` | utils+cibs create + integrate (`SATELLITES` env) |
 | `update_network` | blocked single updates + `network update` |
-| `update_all` | all of the above (release gate) |
+| `update_all` | `update_isolated` + `update_network` (release gate) |
 
 Env: `SATELLITES=utils,cibs`, `PARENT_PROFILE=empty|sample|inventory`, `PLUGIN_VER` / `TARGET_VER` (default: last two semver patches).
 

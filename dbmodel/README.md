@@ -280,7 +280,7 @@ PG_MAJOR=18 ./dbmodel/test/run_tests.sh ud
 
 ### Network E2E and satellite pgTAP
 
-CLI lifecycle tests (profiles, upgrades, addon integration, lockstep network) and optional satellite pgTAP:
+CLI lifecycle tests (release gate: isolated upgrade + network lockstep; optional profiles/addons) and satellite pgTAP:
 
 ```bash
 ./dbmodel/test/run_e2e.sh update_all       # release gate suite
