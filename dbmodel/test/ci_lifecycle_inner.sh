@@ -23,7 +23,7 @@ gw() {
     ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
 }
 
-TARGET_VER="$(python3 "${_TEST_ROOT}/plugin_version.py")"
+eval "$(python3 "${_TEST_ROOT}/e2e_versions.py")"
 
 create_main_profile() {
   local ptype="$1"
@@ -42,7 +42,6 @@ create_main_profile() {
     --version "$TARGET_VER" \
     --conn "$CONN"
   gw_e2e_assert_sys_version "$schema" "$TARGET_VER"
-  gw schema main drop --name "$schema" --yes --cascade --conn "$CONN"
 }
 
 case "${MODE}" in

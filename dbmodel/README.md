@@ -386,7 +386,7 @@ flowchart LR
 |-----|--------|-------|
 | `pgtap-main` | `ws/ud` × PG 16/17/18 (6) | bootstrap sample → pgTAP all groups → dump → artifact |
 | `profiles-smoke` | PG 16/17/18 (3) | empty + inventory create ws/ud |
-| `update-isolated` | PG 16/17/18 (3) | isolated ws/ud upgrade |
+| `update-isolated` | PG 16/17/18 (3) | isolated ws/ud upgrade (`latest released → metadata.txt`) |
 | `pgtap-satellites` | PG 16/17/18 (3) | **after main lanes** — ws_40+ud_40 then utils/cibs pgTAP |
 | `pgtap-network` | PG 16/17/18 (3) | **after satellites** — integrated sample network pgTAP |
 | `publish-gw-db` | ws/ud × PG (6, main/tags) | Build `ghcr.io/giswater/gw-db:…` from pgtap-main dump |
@@ -409,10 +409,19 @@ flowchart LR
 | [`test/prove_inner.sh`](./test/prove_inner.sh) | One `TEST_GROUPS`; `-j 1` for function/data |
 | [`test/dump_schema.sh`](./test/dump_schema.sh) | `pg_dump -n {schema}` |
 | [`test/replace_vars.py`](./test/replace_vars.py) | Staging copy for pgTAP |
-| [`test/plugin_version.py`](./test/plugin_version.py) | Max semver from `schemas/main/*/updates/` |
+| [`test/e2e_versions.py`](./test/e2e_versions.py) | E2E upgrade path: `PLUGIN_VER` (CHANGELOG latest release) → `TARGET_VER` (`metadata.txt`) |
+| [`test/plugin_version.py`](./test/plugin_version.py) | Max semver folder under `schemas/main/*/updates/` (pgTAP bootstrap) |
 | [`test/diagnose_db.sh`](./test/diagnose_db.sh) | Optional host `psql` via debug compose |
 
-Plugin version helper:
+E2E upgrade versions (same semantics as `gw schema main update` without `--version`):
+
+```bash
+python3 dbmodel/test/e2e_versions.py
+# TARGET_VER=4.15.0
+# PLUGIN_VER=4.14.4
+```
+
+Max update folder semver (pgTAP bootstrap):
 
 ```bash
 python3 dbmodel/test/plugin_version.py

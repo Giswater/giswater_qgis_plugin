@@ -40,10 +40,8 @@ for ptype in "${TYPES[@]}"; do
   gw_e2e_assert_sys_version "$schema" "$PLUGIN_VER"
 
   echo "=== ${ptype}: update -> ${TARGET_VER} ==="
-  gw schema main update --name "$schema" --version "$TARGET_VER" --conn "$CONN"
+  gw schema main update --name "$schema" --conn "$CONN"
   gw_e2e_assert_sys_version "$schema" "$TARGET_VER"
-
-  gw schema main drop --name "$schema" --yes --cascade --conn "$CONN"
 done
 
 echo ""
