@@ -90,9 +90,7 @@ jobs:
         run: |
           chmod +x test/*.sh ../scripts/gw_*.sh ../scripts/gw_bootstrap_network.sh ../scripts/verify_dbmodel_ci_checks.sh 2>/dev/null || chmod +x test/*.sh
           docker compose -f docker-compose.test.yml run --rm -T runner \
-            bash -c "bash /workspace/dbmodel/test/bootstrap_inner.sh ${{ matrix.project }} && \
-                     bash /workspace/dbmodel/test/dump_schema.sh ${{ matrix.project }} && \
-                     bash /workspace/dbmodel/test/prove_inner.sh ${{ matrix.project }}"
+            bash /workspace/dbmodel/test/pgtap_main_inner.sh ${{ matrix.project }}
 
       - name: Upload schema dump artifact
         if: steps.filter.outputs.active == 'true' && success()
