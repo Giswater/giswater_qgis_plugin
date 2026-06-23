@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add unique index on `link` table to enforce feature_id and feature_type uniqueness when state is 1 and feature_id is not null.
+
 ### Fixed
 
 - Fix schema integration of `cibs` and `utils`.

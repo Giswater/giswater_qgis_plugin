@@ -33,3 +33,7 @@ BEGIN
         );
     END IF;
 END $patch$;
+
+CREATE UNIQUE INDEX link_feature_id_state1_unique
+ON link (feature_id, feature_type)
+WHERE state = 1 AND feature_id IS NOT NULL;
