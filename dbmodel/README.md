@@ -387,8 +387,8 @@ flowchart LR
 | `pgtap-main` | `ws/ud` × PG 16/17/18 (6) | bootstrap sample → pgTAP all groups → dump → artifact |
 | `profiles-smoke` | PG 16/17/18 (3) | empty + inventory create ws/ud |
 | `update-isolated` | PG 16/17/18 (3) | isolated ws/ud upgrade |
-| `pgtap-satellites` | PG 16/17/18 (3) | utils + cibs bootstrap → pgTAP |
-| `pgtap-network` | PG 16/17/18 (3) | integrated sample network → pgTAP |
+| `pgtap-satellites` | PG 16/17/18 (3) | **after main lanes** — ws_40+ud_40 then utils/cibs pgTAP |
+| `pgtap-network` | PG 16/17/18 (3) | **after satellites** — integrated sample network pgTAP |
 | `publish-gw-db` | ws/ud × PG (6, main/tags) | Build `ghcr.io/giswater/gw-db:…` from pgtap-main dump |
 
 **21 checks** on PR (5 lanes × 3 PG + 6 pgTAP project splits). Each pgTAP job runs all test groups in one step (`TEST_GROUPS=all`).
@@ -401,8 +401,10 @@ flowchart LR
 |------|------|
 | [`test/run_tests.sh`](./test/run_tests.sh) | Host: `docker compose` orchestration |
 | [`test/run_tests_inner.sh`](./test/run_tests_inner.sh) | Container: bootstrap → all groups → optional dump |
-| [`test/ci_lifecycle_inner.sh`](./test/ci_lifecycle_inner.sh) | CI lanes: profiles-smoke, update-isolated, pgtap-satellites, pgtap-network |
 | [`test/bootstrap_inner.sh`](./test/bootstrap_inner.sh) | `init-db` + `create --profile sample` + `replace_vars` |
+| [`test/ci_lifecycle_inner.sh`](./test/ci_lifecycle_inner.sh) | CI lanes: profiles, update, satellites, network |
+| [`test/bootstrap_parents_inner.sh`](./test/bootstrap_parents_inner.sh) | `db init` + ws_40/ud_40 parents (before addons) |
+| [`test/bootstrap_addon_inner.sh`](./test/bootstrap_addon_inner.sh) | addon create (requires parents) + `replace_vars` |
 | [`test/restore_inner.sh`](./test/restore_inner.sh) | `init-db` + roles + `pg_restore` from `GW_SCHEMA_DUMP` |
 | [`test/prove_inner.sh`](./test/prove_inner.sh) | One `TEST_GROUPS`; `-j 1` for function/data |
 | [`test/dump_schema.sh`](./test/dump_schema.sh) | `pg_dump -n {schema}` |

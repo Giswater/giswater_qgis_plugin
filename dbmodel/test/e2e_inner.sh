@@ -52,6 +52,7 @@ case "${SCENARIO}" in
     bash "${SCRIPTS}/gw_e2e_satellites.sh"
     ;;
   pgtap_addon)
+    bash "${_TEST_ROOT}/bootstrap_parents_inner.sh"
     bash "${_TEST_ROOT}/bootstrap_addon_inner.sh" "${2:?utils|cibs}"
     bash "${_TEST_ROOT}/prove_inner.sh" "${2}"
     ;;

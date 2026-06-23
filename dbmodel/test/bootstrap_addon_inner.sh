@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Bootstrap standalone addon schema for pgTAP (utils or cibs).
+# Bootstrap addon schema for pgTAP (utils or cibs). Requires ws_40 + ud_40 parents
+# (run bootstrap_parents_inner.sh first).
 set -euo pipefail
 
 # shellcheck source=_env_inner.sh
@@ -15,8 +16,13 @@ gw() {
     ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
 }
 
-echo "==> giswater_admin db init"
-gw db init --conn "${GW_CONN}" --with-pgtap
+for parent in ws_40 ud_40; do
+  if ! psql "${GW_CONN}" -tA -v ON_ERROR_STOP=1 \
+      -c "SELECT 1 FROM information_schema.schemata WHERE schema_name = '${parent}'" | grep -q 1; then
+    echo "error: parent schema ${parent} missing; run bootstrap_parents_inner.sh first" >&2
+    exit 1
+  fi
+done
 
 echo "==> drop addon schema ${SCHEMA}"
 gw schema addon drop --type "${PROJECT}" --name "${SCHEMA}" --yes --cascade \
