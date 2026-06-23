@@ -13,13 +13,15 @@ AS $function$
 DECLARE
     rec record;
 BEGIN
+    SET search_path = publi, public;
 
     FOR rec IN
-        SELECT viewname
-        FROM publi.config_matviews_refresh
+        SELECT viewname, selector_config
+        FROM publi.config_materialized_views
         WHERE active
     LOOP
         BEGIN
+            -- Todo: set selectors
 
             EXECUTE format(
                 'REFRESH MATERIALIZED VIEW publi.%I',
