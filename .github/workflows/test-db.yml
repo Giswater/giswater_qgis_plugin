@@ -84,21 +84,15 @@ jobs:
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml up -d postgres --wait
 
-      - name: Bootstrap and pgTAP
+      - name: Bootstrap, dump, and pgTAP
         if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: |
           chmod +x test/*.sh ../scripts/gw_*.sh ../scripts/gw_bootstrap_network.sh ../scripts/verify_dbmodel_ci_checks.sh 2>/dev/null || chmod +x test/*.sh
           docker compose -f docker-compose.test.yml run --rm -T runner \
             bash -c "bash /workspace/dbmodel/test/bootstrap_inner.sh ${{ matrix.project }} && \
+                     bash /workspace/dbmodel/test/dump_schema.sh ${{ matrix.project }} && \
                      bash /workspace/dbmodel/test/prove_inner.sh ${{ matrix.project }}"
-
-      - name: Dump schema for gw-db image
-        if: steps.filter.outputs.active == 'true'
-        working-directory: dbmodel
-        run: |
-          docker compose -f docker-compose.test.yml run --rm -T runner \
-            bash /workspace/dbmodel/test/dump_schema.sh ${{ matrix.project }}
 
       - name: Upload schema dump artifact
         if: steps.filter.outputs.active == 'true' && success()
