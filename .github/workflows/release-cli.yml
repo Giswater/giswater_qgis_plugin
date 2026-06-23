@@ -5,14 +5,25 @@ on:
     types: [published]
 
 jobs:
-  e2e:
-    uses: ./.github/workflows/e2e-giswater.yml
-    with:
-      scenario: update_all
-      pg_version: "18"
+  verify-dbmodel-ci:
+    if: startsWith(github.event.release.tag_name, 'cli-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify dbmodel CI checks on release commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/verify_dbmodel_ci_checks.sh --tag "${{ github.event.release.tag_name }}" --cli-release
 
   publish:
-    needs: [e2e]
+    needs: [verify-dbmodel-ci]
     runs-on: ubuntu-latest
     if: startsWith(github.event.release.tag_name, 'cli-v')
     environment: pypi

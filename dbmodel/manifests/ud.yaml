@@ -115,8 +115,6 @@ profiles:
     phases: [load_base, updates, lastprocess, load_sample, load_inv, final_pass]
   dev:
     phases: [load_base, updates, lastprocess, load_dev, final_pass]
-  ci:
-    phases: [load_base, updates, lastprocess, load_sample, final_pass]
   update:
     phases: [reload_fct_ftrg, updates, lastprocess_upgrade]
   update_step:

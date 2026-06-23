@@ -661,3 +661,46 @@ def create_github_release_with_api(version: Version, notes: str) -> None:
         raise ReleaseError(f"GitHub release API failed: {exc.code}\n{message}") from exc
 
     print(f"Created GitHub Release: {release.get('html_url', version.tag)}")
+
+
+def git_output(root: Path, *args: str) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def ensure_dbmodel_ci_green(
+    root: Path,
+    *,
+    execute: bool,
+    cli_release: bool = False,
+    sha: str | None = None,
+) -> None:
+    """Require PostgreSQL Tests workflow checks on the release commit."""
+    script = root / "scripts" / "verify_dbmodel_ci_checks.sh"
+    if not script.is_file():
+        raise ReleaseError(f"Missing {script}")
+
+    commit = sha or git_output(root, "rev-parse", "HEAD")
+    cmd = ["bash", str(script), "--sha", commit]
+    if cli_release:
+        cmd.append("--cli-release")
+
+    if not execute:
+        label = "CLI (skip if dbmodel unchanged)" if cli_release else "plugin"
+        print(f"Would verify dbmodel CI checks on {commit} ({label})")
+        print(f"$ {' '.join(cmd)}")
+        return
+
+    if shutil.which("gh") is None:
+        raise ReleaseError(
+            "gh CLI is required to verify dbmodel CI checks before release. "
+            "Install gh or run the release from GitHub Actions."
+        )
+
+    run(cmd, cwd=root, execute=True)

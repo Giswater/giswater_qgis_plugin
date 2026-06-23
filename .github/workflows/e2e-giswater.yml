@@ -29,6 +29,7 @@ permissions:
 
 jobs:
   e2e:
+    name: Network E2E (${{ inputs.scenario }})
     runs-on: ubuntu-latest
     env:
       PG_MAJOR: ${{ inputs.pg_version }}

@@ -5,14 +5,33 @@ on:
     types: [published]
 
 jobs:
-  e2e:
+  verify-dbmodel-ci:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify dbmodel CI checks on release commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/verify_dbmodel_ci_checks.sh --tag "${{ github.event.release.tag_name }}"
+
+  network-lockstep:
+    if: startsWith(github.event.release.tag_name, 'v')
     uses: ./.github/workflows/e2e-giswater.yml
     with:
-      scenario: update_all
+      scenario: update_network
       pg_version: "18"
+      parent_profile: empty
 
   release:
-    needs: [e2e]
+    needs: [verify-dbmodel-ci, network-lockstep]
     runs-on: ubuntu-latest
     if: startsWith(github.event.release.tag_name, 'v')
     steps:

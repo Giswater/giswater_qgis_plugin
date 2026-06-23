@@ -7,17 +7,25 @@ on:
     paths:
       - 'dbmodel/**'
       - 'giswater_admin/**'
+      - 'scripts/gw_e2e*.sh'
+      - 'scripts/gw_bootstrap_network.sh'
       - '.github/workflows/test-db.yml'
   pull_request:
     branches: [main, release/**, feature/**, refactor/**]
     paths:
       - 'dbmodel/**'
       - 'giswater_admin/**'
+      - 'scripts/gw_e2e*.sh'
+      - 'scripts/gw_bootstrap_network.sh'
       - '.github/workflows/test-db.yml'
   workflow_dispatch:
     inputs:
-      tests:
-        description: "Tests to run (all or schema|security|function|data|performance)"
+      lane:
+        description: "all | pgtap-main | profiles-smoke | update-isolated | pgtap-satellites | pgtap-network"
+        required: false
+        default: "all"
+      pg_version:
+        description: "PostgreSQL major (all | 16 | 17 | 18)"
         required: false
         default: "all"
       build_image:
@@ -30,51 +38,70 @@ permissions:
   packages: write
 
 jobs:
-  db-bootstrap:
+  pgtap-main:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      inputs.lane == 'all' || inputs.lane == 'pgtap-main'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        project: [ud, ws]
+        project: [ws, ud]
         pg_version: [16, 17, 18]
-
+    name: pgTAP ${{ matrix.project }} (PG ${{ matrix.pg_version }})
     env:
       PG_MAJOR: ${{ matrix.pg_version }}
-      POSTGIS_VERSION: ${{ matrix.pg_version == 18 && '3.6' || '3.5' }}
+      POSTGIS_VERSION: ${{ matrix.pg_version == '18' && '3.6' || '3.5' }}
+      TEST_GROUPS: all
       GW_VERBOSE: "1"
       GW_TIMING: "1"
       GW_SCHEMA_DUMP: /workspace/dbmodel/gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}.dump
 
     steps:
+      - name: Skip matrix cell (workflow_dispatch filter)
+        id: filter
+        run: |
+          active=true
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            req="${{ github.event.inputs.pg_version }}"
+            if [[ "${req}" != "all" && "${req}" != "${{ matrix.pg_version }}" ]]; then
+              active=false
+            fi
+          fi
+          echo "active=${active}" >> "${GITHUB_OUTPUT}"
+
       - name: Checkout repository
+        if: steps.filter.outputs.active == 'true'
         uses: actions/checkout@v6
 
-      - name: Show matrix
-        run: echo "Bootstrap ${{ matrix.project }} on PostgreSQL ${{ matrix.pg_version }} (PostGIS ${POSTGIS_VERSION})"
-
       - name: Build Docker images
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml build --quiet postgres runner
 
       - name: Start Postgres
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml up -d postgres --wait
 
-      - name: Bootstrap schema (gw schema main create ci)
+      - name: Bootstrap and pgTAP
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: |
-          chmod +x test/*.sh
+          chmod +x test/*.sh ../scripts/*.sh
           docker compose -f docker-compose.test.yml run --rm -T runner \
-            bash /workspace/dbmodel/test/bootstrap_inner.sh ${{ matrix.project }}
+            bash -c "bash /workspace/dbmodel/test/bootstrap_inner.sh ${{ matrix.project }} && \
+                     bash /workspace/dbmodel/test/prove_inner.sh ${{ matrix.project }}"
 
-      - name: Dump schema for test jobs
+      - name: Dump schema for gw-db image
+        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: |
           docker compose -f docker-compose.test.yml run --rm -T runner \
             bash /workspace/dbmodel/test/dump_schema.sh ${{ matrix.project }}
 
       - name: Upload schema dump artifact
-        if: success()
+        if: steps.filter.outputs.active == 'true' && success()
         uses: actions/upload-artifact@v7
         with:
           name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
@@ -82,93 +109,182 @@ jobs:
           retention-days: 2
 
       - name: Stop Postgres
-        if: always()
+        if: always() && steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml down
 
-  db-test:
-    needs: db-bootstrap
+  profiles-smoke:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      inputs.lane == 'all' || inputs.lane == 'profiles-smoke'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        project: [ud, ws]
         pg_version: [16, 17, 18]
-        test_group: [schema, security, function, data, performance]
-
+    name: profiles empty+inventory (PG ${{ matrix.pg_version }})
     env:
       PG_MAJOR: ${{ matrix.pg_version }}
-      POSTGIS_VERSION: ${{ matrix.pg_version == 18 && '3.6' || '3.5' }}
-      PG_PROVE_JOBS: "4"
-      TEST_GROUPS: ${{ matrix.test_group }}
+      POSTGIS_VERSION: ${{ matrix.pg_version == '18' && '3.6' || '3.5' }}
       GW_VERBOSE: "1"
       GW_TIMING: "1"
-      GW_SCHEMA_DUMP: /workspace/dbmodel/gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}.dump
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      # matrix.* is not allowed in job-level if: — filter here for workflow_dispatch
-      - name: Filter test group
+      - name: Skip matrix cell (workflow_dispatch filter)
         id: filter
         run: |
           active=true
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            req="${{ github.event.inputs.tests }}"
-            if [[ "${req}" != "all" && "${req}" != "${{ matrix.test_group }}" ]]; then
+            req="${{ github.event.inputs.pg_version }}"
+            if [[ "${req}" != "all" && "${req}" != "${{ matrix.pg_version }}" ]]; then
               active=false
             fi
           fi
           echo "active=${active}" >> "${GITHUB_OUTPUT}"
 
-      - name: Skip test group (not requested)
-        if: steps.filter.outputs.active != 'true'
-        run: echo "Skipping ${{ matrix.test_group }} (workflow_dispatch tests=${{ github.event.inputs.tests }})"
-
-      - name: Show matrix
+      - uses: actions/checkout@v6
         if: steps.filter.outputs.active == 'true'
-        run: echo "pgTAP ${{ matrix.test_group }} — ${{ matrix.project }} PostgreSQL ${{ matrix.pg_version }}"
 
-      - name: Download schema dump
+      - working-directory: dbmodel
         if: steps.filter.outputs.active == 'true'
-        uses: actions/download-artifact@v8
-        with:
-          name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
-          path: dbmodel
-
-      - name: Build Docker images
-        if: steps.filter.outputs.active == 'true'
-        working-directory: dbmodel
-        run: docker compose -f docker-compose.test.yml build --quiet postgres runner
-
-      - name: Start Postgres
-        if: steps.filter.outputs.active == 'true'
-        working-directory: dbmodel
-        run: docker compose -f docker-compose.test.yml up -d postgres --wait
-
-      - name: Restore schema from dump
-        if: steps.filter.outputs.active == 'true'
-        working-directory: dbmodel
         run: |
-          chmod +x test/*.sh
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
           docker compose -f docker-compose.test.yml run --rm -T runner \
-            bash /workspace/dbmodel/test/restore_inner.sh ${{ matrix.project }}
+            bash /workspace/dbmodel/test/ci_lifecycle_inner.sh profiles-smoke
+          docker compose -f docker-compose.test.yml down
 
-      - name: Run pgTAP (${{ matrix.test_group }})
-        if: steps.filter.outputs.active == 'true'
-        working-directory: dbmodel
+  update-isolated:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      inputs.lane == 'all' || inputs.lane == 'update-isolated'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [16, 17, 18]
+    name: update isolated (PG ${{ matrix.pg_version }})
+    env:
+      PG_MAJOR: ${{ matrix.pg_version }}
+      POSTGIS_VERSION: ${{ matrix.pg_version == '18' && '3.6' || '3.5' }}
+      GW_VERBOSE: "1"
+      GW_TIMING: "1"
+
+    steps:
+      - name: Skip matrix cell (workflow_dispatch filter)
+        id: filter
         run: |
-          docker compose -f docker-compose.test.yml run --rm -T runner \
-            bash /workspace/dbmodel/test/prove_inner.sh ${{ matrix.project }}
+          active=true
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            req="${{ github.event.inputs.pg_version }}"
+            if [[ "${req}" != "all" && "${req}" != "${{ matrix.pg_version }}" ]]; then
+              active=false
+            fi
+          fi
+          echo "active=${active}" >> "${GITHUB_OUTPUT}"
 
-      - name: Stop Postgres
-        if: always() && steps.filter.outputs.active == 'true'
-        working-directory: dbmodel
-        run: docker compose -f docker-compose.test.yml down
+      - uses: actions/checkout@v6
+        if: steps.filter.outputs.active == 'true'
+
+      - working-directory: dbmodel
+        if: steps.filter.outputs.active == 'true'
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/ci_lifecycle_inner.sh update-isolated
+          docker compose -f docker-compose.test.yml down
+
+  pgtap-satellites:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      inputs.lane == 'all' || inputs.lane == 'pgtap-satellites'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [16, 17, 18]
+    name: pgTAP satellites (PG ${{ matrix.pg_version }})
+    env:
+      PG_MAJOR: ${{ matrix.pg_version }}
+      POSTGIS_VERSION: ${{ matrix.pg_version == '18' && '3.6' || '3.5' }}
+      TEST_GROUPS: all
+      GW_VERBOSE: "1"
+      GW_TIMING: "1"
+
+    steps:
+      - name: Skip matrix cell (workflow_dispatch filter)
+        id: filter
+        run: |
+          active=true
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            req="${{ github.event.inputs.pg_version }}"
+            if [[ "${req}" != "all" && "${req}" != "${{ matrix.pg_version }}" ]]; then
+              active=false
+            fi
+          fi
+          echo "active=${active}" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/checkout@v6
+        if: steps.filter.outputs.active == 'true'
+
+      - working-directory: dbmodel
+        if: steps.filter.outputs.active == 'true'
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/ci_lifecycle_inner.sh pgtap-satellites
+          docker compose -f docker-compose.test.yml down
+
+  pgtap-network:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      inputs.lane == 'all' || inputs.lane == 'pgtap-network'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [16, 17, 18]
+    name: pgTAP network (PG ${{ matrix.pg_version }})
+    env:
+      PG_MAJOR: ${{ matrix.pg_version }}
+      POSTGIS_VERSION: ${{ matrix.pg_version == '18' && '3.6' || '3.5' }}
+      TEST_GROUPS: all
+      GW_VERBOSE: "1"
+      GW_TIMING: "1"
+
+    steps:
+      - name: Skip matrix cell (workflow_dispatch filter)
+        id: filter
+        run: |
+          active=true
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            req="${{ github.event.inputs.pg_version }}"
+            if [[ "${req}" != "all" && "${req}" != "${{ matrix.pg_version }}" ]]; then
+              active=false
+            fi
+          fi
+          echo "active=${active}" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/checkout@v6
+        if: steps.filter.outputs.active == 'true'
+
+      - working-directory: dbmodel
+        if: steps.filter.outputs.active == 'true'
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/ci_lifecycle_inner.sh pgtap-network
+          docker compose -f docker-compose.test.yml down
 
   publish-gw-db:
-    needs: [db-bootstrap, db-test]
+    needs: [pgtap-main]
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event.inputs.build_image == 'true'
     runs-on: ubuntu-latest
     strategy:

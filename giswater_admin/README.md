@@ -283,9 +283,9 @@ gw create --kind ws --schema test --profile empty --check \
   --conn "postgresql://user@127.0.0.1:5432/mydb"
 ```
 
-### Network E2E (optional / release gate)
+### Network E2E (manual / release lockstep)
 
-Release gate E2E (isolated ws/ud upgrades + linked network lockstep update). **Required before PyPI / plugin deploy** on `cli-v*` and `v*` releases. Profile creates and standalone addon integrate run separately (`run_e2e.sh profiles|addons`) or via pgTAP on PR.
+Per-commit dbmodel validation runs in **PostgreSQL Tests** (21 checks: sample pgTAP, profiles, updates, satellites, network). **Release** verifies those checks on the tag SHA; plugin releases also run **network lockstep** (`update_network`, PG 18).
 
 **Local (direct, needs Postgres + `CONN`):**
 
@@ -312,7 +312,7 @@ PG_MAJOR=17 ./dbmodel/test/run_e2e.sh update_network
 ./dbmodel/test/run_satellite_tests.sh network_ws
 ```
 
-**CI:** GitHub Actions → *Network E2E (Giswater)* (`workflow_dispatch`) or automatic on tag push (`v*`, `cli-v*`).
+**CI:** GitHub Actions → *PostgreSQL Tests* on every PR/push touching `dbmodel/**` (21 jobs). *Network E2E (Giswater)* is manual (`workflow_dispatch`) for ad-hoc scenarios. Release workflows verify CI checks instead of re-running the full matrix.
 
 | Scenario | Script / input |
 |----------|----------------|
@@ -695,7 +695,7 @@ gw network show --flat --conn "$CONN" --json | python3 -m json.tool
 
 | `kind` | Typical profiles | Notes |
 |--------|------------------|-------|
-| **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `ci`, `update` | Water supply. Updates: `schemas/main/common/updates` then `schemas/main/ws/updates`. |
+| **ws** | `empty`, `sample_full`, `sample_inv`, `dev`, `update` | Water supply. Updates: `schemas/main/common/updates` then `schemas/main/ws/updates`. |
 | **ud** | same as ws | Sewerage. Updates: common then `schemas/main/ud/updates`. |
 | **utils** | `empty`, `integrate_ws`, `integrate_ud`, `copy_data`, `update` | Standalone create; integrate ws/ud separately; version in `utils.sys_version`. |
 | **am** | `empty`, `sample`, `integrate`, `integrate_sample`, `update` | WS parent only; singleton; create then integrate |
@@ -707,10 +707,9 @@ gw network show --flat --conn "$CONN" --json | python3 -m json.tool
 | Profile | Phases (summary) |
 |---------|------------------|
 | `empty` | `load_base` → `updates` → `lastprocess` → `final_pass` |
-| `sample_full` | … → `load_sample` → `final_pass` |
+| `sample_full` | … → `load_sample` → `final_pass` (CLI `--profile sample`; pgTAP bootstrap) |
 | `sample_inv` | … → `load_sample` → `load_inv` → `final_pass` |
 | `dev` | … → `load_dev` → `final_pass` |
-| `ci` | … → `load_sample` → `final_pass` (used by pgTAP bootstrap) |
 | `update` | `reload_fct_ftrg` → `updates` → `lastprocess_upgrade` |
 
 Details and folder layout: [dbmodel README — Schema architecture](../dbmodel/README.md#schema-architecture).

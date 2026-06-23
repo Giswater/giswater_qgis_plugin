@@ -35,7 +35,7 @@ def register(sub: argparse._SubParsersAction, parent: argparse.ArgumentParser) -
     sp_mc.add_argument(
         "--profile",
         default="empty",
-        choices=["empty", "sample", "inventory", "ci", "dev"],
+        choices=["empty", "sample", "inventory", "dev"],
     )
     sp_mc.add_argument("--srid", default="25831")
     _add_schema_common(sp_mc)

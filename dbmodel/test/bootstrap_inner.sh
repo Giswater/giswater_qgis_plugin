@@ -15,11 +15,11 @@ echo "==> drop schema ${SCHEMA} (if exists)"
 python3 -m giswater_admin schema main drop --name "${SCHEMA}" --yes --cascade \
   --conn "${GW_CONN}" --dbmodel-path "${DBMODEL_DIR}" >/dev/null 2>&1 || true
 
-echo "==> giswater_admin schema main create --profile ci (schema ${SCHEMA})"
+echo "==> giswater_admin schema main create --profile sample (schema ${SCHEMA})"
 python3 -m giswater_admin schema main create \
   --type "${PROJECT}" \
   --name "${SCHEMA}" \
-  --profile ci \
+  --profile sample \
   --srid 25831 \
   --locale en_US \
   --version "${GW_PLUGIN_VERSION}" \

@@ -82,7 +82,7 @@ sequenceDiagram
   participant M as manifests/ws.yaml
   participant B as SchemaBuilder
   participant SQL as schemas/main
-  CLI->>M: profile=empty|ci|sample_full|...
+  CLI->>M: profile=empty|sample|inventory|...
   M->>B: ordered phases
   B->>SQL: sql_dir / version_walk / sql_function
 ```
@@ -212,7 +212,7 @@ Prerequisite: parent `ws` or `ud` project already created. CLI: `create --kind c
 | **audit** | `structure` profile once; `activate` per parent project |
 | **cibs** | Standalone create; `integrate` profile wires parent ws/ud |
 
-pgTAP bootstrap uses `create --profile ci` on `ws` or `ud` — see [Testing](#testing).
+pgTAP bootstrap uses `create --profile sample` on `ws` or `ud` — see [Testing](#testing).
 
 ---
 
@@ -278,7 +278,21 @@ PG_MAJOR=18 ./dbmodel/test/run_tests.sh ud
 
 `PG_MAJOR=18` uses PostGIS **3.6**; 16 and 17 use **3.5**.
 
-### Network E2E and satellite pgTAP
+### CI (PostgreSQL Tests)
+
+On every PR/push touching `dbmodel/**`, GitHub Actions runs **21 checks** (6 lanes × PG 16/17/18):
+
+| Lane | What |
+|------|------|
+| pgTAP ws / ud | `--profile sample` + full pgTAP |
+| profiles empty+inventory | create smoke ws+ud |
+| update isolated | penúltimo→último patch ws+ud |
+| pgTAP satellites | utils + cibs standalone |
+| pgTAP network | integrated sample + network pgTAP |
+
+Release (`prepare_*_release.py --execute`) calls `scripts/verify_dbmodel_ci_checks.sh` before tagging. Plugin release also runs network lockstep via Actions.
+
+### Network E2E (manual)
 
 CLI lifecycle tests (release gate: isolated upgrade + network lockstep; optional profiles/addons) and satellite pgTAP:
 
@@ -332,7 +346,7 @@ flowchart LR
 **Bootstrap** (`bootstrap_inner.sh`):
 
 1. `giswater_admin init-db`
-2. `drop` + `create --profile ci` → schema `ws_40` or `ud_40`
+2. `drop` + `create --profile sample` → schema `ws_40` or `ud_40`
 3. `replace_vars.py` → copies `test/ws` or `test/ud` to `test/.run/{ws,ud}/` (only placeholders `SCHEMA_NAME`, `SRID_VALUE` resolved; **sources never modified**)
 
 **Prove** (`prove_inner.sh`): runs pgTAP for one `TEST_GROUPS` value against the staging tree.
@@ -360,20 +374,26 @@ Inside Docker, Postgres is always `127.0.0.1:5432` on the compose network. A war
 
 ```mermaid
 flowchart LR
-  BS[db-bootstrap matrix 6] --> Art[schema dump artifact]
-  Art --> DT[db-test matrix 30]
-  BS --> Pub[publish-gw-db main/tags]
+  PM[pgtap-main 6] --> Art[schema dump artifact]
+  PS[profiles-smoke 3]
+  UI[update-isolated 3]
+  SAT[pgtap-satellites 3]
+  NET[pgtap-network 3]
+  PM --> Pub[publish-gw-db main/tags]
 ```
 
 | Job | Matrix | Steps |
 |-----|--------|-------|
-| `db-bootstrap` | `ws/ud` × PG 16/17/18 (6) | Postgres → bootstrap → dump → upload artifact |
-| `db-test` | × groups: schema, security, function, data, performance (30) | Download dump → restore → pg_prove group |
-| `publish-gw-db` | same 6 (main/tags) | Build `ghcr.io/giswater/gw-db:…` from bootstrap dump |
+| `pgtap-main` | `ws/ud` × PG 16/17/18 (6) | bootstrap sample → pgTAP all groups → dump → artifact |
+| `profiles-smoke` | PG 16/17/18 (3) | empty + inventory create ws/ud |
+| `update-isolated` | PG 16/17/18 (3) | isolated ws/ud upgrade |
+| `pgtap-satellites` | PG 16/17/18 (3) | utils + cibs bootstrap → pgTAP |
+| `pgtap-network` | PG 16/17/18 (3) | integrated sample network → pgTAP |
+| `publish-gw-db` | ws/ud × PG (6, main/tags) | Build `ghcr.io/giswater/gw-db:…` from pgtap-main dump |
 
-Jobs run groups in parallel; each test job restores the same dump into a fresh Postgres. `GW_VERBOSE=1` and `GW_TIMING=1` on bootstrap and test jobs.
+**21 checks** on PR (5 lanes × 3 PG + 6 pgTAP project splits). Each pgTAP job runs all test groups in one step (`TEST_GROUPS=all`).
 
-`workflow_dispatch` input `tests` can limit to one group (e.g. `function`).
+`workflow_dispatch` inputs: `lane` (all or one lane), `pg_version`, `build_image`.
 
 ### Test harness files
 
@@ -381,7 +401,8 @@ Jobs run groups in parallel; each test job restores the same dump into a fresh P
 |------|------|
 | [`test/run_tests.sh`](./test/run_tests.sh) | Host: `docker compose` orchestration |
 | [`test/run_tests_inner.sh`](./test/run_tests_inner.sh) | Container: bootstrap → all groups → optional dump |
-| [`test/bootstrap_inner.sh`](./test/bootstrap_inner.sh) | `init-db` + `create --profile ci` + `replace_vars` |
+| [`test/ci_lifecycle_inner.sh`](./test/ci_lifecycle_inner.sh) | CI lanes: profiles-smoke, update-isolated, pgtap-satellites, pgtap-network |
+| [`test/bootstrap_inner.sh`](./test/bootstrap_inner.sh) | `init-db` + `create --profile sample` + `replace_vars` |
 | [`test/restore_inner.sh`](./test/restore_inner.sh) | `init-db` + roles + `pg_restore` from `GW_SCHEMA_DUMP` |
 | [`test/prove_inner.sh`](./test/prove_inner.sh) | One `TEST_GROUPS`; `-j 1` for function/data |
 | [`test/dump_schema.sh`](./test/dump_schema.sh) | `pg_dump -n {schema}` |
