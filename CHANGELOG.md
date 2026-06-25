@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix schema integration of `cibs` and `utils`.
 - Change wmeter_number type to text in ext_hydrometer table.
 
+## [4.14.5] - 2026-06-25
+
+### Fixed
+
+- Fix `get_major_version` function on `tools_qgis` to return the correct major version.
+
 ## [4.14.4] - 2026-06-19
 
 ### Fixed
@@ -467,7 +473,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.4...main
+[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.5...main
+[4.14.5]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.4...v4.14.5
 [4.14.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.3...v4.14.4
 [4.14.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.2...v4.14.3
 [4.14.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.14.1...v4.14.2
