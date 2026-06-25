@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `get_major_version` function on `tools_qgis` to return the correct major version.
+
 ## [4.14.4] - 2026-06-19
 
 ### Fixed
