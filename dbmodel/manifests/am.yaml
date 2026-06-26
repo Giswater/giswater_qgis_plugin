@@ -13,8 +13,9 @@ phases:
     type: sql_dir
     description: "Asset management DDL."
     steps:
-      - { source: "schemas/addon/am/base/base.sql", recursive: false }
+      - { source: "schemas/addon/am/base/init.sql", recursive: false }
       - { source: "schemas/addon/am/base/fct", recursive: false }
+      - { source: "schemas/addon/am/base/base.sql", recursive: false }
 
   - id: integrate_am
     type: sql_dir
