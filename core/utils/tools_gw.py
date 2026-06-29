@@ -7,10 +7,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
+import io
 import json
 import os
 import random
 import re
+import shutil
 import sys
 import sqlite3
 import webbrowser
@@ -404,9 +406,8 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
         else:
             parser.set(section, parameter)  # This is just for writing comments
 
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
+        if not _write_config_parser(path, parser):
+            return
 
     except Exception as e:
         msg = "{0} exception [{1}]: {2}"
@@ -6711,9 +6712,70 @@ def recreate_config_files():
                 os.remove(bak_filename)
             os.rename(filepath, bak_filename)
 
+    _restore_user_params_config()
     manage_user_config_folder(lib_vars.user_folder_dir)
     initialize_parsers()
     user_params_to_userconfig()
+
+
+def _make_config_parser():
+    """ Create a ConfigParser with Giswater config conventions. """
+    return configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
+
+
+def _try_read_config_path(filepath):
+    """ Read a config file; return parser on success or None if unreadable. """
+    parser = _make_config_parser()
+    try:
+        parser.read(filepath)
+        return parser
+    except Exception:
+        return None
+
+
+def _write_config_parser(path, parser):
+    """ Write parser to disk. For user_params, validate round-trip before persisting. """
+    buffer = io.StringIO()
+    parser.write(buffer)
+    content = buffer.getvalue()
+
+    if path.endswith(f"{os.sep}user_params.config"):
+        test_parser = _make_config_parser()
+        try:
+            test_parser.read_file(io.StringIO(content))
+        except Exception as e:
+            msg = "{0}: Refusing to write invalid user_params.config [{1}]: {2}"
+            msg_params = ("_write_config_parser", type(e).__name__, e)
+            tools_log.log_warning(msg, msg_params=msg_params)
+            return False
+
+    with open(path, 'w') as configfile:
+        configfile.write(content)
+    return True
+
+
+def _restore_user_params_config():
+    """ Restore user_params.config from plugin template when the user copy is unreadable. """
+    if global_vars.gw_dev_mode:
+        return
+
+    user_filepath = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}user_params.config"
+    src = f"{lib_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
+    if not os.path.exists(src):
+        return
+
+    if os.path.exists(user_filepath) and _try_read_config_path(user_filepath) is not None:
+        return
+
+    if os.path.exists(user_filepath):
+        now = datetime.now().strftime("%d%m%Y-%H%M%S")
+        bak_filename = f"{user_filepath}_{now}.bak"
+        if os.path.exists(bak_filename):
+            os.remove(bak_filename)
+        os.rename(user_filepath, bak_filename)
+
+    os.makedirs(os.path.dirname(user_filepath), exist_ok=True)
+    shutil.copyfile(src, user_filepath)
 
 
 def remove_deprecated_config_vars():
@@ -7347,7 +7409,7 @@ def _get_parser_from_filename(filename):
     else:
         return None, None
 
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
+    parser = _make_config_parser()
     filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
     if not os.path.exists(filepath):
         msg = "File not found: {0}"
@@ -7358,6 +7420,11 @@ def _get_parser_from_filename(filename):
     try:
         parser.read(filepath)
     except (configparser.DuplicateSectionError, configparser.DuplicateOptionError, configparser.ParsingError) as e:
+        msg = "Error parsing file: {0}"
+        msg_params = (filepath,)
+        tools_qgis.show_critical(msg, parameter=e, msg_params=msg_params)
+        return filepath, None
+    except Exception as e:
         msg = "Error parsing file: {0}"
         msg_params = (filepath,)
         tools_qgis.show_critical(msg, parameter=e, msg_params=msg_params)
