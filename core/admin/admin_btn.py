@@ -2370,7 +2370,20 @@ class GwAdminButton:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
 
     def _should_show_advanced_tab(self) -> bool:
-        level_ok = lib_vars.user_level['level'] in lib_vars.user_level['showadminadvanced']
+        allowed_levels = lib_vars.user_level.get('showadminadvanced')
+        if allowed_levels is None:
+            allowed_levels = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
+            lib_vars.user_level['showadminadvanced'] = allowed_levels
+
+        user_level = lib_vars.user_level.get('level')
+        if user_level in (None, "None"):
+            user_level = tools_gw.get_config_parser('user_level', 'level', "user", "init", False)
+            lib_vars.user_level['level'] = user_level
+
+        if not allowed_levels or user_level in (None, "None"):
+            return False
+
+        level_ok = str(user_level) in str(allowed_levels)
         return level_ok and self._can_administer_schemas()
 
     def _update_advanced_tab_visibility(self):
