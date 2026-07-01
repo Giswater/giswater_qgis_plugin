@@ -37,3 +37,11 @@ END $patch$;
 CREATE UNIQUE INDEX link_feature_id_state1_unique
 ON link (feature_id, feature_type)
 WHERE state = 1 AND feature_id IS NOT NULL;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4370, 'Invalid or missing QGIS project CRS (EPSG). Please configure a valid projected coordinate system.', NULL, 0, true, 'utils', 'core', 'UI')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4371, 'QGIS project CRS is geographic (lat/long). INP export requires a projected CRS (e.g. EPSG:8908 CRTM05 for Costa Rica). Change the project CRS in QGIS and retry.', NULL, 0, true, 'utils', 'core', 'UI')
+ON CONFLICT (id) DO NOTHING;

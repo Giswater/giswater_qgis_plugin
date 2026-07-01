@@ -39,6 +39,7 @@ v_valvemodeval text;
 v_networkmodeval text;
 v_return json;
 v_client_epsg integer;
+v_message text;
 
 BEGIN
 
@@ -48,6 +49,17 @@ BEGIN
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_client_epsg = (p_data->>'client')::json->>'epsg';
+
+	-- validate QGIS project CRS for INP export (projected CRS required)
+	IF v_client_epsg IS NULL OR NOT EXISTS (SELECT 1 FROM spatial_ref_sys WHERE srid = v_client_epsg) THEN
+		SELECT error_message INTO v_message FROM sys_message WHERE id = 4370;
+		RETURN ('{"status":"Failed","message":{"level":1, "text":"'||v_message||'"}}')::json;
+	END IF;
+
+	IF gw_fct_is_geographic_srid(v_client_epsg) IS TRUE THEN
+		SELECT error_message INTO v_message FROM sys_message WHERE id = 4371;
+		RETURN ('{"status":"Failed","message":{"level":1, "text":"'||v_message||'"}}')::json;
+	END IF;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_controls AS
 	 SELECT c.text

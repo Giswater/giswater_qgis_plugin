@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add unique index on `link` table to enforce feature_id and feature_type uniqueness when state is 1 and feature_id is not null.
+- New validation message for invalid or missing QGIS project CRS (EPSG) on pg2epa INP export.
 
 ### Fixed
 
