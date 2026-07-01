@@ -6682,9 +6682,11 @@ def user_params_to_userconfig():
                 value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
 
                 # If this value (user config file) is None (doesn't exist, isn't set, etc.)
-                if value is None:
+                if value is None or str(value).strip() in ('None', ''):
                     # Read the default value for that parameter
                     value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
+                    if value is None or str(value).strip() in ('None', ''):
+                        continue
                     # Set value[section][parameter] in the user config file
                     set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
                 else:

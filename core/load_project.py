@@ -412,7 +412,7 @@ class GwLoadProject(QObject):
 
         toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         if toolbars_order in (None, 'None'):
-            toolbars_order = tools_gw.get_config_parser('toolbars_position', '_toolbars_order', 'user', 'init')
+            toolbars_order = tools_gw.get_config_parser('init.toolbars_position', '_toolbars_order', 'project', 'user_params', False)
 
         if toolbars_order in (None, 'None'):
             msg = "Parameter '{0}' is None"
