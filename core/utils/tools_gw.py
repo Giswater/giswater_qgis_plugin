@@ -344,7 +344,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         if value is not None and not get_comment:
             value = value.split('#')[0].strip()
 
-        if not get_none and str(value) in "None":
+        if not get_none and _is_empty_config_value(value):
             value = None
 
         # Check if the parameter exists in the inventory, if not creates it
@@ -6638,65 +6638,99 @@ def check_old_userconfig(user_folder_dir):
         os.removedirs(old_folder_path)
 
 
+def _is_empty_config_value(value) -> bool:
+    """ True when a config value is unset: missing, None, empty, or the literal 'None'. """
+    if value is None:
+        return True
+    return str(value).split('#')[0].strip() in ('None', '')
+
+
+def _split_inventory_section(section: str):
+    """ Split 'init.toolbars_position' into ('init', 'toolbars_position'). """
+    parts = section.split('.', 1)
+    if len(parts) != 2:
+        return None, None
+    return parts[0], parts[1]
+
+
+def _parse_inventory_key(inv_key: str):
+    """
+    Parse a key from user_params.config (inventory).
+    Leading '_' means: default for ws_/ud_ prefixed keys in init/session.
+    Returns (config_parameter, apply_project_prefix) or (None, False) for invalid keys.
+    """
+    if inv_key.startswith('#'):
+        return None, False
+    if inv_key.startswith('_'):
+        return inv_key[1:], True
+    return inv_key, False
+
+
+def _inventory_key_for_user_param(parameter: str, prefix: bool) -> str:
+    """ Map a runtime user-config parameter to its inventory key in user_params.config. """
+    if prefix and global_vars.project_type is not None:
+        if parameter.startswith('_'):
+            return parameter
+        return f"_{parameter}"
+    return parameter
+
+
+def get_user_config_or_default(file_name: str, section: str, parameter: str):
+    """
+    Read a user config value (init/session), falling back to user_params inventory defaults.
+    Inventory lookup order: _parameter (generic), ws_parameter, ud_parameter.
+    """
+    value = get_config_parser(section, parameter, "user", file_name, prefix=True, get_none=False,
+                              chk_user_params=False)
+    if not _is_empty_config_value(value):
+        return value
+
+    inv_section = f"{file_name}.{section}"
+    for inv_key in (f"_{parameter}", f"ws_{parameter}", f"ud_{parameter}"):
+        default = get_config_parser(inv_section, inv_key, "project", "user_params", prefix=False,
+                                    chk_user_params=False, get_none=False)
+        if not _is_empty_config_value(default):
+            return default
+    return None
+
+
 def user_params_to_userconfig():
-    """ Function to load all the variables from user_params.config to their respective user config files """
+    """ Seed init.config / session.config from user_params.config inventory defaults. """
 
     parser = global_vars.configs['user_params'][1]
     if parser is None:
         return
 
     try:
-        # Get the sections of the user params inventory
-        inv_sections = parser.sections()
+        for inv_section in parser.sections():
+            file_name, section_name = _split_inventory_section(inv_section)
+            if file_name is None:
+                continue
 
-        # For each section (inventory)
-        for section in inv_sections:
-
-            file_name = section.split('.')[0]
-            section_name = section.split('.')[1]
-            parameters = parser.options(section)
-
-            # For each parameter (inventory)
-            for parameter in parameters:
-
-                # Manage if parameter need prefix and project_type is not defined
-                if parameter.startswith("_") and global_vars.project_type is None:
+            for inv_key in parser.options(inv_section):
+                config_param, apply_prefix = _parse_inventory_key(inv_key)
+                if config_param is None:
                     continue
-                if parameter.startswith("#"):
+                if apply_prefix and global_vars.project_type is None:
                     continue
 
-                _pre = False
-                inv_param = parameter
-                # If it needs a prefix
-                if parameter.startswith("_"):
-                    _pre = True
-                    parameter = inv_param[1:]
-                # If it's just a comment line
-                if parameter.startswith("#"):
-                    # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
-                    set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
-                    continue
+                current = get_config_parser(section_name, config_param, "user", file_name,
+                                            apply_prefix, True, False, True)
 
-                # If it's a normal value
-                # Get value[section][parameter] of the user config file
-                value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
-
-                # If this value (user config file) is None (doesn't exist, isn't set, etc.)
-                if value is None or str(value).strip() in ('None', ''):
-                    # Read the default value for that parameter
-                    value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
-                    if value is None or str(value).strip() in ('None', ''):
+                if _is_empty_config_value(current):
+                    default = get_config_parser(inv_section, inv_key, "project", "user_params",
+                                                False, True, False, True)
+                    if _is_empty_config_value(default):
                         continue
-                    # Set value[section][parameter] in the user config file
-                    set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
+                    set_config_parser(section_name, config_param, default, "user", file_name,
+                                      None, apply_prefix, False)
                 else:
-                    value2 = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
-                    if value2 is not None:
-                        # If there's an inline comment in the inventory but there isn't one in the user config file, add it
-                        if "#" not in value and "#" in value2:
-                            # Get the comment (inventory) and set it (user config file)
-                            comment = value2.split('#')[1]
-                            set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
+                    inv_value = get_config_parser(inv_section, inv_key, "project", "user_params",
+                                                  False, True, False, True)
+                    if inv_value and "#" not in current and "#" in inv_value:
+                        comment = inv_value.split('#')[1]
+                        set_config_parser(section_name, config_param, current.strip(), "user", file_name,
+                                          comment, apply_prefix, False)
     except Exception:
         pass
 
@@ -7366,34 +7400,26 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
 
 
 def _check_user_params(section, parameter, file_name, prefix=False):
-    """ Check if a parameter exists in the config/user_params.config
-        If it doesn't exist, it creates it and assigns 'None' as a default value
-    """
+    """ Ensure parameter exists in user_params.config inventory; create it with None if missing. """
 
     if section == "i18n_generator" or parameter == "dev_commit":
         return
 
-    # Check if the parameter needs the prefix or not
-    if prefix and global_vars.project_type is not None:
-        parameter = f"_{parameter}"
+    inv_key = _inventory_key_for_user_param(parameter, prefix)
+    inv_section = f"{file_name}.{section}"
 
-    # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
-    check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
+    check_value = get_config_parser(inv_section, inv_key, "project", "user_params", False,
                                     get_comment=True, chk_user_params=False)
 
     if check_value is None:
-        # Get the value of the parameter (the one get_config_parser is looking for) in the inventory with prefix
-        parameter_prefixed = f"ws{parameter}"
-        check_value = get_config_parser(f"{file_name}.{section}", parameter_prefixed, "project", "user_params", False,
-                                        get_comment=True, chk_user_params=False)
-        if check_value is None:
-            parameter_prefixed = f"ud{parameter}"
-            check_value = get_config_parser(f"{file_name}.{section}", parameter_prefixed, "project", "user_params", False,
-                                        get_comment=True, chk_user_params=False)
+        for typed_key in (f"ws_{inv_key.lstrip('_')}", f"ud_{inv_key.lstrip('_')}"):
+            check_value = get_config_parser(inv_section, typed_key, "project", "user_params", False,
+                                            get_comment=True, chk_user_params=False)
+            if check_value is not None:
+                break
 
-    # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
-        set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
+        set_config_parser(inv_section, inv_key, None, "project", "user_params", prefix=False,
                           chk_user_params=False)
     else:
         return check_value
