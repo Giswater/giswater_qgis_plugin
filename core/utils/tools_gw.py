@@ -1996,10 +1996,7 @@ def enable_widgets(dialog, result, enable):
                     if field.get('layoutname') is not None and not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']):
                         continue
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
-                        widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
-                        if type(widget) is GwHyperLinkLineEdit:
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
+                        set_widget_readonly(widget, not enable)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit, QCheckBox)):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget {color: rgb(110, 110, 110)}")
@@ -2026,17 +2023,8 @@ def enable_all(dialog, result, from_apply=False):
                 continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, GwHyperLinkLineEdit):
-                        widget.setReadOnly(not field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
-                            if type(widget) is GwHyperLinkLineEdit:
-                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
-                        else:
-                            widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            if not from_apply:
-                                widget.setStyleSheet(None)
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+                        set_widget_readonly(widget, not field['iseditable'], from_apply=from_apply)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit)):
                         widget.setEnabled(field['iseditable'])
                         if not from_apply:
@@ -2511,8 +2499,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 iseditable = field.get('iseditable')
                 if type(widget) in (QLineEdit, QDoubleSpinBox):
                     if iseditable in (False, "False"):
-                        widget.setReadOnly(True)
-                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                        set_widget_readonly(widget, True)
                     if type(widget) is QLineEdit:
                         if 'placeholder' in field:
                             widget.setPlaceholderText(field['placeholder'])
@@ -2520,7 +2507,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if iseditable in (False, "False"):
                         widget.setEnabled(False)
                 widget.setObjectName(field['widgetname'])
-                if iseditable is not None:
+                if iseditable is not None and type(widget) not in (QLineEdit, QDoubleSpinBox):
                     widget.setEnabled(bool(iseditable))
 
                 add_widget(dialog, field, lbl, widget)
@@ -2755,9 +2742,7 @@ def add_spinbox(**kwargs):
         elif field['widgettype'] == 'doubleSpinbox' and field['value'] != "":
             widget.setValue(float(field['value']))
     if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0); color: rgb(100, 100, 100)}")
+        set_widget_readonly(widget, not field['iseditable'])
 
     return widget
 
@@ -2919,9 +2904,7 @@ def add_textarea(field):
         widget.setProperty('value', field['value'])
 
     if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+        set_widget_readonly(widget, not field['iseditable'])
 
     return widget
 
@@ -3124,6 +3107,29 @@ def set_widget_size(widget, field):
     return widget
 
 
+def set_widget_readonly(widget, readonly, from_apply=False):
+
+    if type(widget) not in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+        return widget
+
+    widget.setEnabled(True)
+    widget.setReadOnly(readonly)
+    if isinstance(widget, (QSpinBox, QDoubleSpinBox)) and widget.lineEdit():
+        widget.lineEdit().setEnabled(True)
+
+    if readonly:
+        widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
+        if type(widget) is GwHyperLinkLineEdit:
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
+    else:
+        widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        if not from_apply:
+            widget.setStyleSheet(None)
+
+    return widget
+
+
 def add_lineedit(field):
     """ Add widgets QLineEdit type """
 
@@ -3153,11 +3159,7 @@ def add_lineedit(field):
     if 'tooltip' in field:
         widget.setToolTip(field['tooltip'])
     if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-    if 'value' in field:
-        widget.setText(field['value'])
+        set_widget_readonly(widget, not field['iseditable'])
     return widget
 
 
@@ -7811,7 +7813,10 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
                 widget.setProperty('saveValue', False)
         if field['widgetcontrols'] is not None and 'isEnabled' in field['widgetcontrols']:
             if field['widgetcontrols']['isEnabled'] is False:
-                widget.setEnabled(False)
+                if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+                    set_widget_readonly(widget, True)
+                else:
+                    widget.setEnabled(False)
     except Exception:
         # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
         pass
