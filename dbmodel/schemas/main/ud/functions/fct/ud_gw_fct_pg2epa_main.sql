@@ -58,7 +58,7 @@ BEGIN
 
 	-- get input data
 	v_result =  (p_data->>'data')::json->>'resultId';
-	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
+	v_dumpsubcatch = NULLIF((p_data->>'data')::json->>'dumpSubcatch', '')::boolean;
 	v_step = (p_data->>'data')::json->>'step';
 	v_input = concat('{"data":{"parameters":{"isEmbebed":true, "resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
 

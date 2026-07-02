@@ -98,7 +98,7 @@ BEGIN
 	-- getting input data
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
-	v_dumpsubc := ((p_data ->>'data')::json->>'parameters')::json->>'dumpSubcatch';
+	v_dumpsubc := NULLIF(((p_data ->>'data')::json->>'parameters')::json->>'dumpSubcatch', '')::boolean;
 
 	-- get system values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
