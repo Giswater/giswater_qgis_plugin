@@ -224,9 +224,7 @@ class GwAdminButton:
             project_srid = '25831'
 
         # Save in settings
-        tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
-        tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}', prefix=False)
-        tools_gw.set_config_parser('btn_admin', 'project_locale', f'{self.locale}', prefix=False)
+        self._save_create_project_user_values()
 
         # Check if project name is valid
         if not self._check_project_name(project_name_schema, project_descript):
@@ -1266,20 +1264,6 @@ class GwAdminButton:
         self.rdb_sample_full = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_full')
         self.rdb_empty = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_empty')
 
-        # Load user values
-        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session",
-                                                             False, force_reload=True))
-        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "session",
-                                                                 False, force_reload=True))
-        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "session", False,
-                                                        force_reload=True)
-        if create_schema_type:
-            chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
-            try:
-                chk_widget.setChecked(True)
-            except Exception:
-                pass
-
         # TODO: do and call listener for buton + table -> temp_csv
 
         # Manage SRID
@@ -1303,17 +1287,72 @@ class GwAdminButton:
         if global_vars.gw_dev_mode is True:
             list_locale.append(["no_TR", "Hardcoded (No translation)"])
         tools_qt.fill_combo_values(self.cmb_locale, list_locale)
-        locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
-        tools_qt.set_combo_value(self.cmb_locale, locale, 0, add_new=False)
+
+        self._load_create_project_user_values()
 
         # Set shortcut keys
-        self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project, False))
+        self.dlg_readsql_create_project.key_escape.connect(
+            partial(self._close_dialog_admin, self.dlg_readsql_create_project))
 
         # Get database connection name
         self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
         # Set signals
         self._set_signals_create_project()
+
+    def _load_create_project_user_values(self):
+        """Load last user values from session.config (same pattern as mincut _load_widgets_values)."""
+        if self.dlg_readsql_create_project is None:
+            return
+
+        project_name = tools_gw.get_config_parser(
+            'btn_admin', 'project_name_schema', "user", "session", False, force_reload=True)
+        project_descript = tools_gw.get_config_parser(
+            'btn_admin', 'project_descript', "user", "session", False, force_reload=True)
+        create_schema_type = tools_gw.get_config_parser(
+            'btn_admin', 'create_schema_type', "user", "session", False, force_reload=True)
+
+        if project_name:
+            self.project_name.setText(project_name)
+        if project_descript:
+            self.project_descript.setText(project_descript)
+
+        if create_schema_type not in ('rdb_sample_inv', 'rdb_sample_full', 'rdb_empty'):
+            create_schema_type = 'rdb_empty'
+        for radio in (self.rdb_empty, self.rdb_sample_inv, self.rdb_sample_full):
+            if radio is not None:
+                radio.setChecked(radio.objectName() == create_schema_type)
+
+        if self.cmb_locale is not None:
+            locale = tools_gw.get_config_parser(
+                'btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
+            if locale:
+                tools_qt.set_combo_value(self.cmb_locale, locale, 0, add_new=False)
+
+    def _save_create_project_user_values(self):
+        """Save form values to session.config (same pattern as mincut _save_widgets_values)."""
+        if self.dlg_readsql_create_project is None:
+            return
+
+        project_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
+        project_descript = tools_qt.get_text(self.dlg_readsql_create_project, 'project_descript')
+        if self.cmb_locale is not None:
+            project_locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
+        else:
+            project_locale = None
+
+        if self.rdb_sample_inv is not None and self.rdb_sample_inv.isChecked():
+            create_schema_type = 'rdb_sample_inv'
+        elif self.rdb_sample_full is not None and self.rdb_sample_full.isChecked():
+            create_schema_type = 'rdb_sample_full'
+        else:
+            create_schema_type = 'rdb_empty'
+
+        tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}', prefix=False)
+        if project_locale:
+            tools_gw.set_config_parser('btn_admin', 'project_locale', f'{project_locale}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'create_schema_type', create_schema_type, prefix=False)
 
     # region private functions
 
@@ -2761,6 +2800,7 @@ class GwAdminButton:
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
             partial(self._close_dialog_admin, self.dlg_readsql_create_project))
+        self.dlg_readsql_create_project.dlg_closed.connect(partial(self._save_create_project_user_values))
         self.cmb_create_project_type.currentIndexChanged.connect(
             partial(self._change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self._update_locale))
@@ -2792,6 +2832,7 @@ class GwAdminButton:
         if self.dlg_readsql_create_project is None:
             self.init_dialog_create_project()
 
+        self._load_create_project_user_values()
         self._filter_srid_changed()
 
         # Get project_type from selected schema
