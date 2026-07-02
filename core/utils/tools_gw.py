@@ -505,7 +505,7 @@ def open_help_link(context, uiname, dlg=None):
 def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
     """ Open dialog """
     # Check database connection before opening dialog
-    if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
+    if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not check_db_connection():
         return
 
     # Manage translate
@@ -3875,6 +3875,9 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     :return: Response of the function executed (json)
     """
 
+    if aux_conn is None and not is_thread:
+        check_db_connection()
+
     # Check if function exists
     if check_function:
         row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn, is_thread=is_thread)
@@ -4462,7 +4465,7 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
     if schema_name is None:
         schema_name = lib_vars.schema_name
 
-    if not tools_db.check_db_connection():
+    if not check_db_connection():
         return None
     if not tools_db.check_table(table):
         msg = "Table not found: {0}"
@@ -6359,6 +6362,47 @@ def refresh_selectors(is_cm: bool = False):
                 selector.open_selector(reload_dlg=dialog)
         except Exception:
             pass
+
+
+def _refresh_selector_map_layers():
+    """Reload selector-driven layers and refresh the map canvas."""
+
+    for layer_name in ('ve_arc', 've_node', 've_connec', 've_gully', 've_link', 've_plan_psector'):
+        tools_qgis.set_layer_index(layer_name)
+    tools_qgis.refresh_map_canvas()
+
+
+def resync_map_after_db_reconnect():
+    """Resync planned network / selector map state after the database reconnects."""
+
+    try:
+        if not global_vars.project_loaded or global_vars.iface is None:
+            return
+
+        psignals = global_vars.psignals or {}
+        if psignals.get('psector_active'):
+            psector_id = psignals.get('psector_id')
+            if not psector_id:
+                row = get_config_value('plan_psector_current', log_info=False)
+                psector_id = row[0] if row else None
+            if psector_id:
+                set_psector_mode_enabled(
+                    enable=True, psector_id=psector_id, do_call_fct=True, force_change=True
+                )
+                return
+
+        _refresh_selector_map_layers()
+    except Exception as e:
+        msg = "Exception in resync_map_after_db_reconnect: {0}"
+        tools_log.log_warning(msg, msg_params=(e,))
+
+
+def check_db_connection():
+    """Check DB connection (libs) and resync map when QGIS layers were stale after idle."""
+    opened, reconnected = tools_db.check_db_connection()
+    if opened and reconnected:
+        resync_map_after_db_reconnect()
+    return opened
 
 
 def execute_class_function(dlg_class, func_name: str, kwargs: Optional[dict] = None):
