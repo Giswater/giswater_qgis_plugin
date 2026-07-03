@@ -129,6 +129,8 @@ ON CONFLICT (id) DO UPDATE SET
   descript = EXCLUDED.descript;
 
 
+CREATE SEQUENCE IF NOT EXISTS om_scada_graph_seq;
+
 CREATE TABLE om_scada_graph (
 	graph_class text NOT NULL DEFAULT 'NETWORK'::text,
 	edge_id int4 NOT NULL DEFAULT nextval('om_scada_graph_seq'::regclass),
