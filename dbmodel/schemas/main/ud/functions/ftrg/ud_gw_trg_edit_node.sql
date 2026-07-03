@@ -55,9 +55,6 @@ v_force_delete boolean;
 v_feature_class text;
 v_psector integer;
 v_trace_featuregeom boolean;
-v_seq_name text;
-v_seq_code text;
-v_code_prefix text;
 
 v_gully_outlet_type text;
 v_gully_method text;
@@ -455,24 +452,19 @@ BEGIN
 		END IF;
 
 		-- Code
-		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix
+		IF btrim(coalesce(NEW.code, '')) = '' THEN
+			NEW.code := NULL;
+		END IF;
+
+				SELECT code_autofill, cat_feature.id INTO v_code_autofill_bool, v_featurecat
 		FROM cat_feature WHERE id=NEW.node_type;
 
-		IF v_featurecat IS NOT NULL THEN
-			-- use specific sequence for code when its name matches featurecat_code_seq
-			EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-			EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||'
-            AND relkind = ''S'' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = '||quote_literal(v_schemaname)||');' INTO v_sql;
+		IF NEW.code IS NULL THEN
+			NEW.code := gw_fct_generate_code('feature', NEW.node_type, json_strip_nulls(row_to_json(NEW)::json));
+		END IF;
 
-			IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
-				EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-					NEW.code=concat(v_code_prefix,v_seq_code);
-			END IF;
-
-			--Copy id to code field
-			IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
-				NEW.code=NEW.node_id;
-			END IF;
+		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
+			NEW.code=NEW.node_id;
 		END IF;
 
 		--Sys_code

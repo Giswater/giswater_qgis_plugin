@@ -46,8 +46,6 @@ v_auto_streetvalues_status boolean;
 v_auto_streetvalues_buffer integer;
 v_auto_streetvalues_field text;
 v_trace_featuregeom boolean;
-v_seq_name text;
-v_seq_code text;
 
 -- dynamic mapzones strategy
 v_isdma boolean = false;
@@ -64,7 +62,6 @@ v_epavdef json;
 v_man_view text;
 v_input json;
 
-v_code_prefix text;
 
 v_childtable_name text;
 v_schemaname text;
@@ -390,21 +387,17 @@ BEGIN
 		END IF;
 
 		-- Code
-		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature
-		JOIN cat_node ON cat_feature.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id;
-
-		-- use specific sequence for code when its name matches featurecat_code_seq
-		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
-		EXECUTE 'SELECT relname FROM pg_catalog.pg_class WHERE relname='||quote_literal(v_seq_name)||'
-        AND relkind = ''S'' AND relnamespace = (SELECT oid FROM pg_namespace WHERE nspname = '||quote_literal(v_schemaname)||');' INTO v_sql;
-
-
-		IF v_sql IS NOT NULL AND NEW.code IS NULL THEN
-			EXECUTE 'SELECT nextval('||quote_literal(v_seq_name)||');' INTO v_seq_code;
-				NEW.code=concat(v_code_prefix,v_seq_code);
+		IF btrim(coalesce(NEW.code, '')) = '' THEN
+			NEW.code := NULL;
 		END IF;
 
-		--Copy id to code field
+				SELECT code_autofill, cat_feature.id INTO v_code_autofill_bool, v_featurecat FROM cat_feature
+		JOIN cat_node ON cat_feature.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id;
+
+		IF NEW.code IS NULL THEN
+			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(row_to_json(NEW)::json));
+		END IF;
+
 		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
 			NEW.code=NEW.node_id;
 		END IF;
@@ -778,7 +771,18 @@ BEGIN
     -- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
 
-	-- static pressure
+		IF btrim(coalesce(NEW.code, '')) = '' THEN
+			NEW.code := NULL;
+		END IF;
+
+		SELECT code_autofill, cat_feature.id INTO v_code_autofill_bool, v_featurecat FROM cat_feature
+		JOIN cat_node ON cat_feature.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id;
+
+		IF NEW.code IS NULL AND NEW.the_geom IS NOT NULL THEN
+			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(row_to_json(NEW)::json));
+		END IF;
+
+			-- static pressure
 		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
 			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-top_elev
 			WHERE node_id = NEW.node_id;
