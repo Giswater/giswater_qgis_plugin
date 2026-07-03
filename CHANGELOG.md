@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix schema integration of `cibs` and `utils`.
 - Change wmeter_number type to text in ext_hydrometer table.
+- Fix `gw_fct_settoarc` so setting `to_arc` no longer auto-adds the node to mapzone's `graphconfig`, it only updates `toArc` when the node is already configured as `nodeParent` (avoids duplicate mapzone delimiters after arc divide). 
+- Fix `dqaId` parameter parsing (`dqaId` was incorrectly read from `presszoneId`).
 
 ## [4.14.5] - 2026-06-25
 
