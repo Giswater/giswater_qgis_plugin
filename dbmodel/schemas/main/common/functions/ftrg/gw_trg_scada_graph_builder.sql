@@ -5,9 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_scada_graph_builder();
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_scada_graph_builder();
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_scada_graph_builder()
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_scada_graph_builder()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
