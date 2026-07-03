@@ -12,4 +12,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO config_mapzones (id, abrevation, descript, fid, code_autofill, active, is_dynamic) VALUES
 ('DWFZONE', 'DWF', 'Drainage Water Flow Zone', 481, true, true, true),
-('DRAINZONE', 'DRA', 'Drainage Zone', 481, true, true, false),
+('DRAINZONE', 'DRA', 'Drainage Zone', 481, true, true, false);
