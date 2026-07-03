@@ -166,9 +166,9 @@ CREATE TABLE om_scada_graph_json (
 );
 
 -- Table Triggers
-CREATE TRIGGER gw_trg_graph_topology_builder BEFORE INSERT OR UPDATE OF object_1, object_2 ON om_scada_graph FOR EACH ROW EXECUTE FUNCTION gw_trg_graph_topology_builder();
-CREATE TRIGGER gw_trg_graph_topology_builder_after AFTER INSERT OR UPDATE OF object_1, object_2 ON om_scada_graph FOR EACH ROW EXECUTE FUNCTION gw_trg_graph_topology_builder();
+CREATE TRIGGER gw_trg_scada_graph_builder_before BEFORE INSERT OR UPDATE OF object_1, object_2 ON om_scada_graph FOR EACH ROW EXECUTE FUNCTION gw_trg_scada_graph_builder();
+CREATE TRIGGER gw_trg_scada_graph_builder_after AFTER INSERT OR UPDATE OF object_1, object_2 ON om_scada_graph FOR EACH ROW EXECUTE FUNCTION gw_trg_scada_graph_builder();
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3544, 'gw_fct_scada_graph_builder', 'utils', 'function', 'json', 'json', 'Builds a scada graph using node_1 and node_2 as input values.', 'role_om', NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3544, 'gw_trg_scada_graph_builder', 'utils', 'trigger', 'json', 'json', 'Builds a scada graph using node_1 and node_2 as input values.', 'role_om', NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3546, 'gw_fct_scada_graph_export', 'utils', 'function', 'json', 'json', 'Exports the scada graph created into a JSON by using graph builder.', 'role_om', NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source", function_alias) VALUES(3548, 'gw_fct_scada_graph_check', 'utils', 'function', 'json', 'json', 'Checks the consistency of de attributes of the scada graph', 'role_om', NULL, 'core', NULL) ON CONFLICT (id) DO NOTHING;
