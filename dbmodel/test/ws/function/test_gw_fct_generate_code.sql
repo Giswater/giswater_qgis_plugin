@@ -88,10 +88,20 @@ ON CONFLICT (macrosector_id) DO UPDATE SET code = EXCLUDED.code, the_geom = EXCL
 
 UPDATE cat_feature SET abrevation = 'TST_' WHERE id = 'MANHOLE';
 
-UPDATE config_code_parts SET active = false, concat_order = 90 WHERE context = 'feature' AND part = 'separator';
-UPDATE config_code_parts SET concat_order = 91 WHERE context = 'feature' AND part = 'sequence';
+UPDATE config_code_parts c
+SET concat_order = 900 + sub.rn
+FROM (
+    SELECT id, row_number() OVER (ORDER BY part) AS rn
+    FROM config_code_parts
+    WHERE context = 'feature' AND entity IS NULL
+) sub
+WHERE c.id = sub.id;
+
+UPDATE config_code_parts SET concat_order = 905 WHERE context = 'feature' AND entity = 'NODE' AND part = 'abrevation';
+
 UPDATE config_code_parts SET active = true, concat_order = 1 WHERE context = 'feature' AND part = 'macrosector_code';
 UPDATE config_code_parts SET active = true, concat_order = 2 WHERE context = 'feature' AND part = 'project_network';
+UPDATE config_code_parts SET active = false, concat_order = 900 WHERE context = 'feature' AND part = 'separator';
 UPDATE config_code_parts SET concat_order = 3 WHERE context = 'feature' AND entity = 'NODE' AND part = 'abrevation';
 UPDATE config_code_parts SET active = true, concat_order = 4 WHERE context = 'feature' AND part = 'sequence';
 
@@ -110,10 +120,18 @@ SELECT is(
     'Feature code picks nearest macrosector from element geometry (CR layout)'
 );
 
-UPDATE config_code_parts SET active = false, concat_order = 90 WHERE context = 'mapzone' AND part = 'separator';
-UPDATE config_code_parts SET concat_order = 91 WHERE context = 'mapzone' AND part = 'sequence';
+UPDATE config_code_parts c
+SET concat_order = 900 + sub.rn
+FROM (
+    SELECT id, row_number() OVER (ORDER BY part) AS rn
+    FROM config_code_parts
+    WHERE context = 'mapzone' AND entity IS NULL
+) sub
+WHERE c.id = sub.id;
+
 UPDATE config_code_parts SET active = true, concat_order = 1 WHERE context = 'mapzone' AND part = 'macrosector_code';
 UPDATE config_code_parts SET active = true, concat_order = 2 WHERE context = 'mapzone' AND part = 'project_network';
+UPDATE config_code_parts SET active = false, concat_order = 900 WHERE context = 'mapzone' AND part = 'separator';
 UPDATE config_code_parts SET concat_order = 3 WHERE context = 'mapzone' AND part = 'abrevation';
 UPDATE config_code_parts SET active = true, concat_order = 4 WHERE context = 'mapzone' AND part = 'sequence';
 
@@ -131,8 +149,16 @@ SELECT is(
     'Mapzone code picks nearest macrosector from geometry (CR layout)'
 );
 
-UPDATE config_code_parts SET active = false, concat_order = 90 WHERE context = 'mapzone' AND part = 'macrosector_code';
-UPDATE config_code_parts SET active = false, concat_order = 91 WHERE context = 'mapzone' AND part = 'project_network';
+UPDATE config_code_parts c
+SET concat_order = 900 + sub.rn
+FROM (
+    SELECT id, row_number() OVER (ORDER BY part) AS rn
+    FROM config_code_parts
+    WHERE context = 'mapzone' AND entity IS NULL
+) sub
+WHERE c.id = sub.id;
+
+UPDATE config_code_parts SET active = false WHERE context = 'mapzone' AND part IN ('macrosector_code', 'project_network');
 UPDATE config_code_parts SET active = true, concat_order = 1 WHERE context = 'mapzone' AND part = 'abrevation';
 UPDATE config_code_parts SET active = true, concat_order = 2 WHERE context = 'mapzone' AND part = 'separator';
 UPDATE config_code_parts SET active = true, concat_order = 3, source_expr = $$lpad(nextval('seq_mapzone_code')::text, 5, '0')$$ WHERE context = 'mapzone' AND part = 'sequence';
@@ -164,9 +190,16 @@ SELECT is(
     'Returns NULL when all feature code parts are inactive'
 );
 
-UPDATE config_code_parts SET concat_order = 90 WHERE context = 'feature' AND part = 'separator';
-UPDATE config_code_parts SET concat_order = 91 WHERE context = 'feature' AND part = 'macrosector_code';
-UPDATE config_code_parts SET concat_order = 92 WHERE context = 'feature' AND part = 'project_network';
+UPDATE config_code_parts c
+SET concat_order = 900 + sub.rn
+FROM (
+    SELECT id, row_number() OVER (ORDER BY part) AS rn
+    FROM config_code_parts
+    WHERE context = 'feature' AND entity IS NULL
+) sub
+WHERE c.id = sub.id;
+
+UPDATE config_code_parts SET concat_order = 905 WHERE context = 'feature' AND entity = 'NODE' AND part = 'abrevation';
 UPDATE config_code_parts SET active = true, concat_order = 1 WHERE context = 'feature' AND entity = 'NODE' AND part = 'abrevation';
 UPDATE config_code_parts
 SET active = true,
@@ -199,10 +232,18 @@ SELECT is(
     'User-provided code is preserved (CR NULL-only autofill rule)'
 );
 
-UPDATE config_code_parts SET active = false, concat_order = 90 WHERE context = 'mapzone' AND part = 'separator';
-UPDATE config_code_parts SET concat_order = 91 WHERE context = 'mapzone' AND part = 'sequence';
+UPDATE config_code_parts c
+SET concat_order = 900 + sub.rn
+FROM (
+    SELECT id, row_number() OVER (ORDER BY part) AS rn
+    FROM config_code_parts
+    WHERE context = 'mapzone' AND entity IS NULL
+) sub
+WHERE c.id = sub.id;
+
 UPDATE config_code_parts SET active = true, concat_order = 1 WHERE context = 'mapzone' AND part = 'macrosector_code';
 UPDATE config_code_parts SET active = true, concat_order = 2 WHERE context = 'mapzone' AND part = 'project_network';
+UPDATE config_code_parts SET active = false, concat_order = 900 WHERE context = 'mapzone' AND part = 'separator';
 UPDATE config_code_parts SET concat_order = 3 WHERE context = 'mapzone' AND part = 'abrevation';
 UPDATE config_code_parts SET active = true, concat_order = 4, source_expr = $$lpad(nextval('seq_mapzone_code')::text, 5, '0')$$ WHERE context = 'mapzone' AND part = 'sequence';
 UPDATE config_mapzones SET abrevation = 'TST_' WHERE id = 'TSTMAP';
