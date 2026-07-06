@@ -1,0 +1,155 @@
+name: Generate i18n
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag or commit SHA (empty = default branch)"
+        required: false
+        default: ""
+      languages:
+        description: "Comma-separated language codes (empty = all from API)"
+        required: false
+        default: ""
+      version:
+        description: "Version override e.g. 4.15.0 (empty = metadata.txt or release tag)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 2 * * *"
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  generate-i18n:
+    runs-on: ubuntu-latest
+    env:
+      TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
+      TRANSLATIONS_API_USER: ${{ secrets.TRANSLATIONS_API_USER }}
+      TRANSLATIONS_API_PASSWORD: ${{ secrets.TRANSLATIONS_API_PASSWORD }}
+    steps:
+      - name: Validate required secrets
+        run: |
+          set -euo pipefail
+          missing=()
+          [ -z "${TRANSLATIONS_API_URL}" ] && missing+=("TRANSLATIONS_API_URL")
+          [ -z "${TRANSLATIONS_API_USER}" ] && missing+=("TRANSLATIONS_API_USER")
+          [ -z "${TRANSLATIONS_API_PASSWORD}" ] && missing+=("TRANSLATIONS_API_PASSWORD")
+          [ -z "${{ vars.I18N_BOT_APP_CLIENT_ID }}" ] && missing+=("I18N_BOT_APP_CLIENT_ID (repository variable)")
+          [ -z "${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}" ] && missing+=("I18N_BOT_APP_PRIVATE_KEY")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required secrets: ${missing[*]}"
+            exit 1
+          fi
+
+      - name: Generate GitHub App token
+        id: translations-app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.I18N_BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}
+          owner: Giswater
+          repositories: translations
+          permission-contents: write
+
+      - name: Checkout giswater repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+          path: giswater
+
+      - name: Resolve plugin version
+        id: version
+        working-directory: giswater
+        run: |
+          set -euo pipefail
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="$(grep '^version=' metadata.txt | head -n1 | cut -d= -f2)"
+          fi
+
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Invalid version '$VERSION'. Expected format X.Y.Z"
+            exit 1
+          fi
+
+          IFS='.' read -r major minor patch <<< "$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version_path=${major}/${minor}/${patch}" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: $VERSION (${major}/${minor}/${patch})"
+
+      - name: Download translation ZIP files
+        working-directory: giswater
+        env:
+          LANG_CODE: ${{ github.event.inputs.languages }}
+        run: |
+          set -euo pipefail
+          python3 scripts/export_i18n_zips.py \
+            --base-url "$TRANSLATIONS_API_URL" \
+            --user "$TRANSLATIONS_API_USER" \
+            --password "$TRANSLATIONS_API_PASSWORD" \
+            --languages-json-out ../artifacts/languages.json \
+            --output-dir ../artifacts/i18n
+
+      - name: Checkout translations repository
+        uses: actions/checkout@v6
+        with:
+          repository: Giswater/translations
+          token: ${{ steps.translations-app-token.outputs.token }}
+          path: translations
+
+      - name: Get GitHub App bot identity
+        id: app-bot
+        env:
+          GH_TOKEN: ${{ steps.translations-app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          APP_SLUG="${{ steps.translations-app-token.outputs.app-slug }}"
+          USER_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          echo "name=${APP_SLUG}[bot]" >> "$GITHUB_OUTPUT"
+          echo "email=${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
+
+      - name: Publish ZIP files to translations repository
+        env:
+          BOT_NAME: ${{ steps.app-bot.outputs.name }}
+          BOT_EMAIL: ${{ steps.app-bot.outputs.email }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          VERSION_PATH="${{ steps.version.outputs.version_path }}"
+          SOURCE_DIR="artifacts/i18n"
+          TARGET_REPO="translations"
+
+          if [ ! -d "$SOURCE_DIR" ] || [ -z "$(find "$SOURCE_DIR" -maxdepth 1 -name '*.zip' -print -quit)" ]; then
+            echo "::error::No ZIP files were generated in $SOURCE_DIR"
+            exit 1
+          fi
+          if [ ! -f "$SOURCE_DIR/languages.json" ]; then
+            echo "::error::languages.json was not generated in $SOURCE_DIR"
+            exit 1
+          fi
+
+          mkdir -p "$TARGET_REPO/latest" "$TARGET_REPO/$VERSION_PATH"
+          cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/latest/"
+          cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/$VERSION_PATH/"
+          cp "$SOURCE_DIR/languages.json" "$TARGET_REPO/languages.json"
+
+          cd "$TARGET_REPO"
+          git config user.name "$BOT_NAME"
+          git config user.email "$BOT_EMAIL"
+          git add languages.json latest "$VERSION_PATH"
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(i18n): update translation ZIPs for v${VERSION}"
+          git push origin HEAD
