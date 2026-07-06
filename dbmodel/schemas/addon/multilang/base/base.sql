@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-SET search_path = i18n, public, pg_catalog;
+SET search_path = multilang, public, pg_catalog;
 
 CREATE TABLE sys_version (
     id serial4 NOT NULL,
@@ -378,6 +378,6 @@ CREATE TABLE dbtypevalue (
 );
 
 
-GRANT ALL ON SCHEMA i18n TO role_basic;
-GRANT SELECT ON ALL TABLES IN SCHEMA i18n TO role_basic;
-GRANT SELECT ON ALL SEQUENCES IN SCHEMA i18n TO role_basic;
+GRANT ALL ON SCHEMA multilang TO role_basic;
+GRANT SELECT ON ALL TABLES IN SCHEMA multilang TO role_basic;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA multilang TO role_basic;

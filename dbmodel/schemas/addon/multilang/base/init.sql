@@ -14,10 +14,10 @@ SET client_min_messages = warning;
 
 RESET ROLE;
 
-CREATE SCHEMA IF NOT EXISTS i18n AUTHORIZATION role_system;
+CREATE SCHEMA IF NOT EXISTS multilang AUTHORIZATION role_system;
 
 SET ROLE role_system;
 
-GRANT ALL ON SCHEMA i18n TO role_system;
-GRANT ALL ON SCHEMA i18n TO role_basic;
-ALTER DEFAULT PRIVILEGES IN SCHEMA i18n GRANT SELECT ON TABLES TO role_basic;
+GRANT ALL ON SCHEMA multilang TO role_system;
+GRANT ALL ON SCHEMA multilang TO role_basic;
+ALTER DEFAULT PRIVILEGES IN SCHEMA multilang GRANT SELECT ON TABLES TO role_basic;

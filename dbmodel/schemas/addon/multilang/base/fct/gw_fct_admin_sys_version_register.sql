@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-CREATE OR REPLACE FUNCTION i18n.gw_fct_admin_sys_version_register(p_data json)
+CREATE OR REPLACE FUNCTION multilang.gw_fct_admin_sys_version_register(p_data json)
 RETURNS json AS
 $BODY$
 DECLARE
@@ -22,7 +22,7 @@ DECLARE
     v_environment jsonb;
     v_addparam jsonb;
 BEGIN
-    SET search_path = i18n, public;
+    SET search_path = multilang, public;
 
     v_gwversion := (p_data -> 'data') ->> 'gwVersion';
     v_language := COALESCE((p_data -> 'client') ->> 'lang', 'en_US');
@@ -35,7 +35,7 @@ BEGIN
     v_merge := COALESCE((p_data -> 'data') -> 'mergeAddparam', '{}'::json)::jsonb;
     v_environment := jsonb_build_object('postgres', version(), 'postgis', postgis_version());
 
-    SELECT * INTO v_prev FROM i18n.sys_version ORDER BY id DESC LIMIT 1;
+    SELECT * INTO v_prev FROM multilang.sys_version ORDER BY id DESC LIMIT 1;
 
     IF v_gwversion IS NULL AND v_prev IS NOT NULL THEN
         v_gwversion := v_prev.giswater;
@@ -80,10 +80,10 @@ BEGIN
         );
     END IF;
 
-    INSERT INTO i18n.sys_version (giswater, project_type, postgres, postgis, language, epsg, addparam)
+    INSERT INTO multilang.sys_version (giswater, project_type, postgres, postgis, language, epsg, addparam)
     VALUES (
         v_gwversion,
-        upper(COALESCE(v_projecttype, 'I18N')),
+        upper(COALESCE(v_projecttype, 'MULTILANG')),
         version(),
         postgis_version(),
         v_language,

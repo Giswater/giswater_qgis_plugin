@@ -5,6 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
-SET search_path = i18n, public, pg_catalog;
+SET search_path = multilang, public, pg_catalog;
 
 -- Reserved for future semver patches after the base bootstrap.

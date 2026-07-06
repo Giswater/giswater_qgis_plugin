@@ -1,11 +1,11 @@
-# i18n schema manifest.
+# multilang schema manifest.
 #
 # Standalone translations repository. Local model stores one row per language
 # (column `lang`) instead of the cloud wide-column layout.
 #
-# SQL: `schemas/addon/i18n/base/` + semver patches under `updates/`.
+# SQL: `schemas/addon/multilang/base/` + semver patches under `updates/`.
 
-kind: i18n
+kind: multilang
 engine_version: 1
 
 substitutions: {}
@@ -13,31 +13,31 @@ substitutions: {}
 phases:
   - id: load_base_schema
     type: sql_dir
-    description: "Bootstrap i18n schema: init, functions, tables."
+    description: "Bootstrap multilang schema: init, functions, tables."
     steps:
-      - { source: "schemas/addon/i18n/base/init.sql", recursive: false }
-      - { source: "schemas/addon/i18n/base/fct", recursive: false }
-      - { source: "schemas/addon/i18n/base/base.sql", recursive: false }
-      - { source: "schemas/addon/i18n/base/tables", recursive: false }
-      - { source: "schemas/addon/i18n/base/ftrg", recursive: false }
+      - { source: "schemas/addon/multilang/base/init.sql", recursive: false }
+      - { source: "schemas/addon/multilang/base/fct", recursive: false }
+      - { source: "schemas/addon/multilang/base/base.sql", recursive: false }
+      - { source: "schemas/addon/multilang/base/tables", recursive: false }
+      - { source: "schemas/addon/multilang/base/ftrg", recursive: false }
 
   - id: updates
     type: version_walk
-    description: "Apply i18n-specific update patches."
-    root: "schemas/addon/i18n/updates"
+    description: "Apply multilang-specific update patches."
+    root: "schemas/addon/multilang/updates"
     range:
       mode: "{{ run_mode }}"
 
   - id: register_version
     type: sql_function
-    description: "Append i18n.sys_version row."
-    function: "i18n.gw_fct_admin_sys_version_register"
+    description: "Append multilang.sys_version row."
+    function: "multilang.gw_fct_admin_sys_version_register"
     payload:
       client:
         lang: "{{ locale }}"
       data:
         gwVersion: "{{ plugin_version }}"
-        projectType: "I18N"
+        projectType: "MULTILANG"
         isNewProject: "{{ register_is_new }}"
         inferParentsFromConfig: "{{ infer_parents_from_config }}"
         parentSchema: "{{ register_parent_schema }}"

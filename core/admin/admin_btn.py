@@ -1007,7 +1007,7 @@ class GwAdminButton:
             )
         elif kind == "audit":
             self._update_audit(on_done=on_done)
-        elif kind == "i18n":
+        elif kind == "multilang":
             self._update_i18n(on_done=on_done)
         else:
             tools_qgis.show_warning(
@@ -4193,11 +4193,11 @@ class GwAdminButton:
 
     def _create_i18n(self):
         """Create the (singleton) i18n satellite schema via the engine."""
-        if admin_catalog.schema_exists('i18n'):
-            tools_qgis.show_message("Schema i18n already exists.", Qgis.MessageLevel.Info)
+        if admin_catalog.schema_exists('multilang'):
+            tools_qgis.show_message("Schema multilang already exists.", Qgis.MessageLevel.Info)
             return
         bp = BuildParams(
-            schema_name='i18n',
+            schema_name='multilang',
             srid=str(self.project_epsg or "25831"),
             locale=self.locale,
             plugin_version=str(self.plugin_version),
@@ -4206,20 +4206,20 @@ class GwAdminButton:
             sql_root=self.sql_dir,
         )
         self._submit_builder(
-            'i18n',
+            'multilang',
             bp,
-            description='Create i18n schema',
-            on_done=partial(self._on_builder_done_other_update, 'i18n'),
+            description='Create multilang schema',
+            on_done=partial(self._on_builder_done_other_update, 'multilang'),
         )
 
     def _update_i18n(self, on_done=None):
         """Run the i18n 'update' profile in place."""
         row = tools_db.get_row(
-            "SELECT giswater FROM i18n.sys_version ORDER BY id DESC LIMIT 1"
+            "SELECT giswater FROM multilang.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
         bp = BuildParams(
-            schema_name='i18n',
+            schema_name='multilang',
             srid=str(self.project_epsg or "25831"),
             locale=self.locale,
             plugin_version=str(self.plugin_version),
@@ -4228,11 +4228,11 @@ class GwAdminButton:
             run_mode='upgrade',
             sql_root=self.sql_dir,
         )
-        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'i18n')
+        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'multilang')
         self._submit_builder(
-            'i18n',
+            'multilang',
             bp,
-            description="Update i18n schema",
+            description="Update multilang schema",
             on_done=callback,
         )
 
@@ -4353,6 +4353,15 @@ class GwAdminButton:
     def _on_builder_done_other_update(self, schema_name, result):
         if not result.ok:
             self.error_count += 1
+        elif schema_name == 'multilang' and self.schema_name:
+            lang_value = json.dumps({"lang": self.locale or "en_US"}).replace("'", "''")
+            sql = (f"UPDATE {self.schema_name}.config_param_system "
+                   f"SET value = '{lang_value}', isenabled = true "
+                   f"WHERE parameter = 'utils_language_ui'")
+            tools_log.log_info("Task '{0}' execute sql: '{1}'",
+                               msg_params=("Update multilang language", sql,))
+            if not tools_db.execute_sql(sql):
+                self.error_count += 1
         self.manage_other_process_result()
 
     def _calculate_elapsed_time(self, dialog):

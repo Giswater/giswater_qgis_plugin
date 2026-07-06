@@ -745,7 +745,7 @@
        <item row="2" column="0" colspan="2">
         <widget class="QGroupBox" name="grb_i18n">
          <property name="title">
-          <string>I18n</string>
+          <string>Multilang</string>
          </property>
          <layout class="QVBoxLayout" name="layout_i18n">
           <property name="spacing">

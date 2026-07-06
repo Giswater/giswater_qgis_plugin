@@ -167,7 +167,7 @@ def project_type_for_schema(
     return None
 
 
-_SATELLITE_SCHEMAS = frozenset({"i18n", "utils", "cibs", "am", "cm", "audit"})
+_SATELLITE_SCHEMAS = frozenset({"multilang", "utils", "cibs", "am", "cm", "audit"})
 
 _SYS_VERSION_COLUMNS = """
 SELECT n.nspname, a.attname
@@ -473,7 +473,7 @@ def get_utils_network_parents(fetcher: RowFetcher = _tools_db_fetch) -> dict[str
     return result
 
 
-_NETWORK_SATELLITE_ORDER = ("i18n", "utils", "cibs", "am", "cm", "audit")
+_NETWORK_SATELLITE_ORDER = ("multilang", "utils", "cibs", "am", "cm", "audit")
 
 
 def _version_tuple(version: Any) -> tuple:
