@@ -574,6 +574,26 @@ def close_dialog(dlg, delete_dlg=True, plugin='core'):
             pass
 
 
+def focus_open_dialog(dlg, alert: bool = True) -> bool:
+    """Bring an already-open dialog to the front and alert the user."""
+    if dlg is None or isdeleted(dlg):
+        return False
+
+    app = QApplication.instance()
+    if app is not None and alert:
+        app.beep()
+        alert_fn = getattr(app, 'alert', None)
+        if callable(alert_fn):
+            alert_fn(dlg)
+
+    try:
+        dlg.raise_()
+        dlg.activateWindow()
+    except RuntimeError:
+        return False
+    return True
+
+
 def connect_signal(obj, pfunc, section, signal_name):
     """
     Connects a signal like this -> obj.connect(pfunc) and stores it in global_vars.active_signals
