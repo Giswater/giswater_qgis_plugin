@@ -1007,6 +1007,8 @@ class GwAdminButton:
             )
         elif kind == "audit":
             self._update_audit(on_done=on_done)
+        elif kind == "i18n":
+            self._update_i18n(on_done=on_done)
         else:
             tools_qgis.show_warning(
                 "Unsupported schema kind in update plan.",
@@ -4187,6 +4189,51 @@ class GwAdminButton:
             ud_schema=ud_list[0] if ud_list else '',
             project_version=str(current_version),
             on_done=on_done,
+        )
+
+    def _create_i18n(self):
+        """Create the (singleton) i18n satellite schema via the engine."""
+        if admin_catalog.schema_exists('i18n'):
+            tools_qgis.show_message("Schema i18n already exists.", Qgis.MessageLevel.Info)
+            return
+        bp = BuildParams(
+            schema_name='i18n',
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            profile='empty',
+            register_is_new='true',
+            sql_root=self.sql_dir,
+        )
+        self._submit_builder(
+            'i18n',
+            bp,
+            description='Create i18n schema',
+            on_done=partial(self._on_builder_done_other_update, 'i18n'),
+        )
+
+    def _update_i18n(self, on_done=None):
+        """Run the i18n 'update' profile in place."""
+        row = tools_db.get_row(
+            "SELECT giswater FROM i18n.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        current_version = row[0] if row and row[0] else "0.0.0"
+        bp = BuildParams(
+            schema_name='i18n',
+            srid=str(self.project_epsg or "25831"),
+            locale=self.locale,
+            plugin_version=str(self.plugin_version),
+            project_version=str(current_version),
+            profile='update',
+            run_mode='upgrade',
+            sql_root=self.sql_dir,
+        )
+        callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'i18n')
+        self._submit_builder(
+            'i18n',
+            bp,
+            description="Update i18n schema",
+            on_done=callback,
         )
 
     def _update_cibs(self, on_done=None):

@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>980</width>
-    <height>760</height>
+    <height>840</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>980</width>
-    <height>760</height>
+    <height>840</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>980</width>
-    <height>760</height>
+    <height>840</height>
    </size>
   </property>
   <property name="sizeGripEnabled">
@@ -743,6 +743,100 @@
         </widget>
        </item>
        <item row="2" column="0" colspan="2">
+        <widget class="QGroupBox" name="grb_i18n">
+         <property name="title">
+          <string>I18n</string>
+         </property>
+         <layout class="QVBoxLayout" name="layout_i18n">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lbl_i18n_info">
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string>Not installed</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_i18n">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="layout_i18n_actions">
+            <property name="spacing">
+             <number>6</number>
+            </property>
+            <item>
+             <spacer name="horizontalSpacer_i18n">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_i18n_create">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Create</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_i18n_update">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Update</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_i18n_delete">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Delete</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
         <widget class="QGroupBox" name="grb_audit">
          <property name="title">
           <string>Audit</string>

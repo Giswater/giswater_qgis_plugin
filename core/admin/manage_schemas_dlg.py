@@ -23,7 +23,7 @@ _COL_LINKED = 4
 _COL_CREATED = 5
 _COL_UPDATED = 6
 _FIXED_WIDTH = 980
-_FIXED_HEIGHT = 760
+_FIXED_HEIGHT = 840
 
 
 class GwManageSchemasDialog(GwAdminManageSchemasUi):
@@ -54,6 +54,7 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             "lbl_am_info",
             "lbl_cm_info",
             "lbl_audit_info",
+            "lbl_i18n_info",
         ):
             label = getattr(self, attr, None)
             if label is not None:
@@ -64,7 +65,7 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
                     QSizePolicy.Policy.Minimum,
                 )
         for grb_attr in (
-            "grb_utils", "grb_cibs", "grb_am", "grb_cm", "grb_audit",
+            "grb_utils", "grb_cibs", "grb_am", "grb_cm", "grb_i18n", "grb_audit",
         ):
             group = getattr(self, grb_attr, None)
             layout = group.layout() if group is not None else None
@@ -206,6 +207,9 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_cm_sample.clicked.connect(partial(self._load_cm_sample))
         self.btn_cm_qgis.clicked.connect(partial(self._create_cm_qgis))
         self.btn_delete_cm.clicked.connect(partial(self._delete_cm))
+        self.btn_i18n_create.clicked.connect(partial(self.admin._create_i18n))
+        self.btn_i18n_update.clicked.connect(partial(self.admin._update_i18n))
+        self.btn_i18n_delete.clicked.connect(partial(self.admin._delete_other_schema, 'i18n'))
         self.btn_create_audit.clicked.connect(partial(self._create_audit))
         self.btn_update_audit.clicked.connect(partial(self.admin._update_audit))
         self.btn_activate_audit.clicked.connect(partial(self._activate_audit))
@@ -387,11 +391,13 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         am_row = self._satellite_row(kind="AM") or self._satellite_row(schema="am")
         cm_row = self._satellite_row(kind="CM")
         audit_row = self._satellite_row(kind="AUDIT") or self._satellite_row(schema="audit")
+        i18n_row = self._satellite_row(kind="I18N") or self._satellite_row(schema="i18n")
 
         self._update_satellite_panel("grb_utils", "lbl_utils_info", "Utils", utils_row, "utils")
         self._update_satellite_panel("grb_cibs", "lbl_cibs_info", "Cibs", cibs_row, "cibs")
         self._update_satellite_panel("grb_am", "lbl_am_info", "AM", am_row, "am")
         self._update_satellite_panel("grb_cm", "lbl_cm_info", "CM", cm_row, "cm")
+        self._update_satellite_panel("grb_i18n", "lbl_i18n_info", "I18n", i18n_row, "i18n")
         self._update_satellite_panel("grb_audit", "lbl_audit_info", "Audit", audit_row, "audit")
         self._update_network_label()
 
@@ -432,12 +438,14 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         am_row = self._satellite_row(kind="AM") or self._satellite_row(schema="am")
         cm_row = self._satellite_row(kind="CM")
         audit_row = self._satellite_row(kind="AUDIT") or self._satellite_row(schema="audit")
+        i18n_row = self._satellite_row(kind="I18N") or self._satellite_row(schema="i18n")
 
         utils_exists = utils_row is not None
         cibs_exists = cibs_row is not None
         am_exists = am_row is not None
         cm_exists = cm_row is not None
         audit_exists = audit_row is not None
+        i18n_exists = i18n_row is not None
 
         self.btn_utils_create.setEnabled(not utils_exists)
         self.btn_utils_update.setEnabled(
@@ -501,6 +509,12 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         )
         self.btn_cm_qgis.setEnabled(cm_exists)
         self.btn_delete_cm.setEnabled(cm_exists)
+
+        self.btn_i18n_create.setEnabled(not i18n_exists)
+        self.btn_i18n_update.setEnabled(
+            i18n_exists and self._needs_update(str((i18n_row or {}).get("version") or ""))
+        )
+        self.btn_i18n_delete.setEnabled(i18n_exists)
 
         self.btn_create_audit.setEnabled(not audit_exists)
         self.btn_update_audit.setEnabled(
