@@ -61,8 +61,8 @@ PARENTS=("$WS" "$UD")
 if [[ -z "${PLUGIN_VER:-}" ]]; then
   _repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   eval "$(python3 "${_repo_root}/dbmodel/test/e2e_versions.py")"
-  # Create at source version; lockstep/network tests upgrade to TARGET_VER.
-  PLUGIN_VER="${PLUGIN_VER}"
+  # Default: create at current dev (TARGET_VER). Upgrade E2E sets PLUGIN_VER explicitly.
+  PLUGIN_VER="${TARGET_VER}"
 fi
 
 gw_cmd() {
