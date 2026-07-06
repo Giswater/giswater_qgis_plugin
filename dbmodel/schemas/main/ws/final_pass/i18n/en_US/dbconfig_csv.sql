@@ -28,4 +28,3 @@ UPDATE config_csv AS t SET alias = v.alias, descript = v.descript FROM (
     (514, 'Import netscenario closed valves ', 'The csv file must have the following fields: netscenario_id, node_id, closed')
 ) AS v(fid, alias, descript)
 WHERE t.fid = v.fid;
-

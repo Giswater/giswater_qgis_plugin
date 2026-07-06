@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US">
-	<!-- TOOLBARS AND ACTIONS -->
+<!-- TOOLBARS AND ACTIONS -->
 	<context>
 		<name>giswater</name>
 		<message>
@@ -552,7 +552,10 @@
 			<source>Workcat manager</source>
 			<translation>Workcat manager</translation>
 		</message>
-		<!-- PYTHON MESSAGES -->
+	</context>
+<!-- PYTHON MESSAGES -->
+	<context>
+		<name>giswater</name>
 		<message>
 			<source></source>
 			<translation></translation>
@@ -5334,11 +5337,11 @@
 			<translation>The &apos;Path&apos; field is required for Import INP data.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+ Please ensure that features has no undelete value on true.\n
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn&apos;t divide arc.\n
+ Please ensure that features has no undelete value on true.\n
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>
@@ -6586,8 +6589,7 @@
 			<translation>Zoom unavailable. Doesn&apos;t exist the geometry for the street</translation>
 		</message>
 	</context>
-
-	<!-- UI TRANSLATION -->
+<!-- UI TRANSLATION -->
 	<context>
 		<name>add_campaign</name>
 		<message>
@@ -25144,4 +25146,3 @@
 		</message>
 	</context>
 </TS>
-

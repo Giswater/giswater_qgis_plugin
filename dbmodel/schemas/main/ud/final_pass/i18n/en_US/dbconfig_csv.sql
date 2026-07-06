@@ -29,4 +29,3 @@ UPDATE config_csv AS t SET alias = v.alias, descript = v.descript FROM (
     (471, 'Import crm period values', 'The csv file must have the following fields: id, start_date, end_date, period_seconds (optional), code')
 ) AS v(fid, alias, descript)
 WHERE t.fid = v.fid;
-
