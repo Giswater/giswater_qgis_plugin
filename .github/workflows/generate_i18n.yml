@@ -38,7 +38,7 @@ jobs:
           [ -z "${TRANSLATIONS_API_URL}" ] && missing+=("TRANSLATIONS_API_URL")
           [ -z "${TRANSLATIONS_API_USER}" ] && missing+=("TRANSLATIONS_API_USER")
           [ -z "${TRANSLATIONS_API_PASSWORD}" ] && missing+=("TRANSLATIONS_API_PASSWORD")
-          [ -z "${{ vars.I18N_BOT_APP_CLIENT_ID }}" ] && missing+=("I18N_BOT_APP_CLIENT_ID (repository variable)")
+          [ -z "${{ secrets.I18N_BOT_APP_CLIENT_ID }}" ] && missing+=("I18N_BOT_APP_CLIENT_ID")
           [ -z "${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}" ] && missing+=("I18N_BOT_APP_PRIVATE_KEY")
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "::error::Missing required secrets: ${missing[*]}"
@@ -49,7 +49,7 @@ jobs:
         id: translations-app-token
         uses: actions/create-github-app-token@v3
         with:
-          client-id: ${{ vars.I18N_BOT_APP_CLIENT_ID }}
+          client-id: ${{ secrets.I18N_BOT_APP_CLIENT_ID }}
           private-key: ${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}
           owner: Giswater
           repositories: translations
