@@ -1062,7 +1062,6 @@ class GwProfile:
         y = [self.first_top_y, self.node_top_y]
         plt.plot(x, y, color=line_color, linewidth=line_width, linestyle=line_style)
 
-
     def _legend_title(self):
         if self._title not in (None, ''):
             return self._title
@@ -1080,6 +1079,7 @@ class GwProfile:
         if self._dlg is not None:
             return tools_qt.get_calendar_date(self._dlg, self._dlg.date)
         return ''
+        
     def _get_stylesheet(self, data_type='REAL'):
 
         # TODO: Enhance this function, manage all case for data_type, harmonie REAL/TOP-REAL...

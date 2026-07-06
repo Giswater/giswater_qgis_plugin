@@ -101,7 +101,6 @@ class GwProfileButton(GwAction):
         else:
             tools_gw.open_dialog(self.dlg_draw_profile, dlg_name='profile')
 
-
     def show_profile_for_nodes(self, init_node, end_node, links_distance=None):
         return self.profile.show_profile(init_node, end_node, links_distance=links_distance)
 
