@@ -28,7 +28,9 @@ ProgressCb = Callable[[int, int, str, Optional[sql_runner.FileExec]], None]
 # on the database) and ends with SET ROLE role_system for the rest of the phase.
 # updates/load_sample are excluded: legacy patches use DISABLE TRIGGER ALL, which
 # requires superuser to touch RI_ConstraintTrigger system triggers.
-_ROLE_SYSTEM_PHASES = frozenset({"reload_fct_ftrg"})
+# reload_fct_ftrg is excluded: upgrade patches applied as superuser may re-own
+# functions; only the installer can CREATE OR REPLACE them on the next upgrade.
+_ROLE_SYSTEM_PHASES = frozenset()
 # init.sql ends with SET ROLE role_system; restore installer before superuser phases.
 _RESET_ROLE_AFTER_PHASES = frozenset({"load_base"})
 
