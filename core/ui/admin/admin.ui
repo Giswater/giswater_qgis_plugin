@@ -59,8 +59,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>598</width>
-             <height>799</height>
+             <width>606</width>
+             <height>812</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_11">
@@ -315,8 +315,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>502</width>
-             <height>700</height>
+             <width>606</width>
+             <height>812</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -386,9 +386,9 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
                <item>
-                <widget class="QPushButton" name="btn_update_translation">
+                <widget class="QPushButton" name="btn_manage_languages">
                  <property name="text">
-                  <string>Instant update multilang</string>
+                  <string>Manage Languages</string>
                  </property>
                 </widget>
                </item>
@@ -682,8 +682,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>598</width>
-             <height>799</height>
+             <width>192</width>
+             <height>480</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">

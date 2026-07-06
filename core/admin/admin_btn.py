@@ -35,8 +35,8 @@ from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
 from .markdown_generator import GwAdminMarkdownGenerator
-from .schema_i18n_update import GwSchemaI18NUpdate
 from .i18n_manager import GwSchemaI18NManager
+from .i18n_hot_update import GwAdminI18NHotUpdate
 from .import_osm import GwImportOsm
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
@@ -1898,9 +1898,9 @@ class GwAdminButton:
         self.dlg_readsql.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
 
         # i18n
+        self.dlg_readsql.btn_manage_languages.clicked.connect(partial(self._manage_languages_hot_update))
         self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
-        self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
-        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self._i18n_generator))
 
         # Markdown generator
         self.dlg_readsql.btn_markdown_generator.clicked.connect(partial(self._markdown_generator))
@@ -1940,27 +1940,30 @@ class GwAdminButton:
         qm_gen = GwAdminMarkdownGenerator()
         qm_gen.init_dialog()
 
-    def _manage_translations(self):
-        """ Initialize the translation functionalities """
-
-        qm_gen = GwI18NGenerator()
-        qm_gen.init_dialog()
-        dict_info = tools_gw.get_project_info(self._get_schema_name())
-        qm_gen.pass_schema_info(dict_info, self._get_schema_name())
-
-    def _update_translations(self):
-        """ Initialize the translation functionalities """
-
-        qm_i18n_up = GwSchemaI18NUpdate()
-        qm_i18n_up.init_dialog()
-
     def _i18n_manager(self):
-        """ Initialize the i18n functionalities """
 
-        qm_i18n_manager = GwSchemaI18NManager()
-        qm_i18n_manager.init_dialog()
+        manager = GwSchemaI18NManager()
+        manager.init_dialog()
         dict_info = tools_gw.get_project_info(self._get_schema_name())
-        qm_i18n_manager.pass_schema_info(dict_info)
+        manager.pass_schema_info(dict_info)
+
+    def _i18n_generator(self):
+
+        generator = GwI18NGenerator()
+        generator.init_dialog()
+        dict_info = tools_gw.get_project_info(self._get_schema_name())
+        generator.pass_schema_info(dict_info)
+
+    def _manage_languages_hot_update(self):
+        """ Initialize the language functionalities """
+        dlg = getattr(self, 'dlg_i18n_hot_update', None)
+        if dlg is not None and not isdeleted(dlg) and dlg.isVisible():
+            tools_gw.focus_open_dialog(dlg)
+            return
+
+        manager = GwAdminI18NHotUpdate(self)
+        manager.init_dialog()
+        self.dlg_i18n_hot_update = manager.dlg_qm
 
     def _import_osm(self):
         """ Initialize import osm streetaxis functionality """
