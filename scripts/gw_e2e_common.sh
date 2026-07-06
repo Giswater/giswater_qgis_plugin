@@ -52,6 +52,7 @@ gw_e2e_setup_gw() {
   gw() {
     python3 -m giswater_admin "$@" \
       --dbmodel-path "${GW_E2E_DBMODEL}" \
+      --conn "${CONN}" \
       ${GW_ADMIN_FLAGS[@]+"${GW_ADMIN_FLAGS[@]}"}
   }
 }
