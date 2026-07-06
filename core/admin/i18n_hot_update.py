@@ -71,7 +71,6 @@ class GwAdminI18NHotUpdate():
         self._schema_model = QStandardItemModel(0, len(_SCHEMA_COLUMNS), self.dlg_qm)
         self._schema_model.setHorizontalHeaderLabels(list(_SCHEMA_COLUMNS))
         tools_gw.load_settings(self.dlg_qm)
-        self._load_user_values()
         self.dev_commit = tools_gw.get_config_parser(
             'system', 'force_commit', "user", "init", prefix=True,
         )
@@ -86,7 +85,7 @@ class GwAdminI18NHotUpdate():
         self._apply_dialog_height()
         self.admin._manage_schemas_update_system_info = self._update_system_info
         self.dlg_qm.finished.connect(self._clear_admin_callbacks)
-        tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_i18n_languages')
+        tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_i18n_hot_update')
 
     def _set_signals(self):
         self.dlg_qm.btn_update.clicked.connect(partial(self._run_update))
@@ -95,7 +94,6 @@ class GwAdminI18NHotUpdate():
         self.dlg_qm.btn_refresh.clicked.connect(partial(self._refresh_schema_table))
         self.dlg_qm.cmb_connection.currentIndexChanged.connect(partial(self._on_connection_changed))
         self.dlg_qm.cmb_language.currentIndexChanged.connect(partial(self._save_language_selection))
-        self.dlg_qm.rejected.connect(self._save_user_values)
 
     def _setup_status_label(self) -> None:
         self.dlg_qm.lbl_info.setWordWrap(False)
@@ -753,17 +751,3 @@ class GwAdminI18NHotUpdate():
                 "project_type": ["cm"]
             },
         }
-
-    def _save_user_values(self):
-        language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
-        if language:
-            tools_gw.set_config_parser(
-                'i18n_generator', 'qm_lang_language', f"{language}",
-                "user", "session", prefix=False,
-            )
-
-    def _load_user_values(self):
-        tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "session", False)
-        tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "session", False)
-        tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "session", False)
-        tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "session", False)

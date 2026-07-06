@@ -105,7 +105,7 @@ class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
         item = self._locales_model.item(indexes[0].row(), _COL_NAME)
         return item.text() if item else ""
 
-    def _selected_locale_active(self) -> bool | None:
+    def _selected_locale_active(self) -> tuple[bool, str] | None:
         locale = self._selected_locale()
         if not locale:
             return None, None
