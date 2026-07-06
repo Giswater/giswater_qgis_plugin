@@ -966,6 +966,7 @@ class GwAdminMarkdownGeneratorUi(GwDialog, FORM_CLASS):
 UINAME = "admin_i18n_hot_update"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
+
 class GwAdminI18NHotUpdateUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME

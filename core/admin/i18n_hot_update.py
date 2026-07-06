@@ -164,7 +164,6 @@ class GwAdminI18NHotUpdate():
             self._refresh_schema_table()
         finally:
             self.dlg_qm.setEnabled(True)
-        
 
     def _ensure_dialog_scroll(self) -> None:
         if self._scroll_area is not None:
@@ -215,7 +214,6 @@ class GwAdminI18NHotUpdate():
         self.dlg_qm.setMaximumHeight(dialog_height)
 
         self._ensure_dialog_scroll()
-
 
     def _setup_schema_table(self) -> None:
         self.dlg_qm.tbl_schemas.setModel(self._schema_model)

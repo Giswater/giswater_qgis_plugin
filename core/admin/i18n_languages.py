@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
-import locale
 import os
 import shutil
 import subprocess
@@ -21,8 +20,7 @@ from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QEvent, Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import (
-    QListWidget, QCompleter, QLineEdit, QVBoxLayout, QWidget,
-    QHeaderView, QInputDialog, QSizePolicy, QAbstractItemView,
+    QHeaderView, QAbstractItemView,
 )
 
 from ..ui.ui_manager import GwI18NManageLanguagesUi
@@ -43,6 +41,7 @@ _I18N_SCHEMAS = {'ws': 'schemas/main/ws/final_pass/i18n', 'ud': 'schemas/main/ud
                 'am': 'schemas/addon/am/final_pass/i18n', 'cm': 'schemas/addon/cm/final_pass/i18n',
                 'python': 'i18n'}
 _TS_NAME = 'giswater'
+
 
 class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
 

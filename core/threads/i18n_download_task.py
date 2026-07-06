@@ -1,6 +1,7 @@
 from qgis.PyQt.QtCore import pyqtSignal
 from .task import GwTask
 
+
 class GwDownloadLanguageTask(GwTask):
     task_finished = pyqtSignal(bool, str, str, str)  # ok, locale, schema, error
 
