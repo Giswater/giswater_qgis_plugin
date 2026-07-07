@@ -396,9 +396,9 @@ BEGIN
 
 		EXECUTE 'SELECT sum("billed_volume") FROM ('||v_querytext||')' INTO v_total_vol;
 
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4656", "function":"'||v_function_id||'", "parameters":{"v_total_hydro":"'||v_total_hydro||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4656", "function":"'||v_function_id||'", "parameters":{"v_total_hydro":"'||COALESCE(v_total_hydro, 0)||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4658", "function":"'||v_function_id||'", "parameters":{"v_total_vol":"'||v_total_vol||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4658", "function":"'||v_function_id||'", "parameters":{"v_total_vol":"'||COALESCE(v_total_vol, 0)||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 		IF v_dma_weight_factor is true then
 			EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source, pattern_id)
@@ -443,7 +443,7 @@ BEGIN
 			-- real volume inserted
 			SELECT sum(demand)/v_factor INTO v_count2 FROM inp_dscenario_demand WHERE dscenario_id = v_scenarioid;
 
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4640", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "parameters":{"volume":"'||v_count2||'", "percentage":"'||(100-100*v_count2::float/v_total_vol::float)::numeric(12,2)||'"}}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4640", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "parameters":{"volume":"'||COALESCE(v_count2, 0)||'", "percentage":"'||COALESCE((100-100*v_count2::float/v_total_vol::float)::numeric(12,2), 0)||'"}}}$$)';
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4642", "function":"'||v_function_id||'", "fid":"'||v_fid||'"}}$$)';
 		END IF;
@@ -502,11 +502,11 @@ BEGIN
 		IF v_pattern > 1 THEN
 
 			GET DIAGNOSTICS v_count2 = row_count;	
-			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4660", "function":"'||v_function_id||'", "parameters":{"v_count2":"'||v_count2||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4660", "function":"'||v_function_id||'", "parameters":{"v_count2":"'||COALESCE(v_count2, 0)||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 		
 			IF v_count > v_count2 THEN
 
-				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4662", "function":"'||v_function_id||'", "parameters":{"v_count":"'||(v_count-v_count2)||'"}, "fid":"'||v_fid||'", "criticity":"2", "prefix_id":"1006", "is_process":true}}$$)';
+				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4662", "function":"'||v_function_id||'", "parameters":{"v_count":"'||COALESCE((v_count-v_count2), 0)||'"}, "fid":"'||v_fid||'", "criticity":"2", "prefix_id":"1006", "is_process":true}}$$)';
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4664", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4666", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
 				EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4668", "function":"'||v_function_id||'", "fid":"'||v_fid||'", "criticity":"2", "is_process":true}}$$)';
@@ -528,7 +528,7 @@ BEGIN
 		INTO v_rec_hydro;
 
 
-		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4674", "function":"'||v_function_id||'", "parameters":{"v_hydro_no_llegits":"'||v_rec_hydro.hydro_no_llegits||'", "v_hydro_total":"'||v_rec_hydro.hydro_total||'", "v_percentage":"'||v_rec_hydro.percentage||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
+		EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4674", "function":"'||v_function_id||'", "parameters":{"v_hydro_no_llegits":"'||COALESCE(v_rec_hydro.hydro_no_llegits, 0)||'", "v_hydro_total":"'||COALESCE(v_rec_hydro.hydro_total, 0)||'", "v_percentage":"'||COALESCE(v_rec_hydro.percentage, 0)||'"}, "fid":"'||v_fid||'", "criticity":"1", "is_process":true}}$$)';
 
 		-- set selector
 		INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING;
