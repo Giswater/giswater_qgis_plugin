@@ -26,12 +26,12 @@ permissions:
 jobs:
   generate-i18n:
     runs-on: ubuntu-latest
-    env:
-      TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
-      TRANSLATIONS_API_USER: ${{ secrets.TRANSLATIONS_API_USER }}
-      TRANSLATIONS_API_PASSWORD: ${{ secrets.TRANSLATIONS_API_PASSWORD }}
     steps:
       - name: Validate required secrets
+        env:
+          TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
+          TRANSLATIONS_API_USER: ${{ secrets.TRANSLATIONS_API_USER }}
+          TRANSLATIONS_API_PASSWORD: ${{ secrets.TRANSLATIONS_API_PASSWORD }}
         run: |
           set -euo pipefail
           missing=()
@@ -44,16 +44,6 @@ jobs:
             echo "::error::Missing required secrets: ${missing[*]}"
             exit 1
           fi
-
-      - name: Generate GitHub App token
-        id: translations-app-token
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ secrets.I18N_BOT_APP_CLIENT_ID }}
-          private-key: ${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}
-          owner: Giswater
-          repositories: translations
-          permission-contents: write
 
       - name: Checkout giswater repository
         uses: actions/checkout@v6
@@ -89,8 +79,12 @@ jobs:
         working-directory: giswater
         env:
           LANG_CODE: ${{ github.event.inputs.languages }}
+          TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
+          TRANSLATIONS_API_USER: ${{ secrets.TRANSLATIONS_API_USER }}
+          TRANSLATIONS_API_PASSWORD: ${{ secrets.TRANSLATIONS_API_PASSWORD }}
         run: |
           set -euo pipefail
+          pip install requests
           python3 scripts/export_i18n_zips.py \
             --base-url "$TRANSLATIONS_API_URL" \
             --user "$TRANSLATIONS_API_USER" \
@@ -98,12 +92,23 @@ jobs:
             --languages-json-out ../artifacts/languages.json \
             --output-dir ../artifacts/i18n
 
+      - name: Generate GitHub App token
+        id: translations-app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.I18N_BOT_APP_CLIENT_ID }}
+          private-key: ${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}
+          owner: Giswater
+          repositories: translations
+          permission-contents: write
+
       - name: Checkout translations repository
         uses: actions/checkout@v6
         with:
           repository: Giswater/translations
           token: ${{ steps.translations-app-token.outputs.token }}
           path: translations
+          persist-credentials: false
 
       - name: Get GitHub App bot identity
         id: app-bot
@@ -117,33 +122,37 @@ jobs:
           echo "email=${USER_ID}+${APP_SLUG}[bot]@users.noreply.github.com" >> "$GITHUB_OUTPUT"
 
       - name: Publish ZIP files to translations repository
+        id: publish
         env:
           BOT_NAME: ${{ steps.app-bot.outputs.name }}
           BOT_EMAIL: ${{ steps.app-bot.outputs.email }}
+          GH_TOKEN: ${{ steps.translations-app-token.outputs.token }}
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.version }}"
           VERSION_PATH="${{ steps.version.outputs.version_path }}"
           SOURCE_DIR="artifacts/i18n"
+          LANGUAGES_JSON="artifacts/languages.json"
           TARGET_REPO="translations"
 
           if [ ! -d "$SOURCE_DIR" ] || [ -z "$(find "$SOURCE_DIR" -maxdepth 1 -name '*.zip' -print -quit)" ]; then
             echo "::error::No ZIP files were generated in $SOURCE_DIR"
             exit 1
           fi
-          if [ ! -f "$SOURCE_DIR/languages.json" ]; then
-            echo "::error::languages.json was not generated in $SOURCE_DIR"
+          if [ ! -f "$LANGUAGES_JSON" ]; then
+            echo "::error::languages.json was not generated in $LANGUAGES_JSON"
             exit 1
           fi
 
           mkdir -p "$TARGET_REPO/latest" "$TARGET_REPO/$VERSION_PATH"
           cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/latest/"
           cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/$VERSION_PATH/"
-          cp "$SOURCE_DIR/languages.json" "$TARGET_REPO/languages.json"
+          cp "$LANGUAGES_JSON" "$TARGET_REPO/languages.json"
 
           cd "$TARGET_REPO"
           git config user.name "$BOT_NAME"
           git config user.email "$BOT_EMAIL"
+          gh auth setup-git
           git add languages.json latest "$VERSION_PATH"
 
           if git diff --staged --quiet; then
@@ -153,3 +162,13 @@ jobs:
 
           git commit -m "chore(i18n): update translation ZIPs for v${VERSION}"
           git push origin HEAD
+
+      - name: Cleanup GitHub App session
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -d translations/.git ]; then
+            git -C translations config --local --unset-all http.https://github.com/.extraheader 2>/dev/null || true
+            git -C translations config --local --unset-all credential.helper 2>/dev/null || true
+          fi
+          unset GH_TOKEN

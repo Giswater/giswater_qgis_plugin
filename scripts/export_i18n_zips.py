@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Download translation ZIP exports from the translations API for CI workflows.
 
+Authentication uses a cookie session obtained from::
+
+  POST {base_url}/api/auth/sign-in/username
+  {"username": "...", "password": "..."}
+
 Example::
 
   python scripts/export_i18n_zips.py \\
@@ -18,16 +23,17 @@ Environment variables override defaults when CLI flags are omitted:
 from __future__ import annotations
 
 import argparse
-import base64
 import json
 import os
 import sys
-import urllib.error
 import urllib.parse
-import urllib.request
 from pathlib import Path
+from typing import Any
+
+import requests
 
 DEFAULT_TS_NAME = "giswater"
+SIGN_IN_PATH = "/api/auth/sign-in/username"
 ZIP_MAGIC = b"PK"
 
 
@@ -40,52 +46,80 @@ def resolve_setting(cli_value: str | None, env_name: str, default: str | None = 
     return default
 
 
-def build_auth_header(user: str, password: str) -> str:
-    if not user or not password:
-        raise ValueError(
-            "API credentials are required. Set TRANSLATIONS_API_USER and "
-            "TRANSLATIONS_API_PASSWORD (or pass --user / --password)."
-        )
-    token = base64.b64encode(f"{user}:{password}".encode("utf-8")).decode("ascii")
-    return f"Basic {token}"
+class ApiSession:
+    """Authenticated HTTP session for the translations API."""
+
+    def __init__(
+        self,
+        base_url: str,
+        username: str,
+        password: str,
+        *,
+        timeout: float = 120,
+    ) -> None:
+        if not username or not password:
+            raise ValueError(
+                "API credentials are required. Set TRANSLATIONS_API_USER and "
+                "TRANSLATIONS_API_PASSWORD (or pass --user / --password)."
+            )
+
+        self.base_url = base_url.rstrip("/")
+        self.timeout = timeout
+        self._session = requests.Session()
+        self._sign_in(username, password)
+
+    def _sign_in(self, username: str, password: str) -> None:
+        url = f"{self.base_url}{SIGN_IN_PATH}"
+        try:
+            response = self._session.post(
+                url,
+                json={"username": username, "password": password},
+                timeout=self.timeout,
+            )
+        except requests.RequestException as exc:
+            raise RuntimeError(f"Failed to reach auth API at {url}: {exc}") from exc
+
+        if response.status_code >= 400:
+            raise RuntimeError(
+                f"Login failed (HTTP {response.status_code}) for {url}: {response.text}"
+            )
+
+    def get_bytes(self, path: str, *, accept: str) -> bytes:
+        url = f"{self.base_url}{path}" if path.startswith("/") else path
+        headers = {"Accept": accept, "Connection": "close"}
+
+        try:
+            response = self._session.get(url, headers=headers, timeout=self.timeout)
+        except requests.RequestException as exc:
+            raise RuntimeError(f"Failed to reach {url}: {exc}") from exc
+
+        if response.status_code >= 400:
+            raise RuntimeError(f"HTTP {response.status_code} for {url}: {response.text}")
+
+        body = response.content
+        if not body:
+            raise RuntimeError(f"Empty response from {url}")
+        return body
+
+    def close(self) -> None:
+        self._session.close()
+
+    def __enter__(self) -> ApiSession:
+        return self
+
+    def __exit__(self, *_args: Any) -> None:
+        self.close()
 
 
-def request_url(
-    url: str,
-    *,
-    user: str,
-    password: str,
-    accept: str,
-    timeout: int = 120,
-) -> bytes:
-    request = urllib.request.Request(url, method="GET")
-    request.add_header("Authorization", build_auth_header(user, password))
-    request.add_header("Accept", accept)
-
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            body = response.read()
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode(errors="replace")
-        raise RuntimeError(f"HTTP {exc.code} for {url}: {detail}") from exc
-    except urllib.error.URLError as exc:
-        raise RuntimeError(f"Failed to reach {url}: {exc}") from exc
-
-    if not body:
-        raise RuntimeError(f"Empty response from {url}")
-    return body
-
-
-def fetch_languages_dict(base_url: str, user: str, password: str) -> dict[str, str]:
-    url = f"{base_url.rstrip('/')}/api/languages"
-    body = request_url(url, user=user, password=password, accept="application/json")
+def fetch_languages_dict(api: ApiSession) -> dict[str, str]:
+    body = api.get_bytes("/api/languages", accept="application/json")
     try:
         payload = json.loads(body.decode("utf-8"))
     except json.JSONDecodeError as exc:
-        raise RuntimeError(f"Invalid JSON from {url}") from exc
+        raise RuntimeError("Invalid JSON from /api/languages") from exc
 
     if not isinstance(payload, dict):
-        raise RuntimeError(f"Unexpected languages payload from {url}: expected object")
+        raise RuntimeError("Unexpected languages payload from /api/languages: expected object")
 
     languages = {
         str(locale).strip().lower(): str(name)
@@ -93,19 +127,8 @@ def fetch_languages_dict(base_url: str, user: str, password: str) -> dict[str, s
         if str(locale).strip()
     }
     if not languages:
-        raise RuntimeError(f"No languages returned from {url}")
+        raise RuntimeError("No languages returned from /api/languages")
     return languages
-
-
-def fetch_languages(base_url: str, user: str, password: str) -> list[str]:
-    return sorted(fetch_languages_dict(base_url, user, password).keys())
-
-
-def write_languages_json(path: Path, base_url: str, user: str, password: str) -> None:
-    languages = fetch_languages_dict(base_url, user, password)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(languages, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {path} ({len(languages)} language(s))")
 
 
 def normalize_lang(lang: str) -> str:
@@ -116,28 +139,22 @@ def zip_filename(lang: str) -> str:
     return f"translations_{normalize_lang(lang)}.zip"
 
 
-def build_export_url(base_url: str, lang: str, ts_name: str) -> str:
+def build_export_path(lang: str, ts_name: str) -> str:
     query = urllib.parse.urlencode({"ts_name": ts_name})
-    return f"{base_url.rstrip('/')}/api/translations/{normalize_lang(lang)}/export/zip?{query}"
+    return f"/api/translations/{normalize_lang(lang)}/export/zip?{query}"
 
 
 def download_zip(
-    base_url: str,
+    api: ApiSession,
     lang: str,
     ts_name: str,
     output_dir: Path,
-    user: str,
-    password: str,
 ) -> Path:
-    url = build_export_url(base_url, lang, ts_name)
+    path = build_export_path(lang, ts_name)
+    url = f"{api.base_url}{path}"
     print(f"GET {url}")
 
-    body = request_url(
-        url,
-        user=user,
-        password=password,
-        accept="application/zip, application/octet-stream, */*",
-    )
+    body = api.get_bytes(path, accept="application/zip, application/octet-stream, */*")
     if not body.startswith(ZIP_MAGIC):
         raise RuntimeError(
             f"Response for {lang} is not a ZIP archive (missing PK header). "
@@ -185,9 +202,9 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
 
-    base_url = resolve_setting(args.base_url, "TRANSLATIONS_API_URL")
-    user = resolve_setting(args.user, "TRANSLATIONS_API_USER", "")
-    password = resolve_setting(args.password, "TRANSLATIONS_API_PASSWORD", "")
+    base_url = (resolve_setting(args.base_url, "TRANSLATIONS_API_URL") or "").strip()
+    user = (resolve_setting(args.user, "TRANSLATIONS_API_USER", "") or "").strip()
+    password = (resolve_setting(args.password, "TRANSLATIONS_API_PASSWORD", "") or "").strip()
     ts_name = resolve_setting(args.ts_name, "TS_NAME", DEFAULT_TS_NAME) or DEFAULT_TS_NAME
     languages_raw = resolve_setting(args.languages, "LANG_CODE", None)
     output_dir = Path(args.output_dir)
@@ -200,26 +217,41 @@ def main() -> int:
         return 1
 
     try:
-        if args.languages_json_out:
-            write_languages_json(Path(args.languages_json_out), base_url, user, password)
+        with ApiSession(base_url, user, password) as api:
+            languages = parse_languages(languages_raw)
+            languages_dict: dict[str, str] | None = None
+            if languages is None or args.languages_json_out:
+                print("Fetching language list from API...")
+                languages_dict = fetch_languages_dict(api)
 
-        languages = parse_languages(languages_raw)
-        if languages is None:
-            print("Fetching language list from API...")
-            languages = fetch_languages(base_url, user, password)
-            print(f"Languages: {', '.join(languages)}")
+            if args.languages_json_out:
+                languages_json_path = Path(args.languages_json_out)
+                languages_json_path.parent.mkdir(parents=True, exist_ok=True)
+                languages_json_path.write_text(
+                    json.dumps(languages_dict, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+                print(f"Wrote {languages_json_path} ({len(languages_dict)} language(s))")
 
-        failures = 0
-        for lang in languages:
-            try:
-                download_zip(base_url, lang, ts_name, output_dir, user, password)
-            except RuntimeError as exc:
-                print(f"Error exporting {lang}: {exc}", file=sys.stderr)
-                failures += 1
+            if languages is None:
+                languages = sorted(languages_dict.keys())
+                print(f"Languages: {', '.join(languages)}")
 
-        if failures:
-            print(f"Failed to export {failures} language(s).", file=sys.stderr)
-            return 1
+            failures = 0
+            downloaded: list[Path] = []
+            for lang in languages:
+                try:
+                    downloaded.append(download_zip(api, lang, ts_name, output_dir))
+                except RuntimeError as exc:
+                    print(f"Error exporting {lang}: {exc}", file=sys.stderr)
+                    failures += 1
+
+            if downloaded:
+                print(f"Downloaded {len(downloaded)} ZIP file(s) to {output_dir.resolve()}")
+
+            if failures:
+                print(f"Failed to export {failures} language(s).", file=sys.stderr)
+                return 1
         return 0
     except (RuntimeError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
