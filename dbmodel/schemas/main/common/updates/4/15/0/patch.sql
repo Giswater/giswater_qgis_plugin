@@ -176,3 +176,31 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
 VALUES ('utils_language_ui', 'hidden', 'UI language for database messages when multilang schema is enabled', 'role_basic', NULL, 'UI language', NULL, NULL, false, NULL, 'utils', false, NULL, NULL, NULL, false, 'json', 'linetext', false, NULL, '{"lang":"en_US"}', NULL, false, NULL, NULL, NULL, NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
+
+DO $patch$ 
+DECLARE
+    v_utils boolean; 
+BEGIN
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+	 
+	 IF v_utils IS FALSE THEN
+        DO $$
+        BEGIN
+            IF EXISTS (
+                SELECT 1
+                FROM pg_attribute a
+                JOIN pg_class c ON a.attrelid = c.oid
+                JOIN pg_namespace n ON c.relnamespace = n.oid
+                WHERE c.relname = 'ext_plot'
+                  AND n.nspname = current_schema()
+                  AND a.attname = 'streetaxis_id'
+                  AND a.attnotnull = true
+            ) THEN
+                EXECUTE 'ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL';
+            END IF;
+        END
+        $$;
+
+     END IF;
+ END $patch$;
+ 
