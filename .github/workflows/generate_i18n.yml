@@ -11,12 +11,12 @@ on:
         options:
           - latest
           - release
-      ref:
-        description: "Plugin repo branch, tag or commit SHA (empty = default branch)"
-        required: false
-        default: ""
       languages:
         description: "Comma-separated language codes, e.g. es_cr,es_es (empty = all from API)"
+        required: false
+        default: ""
+      ref:
+        description: "Plugin repo branch, tag or commit SHA (empty = default branch)"
         required: false
         default: ""
       version:
