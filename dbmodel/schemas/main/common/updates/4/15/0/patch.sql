@@ -179,28 +179,85 @@ ON CONFLICT (id) DO NOTHING;
 
 DO $patch$ 
 DECLARE
-    v_utils boolean; 
+	v_utils boolean; 
 BEGIN
-     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
-	 
-	 IF v_utils IS FALSE THEN
-        DO $$
-        BEGIN
-            IF EXISTS (
-                SELECT 1
-                FROM pg_attribute a
-                JOIN pg_class c ON a.attrelid = c.oid
-                JOIN pg_namespace n ON c.relnamespace = n.oid
-                WHERE c.relname = 'ext_plot'
-                  AND n.nspname = current_schema()
-                  AND a.attname = 'streetaxis_id'
-                  AND a.attnotnull = true
-            ) THEN
-                EXECUTE 'ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL';
-            END IF;
-        END
-        $$;
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
 
-     END IF;
- END $patch$;
+	IF v_utils IS FALSE THEN
+		DO $$
+		BEGIN
+			IF EXISTS (
+				SELECT 1
+				FROM pg_attribute a
+				JOIN pg_class c ON a.attrelid = c.oid
+				JOIN pg_namespace n ON c.relnamespace = n.oid
+				WHERE c.relname = 'ext_plot'
+				AND n.nspname = current_schema()
+				AND a.attname = 'streetaxis_id'
+				AND a.attnotnull = true
+			) THEN
+				EXECUTE 'ALTER TABLE ext_plot ALTER COLUMN streetaxis_id DROP NOT NULL';
+			END IF;
+		END $$;
+	END IF;
+END $patch$;
  
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4676, 'The demand is OK: demand values sum to 1 per DMA because they are weight factors.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4640, 'The volume water inserted is %volume%, wich it means that lossed water percentatge due leak of data have been %percentage% %.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4642, 'The water loss could be motivated by current connecs with state = 0 which they was operative for that period with some hydrometer linked', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4644, 'New scenario: %v_name% ( %v_scenarioid% )', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4646, 'Copy from CRM period: %v_crm_name%', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4648, 'Source pattern: %v_pattern%', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4650, 'Demand units: %v_demandunits%', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4652, 'Period seconds: %v_periodseconds%', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4654, 'WARNING: The period has not data on period_seconds columns. The system default value have been used ( %v_periodseconds% ) ', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4656, 'There are %v_total_hydro% hydrometers with data for this period and this exploitation.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4658, 'The total volume (m3) for all the hydrometers is %v_total_vol%.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4660, '%v_count2% rows have been update with pattern value.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4662, '%v_count% rows have not been updated. This may be for missed data from source pattern table.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4664, 'SECTOR DEFAULT: sector table.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4666, 'DMA DEFAULT: dma table.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4668, 'DMA PERIOD: ext_rtc_dma_period table.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4670, 'HYDROMETER CATEGORY: hydrometer_category table.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4672, 'FEATURE PATTERN: inp_junction & inp_connec tables.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4674, 'INFO: There are %v_hydro_no_llegits% non-read hydrometers from %v_hydro_total% hydrometers in total (%v_percentage%% of the hydrometers)', NULL, 1, true, 'utils', 'core', 'AUDIT');
+
+UPDATE sys_function SET function_alias = 'CREATE DSCENARIO FROM CRM' WHERE id = 3110;
