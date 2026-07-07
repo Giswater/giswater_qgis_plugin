@@ -172,7 +172,7 @@ BEGIN
 	), mec AS (
 		SELECT * FROM temp_om_scada_graph a WHERE object_1::TEXT IN (SELECT node_1 FROM arc UNION ALL SELECT node_2 FROM arc)
 	)
-	SELECT v_fid, ''2'', object_1, objecttype_1, state_1, expl_1, edge_id, geom_1, 
+	SELECT '||v_fid||', ''2'', object_1, objecttype_1, state_1, expl_1, edge_id, geom_1, 
 	concat(''Object_1 from edge_id '', edge_id, '' is orphan.'') FROM temp_om_scada_graph 
 	WHERE object_1 NOT IN (SELECT object_1 FROM mec)';
 
@@ -198,7 +198,7 @@ BEGIN
 	), mec AS (
 		SELECT * FROM temp_om_scada_graph a WHERE object_2::TEXT IN (SELECT node_1 FROM arc UNION ALL SELECT node_2 FROM arc)
 	)
-	SELECT v_fid, ''2'', object_2, objecttype_2, state_2, expl_2, edge_id, geom_2, 
+	SELECT '||v_fid||', ''2'', object_2, objecttype_2, state_2, expl_2, edge_id, geom_2, 
 	concat(''Object_2 from edge_id '', edge_id, '' is orphan.'') FROM temp_om_scada_graph 
 	WHERE object_2 NOT IN (SELECT object_2 FROM mec)';
 
