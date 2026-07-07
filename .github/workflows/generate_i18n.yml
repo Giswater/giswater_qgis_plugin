@@ -3,16 +3,24 @@ name: Generate i18n
 on:
   workflow_dispatch:
     inputs:
+      publish_mode:
+        description: "latest = update translations/latest only; release = create version folder and update latest/"
+        required: true
+        default: latest
+        type: choice
+        options:
+          - latest
+          - release
       ref:
-        description: "Branch, tag or commit SHA (empty = default branch)"
+        description: "Plugin repo branch, tag or commit SHA (empty = default branch)"
         required: false
         default: ""
       languages:
-        description: "Comma-separated language codes (empty = all from API)"
+        description: "Comma-separated language codes, e.g. es_cr,es_es (empty = all from API)"
         required: false
         default: ""
       version:
-        description: "Version override e.g. 4.15.0 (empty = metadata.txt or release tag)"
+        description: "Plugin version X.Y.Z — only used when publish_mode=release (empty = metadata.txt)"
         required: false
         default: ""
   schedule:
@@ -32,51 +40,37 @@ jobs:
           TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
           TRANSLATIONS_API_USER: ${{ secrets.TRANSLATIONS_API_USER }}
           TRANSLATIONS_API_PASSWORD: ${{ secrets.TRANSLATIONS_API_PASSWORD }}
+          I18N_BOT_APP_CLIENT_ID: ${{ secrets.I18N_BOT_APP_CLIENT_ID }}
+          I18N_BOT_APP_PRIVATE_KEY: ${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}
         run: |
           set -euo pipefail
           missing=()
-          [ -z "${TRANSLATIONS_API_URL}" ] && missing+=("TRANSLATIONS_API_URL")
-          [ -z "${TRANSLATIONS_API_USER}" ] && missing+=("TRANSLATIONS_API_USER")
-          [ -z "${TRANSLATIONS_API_PASSWORD}" ] && missing+=("TRANSLATIONS_API_PASSWORD")
-          [ -z "${{ secrets.I18N_BOT_APP_CLIENT_ID }}" ] && missing+=("I18N_BOT_APP_CLIENT_ID")
-          [ -z "${{ secrets.I18N_BOT_APP_PRIVATE_KEY }}" ] && missing+=("I18N_BOT_APP_PRIVATE_KEY")
+          required_secrets=(
+            TRANSLATIONS_API_URL
+            TRANSLATIONS_API_USER
+            TRANSLATIONS_API_PASSWORD
+            I18N_BOT_APP_CLIENT_ID
+            I18N_BOT_APP_PRIVATE_KEY
+          )
+
+          for secret in "${required_secrets[@]}"; do
+            [ -z "${!secret}" ] && missing+=("$secret")
+          done
+
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "::error::Missing required secrets: ${missing[*]}"
             exit 1
           fi
 
-      - name: Checkout giswater repository
+      - name: Checkout giswater_qgis_plugin repository
         uses: actions/checkout@v6
         with:
+          repository: Giswater/giswater_qgis_plugin
           ref: ${{ github.event.inputs.ref || github.ref }}
-          path: giswater
-
-      - name: Resolve plugin version
-        id: version
-        working-directory: giswater
-        run: |
-          set -euo pipefail
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          elif [ "${{ github.event_name }}" = "release" ]; then
-            VERSION="${{ github.event.release.tag_name }}"
-            VERSION="${VERSION#v}"
-          else
-            VERSION="$(grep '^version=' metadata.txt | head -n1 | cut -d= -f2)"
-          fi
-
-          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "::error::Invalid version '$VERSION'. Expected format X.Y.Z"
-            exit 1
-          fi
-
-          IFS='.' read -r major minor patch <<< "$VERSION"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "version_path=${major}/${minor}/${patch}" >> "$GITHUB_OUTPUT"
-          echo "Resolved version: $VERSION (${major}/${minor}/${patch})"
+          path: giswater_qgis_plugin
 
       - name: Download translation ZIP files
-        working-directory: giswater
+        working-directory: giswater_qgis_plugin
         env:
           LANG_CODE: ${{ github.event.inputs.languages }}
           TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
@@ -127,10 +121,12 @@ jobs:
           BOT_NAME: ${{ steps.app-bot.outputs.name }}
           BOT_EMAIL: ${{ steps.app-bot.outputs.email }}
           GH_TOKEN: ${{ steps.translations-app-token.outputs.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          PUBLISH_MODE: ${{ github.event.inputs.publish_mode || 'latest' }}
+          VERSION_INPUT: ${{ github.event.inputs.version || '' }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || '' }}
         run: |
           set -euo pipefail
-          VERSION="${{ steps.version.outputs.version }}"
-          VERSION_PATH="${{ steps.version.outputs.version_path }}"
           SOURCE_DIR="artifacts/i18n"
           LANGUAGES_JSON="artifacts/languages.json"
           TARGET_REPO="translations"
@@ -144,23 +140,77 @@ jobs:
             exit 1
           fi
 
-          mkdir -p "$TARGET_REPO/latest" "$TARGET_REPO/$VERSION_PATH"
+          PUBLISH_RELEASE=false
+          if [ "$EVENT_NAME" = "release" ] || [ "$PUBLISH_MODE" = "release" ]; then
+            PUBLISH_RELEASE=true
+          fi
+
+          mkdir -p "$TARGET_REPO/latest"
           cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/latest/"
-          cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/$VERSION_PATH/"
-          cp "$LANGUAGES_JSON" "$TARGET_REPO/languages.json"
+          cp "$LANGUAGES_JSON" "$TARGET_REPO/latest/languages.json"
+          GIT_PATHS=(latest)
+          COMMIT_MSG="chore(i18n): update latest translation ZIPs"
+
+          if [ "$PUBLISH_RELEASE" = "true" ]; then
+            VERSION="$VERSION_INPUT"
+            if [ -z "$VERSION" ] && [ "$EVENT_NAME" = "release" ]; then
+              VERSION="${RELEASE_TAG#v}"
+            fi
+            if [ -z "$VERSION" ]; then
+              VERSION="$(awk -F= '/^version=/{print $2; exit}' giswater_qgis_plugin/metadata.txt)"
+            fi
+            if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::Invalid version '$VERSION'. Expected format X.Y.Z"
+              exit 1
+            fi
+
+            IFS='.' read -r major minor patch <<< "$VERSION"
+            VERSION_PATH="${major}/${minor}/${patch}"
+            echo "Release publish: creating version ${VERSION} and updating latest/."
+
+            python3 - "$VERSION" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          repo = Path("translations")
+          current = tuple(int(part) for part in sys.argv[1].split("."))
+          versions = {current}
+
+          for path in repo.glob("[0-9]*/*/*"):
+              parts = path.relative_to(repo).parts
+              if path.is_dir() and len(parts) == 3 and all(part.isdigit() for part in parts):
+                  versions.add(tuple(int(part) for part in parts))
+
+          Path("artifacts/versions.json").write_text(
+              json.dumps([".".join(map(str, version)) for version in sorted(versions)], indent=2)
+              + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+            mkdir -p "$TARGET_REPO/$VERSION_PATH"
+            cp "$SOURCE_DIR"/*.zip "$TARGET_REPO/$VERSION_PATH/"
+            cp "$LANGUAGES_JSON" "$TARGET_REPO/$VERSION_PATH/languages.json"
+            cp artifacts/versions.json "$TARGET_REPO/versions.json"
+            GIT_PATHS=(versions.json "$VERSION_PATH" latest)
+            COMMIT_MSG="chore(i18n): update translation ZIPs for v${VERSION}"
+          else
+            echo "${EVENT_NAME} trigger (publish_mode=${PUBLISH_MODE}): updating latest/ only."
+          fi
 
           cd "$TARGET_REPO"
           git config user.name "$BOT_NAME"
           git config user.email "$BOT_EMAIL"
           gh auth setup-git
-          git add languages.json latest "$VERSION_PATH"
+          git add "${GIT_PATHS[@]}"
 
           if git diff --staged --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "chore(i18n): update translation ZIPs for v${VERSION}"
+          git commit -m "$COMMIT_MSG"
           git push origin HEAD
 
       - name: Cleanup GitHub App session
