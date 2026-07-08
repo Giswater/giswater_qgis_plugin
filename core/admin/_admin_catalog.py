@@ -219,16 +219,35 @@ def _sys_version_columns_by_schema(
 
 def _version_column_for_schema(schema_name: str, columns: set[str]) -> str:
     if schema_name in _SATELLITE_SCHEMAS:
-        if "version" in columns:
-            return "version"
-        if "giswater" in columns:
-            return "giswater"
+        for col in ("version", "giswater"):
+            if col in columns:
+                return col
     else:
-        if "giswater" in columns:
-            return "giswater"
-        if "version" in columns:
-            return "version"
-    return "giswater"
+        for col in ("giswater", "version"):
+            if col in columns:
+                return col
+    return ""
+
+
+def _fetch_sys_version_addparam(
+    schema_name: str,
+    fetcher: RowFetcher,
+    *,
+    columns: set[str] | None = None,
+) -> dict[str, Any]:
+    """Return parsed addparam when the column exists; {} otherwise."""
+    if columns is None:
+        columns = _sys_version_columns_by_schema([schema_name], fetcher).get(schema_name, set())
+    if "addparam" not in columns:
+        return {}
+    row = fetcher(
+        f"SELECT addparam FROM {_quote_ident(schema_name)}.sys_version "
+        "ORDER BY id DESC LIMIT 1",
+        None,
+    )
+    if not row or not row[0]:
+        return {}
+    return _parse_addparam(row[0][0])
 
 
 def _parse_addparam(addparam: Any) -> dict[str, Any]:
@@ -390,6 +409,9 @@ def fetch_schema_inventory(fetcher: RowFetcher = _tools_db_fetch) -> list[dict[s
         }
         columns = columns_by_schema.get(schema_name, set())
         version_col = _version_column_for_schema(schema_name, columns)
+        if not version_col:
+            inventory.append(empty_entry)
+            continue
         select_cols = ["project_type", version_col]
         if "addparam" in columns:
             select_cols.append("addparam")
@@ -435,11 +457,7 @@ def get_utils_network_parents(fetcher: RowFetcher = _tools_db_fetch) -> dict[str
     if not schema_exists("utils", fetcher):
         return result
 
-    row = fetcher(
-        "SELECT addparam FROM utils.sys_version ORDER BY id DESC LIMIT 1",
-        None,
-    )
-    ap = _parse_addparam(row[0][0] if row and row[0] else None)
+    ap = _fetch_sys_version_addparam("utils", fetcher)
     network = ap.get("network_parents") or {}
     if isinstance(network, dict):
         for kind in ("ws", "ud"):
@@ -499,6 +517,8 @@ def _fetch_schema_sys_version_entry(
     columns_by_schema = _sys_version_columns_by_schema([schema_name], fetcher)
     columns = columns_by_schema.get(schema_name, set())
     version_col = _version_column_for_schema(schema_name, columns)
+    if not version_col:
+        return {"schema": schema_name, "kind": "", "version": "", "addparam": {}}
     select_cols = ["project_type", version_col]
     if "addparam" in columns:
         select_cols.append("addparam")
