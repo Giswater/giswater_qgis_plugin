@@ -8,6 +8,12 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP", "rootViews":["ve_gully"], "saveRoots":true, "batchId":1}}$$);
+
+ALTER TABLE gully ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
+
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"RESTORE", "batchId":1}}$$);
+
 -- pg2epa geographic SRID validation: gw_fct_pg2epa_main (step 1), gw_fct_pg2epa_export_inp and gw_fct_pg2epa_dump_subcatch (base/fct, applied via load_base / reload_fct_ftrg).
 
 INSERT INTO config_mapzones (id, abrevation, descript, fid, code_autofill, active, is_dynamic) VALUES

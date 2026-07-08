@@ -265,3 +265,13 @@ UPDATE sys_function SET function_alias = 'CREATE DSCENARIO FROM CRM' WHERE id = 
 UPDATE config_param_system
 	SET value = jsonb_set(value::jsonb, '{sys_query_text_add}', '"SELECT distinct(concat(s.name, '', '', m.name, '', '', a.postnumber)) as \"value\", (concat(s.name, '', '', m.name, '', '', a.postnumber)) as \"displayName\" FROM ve_streetaxis s join v_municipality m using(muni_id) left join ve_address a on s.id = a.streetaxis_id WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) ILIKE "')
 	WHERE parameter='basic_search_v2_tab_address';
+
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"SAVE-DROP", "rootViews":["ve_arc","ve_node","ve_connec","ve_link","ve_element"], "saveRoots":true, "batchId":1}}$$);
+
+ALTER TABLE arc ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
+ALTER TABLE node ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
+ALTER TABLE connec ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
+ALTER TABLE link ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
+ALTER TABLE element ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
+
+SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"RESTORE", "batchId":1}}$$);
