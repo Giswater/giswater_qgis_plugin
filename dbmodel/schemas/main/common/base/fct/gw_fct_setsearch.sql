@@ -148,8 +148,8 @@ v_ycoord float;
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample", public;
-	v_schemaname = 'ws_sample';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	-- Set api version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
@@ -180,15 +180,11 @@ BEGIN
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT st_x (a.the_geom) as xcoord, st_y (a.the_geom) as  ycoord, St_AsText(a.the_geom) FROM ve_streetaxis s join v_municipality m using(muni_id) left join ve_address a on s.id = a.streetaxis_id
 		 WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) = ('||quote_nullable(v_filter_value)||'))row'
 		INTO v_geometry;
-raise notice 'aaaa -> %', 'SELECT row_to_json(row) FROM (SELECT st_x (a.the_geom) as xcoord, st_y (a.the_geom) as  ycoord, St_AsText(a.the_geom) FROM ve_streetaxis s join v_municipality m using(muni_id) left join ve_address a on s.id = a.streetaxis_id
-		 WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) = ('||quote_nullable(v_filter_value)||'))row';
-raise notice 'v_geometry 222 -> %',v_geometry;
 
 	elsif v_section = 'basic_search_v2_tab_address' then
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM ve_streetaxis '||
 		' s WHERE '||v_filter_key||' = ('||quote_nullable(v_filter_value)||'))row'
 		INTO v_geometry;
-		raise notice 'v_geometry 111 -> %',v_geometry;
 	elsif v_section = 'basic_search_v2_tab_psector' then
 		EXECUTE 'SELECT row_to_json(row) FROM (SELECT ST_x(ST_centroid(ST_envelope(the_geom))) AS xcoord, ST_y(ST_centroid(ST_envelope(the_geom))) AS ycoord, St_AsText(the_geom) FROM '||quote_ident(v_table_name)||
 		' WHERE '||quote_ident(v_filter_key)||' = ('||quote_nullable(v_filter_value)||'))row'
