@@ -41,6 +41,7 @@ from .import_osm import GwImportOsm
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.schema_builder_task import GwSchemaBuilderTask, load_kind_manifest
+from ..threads.multilang_schema_task import GwMultilangSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
 from ..threads.project_schema_vacuum import GwVacuumSchemaTask
@@ -3119,8 +3120,62 @@ class GwAdminButton:
                 tools_qt.show_info_box(msg, "Info")
                 self._refresh_admin_catalog_cache()
                 self._set_buttons_enabled()
+                refresh = getattr(self, "_manage_schemas_refresh", None)
+                if refresh:
+                    refresh()
             else:
                 tools_qt.show_info_box(f"Delete schema failed: {fx.error}", "Error")
+
+    def _multilang_stored_seeded_schemas(self) -> set[str]:
+        from .i18n_baseline_seed import fetch_seeded_schema_names_from_multilang
+
+        if not admin_catalog.schema_exists("multilang"):
+            return set()
+        return fetch_seeded_schema_names_from_multilang(
+            fetcher=admin_catalog._tools_db_fetch,
+        )
+
+    def _multilang_current_seed_targets(self, inventory_rows=None) -> set[str]:
+        from .i18n_languages import _I18N_SCHEMAS
+        schemas = set()
+        for row in inventory_rows:
+            kind = row.get("kind").lower()
+            schema = row.get("schema")
+            if not kind or kind == "am" or kind not in _I18N_SCHEMAS.keys():
+                continue
+            schemas.add(schema)
+
+        return schemas
+
+    def _multilang_schemas_out_of_sync(self, inventory_rows=None) -> bool:
+        """True when network schemas differ from the last multilang seed."""
+
+        if not admin_catalog.schema_exists("multilang"):
+            return False
+        current = self._multilang_current_seed_targets(inventory_rows)
+        stored = self._multilang_stored_seeded_schemas()
+        print(f"current: {current}")
+        print(f"stored: {stored}")
+        return current != stored
+
+    def _multilang_baseline_changed(self) -> bool:
+        """True when bundled en_US baseline SQL differs from the last seed."""
+        from .i18n_baseline_seed import baseline_needs_reseed
+
+        if not admin_catalog.schema_exists("multilang"):
+            return False
+        row = tools_db.get_row(
+            "SELECT addparam FROM multilang.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        stored = None
+        if row and row[0]:
+            try:
+                addparam = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+                if isinstance(addparam, dict):
+                    stored = addparam.get("seed_baseline_fingerprint")
+            except (TypeError, ValueError):
+                pass
+        return baseline_needs_reseed(self.sql_dir, stored)
 
     def _build_replace_dlg(self, replace_json):
 
@@ -4194,29 +4249,60 @@ class GwAdminButton:
             on_done=on_done,
         )
 
-    def _create_i18n(self):
-        """Create the (singleton) i18n satellite schema via the engine."""
+    def _create_i18n(self, manage_schemas_dlg=None):
+        """Create multilang schema and seed en_US baseline translations."""
         if admin_catalog.schema_exists('multilang'):
             tools_qgis.show_message("Schema multilang already exists.", Qgis.MessageLevel.Info)
-            return
+            return False
         bp = BuildParams(
             schema_name='multilang',
             srid=str(self.project_epsg or "25831"),
-            locale=self.locale,
+            locale="en_US",
             plugin_version=str(self.plugin_version),
             profile='empty',
             register_is_new='true',
             sql_root=self.sql_dir,
         )
-        self._submit_builder(
-            'multilang',
+        self._submit_multilang_task(
             bp,
             description='Create multilang schema',
-            on_done=partial(self._on_builder_done_other_update, 'multilang'),
+            on_done=partial[None](self._on_builder_done_other_update, 'multilang'),
+            manage_schemas_dlg=manage_schemas_dlg,
         )
+        return True
 
-    def _update_i18n(self, on_done=None):
-        """Run the i18n 'update' profile in place."""
+    def _submit_multilang_task(
+        self,
+        params,
+        *,
+        description=None,
+        on_done=None,
+        manage_schemas_dlg=None,
+    ):
+        """Queue multilang build + baseline seed on the QGIS task manager."""
+        self._open_schema_build_message_log()
+        self.schema_build_progress_hint = ""
+        self.error_count = 0
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.start(1000)
+
+        desc = description or "Create multilang schema"
+        task = GwMultilangSchemaTask(
+            self,
+            params,
+            description=desc,
+            timer=self.timer,
+            on_done=on_done,
+            manage_schemas_dlg=manage_schemas_dlg,
+        )
+        self.task_create_schema = task
+        QgsApplication.taskManager().addTask(task)
+        QgsApplication.taskManager().triggerTask(task)
+        return task
+
+    def _update_i18n(self, on_done=None, manage_schemas_dlg=None):
+        """Run multilang schema update and re-seed baseline translations."""
         row = tools_db.get_row(
             "SELECT giswater FROM multilang.sys_version ORDER BY id DESC LIMIT 1"
         )
@@ -4224,7 +4310,7 @@ class GwAdminButton:
         bp = BuildParams(
             schema_name='multilang',
             srid=str(self.project_epsg or "25831"),
-            locale=self.locale,
+            locale="en_US",
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',
@@ -4232,11 +4318,11 @@ class GwAdminButton:
             sql_root=self.sql_dir,
         )
         callback = on_done if on_done is not None else partial(self._on_builder_done_other_update, 'multilang')
-        self._submit_builder(
-            'multilang',
+        self._submit_multilang_task(
             bp,
             description="Update multilang schema",
             on_done=callback,
+            manage_schemas_dlg=manage_schemas_dlg,
         )
 
     def _update_cibs(self, on_done=None):
@@ -4356,15 +4442,6 @@ class GwAdminButton:
     def _on_builder_done_other_update(self, schema_name, result):
         if not result.ok:
             self.error_count += 1
-        elif schema_name == 'multilang' and self.schema_name:
-            lang_value = json.dumps({"lang": self.locale or "en_US"}).replace("'", "''")
-            sql = (f"UPDATE {self.schema_name}.config_param_system "
-                   f"SET value = '{lang_value}', isenabled = true "
-                   f"WHERE parameter = 'utils_language_ui'")
-            tools_log.log_info("Task '{0}' execute sql: '{1}'",
-                               msg_params=("Update multilang language", sql,))
-            if not tools_db.execute_sql(sql):
-                self.error_count += 1
         self.manage_other_process_result()
 
     def _calculate_elapsed_time(self, dialog):
