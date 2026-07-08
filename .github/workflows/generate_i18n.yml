@@ -1,4 +1,4 @@
-name: Generate i18n
+name: "🌍 Generate i18n"
 
 on:
   workflow_dispatch:
