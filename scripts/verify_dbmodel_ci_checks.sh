@@ -9,7 +9,7 @@
 # Requires: gh (authenticated) or GITHUB_TOKEN + git for --tag resolution.
 set -euo pipefail
 
-REPO="${GITHUB_REPOSITORY:-Giswater/plugin}"
+REPO="${GITHUB_REPOSITORY:-giswater/plugin}"
 CLI_RELEASE=false
 SHA=""
 TAG=""

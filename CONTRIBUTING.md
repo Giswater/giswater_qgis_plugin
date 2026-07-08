@@ -120,5 +120,5 @@ Marc Vilaseca, Aigües de Vic, SA.<br>
 ## Commiters
 
 <a href="https://github.com/giswater/plugin/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Giswater/plugin" />
+  <img src="https://contrib.rocks/image?repo=giswater/plugin" />
 </a>

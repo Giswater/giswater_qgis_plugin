@@ -262,7 +262,7 @@ python3 scripts/prepare_cli_release.py 0.2.0 --execute --create-github-release
 
 When the GitHub Release is published, CI (`.github/workflows/release-cli.yml`) runs tests, validates versions, builds `dist/*`, publishes to PyPI via OIDC (Trusted Publisher, environment `pypi`), and attaches wheels to the release.
 
-**One-time PyPI setup:** register a pending publisher at https://pypi.org/manage/account/publishing/ with project `giswater-cli`, owner `Giswater`, repository `plugin`, workflow `release-cli.yml`, environment `pypi`. Create the matching `pypi` environment in GitHub repo settings.
+**One-time PyPI setup:** register a pending publisher at https://pypi.org/manage/account/publishing/ with project `giswater-cli`, owner `giswater`, repository `plugin`, workflow `release-cli.yml`, environment `pypi`. Create the matching `pypi` environment in GitHub repo settings.
 
 Users install the tool once (`pipx install giswater-cli`) and refresh schema SQL with `gw dbmodel install` when a new plugin version ships.
 

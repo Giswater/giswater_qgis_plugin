@@ -65,7 +65,7 @@ jobs:
       - name: Checkout plugin repository
         uses: actions/checkout@v6
         with:
-          repository: Giswater/plugin
+          repository: giswater/plugin
           ref: ${{ github.event.inputs.ref || github.ref }}
           path: plugin
 
