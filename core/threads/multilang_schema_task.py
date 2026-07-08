@@ -25,7 +25,7 @@ from ...giswater_admin.log_format import (
     format_file,
     format_progress_status,
 )
-from ...libs import lib_vars, tools_db, tools_log
+from ...libs import lib_vars, tools_log
 from ..admin._admin_catalog import fetch_schema_inventory, make_psycopg2_fetcher
 from ..admin.i18n_baseline_seed import (
     SEED_LANGUAGE_FOLDER,

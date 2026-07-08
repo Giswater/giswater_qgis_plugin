@@ -26,7 +26,7 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, \
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QRegularExpression, \
     QItemSelectionModel, QTimer
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegularExpressionValidator, QPalette
