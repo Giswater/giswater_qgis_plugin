@@ -323,7 +323,10 @@ class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
         try:
             languages = self.fetch_languages()
             if isinstance(languages, dict):
-                api_names = {str(locale): str(name) for locale, name in languages.items()}
+                for locale, name in languages.items():
+                    locale_parts = str(locale).split("_")
+                    locale = locale_parts[0].lower() + "_" + locale_parts[1].upper()
+                    api_names[locale] = name
         except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError):
             pass
         

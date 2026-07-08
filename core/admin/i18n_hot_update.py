@@ -338,6 +338,8 @@ class GwAdminI18NHotUpdate():
                 self._schema_model.removeRows(0, self._schema_model.rowCount())
                 self._inventory_rows = admin_catalog.fetch_schema_inventory()
                 for row in self._inventory_rows:
+                    if row.get("kind") not in _TRANSLATABLE_KINDS:
+                        continue
                     language = self._fetch_schema_language(str(row.get("schema") or ""))
                     values = (
                         row.get("schema", ""),
@@ -695,10 +697,17 @@ class GwAdminI18NHotUpdate():
     def _change_lang(self) -> None:
         lang = self.language.replace("'", "''")
         schema = self._sql_schema_name(self.schema)
-        query = f"UPDATE {schema}.sys_version SET language = '{lang}'"
+        query = (
+            f"UPDATE {schema}.sys_version SET language = '{lang}';"
+            f"INSERT INTO {schema}.config_param_user (parameter, value, cur_user) "
+            f"VALUES ('utils_language_ui', NULL,current_user) "
+            f"ON CONFLICT (parameter, cur_user) DO UPDATE "
+            f"SET value = EXCLUDED.value;"
+        )
         try:
             self.cursor_dest.execute(query)
             tools_db.dao.commit()
+            tools_qt._add_translator(True)
         except Exception:
             tools_db.dao.rollback()
 
