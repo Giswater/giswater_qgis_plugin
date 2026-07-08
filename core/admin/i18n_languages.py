@@ -301,7 +301,7 @@ class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
                 db_name, db_active, version = db_locales.get(locale, (name, 0, None))
                 downloaded_locales[locale] = (db_name or name, version)
                 if locale in db_locales:
-                    if not db_active:
+                    if db_active == 0:
                         cursor.execute("UPDATE locales SET active = 1 WHERE locale = ?", (locale,))
                 else:
                     cursor.execute(
