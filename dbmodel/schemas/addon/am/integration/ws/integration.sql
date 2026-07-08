@@ -15219,3 +15219,9 @@ CREATE RULE v_asset_arc_input_update AS ON UPDATE TO v_asset_arc_input
     strategic = EXCLUDED.strategic,
     rleak = EXCLUDED.rleak;
 
+SELECT am.gw_fct_admin_sys_version_register(json_build_object(
+	'data', json_build_object(
+		'parentSchema', 'SCHEMA_NAME'
+	)
+)::json);
+

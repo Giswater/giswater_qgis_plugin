@@ -1126,3 +1126,9 @@ $$;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA cm TO role_basic;
 GRANT SELECT ON ALL SEQUENCES IN SCHEMA cm TO role_basic;
+
+SELECT cm.gw_fct_admin_sys_version_register(json_build_object(
+	'data', json_build_object(
+		'parentSchema', 'PARENT_SCHEMA'
+	)
+)::json);
