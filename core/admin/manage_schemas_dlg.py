@@ -207,9 +207,9 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_cm_sample.clicked.connect(partial(self._load_cm_sample))
         self.btn_cm_qgis.clicked.connect(partial(self._create_cm_qgis))
         self.btn_delete_cm.clicked.connect(partial(self._delete_cm))
-        self.btn_i18n_create.clicked.connect(partial(self.admin._create_i18n))
-        self.btn_i18n_update.clicked.connect(partial(self.admin._update_i18n))
-        self.btn_i18n_delete.clicked.connect(partial(self.admin._delete_other_schema, 'multilang'))
+        self.btn_i18n_create.clicked.connect(partial(self._create_i18n))
+        self.btn_i18n_update.clicked.connect(partial(self._update_i18n))
+        self.btn_i18n_delete.clicked.connect(partial(self._delete_i18n))
         self.btn_create_audit.clicked.connect(partial(self._create_audit))
         self.btn_update_audit.clicked.connect(partial(self.admin._update_audit))
         self.btn_activate_audit.clicked.connect(partial(self._activate_audit))
@@ -423,6 +423,13 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             str(self.admin.plugin_version),
         )
 
+    def _i18n_needs_update(self) -> bool:
+        if self.admin._multilang_baseline_changed():
+            return True
+        elif self.admin._multilang_schemas_out_of_sync(self._inventory_rows):
+            return True
+        return False
+
     def _network_has_pending_updates(self, anchor: str) -> bool:
         if not anchor or self._parent_kind(anchor) not in ("WS", "UD"):
             return False
@@ -511,9 +518,7 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_delete_cm.setEnabled(cm_exists)
 
         self.btn_i18n_create.setEnabled(not i18n_exists)
-        self.btn_i18n_update.setEnabled(
-            i18n_exists and self._needs_update(str((i18n_row or {}).get("version") or ""))
-        )
+        self.btn_i18n_update.setEnabled(i18n_exists and self._i18n_needs_update())
         self.btn_i18n_delete.setEnabled(i18n_exists)
 
         self.btn_create_audit.setEnabled(not audit_exists)
@@ -680,3 +685,26 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             tools_qt.show_info_box("Select a network anchor to copy cibs data.")
             return
         self.admin._copy_cibs_data(parent_schema=parent)
+
+    def _create_i18n(self) -> None:
+        """Create multilang schema asynchronously and refresh when done."""
+        self.setEnabled(False)
+        try:
+            if not self.admin._create_i18n(manage_schemas_dlg=self):
+                self.setEnabled(True)
+        except Exception:
+            self.setEnabled(True)
+            raise
+
+    def _update_i18n(self) -> None:
+        """Update multilang schema and re-apply baseline translations."""
+        self.setEnabled(False)
+        try:
+            self.admin._update_i18n(manage_schemas_dlg=self)
+        except Exception:
+            self.setEnabled(True)
+            raise
+
+    def _delete_i18n(self) -> None:
+        """Delete multilang schema and refresh inventory."""
+        self.admin._delete_other_schema("multilang")

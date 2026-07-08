@@ -177,7 +177,18 @@ INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv
 VALUES ('utils_language_ui', 'hidden', 'UI language for database messages when multilang schema is enabled', 'role_basic', NULL, 'UI language', NULL, NULL, false, NULL, 'utils', false, NULL, NULL, NULL, false, 'json', 'linetext', false, NULL, '{"lang":"en_US"}', NULL, false, NULL, NULL, NULL, NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
-DO $patch$ 
+INSERT INTO config_param_user (parameter, value, cur_user)
+VALUES ('utils_language_ui', '{"status":true, "lang":"en_US"}', current_user)
+ON CONFLICT (parameter, cur_user) DO NOTHING;
+
+DO $patch$
+BEGIN
+    IF to_regprocedure('gw_fct_get_utils_language_ui()') IS NOT NULL THEN
+        ALTER FUNCTION gw_fct_get_utils_language_ui() VOLATILE;
+    END IF;
+END $patch$;
+
+DO $patch$
 DECLARE
 	v_utils boolean; 
 BEGIN
