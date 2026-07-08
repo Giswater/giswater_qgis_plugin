@@ -299,20 +299,18 @@ BEGIN
 
 		v_featurecat := COALESCE(v_customfeature, v_element_type);
 
-		IF v_featurecat IS NOT NULL THEN
-			SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id = v_featurecat;
-		END IF;
-
 		IF btrim(coalesce(NEW.code, '')) = '' THEN
 			NEW.code := NULL;
 		END IF;
 
-				IF NEW.code IS NULL AND v_featurecat IS NOT NULL THEN
-			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(row_to_json(NEW)::json));
-		END IF;
+		IF NEW.code IS NULL AND v_featurecat IS NOT NULL THEN
+			SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id = v_featurecat;
 
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
-			NEW.code := NEW.element_id::text;
+			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(row_to_json(NEW)::json));
+
+			IF NEW.code IS NULL AND v_code_autofill_bool THEN
+				NEW.code := NEW.element_id::text;
+			END IF;
 		END IF;
 
 		INSERT INTO "element" (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type,

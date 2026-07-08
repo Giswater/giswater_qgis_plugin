@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Change `dataquality_obs` type to text[] in `arc`, `node`, `connec`, `link`, and `element` tables.
+- Change `edit_sys_code_autofill` variable to accept new values: `uuid`, `code`, `none`.
 
 ### Fixed
 

@@ -275,3 +275,17 @@ ALTER TABLE link ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs
 ALTER TABLE element ALTER COLUMN dataquality_obs TYPE text[] USING (dataquality_obs::text)::text[];
 
 SELECT gw_fct_admin_manage_view_dependencies($${"data":{"action":"RESTORE", "batchId":1}}$$);
+
+UPDATE config_param_system
+SET value = (
+        SELECT json_object_agg(key,
+            CASE
+                WHEN val::text = 'true' THEN 'uuid'
+                WHEN val::text = 'false' THEN 'none'
+                ELSE trim(both '"' from val::text)
+            END
+        )::text
+        FROM json_each(value::json) AS e(key, val)
+    ),
+    descript = 'Auto-fill sys_code on insert per feature type: uuid (random UUID), code (copy from code), none (disabled). Legacy true/false values are still supported.'
+WHERE parameter = 'edit_sys_code_autofill';

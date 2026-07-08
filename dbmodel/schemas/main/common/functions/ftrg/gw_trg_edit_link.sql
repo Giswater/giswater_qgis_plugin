@@ -673,15 +673,13 @@ BEGIN
 
 		v_featurecat := COALESCE(v_customfeature, NEW.link_type);
 
-		IF v_featurecat IS NOT NULL THEN
-			SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id = v_featurecat;
-		END IF;
-
 		IF btrim(coalesce(NEW.code, '')) = '' THEN
 			NEW.code := NULL;
 		END IF;
 
-				IF NEW.code IS NULL AND NEW.the_geom IS NOT NULL AND v_featurecat IS NOT NULL THEN
+		IF NEW.code IS NULL AND NEW.the_geom IS NOT NULL AND v_featurecat IS NOT NULL THEN
+			SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id = v_featurecat;
+
 			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(
 				(row_to_json(NEW)::jsonb || jsonb_strip_nulls(jsonb_build_object(
 					'sector_id', v_sector,
@@ -692,10 +690,10 @@ BEGIN
 					'minsector_id', v_minsector
 				)))::json
 			));
-		END IF;
 
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
-			NEW.code := NEW.link_id;
+			IF NEW.code IS NULL AND v_code_autofill_bool THEN
+				NEW.code := NEW.link_id;
+			END IF;
 		END IF;
 
 		-- insert into link table

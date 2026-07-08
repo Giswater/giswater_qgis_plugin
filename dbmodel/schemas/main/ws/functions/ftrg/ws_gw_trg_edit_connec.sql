@@ -53,7 +53,7 @@ v_trace_featuregeom boolean;
 v_connec_id text;
 v_childtable_name text;
 v_schemaname text;
-v_sys_code_autofill boolean;
+v_sys_code_autofill text;
 
 BEGIN
 
@@ -348,11 +348,6 @@ BEGIN
 				"data":{"message":"3036", "function":"1318","parameters":{"state_id":"'||v_sql::text||'"}}}$$);';
 		END IF;
 
-		--Sys_code
-		IF v_sys_code_autofill IS TRUE THEN
-			NEW.sys_code=gen_random_uuid();
-		END IF;
-
 		--Publish
 		IF NEW.publish IS NULL THEN
 			NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
@@ -417,17 +412,26 @@ BEGIN
 			NEW.code := NULL;
 		END IF;
 
-				SELECT code_autofill, cat_feature.id INTO v_code_autofill_bool, v_featurecat FROM cat_feature
-		join cat_connec on cat_feature.id=cat_connec.connec_type where cat_connec.id=NEW.conneccat_id;
+		SELECT code_autofill, cat_feature.id
+		INTO v_code_autofill_bool, v_featurecat
+		FROM cat_feature
+		JOIN cat_connec ON cat_feature.id = cat_connec.connec_type
+		WHERE cat_connec.id = NEW.conneccat_id;
 
 		IF NEW.code IS NULL THEN
 			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(row_to_json(NEW)::json));
+
+			IF NEW.code IS NULL AND v_code_autofill_bool THEN
+				NEW.code := NEW.connec_id;
+			END IF;
 		END IF;
 
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
-			NEW.code=NEW.connec_id;
+		--Sys_code (uuid | code | none)
+		IF v_sys_code_autofill IN ('uuid', 'true') THEN
+			NEW.sys_code := gen_random_uuid();
+		ELSIF v_sys_code_autofill = 'code' THEN
+			NEW.sys_code := NEW.code;
 		END IF;
-
 		-- LINK
 		--google maps style
 		IF (SELECT (value::json->>'google_maps')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN

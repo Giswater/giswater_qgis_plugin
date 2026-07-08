@@ -34,7 +34,7 @@ v_childtable_name text;
 v_schemaname text;
 rec_param_link record;
 v_connecs text;
-v_sys_code_autofill boolean;
+v_sys_code_autofill text;
 
 BEGIN
 
@@ -318,20 +318,25 @@ BEGIN
 			NEW.code := NULL;
 		END IF;
 
-				SELECT code_autofill, cat_feature.id INTO v_code_autofill_bool, v_featurecat FROM cat_feature
-		JOIN cat_arc ON cat_feature.id=cat_arc.arc_type WHERE cat_arc.id=NEW.arccat_id;
+		SELECT code_autofill, cat_feature.id
+		INTO v_code_autofill_bool, v_featurecat
+		FROM cat_feature
+		JOIN cat_arc ON cat_feature.id = cat_arc.arc_type
+		WHERE cat_arc.id = NEW.arccat_id;
 
 		IF NEW.code IS NULL THEN
 			NEW.code := gw_fct_generate_code('feature', v_featurecat, json_strip_nulls(row_to_json(NEW)::json));
+
+			IF NEW.code IS NULL AND v_code_autofill_bool THEN
+				NEW.code := NEW.arc_id;
+			END IF;
 		END IF;
 
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
-			NEW.code=NEW.arc_id;
-		END IF;
-
-		--Sys_code
-		IF v_sys_code_autofill IS TRUE THEN
-			NEW.sys_code=gen_random_uuid();
+		--Sys_code (uuid | code | none)
+		IF v_sys_code_autofill IN ('uuid', 'true') THEN
+			NEW.sys_code := gen_random_uuid();
+		ELSIF v_sys_code_autofill = 'code' THEN
+			NEW.sys_code := NEW.code;
 		END IF;
 
 		-- Workcat_id

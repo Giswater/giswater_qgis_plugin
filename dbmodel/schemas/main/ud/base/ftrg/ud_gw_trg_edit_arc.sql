@@ -38,7 +38,7 @@ v_childtable_name text;
 v_schemaname text;
 rec_param_link record;
 v_connecs text;
-v_sys_code_autofill boolean;
+v_sys_code_autofill text;
 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -343,20 +343,23 @@ BEGIN
 			NEW.code := NULL;
 		END IF;
 
-				SELECT code_autofill, cat_feature.id INTO v_code_autofill_bool, v_featurecat
-		FROM cat_feature WHERE id=NEW.arc_type;
+		SELECT code_autofill, cat_feature.id
+		INTO v_code_autofill_bool, v_featurecat
+		FROM cat_feature WHERE id = NEW.arc_type;
 
 		IF NEW.code IS NULL THEN
 			NEW.code := gw_fct_generate_code('feature', NEW.arc_type, json_strip_nulls(row_to_json(NEW)::json));
+
+			IF NEW.code IS NULL AND v_code_autofill_bool THEN
+				NEW.code := NEW.arc_id;
+			END IF;
 		END IF;
 
-		IF (v_code_autofill_bool IS TRUE) AND NEW.code IS NULL THEN
-			NEW.code=NEW.arc_id;
-		END IF;
-
-		--Sys_code
-		IF v_sys_code_autofill IS TRUE THEN
-			NEW.sys_code=gen_random_uuid();
+		--Sys_code (uuid | code | none)
+		IF v_sys_code_autofill IN ('uuid', 'true') THEN
+			NEW.sys_code := gen_random_uuid();
+		ELSIF v_sys_code_autofill = 'code' THEN
+			NEW.sys_code := NEW.code;
 		END IF;
 
 		-- LINK
