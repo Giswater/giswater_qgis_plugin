@@ -261,3 +261,7 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 VALUES(4674, 'INFO: There are %v_hydro_no_llegits% non-read hydrometers from %v_hydro_total% hydrometers in total (%v_percentage%% of the hydrometers)', NULL, 1, true, 'utils', 'core', 'AUDIT');
 
 UPDATE sys_function SET function_alias = 'CREATE DSCENARIO FROM CRM' WHERE id = 3110;
+
+UPDATE config_param_system
+	SET value = jsonb_set(value::jsonb, '{sys_query_text_add}', '"SELECT distinct(concat(s.name, '', '', m.name, '', '', a.postnumber)) as \"value\", (concat(s.name, '', '', m.name, '', '', a.postnumber)) as \"displayName\" FROM ve_streetaxis s join v_municipality m using(muni_id) left join ve_address a on s.id = a.streetaxis_id WHERE concat(s.name, '', '', m.name, '', '', a.postnumber) ILIKE "')
+	WHERE parameter='basic_search_v2_tab_address';
