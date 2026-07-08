@@ -62,15 +62,15 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout giswater_qgis_plugin repository
+      - name: Checkout plugin repository
         uses: actions/checkout@v6
         with:
-          repository: Giswater/giswater_qgis_plugin
+          repository: Giswater/plugin
           ref: ${{ github.event.inputs.ref || github.ref }}
-          path: giswater_qgis_plugin
+          path: plugin
 
       - name: Download translation ZIP files
-        working-directory: giswater_qgis_plugin
+        working-directory: plugin
         env:
           LANG_CODE: ${{ github.event.inputs.languages }}
           TRANSLATIONS_API_URL: ${{ secrets.TRANSLATIONS_API_URL }}
@@ -157,7 +157,7 @@ jobs:
               VERSION="${RELEASE_TAG#v}"
             fi
             if [ -z "$VERSION" ]; then
-              VERSION="$(awk -F= '/^version=/{print $2; exit}' giswater_qgis_plugin/metadata.txt)"
+              VERSION="$(awk -F= '/^version=/{print $2; exit}' plugin/metadata.txt)"
             fi
             if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "::error::Invalid version '$VERSION'. Expected format X.Y.Z"

@@ -29,7 +29,7 @@ from ...libs import lib_vars, tools_qt, tools_qgis
 from ..threads.i18n_download_task import GwDownloadLanguageTask
 
 
-TRANSLATIONS_REPO_URL = "https://github.com/Giswater/translations/raw/main"
+TRANSLATIONS_REPO_URL = "https://github.com/giswater/translations/raw/main"
 TRANSLATIONS_GITHUB_TREE_URL = (
     "https://api.github.com/repos/Giswater/translations/git/trees/main?recursive=1"
 )

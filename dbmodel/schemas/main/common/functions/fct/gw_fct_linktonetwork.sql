@@ -21,7 +21,7 @@ This function have been refactorized on 2022/12 changing the full strategy of li
 
 DESCRIPTION
 -----------
-No doubt this is the most important function for links. Lots of procedures and workflows works with this function. See: https://github.com/Giswater/giswater_dbmodel/wiki/Links-Workflows.
+No doubt this is the most important function for links. Lots of procedures and workflows works with this function. See: https://github.com/giswater/plugin/wiki/Links-Workflows.
 Main workflows:
 - Create a new link with or without defined target for operative connects
 - Create a new link  with or without defined target for operative connects in order to be used on psector strategy

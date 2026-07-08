@@ -11,8 +11,8 @@ Changelog=Version 4.15.0
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
-repository=https://github.com/giswater/giswater_qgis_plugin
-tracker=https://github.com/giswater/giswater_qgis_plugin/issues
+repository=https://github.com/giswater/plugin
+tracker=https://github.com/giswater/plugin/issues
 category=Plugins
 icon=icons/dialogs/136.png
 experimental=False

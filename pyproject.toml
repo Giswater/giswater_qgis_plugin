@@ -34,8 +34,8 @@ gw = "giswater_admin.cli:main"
 
 [project.urls]
 Homepage = "https://www.giswater.org"
-Repository = "https://github.com/giswater/giswater_qgis_plugin"
-Documentation = "https://github.com/giswater/giswater_qgis_plugin/blob/main/giswater_admin/README.md"
+Repository = "https://github.com/giswater/plugin"
+Documentation = "https://github.com/giswater/plugin/blob/main/giswater_admin/README.md"
 
 [tool.setuptools.packages.find]
 include = ["giswater_admin*"]

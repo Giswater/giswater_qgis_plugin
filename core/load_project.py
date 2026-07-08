@@ -250,7 +250,7 @@ class GwLoadProject(QObject):
         majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', lib_vars.plugin_dir).replace('.', '')
         minorPgrVersion = tools_qgis.get_plugin_metadata('minorPgrVersion', '3.8.0', lib_vars.plugin_dir).replace('.', '')
 
-        url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
+        url_wiki = "https://github.com/giswater/plugin/wiki/Version-compatibility"
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"

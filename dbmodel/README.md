@@ -1,6 +1,6 @@
 <div align="center">
 	<h1>Giswater DB Model</h1>
-	<a href="https://github.com/Giswater/giswater_dbmodel"><img alt="Giswater Dbmodel Badge" src="https://img.shields.io/badge/GISWATER-DBMODEL-blue?style=for-the-badge&logo=postgresql&logoColor=ffffff"></a>
+	<a href="https://github.com/giswater/giswater_dbmodel"><img alt="Giswater Dbmodel Badge" src="https://img.shields.io/badge/GISWATER-DBMODEL-blue?style=for-the-badge&logo=postgresql&logoColor=ffffff"></a>
 	<a href="./LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/giswater/giswater_dbmodel?style=for-the-badge"></a>
 </div>
 
@@ -457,28 +457,28 @@ Published images: `ghcr.io/giswater/gw-db:main-pg16-ws` (and `ud`, PG 17/18).
 - Catalogs: materials, node, arc.
 - Map zones: macroexploitation, municipality, sector, dma, etc.
 
-- [Start from scratch](https://github.com/Giswater/giswater_dbmodel/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project)
-- [Configuration guide](https://github.com/Giswater/giswater_dbmodel/wiki/Config)
+- [Start from scratch](https://github.com/giswater/plugin/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project)
+- [Configuration guide](https://github.com/giswater/plugin/wiki/Config)
 
 ---
 
 ## Wiki
 
-[ Giswater Wiki](https://github.com/Giswater/giswater_dbmodel/wiki)
+[ Giswater Wiki](https://github.com/giswater/plugin/wiki)
 
 ---
 
 ## FAQs
 
-[FAQs](https://github.com/Giswater/giswater_dbmodel/wiki/FAQs)
+[FAQs](https://github.com/giswater/plugin/wiki/FAQs)
 
 ---
 
 ## Repositories
 
-- **Docs**: [Giswater Docs](https://github.com/Giswater/docs)
-- **QGIS Plugin**: [Giswater QGIS Plugin](https://github.com/Giswater/giswater_qgis_plugin)
-- **Database Model**: [Giswater DB Model](https://github.com/Giswater/giswater_dbmodel)
+- **Docs**: [Giswater Docs](https://github.com/giswater/docs)
+- **QGIS Plugin**: [Giswater QGIS Plugin](https://github.com/giswater/plugin)
+- **Database Model**: [Giswater DB Model](https://github.com/giswater/giswater_dbmodel)
 - **CLI (in plugin repo)**: [giswater_admin/README.md](../giswater_admin/README.md)
 
 ---

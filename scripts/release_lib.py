@@ -16,8 +16,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-REPO_URL = "https://github.com/Giswater/giswater_qgis_plugin"
-GH_REPO = "Giswater/giswater_qgis_plugin"
+REPO_URL = "https://github.com/giswater/plugin"
+GH_REPO = "Giswater/plugin"
 DOCS_URL = "https://docs.giswater.org/latest/en/docs/index.html"
 CLI_RUFF_PATHS = ("giswater_admin", "scripts")
 

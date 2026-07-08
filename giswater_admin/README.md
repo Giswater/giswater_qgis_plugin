@@ -153,7 +153,7 @@ gw schema main create --type ws --name demo --profile empty --conn "postgresql:/
 **Development without a release** (use your local checkout):
 
 ```bash
-gw dbmodel use dev --root /path/to/giswater_qgis_plugin
+gw dbmodel use dev --root /path/to/plugin
 gw schema main create --type ws --name test_dev --conn "$CONN" --check
 ```
 
@@ -167,7 +167,7 @@ Config and cache locations:
 ### From the plugin repository (contributors)
 
 ```bash
-cd /path/to/giswater_qgis_plugin
+cd /path/to/plugin
 python3 -m pip install -e .
 # or legacy:
 python3 -m pip install -r giswater_admin/requirements.txt
@@ -262,14 +262,14 @@ python3 scripts/prepare_cli_release.py 0.2.0 --execute --create-github-release
 
 When the GitHub Release is published, CI (`.github/workflows/release-cli.yml`) runs tests, validates versions, builds `dist/*`, publishes to PyPI via OIDC (Trusted Publisher, environment `pypi`), and attaches wheels to the release.
 
-**One-time PyPI setup:** register a pending publisher at https://pypi.org/manage/account/publishing/ with project `giswater-cli`, owner `Giswater`, repository `giswater_qgis_plugin`, workflow `release-cli.yml`, environment `pypi`. Create the matching `pypi` environment in GitHub repo settings.
+**One-time PyPI setup:** register a pending publisher at https://pypi.org/manage/account/publishing/ with project `giswater-cli`, owner `Giswater`, repository `plugin`, workflow `release-cli.yml`, environment `pypi`. Create the matching `pypi` environment in GitHub repo settings.
 
 Users install the tool once (`pipx install giswater-cli`) and refresh schema SQL with `gw dbmodel install` when a new plugin version ships.
 
 ### Testing locally
 
 ```bash
-cd /path/to/giswater_qgis_plugin
+cd /path/to/plugin
 python3 -m pip install -e .
 
 # Ensure gw is on PATH (macOS user install example)
