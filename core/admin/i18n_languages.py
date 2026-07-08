@@ -296,6 +296,7 @@ class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
             for locale, name, active, version in cursor.fetchall()
         }
 
+        dirty = False
         for locale, name in locales.items():
             if self._language_files_exist(locale):
                 db_name, db_active, version = db_locales.get(locale, (name, 0, None))
@@ -303,17 +304,22 @@ class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
                 if locale in db_locales:
                     if db_active == 0:
                         cursor.execute("UPDATE locales SET active = 1 WHERE locale = ?", (locale,))
+                        dirty = True
                 else:
                     cursor.execute(
                         "INSERT INTO locales (locale, name, active, version) VALUES (?, ?, 1, ?)",
                         (locale, name, version),
                     )
+                    dirty = True
             elif locale in db_locales and db_locales[locale][1]:
                 cursor.execute(
                     "UPDATE locales SET active = 0, version = NULL WHERE locale = ?",
                     (locale,),
                 )
-        cursor.connection.commit()
+                dirty = True
+        if dirty:
+            cursor.connection.commit()
+            self._manager._populate_language_combo()
         return downloaded_locales
 
     def load_locales(self) -> None:
@@ -327,6 +333,8 @@ class GwI18NManageLanguagesDialog(GwI18NManageLanguagesUi):
                     locale_parts = str(locale).split("_")
                     locale = locale_parts[0].lower() + "_" + locale_parts[1].upper()
                     api_names[locale] = name
+                    print(f"locale: {locale}")
+                    print(f"name: {name}")
         except (urllib.error.URLError, urllib.error.HTTPError, OSError, json.JSONDecodeError):
             pass
         
