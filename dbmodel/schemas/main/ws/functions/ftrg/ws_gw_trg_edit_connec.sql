@@ -426,6 +426,10 @@ BEGIN
 			END IF;
 		END IF;
 
+		IF NEW.sys_code IS NOT NULL AND v_sys_code_autofill NOT IN ('false', 'none') THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4676", "function":"1304"}}$$);';
+		END IF;
+
 		--Sys_code (uuid | code | none)
 		IF v_sys_code_autofill IN ('uuid', 'true') THEN
 			NEW.sys_code := gen_random_uuid();

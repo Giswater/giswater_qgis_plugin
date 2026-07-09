@@ -289,3 +289,6 @@ SET value = (
     ),
     descript = 'Auto-fill sys_code on insert per feature type: uuid (random UUID), code (copy from code), none (disabled). Legacy true/false values are still supported.'
 WHERE parameter = 'edit_sys_code_autofill';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
+VALUES(4676, 'Sys_code is not null and sys_code_autofill is activated.', NULL, 1, true, 'utils', 'core', 'AUDIT');
