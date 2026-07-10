@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `gw_fct_settoarc` so setting `to_arc` no longer auto-adds the node to mapzone's `graphconfig`, it only updates `toArc` when the node is already configured as `nodeParent` (avoids duplicate mapzone delimiters after arc divide). 
 - Fix `dqaId` parameter parsing (`dqaId` was incorrectly read from `presszoneId`).
 - Fix `gw_fct_setsearch` function to improve `sys_query_text_add` functionality.
+- Fix `gw_fct_setnodefromarc` function to return the correct error message.
 
 ## [4.14.5] - 2026-06-25
 
