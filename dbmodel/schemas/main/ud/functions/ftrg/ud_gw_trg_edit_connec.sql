@@ -522,9 +522,9 @@ BEGIN
 
 		-- set and get id for polygon
 		IF (v_doublegeometry IS TRUE) THEN
-			INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id )
+			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id, state)
 			VALUES (v_featureclass, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_doublegeom_buffer)))
-			from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id);
+			from connec where connec_id=NEW.connec_id), NEW.connec_type, NEW.connec_id, NEW.state);
 		END IF;
 
 		IF v_man_table = 'man_cjoin' THEN

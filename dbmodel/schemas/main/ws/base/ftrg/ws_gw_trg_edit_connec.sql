@@ -562,9 +562,9 @@ BEGIN
 		INTO v_insert_double_geom, v_double_geom_buffer;
 
 		IF (v_insert_double_geom IS TRUE) THEN
-			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id )
+			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id, state)
 			VALUES (v_feature_class, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer)))
-			from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
+			from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id, NEW.state);
 		END IF;
 
 

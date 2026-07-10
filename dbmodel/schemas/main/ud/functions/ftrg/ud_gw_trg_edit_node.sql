@@ -652,9 +652,9 @@ BEGIN
 
 		-- set and get id for polygonFse
 		IF (v_doublegeometry IS TRUE) THEN
-			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id )
+			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id, state)
 			VALUES (v_feature_class, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer)))
-			from node where node_id=NEW.node_id), NEW.node_type, NEW.node_id);
+			from node where node_id=NEW.node_id), NEW.node_type, NEW.node_id, NEW.state);
 		END IF;
 
 

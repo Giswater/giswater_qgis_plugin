@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `dqaId` parameter parsing (`dqaId` was incorrectly read from `presszoneId`).
 - Fix `gw_fct_setsearch` function to improve `sys_query_text_add` functionality.
 - Fix `gw_fct_setnodefromarc` function to return the correct error message.
+- Fix `gw_trg_edit_<feature>` triggers to set the correct state in the polygon table.
+- Fix `gw_trg_edit_psector` trigger to set the correct state in the polygon table.
 
 ## [4.14.5] - 2026-06-25
 

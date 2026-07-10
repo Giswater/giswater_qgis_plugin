@@ -579,8 +579,8 @@ BEGIN
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
 
-				INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id )
-				VALUES (v_featureclass, v_the_geom_pol, NEW.gully_type, NEW.gully_id);
+				INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id, state)
+				VALUES (v_featureclass, v_the_geom_pol, NEW.gully_type, NEW.gully_id, NEW.state);
 			END IF;
 		END IF;
 
@@ -926,8 +926,8 @@ BEGIN
 						INTO v_the_geom_pol;
 
 					IF (SELECT pol_id FROM polygon WHERE feature_id = NEW.gully_id) IS NULL THEN
-						INSERT INTO polygon(sys_type, the_geom, featurecat_id,feature_id )
-						VALUES (v_featureclass, v_the_geom_pol, NEW.gully_type, NEW.gully_id);
+						INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id, state)
+						VALUES (v_featureclass, v_the_geom_pol, NEW.gully_type, NEW.gully_id, NEW.state);
 					ELSE
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id =NEW.gully_id;
 					END IF;
