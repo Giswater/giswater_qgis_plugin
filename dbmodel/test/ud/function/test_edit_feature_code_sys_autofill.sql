@@ -47,7 +47,7 @@ BEGIN
     ) VALUES (
         p_node_id::integer, p_code, p_sys_code, 33.220, 'CHAMBER', 'CHAMBER', 'CHAMBER-01', 'STORAGE', 1, 2,
         2, 2, 2, 3, 'soil1', 0, 'work1', 'owner1', 2,
-        '1', 'SRID=25831;POINT (418456.7137334756 4577989.971585366)'::geometry, true, true, false, false, 'STORAGE', 0, 0, true
+        '1', format('SRID=25831;POINT(%s %s)', 430000 + abs(p_node_id::integer), 4585000 + abs(p_node_id::integer))::geometry, true, true, false, false, 'STORAGE', 0, 0, true
     );
 END;
 $$;
@@ -72,7 +72,9 @@ BEGIN
         p_arc_id::integer, p_code, p_sys_code, p_node_1::integer, 'CHAMBER', p_node_2::integer, 'CHAMBER', 'CONDUIT', 'CONDUIT', 'CC100',
         'CIRCULAR', 1.0000, 0.0000, 1.30, 0.7854, 'CONDUIT', 1, 2, 2, 2,
         2, 3.47, 3, 'soil1', 0, 'work1', 'owner1', 2, '',
-        '1', true, true, false, true, 'SRID=25831;LINESTRING (418456.38290275045 4577986.547739702, 418459.7520876639 4577987.378497627)'::geometry, 'CONDUIT'
+        '1', true, true, false, true, format('SRID=25831;LINESTRING(%s %s, %s %s)',
+            430000 + abs(p_node_1::integer), 4585000 + abs(p_node_1::integer),
+            430000 + abs(p_node_2::integer), 4585000 + abs(p_node_2::integer))::geometry, 'CONDUIT'
     );
 END;
 $$;
@@ -89,7 +91,7 @@ BEGIN
         p_connec_id::integer, p_code, p_sys_code, 55.2583, 2.1380, 1.7380, 'DIRECT-CONNECTION', 'CJOIN', 'CONNEC', 'PVC', 1, 2,
         1, 1, 1.938, 17.979, '171', 1, 'soil1', 'St. Function', 'St. Category',
         0, 'St. Location', 'owner1', 1, -56.687, 'https://www.giswater.org', '0', true, true, '171',
-        'ARC', 'SRID=25831;POINT (418802.5740642579 4576477.885736115)'::geometry, true
+        'ARC', format('SRID=25831;POINT(%s %s)', 431000 + abs(p_connec_id::integer), 4586000 + abs(p_connec_id::integer))::geometry, true
     );
 END;
 $$;
@@ -106,7 +108,7 @@ BEGIN
         p_gully_id::integer, p_code, p_sys_code, 36.7800, 34.5000, 77.6000, 0.8000, 0.0000, 'Concrete', 'GINLET', 'GULLY', 'SGRT4',
         1.00, false, false, 'DIRECT-CONNECTION', 4.672, 1.200, '18893', 'GULLY', 1, 2,
         2, 2, 2, 2, 3, 'soil1', 'St. Function', 'St. Category', 'St. Location',
-        0, 'owner1', 'https://www.giswater.org', '0', true, true, true, 'SRID=25831;POINT (429089.6348767015 4576325.2010902)'::geometry, '18893', 'ARC'
+        0, 'owner1', 'https://www.giswater.org', '0', true, true, true, format('SRID=25831;POINT(%s %s)', 432000 + abs(p_gully_id::integer), 4587000 + abs(p_gully_id::integer))::geometry, '18893', 'ARC'
     );
 END;
 $$;

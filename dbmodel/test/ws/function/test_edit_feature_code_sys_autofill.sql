@@ -46,7 +46,7 @@ BEGIN
     ) VALUES (
         p_node_id::integer, p_code, p_sys_code, 33.1500, 'JUNCTION', 'JUNCTION', 'JUNCTION DN63', 'JUNCTION', 1, 2,
         2, 5, 3, 3, 38.600, 'soil1', 'work1', 'owner1', 2,
-        '1', 'SRID=25831;POINT (418466.7894577002 4577980.444948242)'::geometry, true, true, 'JUNCTION'
+        '1', format('SRID=25831;POINT(%s %s)', 433000 + abs(p_node_id::integer), 4588000 + abs(p_node_id::integer))::geometry, true, true, 'JUNCTION'
     );
 END;
 $$;
@@ -84,7 +84,7 @@ BEGIN
         '25', 25.00000, 'JUNCTION', 'JUNCTION', 1, 2, 1, 3, '3', 2,
         'cc3279', NULL, '2031', 33.654, 'soil1', 'St. Function', 'St. Category', 'St. Fluid',
         'St. Location', 'work2', 'owner1', 1, 2.564, 'https://www.giswater.org', '0', true, true, '2031',
-        'ARC', 'SRID=25831;POINT (414234.94619056734 4576497.812674751)'::geometry, true
+        'ARC', format('SRID=25831;POINT(%s %s)', 434000 + abs(p_connec_id::integer), 4589000 + abs(p_connec_id::integer))::geometry, true
     );
 END;
 $$;
