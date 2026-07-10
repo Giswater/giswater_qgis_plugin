@@ -44,7 +44,7 @@ BEGIN
         expl_id, sector_id, presszone_id, dma_id, staticpressure, soilcat_id, workcat_id, ownercat_id, muni_id,
         verified, the_geom, publish, inventory, inp_type
     ) VALUES (
-        p_node_id, p_code, p_sys_code, 33.1500, 'JUNCTION', 'JUNCTION', 'JUNCTION DN63', 'JUNCTION', 1, 2,
+        p_node_id::integer, p_code, p_sys_code, 33.1500, 'JUNCTION', 'JUNCTION', 'JUNCTION DN63', 'JUNCTION', 1, 2,
         2, 5, 3, 3, 38.600, 'soil1', 'work1', 'owner1', 2,
         '1', 'SRID=25831;POINT (418466.7894577002 4577980.444948242)'::geometry, true, true, 'JUNCTION'
     );
@@ -61,7 +61,7 @@ BEGIN
         function_type, category_type, fluid_type, location_type, workcat_id, ownercat_id, muni_id, link, verified,
         publish, inventory, the_geom, inp_type
     ) VALUES (
-        p_arc_id, p_code, p_sys_code, '1059', 'T', 39.4360, 0.0000, 32.314, '1058', 'T',
+        p_arc_id::integer, p_code, p_sys_code, '1059', 'T', 39.4360, 0.0000, 32.314, '1058', 'T',
         34.309, 37.4409, 0.0000, 0.00, 'FD150', 'PIPE', 'PIPE', 'FD', '16',
         '150', 153.00000, 'PIPE', 1, 2, 1, 3, '3', 2, 'soil1',
         'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work1', 'owner1', 1, '', '0',
@@ -80,7 +80,7 @@ BEGIN
         location_type, workcat_id, ownercat_id, muni_id, rotation, link, verified, publish, inventory, pjoint_id,
         pjoint_type, the_geom, is_operative
     ) VALUES (
-        p_connec_id, p_code, p_sys_code, 38.0963, NULL, 'WJOIN', 'WJOIN', 'FACADE-CABINET', 'PVC', '16',
+        p_connec_id::integer, p_code, p_sys_code, 38.0963, NULL, 'WJOIN', 'WJOIN', 'FACADE-CABINET', 'PVC', '16',
         '25', 25.00000, 'JUNCTION', 'JUNCTION', 1, 2, 1, 3, '3', 2,
         'cc3279', NULL, '2031', 33.654, 'soil1', 'St. Function', 'St. Category', 'St. Fluid',
         'St. Location', 'work2', 'owner1', 1, 2.564, 'https://www.giswater.org', '0', true, true, '2031',

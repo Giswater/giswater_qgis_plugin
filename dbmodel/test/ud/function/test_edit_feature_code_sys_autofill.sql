@@ -45,7 +45,7 @@ BEGIN
         expl_id, sector_id, macrosector_id, omzone_id, soilcat_id, fluid_type, workcat_id, ownercat_id, muni_id,
         verified, the_geom, publish, inventory, uncertain, unconnected, inp_type, length, width, is_operative
     ) VALUES (
-        p_node_id, p_code, p_sys_code, 33.220, 'CHAMBER', 'CHAMBER', 'CHAMBER-01', 'STORAGE', 1, 2,
+        p_node_id::integer, p_code, p_sys_code, 33.220, 'CHAMBER', 'CHAMBER', 'CHAMBER-01', 'STORAGE', 1, 2,
         2, 2, 2, 3, 'soil1', 0, 'work1', 'owner1', 2,
         '1', 'SRID=25831;POINT (418456.7137334756 4577989.971585366)'::geometry, true, true, false, false, 'STORAGE', 0, 0, true
     );
@@ -69,7 +69,7 @@ BEGIN
         macrosector_id, gis_length, omzone_id, soilcat_id, fluid_type, workcat_id, ownercat_id, muni_id, link,
         verified, publish, inventory, uncertain, is_operative, the_geom, inp_type
     ) VALUES (
-        p_arc_id, p_code, p_sys_code, p_node_1, 'CHAMBER', p_node_2, 'CHAMBER', 'CONDUIT', 'CONDUIT', 'CC100',
+        p_arc_id::integer, p_code, p_sys_code, p_node_1::integer, 'CHAMBER', p_node_2::integer, 'CHAMBER', 'CONDUIT', 'CONDUIT', 'CC100',
         'CIRCULAR', 1.0000, 0.0000, 1.30, 0.7854, 'CONDUIT', 1, 2, 2, 2,
         2, 3.47, 3, 'soil1', 0, 'work1', 'owner1', 2, '',
         '1', true, true, false, true, 'SRID=25831;LINESTRING (418456.38290275045 4577986.547739702, 418459.7520876639 4577987.378497627)'::geometry, 'CONDUIT'
@@ -86,7 +86,7 @@ BEGIN
         fluid_type, location_type, ownercat_id, muni_id, rotation, link, verified, publish, inventory, pjoint_id,
         pjoint_type, the_geom, is_operative
     ) VALUES (
-        p_connec_id, p_code, p_sys_code, 55.2583, 2.1380, 1.7380, 'DIRECT-CONNECTION', 'CJOIN', 'CONNEC', 'PVC', 1, 2,
+        p_connec_id::integer, p_code, p_sys_code, 55.2583, 2.1380, 1.7380, 'DIRECT-CONNECTION', 'CJOIN', 'CONNEC', 'PVC', 1, 2,
         1, 1, 1.938, 17.979, '171', 1, 'soil1', 'St. Function', 'St. Category',
         0, 'St. Location', 'owner1', 1, -56.687, 'https://www.giswater.org', '0', true, true, '171',
         'ARC', 'SRID=25831;POINT (418802.5740642579 4576477.885736115)'::geometry, true
@@ -103,7 +103,7 @@ BEGIN
         expl_id, sector_id, macrosector_id, muni_id, omzone_id, soilcat_id, function_type, category_type, location_type,
         fluid_type, ownercat_id, link, verified, inventory, publish, is_operative, the_geom, pjoint_id, pjoint_type
     ) VALUES (
-        p_gully_id, p_code, p_sys_code, 36.7800, 34.5000, 77.6000, 0.8000, 0.0000, 'Concrete', 'GINLET', 'GULLY', 'SGRT4',
+        p_gully_id::integer, p_code, p_sys_code, 36.7800, 34.5000, 77.6000, 0.8000, 0.0000, 'Concrete', 'GINLET', 'GULLY', 'SGRT4',
         1.00, false, false, 'DIRECT-CONNECTION', 4.672, 1.200, '18893', 'GULLY', 1, 2,
         2, 2, 2, 2, 3, 'soil1', 'St. Function', 'St. Category', 'St. Location',
         0, 'owner1', 'https://www.giswater.org', '0', true, true, true, 'SRID=25831;POINT (429089.6348767015 4576325.2010902)'::geometry, '18893', 'ARC'

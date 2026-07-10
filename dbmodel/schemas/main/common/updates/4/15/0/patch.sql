@@ -291,4 +291,4 @@ SET value = (
 WHERE parameter = 'edit_sys_code_autofill';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type)
-VALUES(4678, 'Sys_code is not null and sys_code_autofill is activated.', NULL, 1, true, 'utils', 'core', 'AUDIT');
+VALUES(4678, 'Sys_code is not null and sys_code_autofill is activated.', NULL, 1, true, 'utils', 'core', NULL);
