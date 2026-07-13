@@ -58,7 +58,7 @@ case "${MODE}" in
 
   i18n-bootstrap)
     export PARENT_PROFILE="${GW_PARENT_PROFILE:-sample}"
-    export SATELLITES="${GW_SATELLITES:-cm,am}"
+    export SATELLITES="${GW_SATELLITES:-}"
     export WS="${WS:-ws}"
     export UD="${UD:-ud}"
     export LANGUAGE="${LANGUAGE:-no_TR}"
