@@ -1,4 +1,4 @@
-name: "🌍 Update i18n"
+name: "🖲️ i18n: Update i18n DB"
 
 on:
   workflow_dispatch: # for testing
@@ -126,11 +126,11 @@ jobs:
           docker compose -f docker-compose.test.yml run --rm -T \
             -e WS=ws_trans \
             -e UD=ud_trans \
-            -e CM=cm \
             -e AM=am \
             -e LANGUAGE=no_TR \
             -e GW_PARENT_PROFILE=sample \
-            -e GW_SATELLITES=cm,am \
+            -e GW_SATELLITES_PROFILE=empty \
+            -e GW_SATELLITES=am \
             runner \
             bash /workspace/dbmodel/test/ci_lifecycle_inner.sh i18n-bootstrap
           docker compose -f docker-compose.test.yml run --rm -T runner \
