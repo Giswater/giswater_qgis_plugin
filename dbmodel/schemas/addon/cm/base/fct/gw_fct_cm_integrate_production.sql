@@ -147,7 +147,12 @@ BEGIN
 	SELECT array_agg(lower(concat('PARENT_SCHEMA_', lower(id)))) INTO v_node_childs
 	FROM PARENT_SCHEMA.cat_feature
 	WHERE lower(feature_type) = 'node';
-	
+
+	FOR v_catfeature IN SELECT unnest(ARRAY['arc', 'node', 'connec', 'link', 'gully']) AS id
+	LOOP
+		EXECUTE format('UPDATE cm.om_campaign_lot_x_%s SET integrated_id = %s_id WHERE %s_id > 0 AND lot_id IN (SELECT lot_id FROM cm.om_campaign_lot WHERE campaign_id = %s)',
+		v_catfeature.id, v_catfeature.id, v_catfeature.id, v_campaign);
+	END LOOP;
 
 	v_querytext_review :=
 		format('SELECT * FROM (SELECT object_id, feature_type, 
