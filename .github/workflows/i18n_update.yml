@@ -132,14 +132,7 @@ jobs:
             runner \
             bash /workspace/dbmodel/test/ci_lifecycle_inner.sh i18n-bootstrap
           docker compose -f docker-compose.test.yml run --rm -T runner \
-            bash -c '
-              set -euo pipefail
-              for schema in ws_trans ud_trans; do
-                lang="$(psql "$GW_CONN" -At -c "SELECT language FROM ${schema}.sys_version LIMIT 1")"
-                echo "${schema}.sys_version.language=${lang}"
-                [ "$lang" = "no_TR" ] || { echo "::error::Expected ${schema} language no_TR, got ${lang}"; exit 1; }
-              done
-            '
+            bash /workspace/dbmodel/test/i18n_assert_language_inner.sh
 
       - name: Run i18n searcher
         working-directory: plugin/dbmodel
@@ -163,22 +156,9 @@ jobs:
             -e TRANSLATIONS_API_URL \
             -e TRANSLATIONS_API_USER \
             -e TRANSLATIONS_API_PASSWORD \
-            -e GW_CONN \
+            -e I18N_VERSION="${VERSION}" \
             runner \
-            bash -c '
-              set -euo pipefail
-              pip install -q requests psycopg2-binary
-              python3 /workspace/scripts/i18n_searcher.py \
-                --base-url "$TRANSLATIONS_API_URL" \
-                --user "$TRANSLATIONS_API_USER" \
-                --password "$TRANSLATIONS_API_PASSWORD" \
-                --origin-conn "$GW_CONN" \
-                --project-types ws,ud \
-                --origin-schemas ws=ws_trans,ud=ud_trans \
-                --version "'"${VERSION}"'" \
-                --repo-root /workspace \
-                --json-out /workspace/artifacts/i18n/detections.json
-            '
+            bash /workspace/dbmodel/test/i18n_searcher_inner.sh
 
       - name: Stop Postgres
         if: always()
