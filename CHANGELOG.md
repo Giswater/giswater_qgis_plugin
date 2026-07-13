@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.15.0] - 2026-07-13
+
 ### Added
 
 - Add unique index on `link` table to enforce feature_id and feature_type uniqueness when state is 1 and feature_id is not null.
@@ -486,7 +488,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.14.5...main
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.0...main
+[4.15.0]: https://github.com/giswater/plugin/compare/v4.14.5...v4.15.0
 [4.14.5]: https://github.com/giswater/plugin/compare/v4.14.4...v4.14.5
 [4.14.4]: https://github.com/giswater/plugin/compare/v4.14.3...v4.14.4
 [4.14.3]: https://github.com/giswater/plugin/compare/v4.14.2...v4.14.3
