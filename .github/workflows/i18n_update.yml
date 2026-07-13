@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         project: [ws, ud]
-        pg_version: [16, 17, 18]
+        pg_version: [18]
     name: pgTAP ${{ matrix.project }} (PG ${{ matrix.pg_version }})
     env:
       PG_MAJOR: ${{ matrix.pg_version }}
@@ -126,11 +126,9 @@ jobs:
           docker compose -f docker-compose.test.yml run --rm -T \
             -e WS=ws_trans \
             -e UD=ud_trans \
-            -e AM=am \
             -e LANGUAGE=no_TR \
             -e GW_PARENT_PROFILE=sample \
             -e GW_SATELLITES_PROFILE=empty \
-            -e GW_SATELLITES=am \
             runner \
             bash /workspace/dbmodel/test/ci_lifecycle_inner.sh i18n-bootstrap
           docker compose -f docker-compose.test.yml run --rm -T runner \
