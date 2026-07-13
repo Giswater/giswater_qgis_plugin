@@ -90,7 +90,7 @@ BEGIN
 				IF OLD.action = 4 THEN
 					FOR v_rec IN SELECT t.table_name, c.column_name AS id_column FROM information_schema.tables t
 								JOIN information_schema.columns c ON t.table_schema = c.table_schema AND t.table_name = c.table_name
-								WHERE t.table_type = 'BASE TABLE' AND t.table_name LIKE 'ap_%' AND t.table_schema = 'cm' AND c.ordinal_position = 3
+								WHERE t.table_type = 'BASE TABLE' AND t.table_name LIKE 'PARENT_SCHEMA_%' AND t.table_schema = 'cm' AND c.ordinal_position = 3
 					LOOP
 						EXECUTE format('select 1 FROM cm.%I WHERE %I = $1.%I', v_rec.table_name, v_rec.id_column, v_feature_id_column) USING OLD INTO v_exists;
 	
