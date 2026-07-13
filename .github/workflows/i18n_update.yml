@@ -116,7 +116,7 @@ jobs:
           ref: ${{ github.event.inputs.ref || github.ref }}
           path: plugin
 
-      - name: Bootstrap sample network (ws, ud, cm, am) with language no_TR
+      - name: Bootstrap sample network (ws, ud) with language no_TR
         working-directory: plugin/dbmodel
         run: |
           set -euo pipefail
@@ -128,7 +128,6 @@ jobs:
             -e UD=ud_trans \
             -e LANGUAGE=no_TR \
             -e GW_PARENT_PROFILE=sample \
-            -e GW_SATELLITES_PROFILE=empty \
             runner \
             bash /workspace/dbmodel/test/ci_lifecycle_inner.sh i18n-bootstrap
           docker compose -f docker-compose.test.yml run --rm -T runner \

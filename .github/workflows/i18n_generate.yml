@@ -1,4 +1,4 @@
-name: "🌍 Generate i18n"
+name: "🗂️ I18N: Generate ZIP files"
 
 on:
   workflow_dispatch:
