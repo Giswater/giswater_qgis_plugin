@@ -1,4 +1,4 @@
-name: "Update i18n"
+name: "🌍 Update i18n"
 
 on:
   workflow_dispatch: # for testing

@@ -22,18 +22,13 @@ import json
 import logging
 import re
 import sys
+import psycopg2
+import psycopg2.extras
 from dataclasses import dataclass, field
 from enum import Enum
 from itertools import product
 from pathlib import Path
 from typing import Any, Optional
-
-_SCRIPT_DIR = Path(__file__).resolve().parent
-if str(_SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(_SCRIPT_DIR))
-
-import psycopg2
-import psycopg2.extras
 
 from i18n_api_client import (
     DEFAULT_CHANGED_PATH,
@@ -45,6 +40,11 @@ from i18n_api_client import (
     resolve_setting,
     upload_detection_records,
 )
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+
 
 log = logging.getLogger(__name__)
 
