@@ -127,9 +127,6 @@ create_satellite() {
   local extra=(--name "$name")
 
   case "$kind" in
-    cm)
-      extra+=(--profile bootstrap)
-      ;;
     audit)
       extra+=(--profile empty)
       ;;
