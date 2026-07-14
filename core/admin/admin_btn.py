@@ -448,7 +448,9 @@ class GwAdminButton:
             "You are about to integrate am with the following WS schema: {0}\n\n"
             "Are you sure you want to continue?"
         )
-        if not tools_qt.show_question(msg, "Integrate am", msg_params=(parent_schema,)):
+        msg_params = (parent_schema,)
+        title = "Integrate am"
+        if not tools_qt.show_question(msg, title, msg_params=msg_params):
             return
         bp = BuildParams(
             schema_name="am",
