@@ -89,7 +89,7 @@ jobs:
         run: |
           set -euo pipefail
           pip install requests
-          python3 scripts/export_i18n_zips.py \
+          python3 scripts/i18n_export_zips.py \
             --base-url "$TRANSLATIONS_API_URL" \
             --user "$TRANSLATIONS_API_USER" \
             --password "$TRANSLATIONS_API_PASSWORD" \
