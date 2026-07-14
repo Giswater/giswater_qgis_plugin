@@ -824,6 +824,7 @@ def _baseline_by_table(
 ) -> list[dict[str, Any]]:
     return [row for row in i18n_rows if row.get("table_name") == table_name]
 
+
 def _index_widget_context(raw_lines: list[str]) -> list[tuple[int, bool]]:
     """For each line, the nearest preceding <widget line and whether an
     <action name= line blocks the upward walk (baseline _search_dialog_info)."""
@@ -1343,6 +1344,7 @@ def sort_keys_deep(value: object) -> object:
         for key in sorted(value.keys())  # type: ignore[union-attr]
     }
 
+
 _PY_TABLES = frozenset({"pymessage", "pytoolbar", "pydialog"})
 # Internal-only columns on py* rows; omitted from POST body per post-detections-python.md.
 _PY_POST_OMIT_COLUMNS = frozenset({"context", "project_type", "table_org", "schema_org"})
@@ -1669,7 +1671,7 @@ def _extract_feat_table(
                 continue
             if not (formname.startswith(prefix) or formname == prefix):
                 continue
-            repeated_row = (row.get("formtype"),  row.get("tabname"), row.get("columnname"))
+            repeated_row = (row.get("formtype"), row.get("tabname"), row.get("columnname"))
             if repeated_row in repeated_rows:
                 continue
             expected.append({
