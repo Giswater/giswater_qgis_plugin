@@ -102,6 +102,8 @@ phases:
     steps:
       - source: "schemas/main/ud/final_pass/config_form_fields"
         recursive: false
+      - source: "schemas/main/ud/final_pass/config_form_tableview"
+        recursive: false
       - source: "schemas/main/ud/final_pass/i18n/{{ locale }}"
         fallback_source: "schemas/main/ud/final_pass/i18n/en_US"
         recursive: false
