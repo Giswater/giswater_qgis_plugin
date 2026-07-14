@@ -717,7 +717,6 @@ def extract_py_candidates(
     )
 
     findings.extend(_extract_pydialog_candidates(i18n_rows, scan_root))
-    findings.extend(_extract_py_toolbar_candidates(i18n_rows, scan_root))
 
     log.info("Python extraction: %d detection(s)", len(findings))
     return findings
@@ -776,46 +775,6 @@ def _pydialog_finding(
             previous_columns=dict(baseline_row) if baseline_row is not None else {},
         ),
     )
-
-
-def _pytoolbar_row(source: str, lb_en_us: str) -> dict[str, Any]:
-    return {
-        "source": source,
-        "source_code": "giswater",
-        "lb_en_us": lb_en_us,
-    }
-
-
-def _pytoolbar_finding(
-    source: str,
-    update_kind: UpdateKind,
-    *,
-    original_text: str,
-    previous_text: Optional[str] = None,
-    baseline_row: Optional[dict[str, Any]] = None,
-) -> ExtractedString:
-    if update_kind == UpdateKind.DELETED and baseline_row is not None:
-        original_text = str(baseline_row.get("lb_en_us", original_text) or original_text)
-    row = _pytoolbar_row(source, original_text)
-    return ExtractedString(
-        source_type=SourceType.UI_DIALOG,
-        original_text=original_text,
-        translation_key=source,
-        identifier="pytoolbar",
-        update_kind=update_kind,
-        column_id="lb_en_us",
-        previous_text=previous_text,
-        db_location=DbLocation(
-            table_i18n="pytoolbar",
-            primary_key={"source": source, "source_code": "giswater"},
-            columns=row,
-            previous_columns=dict(baseline_row) if baseline_row is not None else {},
-        ),
-    )
-
-
-def _pytoolbar_scannable(source: str) -> bool:
-    return source.startswith("btn_") or source.startswith("action")
 
 
 def _baseline_by_table(
@@ -964,43 +923,6 @@ def _scan_py_toolbars(scan_root: Path) -> dict[str, str]:
             if text_match:
                 labels[source] = text_match.group(1).strip()
     return labels
-
-
-def _extract_py_toolbar_candidates(
-    i18n_rows: list[dict],
-    scan_root: Path,
-) -> list[ExtractedString]:
-    scanned = _scan_py_toolbars(scan_root)
-    baseline_rows = _baseline_by_table(i18n_rows, "pytoolbar")
-    baseline_by_source: dict[str, dict[str, Any]] = {}
-    for row in baseline_rows:
-        source = str(row.get("source", "") or "")
-        if source:
-            baseline_by_source[source] = row
-
-    findings: list[ExtractedString] = []
-    for source, label, update_kind, baseline in _classify_scanned_texts(
-        scanned,
-        baseline_by_source,
-        "lb_en_us",
-        include_deleted=_pytoolbar_scannable,
-    ):
-        findings.append(
-            _pytoolbar_finding(
-                source,
-                update_kind,
-                original_text=label,
-                previous_text=(
-                    str(baseline.get("lb_en_us", "") or "")
-                    if update_kind == UpdateKind.TEXT_CHANGED and baseline is not None
-                    else None
-                ),
-                baseline_row=baseline,
-            )
-        )
-
-    log.info("Py toolbar extraction: %d detection(s)", len(findings))
-    return findings
 
 
 # region Origin PostgreSQL
@@ -1345,7 +1267,7 @@ def sort_keys_deep(value: object) -> object:
     }
 
 
-_PY_TABLES = frozenset({"pymessage", "pytoolbar", "pydialog"})
+_PY_TABLES = frozenset({"pymessage", "pydialog"})
 # Internal-only columns on py* rows; omitted from POST body per post-detections-python.md.
 _PY_POST_OMIT_COLUMNS = frozenset({"context", "project_type", "table_org", "schema_org"})
 
