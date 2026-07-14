@@ -759,7 +759,7 @@ BEGIN
 		ELSIF (NEW.epa_type = 'STORAGE') THEN
 			INSERT INTO inp_storage (node_id, storage_type) VALUES (NEW.node_id, 'TABULAR');
 		ELSIF (NEW.epa_type = 'NETGULLY') THEN
-			INSERT INTO inp_netgully (node_id, y0, ysur, apond, outlet_type, method, weir_cd, orifice_cd, efficiency)
+			INSERT INTO inp_netgully (node_id, y0, ysur, apond, outlet_type, gully_method, weir_cd, orifice_cd, efficiency)
 			VALUES (NEW.node_id, 0, 0, 0, v_gully_outlet_type, v_gully_method, v_gully_weir_cd, v_gully_orifice_cd, v_gully_efficiency);
 		ELSIF (NEW.epa_type = 'INLET') THEN
 			INSERT INTO inp_inlet (node_id, y0, ysur, apond, inlet_type, outlet_type, gully_method, custom_top_elev, custom_depth, inlet_length, inlet_width, cd1, cd2, efficiency)
@@ -814,7 +814,7 @@ BEGIN
 				EXECUTE v_sql;
 
 				IF (NEW.epa_type = 'NETGULLY') THEN
-					UPDATE inp_netgully SET outlet_type = v_gully_outlet_type, method = v_gully_method, weir_cd = v_gully_weir_cd,
+					UPDATE inp_netgully SET outlet_type = v_gully_outlet_type, gully_method = v_gully_method, weir_cd = v_gully_weir_cd,
 					orifice_cd = v_gully_orifice_cd, efficiency = v_gully_efficiency
 					WHERE node_id = OLD.node_id;
 
