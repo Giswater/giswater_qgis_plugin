@@ -1552,7 +1552,8 @@ BEGIN
 			the_geom,
 			to_arc
 		)
-		SELECT v_mincut_id,
+		SELECT DISTINCT ON (tpa.pgr_node_id)
+			v_mincut_id,
 			tpa.pgr_node_id AS node_id,
 			tpa.closed,
 			tpa.broken,
@@ -1563,7 +1564,8 @@ BEGIN
 			tpa.to_arc
 		FROM temp_pgr_arc_linegraph tpa
 		JOIN node n ON n.node_id = tpa.pgr_node_id
-		WHERE tpa.mapzone_id <> 0;
+		WHERE tpa.mapzone_id <> 0
+		ORDER BY tpa.pgr_node_id;
 
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 		SELECT v_mincut_id, c.connec_id, c.the_geom, c.customer_code

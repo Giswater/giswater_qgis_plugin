@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `gw_trg_edit_inp_gully` trigger to use `gully_method` instead of `method`.
 - Fix `gw_trg_edit_inp_node` trigger to use `gully_method` instead of `method`.
 - Fix `gw_trg_edit_node` trigger to use `gully_method` instead of `method`.
+- Fix `gw_fct_setmincut` use DISTINCT ON to avoid duplicate records in `om_mincut_valve`.
 
 ### Changed
 - Refactor `v_om_mincut_initpoint`: now uses a JOIN instead of a LEFT JOIN with `selector_mincut_result` and removes the check for `id > 0`.
