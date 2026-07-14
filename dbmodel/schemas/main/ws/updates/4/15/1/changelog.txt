@@ -1,0 +1,1 @@
+- Fix `v_om_mincut_initpoint` join current user in `selector_mincut_result`.
