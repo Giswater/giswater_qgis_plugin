@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `gw_trg_edit_inp_gully` trigger to use `gully_method` instead of `method`.
+- Fix `gw_trg_edit_inp_node` trigger to use `gully_method` instead of `method`.
+- Fix `gw_trg_edit_node` trigger to use `gully_method` instead of `method`.
+
 ## [4.15.0] - 2026-07-13
 
 ### Added
