@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.15.1] - 2026-07-15
+
 ### Fixed
 
 - Fix `gw_trg_edit_inp_gully` trigger to use `gully_method` instead of `method`.
@@ -499,7 +501,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.15.0...main
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.1...release/4.15
+[4.15.1]: https://github.com/giswater/plugin/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/giswater/plugin/compare/v4.14.5...v4.15.0
 [4.14.5]: https://github.com/giswater/plugin/compare/v4.14.4...v4.14.5
 [4.14.4]: https://github.com/giswater/plugin/compare/v4.14.3...v4.14.4
