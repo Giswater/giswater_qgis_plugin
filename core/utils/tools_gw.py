@@ -4402,8 +4402,13 @@ def get_project_info(schemaname=None, order_direction="DESC"):
         tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
+    has_addparam = tools_db.check_column(tablename, 'addparam', schemaname)
+    creation_profile_sql = (
+        "addparam -> 'environment' ->> 'creation_profile'"
+        if has_addparam else "NULL"
+    )
     sql = (f"SELECT lower(project_type), epsg, giswater, language, date, "
-           f"addparam -> 'environment' ->> 'creation_profile' "
+           f"{creation_profile_sql} "
            f"FROM {schemaname}.{tablename} "
            f"ORDER BY id {order_direction} LIMIT 1")
     row = tools_db.get_row(sql)
