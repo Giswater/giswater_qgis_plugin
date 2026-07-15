@@ -64,6 +64,7 @@ v_data json;
 v_arc_nodes_set text;
 v_arc_nodes_check text;
 v_old_variable_update_nodes text;
+v_error_context text;
 
 BEGIN
 
@@ -81,8 +82,6 @@ BEGIN
 	
 -- getting input data
 	v_campaign :=  (((p_data ->>'data')::json->>'parameters')::json->>'campaignId')::integer;
-
-	UPDATE cm.om_campaign SET status = 3 WHERE campaign_id = v_campaign;
 
 	v_data :=
 	jsonb_build_object(
@@ -516,6 +515,7 @@ BEGIN
 	END IF;
 	
 	-- manage campaing status value (INTEGRATED) and clean selectors
+	UPDATE cm.om_campaign SET status = 3 WHERE campaign_id = v_campaign; -- we need to set the campaign status to Assigned to update lot status to Accepted.
 	UPDATE cm.om_campaign_lot SET status=9 WHERE campaign_id=v_campaign;
 	UPDATE cm.om_campaign SET status=9 WHERE campaign_id=v_campaign;
 	DELETE FROM cm.selector_lot where lot_id in (select lot_id from cm.om_campaign_lot where campaign_id=v_campaign);
@@ -566,6 +566,7 @@ BEGIN
 	RETURN v_result;
 
 EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	-- Restore trigger params even on error
 	IF to_regclass('pg_temp.tmp_cm_integrate_trigger_params') IS NOT NULL THEN
 		FOR v_restore_param IN
@@ -588,7 +589,7 @@ EXCEPTION WHEN OTHERS THEN
 
 	-- Ensure restoration on error
 	PERFORM set_config('search_path', v_prev_search_path, true);
-	RAISE;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
