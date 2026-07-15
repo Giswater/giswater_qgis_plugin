@@ -674,6 +674,65 @@ def git_output(root: Path, *args: str) -> str:
     return result.stdout.strip()
 
 
+def git_output_optional(root: Path, *args: str) -> str | None:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    value = result.stdout.strip()
+    return value or None
+
+
+# Keep in sync with path filters in .github/workflows/test-db.yml.
+DBMODEL_CI_PATHSPECS = (
+    "dbmodel",
+    "giswater_admin",
+    "scripts/gw_e2e",
+    "scripts/gw_bootstrap_network.sh",
+    ".github/workflows/test-db.yml",
+)
+
+
+def dbmodel_unchanged_since_tag(
+    root: Path, since_tag: str, end: str = "HEAD"
+) -> bool:
+    completed = subprocess.run(
+        ["git", "diff", "--quiet", since_tag, end, "--", *DBMODEL_CI_PATHSPECS],
+        cwd=root,
+        check=False,
+    )
+    return completed.returncode == 0
+
+
+def resolve_dbmodel_ci_sha(
+    root: Path,
+    *,
+    since_tag: str,
+    end: str,
+) -> str:
+    """Return the last commit in since_tag..end that can trigger PostgreSQL Tests."""
+    commit = git_output_optional(
+        root,
+        "log",
+        "-1",
+        "--format=%H",
+        f"{since_tag}..{end}",
+        "--",
+        *DBMODEL_CI_PATHSPECS,
+    )
+    if commit:
+        return commit
+    raise ReleaseError(
+        f"dbmodel/ changed since {since_tag} but no commit in that range touches "
+        "dbmodel CI paths; cannot pick a verification commit"
+    )
+
+
 def ensure_dbmodel_ci_green(
     root: Path,
     *,
@@ -681,21 +740,53 @@ def ensure_dbmodel_ci_green(
     cli_release: bool = False,
     sha: str | None = None,
 ) -> None:
-    """Require PostgreSQL Tests workflow checks on the release commit."""
+    """Require PostgreSQL Tests workflow checks before release."""
     script = root / "scripts" / "verify_dbmodel_ci_checks.sh"
     if not script.is_file():
         raise ReleaseError(f"Missing {script}")
 
-    commit = sha or git_output(root, "rev-parse", "HEAD")
-    cmd = ["bash", str(script), "--sha", commit]
+    head = sha or git_output(root, "rev-parse", "HEAD")
     if cli_release:
-        cmd.append("--cli-release")
+        commit = head
+        cmd = ["bash", str(script), "--sha", commit, "--cli-release"]
+        if not execute:
+            print(
+                "Would verify dbmodel CI checks on "
+                f"{commit} (CLI; skip if dbmodel unchanged)"
+            )
+            print(f"$ {' '.join(cmd)}")
+            return
+    else:
+        since_tag = git_output(root, "describe", "--tags", "--abbrev=0", head)
+        if dbmodel_unchanged_since_tag(root, since_tag, head):
+            message = (
+                f"dbmodel/ unchanged since {since_tag}; skipping dbmodel CI verify"
+            )
+            if execute:
+                print(message)
+            else:
+                print(f"Would skip dbmodel CI verify ({message})")
+            return
 
-    if not execute:
-        label = "CLI (skip if dbmodel unchanged)" if cli_release else "plugin"
-        print(f"Would verify dbmodel CI checks on {commit} ({label})")
-        print(f"$ {' '.join(cmd)}")
-        return
+        commit = resolve_dbmodel_ci_sha(root, since_tag=since_tag, end=head)
+        cmd = ["bash", str(script), "--sha", commit]
+        if not execute:
+            if commit != head:
+                print(
+                    "Would verify dbmodel CI checks on "
+                    f"{commit} (last dbmodel commit since {since_tag}; "
+                    f"release commit {head} only touches release metadata)"
+                )
+            else:
+                print(f"Would verify dbmodel CI checks on {commit}")
+            print(f"$ {' '.join(cmd)}")
+            return
+
+        if commit != head:
+            print(
+                f"Release commit {head[:12]} only touches release metadata; "
+                f"verifying dbmodel CI on {commit[:12]}"
+            )
 
     if shutil.which("gh") is None:
         raise ReleaseError(
