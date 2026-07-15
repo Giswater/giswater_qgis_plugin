@@ -125,9 +125,9 @@ ON CONFLICT (id) DO UPDATE SET epa_default = EXCLUDED.epa_default;
 
 INSERT INTO cat_feature_element (id, epa_default) VALUES
 ('TAPA', 'UNDEFINED'),
-('EPUMP', 'FRELEM'),
-('EVALVE', 'FRELEM'),
-('EMETER', 'FRELEM')
+('EPUMP', 'FRPUMP'),
+('EVALVE', 'FRVALVE'),
+('EMETER', 'FRSHORTPIPE')
 ON CONFLICT (id) DO UPDATE SET epa_default = EXCLUDED.epa_default;
 
 INSERT INTO cat_node (id, node_type) VALUES
