@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix `gw_fct_mincut_minsector` and `gw_fct_setmincut` functions to count hydrometers correctly.
+
+## [4.15.2] - 2026-07-16
+
+### Fixed
+
 - Fix `gw_fct_setnodefromarc` function to return the correct error message with `gw_fct_exception_others` function.
 - Fix admin dialog: do not show ghost schemas in parentheses when switching connections or after delete; restore selection only if the schema exists on the current connection.
 - Fix admin dialog: persist last selected schema per connection instead of globally.
@@ -511,7 +517,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.15.1...release/4.15
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.2...main
+[4.15.2]: https://github.com/giswater/plugin/compare/v4.15.1...v4.15.2
 [4.15.1]: https://github.com/giswater/plugin/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/giswater/plugin/compare/v4.14.5...v4.15.0
 [4.14.5]: https://github.com/giswater/plugin/compare/v4.14.4...v4.14.5

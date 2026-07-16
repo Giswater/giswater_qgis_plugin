@@ -1734,13 +1734,12 @@ BEGIN
 				SELECT
 					json_build_object(
 						'category', hc.observ,
-						'number', count(h.hydrometer_id)
+						'number', count(omh.hydrometer_id)
 					) AS b
-				FROM vf_hydrometer h
-				JOIN connec c ON h.feature_id = c.connec_id
-				JOIN om_mincut_connec omc ON c.connec_id = omc.connec_id
+				FROM om_mincut_hydrometer omh
+				JOIN vf_hydrometer h ON h.hydrometer_id = omh.hydrometer_id
 				LEFT JOIN v_cat_hydrometer_category hc ON hc.id::text = h.category_id::text
-				WHERE omc.result_id = v_mincut_id
+				WHERE omh.result_id = v_mincut_id
 				GROUP BY hc.observ
 				ORDER BY hc.observ
 			) a
@@ -2312,13 +2311,12 @@ BEGIN
 								SELECT
 									json_build_object(
 										'category', hc.observ,
-										'number', count(h.hydrometer_id)
+										'number', count(omh.hydrometer_id)
 									) AS b
-								FROM vf_hydrometer h
-								JOIN connec c ON h.feature_id = c.connec_id
-								JOIN om_mincut_connec omc ON c.connec_id = omc.connec_id
+								FROM om_mincut_hydrometer omh
+								JOIN vf_hydrometer h ON h.hydrometer_id = omh.hydrometer_id
 								LEFT JOIN v_cat_hydrometer_category hc ON hc.id::text = h.category_id::text
-								WHERE omc.result_id = v_mincut_affected_id
+								WHERE omh.result_id = v_mincut_affected_id
 								GROUP BY hc.observ
 								ORDER BY hc.observ
 							) a
