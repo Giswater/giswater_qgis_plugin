@@ -41,6 +41,7 @@ v_check_result json;
 v_export_result json;
 v_export_data_body json;
 v_check_data_body json;
+v_error_context text;
 
 BEGIN
 
@@ -118,8 +119,8 @@ BEGIN
 	)::json, 3547, null, null, null);
 
 EXCEPTION WHEN OTHERS THEN
-	RETURN ('{"status":"Failed","message":{"level":2, "text":' || to_json(SQLERRM) || '},
-	"version":"'|| COALESCE(v_version, '') ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	RETURN gw_fct_exception_others('Failed', SQLERRM, SQLSTATE, SQLERRM, v_error_context);
 
 END;
 $function$

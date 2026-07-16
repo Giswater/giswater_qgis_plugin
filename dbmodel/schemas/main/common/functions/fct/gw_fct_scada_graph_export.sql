@@ -37,6 +37,7 @@ v_object_1 integer;
 v_object_2 integer;
 v_result JSON;
 v_Result_info JSON;
+v_error_context text;
 BEGIN
 
 	-- Search path
@@ -127,7 +128,10 @@ BEGIN
 				',"data":{  "info":'||v_result_info||', "result":'||v_json_result_return||'}}'||
 			'}')::json, 3546, null, null, null);
 
-	
+EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	RETURN gw_fct_exception_others('Failed', SQLERRM, SQLSTATE, SQLERRM, v_error_context);
+
 END;
 
 $function$
