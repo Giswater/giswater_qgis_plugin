@@ -733,6 +733,63 @@ def resolve_dbmodel_ci_sha(
     )
 
 
+RELEASE_METADATA_FILES = frozenset({"CHANGELOG.md", "metadata.txt"})
+
+
+def is_release_metadata_only_commit(root: Path, sha: str) -> bool:
+    """True when a commit only touches release bookkeeping files."""
+    names = git_output_optional(
+        root,
+        "diff-tree",
+        "--no-commit-id",
+        "--name-only",
+        "-r",
+        sha,
+    )
+    if not names:
+        return True
+    return set(names.splitlines()).issubset(RELEASE_METADATA_FILES)
+
+
+def is_git_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
+    completed = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=root,
+        check=False,
+    )
+    return completed.returncode == 0
+
+
+def resolve_dbmodel_ci_verification_sha(
+    root: Path,
+    *,
+    since_tag: str,
+    end: str,
+) -> str:
+    """Return the commit whose push CI validates dbmodel changes.
+
+    GitHub Actions runs on the push tip, not on every commit in a push.
+    Walk back release-metadata-only commits on top of end so we verify
+    the pushed tip that actually ran CI, not an intermediate dbmodel commit.
+    """
+    # Ensure dbmodel changed in the range before picking a verification SHA.
+    resolve_dbmodel_ci_sha(root, since_tag=since_tag, end=end)
+
+    verify_sha = end
+    while verify_sha != since_tag and is_release_metadata_only_commit(
+        root, verify_sha
+    ):
+        parent = git_output_optional(root, "rev-parse", f"{verify_sha}^")
+        if not parent:
+            break
+        if not is_git_ancestor(root, since_tag, parent) or not is_git_ancestor(
+            root, parent, end
+        ):
+            break
+        verify_sha = parent
+    return verify_sha
+
+
 def ensure_dbmodel_ci_green(
     root: Path,
     *,
@@ -768,24 +825,28 @@ def ensure_dbmodel_ci_green(
                 print(f"Would skip dbmodel CI verify ({message})")
             return
 
-        commit = resolve_dbmodel_ci_sha(root, since_tag=since_tag, end=head)
+        commit = resolve_dbmodel_ci_verification_sha(
+            root, since_tag=since_tag, end=head
+        )
         cmd = ["bash", str(script), "--sha", commit]
         if not execute:
             if commit != head:
                 print(
                     "Would verify dbmodel CI checks on "
-                    f"{commit} (last dbmodel commit since {since_tag}; "
-                    f"release commit {head} only touches release metadata)"
+                    f"{commit} (push tip; HEAD {head[:12]} is release metadata)"
                 )
             else:
-                print(f"Would verify dbmodel CI checks on {commit}")
+                print(
+                    "Would verify dbmodel CI checks on "
+                    f"{commit} (push tip)"
+                )
             print(f"$ {' '.join(cmd)}")
             return
 
         if commit != head:
             print(
-                f"Release commit {head[:12]} only touches release metadata; "
-                f"verifying dbmodel CI on {commit[:12]}"
+                f"HEAD {head[:12]} is release metadata; "
+                f"verifying dbmodel CI on push tip {commit[:12]}"
             )
 
     if shutil.which("gh") is None:
