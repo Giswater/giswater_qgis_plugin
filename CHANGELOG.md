@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.15.2] - 2026-07-16
+
 ### Fixed
 
 - Fix `gw_fct_setnodefromarc` function to return the correct error message with `gw_fct_exception_others` function.
@@ -511,7 +513,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.15.1...release/4.15
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.2...release/4.15
+[4.15.2]: https://github.com/giswater/plugin/compare/v4.15.1...v4.15.2
 [4.15.1]: https://github.com/giswater/plugin/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/giswater/plugin/compare/v4.14.5...v4.15.0
 [4.14.5]: https://github.com/giswater/plugin/compare/v4.14.4...v4.14.5
