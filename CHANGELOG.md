@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix `gw_fct_setnodefromarc` function to return the correct error message with `gw_fct_exception_others` function.
+- Fix admin dialog: do not show ghost schemas in parentheses when switching connections or after delete; restore selection only if the schema exists on the current connection.
+- Fix admin dialog: persist last selected schema per connection instead of globally.
+- Fix admin dialog: refresh schema list and project info when switching connections (ignore stale async load results).
+- Fix admin dialog: avoid `TypeError` and missing-table warnings when a deleted or invalid schema is still selected.
+- Fix admin dialog: show PostgreSQL/PostGIS/pgRouting versions for the active connection even when the server version is incompatible.
+- Fix admin dialog: pg_service connections without user/password in `pg_service.conf` now prompt credentials via QGIS (same as Browser) instead of failing with `fe_sendauth`.
 
 ## [4.15.1] - 2026-07-15
 
