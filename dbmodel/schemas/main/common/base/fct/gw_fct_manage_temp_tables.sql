@@ -163,7 +163,7 @@ BEGIN
                         SELECT 1
                         FROM selector_expl se
                         WHERE se.cur_user = current_user
-                          AND se.expl_id = ANY(array_append(a.expl_visibility::integer[], a.expl_id))
+                          AND (se.expl_id = a.expl_id OR se.expl_id = ANY (a.expl_visibility))
                     )';
 
             CREATE TEMP TABLE IF NOT EXISTS temp_exploitation (

@@ -1,1 +1,2 @@
 - Add profile interpolation dynamic form.
+- Optimize `vf_link` and `vf_gully` selector filters for large selector sets (same pattern as common `vf_*` views).
