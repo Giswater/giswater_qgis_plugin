@@ -1,0 +1,5 @@
+- Add `gw_fct_scada_graph_build` to orchestrate scada graph edge creation: insert, check/fix and export JSON.
+- Add sys_message 4678 when sys_code is not null and sys_code_autofill is activated.
+- Register `profile_interpolation` and `scada_graph` dynamic form types and layout definitions.
+- Improve `gw_fct_scada_graph_check` and `gw_fct_scada_graph_export` to resolve `explId` from `object_1`/`object_2`.
+- Fix `gw_trg_scada_graph_builder` to use `node_type`, `feature_class` and current schema.
