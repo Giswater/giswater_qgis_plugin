@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `gw_fct_setnodefromarc` function to return the correct error message with `gw_fct_exception_others` function.
+
 ## [4.15.1] - 2026-07-15
 
 ### Fixed
