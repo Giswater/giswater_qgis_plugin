@@ -69,51 +69,10 @@ class GwTestQgis:
 
         return True
 
-    def create_project(self, project_type='ws', project_name=None, project_title=None):
-
-        print("\nStart create_project")
-
-        # Load main plugin class
-        if not self.load_plugin():
-            return False
-
-        # Connect to a database providing a service_name set in .pg_service.conf
-        if not self.connect_to_database(self.service_name):
-            return False
-
-        self.test_giswater.gw_admin.init_sql(False, self.user, show_dialog=False)
-        self.test_giswater.gw_admin.init_dialog_create_project(project_type)
-        if project_name is None:
-            project_name = f"test_{project_type}"
-        if project_title is None:
-            project_title = f"test_{project_type}"
-        self.test_giswater.gw_admin.create_project_data_schema(project_name, project_title, project_type,
-            '25831', 'US', is_test=True, exec_last_process=True, example_data=True)
-
-        print("Finish create_project")
-
-        return True
-
-    def update_project(self, project_type='ws'):
-
-        print("\nStart update_project")
-
-        # Load main plugin class
-        if not self.load_plugin():
-            return False
-
-        # Connect to a database providing a service_name set in .pg_service.conf
-        if not self.connect_to_database(self.service_name):
-            return False
-
-        self.test_giswater.gw_admin.init_sql(False, self.user, show_dialog=False)
-        self.test_giswater.gw_admin.init_dialog_create_project(project_type)
-        project_name = f"test_{project_type}"
-        self.test_giswater.gw_admin.load_updates(project_type, schema_name=project_name)
-
-        print("Finish update_project")
-
-        return True
+    # NOTE: create_project / update_project lived here historically but
+    # required spinning up a QgsApplication just to drive the Admin
+    # dialogs. They have been replaced by the engine-direct smoke suite
+    # in `test/engine/smoke/`, which runs faster and has no Qt deps.
 
     def create_gis_project(self, project_type='ws'):
 
@@ -168,18 +127,6 @@ class GwTestQgis:
         return
 
 
-def test_create_project():
-    test = GwTestQgis()
-    status = test.create_project()
-    print(status)
-
-
-def test_update_project():
-    test = GwTestQgis()
-    status = test.update_project('ud')
-    print(status)
-
-
 def test_create_gis_project():
     test = GwTestQgis()
     status = test.create_gis_project('ud')
@@ -195,5 +142,5 @@ def test_manage_visit():
 if __name__ == '__main__':
     print("MAIN")
     test = GwTestQgis()
-    test.create_project('ws', 'ws_dev34')
+    test.create_gis_project('ws')
 

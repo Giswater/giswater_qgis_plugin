@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'diam1', 'diam2'
+        'muni_visibility', 'diam1', 'diam2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_reduction should have the correct columns'
 );
@@ -73,21 +73,21 @@ SELECT col_type_is('ve_node_reduction', 'macroexpl_id', 'int4', 'Column macroexp
 SELECT col_type_is('ve_node_reduction', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_reduction', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_reduction', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_reduction', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_reduction', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_reduction', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_reduction', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_reduction', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_reduction', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_reduction', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_reduction', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_reduction', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_reduction', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_reduction', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_reduction', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_reduction', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_reduction', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_reduction', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_reduction', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_reduction', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_reduction', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_reduction', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_reduction', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_reduction', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_reduction', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_reduction', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_reduction', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -184,6 +184,9 @@ SELECT col_type_is('ve_node_reduction', 'sector_visibility', 'int4[]', 'Column s
 SELECT col_type_is('ve_node_reduction', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_reduction', 'diam1', 'numeric(12,3)', 'Column diam1 should be numeric(12,3)');
 SELECT col_type_is('ve_node_reduction', 'diam2', 'numeric(12,3)', 'Column diam2 should be numeric(12,3)');
+
+SELECT col_type_is('ve_node_reduction', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_reduction', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

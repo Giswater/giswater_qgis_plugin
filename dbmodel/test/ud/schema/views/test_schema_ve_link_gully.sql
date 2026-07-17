@@ -61,12 +61,12 @@ SELECT col_type_is('ve_link_gully', 'macroexpl_id', 'int4', 'Column macroexpl_id
 SELECT col_type_is('ve_link_gully', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_link_gully', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_link_gully', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_link_gully', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_link_gully', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_link_gully', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_link_gully', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_link_gully', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_link_gully', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_link_gully', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_link_gully', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_link_gully', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_link_gully', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_link_gully', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_link_gully', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');

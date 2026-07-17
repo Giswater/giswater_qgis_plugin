@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'customer_code', 'top_floor', 'wjoin_type'
+        'muni_visibility', 'customer_code', 'top_floor', 'wjoin_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_water_connection should have the correct columns'
 );
@@ -73,21 +73,21 @@ SELECT col_type_is('ve_node_water_connection', 'macroexpl_id', 'int4', 'Column m
 SELECT col_type_is('ve_node_water_connection', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_water_connection', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_water_connection', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_water_connection', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_water_connection', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_water_connection', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_water_connection', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_water_connection', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_water_connection', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_water_connection', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_water_connection', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_water_connection', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_water_connection', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_water_connection', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_water_connection', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_water_connection', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_water_connection', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_water_connection', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_water_connection', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_water_connection', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_water_connection', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -185,6 +185,9 @@ SELECT col_type_is('ve_node_water_connection', 'muni_visibility', 'int4[]', 'Col
 SELECT col_type_is('ve_node_water_connection', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
 SELECT col_type_is('ve_node_water_connection', 'top_floor', 'int4', 'Column top_floor should be int4');
 SELECT col_type_is('ve_node_water_connection', 'wjoin_type', 'text', 'Column wjoin_type should be text');
+
+SELECT col_type_is('ve_node_water_connection', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_water_connection', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

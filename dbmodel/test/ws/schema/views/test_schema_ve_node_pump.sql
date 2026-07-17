@@ -44,7 +44,7 @@ SELECT columns_are(
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'sector_visibility', 'muni_visibility',
         'max_flow', 'min_flow', 'nom_flow', 'power', 'pressure_exit', 'elev_height',
-        'name', 'pump_number', 'to_arc', 'pump_type', 'engine_type'
+        'name', 'pump_number', 'to_arc', 'pump_type', 'engine_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_pump should have the correct columns'
 );
@@ -74,21 +74,21 @@ SELECT col_type_is('ve_node_pump', 'macroexpl_id', 'int4', 'Column macroexpl_id 
 SELECT col_type_is('ve_node_pump', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_pump', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_pump', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_pump', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_pump', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_pump', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_pump', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_pump', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_pump', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_pump', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_pump', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_pump', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_pump', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_pump', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_pump', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_pump', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_pump', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_pump', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_pump', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_pump', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_pump', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_pump', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_pump', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_pump', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_pump', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_pump', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_pump', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -193,6 +193,9 @@ SELECT col_type_is('ve_node_pump', 'pump_number', 'int4', 'Column pump_number sh
 SELECT col_type_is('ve_node_pump', 'to_arc', 'int4', 'Column to_arc should be int4');
 SELECT col_type_is('ve_node_pump', 'pump_type', 'int4', 'Column pump_type should be int4');
 SELECT col_type_is('ve_node_pump', 'engine_type', 'int4', 'Column engine_type should be int4');
+
+SELECT col_type_is('ve_node_pump', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_pump', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

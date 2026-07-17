@@ -1,0 +1,4 @@
+- Mapzone manager: add "Filter by selector" checkbox and layout fixes (labels without stretch, hspacer, button order).
+- Create `vf_exploitation` view (cat_manager + `admin_exploitation_x_user`).
+- Improve `gw_fct_graphanalytics_manage_temporary` now uses the new `vf_exploitation` view to filter with permissions.
+- Improve `gw_fct_setmincut` now uses the new `vf_exploitation` view to filter with permissions.

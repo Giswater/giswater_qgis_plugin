@@ -21,7 +21,7 @@ SELECT has_table('man_valve'::name, 'Table man_valve should exist');
 SELECT columns_are(
     'man_valve',
     ARRAY[
-        'node_id', 'name', 'flowsetting'
+        'node_id', 'name', 'flowsetting', 'turns_count'
     ],
     'Table man_valve should have the correct columns'
 );
@@ -30,6 +30,7 @@ SELECT columns_are(
 SELECT col_type_is('man_valve', 'node_id', 'int4', 'Column node_id should be int4');
 SELECT col_type_is('man_valve', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('man_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
+SELECT col_type_is('man_valve', 'turns_count', 'numeric(12,4)', 'Column turns_count should be numeric(12,4)');
 
 -- Check foreign keys
 SELECT has_fk('man_valve', 'Table man_valve should have foreign keys');

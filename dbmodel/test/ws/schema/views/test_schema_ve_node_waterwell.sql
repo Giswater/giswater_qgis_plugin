@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'name', 'inlet_arc'
+        'muni_visibility', 'name', 'inlet_arc', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_waterwell should have the correct columns'
 );
@@ -73,21 +73,21 @@ SELECT col_type_is('ve_node_waterwell', 'macroexpl_id', 'int4', 'Column macroexp
 SELECT col_type_is('ve_node_waterwell', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_waterwell', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_waterwell', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_waterwell', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_waterwell', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_waterwell', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_waterwell', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_waterwell', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_waterwell', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_waterwell', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_waterwell', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_waterwell', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_waterwell', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_waterwell', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_waterwell', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_waterwell', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_waterwell', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_waterwell', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_waterwell', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_waterwell', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_waterwell', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_waterwell', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_waterwell', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_waterwell', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_waterwell', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_waterwell', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_waterwell', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -184,6 +184,9 @@ SELECT col_type_is('ve_node_waterwell', 'sector_visibility', 'int4[]', 'Column s
 SELECT col_type_is('ve_node_waterwell', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_waterwell', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('ve_node_waterwell', 'inlet_arc', 'int4[]', 'Column inlet_arc should be int4[]');
+
+SELECT col_type_is('ve_node_waterwell', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_waterwell', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

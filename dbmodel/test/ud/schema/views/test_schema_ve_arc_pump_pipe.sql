@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'bottom_mat',
-        'conduit_code', 'pumpipe_param_1', 'pumpipe_param_2'
+        'conduit_code', 'pumpipe_param_1', 'pumpipe_param_2', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_pump_pipe should have the correct columns'
 );
@@ -96,17 +96,17 @@ SELECT col_type_is('ve_arc_pump_pipe', 'macroexpl_id', 'int4', 'Column macroexpl
 SELECT col_type_is('ve_arc_pump_pipe', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_arc_pump_pipe', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_arc_pump_pipe', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_arc_pump_pipe', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pump_pipe', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pump_pipe', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_arc_pump_pipe', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pump_pipe', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pump_pipe', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_arc_pump_pipe', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_arc_pump_pipe', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pump_pipe', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pump_pipe', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_arc_pump_pipe', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_arc_pump_pipe', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
 SELECT col_type_is('ve_arc_pump_pipe', 'dma_id', 'int4', 'Column dma_id should be int4');
-SELECT col_type_is('ve_arc_pump_pipe', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pump_pipe', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pump_pipe', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_arc_pump_pipe', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_arc_pump_pipe', 'pavcat_id', 'varchar(30)', 'Column pavcat_id should be varchar(30)');
@@ -198,6 +198,9 @@ SELECT col_type_is('ve_arc_pump_pipe', 'bottom_mat', 'text', 'Column bottom_mat 
 SELECT col_type_is('ve_arc_pump_pipe', 'conduit_code', 'text', 'Column conduit_code should be text');
 SELECT col_type_is('ve_arc_pump_pipe', 'pumpipe_param_1', 'bool', 'Column pumpipe_param_1 should be bool');
 SELECT col_type_is('ve_arc_pump_pipe', 'pumpipe_param_2', 'text', 'Column pumpipe_param_2 should be text');
+
+SELECT col_type_is('ve_arc_pump_pipe', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_pump_pipe', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

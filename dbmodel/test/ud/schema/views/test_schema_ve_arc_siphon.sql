@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'name',
-        'siphon_code'
+        'siphon_code', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_siphon should have the correct columns'
 );
@@ -96,17 +96,17 @@ SELECT col_type_is('ve_arc_siphon', 'macroexpl_id', 'int4', 'Column macroexpl_id
 SELECT col_type_is('ve_arc_siphon', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_arc_siphon', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_arc_siphon', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_arc_siphon', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_arc_siphon', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_arc_siphon', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_arc_siphon', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_siphon', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_siphon', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_arc_siphon', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_arc_siphon', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_siphon', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_siphon', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_arc_siphon', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_arc_siphon', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
 SELECT col_type_is('ve_arc_siphon', 'dma_id', 'int4', 'Column dma_id should be int4');
-SELECT col_type_is('ve_arc_siphon', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_siphon', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_siphon', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_arc_siphon', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_arc_siphon', 'pavcat_id', 'varchar(30)', 'Column pavcat_id should be varchar(30)');
@@ -196,6 +196,9 @@ SELECT col_type_is('ve_arc_siphon', 'uuid', 'uuid', 'Column uuid should be uuid'
 SELECT col_type_is('ve_arc_siphon', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('ve_arc_siphon', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_arc_siphon', 'siphon_code', 'text', 'Column siphon_code should be text');
+
+SELECT col_type_is('ve_arc_siphon', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_siphon', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

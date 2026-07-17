@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'sander_depth', 'prot_surface', 'inlet', 'bottom_channel', 'accessibility',
-        'bottom_mat', 'height', 'manhole_code', 'cirmanhole_param_1', 'cirmanhole_param_2'
+        'bottom_mat', 'height', 'manhole_code', 'cirmanhole_param_1', 'cirmanhole_param_2', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_circ_manhole should have the correct columns'
 );
@@ -73,12 +73,12 @@ SELECT col_type_is('ve_node_circ_manhole', 'macroexpl_id', 'int4', 'Column macro
 SELECT col_type_is('ve_node_circ_manhole', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_circ_manhole', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_circ_manhole', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_circ_manhole', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_circ_manhole', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_circ_manhole', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_circ_manhole', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_circ_manhole', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_circ_manhole', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_circ_manhole', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_circ_manhole', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_circ_manhole', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_circ_manhole', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_circ_manhole', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_circ_manhole', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -179,6 +179,9 @@ SELECT col_type_is('ve_node_circ_manhole', 'height', 'numeric(12,4)', 'Column he
 SELECT col_type_is('ve_node_circ_manhole', 'manhole_code', 'text', 'Column manhole_code should be text');
 SELECT col_type_is('ve_node_circ_manhole', 'cirmanhole_param_1', 'int4', 'Column cirmanhole_param_1 should be int4');
 SELECT col_type_is('ve_node_circ_manhole', 'cirmanhole_param_2', 'text', 'Column cirmanhole_param_2 should be text');
+SELECT col_type_is('ve_node_circ_manhole', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_circ_manhole', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_circ_manhole', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

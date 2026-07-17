@@ -1,0 +1,108 @@
+name: 🌊 Network E2E (Giswater)
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "profiles | addons | update_isolated | update_network | update_all | satellites"
+        required: false
+        default: "update_all"
+      satellites:
+        description: "Addon kinds (comma-separated)"
+        required: false
+        default: "utils,cibs"
+      parent_profile:
+        description: "Parent ws/ud profile for network scenarios"
+        required: false
+        default: "empty"
+      pg_version:
+        description: "PostgreSQL major version"
+        required: false
+        default: "18"
+      mode:
+        description: "e2e | pgtap_utils | pgtap_cibs | pgtap_network_ws | pgtap_network_ud | pgtap_all"
+        required: false
+        default: "e2e"
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    if: inputs.mode == 'e2e' || inputs.mode == ''
+    uses: ./.github/workflows/e2e-giswater.yml
+    with:
+      scenario: ${{ inputs.scenario }}
+      pg_version: ${{ inputs.pg_version }}
+      satellites: ${{ inputs.satellites }}
+      parent_profile: ${{ inputs.parent_profile }}
+
+  pgtap-utils:
+    if: inputs.mode == 'pgtap_utils' || inputs.mode == 'pgtap_all'
+    runs-on: ubuntu-latest
+    env:
+      PG_MAJOR: ${{ inputs.pg_version }}
+      POSTGIS_VERSION: ${{ inputs.pg_version == '18' && '3.6' || '3.5' }}
+    steps:
+      - uses: actions/checkout@v6
+      - working-directory: dbmodel
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/e2e_inner.sh pgtap_addon utils
+          docker compose -f docker-compose.test.yml down
+
+  pgtap-cibs:
+    if: inputs.mode == 'pgtap_cibs' || inputs.mode == 'pgtap_all'
+    runs-on: ubuntu-latest
+    env:
+      PG_MAJOR: ${{ inputs.pg_version }}
+      POSTGIS_VERSION: ${{ inputs.pg_version == '18' && '3.6' || '3.5' }}
+    steps:
+      - uses: actions/checkout@v6
+      - working-directory: dbmodel
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/e2e_inner.sh pgtap_addon cibs
+          docker compose -f docker-compose.test.yml down
+
+  pgtap-network-ws:
+    if: inputs.mode == 'pgtap_network_ws' || inputs.mode == 'pgtap_all'
+    runs-on: ubuntu-latest
+    env:
+      PG_MAJOR: ${{ inputs.pg_version }}
+      POSTGIS_VERSION: ${{ inputs.pg_version == '18' && '3.6' || '3.5' }}
+      PARENT_PROFILE: ${{ inputs.parent_profile }}
+    steps:
+      - uses: actions/checkout@v6
+      - working-directory: dbmodel
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          GW_PARENT_PROFILE="${PARENT_PROFILE}" docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/e2e_inner.sh pgtap_network network_ws
+          docker compose -f docker-compose.test.yml down
+
+  pgtap-network-ud:
+    if: inputs.mode == 'pgtap_network_ud' || inputs.mode == 'pgtap_all'
+    runs-on: ubuntu-latest
+    env:
+      PG_MAJOR: ${{ inputs.pg_version }}
+      POSTGIS_VERSION: ${{ inputs.pg_version == '18' && '3.6' || '3.5' }}
+      PARENT_PROFILE: ${{ inputs.parent_profile }}
+    steps:
+      - uses: actions/checkout@v6
+      - working-directory: dbmodel
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml build --quiet postgres runner
+          docker compose -f docker-compose.test.yml up -d postgres --wait
+          GW_PARENT_PROFILE="${PARENT_PROFILE}" docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/e2e_inner.sh pgtap_network network_ud
+          docker compose -f docker-compose.test.yml down

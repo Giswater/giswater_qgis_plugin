@@ -42,7 +42,7 @@ SELECT columns_are(
         'mincut_length', 'mincut_watervol', 'mincut_criticality', 'hydraulic_criticality', 'pipe_capacity', 'mincut_impact_topo',
         'mincut_impact_hydro', 'sector_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'the_geom', 'p_state', 'uuid', 'uncertain'
+        'the_geom', 'p_state', 'uuid', 'uncertain', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_varc should have the correct columns'
 );
@@ -79,21 +79,21 @@ SELECT col_type_is('ve_arc_varc', 'macroexpl_id', 'int4', 'Column macroexpl_id s
 SELECT col_type_is('ve_arc_varc', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_arc_varc', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_arc_varc', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_arc_varc', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_arc_varc', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_arc_varc', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_varc', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_arc_varc', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_varc', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_arc_varc', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_arc_varc', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_arc_varc', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_arc_varc', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_arc_varc', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_arc_varc', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_arc_varc', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_arc_varc', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_arc_varc', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_varc', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_arc_varc', 'pavcat_id', 'varchar(30)', 'Column pavcat_id should be varchar(30)');
 SELECT col_type_is('ve_arc_varc', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -178,6 +178,9 @@ SELECT col_type_is('ve_arc_varc', 'the_geom', 'geometry(linestring, SRID_VALUE)'
 SELECT col_type_is('ve_arc_varc', 'p_state', 'int2', 'Column p_state should be int2');
 SELECT col_type_is('ve_arc_varc', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_arc_varc', 'uncertain', 'bool', 'Column uncertain should be bool');
+
+SELECT col_type_is('ve_arc_varc', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_varc', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

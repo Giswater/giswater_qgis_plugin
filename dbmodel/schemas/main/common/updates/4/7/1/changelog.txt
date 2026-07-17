@@ -1,0 +1,2 @@
+- fix(sys_param_user): set is_mandatory true on some variables
+- fix(mapzones): fix mapzone check

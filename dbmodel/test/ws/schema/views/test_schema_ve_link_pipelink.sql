@@ -34,7 +34,7 @@ SELECT columns_are(
         'model_id', 'verified', 'uncertain', 'userdefined_geom', 'datasource', 'is_operative',
         'sector_style', 'omzone_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'inp_type', 'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at',
-        'updated_by', 'the_geom', 'p_state', 'uuid'
+        'updated_by', 'the_geom', 'p_state', 'uuid', 'dataquality', 'dataquality_obs'
     ],
     'View ve_link_pipelink should have the correct columns'
 );
@@ -67,21 +67,21 @@ SELECT col_type_is('ve_link_pipelink', 'macroexpl_id', 'int4', 'Column macroexpl
 SELECT col_type_is('ve_link_pipelink', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_link_pipelink', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_link_pipelink', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_link_pipelink', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_link_pipelink', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_link_pipelink', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_link_pipelink', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_link_pipelink', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_link_pipelink', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_link_pipelink', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_link_pipelink', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_link_pipelink', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_link_pipelink', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_link_pipelink', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_link_pipelink', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_link_pipelink', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_link_pipelink', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_link_pipelink', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_link_pipelink', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_link_pipelink', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_link_pipelink', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_link_pipelink', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_link_pipelink', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_link_pipelink', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_link_pipelink', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_link_pipelink', 'location_type', 'varchar(50)', 'Column location_type should be varchar(50)');
 SELECT col_type_is('ve_link_pipelink', 'fluid_type', 'varchar(50)', 'Column fluid_type should be varchar(50)');
@@ -122,6 +122,9 @@ SELECT col_type_is('ve_link_pipelink', 'updated_by', 'varchar(50)', 'Column upda
 SELECT col_type_is('ve_link_pipelink', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Column the_geom should be geometry(linestring, SRID_VALUE)');
 SELECT col_type_is('ve_link_pipelink', 'p_state', 'int2', 'Column p_state should be int2');
 SELECT col_type_is('ve_link_pipelink', 'uuid', 'uuid', 'Column uuid should be uuid');
+
+SELECT col_type_is('ve_link_pipelink', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_link_pipelink', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

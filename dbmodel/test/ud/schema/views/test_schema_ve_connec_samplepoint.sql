@@ -39,7 +39,7 @@ SELECT columns_are(
         'sector_style', 'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'expl_visibility',
         'xcoord', 'ycoord', 'lat', 'long', 'created_at', 'created_by',
         'updated_at', 'updated_by', 'the_geom', 'diagonal', 'p_state', 'uuid',
-        'treatment_type', 'xyz_date', 'has_treatment', 'lab_code', 'place_name', 'cabinet'
+        'treatment_type', 'xyz_date', 'has_treatment', 'lab_code', 'place_name', 'cabinet', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_samplepoint should have the correct columns'
 );
@@ -66,16 +66,16 @@ SELECT col_type_is('ve_connec_samplepoint', 'macroexpl_id', 'int4', 'Column macr
 SELECT col_type_is('ve_connec_samplepoint', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_connec_samplepoint', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_connec_samplepoint', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_connec_samplepoint', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_connec_samplepoint', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_connec_samplepoint', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_connec_samplepoint', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_samplepoint', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_samplepoint', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_connec_samplepoint', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_connec_samplepoint', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_samplepoint', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_samplepoint', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_connec_samplepoint', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_connec_samplepoint', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_connec_samplepoint', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_samplepoint', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_samplepoint', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_connec_samplepoint', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_connec_samplepoint', 'minsector_id', 'int4', 'Column minsector_id should be int4');
@@ -159,6 +159,9 @@ SELECT col_type_is('ve_connec_samplepoint', 'has_treatment', 'bool', 'Column has
 SELECT col_type_is('ve_connec_samplepoint', 'lab_code', 'varchar(30)', 'Column lab_code should be varchar(30)');
 SELECT col_type_is('ve_connec_samplepoint', 'place_name', 'varchar(254)', 'Column place_name should be varchar(254)');
 SELECT col_type_is('ve_connec_samplepoint', 'cabinet', 'varchar(150)', 'Column cabinet should be varchar(150)');
+
+SELECT col_type_is('ve_connec_samplepoint', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_samplepoint', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

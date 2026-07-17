@@ -45,7 +45,7 @@ SELECT columns_are(
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
         'muni_visibility', 'vmax', 'vutil', 'area', 'chlorination', 'name',
         'hmax', 'automated', 'length', 'width', 'shape', 'fence_type',
-        'fence_length', 'inlet_arc', 'invert_level', 'tank_param_1', 'tank_param_2'
+        'fence_length', 'inlet_arc', 'invert_level', 'tank_param_1', 'tank_param_2', 'vnom', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_tank should have the correct columns'
 );
@@ -75,21 +75,21 @@ SELECT col_type_is('ve_node_tank', 'macroexpl_id', 'int4', 'Column macroexpl_id 
 SELECT col_type_is('ve_node_tank', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_tank', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_tank', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_tank', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_tank', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_tank', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_tank', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_tank', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_tank', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_tank', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_tank', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_tank', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_tank', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_tank', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_tank', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_tank', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_tank', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_tank', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_tank', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_tank', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_tank', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_tank', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_tank', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_tank', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_tank', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_tank', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_tank', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -200,6 +200,10 @@ SELECT col_type_is('ve_node_tank', 'inlet_arc', 'int4[]', 'Column inlet_arc shou
 SELECT col_type_is('ve_node_tank', 'invert_level', 'numeric(12,3)', 'Column invert_level should be numeric(12,3)');
 SELECT col_type_is('ve_node_tank', 'tank_param_1', 'int4', 'Column tank_param_1 should be int4');
 SELECT col_type_is('ve_node_tank', 'tank_param_2', 'date', 'Column tank_param_2 should be date');
+
+SELECT col_type_is('ve_node_tank', 'vnom', 'numeric(12,3)', 'Column vnom should be numeric(12,3)');
+SELECT col_type_is('ve_node_tank', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_tank', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

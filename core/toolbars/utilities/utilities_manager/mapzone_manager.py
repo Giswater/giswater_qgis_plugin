@@ -74,8 +74,9 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         # Restore state
-        self._restore_last_tab()
         self._restore_show_inactive_state()
+        self._restore_filter_selector_state()
+        self._restore_last_tab()
 
         # Keep only lifecycle/non-config-driven signals in Python.
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._manage_current_changed))
@@ -85,6 +86,11 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(self._save_show_inactive_state)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.save_current_tab, self.mapzone_mng_dlg, self.mapzone_mng_dlg.main_tab, 'mapzone_manager'))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
+        if self.mapzone_mng_dlg.chk_filter_selector is not None:
+            self.mapzone_mng_dlg.chk_filter_selector.stateChanged.connect(
+                partial(self._on_filter_selector_changed, self.mapzone_mng_dlg))
+            self.mapzone_mng_dlg.chk_filter_selector.stateChanged.connect(
+                self._save_filter_selector_state)
 
         self._manage_current_changed()
         self.mapzone_mng_dlg.main_tab.currentChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg, None))
@@ -257,6 +263,7 @@ class GwMapzoneManager:
         txt_column = (txt_field or {}).get('columnname')
         self.mapzone_mng_dlg.txt_name = self._bind_widget(QLineEdit, txt_column) if txt_column else None
         self.mapzone_mng_dlg.chk_active = self._bind_widget(QCheckBox, "chk_active")
+        self.mapzone_mng_dlg.chk_filter_selector = self._bind_widget(QCheckBox, "chk_filter_selector")
         tabwidget_field = self._get_tabwidget_field()
         tabwidget_column = (tabwidget_field or {}).get('columnname')
         self.mapzone_mng_dlg.main_tab = self._bind_widget(QTabWidget, tabwidget_column) if tabwidget_column else None
@@ -290,6 +297,53 @@ class GwMapzoneManager:
         if callable(handler):
             self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(handler))
 
+    def _use_selector_filter(self):
+        """Return True when table data must come from selector-based v_ui_*_sel views."""
+        chk = getattr(self.mapzone_mng_dlg, 'chk_filter_selector', None)
+        if chk is None or isdeleted(chk):
+            return False
+        return chk.isChecked()
+
+    def _get_mapzone_type(self, widget=None):
+        """Resolve mapzone type (sector, dma, ...) from the current or given tab widget."""
+        if widget is None:
+            if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
+                return None
+            widget = self.mapzone_mng_dlg.main_tab.currentWidget()
+        if widget is None or isdeleted(widget):
+            return None
+
+        mapzone_type = widget.property('mapzone_type')
+        if mapzone_type:
+            return mapzone_type
+
+        object_name = widget.objectName() or ''
+        if object_name.startswith('v_ui_'):
+            return object_name.replace('v_ui_', '', 1).replace('_sel', '').replace('_cat', '')
+        if object_name.startswith('tbl_v_ui_'):
+            return object_name.replace('tbl_v_ui_', '', 1).replace('_sel', '').replace('_cat', '')
+        if object_name.startswith('tbl_plan_netscenario_'):
+            return object_name.replace('tbl_plan_netscenario_', '', 1)
+        return object_name.split('_')[-1]
+
+    def _get_mapzone_view(self, mapzone_type=None):
+        """Return v_ui_* view used to populate the manager table."""
+        if mapzone_type is None:
+            mapzone_type = self._get_mapzone_type()
+        if not mapzone_type:
+            return None
+        suffix = '_sel' if self._use_selector_filter() else ''
+        return f'v_ui_{mapzone_type}{suffix}'
+
+    def _get_mapzone_edit_view(self, mapzone_type=None):
+        """Return ve_* or plan_netscenario_* view used for CRUD operations."""
+        mapzone_type = mapzone_type or self._get_mapzone_type()
+        if not mapzone_type:
+            return None
+        if self.netscenario_id is not None:
+            return f'plan_netscenario_{mapzone_type}'
+        return f've_{mapzone_type}'
+
     def _load_main_tabs(self):
         """Create dynamic manager tabs (table views) for project mapzone types."""
         if self.mapzone_mng_dlg.main_tab is None:
@@ -319,22 +373,21 @@ class GwMapzoneManager:
             return False
 
         for mapzone_type, tab_label in tabs:
-            view = f'v_ui_{mapzone_type}'
             qtableview = QTableView()
-            qtableview.setObjectName(f"tbl_{view}")
-            qtableview.clicked.connect(partial(self._manage_highlight, qtableview, view))
-            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
+            qtableview.setProperty('mapzone_type', mapzone_type)
+            qtableview.setObjectName(f'v_ui_{mapzone_type}')
+            qtableview.clicked.connect(partial(self._manage_highlight, qtableview))
+            qtableview.doubleClicked.connect(partial(self.manage_update, self.mapzone_mng_dlg, qtableview, None))
             qtableview.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
             qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
-            tab_idx = self.mapzone_mng_dlg.main_tab.addTab(qtableview, tab_label)
-            self.mapzone_mng_dlg.main_tab.widget(tab_idx).setObjectName(view)
+            self.mapzone_mng_dlg.main_tab.addTab(qtableview, tab_label)
         return self.mapzone_mng_dlg.main_tab.count() > 0
 
-    def _manage_highlight(self, qtableview, view, index):
+    def _manage_highlight(self, qtableview, index):
         """ Creates rubberband to indicate which feature is selected """
 
         tools_gw.reset_rubberband(self.rubber_band)
-        table = view
+        table = self._get_mapzone_view(qtableview.property('mapzone_type'))
         feature_type = 'feature_id'
 
         for x in self.feature_types:
@@ -449,8 +502,12 @@ class GwMapzoneManager:
         if current_widget is None:
             return
 
-        # Get the table name
-        self.table_name = f"{current_widget.objectName()}"
+        mapzone_type = self._get_mapzone_type(current_widget)
+        view_name = self._get_mapzone_view(mapzone_type)
+        if not view_name:
+            return
+
+        self.table_name = view_name
         widget = current_widget
 
         if self.schema_name not in self.table_name:
@@ -514,6 +571,12 @@ class GwMapzoneManager:
             return int(state) == checked_value
         except (TypeError, ValueError):
             return dialog.chk_active.isChecked()
+
+    def _on_filter_selector_changed(self, dialog, state=None):
+        """Reload current tab using selector or cat_manager view."""
+        if dialog is None or isdeleted(dialog):
+            return
+        self._manage_current_changed(clear_text=False)
 
     def _filter_active(self, dialog, active):
         """ Filters manager table by active """
@@ -949,7 +1012,7 @@ class GwMapzoneManager:
         """ Dialog from config button """
         if dialog is None:
             dialog = self.mapzone_mng_dlg
-        if self._is_readonly_mapzone():
+        if self._is_readonly_mapzone(dialog):
             return
 
         # Get selected row
@@ -963,7 +1026,7 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        self.mapzone_type = tableview.objectName().split('_')[-1].lower()
+        self.mapzone_type = self._get_mapzone_type(tableview)
         col_idx = tools_qt.get_col_index_by_col_name(tableview, f'{self.mapzone_type}_id')
         self.mapzone_id = index.sibling(index.row(), col_idx).data()
         col_idx = tools_qt.get_col_index_by_col_name(tableview, 'name')
@@ -1139,7 +1202,7 @@ class GwMapzoneManager:
 
     def _show_context_menu(self, qtableview):
         """ Show custom context menu """
-        tab_name = qtableview.objectName().replace('tbl_v_ui_', '').lower()
+        tab_name = self._get_mapzone_type(qtableview)
         if self._is_readonly_mapzone(tab_name):
             return
         menu = QMenu(qtableview)
@@ -1629,7 +1692,7 @@ class GwMapzoneManager:
             return
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '')
+        view = self._get_mapzone_edit_view()
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1643,21 +1706,34 @@ class GwMapzoneManager:
             active = tools_os.set_boolean(active)
             field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
 
-            sql = f"UPDATE {view.replace('v_ui_', 've_')} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
+            sql = f"UPDATE {view} SET active = {str(not active).lower()} WHERE {field_id}::text = '{mapzone_id}'"
             tools_db.execute_sql(sql)
 
         # Refresh tableview
         self._manage_current_changed(clear_text=False)
 
-    def manage_create(self, dialog=None, tableview=None, *args, **kwargs):
+    def manage_create(self, dialog=None, tableview=None, on_close=None, *args, **kwargs):
         if dialog is None:
             dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone(dialog):
             return
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl', '').replace('v_ui_', 've_')
-        field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
+        mapzone_type = self._get_mapzone_type(tableview)
+        if not mapzone_type:
+            return
+        tablename = self._get_mapzone_edit_view(mapzone_type)
+        if not tablename:
+            return
+
+        col_name = f"{mapzone_type}_id"
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
+        if col_idx in (None, False):
+            field_id = tableview.model().headerData(0, Qt.Orientation.Horizontal)
+        else:
+            field_id = tableview.model().headerData(col_idx, Qt.Orientation.Horizontal)
+        if field_id:
+            field_id = str(field_id).lower()
 
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
@@ -1667,11 +1743,11 @@ class GwMapzoneManager:
             return
         result = json_result
 
-        dlg_title = f"New {tablename.split('_')[-1].capitalize()}"
+        dlg_title = f"New {mapzone_type.capitalize()}"
 
-        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT")
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="INSERT", on_close=on_close)
 
-    def manage_update(self, dialog=None, tableview=None, *args, **kwargs):
+    def manage_update(self, dialog=None, tableview=None, on_close=None, *args, **kwargs):
         if dialog is None:
             dialog = self.mapzone_mng_dlg
         if self._is_readonly_mapzone(dialog):
@@ -1679,7 +1755,8 @@ class GwMapzoneManager:
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
+        mapzone_type = self._get_mapzone_type(tableview)
+        tablename = self._get_mapzone_edit_view(mapzone_type)
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1688,7 +1765,7 @@ class GwMapzoneManager:
 
         # Get selected mapzone data
         index = tableview.selectionModel().currentIndex()
-        col_name = f"{tablename.split('_')[-1].lower()}_id"
+        col_name = f"{mapzone_type}_id"
         if col_name == 'valve_id':
             col_name = 'node_id'
         col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
@@ -1707,16 +1784,16 @@ class GwMapzoneManager:
             return
         result = json_result
 
-        dlg_title = f"Update {tablename.split('_')[-1].capitalize()} ({mapzone_id})"
+        dlg_title = f"Update {mapzone_type.capitalize()} ({mapzone_id})"
 
-        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE")
+        self._build_generic_info(dlg_title, result, tablename, field_id, force_action="UPDATE", on_close=on_close)
 
     def _manage_delete(self, *args, **kwargs):
         if self._is_readonly_mapzone(self.mapzone_mng_dlg):
             return
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 've_')
+        view = self._get_mapzone_edit_view()
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             msg = "Any record selected"
@@ -1748,7 +1825,7 @@ class GwMapzoneManager:
             # Refresh tableview
             self._manage_current_changed()
 
-    def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
+    def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None, on_close=None):
         # Build dlg
 
         self.add_dlg = GwInfoGenericUi(self)
@@ -1817,13 +1894,15 @@ class GwMapzoneManager:
         self.add_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, self.add_dlg))
         self.add_dlg.dlg_closed.connect(self._manage_current_changed)
+        if on_close:
+            self.add_dlg.dlg_closed.connect(on_close)
         self.add_dlg.btn_accept.clicked.connect(
-            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action))
+            partial(self._accept_add_dlg, self.add_dlg, tablename, field_id, None, self.my_json_add, result, force_action, on_close))
 
         # Open dlg
         tools_gw.open_dialog(self.add_dlg, dlg_name='info_generic', title=dlg_title)
 
-    def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
+    def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action, on_close=None):
 
         if not my_json:
             return
@@ -1879,6 +1958,8 @@ class GwMapzoneManager:
         json_result = tools_gw.execute_procedure('gw_fct_upsertfields', body)
         if json_result and json_result.get('status') == 'Accepted':
             tools_gw.close_dialog(dialog)
+            if on_close:
+                on_close()
             return
 
         msg = "Error"
@@ -1915,3 +1996,30 @@ class GwMapzoneManager:
 
         is_checked = self.mapzone_mng_dlg.chk_active.isChecked()
         tools_gw.set_config_parser("dialogs", "mapzone_manager_show_inactive", str(is_checked), "user", "session")
+
+    def _restore_filter_selector_state(self):
+        """Restore filter-by-selector checkbox from last session choice."""
+
+        chk = getattr(self.mapzone_mng_dlg, 'chk_filter_selector', None)
+        if chk is None or isdeleted(chk):
+            return
+
+        filter_selector = tools_gw.get_config_parser(
+            "dialogs", "mapzone_manager_filter_selector", "user", "session")
+        if filter_selector is not None:
+            chk.setChecked(tools_os.set_boolean(filter_selector, default=True))
+
+    def _save_filter_selector_state(self):
+        """Persist filter-by-selector checkbox state for next dialog open."""
+
+        chk = getattr(self.mapzone_mng_dlg, 'chk_filter_selector', None)
+        if chk is None or isdeleted(chk):
+            return
+
+        tools_gw.set_config_parser(
+            "dialogs",
+            "mapzone_manager_filter_selector",
+            str(chk.isChecked()),
+            "user",
+            "session",
+        )

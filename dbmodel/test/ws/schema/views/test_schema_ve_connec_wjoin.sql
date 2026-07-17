@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'top_floor',
-        'wjoin_type'
+        'wjoin_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_wjoin should have the correct columns'
 );
@@ -73,20 +73,20 @@ SELECT col_type_is('ve_connec_wjoin', 'macroexpl_id', 'int4', 'Column macroexpl_
 SELECT col_type_is('ve_connec_wjoin', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_connec_wjoin', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_connec_wjoin', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_connec_wjoin', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_connec_wjoin', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_wjoin', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_wjoin', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_connec_wjoin', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_wjoin', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_wjoin', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_connec_wjoin', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_connec_wjoin', 'dma_type', 'varchar', 'Column dma_type should be varchar');
+SELECT col_type_is('ve_connec_wjoin', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_connec_wjoin', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_connec_wjoin', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_connec_wjoin', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_connec_wjoin', 'omzone_id', 'int4', 'Column omzone_id should be int4');
-SELECT col_type_is('ve_connec_wjoin', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_wjoin', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_wjoin', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'macrocrmzone_id', 'int4', 'Column macrocrmzone_id should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'crmzone_name', 'varchar(100)', 'Column crmzone_name should be varchar(100)');
@@ -189,6 +189,9 @@ SELECT col_type_is('ve_connec_wjoin', 'uncertain', 'bool', 'Column uncertain sho
 SELECT col_type_is('ve_connec_wjoin', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_connec_wjoin', 'top_floor', 'int4', 'Column top_floor should be int4');
 SELECT col_type_is('ve_connec_wjoin', 'wjoin_type', 'text', 'Column wjoin_type should be text');
+
+SELECT col_type_is('ve_connec_wjoin', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_wjoin', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

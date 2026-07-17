@@ -42,7 +42,7 @@ SELECT columns_are(
         'mincut_length', 'mincut_watervol', 'mincut_criticality', 'hydraulic_criticality', 'pipe_capacity', 'mincut_impact_topo',
         'mincut_impact_hydro', 'sector_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'the_geom', 'p_state', 'uuid', 'uncertain', 'pipe_param_1'
+        'the_geom', 'p_state', 'uuid', 'uncertain', 'pipe_param_1', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_pipe should have the correct columns'
 );
@@ -79,21 +79,21 @@ SELECT col_type_is('ve_arc_pipe', 'macroexpl_id', 'int4', 'Column macroexpl_id s
 SELECT col_type_is('ve_arc_pipe', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_arc_pipe', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_arc_pipe', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_arc_pipe', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pipe', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_arc_pipe', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pipe', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_arc_pipe', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pipe', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_arc_pipe', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_arc_pipe', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_arc_pipe', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pipe', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_arc_pipe', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_arc_pipe', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pipe', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_arc_pipe', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_arc_pipe', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_pipe', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_arc_pipe', 'pavcat_id', 'varchar(30)', 'Column pavcat_id should be varchar(30)');
 SELECT col_type_is('ve_arc_pipe', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -179,6 +179,8 @@ SELECT col_type_is('ve_arc_pipe', 'p_state', 'int2', 'Column p_state should be i
 SELECT col_type_is('ve_arc_pipe', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_arc_pipe', 'uncertain', 'bool', 'Column uncertain should be bool');
 SELECT col_type_is('ve_arc_pipe', 'pipe_param_1', 'text', 'Column pipe_param_1 should be text');
+SELECT col_type_is('ve_arc_pipe', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_pipe', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

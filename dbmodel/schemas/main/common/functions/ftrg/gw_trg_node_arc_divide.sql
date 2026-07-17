@@ -1,0 +1,81 @@
+/*
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+*/
+
+--FUNCTION CODE: 1146
+
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_node_arc_divide()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+
+rec record;
+arc_id_aux varchar;
+node_id_aux varchar;
+v_arcdivision_disable boolean;
+v_project_type varchar;
+v_isarcdivide boolean;
+v_node_proximity double precision;
+v_srid integer;
+
+BEGIN
+
+    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	SELECT project_type, epsg INTO v_project_type, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
+
+	-- get node type arc division config
+	IF v_project_type = 'UD' THEN
+		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE NEW.node_type=id;
+	ELSE
+		SELECT isarcdivide INTO v_isarcdivide FROM cat_node
+		JOIN cat_feature_node ON cat_node.node_type = cat_feature_node.id
+		WHERE NEW.nodecat_id=cat_node.id;
+	END IF;
+
+	SELECT value::boolean INTO v_arcdivision_disable FROM config_param_user WHERE "parameter"='edit_disable_arc_divide' AND cur_user=current_user;
+
+	IF v_isarcdivide IS TRUE AND v_arcdivision_disable is not true THEN
+		v_arcdivision_disable = FALSE;
+	ELSE
+		v_arcdivision_disable = TRUE;
+	END IF;
+
+	--  Only enabled on insert
+	IF TG_OP = 'INSERT' AND v_arcdivision_disable IS NOT TRUE THEN
+
+		SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
+
+		-- get if another node exists
+		SELECT node_id INTO node_id_aux FROM node JOIN ve_node USING (node_id) WHERE st_dwithin((NEW.the_geom), node.the_geom, v_node_proximity)
+		AND NEW.node_id != node_id AND node.state=1 AND ve_node.state=1 LIMIT 1;
+
+		IF node_id_aux IS NULL THEN
+
+			SELECT arc_id INTO arc_id_aux FROM arc JOIN ve_arc USING (arc_id)
+			WHERE st_dwithin((NEW.the_geom), arc.the_geom, v_node_proximity)
+			AND arc.node_1 is not null and arc.node_2 is not null
+			LIMIT 1;
+
+			IF arc_id_aux IS NOT NULL THEN
+				EXECUTE 'SELECT gw_fct_setarcdivide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
+			ELSE
+				perform gw_fct_arc_repair(concat('
+				{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":', v_srid, '}, "form":{},
+				"feature":{"tableName":"ve_arc", "featureType":"ARC", "id":["',arc_id,'"]},
+				"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{},
+				"aux_params":null}}')::json) from arc a where st_dwithin(a.the_geom, new.the_geom, v_node_proximity);
+			END IF;
+		END IF;
+   	END IF;
+
+RETURN NEW;
+
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+

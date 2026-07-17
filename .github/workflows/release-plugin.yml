@@ -5,22 +5,50 @@ on:
     types: [published]
 
 jobs:
-  release:
+  verify-dbmodel-ci:
+    if: startsWith(github.event.release.tag_name, 'v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify dbmodel CI checks on release commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/verify_dbmodel_ci_checks.sh --tag "${{ github.event.release.tag_name }}" --wait
+
+  network-lockstep:
+    if: startsWith(github.event.release.tag_name, 'v')
+    uses: ./.github/workflows/e2e-giswater.yml
+    with:
+      scenario: update_network
+      pg_version: "18"
+      parent_profile: empty
+
+  release:
+    needs: [verify-dbmodel-ci, network-lockstep]
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name, 'v')
     steps:
       - name: Checkout repo with submodules
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
+          ref: ${{ github.event.release.tag_name }}
           submodules: recursive
           path: ./giswater
 
       - name: Extract version from tag
         id: ver
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          TAG="${{ github.event.release.tag_name }}"
           VERSION="${TAG#v}"
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Tag $TAG is not a valid semantic version X.Y.Z"
+            echo "::error::Tag $TAG is not a valid plugin release (expected vX.Y.Z)"
             exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"

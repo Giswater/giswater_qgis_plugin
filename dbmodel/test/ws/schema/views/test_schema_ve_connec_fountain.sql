@@ -45,7 +45,7 @@ SELECT columns_are(
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'linked_connec',
         'vmax', 'vtotal', 'container_number', 'pump_number', 'power', 'regulation_tank',
-        'chlorinator', 'arq_patrimony', 'name'
+        'chlorinator', 'arq_patrimony', 'name', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_fountain should have the correct columns'
 );
@@ -74,20 +74,20 @@ SELECT col_type_is('ve_connec_fountain', 'macroexpl_id', 'int4', 'Column macroex
 SELECT col_type_is('ve_connec_fountain', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_connec_fountain', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_connec_fountain', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_connec_fountain', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_connec_fountain', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_connec_fountain', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_connec_fountain', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_fountain', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_fountain', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_connec_fountain', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_fountain', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_fountain', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_connec_fountain', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_connec_fountain', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_connec_fountain', 'dma_type', 'varchar', 'Column dma_type should be varchar');
+SELECT col_type_is('ve_connec_fountain', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_connec_fountain', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_connec_fountain', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_connec_fountain', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_connec_fountain', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_connec_fountain', 'omzone_id', 'int4', 'Column omzone_id should be int4');
-SELECT col_type_is('ve_connec_fountain', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_fountain', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_fountain', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
 SELECT col_type_is('ve_connec_fountain', 'macrocrmzone_id', 'int4', 'Column macrocrmzone_id should be int4');
 SELECT col_type_is('ve_connec_fountain', 'crmzone_name', 'varchar(100)', 'Column crmzone_name should be varchar(100)');
@@ -198,6 +198,9 @@ SELECT col_type_is('ve_connec_fountain', 'regulation_tank', 'varchar(150)', 'Col
 SELECT col_type_is('ve_connec_fountain', 'chlorinator', 'varchar(100)', 'Column chlorinator should be varchar(100)');
 SELECT col_type_is('ve_connec_fountain', 'arq_patrimony', 'bool', 'Column arq_patrimony should be bool');
 SELECT col_type_is('ve_connec_fountain', 'name', 'varchar(254)', 'Column name should be varchar(254)');
+
+SELECT col_type_is('ve_connec_fountain', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_fountain', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

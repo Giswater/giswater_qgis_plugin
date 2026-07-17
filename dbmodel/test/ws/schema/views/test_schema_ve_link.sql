@@ -34,7 +34,7 @@ SELECT columns_are(
         'model_id', 'verified', 'uncertain', 'userdefined_geom', 'datasource', 'is_operative',
         'sector_style', 'omzone_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'inp_type', 'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at',
-        'updated_by', 'the_geom', 'p_state', 'uuid'
+        'updated_by', 'the_geom', 'p_state', 'uuid', 'dataquality', 'dataquality_obs'
     ],
     'View ve_link should have the correct columns'
 );
@@ -67,21 +67,21 @@ SELECT col_type_is('ve_link', 'macroexpl_id', 'int4', 'Column macroexpl_id shoul
 SELECT col_type_is('ve_link', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_link', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_link', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_link', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_link', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_link', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_link', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_link', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_link', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_link', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_link', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_link', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_link', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_link', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_link', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_link', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_link', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_link', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_link', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_link', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_link', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_link', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_link', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_link', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_link', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_link', 'location_type', 'varchar(50)', 'Column location_type should be varchar(50)');
 SELECT col_type_is('ve_link', 'fluid_type', 'varchar(50)', 'Column fluid_type should be varchar(50)');
@@ -122,6 +122,9 @@ SELECT col_type_is('ve_link', 'updated_by', 'varchar(50)', 'Column updated_by sh
 SELECT col_type_is('ve_link', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Column the_geom should be geometry(linestring, SRID_VALUE)');
 SELECT col_type_is('ve_link', 'p_state', 'int2', 'Column p_state should be int2');
 SELECT col_type_is('ve_link', 'uuid', 'uuid', 'Column uuid should be uuid');
+
+SELECT col_type_is('ve_link', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_link', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

@@ -45,7 +45,7 @@ SELECT columns_are(
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
         'muni_visibility', 'name', 'maxflow', 'opsflow', 'screening', 'desander',
         'chemical', 'oxidation', 'coagulation', 'floculation', 'presendiment', 'sediment',
-        'filtration', 'disinfection', 'storage', 'sludgeman', 'inlet_arc'
+        'filtration', 'disinfection', 'storage', 'sludgeman', 'inlet_arc', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_wtp should have the correct columns'
 );
@@ -75,21 +75,21 @@ SELECT col_type_is('ve_node_wtp', 'macroexpl_id', 'int4', 'Column macroexpl_id s
 SELECT col_type_is('ve_node_wtp', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_wtp', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_wtp', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_wtp', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_wtp', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_wtp', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_wtp', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_wtp', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_wtp', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_wtp', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_wtp', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_wtp', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_wtp', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_wtp', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_wtp', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_wtp', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_wtp', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_wtp', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_wtp', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_wtp', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_wtp', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_wtp', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_wtp', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_wtp', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_wtp', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_wtp', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_wtp', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -200,6 +200,9 @@ SELECT col_type_is('ve_node_wtp', 'disinfection', 'int4', 'Column disinfection s
 SELECT col_type_is('ve_node_wtp', 'storage', 'int4', 'Column storage should be int4');
 SELECT col_type_is('ve_node_wtp', 'sludgeman', 'int4', 'Column sludgeman should be int4');
 SELECT col_type_is('ve_node_wtp', 'inlet_arc', 'int4[]', 'Column inlet_arc should be int4[]');
+
+SELECT col_type_is('ve_node_wtp', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_wtp', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

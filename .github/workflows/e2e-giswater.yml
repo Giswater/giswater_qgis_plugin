@@ -1,0 +1,69 @@
+name: 🌊 E2E Giswater (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      scenario:
+        description: "E2E scenario to run"
+        required: false
+        type: string
+        default: update_all
+      pg_version:
+        description: "PostgreSQL major version"
+        required: false
+        type: string
+        default: "18"
+      satellites:
+        description: "Comma-separated addon kinds"
+        required: false
+        type: string
+        default: "utils,cibs"
+      parent_profile:
+        description: "ws/ud create profile for network scenarios"
+        required: false
+        type: string
+        default: "empty"
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Network E2E (${{ inputs.scenario }})
+    runs-on: ubuntu-latest
+    env:
+      PG_MAJOR: ${{ inputs.pg_version }}
+      POSTGIS_VERSION: ${{ inputs.pg_version == '18' && '3.6' || '3.5' }}
+      SATELLITES: ${{ inputs.satellites }}
+      PARENT_PROFILE: ${{ inputs.parent_profile }}
+      GW_VERBOSE: "1"
+      GW_TIMING: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Show scenario
+        run: |
+          echo "E2E scenario=${{ inputs.scenario }} PG=${{ inputs.pg_version }}"
+          echo "SATELLITES=${{ inputs.satellites }} PARENT_PROFILE=${{ inputs.parent_profile }}"
+
+      - name: Build Docker images
+        working-directory: dbmodel
+        run: docker compose -f docker-compose.test.yml build --quiet postgres runner
+
+      - name: Start Postgres
+        working-directory: dbmodel
+        run: docker compose -f docker-compose.test.yml up -d postgres --wait
+
+      - name: Run E2E (${{ inputs.scenario }})
+        working-directory: dbmodel
+        run: |
+          chmod +x test/*.sh ../scripts/*.sh
+          docker compose -f docker-compose.test.yml run --rm -T runner \
+            bash /workspace/dbmodel/test/e2e_inner.sh "${{ inputs.scenario }}"
+
+      - name: Stop Postgres
+        if: always()
+        working-directory: dbmodel
+        run: docker compose -f docker-compose.test.yml down

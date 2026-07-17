@@ -1,0 +1,73 @@
+# utils (satellite) schema manifest.
+#
+# Lifecycle: create utils alone, then integrate each ws/ud parent
+# (integration copies ext_* data into utils before repointing FKs).
+
+kind: utils
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base_schema
+    type: sql_dir
+    description: "Bootstrap utils schema DDL + functions."
+    steps:
+      - { source: "schemas/addon/utils/base/init.sql", recursive: false }
+      - { source: "schemas/addon/utils/base/fct", recursive: false }
+      - { source: "schemas/addon/utils/base/ftrg", recursive: false }
+      - { source: "schemas/addon/utils/base/base.sql", recursive: false }
+
+
+  - id: integrate_utils_ws
+    type: sql_dir
+    description: "Integrate utils with a ws parent schema."
+    steps:
+      - source: "schemas/addon/utils/integration/ws/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: integrate_utils_ud
+    type: sql_dir
+    description: "Integrate utils with a ud parent schema."
+    steps:
+      - source: "schemas/addon/utils/integration/ud/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: updates
+    type: version_walk
+    description: "Apply utils-specific update patches."
+    root: "schemas/addon/utils/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: register_version
+    type: sql_function
+    description: "Append utils.sys_version row."
+    function: "utils.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "UTILS"
+        isNewProject: "{{ register_is_new }}"
+        inferParentsFromConfig: "{{ infer_parents_from_config }}"
+        parentSchema: "{{ register_parent_schema }}"
+        parentKind: "{{ parent_type }}"
+        mergeAddparam: {}
+
+profiles:
+  empty:
+    phases: [load_base_schema, updates, register_version]
+  integrate_ws:
+    phases: [integrate_utils_ws, register_version]
+  integrate_ud:
+    phases: [integrate_utils_ud, register_version]
+  update:
+    phases: [updates, register_version]
+  update_step:
+    phases: [updates, register_version]
+  version_bump:
+    phases: [register_version]

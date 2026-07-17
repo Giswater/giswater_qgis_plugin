@@ -33,7 +33,7 @@ SELECT columns_are(
         'private_linkcat_id', 'verified', 'uncertain', 'userdefined_geom', 'datasource', 'is_operative',
         'sector_style', 'omzone_style', 'drainzone_style', 'dwfzone_style', 'lock_level', 'expl_visibility',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
-        'uuid', 'omunit_id', 'treatment_type'
+        'uuid', 'omunit_id', 'treatment_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_link_conduitlink should have the correct columns'
 );
@@ -66,12 +66,12 @@ SELECT col_type_is('ve_link_conduitlink', 'macroexpl_id', 'int4', 'Column macroe
 SELECT col_type_is('ve_link_conduitlink', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_link_conduitlink', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_link_conduitlink', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_link_conduitlink', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_link_conduitlink', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_link_conduitlink', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_link_conduitlink', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_link_conduitlink', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_link_conduitlink', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_link_conduitlink', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_link_conduitlink', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_link_conduitlink', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_link_conduitlink', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_link_conduitlink', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_link_conduitlink', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -114,6 +114,9 @@ SELECT col_type_is('ve_link_conduitlink', 'p_state', 'int2', 'Column p_state sho
 SELECT col_type_is('ve_link_conduitlink', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_link_conduitlink', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_link_conduitlink', 'treatment_type', 'int4', 'Column treatment_type should be int4');
+
+SELECT col_type_is('ve_link_conduitlink', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_link_conduitlink', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

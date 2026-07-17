@@ -40,7 +40,7 @@ SELECT columns_are(
         'inventory', 'publish', 'is_operative', 'inp_type', 'sector_style', 'omzone_style',
         'drainzone_style', 'dwfzone_style', 'lock_level', 'expl_visibility', 'created_at', 'created_by',
         'updated_at', 'updated_by', 'the_geom', 'p_state', 'uuid', 'treatment_type',
-        'xyz_date', 'has_treatment'
+        'xyz_date', 'has_treatment', 'dataquality', 'dataquality_obs'
     ],
     'View ve_gully should have the correct columns'
 );
@@ -82,17 +82,17 @@ SELECT col_type_is('ve_gully', 'macroexpl_id', 'int4', 'Column macroexpl_id shou
 SELECT col_type_is('ve_gully', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_gully', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_gully', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_gully', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_gully', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_gully', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_gully', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_gully', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_gully', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_gully', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_gully', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_gully', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_gully', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_gully', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_gully', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
 SELECT col_type_is('ve_gully', 'dma_id', 'int4', 'Column dma_id should be int4');
-SELECT col_type_is('ve_gully', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_gully', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_gully', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_gully', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_gully', 'soilcat_id', 'varchar(16)', 'Column soilcat_id should be varchar(16)');
@@ -162,6 +162,9 @@ SELECT col_type_is('ve_gully', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('ve_gully', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('ve_gully', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_gully', 'has_treatment', 'bool', 'Column has_treatment should be bool');
+
+SELECT col_type_is('ve_gully', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_gully', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

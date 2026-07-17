@@ -1,0 +1,2 @@
+- Refactor mapzone `v_ui_*` views to filter by `vf_exploitation` (including null/empty/`{0}` expl_id) and add `v_ui_*_sel` selector variants (`selector_sector`, `selector_macrosector`, `selector_expl`).
+- Refactor mapzone `ve_*` edit views to filter by `vf_exploitation`: `ve_sector`, `ve_macrosector`, `ve_dma`, `ve_macroomzone`, `ve_presszone`, `ve_macrodma`, `ve_macrodqa`, `ve_dqa`, `ve_supplyzone` (WS column layout preserved; no `ve_*_sel`).

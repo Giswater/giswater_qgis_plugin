@@ -1,0 +1,2 @@
+- Set not null and default value for muni_id on parent layers
+- enhan(mapzones): set not null value for macromapzones

@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'has_treatment', 'sector_visibility', 'muni_visibility', 'name', 'wwtp_code',
         'wwtp_type', 'treatment_type', 'maxflow', 'opsflow', 'wwtp_function', 'served_hydrometer',
-        'efficiency', 'sludge_disposition', 'sludge_treatment'
+        'efficiency', 'sludge_disposition', 'sludge_treatment', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_wwtp should have the correct columns'
 );
@@ -73,12 +73,12 @@ SELECT col_type_is('ve_node_wwtp', 'macroexpl_id', 'int4', 'Column macroexpl_id 
 SELECT col_type_is('ve_node_wwtp', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_wwtp', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_wwtp', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_wwtp', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_wwtp', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_wwtp', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_wwtp', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_wwtp', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_wwtp', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_wwtp', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_wwtp', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_wwtp', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_wwtp', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_wwtp', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_wwtp', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -177,6 +177,9 @@ SELECT col_type_is('ve_node_wwtp', 'served_hydrometer', 'int4', 'Column served_h
 SELECT col_type_is('ve_node_wwtp', 'efficiency', 'text', 'Column efficiency should be text');
 SELECT col_type_is('ve_node_wwtp', 'sludge_disposition', 'bool', 'Column sludge_disposition should be bool');
 SELECT col_type_is('ve_node_wwtp', 'sludge_treatment', 'bool', 'Column sludge_treatment should be bool');
+SELECT col_type_is('ve_node_wwtp', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_wwtp', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_wwtp', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

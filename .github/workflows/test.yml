@@ -33,11 +33,11 @@ jobs:
       QGIS_TEST_VERSION: ${{ matrix.qgis_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Test
         run: |
           chmod +x .docker/run-docker-tests.sh
-          docker compose -f .docker/docker-compose.yml run qgis /usr/src/giswater_qgis_plugin/.docker/run-docker-tests.sh
+          docker compose -f .docker/docker-compose.yml run qgis /usr/src/plugin/.docker/run-docker-tests.sh

@@ -1,0 +1,3 @@
+- Remove sector_id and muni_id from exploitation table.
+- Change column type to varchar(30) in ve_* views for mapzones type columns.
+- Optimize gw_trg_array_fk_array_table: pg_catalog type lookup and global edit_disable_arc_fkarray bypass.

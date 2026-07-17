@@ -35,7 +35,7 @@ SELECT col_type_is('om_mincut_hydrometer', 'hydrometer_id', 'int4', 'Column hydr
 SELECT has_fk('om_mincut_hydrometer', 'Table om_mincut_hydrometer should have foreign keys');
 
 SELECT fk_ok('om_mincut_hydrometer', 'result_id', 'om_mincut', 'id', 'FK result_id → om_mincut.id');
-SELECT fk_ok('om_mincut_hydrometer', 'hydrometer_id', 'ext_rtc_hydrometer', 'hydrometer_id', 'FK hydrometer_id → ext_rtc_hydrometer.hydrometer_id');
+SELECT fk_ok('om_mincut_hydrometer', 'hydrometer_id', 'ext_hydrometer', 'hydrometer_id', 'FK hydrometer_id → ext_hydrometer.hydrometer_id');
 
 -- Finish
 SELECT * FROM finish();

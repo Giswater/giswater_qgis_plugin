@@ -39,7 +39,7 @@ SELECT columns_are(
         'sector_style', 'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'expl_visibility',
         'xcoord', 'ycoord', 'lat', 'long', 'created_at', 'created_by',
         'updated_at', 'updated_by', 'the_geom', 'diagonal', 'p_state', 'uuid',
-        'treatment_type', 'xyz_date', 'has_treatment'
+        'treatment_type', 'xyz_date', 'has_treatment', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_cjoin should have the correct columns'
 );
@@ -66,16 +66,16 @@ SELECT col_type_is('ve_connec_cjoin', 'macroexpl_id', 'int4', 'Column macroexpl_
 SELECT col_type_is('ve_connec_cjoin', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_connec_cjoin', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_connec_cjoin', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_connec_cjoin', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_connec_cjoin', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_connec_cjoin', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_connec_cjoin', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_cjoin', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_cjoin', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_connec_cjoin', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_connec_cjoin', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_cjoin', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_cjoin', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_connec_cjoin', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_connec_cjoin', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_connec_cjoin', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_cjoin', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_cjoin', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_connec_cjoin', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_connec_cjoin', 'minsector_id', 'int4', 'Column minsector_id should be int4');
@@ -156,6 +156,9 @@ SELECT col_type_is('ve_connec_cjoin', 'uuid', 'uuid', 'Column uuid should be uui
 SELECT col_type_is('ve_connec_cjoin', 'treatment_type', 'int4', 'Column treatment_type should be int4');
 SELECT col_type_is('ve_connec_cjoin', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_connec_cjoin', 'has_treatment', 'bool', 'Column has_treatment should be bool');
+
+SELECT col_type_is('ve_connec_cjoin', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_cjoin', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

@@ -42,7 +42,7 @@ SELECT columns_are(
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'sander_depth',
         'gullycat_id', 'units', 'groove', 'siphon', 'gullycat2_id', 'groove_height',
-        'groove_length', 'units_placement'
+        'groove_length', 'units_placement', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_netgully should have the correct columns'
 );
@@ -73,12 +73,12 @@ SELECT col_type_is('ve_node_netgully', 'macroexpl_id', 'int4', 'Column macroexpl
 SELECT col_type_is('ve_node_netgully', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_netgully', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_netgully', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_netgully', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_netgully', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_netgully', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_netgully', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netgully', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netgully', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_netgully', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_netgully', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netgully', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netgully', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_netgully', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_netgully', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -176,6 +176,9 @@ SELECT col_type_is('ve_node_netgully', 'gullycat2_id', 'text', 'Column gullycat2
 SELECT col_type_is('ve_node_netgully', 'groove_height', 'float8', 'Column groove_height should be float8');
 SELECT col_type_is('ve_node_netgully', 'groove_length', 'float8', 'Column groove_length should be float8');
 SELECT col_type_is('ve_node_netgully', 'units_placement', 'varchar(16)', 'Column units_placement should be varchar(16)');
+SELECT col_type_is('ve_node_netgully', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_netgully', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_netgully', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

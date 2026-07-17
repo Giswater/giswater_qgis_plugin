@@ -1,0 +1,88 @@
+# Asset-management schema manifest.
+#
+# AM is WS-only: integration SQL lives under integration/ws/.
+# Create (empty|sample) and integrate (integrate|integrate_sample) are separate steps.
+
+kind: am
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base
+    type: sql_dir
+    description: "Asset management DDL."
+    steps:
+      - { source: "schemas/addon/am/base/init.sql", recursive: false }
+      - { source: "schemas/addon/am/base/fct", recursive: false }
+      - { source: "schemas/addon/am/base/base.sql", recursive: false }
+
+  - id: integrate_am
+    type: sql_dir
+    description: "Wire am into the parent ws project schema."
+    steps:
+      - source: "schemas/addon/am/integration/common/fct"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+      - source: "schemas/addon/am/integration/ws/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_sample_user
+    type: sql_dir
+    optional: true
+    description: "Sample data inside the am schema (leaks, dma_nrw, …)."
+    steps:
+      - source: "schemas/addon/am/sample/user"
+        recursive: false
+
+  - id: load_sample_integrate
+    type: sql_dir
+    optional: true
+    description: "Seed am config from parent ws catalogs."
+    steps:
+      - source: "schemas/addon/am/integration/ws/sample.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
+
+  - id: load_updates
+    type: version_walk
+    description: "Walk dbmodel/schemas/addon/am/updates/<M>/<m>/<p>/ semver-ordered."
+    root: "schemas/addon/am/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: load_i18n
+    type: sql_dir
+    optional: true
+    description: "Optional am i18n per locale folder."
+    steps:
+      - source: "schemas/addon/am/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/addon/am/final_pass/i18n/en_US"
+        recursive: false
+
+  - id: register_version
+    type: sql_function
+    description: "Append am.sys_version row."
+    function: "am.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "AM"
+        isNewProject: "TRUE"
+        parentSchema: "{{ parent_schema }}"
+        mergeAddparam: {}
+
+profiles:
+  empty:
+    phases: [load_base, load_updates, load_i18n, register_version]
+  sample:
+    phases: [load_base, load_sample_user, load_updates, load_i18n, register_version]
+  integrate:
+    phases: [integrate_am, load_updates, load_i18n, register_version]
+  integrate_sample:
+    phases: [integrate_am, load_sample_integrate, load_updates, load_i18n, register_version]
+  update:
+    phases: [load_updates, load_i18n, register_version]

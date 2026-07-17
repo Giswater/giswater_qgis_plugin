@@ -1,0 +1,51 @@
+services:
+  postgres:
+    platform: linux/amd64
+    image: gw-ci:pg${PG_MAJOR:-16}
+    build:
+      context: .
+      dockerfile: docker/gw-ci/Dockerfile
+      args:
+        PG_MAJOR: ${PG_MAJOR:-16}
+        POSTGIS_VERSION: ${POSTGIS_VERSION:-3.5}
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: gw_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gw_db"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    # No host port by default (avoids clash with local Postgres on 55432).
+    # Debug: docker compose -f docker-compose.test.yml -f docker-compose.debug.yml up -d
+
+  runner:
+    build:
+      context: .
+      dockerfile: docker/test-runner/Dockerfile
+      args:
+        PG_MAJOR: ${PG_MAJOR:-16}
+    # Image entrypoint strips CRLF from bind-mounted test/*.sh (Windows checkout).
+    entrypoint: ["/usr/local/bin/gw-test-entrypoint"]
+    network_mode: service:postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # :z relabels for SELinux (podman on Fedora); harmless on Docker without SELinux
+      - ..:/workspace:z
+    working_dir: /workspace/dbmodel
+    environment:
+      PYTHONPATH: /workspace
+      GW_CONN: postgresql://postgres:postgres@127.0.0.1:5432/gw_db
+      PGPASSWORD: postgres
+      TEST_GROUPS: ${TEST_GROUPS:-all}
+      PG_PROVE_JOBS: ${PG_PROVE_JOBS:-4}
+      GW_DUMP_PATH: ${GW_DUMP_PATH:-}
+      GW_SCHEMA_DUMP: ${GW_SCHEMA_DUMP:-}
+      GW_VERBOSE: ${GW_VERBOSE:-}
+      GW_DEBUG: ${GW_DEBUG:-}
+      GW_TIMING: ${GW_TIMING:-}
+      GW_TIMING_TOP: ${GW_TIMING_TOP:-}
+      GW_TIMING_THRESHOLD_MS: ${GW_TIMING_THRESHOLD_MS:-}
+      GW_TIMING_DETAIL: ${GW_TIMING_DETAIL:-}

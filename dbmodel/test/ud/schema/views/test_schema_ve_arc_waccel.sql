@@ -45,7 +45,7 @@ SELECT columns_are(
         'drainzone_style', 'dwfzone_style', 'omzone_style', 'lock_level', 'initoverflowpath', 'inverted_slope',
         'negative_offset', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'meandering', 'p_state', 'uuid', 'treatment_type', 'sander_length',
-        'sander_depth', 'prot_surface', 'accessibility', 'name', 'waccel_code'
+        'sander_depth', 'prot_surface', 'accessibility', 'name', 'waccel_code', 'dataquality', 'dataquality_obs'
     ],
     'View ve_arc_waccel should have the correct columns'
 );
@@ -96,17 +96,17 @@ SELECT col_type_is('ve_arc_waccel', 'macroexpl_id', 'int4', 'Column macroexpl_id
 SELECT col_type_is('ve_arc_waccel', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_arc_waccel', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_arc_waccel', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_arc_waccel', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_arc_waccel', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_arc_waccel', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_arc_waccel', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_waccel', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_waccel', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_arc_waccel', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_arc_waccel', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_waccel', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_waccel', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_arc_waccel', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_arc_waccel', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
 SELECT col_type_is('ve_arc_waccel', 'dma_id', 'int4', 'Column dma_id should be int4');
-SELECT col_type_is('ve_arc_waccel', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_arc_waccel', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_arc_waccel', 'omunit_id', 'int4', 'Column omunit_id should be int4');
 SELECT col_type_is('ve_arc_waccel', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_arc_waccel', 'pavcat_id', 'varchar(30)', 'Column pavcat_id should be varchar(30)');
@@ -200,6 +200,9 @@ SELECT col_type_is('ve_arc_waccel', 'prot_surface', 'bool', 'Column prot_surface
 SELECT col_type_is('ve_arc_waccel', 'accessibility', 'varchar(16)', 'Column accessibility should be varchar(16)');
 SELECT col_type_is('ve_arc_waccel', 'name', 'varchar(255)', 'Column name should be varchar(255)');
 SELECT col_type_is('ve_arc_waccel', 'waccel_code', 'text', 'Column waccel_code should be text');
+
+SELECT col_type_is('ve_arc_waccel', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_arc_waccel', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

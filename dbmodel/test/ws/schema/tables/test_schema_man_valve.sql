@@ -25,7 +25,7 @@ SELECT columns_are(
         'pressure_exit', 'depth_valveshaft', 'regulator_situation', 'regulator_location', 'regulator_observ', 'lin_meters',
         'exit_type', 'exit_code', 'drive_type', 'cat_valve2', 'ordinarystatus', 'shutter',
         'brand2', 'model2', 'valve_type', 'to_arc', 'automated', 'connection_type',
-        'flowsetting'
+        'flowsetting', 'turns_count'
     ],
     'Table man_valve should have the correct columns'
 );
@@ -56,6 +56,7 @@ SELECT col_type_is('man_valve', 'to_arc', 'int4', 'Column to_arc should be int4'
 SELECT col_type_is('man_valve', 'automated', 'bool', 'Column automated should be bool');
 SELECT col_type_is('man_valve', 'connection_type', 'int4', 'Column connection_type should be int4');
 SELECT col_type_is('man_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
+SELECT col_type_is('man_valve', 'turns_count', 'numeric(12,4)', 'Column turns_count should be numeric(12,4)');
 
 -- Check foreign keys
 SELECT has_fk('man_valve', 'Table man_valve should have foreign keys');

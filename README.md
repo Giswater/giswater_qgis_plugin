@@ -8,7 +8,7 @@
 	<a href="https://qgis.org/"><img src="https://img.shields.io/badge/qgis-3.34%20(LTR)%20-blue.svg?style=for-the-badge&logo=qgis&logoColor=white"></a>
   	<a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.9-blue.svg?style=for-the-badge&logo=python&logoColor=white"></a>
 	<a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/postgresql-9.5|16-blue.svg?style=for-the-badge&logo=postgresql&logoColor=white"></a>
-	<a href="./LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/giswater/giswater_qgis_plugin?style=for-the-badge"></a>
+	<a href="./LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/giswater/plugin?style=for-the-badge"></a>
 </div>
 
 ## Welcome to the Giswater Project - QGIS Plugin
@@ -56,17 +56,111 @@ Since Giswater functions as server-client software, installation is done across 
 
 Compatible with Windows, Mac, and Linux OS.
 
-- Install PostgreSQL (versions 9.5 to 17).
-- Install PostGIS, pgRouting, and other required PostgreSQL extensions:
+- Install PostgreSQL (versions 9.5 to 18).
+- Install PostGIS, pgRouting, and other required PostgreSQL extensions (database-level, once per database):
 
-  ```postgresql
-  CREATE EXTENSION postgis;
-  CREATE EXTENSION pgrouting;
-  CREATE EXTENSION tablefunc;
-  CREATE EXTENSION unaccent;
-  CREATE EXTENSION postgis_raster;
-  CREATE EXTENSION fuzzystrmatch;
+  ```sql
+  CREATE EXTENSION IF NOT EXISTS postgis;
+  CREATE EXTENSION IF NOT EXISTS pgrouting;
+  CREATE EXTENSION IF NOT EXISTS tablefunc;
+  CREATE EXTENSION IF NOT EXISTS unaccent;
+  CREATE EXTENSION IF NOT EXISTS postgis_raster;
+  CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
   ```
+
+  `postgis`, `pgrouting`, `tablefunc`, and `unaccent` are also created automatically when you build a WS/UD schema ([`dbmodel/schemas/main/common/base/init.sql`](dbmodel/schemas/main/common/base/init.sql)). Install the packages on the server first; the extension objects must exist at the OS level.
+
+- **PostgreSQL roles** — Giswater uses a fixed role hierarchy. You do **not** need to run separate corporate DDL scripts: roles are created idempotently during schema creation and permissions are applied by `gw_fct_admin_role_permissions()` at the end of `lastprocess`.
+
+  | Role | Purpose | Inherits |
+  |------|---------|----------|
+  | `role_basic` | Read-only base (`SELECT` on catalogued tables/views) | — |
+  | `role_om` | Operations & maintenance | `role_basic` |
+  | `role_edit` | Network editing | `role_om` |
+  | `role_epa` | EPA / SWMM modelling | `role_edit` |
+  | `role_plan` | Planning (psectors, etc.) | `role_epa` |
+  | `role_admin` | Schema administration (no superuser) | `role_plan` |
+  | `role_system` | Owns schema objects; used for DDL during build | `role_admin` |
+  | `role_crm` | CRM integration (standalone, no inheritance chain) | — |
+
+  Inheritance chain (each role is granted to the one below; higher roles inherit all lower permissions):
+
+  ```
+  role_system
+    └── role_admin
+          └── role_plan
+                └── role_epa
+                      └── role_edit
+                            └── role_om
+                                  └── role_basic
+
+  role_crm   (standalone)
+  ```
+
+  **Installer requirements:** connect as a PostgreSQL superuser (or equivalent: `CREATEROLE` + `CREATE` on the target database). The build creates missing roles, (re)applies the role hierarchy on every schema create (`GRANT` is idempotent), grants `role_system` to the installer when superuser, creates the project schema `AUTHORIZATION role_system`, and runs restrictive grants (no blanket `ALL` on tables — see [`gw_fct_admin_role_permissions`](dbmodel/schemas/main/common/base/fct/gw_fct_admin_role_permissions.sql)).
+
+  **Manual bootstrap** (only if you must prepare roles before the first schema build, e.g. restricted DBA workflow):
+
+  ```sql
+  DO $$
+  DECLARE
+    v_role_exists boolean;
+  BEGIN
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_basic') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_basic NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_om') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_om NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_edit') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_edit NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_epa') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_epa NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_plan') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_plan NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_admin') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_admin NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_system NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_crm') INTO v_role_exists;
+    IF NOT v_role_exists THEN
+      CREATE ROLE role_crm NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+    END IF;
+
+    GRANT role_basic TO role_om;
+    GRANT role_om TO role_edit;
+    GRANT role_edit TO role_epa;
+    GRANT role_epa TO role_plan;
+    GRANT role_plan TO role_admin;
+    GRANT role_admin TO role_system;
+
+    IF NOT pg_has_role(current_user, 'role_system', 'member')
+       AND (SELECT rolsuper FROM pg_roles WHERE rolname = current_user) IS TRUE THEN
+      GRANT role_system TO current_user;
+    END IF;
+  END$$;
+  ```
+
+  Map QGIS/PostgreSQL logins to the appropriate role (e.g. `GRANT role_edit TO gis_user`). Object-level grants on each project schema are (re)applied by `gw_fct_admin_role_permissions()` during create and upgrade (`lastprocess`).
 
 ### Frontend environment:
 
@@ -86,6 +180,12 @@ Compatible with Windows, Mac, and Linux, but EPA models are only supported on Wi
 
 ## Test
 
+**Database model (pgTAP, Docker):** [dbmodel/README.md — Testing](dbmodel/README.md#testing) — `./dbmodel/test/run_tests.sh ws` (PostgreSQL 16–18 via `PG_MAJOR`).
+
+**Schema CLI (no QGIS):** [giswater_admin/README.md](giswater_admin/README.md) — `pipx install giswater-cli` then `gw create --kind ws …`
+
+**Python unit tests:** `python3 -m pytest test/engine -v` (from plugin repo root).
+
 Use the provided example projects, pre-loaded with datasets for testing. Find setup videos below:
 
 - [Install the plugin](https://www.youtube.com/watch?v=EwDRoHY2qAk&list=PLQ-seRm9Djl4hxWuHidqYayHEk_wsKyko&index=4)
@@ -102,24 +202,25 @@ Ensure you have the permissions to connect to PostgreSQL and that your user has 
 ### Project Setup
 
 - Define catalogs with at least the mandatory categories ([materials, node, arc]) and create map zones ([macroexploitation, exploitation, municipality, sector, dma]).
-- To get started, refer to [Start from Scratch](https://github.com/Giswater/giswater_dbmodel/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project) for guidance.
+- To get started, refer to [Start from Scratch](https://github.com/giswater/plugin/wiki/Start-from-Scratch:-Installing-Giswater-and-steps-to-create-an-empty-project) for guidance.
 - **Tip**: Once map zones and catalogs are defined, you can begin adding network nodes and arcs.
 
-For more configuration options, see the [Giswater configuration guide](https://github.com/Giswater/giswater_dbmodel/wiki/Config).
+For more configuration options, see the [Giswater configuration guide](https://github.com/giswater/plugin/wiki/Config).
 
 ## Wiki
 
-Explore additional documentation on the [Giswater Wiki](https://github.com/Giswater/giswater_dbmodel/wiki).
+Explore additional documentation on the [Giswater Wiki](https://github.com/giswater/plugin/wiki).
 
 ## FAQs
 
-Find answers to common questions in the [Giswater FAQs](https://github.com/Giswater/giswater_dbmodel/wiki/FAQs).
+Find answers to common questions in the [Giswater FAQs](https://github.com/giswater/plugin/wiki/FAQs).
 
 ## Code Repositories
 
-- **Docs**: [Documentation repository](https://github.com/Giswater/docs)
-- **QGIS Plugin**: [QGIS Plugin repository](https://github.com/Giswater/giswater_qgis_plugin)
-- **Database Model**: [Database Model repository](https://github.com/Giswater/giswater_dbmodel)
+- **Docs**: [Documentation repository](https://github.com/giswater/docs)
+- **QGIS Plugin**: [QGIS Plugin repository](https://github.com/giswater/plugin)
+- **Database Model**: [Database Model repository](https://github.com/giswater/giswater_dbmodel) — in this repo: [dbmodel/](dbmodel/) ([schema layout](dbmodel/README.md#schema-architecture), [local tests](dbmodel/README.md#testing))
+- **Headless schema CLI**: [giswater_admin/](giswater_admin/) ([full reference](giswater_admin/README.md))
 
 Other repositories may exist but are either deprecated or inactive.
 

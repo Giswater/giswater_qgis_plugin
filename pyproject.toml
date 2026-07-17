@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "giswater-cli"
+version = "0.3.1"
+description = "Headless CLI for Giswater database schema lifecycle (create, update, drop)"
+readme = "giswater_admin/README.md"
+requires-python = ">=3.9"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "Giswater Association" }]
+keywords = ["giswater", "postgresql", "postgis", "qgis", "water"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+]
+dependencies = [
+    "PyYAML>=6.0",
+    "psycopg2-binary>=2.9",
+    "platformdirs>=4.0",
+]
+
+[project.scripts]
+gw = "giswater_admin.cli:main"
+
+[project.urls]
+Homepage = "https://www.giswater.org"
+Repository = "https://github.com/giswater/plugin"
+Documentation = "https://github.com/giswater/plugin/blob/main/giswater_admin/README.md"
+
+[tool.setuptools.packages.find]
+include = ["giswater_admin*"]

@@ -1,0 +1,97 @@
+name: 🚀 Release CLI (PyPI)
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  verify-dbmodel-ci:
+    if: startsWith(github.event.release.tag_name, 'cli-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Verify dbmodel CI checks on release commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/verify_dbmodel_ci_checks.sh --tag "${{ github.event.release.tag_name }}" --cli-release --wait
+
+  publish:
+    needs: [verify-dbmodel-ci]
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name, 'cli-v')
+    environment: pypi
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Extract and validate CLI version from tag
+        id: ver
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          if [[ ! "$TAG" =~ ^cli-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "::error::Tag $TAG must match cli-vX.Y.Z"
+            exit 1
+          fi
+          VERSION="${BASH_REMATCH[1]}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          PYPROJECT="$(grep -E '^version = ' pyproject.toml | head -1 | sed 's/version = "\(.*\)"/\1/')"
+          MODULE="$(grep -E '^__version__ = ' giswater_admin/__version__.py | sed 's/__version__ = "\(.*\)"/\1/')"
+
+          if [[ "$PYPROJECT" != "$VERSION" ]]; then
+            echo "::error::pyproject.toml version ($PYPROJECT) != tag ($VERSION)"
+            exit 1
+          fi
+          if [[ "$MODULE" != "$VERSION" ]]; then
+            echo "::error::giswater_admin/__version__.py ($MODULE) != tag ($VERSION)"
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package and test dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -e .
+          python3 -m pip install pytest
+
+      - name: Run CLI tests
+        run: python3 -m pytest test/cli/ test/engine/ -q
+
+      - name: Install build tools
+        run: python3 -m pip install --upgrade build
+
+      - name: Build wheel and sdist
+        run: python3 -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Attach dist to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: giswater-cli-dist
+          path: dist/

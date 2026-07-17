@@ -43,7 +43,7 @@ SELECT columns_are(
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'length',
         'width', 'sander_depth', 'max_volume', 'util_volume', 'inlet', 'bottom_channel',
         'accessibility', 'name', 'bottom_mat', 'slope', 'height', 'chamber_param_1',
-        'chamber_param_2'
+        'chamber_param_2', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_chamber should have the correct columns'
 );
@@ -74,12 +74,12 @@ SELECT col_type_is('ve_node_chamber', 'macroexpl_id', 'int4', 'Column macroexpl_
 SELECT col_type_is('ve_node_chamber', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_chamber', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_chamber', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_chamber', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_chamber', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_chamber', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_chamber', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_chamber', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_chamber', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_chamber', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_chamber', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_chamber', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_chamber', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_chamber', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_chamber', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -182,6 +182,10 @@ SELECT col_type_is('ve_node_chamber', 'slope', 'numeric', 'Column slope should b
 SELECT col_type_is('ve_node_chamber', 'height', 'numeric(12,4)', 'Column height should be numeric(12,4)');
 SELECT col_type_is('ve_node_chamber', 'chamber_param_1', 'text', 'Column chamber_param_1 should be text');
 SELECT col_type_is('ve_node_chamber', 'chamber_param_2', 'date', 'Column chamber_param_2 should be date');
+SELECT col_type_is('ve_node_chamber', 'has_access', 'bool', 'Column has_access should be bool');
+
+SELECT col_type_is('ve_node_chamber', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_chamber', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

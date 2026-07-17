@@ -29,7 +29,7 @@ SELECT columns_are(
         'comment', 'descript', 'link', 'num_value', 'workcat_id', 'workcat_id_end',
         'builtdate', 'enddate', 'brand_id', 'model_id', 'verified', 'uncertain',
         'userdefined_geom', 'datasource', 'is_operative', 'lock_level', 'expl_visibility', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid', 'dataquality', 'dataquality_obs'
     ],
     'Table link should have the correct columns'
 );
@@ -88,6 +88,9 @@ SELECT col_type_is('link', 'updated_at', 'timestamp with time zone', 'Column upd
 SELECT col_type_is('link', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('link', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Column the_geom should be geometry(linestring, SRID_VALUE)');
 SELECT col_type_is('link', 'uuid', 'uuid', 'Column uuid should be uuid');
+
+SELECT col_type_is('link', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('link', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 -- Check foreign keys
 SELECT has_fk('link', 'Table link should have foreign keys');

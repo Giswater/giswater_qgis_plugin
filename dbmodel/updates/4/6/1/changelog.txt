@@ -1,3 +1,0 @@
-4.6.1
-*************
-- drop references to sector on trg_cat_manager and recover its trigger

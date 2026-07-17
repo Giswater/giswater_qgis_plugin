@@ -7,10 +7,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import inspect
+import io
 import json
 import os
 import random
 import re
+import shutil
 import sys
 import sqlite3
 import webbrowser
@@ -20,8 +22,6 @@ from typing import Literal, Dict, Optional, Union, Any, List, Tuple
 from qgis.PyQt.sip import isdeleted
 from osgeo import gdal
 
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 from collections import OrderedDict
 from functools import partial
 from datetime import datetime
@@ -67,6 +67,7 @@ from ..toolbars.epa import go2epa_selector_btn  # noqa: F401
 from ..shared import psector  # noqa: F401
 from ..shared import audit  # noqa: F401
 from ..toolbars.utilities import snapshot_view  # noqa: F401
+from ..shared import profile as profile_interpolation, scada_graph  # noqa: F401
 from ..toolbars.edit import connect_link_btn  # noqa: F401
 from ..toolbars.cm import lot, campaign  # noqa: F401
 from ..toolbars.toc.layerstyle_change_btn import apply_styles_to_layers
@@ -221,19 +222,29 @@ def load_settings(dialog, plugin='core'):
         width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session", plugin=plugin)
         height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session", plugin=plugin)
 
-        v_screens = ctypes.windll.user32
-        screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
-        screen_y = v_screens.GetSystemMetrics(79)  # Height of virtual screen
-        monitors = v_screens.GetSystemMetrics(80)  # Will return an integer of the number of display monitors present.
-
-        if None in (x, y) or ((int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1)):
+        # Size can be restored on every platform
+        if None not in (width, height):
             dialog.resize(int(width), int(height))
-        else:
-            if int(x) > screen_x:
-                x = int(screen_x) - int(width)
-            if int(y) > screen_y:
-                y = int(screen_y)
-            dialog.setGeometry(int(x), int(y), int(width), int(height))
+
+        # Wayland forbids clients from setting their own absolute position: leave placement to the compositor
+        if None in (x, y) or QApplication.platformName() == 'wayland':
+            return
+
+        x, y = int(x), int(y)
+        screens = QApplication.screens()
+        # Bounding rectangle of all monitors (cross-platform replacement for the Windows virtual screen metrics)
+        virtual_geom = QApplication.primaryScreen().virtualGeometry()
+
+        # On a single monitor, negative coords mean the saved position is off-screen, so keep current position
+        if (x < 0 or y < 0) and len(screens) == 1:
+            return
+
+        # Clamp so the dialog doesn't end up beyond the virtual desktop
+        if x > virtual_geom.right():
+            x = virtual_geom.right() - dialog.width()
+        if y > virtual_geom.bottom():
+            y = virtual_geom.bottom()
+        dialog.move(x, y)
     except Exception:
         pass
 
@@ -249,10 +260,17 @@ def save_settings(dialog, plugin='core'):
         pass
 
     try:
-        x, y = dialog.geometry().x(), dialog.geometry().y()
-        w, h = dialog.geometry().width(), dialog.geometry().height()
+        geometry = dialog.geometry()
+        w, h = geometry.width(), geometry.height()
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{w}", plugin=plugin)
         set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{h}", plugin=plugin)
+
+        # Wayland reports the absolute position as (0, 0): don't overwrite valid stored values with garbage
+        if QApplication.platformName() == 'wayland':
+            return
+
+        frame_geometry = dialog.frameGeometry()
+        x, y = frame_geometry.x(), frame_geometry.y()
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{x}", plugin=plugin)
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{y}", plugin=plugin)
     except Exception:
@@ -328,7 +346,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         if value is not None and not get_comment:
             value = value.split('#')[0].strip()
 
-        if not get_none and str(value) in "None":
+        if not get_none and _is_empty_config_value(value):
             value = None
 
         # Check if the parameter exists in the inventory, if not creates it
@@ -390,9 +408,8 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
         else:
             parser.set(section, parameter)  # This is just for writing comments
 
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
+        if not _write_config_parser(path, parser):
+            return
 
     except Exception as e:
         msg = "{0} exception [{1}]: {2}"
@@ -490,7 +507,7 @@ def open_help_link(context, uiname, dlg=None):
 def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
     """ Open dialog """
     # Check database connection before opening dialog
-    if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not tools_db.check_db_connection():
+    if (dlg_name != 'admin_credentials' and dlg_name != 'admin') and not check_db_connection():
         return
 
     # Manage translate
@@ -557,6 +574,26 @@ def close_dialog(dlg, delete_dlg=True, plugin='core'):
             dlg.deleteLater()
         except RuntimeError:
             pass
+
+
+def focus_open_dialog(dlg, alert: bool = True) -> bool:
+    """Bring an already-open dialog to the front and alert the user."""
+    if dlg is None or isdeleted(dlg):
+        return False
+
+    app = QApplication.instance()
+    if app is not None and alert:
+        app.beep()
+        alert_fn = getattr(app, 'alert', None)
+        if callable(alert_fn):
+            alert_fn(dlg)
+
+    try:
+        dlg.raise_()
+        dlg.activateWindow()
+    except RuntimeError:
+        return False
+    return True
 
 
 def connect_signal(obj, pfunc, section, signal_name):
@@ -1010,14 +1047,14 @@ def add_layer_provider(gw_id: str, cfg, group="GW Layers", sub_group=None, alias
         layer = QgsVectorLayer(uri, gw_id, provider)
 
     else:
-        raise ValueError(f"Unsupported layer_type: {layer_type}")
+        msg = f"Unsupported layer_type: {layer_type}"
+        tools_qgis.show_warning(msg)
+        return
 
     if not layer.isValid():
-        raise Exception(
-            f"Invalid layer:\n"
-            f"provider={provider}\n"
-            f"uri={uri}"
-        )
+        msg = f"Invalid layer:\nprovider={provider}\nuri={uri}"
+        tools_qgis.show_warning(msg)
+        return
 
     if force_create_group:
         create_groups = True
@@ -1067,7 +1104,8 @@ def build_uri(gw_id: str, provider: str, cfg: dict) -> Optional[str]:
     builder = builders.get(provider)
 
     if not builder:
-        tools_qgis.show_warning(f"No URI builder for provider: {provider}")
+        msg = f"No URI builder for provider: {provider}"
+        tools_qgis.show_warning(msg)
         return None
 
     return builder(cfg)
@@ -1982,10 +2020,7 @@ def enable_widgets(dialog, result, enable):
                     if field.get('layoutname') is not None and not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']):
                         continue
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
-                        widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
-                        if type(widget) is GwHyperLinkLineEdit:
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
+                        set_widget_readonly(widget, not enable)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit, QCheckBox)):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget {color: rgb(110, 110, 110)}")
@@ -2012,17 +2047,8 @@ def enable_all(dialog, result, from_apply=False):
                 continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit, GwHyperLinkLineEdit):
-                        widget.setReadOnly(not field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
-                            if type(widget) is GwHyperLinkLineEdit:
-                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
-                        else:
-                            widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-                            if not from_apply:
-                                widget.setStyleSheet(None)
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+                        set_widget_readonly(widget, not field['iseditable'], from_apply=from_apply)
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit)):
                         widget.setEnabled(field['iseditable'])
                         if not from_apply:
@@ -2497,8 +2523,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 iseditable = field.get('iseditable')
                 if type(widget) in (QLineEdit, QDoubleSpinBox):
                     if iseditable in (False, "False"):
-                        widget.setReadOnly(True)
-                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                        set_widget_readonly(widget, True)
                     if type(widget) is QLineEdit:
                         if 'placeholder' in field:
                             widget.setPlaceholderText(field['placeholder'])
@@ -2506,7 +2531,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if iseditable in (False, "False"):
                         widget.setEnabled(False)
                 widget.setObjectName(field['widgetname'])
-                if iseditable is not None:
+                if iseditable is not None and type(widget) not in (QLineEdit, QDoubleSpinBox):
                     widget.setEnabled(bool(iseditable))
 
                 add_widget(dialog, field, lbl, widget)
@@ -2741,9 +2766,7 @@ def add_spinbox(**kwargs):
         elif field['widgettype'] == 'doubleSpinbox' and field['value'] != "":
             widget.setValue(float(field['value']))
     if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0); color: rgb(100, 100, 100)}")
+        set_widget_readonly(widget, not field['iseditable'])
 
     return widget
 
@@ -2905,9 +2928,7 @@ def add_textarea(field):
         widget.setProperty('value', field['value'])
 
     if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+        set_widget_readonly(widget, not field['iseditable'])
 
     return widget
 
@@ -3110,6 +3131,29 @@ def set_widget_size(widget, field):
     return widget
 
 
+def set_widget_readonly(widget, readonly, from_apply=False):
+
+    if type(widget) not in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+        return widget
+
+    widget.setEnabled(True)
+    widget.setReadOnly(readonly)
+    if isinstance(widget, (QSpinBox, QDoubleSpinBox)) and widget.lineEdit():
+        widget.lineEdit().setEnabled(True)
+
+    if readonly:
+        widget.setFocusPolicy(Qt.FocusPolicy.ClickFocus)
+        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
+        if type(widget) is GwHyperLinkLineEdit:
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
+    else:
+        widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        if not from_apply:
+            widget.setStyleSheet(None)
+
+    return widget
+
+
 def add_lineedit(field):
     """ Add widgets QLineEdit type """
 
@@ -3139,11 +3183,7 @@ def add_lineedit(field):
     if 'tooltip' in field:
         widget.setToolTip(field['tooltip'])
     if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-    if 'value' in field:
-        widget.setText(field['value'])
+        set_widget_readonly(widget, not field['iseditable'])
     return widget
 
 
@@ -4104,6 +4144,9 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     :return: Response of the function executed (json)
     """
 
+    if aux_conn is None and not is_thread:
+        check_db_connection()
+
     # Check if function exists
     if check_function:
         row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn, is_thread=is_thread)
@@ -4608,7 +4651,13 @@ def get_project_info(schemaname=None, order_direction="DESC"):
         tools_qgis.show_warning(msg, parameter=tablename)
         return None
 
-    sql = (f"SELECT lower(project_type), epsg, giswater, language, date "
+    has_addparam = tools_db.check_column(tablename, 'addparam', schemaname)
+    creation_profile_sql = (
+        "addparam -> 'environment' ->> 'creation_profile'"
+        if has_addparam else "NULL"
+    )
+    sql = (f"SELECT lower(project_type), epsg, giswater, language, date, "
+           f"{creation_profile_sql} "
            f"FROM {schemaname}.{tablename} "
            f"ORDER BY id {order_direction} LIMIT 1")
     row = tools_db.get_row(sql)
@@ -4617,7 +4666,8 @@ def get_project_info(schemaname=None, order_direction="DESC"):
                              'project_epsg': row[1],
                              'project_version': row[2],
                              'project_language': row[3],
-                             'project_date': row[4]
+                             'project_date': row[4],
+                             'creation_profile': row[5],
                              }
 
     return project_info_dict
@@ -4689,7 +4739,7 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
     if schema_name is None:
         schema_name = lib_vars.schema_name
 
-    if not tools_db.check_db_connection():
+    if not check_db_connection():
         return None
     if not tools_db.check_table(table):
         msg = "Table not found: {0}"
@@ -6588,6 +6638,47 @@ def refresh_selectors(is_cm: bool = False):
             pass
 
 
+def _refresh_selector_map_layers():
+    """Reload selector-driven layers and refresh the map canvas."""
+
+    for layer_name in ('ve_arc', 've_node', 've_connec', 've_gully', 've_link', 've_plan_psector'):
+        tools_qgis.set_layer_index(layer_name)
+    tools_qgis.refresh_map_canvas()
+
+
+def resync_map_after_db_reconnect():
+    """Resync planned network / selector map state after the database reconnects."""
+
+    try:
+        if not global_vars.project_loaded or global_vars.iface is None:
+            return
+
+        psignals = global_vars.psignals or {}
+        if psignals.get('psector_active'):
+            psector_id = psignals.get('psector_id')
+            if not psector_id:
+                row = get_config_value('plan_psector_current', log_info=False)
+                psector_id = row[0] if row else None
+            if psector_id:
+                set_psector_mode_enabled(
+                    enable=True, psector_id=psector_id, do_call_fct=True, force_change=True
+                )
+                return
+
+        _refresh_selector_map_layers()
+    except Exception as e:
+        msg = "Exception in resync_map_after_db_reconnect: {0}"
+        tools_log.log_warning(msg, msg_params=(e,))
+
+
+def check_db_connection():
+    """Check DB connection (libs) and resync map when QGIS layers were stale after idle."""
+    opened, reconnected = tools_db.check_db_connection()
+    if opened and reconnected:
+        resync_map_after_db_reconnect()
+    return opened
+
+
 def execute_class_function(dlg_class, func_name: str, kwargs: Optional[dict] = None):
     """ 
     Executes a class' function (if the corresponding dialog is open). 
@@ -6867,63 +6958,99 @@ def check_old_userconfig(user_folder_dir):
         os.removedirs(old_folder_path)
 
 
+def _is_empty_config_value(value) -> bool:
+    """ True when a config value is unset: missing, None, empty, or the literal 'None'. """
+    if value is None:
+        return True
+    return str(value).split('#')[0].strip() in ('None', '')
+
+
+def _split_inventory_section(section: str):
+    """ Split 'init.toolbars_position' into ('init', 'toolbars_position'). """
+    parts = section.split('.', 1)
+    if len(parts) != 2:
+        return None, None
+    return parts[0], parts[1]
+
+
+def _parse_inventory_key(inv_key: str):
+    """
+    Parse a key from user_params.config (inventory).
+    Leading '_' means: default for ws_/ud_ prefixed keys in init/session.
+    Returns (config_parameter, apply_project_prefix) or (None, False) for invalid keys.
+    """
+    if inv_key.startswith('#'):
+        return None, False
+    if inv_key.startswith('_'):
+        return inv_key[1:], True
+    return inv_key, False
+
+
+def _inventory_key_for_user_param(parameter: str, prefix: bool) -> str:
+    """ Map a runtime user-config parameter to its inventory key in user_params.config. """
+    if prefix and global_vars.project_type is not None:
+        if parameter.startswith('_'):
+            return parameter
+        return f"_{parameter}"
+    return parameter
+
+
+def get_user_config_or_default(file_name: str, section: str, parameter: str):
+    """
+    Read a user config value (init/session), falling back to user_params inventory defaults.
+    Inventory lookup order: _parameter (generic), ws_parameter, ud_parameter.
+    """
+    value = get_config_parser(section, parameter, "user", file_name, prefix=True, get_none=False,
+                              chk_user_params=False)
+    if not _is_empty_config_value(value):
+        return value
+
+    inv_section = f"{file_name}.{section}"
+    for inv_key in (f"_{parameter}", f"ws_{parameter}", f"ud_{parameter}"):
+        default = get_config_parser(inv_section, inv_key, "project", "user_params", prefix=False,
+                                    chk_user_params=False, get_none=False)
+        if not _is_empty_config_value(default):
+            return default
+    return None
+
+
 def user_params_to_userconfig():
-    """ Function to load all the variables from user_params.config to their respective user config files """
+    """ Seed init.config / session.config from user_params.config inventory defaults. """
 
     parser = global_vars.configs['user_params'][1]
     if parser is None:
         return
 
     try:
-        # Get the sections of the user params inventory
-        inv_sections = parser.sections()
+        for inv_section in parser.sections():
+            file_name, section_name = _split_inventory_section(inv_section)
+            if file_name is None:
+                continue
 
-        # For each section (inventory)
-        for section in inv_sections:
-
-            file_name = section.split('.')[0]
-            section_name = section.split('.')[1]
-            parameters = parser.options(section)
-
-            # For each parameter (inventory)
-            for parameter in parameters:
-
-                # Manage if parameter need prefix and project_type is not defined
-                if parameter.startswith("_") and global_vars.project_type is None:
+            for inv_key in parser.options(inv_section):
+                config_param, apply_prefix = _parse_inventory_key(inv_key)
+                if config_param is None:
                     continue
-                if parameter.startswith("#"):
+                if apply_prefix and global_vars.project_type is None:
                     continue
 
-                _pre = False
-                inv_param = parameter
-                # If it needs a prefix
-                if parameter.startswith("_"):
-                    _pre = True
-                    parameter = inv_param[1:]
-                # If it's just a comment line
-                if parameter.startswith("#"):
-                    # tools_log.log_info(f"set_config_parser: {file_name} {section_name} {parameter}")
-                    set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
-                    continue
+                current = get_config_parser(section_name, config_param, "user", file_name,
+                                            apply_prefix, True, False, True)
 
-                # If it's a normal value
-                # Get value[section][parameter] of the user config file
-                value = get_config_parser(section_name, parameter, "user", file_name, _pre, True, False, True)
-
-                # If this value (user config file) is None (doesn't exist, isn't set, etc.)
-                if value is None:
-                    # Read the default value for that parameter
-                    value = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
-                    # Set value[section][parameter] in the user config file
-                    set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
+                if _is_empty_config_value(current):
+                    default = get_config_parser(inv_section, inv_key, "project", "user_params",
+                                                False, True, False, True)
+                    if _is_empty_config_value(default):
+                        continue
+                    set_config_parser(section_name, config_param, default, "user", file_name,
+                                      None, apply_prefix, False)
                 else:
-                    value2 = get_config_parser(section, inv_param, "project", "user_params", False, True, False, True)
-                    if value2 is not None:
-                        # If there's an inline comment in the inventory but there isn't one in the user config file, add it
-                        if "#" not in value and "#" in value2:
-                            # Get the comment (inventory) and set it (user config file)
-                            comment = value2.split('#')[1]
-                            set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
+                    inv_value = get_config_parser(inv_section, inv_key, "project", "user_params",
+                                                  False, True, False, True)
+                    if inv_value and "#" not in current and "#" in inv_value:
+                        comment = inv_value.split('#')[1]
+                        set_config_parser(section_name, config_param, current.strip(), "user", file_name,
+                                          comment, apply_prefix, False)
     except Exception:
         pass
 
@@ -6941,9 +7068,70 @@ def recreate_config_files():
                 os.remove(bak_filename)
             os.rename(filepath, bak_filename)
 
+    _restore_user_params_config()
     manage_user_config_folder(lib_vars.user_folder_dir)
     initialize_parsers()
     user_params_to_userconfig()
+
+
+def _make_config_parser():
+    """ Create a ConfigParser with Giswater config conventions. """
+    return configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
+
+
+def _try_read_config_path(filepath):
+    """ Read a config file; return parser on success or None if unreadable. """
+    parser = _make_config_parser()
+    try:
+        parser.read(filepath)
+        return parser
+    except Exception:
+        return None
+
+
+def _write_config_parser(path, parser):
+    """ Write parser to disk. For user_params, validate round-trip before persisting. """
+    buffer = io.StringIO()
+    parser.write(buffer)
+    content = buffer.getvalue()
+
+    if path.endswith(f"{os.sep}user_params.config"):
+        test_parser = _make_config_parser()
+        try:
+            test_parser.read_file(io.StringIO(content))
+        except Exception as e:
+            msg = "{0}: Refusing to write invalid user_params.config [{1}]: {2}"
+            msg_params = ("_write_config_parser", type(e).__name__, e)
+            tools_log.log_warning(msg, msg_params=msg_params)
+            return False
+
+    with open(path, 'w') as configfile:
+        configfile.write(content)
+    return True
+
+
+def _restore_user_params_config():
+    """ Restore user_params.config from plugin template when the user copy is unreadable. """
+    if global_vars.gw_dev_mode:
+        return
+
+    user_filepath = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}config{os.sep}user_params.config"
+    src = f"{lib_vars.plugin_dir}{os.sep}config{os.sep}user_params.config"
+    if not os.path.exists(src):
+        return
+
+    if os.path.exists(user_filepath) and _try_read_config_path(user_filepath) is not None:
+        return
+
+    if os.path.exists(user_filepath):
+        now = datetime.now().strftime("%d%m%Y-%H%M%S")
+        bak_filename = f"{user_filepath}_{now}.bak"
+        if os.path.exists(bak_filename):
+            os.remove(bak_filename)
+        os.rename(user_filepath, bak_filename)
+
+    os.makedirs(os.path.dirname(user_filepath), exist_ok=True)
+    shutil.copyfile(src, user_filepath)
 
 
 def remove_deprecated_config_vars():
@@ -7532,34 +7720,26 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
 
 
 def _check_user_params(section, parameter, file_name, prefix=False):
-    """ Check if a parameter exists in the config/user_params.config
-        If it doesn't exist, it creates it and assigns 'None' as a default value
-    """
+    """ Ensure parameter exists in user_params.config inventory; create it with None if missing. """
 
     if section == "i18n_generator" or parameter == "dev_commit":
         return
 
-    # Check if the parameter needs the prefix or not
-    if prefix and global_vars.project_type is not None:
-        parameter = f"_{parameter}"
+    inv_key = _inventory_key_for_user_param(parameter, prefix)
+    inv_section = f"{file_name}.{section}"
 
-    # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
-    check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
+    check_value = get_config_parser(inv_section, inv_key, "project", "user_params", False,
                                     get_comment=True, chk_user_params=False)
 
     if check_value is None:
-        # Get the value of the parameter (the one get_config_parser is looking for) in the inventory with prefix
-        parameter_prefixed = f"ws{parameter}"
-        check_value = get_config_parser(f"{file_name}.{section}", parameter_prefixed, "project", "user_params", False,
-                                        get_comment=True, chk_user_params=False)
-        if check_value is None:
-            parameter_prefixed = f"ud{parameter}"
-            check_value = get_config_parser(f"{file_name}.{section}", parameter_prefixed, "project", "user_params", False,
-                                        get_comment=True, chk_user_params=False)
+        for typed_key in (f"ws_{inv_key.lstrip('_')}", f"ud_{inv_key.lstrip('_')}"):
+            check_value = get_config_parser(inv_section, typed_key, "project", "user_params", False,
+                                            get_comment=True, chk_user_params=False)
+            if check_value is not None:
+                break
 
-    # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
-        set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
+        set_config_parser(inv_section, inv_key, None, "project", "user_params", prefix=False,
                           chk_user_params=False)
     else:
         return check_value
@@ -7577,7 +7757,7 @@ def _get_parser_from_filename(filename):
     else:
         return None, None
 
-    parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True, strict=False)
+    parser = _make_config_parser()
     filepath = f"{folder}{os.sep}config{os.sep}{filename}.config"
     if not os.path.exists(filepath):
         msg = "File not found: {0}"
@@ -7588,6 +7768,11 @@ def _get_parser_from_filename(filename):
     try:
         parser.read(filepath)
     except (configparser.DuplicateSectionError, configparser.DuplicateOptionError, configparser.ParsingError) as e:
+        msg = "Error parsing file: {0}"
+        msg_params = (filepath,)
+        tools_qgis.show_critical(msg, parameter=e, msg_params=msg_params)
+        return filepath, None
+    except Exception as e:
         msg = "Error parsing file: {0}"
         msg_params = (filepath,)
         tools_qgis.show_critical(msg, parameter=e, msg_params=msg_params)
@@ -7946,7 +8131,10 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
                 widget.setProperty('saveValue', False)
         if field['widgetcontrols'] is not None and 'isEnabled' in field['widgetcontrols']:
             if field['widgetcontrols']['isEnabled'] is False:
-                widget.setEnabled(False)
+                if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
+                    set_widget_readonly(widget, True)
+                else:
+                    widget.setEnabled(False)
     except Exception:
         # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
         pass

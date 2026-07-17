@@ -37,7 +37,7 @@ SELECT columns_are(
         'label_x', 'label_y', 'label_rotation', 'rotation', 'label_quadrant', 'inventory',
         'publish', 'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at',
         'updated_by', 'the_geom', '_connec_arccat_id', '_pol_id_', '_connec_matcat_id', 'uuid',
-        'xyz_date'
+        'xyz_date', 'dataquality', 'dataquality_obs'
     ],
     'Table gully should have the correct columns'
 );
@@ -140,6 +140,9 @@ SELECT col_type_is('gully', '_pol_id_', 'varchar(16)', 'Column _pol_id_ should b
 SELECT col_type_is('gully', '_connec_matcat_id', 'text', 'Column _connec_matcat_id should be text');
 SELECT col_type_is('gully', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('gully', 'xyz_date', 'date', 'Column xyz_date should be date');
+
+SELECT col_type_is('gully', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('gully', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 -- Check foreign keys
 SELECT has_fk('gully', 'Table gully should have foreign keys');

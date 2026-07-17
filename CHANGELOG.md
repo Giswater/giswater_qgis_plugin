@@ -7,6 +7,218 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `gw_fct_mincut_minsector` and `gw_fct_setmincut` functions to count hydrometers correctly.
+- Fix selector performance on large projects: optimize `vf_node`/`vf_arc`/`vf_connec`/`vf_element`/`vf_link` filters and stop probing `ve_node` inside `gw_fct_setselectors` (check-all exploitations was multi-second).
+
+## [4.15.2] - 2026-07-16
+
+### Fixed
+
+- Fix `gw_fct_setnodefromarc` function to return the correct error message with `gw_fct_exception_others` function.
+- Fix admin dialog: do not show ghost schemas in parentheses when switching connections or after delete; restore selection only if the schema exists on the current connection.
+- Fix admin dialog: persist last selected schema per connection instead of globally.
+- Fix admin dialog: refresh schema list and project info when switching connections (ignore stale async load results).
+- Fix admin dialog: avoid `TypeError` and missing-table warnings when a deleted or invalid schema is still selected.
+- Fix admin dialog: show PostgreSQL/PostGIS/pgRouting versions for the active connection even when the server version is incompatible.
+- Fix admin dialog: pg_service connections without user/password in `pg_service.conf` now prompt credentials via QGIS (same as Browser) instead of failing with `fe_sendauth`.
+
+## [4.15.1] - 2026-07-15
+
+### Fixed
+
+- Fix `gw_trg_edit_inp_gully` trigger to use `gully_method` instead of `method`.
+- Fix `gw_trg_edit_inp_node` trigger to use `gully_method` instead of `method`.
+- Fix `gw_trg_edit_node` trigger to use `gully_method` instead of `method`.
+- Fix `gw_fct_setmincut` use DISTINCT ON to avoid duplicate records in `om_mincut_valve`.
+- Fix check if column `addparam` exists in `sys_version` table.
+
+### Changed
+- Refactor `v_om_mincut_initpoint`: now uses a JOIN instead of a LEFT JOIN with `selector_mincut_result` and removes the check for `id > 0`.
+
+## [4.15.0] - 2026-07-13
+
+### Added
+
+- Add unique index on `link` table to enforce feature_id and feature_type uniqueness when state is 1 and feature_id is not null.
+- New validation message for invalid or missing QGIS project CRS (EPSG) on pg2epa INP export.
+- New validation message for `sys_code` not null and `sys_code_autofill` activated.
+
+### Changed
+
+- Change `dataquality_obs` type to text[] in `arc`, `node`, `connec`, `link`, and `element` tables.
+- Change `edit_sys_code_autofill` variable to accept new values: `uuid`, `code`, `none`.
+
+### Fixed
+
+- Fix schema integration of `cibs` and `utils`.
+- Change wmeter_number type to text in ext_hydrometer table.
+- Fix `gw_fct_settoarc` so setting `to_arc` no longer auto-adds the node to mapzone's `graphconfig`, it only updates `toArc` when the node is already configured as `nodeParent` (avoids duplicate mapzone delimiters after arc divide). 
+- Fix `dqaId` parameter parsing (`dqaId` was incorrectly read from `presszoneId`).
+- Fix `gw_fct_setsearch` function to improve `sys_query_text_add` functionality.
+- Fix `gw_fct_setnodefromarc` function to return the correct error message.
+- Fix `gw_trg_edit_<feature>` triggers to set the correct state in the polygon table.
+- Fix `gw_trg_edit_psector` trigger to set the correct state in the polygon table.
+
+## [4.14.5] - 2026-06-25
+
+### Fixed
+
+- Fix `get_major_version` function on `tools_qgis` to return the correct major version.
+
+## [4.14.4] - 2026-06-19
+
+### Fixed
+
+- Fix `gw_fct_setselectors` and `gw_fct_getselectors` functions using cat_manager configuration.
+
+## [4.14.3] - 2026-06-15
+
+### Fixed
+
+- Fix `add_demand_check`, initialize cur_step correctly.
+
+## [4.14.2] - 2026-06-12
+
+### Fixed
+
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to set `expl_visibility` and `expl_id` in mapzones expl_ids.
+
+## [4.14.1] - 2026-06-11
+
+### Fixed
+
+- Fix `config_form_fields` `dv_querytext` to use `ve_exploitation` instead of `vf_exploitation` for `macroexpl_id` filter column.
+- Enable and require `sector_id` and `muni_id` on netscenario mapzone forms `plan_netscenario_dma` and `plan_netscenario_presszone`.
+- Fix netscenario mapzone Create/Update in `mapzone_manager` to upsert into `plan_netscenario_*` (not operative `ve_*`) and refresh the netscenario table after accept.
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to filter by `expl_id` in the graphconfig.
+- Fix `gw_fct_graphanalytics_mapzones_v1` function to use `expl_visibility` with `expl_id` in the views.
+- Add missing `cur_user` filter to `config_param_user` queries for `epa_dscenario_percent_hydro_threshold` parameter.
+- Fix netscenario views to use `vf_exploitation` to filter with permissions.
+
+## [4.14.0] - 2026-06-10
+
+### Added
+
+- Add "Filter by selector" checkbox to mapzone manager to toggle between exploitation-permission scope and user selector scope.
+- Persist mapzone manager "Filter by selector" checkbox state per user session (defaults to checked on first open).
+- Add `vf_exploitation` view (based on `cat_manager` and `admin_exploitation_x_user`).
+- Add `v_ui_*_sel` mapzone views for selector-based filtering (`selector_sector`, `selector_macrosector`, `selector_expl`).
+- New tests for `vf_exploitation` view and mapzones `_sel` views.
+
+### Changed
+
+- Refactor mapzone `v_ui_*` views to filter by `vf_exploitation` instead of inline selector filters.
+- Improve `gw_fct_graphanalytics_manage_temporary` now uses the new `vf_exploitation` view to filter with permissions.
+
+### Fixed
+
+- Fix `gw_fct_getprofilevalues` function to use the correct columns for ud and ws.
+
+## [4.13.1] - 2026-06-04
+
+### Fixed
+
+- Fix `graphanalytics_mapzones` function by adding `mapzone_type` filter to graph delete queries in order to avoid deleting graph records belonging to other mapzone types stored in the same table.
+- Fix `cibs`.`cat_hydrometer_category` table by changing the id type to int4 and add foreign key constraint for cat_period_id in hydrometer_period table.
+- Fix `graphanalytics_mapzones` mapzones for ud can also be in SelfConflict, fix small bugs.
+- Fix `graphanalytics_omunit` function by resetting `omunit_id` to 0 when the referenced omunit no longer exists.
+
+### Removed
+
+- Remove default value for `dataquality_obs` columns.
+
+## [4.13.0] - 2026-06-03
+
+### Added
+
+- Add new key `sys_limit` to `config_param_system` to set the limit of the search results, modify the `gw_fct_getsearch` function to use the new key, default to 10.
+- Add new columns `dataquality` and `dataquality_obs` to the `node, arc, connec, link, element and gully` tables.
+- Add new column `turns_count` to the `man_valve` table.
+
+### Changed
+
+- Ignore TCV valves on `sys_fprocess` process 368.
+
+### Fixed
+
+- Update messages for arcs without start/final nodes.
+- Update `gw_fct_admin_manage_fields` function to use the correct schema name and table name.
+
+## [4.12.0] - 2026-06-01
+
+### Added
+
+- **Manage Schemas** dialog (`GwManageSchemasDialog`): single UI to inventory network anchors and manage satellite schemas (utils, cibs, AM, CM, audit) with contextual actions, fixed geometry, and refresh after admin load.
+- Connection selector and read-only **system info** panel in Manage Schemas (PostgreSQL / PostGIS / PgRouting versions and missing extensions); switch DB connection without closing the dialog (`reload_connection_for_manage_schemas`).
+- Rename and delete actions for network (WS/UD) schemas from Manage Schemas, wired to existing admin rename/delete flows.
+- `_admin_catalog` module and `AdminLoadTask`: fast `pg_catalog` inventory (schemas with `sys_version`, aux flags, pending updates) instead of repeated `information_schema` round-trips.
+- `GwSchemaBuilderTask`: generic `QgsTask` around `giswater_admin.engine.SchemaBuilder`, replacing legacy per-schema create threads (`project_schema_*_create`).
+- New **`cibs`** schema and manifest; `sys_version` on cibs; WS/UD integration SQL and admin actions to create, update, adapt, and copy hydrometer data from a selected network parent.
+- Hydrometer model refresh (4.12.0): `ext_hydrometer_period`, `v_`/`ve_` hydrometer views, editable `ve_hydrometer_period`, and `v_cat_*` catalogue views; sample dumps and forms updated.
+- AM/CM manifests and parent-schema creation stubs from Manage Schemas (WS-only AM).
+- pgTAP tests for UD link views (`ve_link`, `ve_link_vlink`, `ve_link_pipelink`).
+- CI/dbmodel: PostGIS matrix, Docker/Podman test runner, parallel `pg_prove`, and stricter SQL folder validation in `sql_runner`.
+- libs: `show_warning_box`, configurable DB connection timeout, and message boxes that respect `message_parent` (modal child of admin dialogs).
+- Add column `is_twin` and `parent_id` to `rpt_cat_result`
+- Add column `vnom` to `man_tank`
+- Recreate triggers for `pol` tables
+
+### Changed
+
+- Manage Schemas CM panel: Create/Integrate/Sample/QGIS actions replace the old `admin_cm_create` launcher dialog. schemas grouped under `dbmodel/schemas/main` and `addons`; network updates consolidated into `patch.sql` per version (drop separate `ddl`/`dml`/`ddlview`/`trg` files for new bumps).
+- Admin: utils/cibs/audit flows consolidated; schema SQL paths point at `main/`; build logs list SQL files only; progress/time labels on schema builder tasks.
+- Hydrometers: rename `ext_rtc_hydrometer` → `ext_hydrometer`, `ext_rtc_hydrometer_data` → `ext_hydrometer_period`; `sum` → `billed_volume`; form/list queries use `v_`/`ve_` views; `ext_cat_hydrometer_category` id type integer.
+- SCADA tables: `ext_rtc_scada` / `ext_rtc_scada_x_data` naming aligned across imports, functions, and tests.
+- `ws_gw_fct_create_dscenario_from_crm`: joins and `hydrometer_id` references updated for the new hydrometer tables (no `pattern_id`).
+- Manage Schemas: cibs adapt/copy pass the selected network schema directly (no `dlg_readsql.cmb_cibs` workaround); info messages use `show_info_box` when opened from the dialog.
+- Mapzone type columns (`sector_type`, `drainzone_type`, `omzone_type`, `dwfzone_type`) widened to `varchar(30)` in tests and patches.
+
+### Removed
+
+- Deprecated `ext_cat_hydrometer_category_x_pattern` table and related tests.
+- Legacy admin threads: `project_schema_create`, `project_schema_utils_create`, `project_schema_cm_create`, `project_schema_audit_create`, `project_schema_asset_create`, `project_schema_update`.
+- Standalone cibs “copy data” button from the main admin UI (copy remains available from Manage Schemas).
+- Obsolete dbmodel per-version changelog/SQL trees under old `updates/` layout (superseded by `schemas/main/.../updates`).
+
+### Fixed
+
+- `gw_fct_anl_arc_*` pgTAP tests: drop leftover temp tables between cases.
+- UD schema tests and link view definitions after hydrometer / structure refactors.
+- WS schema tests after hydrometer catalogue and view renames.
+- `om_mincut_hydrometer` FK targets `ext_hydrometer`; mincut hydrometer views rebuilt on `v_hydrometer` / `v_hydrometer_period`.
+- Plugin/schema path resolution (`plugin_version`, cibs integration SQL, manifests).
+
+## [4.11.2] - 2026-05-29
+
+### Fixed
+
+- Improve UD checks in getvisit and setvisit
+- Update mincut selector config in `config_param_system` (`basic_selector_tab_mincut`): add `typeaheadFilter` so filter in web works.
+- Rename columns in `tbl_mincut_manager` tableview: `expl_id` to `exploitation`, `muni_id` to `municipality`.
+- Fix `gw_fct_setselectors`: use `selector_municipality` (muni) instead of `selector_sector` to update selector_expl.
+- `gw_fct_setmincut`: set `expl_id` from arc and `macroexpl_id` from exploitation on `om_mincut`.
+- Fix visit dialog: unify `parameter_id` combo fill logic and refresh it after visit load and on Event tab entry.
+
+## [4.11.1] - 2026-05-27
+
+### Fixed
+
+- Update reference function id for gw_fct_anl_node_topological_consistency.
+- `gw_fct_graphanalytics_omunit` function to disable `edit_disable_arc_fkarray` when updating omunits.
+- Optimize `gw_trg_array_fk_array_table`: pg_catalog type lookup and global `edit_disable_arc_fkarray` bypass.
+- Fix function id references in `sys_function` and `config_function` tables.
+
+## [4.11.0] - 2026-05-26
+
+### Added
+
+- Algorithm to calculate omunits and macroomunits `gw_fct_graphanalytics_omunit`.
+- `has_access` column to `node` table.
+- `ve_omunit` and `ve_macroomunit` views with edit triggers.
+- New function `gw_fct_admin_manage_view_dependencies` to manage view dependencies.
+
 ### Removed
 
 - `sector_id` and `muni_id` from `exploitation` table.
@@ -16,6 +228,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `gw_trg_edit_psector` trigger to set obsolete features where psector_x_* state is 0 before setting on service features.
 - `gw_fct_graphanalytics_mapzones_v1` check if there are any nodes/arcs in the graphconfig that are not in the operative network (only for connected networks).
+- `config_form_fields` `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
+- `visit` insert correctly the records on `om_visit_x_*` tables.
+- correct signal for rejected visit dialog.
+- recreate the triggers for the mapzones when the utility scheme is activated.
+- fix visit dialog to show the correct features when the dialog is accepted.
+- fix update of omunit and macroomunit geometry type to multipolygon.
+- add `work_order`, `forecast_start`, and `forecast_end` columns to `temp_t_mincut` table.
+- Improve performance of `gw_fct_getinfofromcoordinates` function.
+
+## [4.10.1] - 2026-05-20
+
+### Fixed
+
 - `config_form_fields` `dv_querytext` for `muni_id` in `mincut` form to use correct alias.
 - `visit` insert correctly the records on `om_visit_x_*` tables.
 - correct signal for rejected visit dialog.
@@ -293,20 +518,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.10.0...main
-[4.10.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.1...v4.10.0
-[4.9.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.9.0...v4.9.1
-[4.9.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.4...v4.9.0
-[4.8.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.3...v4.8.4
-[4.8.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.2...v4.8.3
-[4.8.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.1...v4.8.2
-[4.8.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.8.0...v4.8.1
-[4.8.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.7.1...v4.8.0
-[4.7.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.7.0...v4.7.1
-[4.7.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.6.0...v4.7.0
-[4.6.0]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.4...v4.6.0
-[4.5.4]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.3...v4.5.4
-[4.5.3]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.2...v4.5.3
-[4.5.2]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.1...v4.5.2
-[4.5.1]: https://github.com/Giswater/giswater_qgis_plugin/compare/v4.5.0...v4.5.1
-[4.5.0]: https://github.com/Giswater/giswater_qgis_plugin/releases/tag/v4.5.0
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.2...main
+[4.15.2]: https://github.com/giswater/plugin/compare/v4.15.1...v4.15.2
+[4.15.1]: https://github.com/giswater/plugin/compare/v4.15.0...v4.15.1
+[4.15.0]: https://github.com/giswater/plugin/compare/v4.14.5...v4.15.0
+[4.14.5]: https://github.com/giswater/plugin/compare/v4.14.4...v4.14.5
+[4.14.4]: https://github.com/giswater/plugin/compare/v4.14.3...v4.14.4
+[4.14.3]: https://github.com/giswater/plugin/compare/v4.14.2...v4.14.3
+[4.14.2]: https://github.com/giswater/plugin/compare/v4.14.1...v4.14.2
+[4.14.1]: https://github.com/giswater/plugin/compare/v4.14.0...v4.14.1
+[4.14.0]: https://github.com/giswater/plugin/compare/v4.13.1...v4.14.0
+[4.13.1]: https://github.com/giswater/plugin/compare/v4.13.0...v4.13.1
+[4.13.0]: https://github.com/giswater/plugin/compare/v4.12.0...v4.13.0
+[4.12.0]: https://github.com/giswater/plugin/compare/v4.11.2...v4.12.0
+[4.11.2]: https://github.com/giswater/plugin/compare/v4.11.1...v4.11.2
+[4.11.1]: https://github.com/giswater/plugin/compare/v4.11.0...v4.11.1
+[4.11.0]: https://github.com/giswater/plugin/compare/v4.10.1...v4.11.0
+[4.10.1]: https://github.com/giswater/plugin/compare/v4.10.0...v4.10.1
+[4.10.0]: https://github.com/giswater/plugin/compare/v4.9.1...v4.10.0
+[4.9.1]: https://github.com/giswater/plugin/compare/v4.9.0...v4.9.1
+[4.9.0]: https://github.com/giswater/plugin/compare/v4.8.4...v4.9.0
+[4.8.4]: https://github.com/giswater/plugin/compare/v4.8.3...v4.8.4
+[4.8.3]: https://github.com/giswater/plugin/compare/v4.8.2...v4.8.3
+[4.8.2]: https://github.com/giswater/plugin/compare/v4.8.1...v4.8.2
+[4.8.1]: https://github.com/giswater/plugin/compare/v4.8.0...v4.8.1
+[4.8.0]: https://github.com/giswater/plugin/compare/v4.7.1...v4.8.0
+[4.7.1]: https://github.com/giswater/plugin/compare/v4.7.0...v4.7.1
+[4.7.0]: https://github.com/giswater/plugin/compare/v4.6.0...v4.7.0
+[4.6.0]: https://github.com/giswater/plugin/compare/v4.5.4...v4.6.0
+[4.5.4]: https://github.com/giswater/plugin/compare/v4.5.3...v4.5.4
+[4.5.3]: https://github.com/giswater/plugin/compare/v4.5.2...v4.5.3
+[4.5.2]: https://github.com/giswater/plugin/compare/v4.5.1...v4.5.2
+[4.5.1]: https://github.com/giswater/plugin/compare/v4.5.0...v4.5.1
+[4.5.0]: https://github.com/giswater/plugin/releases/tag/v4.5.0

@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'linked_connec',
-        'drain_diam', 'drain_exit', 'drain_gully', 'drain_distance', 'arq_patrimony', 'com_state'
+        'drain_diam', 'drain_exit', 'drain_gully', 'drain_distance', 'arq_patrimony', 'com_state', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_tap should have the correct columns'
 );
@@ -73,20 +73,20 @@ SELECT col_type_is('ve_connec_tap', 'macroexpl_id', 'int4', 'Column macroexpl_id
 SELECT col_type_is('ve_connec_tap', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_connec_tap', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_connec_tap', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_connec_tap', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_connec_tap', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_connec_tap', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_connec_tap', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_tap', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_tap', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_connec_tap', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_tap', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_tap', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_connec_tap', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_connec_tap', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_connec_tap', 'dma_type', 'varchar', 'Column dma_type should be varchar');
+SELECT col_type_is('ve_connec_tap', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_connec_tap', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_connec_tap', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_connec_tap', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_connec_tap', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_connec_tap', 'omzone_id', 'int4', 'Column omzone_id should be int4');
-SELECT col_type_is('ve_connec_tap', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_tap', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_tap', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
 SELECT col_type_is('ve_connec_tap', 'macrocrmzone_id', 'int4', 'Column macrocrmzone_id should be int4');
 SELECT col_type_is('ve_connec_tap', 'crmzone_name', 'varchar(100)', 'Column crmzone_name should be varchar(100)');
@@ -194,6 +194,9 @@ SELECT col_type_is('ve_connec_tap', 'drain_gully', 'varchar(100)', 'Column drain
 SELECT col_type_is('ve_connec_tap', 'drain_distance', 'numeric(12,3)', 'Column drain_distance should be numeric(12,3)');
 SELECT col_type_is('ve_connec_tap', 'arq_patrimony', 'bool', 'Column arq_patrimony should be bool');
 SELECT col_type_is('ve_connec_tap', 'com_state', 'varchar(254)', 'Column com_state should be varchar(254)');
+
+SELECT col_type_is('ve_connec_tap', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_tap', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

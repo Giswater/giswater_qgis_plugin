@@ -41,7 +41,7 @@ SELECT columns_are(
         'lock_level', 'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long',
         'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom', 'p_state',
         'uuid', 'treatment_type', 'has_treatment', 'sector_visibility', 'muni_visibility', 'register_param_1',
-        'register_param_2'
+        'register_param_2', 'has_access', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_register should have the correct columns'
 );
@@ -72,12 +72,12 @@ SELECT col_type_is('ve_node_register', 'macroexpl_id', 'int4', 'Column macroexpl
 SELECT col_type_is('ve_node_register', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_register', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_register', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_register', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_register', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_register', 'drainzone_id', 'int4', 'Column drainzone_id should be int4');
-SELECT col_type_is('ve_node_register', 'drainzone_type', 'varchar(16)', 'Column drainzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_register', 'drainzone_type', 'varchar(30)', 'Column drainzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_register', 'drainzone_outfall', 'int4[]', 'Column drainzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_register', 'dwfzone_id', 'int4', 'Column dwfzone_id should be int4');
-SELECT col_type_is('ve_node_register', 'dwfzone_type', 'varchar(16)', 'Column dwfzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_register', 'dwfzone_type', 'varchar(30)', 'Column dwfzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_register', 'dwfzone_outfall', 'int4[]', 'Column dwfzone_outfall should be int4[]');
 SELECT col_type_is('ve_node_register', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_register', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
@@ -168,6 +168,9 @@ SELECT col_type_is('ve_node_register', 'sector_visibility', 'int4[]', 'Column se
 SELECT col_type_is('ve_node_register', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_register', 'register_param_1', 'text', 'Column register_param_1 should be text');
 SELECT col_type_is('ve_node_register', 'register_param_2', 'text', 'Column register_param_2 should be text');
+SELECT col_type_is('ve_node_register', 'has_access', 'bool', 'Column has_access should be bool');
+SELECT col_type_is('ve_node_register', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_register', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

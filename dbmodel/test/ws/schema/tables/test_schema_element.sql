@@ -28,7 +28,7 @@ SELECT columns_are(
         'ownercat_id', 'brand_id', 'model_id', 'serial_number', 'asset_id', 'verified',
         'datasource', 'label_x', 'label_y', 'label_rotation', 'rotation', 'inventory',
         'publish', 'trace_featuregeom', 'lock_level', 'expl_visibility', 'geometry_type', 'created_at',
-        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid'
+        'created_by', 'updated_at', 'updated_by', 'the_geom', 'uuid', 'dataquality', 'dataquality_obs'
     ],
     'Table element should have the correct columns'
 );
@@ -81,6 +81,9 @@ SELECT col_type_is('element', 'updated_at', 'timestamp with time zone', 'Column 
 SELECT col_type_is('element', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 SELECT col_type_is('element', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column the_geom should be geometry(point, SRID_VALUE)');
 SELECT col_type_is('element', 'uuid', 'uuid', 'Column uuid should be uuid');
+
+SELECT col_type_is('element', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('element', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 -- Check foreign keys
 SELECT has_fk('element', 'Table element should have foreign keys');

@@ -34,7 +34,7 @@ SELECT columns_are(
         'asset_id', 'adate', 'adescript', 'verified', 'datasource', 'label_x',
         'label_y', 'label_rotation', 'label_quadrant', 'inventory', 'publish', 'is_scadamap',
         'lock_level', 'expl_visibility', 'created_at', 'created_by', 'updated_at', 'updated_by',
-        'the_geom', 'uuid', 'uncertain'
+        'the_geom', 'uuid', 'uncertain', 'dataquality', 'dataquality_obs'
     ],
     'Table arc should have the correct columns'
 );
@@ -121,6 +121,9 @@ SELECT col_type_is('arc', 'updated_by', 'varchar(50)', 'Column updated_by should
 SELECT col_type_is('arc', 'the_geom', 'geometry(linestring, SRID_VALUE)', 'Column the_geom should be geometry(linestring, SRID_VALUE)');
 SELECT col_type_is('arc', 'uuid', 'uuid', 'Column uuid should be uuid');
 SELECT col_type_is('arc', 'uncertain', 'bool', 'Column uncertain should be bool');
+
+SELECT col_type_is('arc', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('arc', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 -- Check foreign keys
 SELECT has_fk('arc', 'Table arc should have foreign keys');

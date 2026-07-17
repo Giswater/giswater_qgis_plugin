@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'automated', 'fence_type'
+        'muni_visibility', 'automated', 'fence_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_clorinathor should have the correct columns'
 );
@@ -73,21 +73,21 @@ SELECT col_type_is('ve_node_clorinathor', 'macroexpl_id', 'int4', 'Column macroe
 SELECT col_type_is('ve_node_clorinathor', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_clorinathor', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_clorinathor', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_clorinathor', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_clorinathor', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_clorinathor', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_clorinathor', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_clorinathor', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_clorinathor', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_clorinathor', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_clorinathor', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_clorinathor', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_clorinathor', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_clorinathor', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_clorinathor', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_clorinathor', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_clorinathor', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_clorinathor', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_clorinathor', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_clorinathor', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_clorinathor', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_clorinathor', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_clorinathor', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_clorinathor', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_clorinathor', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_clorinathor', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_clorinathor', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -184,6 +184,9 @@ SELECT col_type_is('ve_node_clorinathor', 'sector_visibility', 'int4[]', 'Column
 SELECT col_type_is('ve_node_clorinathor', 'muni_visibility', 'int4[]', 'Column muni_visibility should be int4[]');
 SELECT col_type_is('ve_node_clorinathor', 'automated', 'bool', 'Column automated should be bool');
 SELECT col_type_is('ve_node_clorinathor', 'fence_type', 'int4', 'Column fence_type should be int4');
+
+SELECT col_type_is('ve_node_clorinathor', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_clorinathor', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

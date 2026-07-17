@@ -218,13 +218,6 @@ class GwVisit(QObject):
 
         self.visit_id.setText(str(visit_id))
 
-        if tools_gw.get_project_type() == 'ud':
-            self._event_feature_type_selected(self.dlg_add_visit, "gully")
-        self._event_feature_type_selected(self.dlg_add_visit, "node")
-        self._event_feature_type_selected(self.dlg_add_visit, "connec")
-        self._event_feature_type_selected(self.dlg_add_visit, "arc")
-        self._event_feature_type_selected(self.dlg_add_visit, "link")
-
         # Force _visit_tab_feature_changed
         excluded_layers = ["ve_arc", "ve_node", "ve_connec", "ve_man_frelem", "ve_man_genelem", "ve_gully",
                            "ve_link"]
@@ -234,6 +227,9 @@ class GwVisit(QObject):
         # Manage relation locking
         if self.locked_feature_type:
             self._set_locked_relation()
+
+        # Ensure parameter_id is populated after visit/feature type are resolved
+        self._set_parameter_id_combo(self.dlg_add_visit)
 
         if self.it_is_new_visit is False:
             # Disable widgets when the visit is not new
@@ -878,28 +874,18 @@ class GwVisit(QObject):
         if self.tabs.widget(index).objectName() == 'tab_relations' and self.locked_feature_id:
             self._ensure_locked_feature_relation()
 
-        # Set user devault parameter
-        parameter_id = tools_gw.get_config_value('om_visit_parameter_vdefault')
-        if parameter_id:
-            tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
+        if self.tabs.widget(index).objectName() == 'tab_event':
+            self._set_parameter_id_combo(self.dlg_add_visit)
 
     def _set_parameter_id_combo(self, dialog):
         """ Set parameter_id combo basing on current selections """
 
-        dialog.parameter_id.clear()
-        parameter_type_id = tools_qt.get_combo_value(self.dlg_add_visit, "parameter_type_id", index=0)
-        feature_type = tools_qt.get_combo_value(self.dlg_add_visit, "cmb_feature_type", index=0, add_quote=True)
-        sql = (f"SELECT id, descript "
-               f"FROM config_visit_parameter "
-               f"WHERE UPPER(parameter_type) = '{parameter_type_id.upper()}' ")
-        if feature_type != '':
-            sql += f"AND UPPER(feature_type) = '{feature_type.upper()}' "
-        sql += "ORDER BY id"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(dialog.parameter_id, rows)
+        self._fill_combo_parameter_id()
 
-        # Set user devault parameter
+        if self.event_parameter_id:
+            tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
+            return
+
         parameter_id = tools_gw.get_config_value('om_visit_parameter_vdefault')
         if parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
@@ -1237,21 +1223,20 @@ class GwVisit(QObject):
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
     def _fill_combo_parameter_id(self):
-        """ Fill combo parameter_id depending feature_type """
+        """ Fill combo parameter_id depending on parameter_type_id and feature_type """
 
-        sql = ("SELECT id, descript "
-               "FROM config_visit_parameter ")
-        where = None
         parameter_type_id = tools_qt.get_combo_value(self.dlg_add_visit, "parameter_type_id", index=0)
-        if parameter_type_id:
-            where = f"WHERE parameter_type = '{parameter_type_id}' "
-        if self.feature_type:
-            if where is None:
-                where = f"WHERE UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
-            else:
-                where += f"AND UPPER(feature_type) IN ('{self.feature_type.upper()}', 'ALL') "
+        feature_type = self.feature_type
+        if not feature_type:
+            feature_type = tools_qt.get_combo_value(self.dlg_add_visit, "feature_type", index=0)
+        if feature_type:
+            feature_type = str(feature_type).lower()
 
-        sql += where
+        sql = "SELECT id, descript FROM config_visit_parameter WHERE 1=1 "
+        if parameter_type_id not in (None, -1, '', 'None'):
+            sql += f"AND UPPER(parameter_type) = '{str(parameter_type_id).upper()}' "
+        if feature_type and feature_type not in ('', 'all'):
+            sql += f"AND UPPER(feature_type) IN ('{feature_type.upper()}', 'ALL') "
         sql += "ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows)

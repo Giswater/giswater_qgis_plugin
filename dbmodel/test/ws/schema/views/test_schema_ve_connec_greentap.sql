@@ -44,7 +44,7 @@ SELECT columns_are(
         'dqa_style', 'supplyzone_style', 'lock_level', 'expl_visibility', 'xcoord', 'ycoord',
         'lat', 'long', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'p_state', 'uuid', 'uncertain', 'xyz_date', 'linked_connec',
-        'greentap_type'
+        'greentap_type', 'dataquality', 'dataquality_obs'
     ],
     'View ve_connec_greentap should have the correct columns'
 );
@@ -73,20 +73,20 @@ SELECT col_type_is('ve_connec_greentap', 'macroexpl_id', 'int4', 'Column macroex
 SELECT col_type_is('ve_connec_greentap', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_connec_greentap', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_connec_greentap', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_connec_greentap', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_connec_greentap', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_connec_greentap', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_connec_greentap', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_greentap', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_greentap', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_connec_greentap', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_greentap', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_greentap', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_connec_greentap', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_connec_greentap', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_connec_greentap', 'dma_type', 'varchar', 'Column dma_type should be varchar');
+SELECT col_type_is('ve_connec_greentap', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_connec_greentap', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_connec_greentap', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_connec_greentap', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_connec_greentap', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_connec_greentap', 'omzone_id', 'int4', 'Column omzone_id should be int4');
-SELECT col_type_is('ve_connec_greentap', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_connec_greentap', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_connec_greentap', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
 SELECT col_type_is('ve_connec_greentap', 'macrocrmzone_id', 'int4', 'Column macrocrmzone_id should be int4');
 SELECT col_type_is('ve_connec_greentap', 'crmzone_name', 'varchar(100)', 'Column crmzone_name should be varchar(100)');
@@ -189,6 +189,9 @@ SELECT col_type_is('ve_connec_greentap', 'uncertain', 'bool', 'Column uncertain 
 SELECT col_type_is('ve_connec_greentap', 'xyz_date', 'date', 'Column xyz_date should be date');
 SELECT col_type_is('ve_connec_greentap', 'linked_connec', 'int4', 'Column linked_connec should be int4');
 SELECT col_type_is('ve_connec_greentap', 'greentap_type', 'text', 'Column greentap_type should be text');
+
+SELECT col_type_is('ve_connec_greentap', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_connec_greentap', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 

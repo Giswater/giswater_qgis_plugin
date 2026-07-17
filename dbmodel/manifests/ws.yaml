@@ -1,0 +1,145 @@
+# Water-supply schema manifest.
+#
+# Mirrors the legacy admin_btn `create_project_data_schema` flow:
+#   load_base -> updates -> lastprocess -> [sample | inv] -> final_pass
+#
+# SQL sources live under dbmodel/schemas/main/.
+
+kind: ws
+engine_version: 1
+
+substitutions: {}
+
+phases:
+  - id: load_base
+    type: sql_dir
+    description: "DDL + common functions/triggers + ws functions/triggers + ws schema_model"
+    steps:
+      - { source: "schemas/main/common/base/init.sql",  recursive: false }
+      - { source: "schemas/main/common/base/fct",  recursive: false }
+      - { source: "schemas/main/common/base/ftrg", recursive: false }
+      - { source: "schemas/main/ws/base/fct",          recursive: false }
+      - { source: "schemas/main/ws/base/ftrg",         recursive: false }
+      - { source: "schemas/main/ws/base/schema_model", recursive: false }
+
+  - id: reload_fct_ftrg
+    type: sql_dir
+    description: "Re-apply functions and triggers (no DDL, no schema_model)."
+    steps:
+      - { source: "schemas/main/common/base/fct",  recursive: false }
+      - { source: "schemas/main/common/base/ftrg", recursive: false }
+      - { source: "schemas/main/ws/base/fct",      recursive: false }
+      - { source: "schemas/main/ws/base/ftrg",     recursive: false }
+
+  - id: updates
+    type: version_walk
+    description: "Apply update patches per version, common first then ws."
+    roots:
+      - "schemas/main/common/updates"
+      - "schemas/main/ws/updates"
+    range:
+      mode: "{{ run_mode }}"
+
+  - id: load_catalog
+    type: sql_dir
+    description: "Locale-specific feature catalog (cat_feature + cat_*)."
+    steps:
+      - source: "schemas/main/ws/catalog/{{ locale }}"
+        fallback_source: "schemas/main/ws/catalog/en_US"
+        recursive: false
+
+  - id: lastprocess
+    type: sql_function
+    description: "Server-side bookkeeping; requires fct/ftrg loaded."
+    function: "{{ schema_name }}.gw_fct_admin_schema_lastprocess"
+    payload:
+      client:
+        device: 4
+        lang: "{{ locale }}"
+      data:
+        isNewProject: "TRUE"
+        gwVersion: "{{ plugin_version }}"
+        projectType: "WS"
+        epsg: "{{ srid }}"
+        descript: "{{ schema_name }}"
+        name: "{{ schema_name }}"
+        author: "{{ db_user }}"
+        date: "{{ today }}"
+        creationProfile: "{{ creation_profile }}"
+
+  - id: lastprocess_upgrade
+    type: sql_function
+    description: "Bookkeeping for the upgrade profile (isNewProject=FALSE)."
+    function: "{{ schema_name }}.gw_fct_admin_schema_lastprocess"
+    payload:
+      client:
+        device: 4
+        lang: "{{ locale }}"
+      data:
+        isNewProject: "FALSE"
+        gwVersion: "{{ plugin_version }}"
+        projectType: "WS"
+        epsg: "{{ srid }}"
+
+  - id: register_version
+    type: sql_function
+    description: "Append sys_version row on upgrade (lightweight lockstep bump)."
+    function: "{{ schema_name }}.gw_fct_admin_sys_version_register"
+    payload:
+      client:
+        lang: "{{ locale }}"
+      data:
+        gwVersion: "{{ plugin_version }}"
+        projectType: "WS"
+        isNewProject: "FALSE"
+        inferParentsFromConfig: "true"
+        mergeAddparam: {}
+
+  - id: load_sample
+    type: sql_dir
+    optional: true
+    description: "Sample 'user' data for ws."
+    steps:
+      - { source: "schemas/main/ws/sample/user", recursive: false }
+
+  - id: load_inv
+    type: sql_dir
+    optional: true
+    description: "Inventory-only fixtures on top of sample. v1 = subtractive."
+    steps:
+      - { source: "schemas/main/ws/sample/inv", recursive: false }
+
+  - id: load_dev
+    type: sql_dir
+    optional: true
+    description: "Dev fixtures. Reachable via CLI --profile dev."
+    steps:
+      - { source: "schemas/main/ws/sample/dev", recursive: false }
+
+  - id: final_pass
+    type: sql_dir
+    description: "Form fields + i18n. Falls back to en_US when locale folder missing."
+    steps:
+      - source: "schemas/main/ws/final_pass/config_form_fields"
+        recursive: false
+      - source: "schemas/main/ws/final_pass/config_form_tableview"
+        recursive: false
+      - source: "schemas/main/ws/final_pass/i18n/{{ locale }}"
+        fallback_source: "schemas/main/ws/final_pass/i18n/en_US"
+        recursive: false
+
+profiles:
+  empty:
+    phases: [load_base, updates, load_catalog, lastprocess, final_pass]
+  sample_full:
+    phases: [load_base, updates, lastprocess, load_sample, final_pass]
+  sample_inv:
+    phases: [load_base, updates, lastprocess, load_sample, load_inv, final_pass]
+  dev:
+    phases: [load_base, updates, lastprocess, load_dev, final_pass]
+  update:
+    phases: [reload_fct_ftrg, updates, lastprocess_upgrade]
+  update_step:
+    phases: [updates, register_version]
+  version_bump:
+    phases: [register_version]

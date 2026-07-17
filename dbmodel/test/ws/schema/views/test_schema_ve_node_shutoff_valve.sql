@@ -47,7 +47,7 @@ SELECT columns_are(
         'depth_valveshaft', 'regulator_situation', 'regulator_location', 'regulator_observ', 'lin_meters', 'exit_type',
         'exit_code', 'drive_type', 'cat_valve2', 'ordinarystatus', 'shutter', 'brand2',
         'model2', 'valve_type', 'to_arc', 'automated', 'connection_type', 'flowsetting',
-        'shtvalve_param_1', 'shtvalve_param_2'
+        'shtvalve_param_1', 'shtvalve_param_2', 'dataquality', 'dataquality_obs', 'turns_count'
     ],
     'View ve_node_shutoff_valve should have the correct columns'
 );
@@ -77,21 +77,21 @@ SELECT col_type_is('ve_node_shutoff_valve', 'macroexpl_id', 'int4', 'Column macr
 SELECT col_type_is('ve_node_shutoff_valve', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_shutoff_valve', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_shutoff_valve', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_shutoff_valve', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_shutoff_valve', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_shutoff_valve', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_shutoff_valve', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_shutoff_valve', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_shutoff_valve', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_shutoff_valve', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_shutoff_valve', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_shutoff_valve', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_shutoff_valve', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_shutoff_valve', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_shutoff_valve', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_shutoff_valve', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_shutoff_valve', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_shutoff_valve', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_shutoff_valve', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_shutoff_valve', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_shutoff_valve', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_shutoff_valve', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_shutoff_valve', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_shutoff_valve', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_shutoff_valve', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_shutoff_valve', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_shutoff_valve', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -211,6 +211,10 @@ SELECT col_type_is('ve_node_shutoff_valve', 'connection_type', 'int4', 'Column c
 SELECT col_type_is('ve_node_shutoff_valve', 'flowsetting', 'numeric(12,3)', 'Column flowsetting should be numeric(12,3)');
 SELECT col_type_is('ve_node_shutoff_valve', 'shtvalve_param_1', 'text', 'Column shtvalve_param_1 should be text');
 SELECT col_type_is('ve_node_shutoff_valve', 'shtvalve_param_2', 'text', 'Column shtvalve_param_2 should be text');
+
+SELECT col_type_is('ve_node_shutoff_valve', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_shutoff_valve', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
+SELECT col_type_is('ve_node_shutoff_valve', 'turns_count', 'numeric(12,4)', 'Column turns_count should be numeric(12,4)');
 
 SELECT * FROM finish();
 

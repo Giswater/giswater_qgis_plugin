@@ -43,7 +43,7 @@ SELECT columns_are(
         'expl_visibility', 'xcoord', 'ycoord', 'lat', 'long', 'closed_valve',
         'broken_valve', 'created_at', 'created_by', 'updated_at', 'updated_by', 'the_geom',
         'p_state', 'uuid', 'uncertain', 'xyz_date', 'to_arc', 'sector_visibility',
-        'muni_visibility', 'lab_code', 'place_name', 'cabinet'
+        'muni_visibility', 'lab_code', 'place_name', 'cabinet', 'dataquality', 'dataquality_obs'
     ],
     'View ve_node_netsamplepoint should have the correct columns'
 );
@@ -73,21 +73,21 @@ SELECT col_type_is('ve_node_netsamplepoint', 'macroexpl_id', 'int4', 'Column mac
 SELECT col_type_is('ve_node_netsamplepoint', 'muni_id', 'int4', 'Column muni_id should be int4');
 SELECT col_type_is('ve_node_netsamplepoint', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('ve_node_netsamplepoint', 'macrosector_id', 'int4', 'Column macrosector_id should be int4');
-SELECT col_type_is('ve_node_netsamplepoint', 'sector_type', 'varchar(16)', 'Column sector_type should be varchar(16)');
+SELECT col_type_is('ve_node_netsamplepoint', 'sector_type', 'varchar(30)', 'Column sector_type should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
-SELECT col_type_is('ve_node_netsamplepoint', 'supplyzone_type', 'varchar(16)', 'Column supplyzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netsamplepoint', 'supplyzone_type', 'varchar(30)', 'Column supplyzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'presszone_id', 'int4', 'Column presszone_id should be int4');
-SELECT col_type_is('ve_node_netsamplepoint', 'presszone_type', 'varchar(16)', 'Column presszone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netsamplepoint', 'presszone_type', 'varchar(30)', 'Column presszone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'presszone_head', 'numeric(12,2)', 'Column presszone_head should be numeric(12,2)');
 SELECT col_type_is('ve_node_netsamplepoint', 'dma_id', 'int4', 'Column dma_id should be int4');
 SELECT col_type_is('ve_node_netsamplepoint', 'macrodma_id', 'int4', 'Column macrodma_id should be int4');
-SELECT col_type_is('ve_node_netsamplepoint', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
+SELECT col_type_is('ve_node_netsamplepoint', 'dma_type', 'varchar(30)', 'Column dma_type should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('ve_node_netsamplepoint', 'macrodqa_id', 'int4', 'Column macrodqa_id should be int4');
-SELECT col_type_is('ve_node_netsamplepoint', 'dqa_type', 'varchar(16)', 'Column dqa_type should be varchar(16)');
+SELECT col_type_is('ve_node_netsamplepoint', 'dqa_type', 'varchar(30)', 'Column dqa_type should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'omzone_id', 'int4', 'Column omzone_id should be int4');
 SELECT col_type_is('ve_node_netsamplepoint', 'macroomzone_id', 'int4', 'Column macroomzone_id should be int4');
-SELECT col_type_is('ve_node_netsamplepoint', 'omzone_type', 'varchar(16)', 'Column omzone_type should be varchar(16)');
+SELECT col_type_is('ve_node_netsamplepoint', 'omzone_type', 'varchar(30)', 'Column omzone_type should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('ve_node_netsamplepoint', 'pavcat_id', 'text', 'Column pavcat_id should be text');
 SELECT col_type_is('ve_node_netsamplepoint', 'soilcat_id', 'varchar(30)', 'Column soilcat_id should be varchar(30)');
@@ -185,6 +185,9 @@ SELECT col_type_is('ve_node_netsamplepoint', 'muni_visibility', 'int4[]', 'Colum
 SELECT col_type_is('ve_node_netsamplepoint', 'lab_code', 'varchar(30)', 'Column lab_code should be varchar(30)');
 SELECT col_type_is('ve_node_netsamplepoint', 'place_name', 'varchar(254)', 'Column place_name should be varchar(254)');
 SELECT col_type_is('ve_node_netsamplepoint', 'cabinet', 'varchar(150)', 'Column cabinet should be varchar(150)');
+
+SELECT col_type_is('ve_node_netsamplepoint', 'dataquality', 'int4', 'Column dataquality should be int4');
+SELECT col_type_is('ve_node_netsamplepoint', 'dataquality_obs', 'text[]', 'Column dataquality_obs should be text[]');
 
 SELECT * FROM finish();
 
