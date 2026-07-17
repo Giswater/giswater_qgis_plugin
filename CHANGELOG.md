@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `tools_db.ensure_service_auth` to get correct credentials from `pg_service.conf`.
+
 ## [4.15.2] - 2026-07-16
 
 ### Fixed
