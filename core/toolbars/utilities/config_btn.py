@@ -242,7 +242,7 @@ class GwConfigButton(GwAction):
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
                     elif field['widgettype'] == 'combo':
-                        widget = QComboBox()
+                        widget = tools_gw.create_combo_box()
                         self._fill_combo(widget, field)
                         widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)

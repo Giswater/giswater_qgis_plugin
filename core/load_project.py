@@ -11,7 +11,7 @@ from functools import partial
 from qgis.core import QgsProject, QgsApplication, QgsSnappingUtils, QgsVectorLayer, QgsEditFormConfig, QgsAttributeEditorContainer, \
                     QgsAttributeEditorField, QgsEditorWidgetSetup, Qgis
 from qgis.PyQt.QtCore import QObject, Qt, QEvent
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QComboBox, QPushButton, QMenu, QAction
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QApplication, QDialog, QPushButton, QMenu, QAction
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .toolbars import buttons
@@ -595,36 +595,14 @@ class GwLoadProject(QObject):
         self.playpause_button.clicked.connect(self._playpause_btn_clicked)
         statusbar.insertPermanentWidget(0, self.playpause_button)
 
-        # Psector combobox
-        self.cmb_psector = QComboBox()
+        # Psector combobox (async load + upward popup)
+        self.cmb_psector = tools_gw.create_combo_box()
+        self.cmb_psector.popup_opens_upward = True
+        self.cmb_psector.setObjectName("cmb_psector")
         self.cmb_psector.setMinimumWidth(200)
         self.cmb_psector.setMaximumWidth(200)
         self.cmb_psector.setMaxVisibleItems(15)
         tools_gw.fill_cmb_psector_id(self.cmb_psector)
-
-        # Configure scroll bar to always show when needed
-        self.cmb_psector.view().setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-
-        # Overwrite showPopup for upward popup
-        original_show_popup = self.cmb_psector.showPopup
-
-        def show_popup_upward():
-            original_show_popup()
-            view = self.cmb_psector.view()
-            popup = view.window()
-            rect = self.cmb_psector.rect()
-            global_pos = self.cmb_psector.mapToGlobal(rect.topLeft())
-
-            # Calculate popup height based on maxVisibleItems
-            item_height = view.sizeHintForRow(0) if self.cmb_psector.count() > 0 else 24
-            max_visible = self.cmb_psector.maxVisibleItems()
-            visible_count = min(self.cmb_psector.count(), max_visible)
-            popup_height = visible_count * item_height + 4  # +4 for border
-
-            # Position popup above the combo box
-            popup.move(global_pos.x(), global_pos.y() - popup_height)
-            popup.resize(self.cmb_psector.width(), popup_height)
-        self.cmb_psector.showPopup = show_popup_upward
 
         statusbar.insertPermanentWidget(1, self.cmb_psector)
 

@@ -398,7 +398,7 @@ class AddNewLot:
             return widget
 
         def create_combo_box():
-            widget = QComboBox()
+            widget = tools_gw.create_combo_box()
             ids = field.get("comboIds", []) or []
             names = field.get("comboNames", []) or []
             if ids:
@@ -1458,7 +1458,7 @@ class AddNewLot:
                 Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
             )
             tbl.setItem(row_idx, 0, item_user)
-            combo_campaign = QComboBox()
+            combo_campaign = tools_gw.create_combo_box()
             tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
             tools_qt.set_combo_value(combo_campaign, campaign_id, 0)
             combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
@@ -1540,7 +1540,7 @@ class AddNewLot:
             Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
         )
         tbl.setItem(row_idx, 0, item_user)
-        combo_campaign = QComboBox()
+        combo_campaign = tools_gw.create_combo_box()
         tools_qt.fill_combo_values(combo_campaign, campaign_rows, index_to_show=1, add_empty=True)
         tools_qt.set_combo_value(combo_campaign, sel_campaign, 0)
         combo_campaign.currentIndexChanged.connect(partial(self._update_campaign_selector_row_bold, dlg, row_idx))
@@ -1796,7 +1796,7 @@ class AddNewLot:
         layout = QVBoxLayout(dlg)
         layout.addWidget(QLabel(label_text))
 
-        cmb_team = QComboBox(dlg)
+        cmb_team = tools_gw.create_combo_box(dlg)
         for team_id, team_name in teams:
             cmb_team.addItem(str(team_name), team_id)
         layout.addWidget(cmb_team)

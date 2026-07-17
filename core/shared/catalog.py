@@ -168,7 +168,7 @@ class GwCatalog:
     def _add_combobox(self, field):
         """ Add QComboBox to dialog """
 
-        widget = QComboBox()
+        widget = tools_gw.create_combo_box()
         widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self._fill_combo(widget, field)

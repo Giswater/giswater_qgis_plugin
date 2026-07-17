@@ -325,7 +325,7 @@ class Workorder:
                 widget.setEnabled(False)
 
         elif wtype == "combo":
-            widget = QComboBox()
+            widget = tools_gw.create_combo_box()
             ids = field.get("comboIds", []) or []
             names = field.get("comboNames", []) or []
             if ids:

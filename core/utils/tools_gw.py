@@ -33,8 +33,9 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QStandardItemModel, QIcon,
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, QAbstractScrollArea, \
-    QVBoxLayout, QHeaderView
+    QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, \
+    QVBoxLayout, QHeaderView, QFormLayout, QBoxLayout, QStackedLayout, QTableWidget, QAbstractItemView, \
+    QAbstractScrollArea
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, \
     QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsVectorFileWriter, QgsCoordinateTransformContext, \
@@ -214,6 +215,7 @@ def get_context_menu_levels(context_value: Any) -> Tuple[Optional[str], Optional
 
 def load_settings(dialog, plugin='core'):
     """ Load user UI settings related with dialog position and size """
+    upgrade_dialog_combos(dialog)
 
     # Get user UI config file
     try:
@@ -3258,13 +3260,7 @@ def add_frame(field, x=None):
 
 
 def add_combo(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
-    # Query-backed combos load their items asynchronously from dv_querytext.
-    # Static combos (with comboIds/comboNames already in the JSON, or with
-    # neither — e.g. literal value lists) keep the legacy CustomQComboBox.
-    if _is_async_combo_field(field):
-        widget = GwAsyncComboBox()
-    else:
-        widget = CustomQComboBox()
+    widget = GwAsyncComboBox()
 
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -3755,6 +3751,219 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
 
 # region Async combo helpers
 
+def _form_layout_roles():
+    if hasattr(QFormLayout, 'ItemRole'):
+        role = QFormLayout.ItemRole
+        return (role.LabelRole, role.FieldRole, role.SpanningRole)
+    return (QFormLayout.LabelRole, QFormLayout.FieldRole, QFormLayout.SpanningRole)
+
+
+def _form_layout_contains(layout: QFormLayout, widget) -> bool:
+    for row in range(layout.rowCount()):
+        for role in _form_layout_roles():
+            item = layout.itemAt(row, role)
+            if item is not None and item.widget() is widget:
+                return True
+    return False
+
+
+def _find_owning_layout(widget):
+    """Return the layout that directly owns ``widget``, walking up if needed."""
+    parent = widget.parentWidget() if widget is not None else None
+    while parent is not None:
+        layout = parent.layout()
+        if layout is not None:
+            if isinstance(layout, QFormLayout):
+                if _form_layout_contains(layout, widget):
+                    return layout
+            else:
+                try:
+                    if layout.indexOf(widget) >= 0:
+                        return layout
+                except Exception:
+                    pass
+        parent = parent.parentWidget()
+    return None
+
+
+def _replace_widget_in_layout(layout, old_widget, new_widget) -> bool:
+    """Swap ``old_widget`` for ``new_widget`` in ``layout``, preserving placement."""
+    if layout is None or old_widget is None or new_widget is None:
+        return False
+
+    try:
+        if isinstance(layout, QGridLayout):
+            index = layout.indexOf(old_widget)
+            if index < 0:
+                return False
+            row, col, row_span, col_span = layout.getItemPosition(index)
+            layout.removeWidget(old_widget)
+            layout.addWidget(new_widget, row, col, row_span, col_span)
+            return True
+
+        if isinstance(layout, QFormLayout):
+            for row in range(layout.rowCount()):
+                for role in _form_layout_roles():
+                    item = layout.itemAt(row, role)
+                    if item is not None and item.widget() is old_widget:
+                        layout.removeWidget(old_widget)
+                        layout.setWidget(row, role, new_widget)
+                        return True
+            return False
+
+        if isinstance(layout, QStackedLayout):
+            index = layout.indexOf(old_widget)
+            if index < 0:
+                return False
+            layout.removeWidget(old_widget)
+            layout.insertWidget(index, new_widget)
+            return True
+
+        if isinstance(layout, QBoxLayout):
+            index = layout.indexOf(old_widget)
+            if index < 0:
+                return False
+            layout.removeWidget(old_widget)
+            layout.insertWidget(index, new_widget)
+            return True
+
+        # Last resort for custom layouts that expose indexOf/insertWidget.
+        index = layout.indexOf(old_widget)
+        if index < 0:
+            return False
+        layout.removeWidget(old_widget)
+        if hasattr(layout, 'insertWidget'):
+            layout.insertWidget(index, new_widget)
+            return True
+        if hasattr(layout, 'addWidget'):
+            layout.addWidget(new_widget)
+            return True
+    except Exception as exc:
+        tools_log.log_warning(
+            "_replace_widget_in_layout failed for '{0}': {1}",
+            msg_params=(old_widget.objectName(), exc),
+        )
+    return False
+
+
+def _should_skip_combo_upgrade(combo) -> bool:
+    """Return True for combos that must not be swapped in-place."""
+    if combo is None or isdeleted(combo):
+        return True
+    if getattr(combo, '_gw_is_async_combo', False):
+        return True
+    parent = combo.parentWidget()
+    while parent is not None:
+        # Table/index cell widgets are owned by setCellWidget/setIndexWidget.
+        if isinstance(parent, (QTableWidget, QAbstractItemView)):
+            return True
+        parent = parent.parentWidget()
+    return False
+
+
+def _copy_combo_state(source: QComboBox, target: QComboBox) -> None:
+    """Copy visual/state properties from ``source`` to ``target``."""
+    target.setObjectName(source.objectName())
+    target.setGeometry(source.geometry())
+    target.setMinimumSize(source.minimumSize())
+    target.setMaximumSize(source.maximumSize())
+    target.setSizePolicy(source.sizePolicy())
+    target.setEnabled(source.isEnabled())
+    target.setVisible(source.isVisible())
+    target.setToolTip(source.toolTip())
+    target.setStatusTip(source.statusTip())
+    target.setWhatsThis(source.whatsThis())
+    target.setFocusPolicy(source.focusPolicy())
+    if source.styleSheet():
+        target.setStyleSheet(source.styleSheet())
+    for prop in ('columnname', 'widgetcontrols', 'selectedId', 'keepDisbled'):
+        value = source.property(prop)
+        if value is not None:
+            target.setProperty(prop, value)
+
+
+def _copy_combo_items(source: QComboBox, target: QComboBox) -> None:
+    """Copy populated rows from a plain combo into its async replacement."""
+    if source.count() <= 0:
+        return
+    for i in range(source.count()):
+        target.addItem(source.itemText(i), source.itemData(i))
+    idx = source.currentIndex()
+    if 0 <= idx < target.count():
+        target.setCurrentIndex(idx)
+    if getattr(target, '_gw_is_async_combo', False):
+        target.setProperty('rows_loaded', True)
+
+
+def upgrade_combo_to_async(combo: QComboBox) -> QComboBox:
+    """Replace a plain ``QComboBox`` with ``GwAsyncComboBox``, keeping layout and name."""
+    if combo is None or isdeleted(combo):
+        return combo
+    if getattr(combo, '_gw_is_async_combo', False):
+        return combo
+
+    parent = combo.parentWidget()
+    if parent is None or isdeleted(parent):
+        return combo
+
+    async_combo = GwAsyncComboBox(parent)
+    _copy_combo_state(combo, async_combo)
+    _copy_combo_items(combo, async_combo)
+
+    layout = _find_owning_layout(combo)
+    replaced = _replace_widget_in_layout(layout, combo, async_combo)
+    if not replaced:
+        async_combo.setGeometry(combo.geometry())
+        async_combo.show()
+
+    combo.hide()
+    combo.deleteLater()
+    return async_combo
+
+
+def upgrade_dialog_combos(root) -> None:
+    """Upgrade every plain ``QComboBox`` under ``root`` to ``GwAsyncComboBox``."""
+    if root is None or isdeleted(root):
+        return
+    if root.property('_gw_combos_upgraded'):
+        return
+
+    combos = [
+        combo for combo in root.findChildren(QComboBox)
+        if not _should_skip_combo_upgrade(combo)
+    ]
+    # Replace deepest combos first so parent/child layout chains stay stable.
+    def _widget_depth(widget):
+        depth = 0
+        parent = widget.parentWidget()
+        while parent is not None:
+            depth += 1
+            parent = parent.parentWidget()
+        return depth
+
+    combos.sort(key=_widget_depth, reverse=True)
+    for combo in combos:
+        try:
+            if _should_skip_combo_upgrade(combo):
+                continue
+            upgrade_combo_to_async(combo)
+        except Exception as exc:
+            tools_log.log_warning(
+                "upgrade_combo_to_async failed for '{0}': {1}",
+                msg_params=(combo.objectName(), exc),
+            )
+
+    try:
+        root.setProperty('_gw_combos_upgraded', True)
+    except Exception:
+        pass
+
+
+def create_combo_box(parent=None) -> GwAsyncComboBox:
+    """Factory for programmatic combo creation."""
+    return GwAsyncComboBox(parent)
+
+
 def _is_async_combo_field(field):
     """Return True when the field metadata describes a query-backed combo.
 
@@ -3872,9 +4081,6 @@ def _build_async_combo_query(widget, field):
 def _fill_async_combo(widget, field, index_to_compare=0):
     """Configure an async combo from JSON metadata and start the background load."""
     if not isinstance(widget, GwAsyncComboBox):
-        # Field declares a query-backed combo but the widget is something
-        # else (e.g. legacy CustomQComboBox created by existing code paths).
-        # Fall back to the synchronous behavior with whatever data we have.
         return widget
 
     widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
@@ -6871,15 +7077,24 @@ def _change_plan_mode_buttons(enable, psector_id, update_cmb_psector_id=False, c
 
 
 def fill_cmb_psector_id(cmb_psector_id, psector_id=None):
-    """ Fill cmb_psector_id """
-    sql = "SELECT psector_id as id, name as idval FROM v_ui_plan_psector WHERE archived = false ORDER BY id ASC"
-    rows = tools_db.get_rows(sql)
+    """Fill cmb_psector_id asynchronously."""
+    sql = (
+        "SELECT psector_id AS id, name AS idval "
+        "FROM v_ui_plan_psector WHERE archived = false ORDER BY id ASC"
+    )
+
     disconnect_signal("psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change")
-    tools_qt.fill_combo_values(cmb_psector_id, rows)
+
     if psector_id is not None:
         tools_qt.set_combo_value(cmb_psector_id, psector_id, 0, add_new=False)
-    connect_signal(cmb_psector_id.currentIndexChanged, partial(manage_psector_change, cmb_psector_id),
-                   "psignals", "fill_cmb_psector_id_currentIndexChanged_manage_psector_change"
+
+    cmb_psector_id.start_loading(sql)
+
+    connect_signal(
+        cmb_psector_id.currentIndexChanged,
+        partial(manage_psector_change, cmb_psector_id),
+        "psignals",
+        "fill_cmb_psector_id_currentIndexChanged_manage_psector_change",
     )
 
 
@@ -8449,16 +8664,9 @@ def _show_context_menu(self, qtableview):
 """ Custom classes to disable wheel scroll event when the widget is not fucused """
 
 
-class CustomQComboBox(QComboBox):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-
-    def wheelEvent(self, *args, **kwargs):
-        if self.hasFocus():
-            return QComboBox.wheelEvent(self, *args, **kwargs)
-        else:
-            return
+class CustomQComboBox(GwAsyncComboBox):
+    """Backward-compatible alias for ``GwAsyncComboBox``."""
+    pass
 
 
 class CustomQgsDateTimeEdit(QgsDateTimeEdit):
