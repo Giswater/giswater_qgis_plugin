@@ -3861,6 +3861,16 @@ def _should_skip_combo_upgrade(combo) -> bool:
     return False
 
 
+def _widget_depth(widget) -> int:
+    """Return nesting depth of ``widget`` in the parent chain."""
+    depth = 0
+    parent = widget.parentWidget()
+    while parent is not None:
+        depth += 1
+        parent = parent.parentWidget()
+    return depth
+
+
 def _copy_combo_state(source: QComboBox, target: QComboBox) -> None:
     """Copy visual/state properties from ``source`` to ``target``."""
     target.setObjectName(source.objectName())
@@ -3933,14 +3943,6 @@ def upgrade_dialog_combos(root) -> None:
         if not _should_skip_combo_upgrade(combo)
     ]
     # Replace deepest combos first so parent/child layout chains stay stable.
-    def _widget_depth(widget):
-        depth = 0
-        parent = widget.parentWidget()
-        while parent is not None:
-            depth += 1
-            parent = parent.parentWidget()
-        return depth
-
     combos.sort(key=_widget_depth, reverse=True)
     for combo in combos:
         try:
