@@ -1513,10 +1513,21 @@ class GwAdminButton:
                 pass
             self._admin_load_task = None
 
+    def _clear_project_schema_combo(self):
+        if not hasattr(self, 'dlg_readsql') or not self.dlg_readsql:
+            return
+        combo = getattr(self.dlg_readsql, 'project_schema_name', None)
+        if combo is None:
+            return
+        combo.blockSignals(True)
+        combo.clear()
+        combo.blockSignals(False)
+
     def _show_admin_loading_state(self):
         self._admin_loading = True
         ignore_widgets = _admin_connection_ignore_widgets()
         tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
+        self._clear_project_schema_combo()
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', tools_qt.tr('Connecting...'))
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
 
@@ -1529,6 +1540,7 @@ class GwAdminButton:
             return
         ignore_widgets = _admin_connection_ignore_widgets()
         tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
+        self._clear_project_schema_combo()
         self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
         tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -1715,10 +1727,9 @@ class GwAdminButton:
         self._apply_admin_load_result(result, connection_name)
 
     def _on_admin_load_finished(self, result: AdminLoadResult, task_result: bool):
-        self._admin_load_task = None
         connection_name = result.connection_name
 
-        # Ignore stale results from a cancelled/superseded connection switch
+        # Stale result from a previous connection: leave the active load alone
         current = self._current_connection_name()
         if connection_name and current and connection_name != current:
             tools_log.log_info(
@@ -1726,63 +1737,74 @@ class GwAdminButton:
             )
             return
 
-        if not task_result or not result.ok:
-            err = result.error or lib_vars.session_vars.get('last_error') or ''
-            # Auth failure on pg_service: prompt and retry once on the main thread
-            if self.is_service and tools_db.is_db_auth_error(err):
-                ok, credentials = self._prepare_connection_credentials(connection_name)
-                if ok and tools_db.ping_database(credentials):
-                    self.logged, credentials = tools_db.connect_to_database_credentials(
-                        credentials, max_attempts=0
+        self._admin_load_task = None
+
+        # Cancelled task: do not treat as connection failure
+        if not task_result and not result.ok and not result.error:
+            self._admin_loading = False
+            return
+
+        try:
+            if not task_result or not result.ok:
+                err = result.error or lib_vars.session_vars.get('last_error') or ''
+                # Auth failure on pg_service: prompt and retry once on the main thread
+                if self.is_service and tools_db.is_db_auth_error(err):
+                    ok, credentials = self._prepare_connection_credentials(connection_name)
+                    if ok and tools_db.ping_database(credentials):
+                        self.logged, credentials = tools_db.connect_to_database_credentials(
+                            credentials, max_attempts=0
+                        )
+                        if self.logged:
+                            tools_db.dao_db_credentials = credentials
+                            lib_vars.session_vars['logged_status'] = True
+                            sync_result = self._build_admin_load_result_sync(connection_name)
+                            self._schema_cache[connection_name] = sync_result
+                            self._apply_admin_load_result(sync_result, connection_name)
+                            return
+                    self._apply_connection_failure(
+                        err or "Connection Failed. Please, check connection parameters"
                     )
-                    if self.logged:
-                        tools_db.dao_db_credentials = credentials
-                        lib_vars.session_vars['logged_status'] = True
-                        sync_result = self._build_admin_load_result_sync(connection_name)
-                        self._schema_cache[connection_name] = sync_result
-                        self._apply_admin_load_result(sync_result, connection_name)
-                        return
-                self._apply_connection_failure(
-                    err or "Connection Failed. Please, check connection parameters"
-                )
+                    return
+                if self.is_service:
+                    msg = ("There is an error in the configuration of the pgservice file, "
+                           "please check it or consult your administrator")
+                    if err:
+                        msg = f"{msg} ({err})"
+                    self._apply_connection_failure(msg)
+                else:
+                    msg = "Connection Failed. Please, check connection parameters"
+                    if err:
+                        msg = f"{msg} ({err})"
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
+                    self._apply_connection_failure(
+                        msg, close_for_credentials=True, connection_name=connection_name
+                    )
                 return
-            if self.is_service:
-                msg = ("There is an error in the configuration of the pgservice file, "
-                       "please check it or consult your administrator")
-                if err:
-                    msg = f"{msg} ({err})"
-                self._apply_connection_failure(msg)
-            else:
-                msg = "Connection Failed. Please, check connection parameters"
-                if err:
-                    msg = f"{msg} ({err})"
-                tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
-                self._apply_connection_failure(
-                    msg, close_for_credentials=True, connection_name=connection_name
-                )
-            return
 
-        ok, credentials = self._prepare_connection_credentials(connection_name)
-        if not ok:
-            msg = lib_vars.session_vars.get('last_error') or "Connection Failed. Please, check connection parameters"
-            self._apply_connection_failure(msg)
-            return
-        self.logged, credentials = tools_db.connect_to_database_credentials(credentials, max_attempts=0)
-        if not self.logged:
-            msg = lib_vars.session_vars.get('last_error') or "Connection Failed. Please, check connection parameters"
-            if self.is_service and tools_db.is_db_auth_error(msg):
+            ok, credentials = self._prepare_connection_credentials(connection_name)
+            if not ok:
+                msg = lib_vars.session_vars.get('last_error') or "Connection Failed. Please, check connection parameters"
                 self._apply_connection_failure(msg)
-            elif self.is_service:
-                self._apply_connection_failure(msg)
-            else:
-                tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
-                self._apply_connection_failure(msg, close_for_credentials=True, connection_name=connection_name)
-            return
+                return
+            self.logged, credentials = tools_db.connect_to_database_credentials(credentials, max_attempts=0)
+            if not self.logged:
+                msg = lib_vars.session_vars.get('last_error') or "Connection Failed. Please, check connection parameters"
+                if self.is_service and tools_db.is_db_auth_error(msg):
+                    self._apply_connection_failure(msg)
+                elif self.is_service:
+                    self._apply_connection_failure(msg)
+                else:
+                    tools_qgis.show_message(msg, Qgis.MessageLevel.Warning)
+                    self._apply_connection_failure(msg, close_for_credentials=True, connection_name=connection_name)
+                return
 
-        tools_db.dao_db_credentials = credentials
-        lib_vars.session_vars['logged_status'] = True
-        self._schema_cache[connection_name] = result
-        self._apply_admin_load_result(result, connection_name)
+            tools_db.dao_db_credentials = credentials
+            lib_vars.session_vars['logged_status'] = True
+            self._schema_cache[connection_name] = result
+            self._apply_admin_load_result(result, connection_name)
+        except Exception:
+            self._admin_loading = False
+            raise
 
     def _ensure_extensions_checked(self):
         if self._extensions_checked:
@@ -1812,6 +1834,10 @@ class GwAdminButton:
 
         self._set_last_connection(connection_name)
         self.username = self._get_user_connection(connection_name)
+
+        # Restore widgets after a previous incompatible-PG / failure disable, then
+        # let _finalize_admin_permissions_and_status selectively re-disable if needed.
+        tools_qt.enable_dialog(self.dlg_readsql, True)
 
         self.dlg_readsql.project_schema_name.blockSignals(True)
         self._populate_data_schema_name()
