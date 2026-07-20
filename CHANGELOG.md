@@ -9,11 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix admin dialog: refresh Project Schema list after a connection error.
 - Fix `gw_fct_mincut_minsector` and `gw_fct_setmincut` functions to count hydrometers correctly.
 - Fix selector performance on large projects: optimize `vf_node`/`vf_arc`/`vf_connec`/`vf_element`/`vf_link` filters and stop probing `ve_node` inside `gw_fct_setselectors` (check-all exploitations was multi-second).
+
+## [4.15.3] - 2026-07-17
+
+### Fixed
+
 - Fix `tools_db.ensure_service_auth` to get correct credentials from `pg_service.conf`.
 - Fix config_form_fields `dv_querytext` to use `vf_hydrometer` and `hydro_customer_code` instead of `v_rtc_hydrometer` and `hydrometer_customer_code`.
-- Fix admin dialog: refresh Project Schema list after a connection error.
 
 ## [4.15.2] - 2026-07-16
 
@@ -521,7 +526,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.15.2...main
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.3...main
+[4.15.3]: https://github.com/giswater/plugin/compare/v4.15.2...v4.15.3
 [4.15.2]: https://github.com/giswater/plugin/compare/v4.15.1...v4.15.2
 [4.15.1]: https://github.com/giswater/plugin/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/giswater/plugin/compare/v4.14.5...v4.15.0
