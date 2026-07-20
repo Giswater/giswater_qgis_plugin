@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fix admin dialog: refresh Project Schema list after a connection error.
+
 ## [4.15.3] - 2026-07-17
 
 ### Fixed
