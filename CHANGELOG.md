@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix blank multilingual projects: respect locale `cat_feature.active` and keep MULTI-CREATE `config_form_fields` (skip sample CFF wipe in empty profile).
 - Fix admin dialog: refresh Project Schema list after a connection error.
 - Fix `gw_fct_mincut_minsector` and `gw_fct_setmincut` functions to count hydrometers correctly.
 - Fix selector performance on large projects: optimize `vf_node`/`vf_arc`/`vf_connec`/`vf_element`/`vf_link` filters and stop probing `ve_node` inside `gw_fct_setselectors` (check-all exploitations was multi-second).
