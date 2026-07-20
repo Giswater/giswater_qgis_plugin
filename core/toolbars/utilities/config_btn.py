@@ -177,11 +177,16 @@ class GwConfigButton(GwAction):
 
     def _get_event_combo_parent(self, row):
 
-        for field in row[0]["fields"]:
-            if field['isparent']:
-                widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
-                if widget:
-                    widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_config, widget, 'config'))
+        for tab in row or []:
+            fields = tab.get('fields') if isinstance(tab, dict) else None
+            if not fields:
+                continue
+            tools_gw.connect_isparent_combos(
+                self.dlg_config,
+                fields,
+                tools_gw.fill_child,
+                'config',
+            )
 
     def _update_values(self):
 
@@ -332,26 +337,10 @@ class GwConfigButton(GwAction):
 
     def _fill_combo(self, widget, field):
 
-        # Generate list of items to add into combo
-        widget.blockSignals(True)
-        widget.clear()
-        widget.blockSignals(False)
-        combolist = []
-        comboIds = field.get('comboIds')
-        comboNames = field.get('comboNames')
-        if None not in (comboIds, comboNames):
-            for i in range(0, len(comboIds)):
-                if comboIds[i] is not None and comboNames[i] is not None:
-                    elem = [comboIds[i], comboNames[i]]
-                    combolist.append(elem)
-
-            records_sorted = sorted(combolist, key=operator.itemgetter(1))
-            # Populate combo
-            for record in records_sorted:
-                widget.addItem(record[1], record)
-        value = field.get('value')
-        if value not in (None, 'None'):
-            tools_qt.set_combo_value(widget, value, 0)
+        payload = dict(field)
+        if payload.get('value') not in (None, 'None') and 'selectedId' not in payload:
+            payload['selectedId'] = payload['value']
+        tools_gw.fill_combo(widget, payload)
 
     def _get_dialog_changed_values(self, widget, tab, chk):
 
