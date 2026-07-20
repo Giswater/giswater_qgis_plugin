@@ -34,7 +34,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication, QMenu, QAction, QDialog, QListWidget, QListWidgetItem, \
-    QVBoxLayout, QHeaderView, QFormLayout, QBoxLayout, QStackedLayout, QTableWidget, QAbstractItemView, \
+    QVBoxLayout, QHeaderView, QTableWidget, QAbstractItemView, \
     QAbstractScrollArea
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, \
@@ -50,7 +50,7 @@ from ..ui.main_window import GwMainWindow
 from ..ui.docker import GwDocker
 from ..ui.ui_manager import GwSelectorUi, GwPsectorManagerUi
 from . import tools_backend_calls
-from .async_combo import GwAsyncComboBox
+from .async_combo import GwAsyncComboBox, attach_combo_popup_search
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
 from ... import global_vars
@@ -3711,11 +3711,27 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
     # Async (query-backed) combos: rebuild the SQL from queryText/queryTextFilter
     # and the current parent value, then schedule the background load.
     if getattr(widget, '_gw_is_async_combo', False):
+        # Filtered child combos must re-query with the live parent value.
+        # ``gw_fct_getchilds`` comboIds snapshots are often stale (wrong parent
+        # id, only ``Undefined``, etc.) once we moved to async widgets.
+        if _should_use_async_combo_fill(widget, field):
+            payload = dict(field)
+            parent_val = _resolve_async_parent_value(widget, field)
+            if parent_val not in (None, '', -1):
+                payload['parentValue'] = parent_val
+            return _fill_async_combo(widget, payload, index_to_compare)
+        # ``gw_fct_getchilds`` (and a few legacy flows) ship an explicit
+        # comboIds/comboNames pair. Prefer that over re-querying async SQL,
+        # but ignore empty lists (initial child placeholders before the parent
+        # is ready) so we can fall back to async SQL with parentValue.
+        if _field_has_legacy_combo_rows(field):
+            if _legacy_combo_rows_are_stale(field):
+                if _is_async_combo_field(field):
+                    return _fill_async_combo(widget, field, index_to_compare)
+            else:
+                return _apply_legacy_rows_to_async(widget, field, index_to_compare)
         if _is_async_combo_field(field):
             return _fill_async_combo(widget, field, index_to_compare)
-        # Legacy callers (gw_fct_setcatalog, gw_fct_getchangefeaturetype) ship
-        # a comboIds/comboNames pair to override an existing combo. Route those
-        # through the async widget API so we don't bypass its model setup.
         return _apply_legacy_rows_to_async(widget, field, index_to_compare)
     if _is_async_combo_field(field):
         return _fill_async_combo(widget, field, index_to_compare)
@@ -3751,106 +3767,13 @@ def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
 
 # region Async combo helpers
 
-def _form_layout_roles():
-    if hasattr(QFormLayout, 'ItemRole'):
-        role = QFormLayout.ItemRole
-        return (role.LabelRole, role.FieldRole, role.SpanningRole)
-    return (QFormLayout.LabelRole, QFormLayout.FieldRole, QFormLayout.SpanningRole)
-
-
-def _form_layout_contains(layout: QFormLayout, widget) -> bool:
-    for row in range(layout.rowCount()):
-        for role in _form_layout_roles():
-            item = layout.itemAt(row, role)
-            if item is not None and item.widget() is widget:
-                return True
-    return False
-
-
-def _find_owning_layout(widget):
-    """Return the layout that directly owns ``widget``, walking up if needed."""
-    parent = widget.parentWidget() if widget is not None else None
-    while parent is not None:
-        layout = parent.layout()
-        if layout is not None:
-            if isinstance(layout, QFormLayout):
-                if _form_layout_contains(layout, widget):
-                    return layout
-            else:
-                try:
-                    if layout.indexOf(widget) >= 0:
-                        return layout
-                except Exception:
-                    pass
-        parent = parent.parentWidget()
-    return None
-
-
-def _replace_widget_in_layout(layout, old_widget, new_widget) -> bool:
-    """Swap ``old_widget`` for ``new_widget`` in ``layout``, preserving placement."""
-    if layout is None or old_widget is None or new_widget is None:
-        return False
-
-    try:
-        if isinstance(layout, QGridLayout):
-            index = layout.indexOf(old_widget)
-            if index < 0:
-                return False
-            row, col, row_span, col_span = layout.getItemPosition(index)
-            layout.removeWidget(old_widget)
-            layout.addWidget(new_widget, row, col, row_span, col_span)
-            return True
-
-        if isinstance(layout, QFormLayout):
-            for row in range(layout.rowCount()):
-                for role in _form_layout_roles():
-                    item = layout.itemAt(row, role)
-                    if item is not None and item.widget() is old_widget:
-                        layout.removeWidget(old_widget)
-                        layout.setWidget(row, role, new_widget)
-                        return True
-            return False
-
-        if isinstance(layout, QStackedLayout):
-            index = layout.indexOf(old_widget)
-            if index < 0:
-                return False
-            layout.removeWidget(old_widget)
-            layout.insertWidget(index, new_widget)
-            return True
-
-        if isinstance(layout, QBoxLayout):
-            index = layout.indexOf(old_widget)
-            if index < 0:
-                return False
-            layout.removeWidget(old_widget)
-            layout.insertWidget(index, new_widget)
-            return True
-
-        # Last resort for custom layouts that expose indexOf/insertWidget.
-        index = layout.indexOf(old_widget)
-        if index < 0:
-            return False
-        layout.removeWidget(old_widget)
-        if hasattr(layout, 'insertWidget'):
-            layout.insertWidget(index, new_widget)
-            return True
-        if hasattr(layout, 'addWidget'):
-            layout.addWidget(new_widget)
-            return True
-    except Exception as exc:
-        tools_log.log_warning(
-            "_replace_widget_in_layout failed for '{0}': {1}",
-            msg_params=(old_widget.objectName(), exc),
-        )
-    return False
-
-
 def _should_skip_combo_upgrade(combo) -> bool:
-    """Return True for combos that must not be swapped in-place."""
+    """Return True for combos that must not receive popup-search attachment."""
     if combo is None or isdeleted(combo):
         return True
     if getattr(combo, '_gw_is_async_combo', False):
+        return True
+    if combo.property('_gw_popup_search'):
         return True
     parent = combo.parentWidget()
     while parent is not None:
@@ -3861,97 +3784,21 @@ def _should_skip_combo_upgrade(combo) -> bool:
     return False
 
 
-def _widget_depth(widget) -> int:
-    """Return nesting depth of ``widget`` in the parent chain."""
-    depth = 0
-    parent = widget.parentWidget()
-    while parent is not None:
-        depth += 1
-        parent = parent.parentWidget()
-    return depth
-
-
-def _copy_combo_state(source: QComboBox, target: QComboBox) -> None:
-    """Copy visual/state properties from ``source`` to ``target``."""
-    target.setObjectName(source.objectName())
-    target.setGeometry(source.geometry())
-    target.setMinimumSize(source.minimumSize())
-    target.setMaximumSize(source.maximumSize())
-    target.setSizePolicy(source.sizePolicy())
-    target.setEnabled(source.isEnabled())
-    target.setVisible(source.isVisible())
-    target.setToolTip(source.toolTip())
-    target.setStatusTip(source.statusTip())
-    target.setWhatsThis(source.whatsThis())
-    target.setFocusPolicy(source.focusPolicy())
-    if source.styleSheet():
-        target.setStyleSheet(source.styleSheet())
-    for prop in ('columnname', 'widgetcontrols', 'selectedId', 'keepDisbled'):
-        value = source.property(prop)
-        if value is not None:
-            target.setProperty(prop, value)
-
-
-def _copy_combo_items(source: QComboBox, target: QComboBox) -> None:
-    """Copy populated rows from a plain combo into its async replacement."""
-    if source.count() <= 0:
-        return
-    for i in range(source.count()):
-        target.addItem(source.itemText(i), source.itemData(i))
-    idx = source.currentIndex()
-    if 0 <= idx < target.count():
-        target.setCurrentIndex(idx)
-    if getattr(target, '_gw_is_async_combo', False):
-        target.setProperty('rows_loaded', True)
-
-
-def upgrade_combo_to_async(combo: QComboBox) -> QComboBox:
-    """Replace a plain ``QComboBox`` with ``GwAsyncComboBox``, keeping layout and name."""
-    if combo is None or isdeleted(combo):
-        return combo
-    if getattr(combo, '_gw_is_async_combo', False):
-        return combo
-
-    parent = combo.parentWidget()
-    if parent is None or isdeleted(parent):
-        return combo
-
-    async_combo = GwAsyncComboBox(parent)
-    _copy_combo_state(combo, async_combo)
-    _copy_combo_items(combo, async_combo)
-
-    layout = _find_owning_layout(combo)
-    replaced = _replace_widget_in_layout(layout, combo, async_combo)
-    if not replaced:
-        async_combo.setGeometry(combo.geometry())
-        async_combo.show()
-
-    combo.hide()
-    combo.deleteLater()
-    return async_combo
-
-
 def upgrade_dialog_combos(root) -> None:
-    """Upgrade every plain ``QComboBox`` under ``root`` to ``GwAsyncComboBox``."""
+    """Attach popup type-to-filter search to plain ``.ui`` ``QComboBox`` widgets."""
     if root is None or isdeleted(root):
         return
     if root.property('_gw_combos_upgraded'):
         return
 
-    combos = [
-        combo for combo in root.findChildren(QComboBox)
-        if not _should_skip_combo_upgrade(combo)
-    ]
-    # Replace deepest combos first so parent/child layout chains stay stable.
-    combos.sort(key=_widget_depth, reverse=True)
-    for combo in combos:
+    for combo in root.findChildren(QComboBox):
+        if _should_skip_combo_upgrade(combo):
+            continue
         try:
-            if _should_skip_combo_upgrade(combo):
-                continue
-            upgrade_combo_to_async(combo)
+            attach_combo_popup_search(combo)
         except Exception as exc:
             tools_log.log_warning(
-                "upgrade_combo_to_async failed for '{0}': {1}",
+                "attach_combo_popup_search failed for '{0}': {1}",
                 msg_params=(combo.objectName(), exc),
             )
 
@@ -3959,6 +3806,175 @@ def upgrade_dialog_combos(root) -> None:
         root.setProperty('_gw_combos_upgraded', True)
     except Exception:
         pass
+
+
+def _field_has_legacy_combo_rows(field) -> bool:
+    """Return True when a field ships a non-empty comboIds/comboNames payload."""
+    if not isinstance(field, dict):
+        return False
+    ids = field.get('comboIds')
+    names = field.get('comboNames')
+    if not isinstance(ids, list) or not isinstance(names, list):
+        return False
+    return len(ids) > 0 and len(names) > 0
+
+
+def _legacy_combo_rows_are_stale(field) -> bool:
+    """True when comboIds is only the null placeholder (id 0 / Undefined)."""
+    if not _field_has_legacy_combo_rows(field):
+        return False
+    ids = field.get('comboIds') or []
+    names = field.get('comboNames') or []
+    if len(ids) != 1:
+        return False
+    only_id = str(ids[0])
+    if only_id not in ('0', '', 'None', 'null'):
+        return False
+    if len(names) == 1:
+        label = str(names[0]).strip().lower()
+        if label in ('undefined', '', 'none', 'null', '(undefined)'):
+            return True
+    return only_id == '0'
+
+
+def _combo_parent_columns(fields) -> set:
+    """Return column names referenced as parent by any combo field."""
+    parents = set()
+    if not fields:
+        return parents
+    for field in fields:
+        if not field or field.get('widgettype') != 'combo':
+            continue
+        parent_id = field.get('parentId') or field.get('dv_parent_id')
+        if parent_id not in (None, ''):
+            parents.add(str(parent_id))
+    return parents
+
+
+def _field_triggers_child_refresh(field, parent_columns) -> bool:
+    """True when a combo should refresh its children on change."""
+    if not field or field.get('widgettype') != 'combo':
+        return False
+    if tools_os.set_boolean(field.get('isparent'), False):
+        return True
+    col = field.get('columnname')
+    return bool(col and str(col) in parent_columns)
+
+
+def _resolve_combo_selected_id(field):
+    """Return the id that should be selected in a combo field."""
+    selected_id = field.get('selectedId')
+    if selected_id not in (None, ''):
+        return selected_id
+    value = field.get('value')
+    if value not in (None, '', 'null'):
+        return value
+    return None
+
+
+def _resolve_async_parent_value(widget, field):
+    """Return the parent id for a filtered child combo, if known."""
+    if not isinstance(field, dict):
+        return None
+    parent_val = field.get('parentValue')
+    if parent_val not in (None, '', -1):
+        return parent_val
+    if _get_async_combo_query_filter(field):
+        return _resolve_parent_value(widget, field)
+    return None
+
+
+def _should_use_async_combo_fill(widget, field) -> bool:
+    """True when a child combo should load via SQL instead of comboIds."""
+    if not _is_async_combo_field(field):
+        return False
+    if not _get_async_combo_query_filter(field):
+        return False
+    parent_val = _resolve_async_parent_value(widget, field)
+    return parent_val not in (None, '', -1)
+
+
+def _find_form_combo(dialog, field_or_name, columnname=None):
+    """Locate a form combo by widgetname / columnname."""
+    if dialog is None or isdeleted(dialog):
+        return None
+    name = None
+    col = columnname
+    if isinstance(field_or_name, dict):
+        name = field_or_name.get('widgetname')
+        col = col or field_or_name.get('columnname')
+    elif isinstance(field_or_name, str):
+        name = field_or_name
+    if name:
+        combo = dialog.findChild(QComboBox, str(name))
+        if combo is not None:
+            return combo
+    if col:
+        combo = dialog.findChild(QComboBox, f"tab_data_{col}")
+        if combo is not None:
+            return combo
+        for combo in dialog.findChildren(QComboBox):
+            if combo.property('columnname') == col:
+                return combo
+    return None
+
+
+def _refresh_isparent_children_when_ready(
+    dialog, parent_widget, refresh_fn, refresh_args=(), _attempt=0
+) -> None:
+    """Run ``refresh_fn`` once the parent combo has rows and a valid id."""
+    max_attempts = 50  # 50 x 50 ms ~= 2.5 s
+
+    combo_id = tools_qt.get_combo_value(dialog, parent_widget, 0)
+    rows_loaded = (
+        not getattr(parent_widget, '_gw_is_async_combo', False)
+        or bool(parent_widget.property('rows_loaded'))
+    )
+    if combo_id in (None, '', -1) or not rows_loaded:
+        if _attempt < max_attempts:
+            QTimer.singleShot(
+                50,
+                partial(
+                    _refresh_isparent_children_when_ready,
+                    dialog,
+                    parent_widget,
+                    refresh_fn,
+                    refresh_args,
+                    _attempt + 1,
+                ),
+            )
+        return
+    refresh_fn(dialog, parent_widget, *refresh_args)
+
+
+def connect_isparent_combos(dialog, fields, refresh_fn, *refresh_args) -> None:
+    """Connect parent combos to ``refresh_fn`` and refresh children once.
+
+    A combo is treated as a parent when ``isparent`` is true **or** when any
+    other combo field lists it in ``parentId`` / ``dv_parent_id`` (e.g.
+    sector_id -> dma_id even if sector is not flagged isparent).
+    """
+    if dialog is None or isdeleted(dialog) or not fields:
+        return
+    parent_columns = _combo_parent_columns(fields)
+    for field in fields:
+        if not _field_triggers_child_refresh(field, parent_columns):
+            continue
+        widget = _find_form_combo(dialog, field)
+        if widget is None:
+            continue
+        bound = partial(refresh_fn, dialog, widget, *refresh_args)
+        widget.currentIndexChanged.connect(bound)
+        QTimer.singleShot(
+            0,
+            partial(
+                _refresh_isparent_children_when_ready,
+                dialog,
+                widget,
+                refresh_fn,
+                refresh_args,
+            ),
+        )
 
 
 def create_combo_box(parent=None) -> GwAsyncComboBox:
@@ -4087,7 +4103,7 @@ def _fill_async_combo(widget, field, index_to_compare=0):
 
     widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
 
-    selected_id = field.get('selectedId')
+    selected_id = _resolve_combo_selected_id(field)
     if selected_id not in (None, ''):
         widget.set_pending_selection(selected_id, index_to_compare)
 
@@ -4120,7 +4136,7 @@ def _apply_legacy_rows_to_async(widget, field, index_to_compare=0):
 
     widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
 
-    selected_id = field.get('selectedId')
+    selected_id = _resolve_combo_selected_id(field)
     if selected_id not in (None, ''):
         widget.set_pending_selection(selected_id, index_to_compare)
 
@@ -4180,15 +4196,15 @@ def resolve_combo_valuemap(field):
 def fill_combo_child(dialog, combo_child):
 
     if 'widgetname' in combo_child:
-        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        child = _find_form_combo(dialog, combo_child)
         if child is not None:
             fill_combo(child, combo_child)
 
 
-def manage_combo_child(dialog, combo_parent, combo_child):
+def manage_combo_child(dialog, combo_parent, combo_child, parent_value=None):
 
     if 'widgetname' in combo_child:
-        child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+        child = _find_form_combo(dialog, combo_child)
 
         if child:
             child.setEnabled(True)
@@ -4196,9 +4212,10 @@ def manage_combo_child(dialog, combo_parent, combo_child):
             # Hint the parent value into the child JSON so that async combos
             # can build their SQL without scanning the dialog. We do not mutate
             # the original dict because it might be reused by callers.
-            parent_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
+            if parent_value in (None, '', -1):
+                parent_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
             child_payload = combo_child
-            if _is_async_combo_field(combo_child):
+            if _is_async_combo_field(combo_child) or _get_async_combo_query_filter(combo_child):
                 child_payload = dict(combo_child)
                 child_payload['parentValue'] = (
                     parent_value if parent_value not in (None, '', -1) else None
@@ -4225,6 +4242,8 @@ def fill_child(dialog, widget, action, feature_type=''):
 
     combo_parent = widget.objectName()
     combo_id = tools_qt.get_combo_value(dialog, widget)
+    if combo_id in (None, '', -1):
+        return
     # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
     json_result = execute_procedure('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{feature_type}'")
     if json_result is None:
@@ -4232,7 +4251,7 @@ def fill_child(dialog, widget, action, feature_type=''):
 
     for combo_child in json_result['fields']:
         if combo_child is not None:
-            fill_combo_child(dialog, combo_child)
+            manage_combo_child(dialog, widget, combo_child, combo_id)
 
 
 def get_expression_filter(feature_type, list_ids=None, layers=None):

@@ -7,9 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import sys
 from functools import partial
-from typing import List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
-from qgis.PyQt.QtCore import QAbstractListModel, QEvent, QModelIndex, Qt, QTimer
+from qgis.PyQt.QtCore import QAbstractListModel, QEvent, QModelIndex, QObject, Qt, QTimer
 from qgis.PyQt.QtGui import QKeyEvent
 from qgis.PyQt.QtWidgets import (
     QApplication,
@@ -217,6 +217,317 @@ class _ComboPopupView(QListView):
             self._top_widget = None
 
 
+class _ComboPopupSearchController(QObject):
+    """Shared type-to-filter popup for ``QComboBox`` and ``GwAsyncComboBox``."""
+
+    def __init__(
+        self,
+        combo: QComboBox,
+        *,
+        label_at: Callable[[int], str],
+        row_count: Callable[[], int],
+        index_at: Optional[Callable[[int], QModelIndex]] = None,
+    ):
+        super().__init__(combo)
+        self._combo = combo
+        self._label_at = label_at
+        self._row_count = row_count
+        self._index_at = index_at or (lambda i: combo.model().index(i, 0))
+        self._search_edit: Optional[QLineEdit] = None
+        self._search_active: bool = False
+        self._hidden_rows: set = set()
+        self._orig_show_popup = None
+        self._orig_hide_popup = None
+
+    def clear_filter_state(self) -> None:
+        self._hidden_rows = set()
+
+    def attach_to_plain_combo(self) -> None:
+        """Hook ``showPopup`` / ``hidePopup`` on an existing ``QComboBox``."""
+        self._ensure_popup_view()
+        self._orig_show_popup = self._combo.showPopup
+        self._orig_hide_popup = self._combo.hidePopup
+        self._combo.showPopup = self._hook_show_popup  # noqa: N802 - Qt API
+        self._combo.hidePopup = self._hook_hide_popup  # noqa: N802 - Qt API
+
+    def _hook_show_popup(self) -> None:
+        self._orig_show_popup()
+        self.install_overlay()
+
+    def _hook_hide_popup(self) -> None:
+        self.teardown_overlay()
+        self._orig_hide_popup()
+
+    def install_overlay(self) -> None:
+        view = self._combo.view()
+        container = self._popup_container()
+        if view is None or container is None:
+            return
+
+        if self._search_edit is None:
+            edit = QLineEdit(view)
+            edit.setObjectName(f"{self._combo.objectName() or 'gw_combo'}_search")
+            edit.setPlaceholderText(self._combo.tr("Type to filter..."))
+            edit.setClearButtonEnabled(True)
+            edit.textChanged.connect(self._apply_search_filter)
+            edit.installEventFilter(self)
+            self._search_edit = edit
+        else:
+            self._search_edit.setParent(view)
+
+        if isinstance(view, _ComboPopupView):
+            view.set_top_widget(self._search_edit)
+
+        edit = self._search_edit
+        edit_h = edit.sizeHint().height()
+        edit.blockSignals(True)
+        edit.clear()
+        edit.blockSignals(False)
+
+        if isinstance(view, _ComboPopupView):
+            view.set_top_margin(edit_h)
+
+        edit.setGeometry(0, 0, view.width(), edit_h)
+        edit.show()
+        edit.raise_()
+        edit.setFocus(Qt.FocusReason.PopupFocusReason)
+
+        self._search_active = True
+        self._apply_search_filter("")
+
+    def teardown_overlay(self) -> None:
+        self._search_active = False
+        self._clear_popup_height()
+        view = self._combo.view()
+        if isinstance(view, _ComboPopupView):
+            view.set_top_margin(0)
+            view.set_top_widget(None)
+        if self._search_edit is None:
+            return
+        try:
+            self._search_edit.blockSignals(True)
+            self._search_edit.clear()
+            self._search_edit.blockSignals(False)
+            self._search_edit.hide()
+        except RuntimeError:
+            self._search_edit = None
+
+    def process_event(self, obj, event) -> bool:
+        if obj is not self._search_edit or event.type() != QEvent.Type.KeyPress:
+            return False
+        assert isinstance(event, QKeyEvent)
+        key = event.key()
+        if key in (
+            Qt.Key.Key_Down,
+            Qt.Key.Key_Up,
+            Qt.Key.Key_PageDown,
+            Qt.Key.Key_PageUp,
+            Qt.Key.Key_Home,
+            Qt.Key.Key_End,
+        ):
+            self._forward_navigation(event)
+            return True
+        if key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+            self._activate_highlighted()
+            return True
+        if key == Qt.Key.Key_Escape:
+            self._combo.hidePopup()
+            return True
+        if key == Qt.Key.Key_Tab:
+            self._combo.hidePopup()
+            QApplication.sendEvent(self._combo, event)
+            return True
+        return False
+
+    def _ensure_popup_view(self) -> None:
+        if not isinstance(self._combo.view(), _ComboPopupView):
+            self._combo.setView(_ComboPopupView(self._combo))
+        if self._combo.maxVisibleItems() <= MAX_POPUP_VISIBLE_HEIGHT_ITEMS:
+            self._combo.setMaxVisibleItems(MAX_POPUP_VISIBLE_HEIGHT_ITEMS)
+
+    def _popup_container(self):
+        view = self._combo.view()
+        return view.parentWidget() if view is not None else None
+
+    def _popup_widgets(self):
+        view = self._combo.view()
+        if view is None:
+            return []
+        seen = set()
+        widgets = []
+        for widget in (self._popup_container(), view, view.window()):
+            if widget is not None and id(widget) not in seen:
+                seen.add(id(widget))
+                widgets.append(widget)
+        return widgets
+
+    def _set_popup_height(self, width: int, height: int) -> None:
+        for widget in self._popup_widgets():
+            if not widget.isVisible():
+                continue
+            widget.setMaximumHeight(_QWIDGETSIZE_MAX)
+            widget.setMinimumHeight(0)
+            widget.resize(width, height)
+            widget.setMinimumHeight(height)
+            widget.setMaximumHeight(height)
+
+    def _clear_popup_height(self) -> None:
+        for widget in self._popup_widgets():
+            widget.setMinimumHeight(0)
+            widget.setMaximumHeight(_QWIDGETSIZE_MAX)
+
+    def _apply_search_filter(self, text: str) -> None:
+        if not self._search_active:
+            return
+        view = self._combo.view()
+        if view is None:
+            return
+        needle = (text or '').strip().lower()
+        total = self._row_count()
+
+        new_hidden: set = set()
+        first_visible = -1
+        visible_count = 0
+        match_count = 0
+        for i in range(total):
+            if needle and needle not in self._label_at(i).lower():
+                new_hidden.add(i)
+                continue
+            match_count += 1
+            if visible_count >= MAX_POPUP_VISIBLE_ROWS:
+                new_hidden.add(i)
+                continue
+            if first_visible < 0:
+                first_visible = i
+            visible_count += 1
+
+        view.setUpdatesEnabled(False)
+        try:
+            for i in self._hidden_rows - new_hidden:
+                view.setRowHidden(i, False)
+            for i in new_hidden - self._hidden_rows:
+                view.setRowHidden(i, True)
+        finally:
+            view.setUpdatesEnabled(True)
+        self._hidden_rows = new_hidden
+
+        if first_visible >= 0:
+            new_idx = self._index_at(first_visible)
+            view.setCurrentIndex(new_idx)
+            view.scrollTo(new_idx)
+
+        self._update_search_status(match_count, visible_count, needle, total)
+        display_rows = 0 if match_count <= 0 else min(match_count, self._combo.maxVisibleItems())
+        QTimer.singleShot(0, partial(self._layout_popup, display_rows, 0))
+
+    def _visible_row_span(self, display_rows: int):
+        first = last = None
+        shown = 0
+        for i in range(self._row_count()):
+            if i in self._hidden_rows:
+                continue
+            if first is None:
+                first = i
+            last = i
+            shown += 1
+            if shown >= display_rows:
+                break
+        return first, last
+
+    def _popup_list_height(self, view, display_rows: int) -> int:
+        if display_rows <= 0:
+            return max(12, view.fontMetrics().height() // 2)
+
+        first, last = self._visible_row_span(display_rows)
+        if first is not None and last is not None:
+            top = view.visualRect(self._index_at(first)).top()
+            bottom = view.visualRect(self._index_at(last)).bottom()
+            if bottom > top:
+                return bottom - top + 1
+
+        total = 0
+        shown = 0
+        for i in range(self._row_count()):
+            if i in self._hidden_rows:
+                continue
+            total += view.sizeHintForRow(i) or (view.fontMetrics().height() + 4)
+            shown += 1
+            if shown >= display_rows:
+                return total
+        return 0
+
+    def _layout_popup(self, display_rows: int, attempt: int = 0) -> None:
+        if not self._search_active:
+            return
+        view = self._combo.view()
+        if view is None:
+            return
+
+        list_h = self._popup_list_height(view, display_rows)
+        if list_h <= 0 and attempt < _POPUP_LAYOUT_MAX_ATTEMPTS:
+            QTimer.singleShot(
+                _POPUP_LAYOUT_RETRY_MS,
+                partial(self._layout_popup, display_rows, attempt + 1),
+            )
+            return
+
+        edit_h = self._search_edit.sizeHint().height() if self._search_edit else 0
+        container = self._popup_container()
+        width = self._combo.width() or (container.width() if container is not None else 0)
+        height = edit_h + list_h + _POPUP_FRAME_PAD
+        self._set_popup_height(width, height)
+
+        if getattr(self._combo, 'popup_opens_upward', False):
+            popup = view.window()
+            if popup is not None and popup.isVisible():
+                pos = self._combo.mapToGlobal(self._combo.rect().topLeft())
+                popup.move(pos.x(), pos.y() - height)
+
+    def _update_search_status(
+        self, match_count: int, visible_count: int, needle: str, total: int
+    ) -> None:
+        if self._search_edit is None:
+            return
+        if needle:
+            if match_count == 0:
+                tip = self._combo.tr("No matches")
+            elif match_count > visible_count:
+                tip = self._combo.tr("Showing {0} of {1} matches - keep typing...").format(
+                    visible_count, match_count
+                )
+            else:
+                tip = self._combo.tr("{0} matches").format(match_count)
+        elif total > MAX_POPUP_VISIBLE_ROWS:
+            tip = self._combo.tr("Type to filter ({0} of {1} shown)").format(
+                MAX_POPUP_VISIBLE_ROWS, total
+            )
+        else:
+            tip = self._combo.tr("Type to filter...")
+        self._search_edit.setToolTip(tip)
+        self._search_edit.setPlaceholderText(tip)
+
+    def _forward_navigation(self, event: QKeyEvent) -> None:
+        view = self._combo.view()
+        if view is None:
+            return
+        QApplication.sendEvent(view, event)
+
+    def _activate_highlighted(self) -> None:
+        view = self._combo.view()
+        if view is None:
+            self._combo.hidePopup()
+            return
+        idx = view.currentIndex()
+        if idx.isValid() and not view.isRowHidden(idx.row()):
+            self._combo.setCurrentIndex(idx.row())
+        self._combo.hidePopup()
+
+    def eventFilter(self, obj, event):  # noqa: N802 - Qt API
+        if self.process_event(obj, event):
+            return True
+        return super().eventFilter(obj, event)
+
+
 class GwAsyncComboBox(QComboBox):
     """Non-editable combobox that loads its items asynchronously and lets the
     user type-to-filter inside the popup.
@@ -267,14 +578,6 @@ class GwAsyncComboBox(QComboBox):
         self._is_null_value: bool = False
         self._loading: bool = False
 
-        # Popup search state.
-        self._search_edit: Optional[QLineEdit] = None
-        self._search_active: bool = False
-        # Set of row indices currently hidden in the popup view. Tracking it
-        # ourselves lets us only call setRowHidden on rows whose state has
-        # actually changed (huge win when typing/backspacing on 15k+ items).
-        self._hidden_rows: set = set()
-
         self.setProperty('rows_loaded', False)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setEditable(False)
@@ -312,7 +615,20 @@ class GwAsyncComboBox(QComboBox):
         self._popup_view = _ComboPopupView(self)
         self.setView(self._popup_view)
 
+        self._popup_search = _ComboPopupSearchController(
+            self,
+            label_at=self._popup_row_label,
+            row_count=lambda: self._list_model.rowCount(),
+            index_at=lambda i: self._list_model.index(i, 0),
+        )
+
         self._show_placeholder('')
+
+    def _popup_row_label(self, row: int) -> str:
+        rows = self._list_model.get_rows()
+        if row < 0 or row >= len(rows):
+            return ''
+        return rows[row][1]
 
     # region Wheel event (match CustomQComboBox)
     def wheelEvent(self, event):  # noqa: N802 - Qt API
@@ -361,6 +677,18 @@ class GwAsyncComboBox(QComboBox):
                     '' if user_data[1] is None else str(user_data[1]))
         # Fall back to using `text` as the visible label only.
         return ('' if user_data is None else str(user_data), '' if text is None else str(text))
+
+    def itemData(self, index: int, role: int = Qt.ItemDataRole.UserRole):  # noqa: N802 - Qt API
+        """Expose ``UserRole`` row payload for ``tools_qt.get_combo_value``."""
+        if index < 0:
+            return None
+        model_index = self._list_model.index(index, 0)
+        if not model_index.isValid():
+            return None
+        data = self._list_model.data(model_index, role)
+        if data is not None:
+            return data
+        return super().itemData(index, role)
     # endregion
 
     # region Public API used by tools_gw / tools_qt
@@ -386,10 +714,12 @@ class GwAsyncComboBox(QComboBox):
     def start_loading(self, query: str) -> None:
         """Begin (or restart) loading the combo's items in the background."""
         if not query:
-            # No query → empty list, just clear the placeholder so the combo
-            # is ready (and signal that loading is "done").
+            # Child combo waiting for a parent value, or an intentional no-op.
+            # Keep the placeholder; do not mark rows as loaded with an empty model
+            # (count 0 blocks the popup and breaks child combos in info forms).
             self._show_placeholder('')
-            self.apply_rows([])
+            self.setProperty('rows_loaded', False)
+            self._loading = False
             return
 
         # Bump token: older tasks finishing later will be ignored.
@@ -430,7 +760,7 @@ class GwAsyncComboBox(QComboBox):
 
         # New row set invalidates any hidden-rows bookkeeping from a
         # previous model state.
-        self._hidden_rows = set()
+        self._popup_search.clear_filter_state()
 
         # Block signals across the model swap + selection so external
         # handlers don't fire intermediate `currentIndexChanged` events
@@ -439,6 +769,14 @@ class GwAsyncComboBox(QComboBox):
         try:
             self._list_model.set_rows(items)
             self._apply_pending_selection()
+            # Plain QComboBox selects index 0 after addItem(); model reset leaves
+            # currentIndex at -1 unless we restore it explicitly.
+            if (
+                self.currentIndex() < 0
+                and self.count() > 0
+                and self._pending_selected_id is None
+            ):
+                self.setCurrentIndex(0)
         finally:
             self.blockSignals(False)
 
@@ -456,299 +794,11 @@ class GwAsyncComboBox(QComboBox):
     # region Popup with type-to-filter
     def showPopup(self):  # noqa: N802 - Qt API
         super().showPopup()
-        if self._list_model.rowCount() <= 1:
-            return
-        self._install_search_overlay()
+        self._popup_search.install_overlay()
 
     def hidePopup(self):  # noqa: N802 - Qt API
-        self._teardown_search_overlay()
+        self._popup_search.teardown_overlay()
         super().hidePopup()
-
-    def _popup_container(self):
-        view = self.view()
-        return view.parentWidget() if view is not None else None
-
-    def _popup_widgets(self):
-        """Return popup widgets whose height we manage (container, view, window)."""
-        view = self.view()
-        if view is None:
-            return []
-        seen = set()
-        widgets = []
-        for widget in (self._popup_container(), view, view.window()):
-            if widget is not None and id(widget) not in seen:
-                seen.add(id(widget))
-                widgets.append(widget)
-        return widgets
-
-    def _set_popup_height(self, width: int, height: int) -> None:
-        """Pin popup height on every layer Qt uses for the combo list."""
-        for widget in self._popup_widgets():
-            if not widget.isVisible():
-                continue
-            widget.setMaximumHeight(_QWIDGETSIZE_MAX)
-            widget.setMinimumHeight(0)
-            widget.resize(width, height)
-            widget.setMinimumHeight(height)
-            widget.setMaximumHeight(height)
-
-    def _clear_popup_height(self) -> None:
-        for widget in self._popup_widgets():
-            widget.setMinimumHeight(0)
-            widget.setMaximumHeight(_QWIDGETSIZE_MAX)
-
-    def _install_search_overlay(self):
-        view = self.view()
-        container = self._popup_container()
-        if view is None or container is None:
-            return
-
-        if self._search_edit is None:
-            edit = QLineEdit(view)
-            edit.setObjectName(f"{self.objectName() or 'gw_async_combo'}_search")
-            edit.setPlaceholderText(self.tr("Type to filter..."))
-            edit.setClearButtonEnabled(True)
-            edit.textChanged.connect(self._apply_search_filter)
-            edit.installEventFilter(self)
-            self._search_edit = edit
-        else:
-            self._search_edit.setParent(view)
-
-        if isinstance(view, _ComboPopupView):
-            view.set_top_widget(self._search_edit)
-
-        edit = self._search_edit
-        edit_h = edit.sizeHint().height()
-        edit.blockSignals(True)
-        edit.clear()
-        edit.blockSignals(False)
-
-        if isinstance(view, _ComboPopupView):
-            view.set_top_margin(edit_h)
-
-        edit.setGeometry(0, 0, view.width(), edit_h)
-        edit.show()
-        edit.raise_()
-        edit.setFocus(Qt.FocusReason.PopupFocusReason)
-
-        self._search_active = True
-        self._apply_search_filter("")
-
-    def _teardown_search_overlay(self):
-        self._search_active = False
-        self._clear_popup_height()
-        view = self.view()
-        if isinstance(view, _ComboPopupView):
-            view.set_top_margin(0)
-            view.set_top_widget(None)
-        if self._search_edit is None:
-            return
-        try:
-            self._search_edit.blockSignals(True)
-            self._search_edit.clear()
-            self._search_edit.blockSignals(False)
-            self._search_edit.hide()
-        except RuntimeError:
-            # View may already be gone.
-            self._search_edit = None
-
-    def _apply_search_filter(self, text: str) -> None:
-        if not self._search_active:
-            return
-        view = self.view()
-        if view is None:
-            return
-        needle = (text or '').strip().lower()
-        rows = self._list_model.get_rows()
-        total = len(rows)
-
-        # Walk the rows once: collect non-matches into the hidden set, and
-        # cap the number of *matches* we actually expose to the view. Excess
-        # matches go into the hidden set too — the user can narrow further.
-        new_hidden: set = set()
-        first_visible = -1
-        visible_count = 0
-        match_count = 0
-        for i in range(total):
-            if needle and needle not in rows[i][1].lower():
-                new_hidden.add(i)
-                continue
-            match_count += 1
-            if visible_count >= MAX_POPUP_VISIBLE_ROWS:
-                new_hidden.add(i)
-                continue
-            if first_visible < 0:
-                first_visible = i
-            visible_count += 1
-
-        # Diff against the previous hidden set to only call setRowHidden on
-        # rows whose visibility actually changed.
-        view.setUpdatesEnabled(False)
-        try:
-            for i in self._hidden_rows - new_hidden:
-                view.setRowHidden(i, False)
-            for i in new_hidden - self._hidden_rows:
-                view.setRowHidden(i, True)
-        finally:
-            view.setUpdatesEnabled(True)
-        self._hidden_rows = new_hidden
-
-        if first_visible >= 0:
-            new_idx = self._list_model.index(first_visible, 0)
-            view.setCurrentIndex(new_idx)
-            view.scrollTo(new_idx)
-
-        self._update_search_status(match_count, visible_count, needle, total)
-        display_rows = 0 if match_count <= 0 else min(match_count, self.maxVisibleItems())
-        self._schedule_layout_popup(display_rows)
-
-    def _schedule_layout_popup(self, display_rows: int) -> None:
-        """Layout after Qt paints rows so visualRect measurements are reliable."""
-        QTimer.singleShot(0, partial(self._layout_popup, display_rows, 0))
-
-    def _visible_row_span(self, display_rows: int):
-        """Return `(first_row, last_row)` indices for popup height, up to `display_rows`."""
-        first = last = None
-        shown = 0
-        for i in range(self._list_model.rowCount()):
-            if i in self._hidden_rows:
-                continue
-            if first is None:
-                first = i
-            last = i
-            shown += 1
-            if shown >= display_rows:
-                break
-        return first, last
-
-    def _popup_list_height(self, view, display_rows: int) -> int:
-        """Measure the painted list height from first to last visible row."""
-        if display_rows <= 0:
-            return max(12, view.fontMetrics().height() // 2)
-
-        first, last = self._visible_row_span(display_rows)
-        if first is not None and last is not None:
-            top = view.visualRect(self._list_model.index(first, 0)).top()
-            bottom = view.visualRect(self._list_model.index(last, 0)).bottom()
-            if bottom > top:
-                return bottom - top + 1
-
-        # Fallback before rows are painted: sum size hints without padding floors.
-        total = 0
-        shown = 0
-        for i in range(self._list_model.rowCount()):
-            if i in self._hidden_rows:
-                continue
-            total += view.sizeHintForRow(i) or (view.fontMetrics().height() + 4)
-            shown += 1
-            if shown >= display_rows:
-                return total
-        return 0
-
-    def _layout_popup(self, display_rows: int, attempt: int = 0) -> None:
-        """Resize the popup to fit the search box plus visible rows.
-
-        Qt opens the list at ``maxVisibleItems`` height. We remeasure the
-        painted row span after the popup is shown and pin the same height on
-        the container, view and top-level popup window so no empty area remains.
-        """
-        if not self._search_active:
-            return
-        view = self.view()
-        if view is None:
-            return
-
-        list_h = self._popup_list_height(view, display_rows)
-        if list_h <= 0 and attempt < _POPUP_LAYOUT_MAX_ATTEMPTS:
-            QTimer.singleShot(
-                _POPUP_LAYOUT_RETRY_MS,
-                partial(self._layout_popup, display_rows, attempt + 1),
-            )
-            return
-
-        edit_h = self._search_edit.sizeHint().height() if self._search_edit else 0
-        container = self._popup_container()
-        width = self.width() or (container.width() if container is not None else 0)
-        height = edit_h + list_h + _POPUP_FRAME_PAD
-
-        self._set_popup_height(width, height)
-
-        if self.popup_opens_upward:
-            popup = view.window()
-            if popup is not None and popup.isVisible():
-                pos = self.mapToGlobal(self.rect().topLeft())
-                popup.move(pos.x(), pos.y() - height)
-
-    def _update_search_status(
-        self, match_count: int, visible_count: int, needle: str, total: int
-    ) -> None:
-        if self._search_edit is None:
-            return
-        if needle:
-            if match_count == 0:
-                tip = self.tr("No matches")
-            elif match_count > visible_count:
-                tip = self.tr("Showing {0} of {1} matches - keep typing...").format(
-                    visible_count, match_count
-                )
-            else:
-                tip = self.tr("{0} matches").format(match_count)
-        elif total > MAX_POPUP_VISIBLE_ROWS:
-            tip = self.tr("Type to filter ({0} of {1} shown)").format(
-                MAX_POPUP_VISIBLE_ROWS, total
-            )
-        else:
-            tip = self.tr("Type to filter...")
-        self._search_edit.setToolTip(tip)
-        # Placeholder is only visible while the line edit is empty, but
-        # showing the truncation hint there is exactly when it's most useful.
-        self._search_edit.setPlaceholderText(tip)
-
-    def _forward_navigation(self, event: QKeyEvent) -> None:
-        # QAbstractItemView.moveCursor already skips hidden rows during
-        # arrow / page navigation, so we just deliver the key event to the
-        # popup view as if it were focused.
-        view = self.view()
-        if view is None:
-            return
-        QApplication.sendEvent(view, event)
-
-    def _activate_highlighted(self) -> None:
-        view = self.view()
-        if view is None:
-            self.hidePopup()
-            return
-        idx = view.currentIndex()
-        if idx.isValid() and not view.isRowHidden(idx.row()):
-            self.setCurrentIndex(idx.row())
-        self.hidePopup()
-
-    def eventFilter(self, obj, event):  # noqa: N802 - Qt API
-        if obj is self._search_edit and event.type() == QEvent.Type.KeyPress:
-            assert isinstance(event, QKeyEvent)
-            key = event.key()
-            if key in (
-                Qt.Key.Key_Down,
-                Qt.Key.Key_Up,
-                Qt.Key.Key_PageDown,
-                Qt.Key.Key_PageUp,
-                Qt.Key.Key_Home,
-                Qt.Key.Key_End,
-            ):
-                self._forward_navigation(event)
-                return True
-            if key in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
-                self._activate_highlighted()
-                return True
-            if key == Qt.Key.Key_Escape:
-                self.hidePopup()
-                return True
-            if key == Qt.Key.Key_Tab:
-                # Close popup and let focus go to the next widget.
-                self.hidePopup()
-                QApplication.sendEvent(self, event)
-                return True
-        return super().eventFilter(obj, event)
     # endregion
 
     # region Internals
@@ -793,3 +843,22 @@ class GwAsyncComboBox(QComboBox):
         # We keep _pending_selected_id so a later reload (e.g. parent combo
         # changed) can pick it up.
     # endregion
+
+
+def attach_combo_popup_search(combo: QComboBox) -> None:
+    """Add type-to-filter popup search to a plain ``QComboBox`` in-place."""
+    if combo is None:
+        return
+    if getattr(combo, '_gw_is_async_combo', False):
+        return
+    if getattr(combo, '_gw_popup_search', None) is not None:
+        return
+
+    controller = _ComboPopupSearchController(
+        combo,
+        label_at=combo.itemText,
+        row_count=combo.count,
+    )
+    controller.attach_to_plain_combo()
+    combo._gw_popup_search = controller
+    combo.setProperty('_gw_popup_search', True)
