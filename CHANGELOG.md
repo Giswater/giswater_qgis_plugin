@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix selector performance on large projects: optimize `vf_node`/`vf_arc`/`vf_connec`/`vf_element`/`vf_link` filters and stop probing `ve_node` inside `gw_fct_setselectors` (check-all exploitations was multi-second).
 - Fix `tools_db.ensure_service_auth` to get correct credentials from `pg_service.conf`.
 - Fix config_form_fields `dv_querytext` to use `vf_hydrometer` and `hydro_customer_code` instead of `v_rtc_hydrometer` and `hydrometer_customer_code`.
+- Fix admin dialog: refresh Project Schema list after a connection error.
 
 ## [4.15.2] - 2026-07-16
 
