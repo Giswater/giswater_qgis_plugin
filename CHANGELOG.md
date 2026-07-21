@@ -10,10 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix blank multilingual projects: respect locale `cat_feature.active` and keep MULTI-CREATE `config_form_fields` (skip sample CFF wipe in empty profile).
-- Fix admin dialog: refresh Project Schema list after a connection error.
-- Fix admin dialog: list all WS/UD schemas on the active connection.
 - Fix `gw_fct_mincut_minsector` and `gw_fct_setmincut` functions to count hydrometers correctly.
 - Fix selector performance on large projects: optimize `vf_node`/`vf_arc`/`vf_connec`/`vf_element`/`vf_link` filters and stop probing `ve_node` inside `gw_fct_setselectors` (check-all exploitations was multi-second).
+
+## [4.15.4] - 2026-07-21
+
+### Fixed
+
+- Fix admin dialog: refresh Project Schema list after a connection error.
+- Fix admin dialog: list all WS/UD schemas on the active connection.
 
 ## [4.15.3] - 2026-07-17
 
@@ -528,7 +533,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.15.3...main
+[unreleased]: https://github.com/giswater/plugin/compare/v4.15.4...main
+[4.15.4]: https://github.com/giswater/plugin/compare/v4.15.3...v4.15.4
 [4.15.3]: https://github.com/giswater/plugin/compare/v4.15.2...v4.15.3
 [4.15.2]: https://github.com/giswater/plugin/compare/v4.15.1...v4.15.2
 [4.15.1]: https://github.com/giswater/plugin/compare/v4.15.0...v4.15.1
