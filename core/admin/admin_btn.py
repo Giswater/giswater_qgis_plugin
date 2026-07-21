@@ -9,6 +9,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 from functools import partial
 from qgis.PyQt.sip import isdeleted
 from time import time
@@ -1293,6 +1294,7 @@ class GwAdminButton:
         tools_qt.fill_combo_values(self.cmb_locale, list_locale)
 
         self._load_create_project_user_values()
+        self._apply_dev_project_name()
 
         # Set shortcut keys
         self.dlg_readsql_create_project.key_escape.connect(
@@ -1357,6 +1359,76 @@ class GwAdminButton:
         if project_locale:
             tools_gw.set_config_parser('btn_admin', 'project_locale', f'{project_locale}', prefix=False)
         tools_gw.set_config_parser('btn_admin', 'create_schema_type', create_schema_type, prefix=False)
+
+    def _dev_project_name_token_values(self):
+        """Resolve tokens for developer auto project_name (snapshot now once)."""
+        now = datetime.now()
+        project_type = tools_qt.get_text(self.dlg_readsql_create_project, self.cmb_create_project_type)
+        if not project_type or project_type == 'null':
+            project_type = 'ws'
+
+        if self.rdb_sample_inv is not None and self.rdb_sample_inv.isChecked():
+            project_profile = 'inventory'
+        elif self.rdb_sample_full is not None and self.rdb_sample_full.isChecked():
+            project_profile = 'sample'
+        else:
+            project_profile = 'empty'
+
+        version = re.sub(r'\D', '', str(self.plugin_version or ''))
+
+        return {
+            'project_type': project_type.lower(),
+            'version': version,
+            'project_profile': project_profile,
+            'YYYYMMDD': now.strftime('%Y%m%d'),
+            'YYYYMM': now.strftime('%Y%m'),
+            'MMDD': now.strftime('%m%d'),
+            'HHMM': now.strftime('%H%M'),
+            'YYYY': now.strftime('%Y'),
+            'MM': now.strftime('%m'),
+            'DD': now.strftime('%d'),
+        }
+
+    def _build_dev_project_name(self):
+        """Build project_name from init.btn_admin tokens + separator."""
+        default_tokens = 'project_type,version,project_profile,YYYYMMDD,HHMM'
+        # Read plugin user_params (gw_dev_mode) so each developer can edit their checkout
+        tokens_raw = tools_gw.get_config_parser(
+            'init.btn_admin', 'dev_project_name_tokens', "project", "user_params",
+            prefix=False, chk_user_params=False, force_reload=True)
+        separator = tools_gw.get_config_parser(
+            'init.btn_admin', 'dev_project_name_separator', "project", "user_params",
+            prefix=False, chk_user_params=False, force_reload=True)
+
+        if not tokens_raw or tokens_raw in ('None', 'null'):
+            tokens_raw = default_tokens
+        if separator is None or separator in ('None', 'null'):
+            separator = '_'
+        # Schema names only allow [a-z0-9_]; coerce invalid separators to '_'
+        if separator not in ('', '_'):
+            separator = '_'
+
+        token_values = self._dev_project_name_token_values()
+        parts = []
+        for token in tokens_raw.split(','):
+            key = token.strip()
+            if not key:
+                continue
+            value = token_values.get(key)
+            if value:
+                parts.append(value)
+
+        return separator.join(parts) if parts else ''
+
+    def _apply_dev_project_name(self):
+        """Auto-fill project_name when GwDevMode is on."""
+        if not global_vars.gw_dev_mode:
+            return
+        if self.project_name is None:
+            return
+        name = self._build_dev_project_name()
+        if name:
+            self.project_name.setText(name)
 
     # region private functions
 
@@ -2976,8 +3048,18 @@ class GwAdminButton:
         self.dlg_readsql_create_project.dlg_closed.connect(partial(self._save_create_project_user_values))
         self.cmb_create_project_type.currentIndexChanged.connect(
             partial(self._change_project_type, self.cmb_create_project_type))
+        self.cmb_create_project_type.currentIndexChanged.connect(
+            lambda _index=None: self._apply_dev_project_name())
         self.cmb_locale.currentIndexChanged.connect(partial(self._update_locale))
         self.filter_srid.textChanged.connect(partial(self._filter_srid_changed))
+        for radio in (self.rdb_empty, self.rdb_sample_inv, self.rdb_sample_full):
+            if radio is not None:
+                radio.toggled.connect(self._on_create_project_profile_toggled)
+
+    def _on_create_project_profile_toggled(self, checked):
+        """Regenerate developer project_name when data-source radio changes."""
+        if checked:
+            self._apply_dev_project_name()
 
     def _open_manage_schemas(self):
         from .manage_schemas_dlg import GwManageSchemasDialog
