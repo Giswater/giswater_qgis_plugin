@@ -397,9 +397,11 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
                 value += f" #{comment}"
             # If the previous value had an inline comment, don't remove it
             else:
-                prev = get_config_parser(section, parameter, config_type, file_name, False, True, False)
-                if prev is not None and "#" in prev:
-                    value += f" #{prev.split('#')[1]}"
+                # get_none=True: keep "None #comment" so inline comments survive rewrites
+                prev = get_config_parser(section, parameter, config_type, file_name, False, True, False,
+                                         get_none=True)
+                if prev is not None and "#" in str(prev):
+                    value += f" #{str(prev).split('#', 1)[1]}"
             parser.set(section, parameter, value)
             # Check if the parameter exists in the inventory, if not creates it
             if chk_user_params and config_type in "user":
@@ -6843,6 +6845,15 @@ def _try_read_config_path(filepath):
 
 def _write_config_parser(path, parser):
     """ Write parser to disk. For user_params, validate round-trip before persisting. """
+    # Never mutate the plugin-bundled user_params template (GwDevMode reads from plugin_dir)
+    if (global_vars.gw_dev_mode and path and lib_vars.plugin_dir
+            and path.endswith(f"{os.sep}user_params.config")
+            and os.path.normpath(path).startswith(os.path.normpath(lib_vars.plugin_dir))):
+        msg = "{0}: Refusing to write plugin user_params.config while GwDevMode is enabled"
+        msg_params = ("_write_config_parser",)
+        tools_log.log_warning(msg, msg_params=msg_params)
+        return False
+
     buffer = io.StringIO()
     parser.write(buffer)
     content = buffer.getvalue()
@@ -7472,7 +7483,11 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
 
 
 def _check_user_params(section, parameter, file_name, prefix=False):
-    """ Ensure parameter exists in user_params.config inventory; create it with None if missing. """
+    """ Ensure parameter exists in user_params.config inventory; create it with None if missing.
+
+    In GwDevMode the inventory is the plugin template — never auto-create keys there
+    (would dirty the git checkout). Only seed missing keys in the user-folder copy.
+    """
 
     if section == "i18n_generator" or parameter == "dev_commit":
         return
@@ -7480,17 +7495,20 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     inv_key = _inventory_key_for_user_param(parameter, prefix)
     inv_section = f"{file_name}.{section}"
 
+    # get_none=True so "None #comment" is not treated as missing
     check_value = get_config_parser(inv_section, inv_key, "project", "user_params", False,
-                                    get_comment=True, chk_user_params=False)
+                                    get_comment=True, chk_user_params=False, get_none=True)
 
     if check_value is None:
         for typed_key in (f"ws_{inv_key.lstrip('_')}", f"ud_{inv_key.lstrip('_')}"):
             check_value = get_config_parser(inv_section, typed_key, "project", "user_params", False,
-                                            get_comment=True, chk_user_params=False)
+                                            get_comment=True, chk_user_params=False, get_none=True)
             if check_value is not None:
                 break
 
     if check_value is None:
+        if global_vars.gw_dev_mode:
+            return None
         set_config_parser(inv_section, inv_key, None, "project", "user_params", prefix=False,
                           chk_user_params=False)
     else:
