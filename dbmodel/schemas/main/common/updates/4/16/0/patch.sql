@@ -139,11 +139,27 @@ WHERE EXISTS (
 	);
 
 CREATE OR REPLACE VIEW vf_element AS
-SELECT e.element_id
+SELECT 
+	e.element_id,
+    COALESCE(pp.state, e.state) AS p_state
 FROM element e
+LEFT JOIN man_frelem mf ON e.element_id = mf.element_id 
+LEFT JOIN LATERAL (
+	SELECT pp_1.state
+	FROM plan_psector_x_node pp_1
+	WHERE pp_1.node_id = mf.node_id AND (
+		pp_1.psector_id IN (
+			SELECT sp.psector_id
+			FROM selector_psector sp
+			WHERE sp.cur_user = CURRENT_USER
+			)
+		)
+    ORDER BY pp_1.psector_id DESC
+	LIMIT 1
+) pp ON true
 WHERE EXISTS (
 		SELECT 1 FROM selector_state ss
-		WHERE ss.cur_user = CURRENT_USER AND ss.state_id = e.state
+		WHERE ss.cur_user = CURRENT_USER AND ss.state_id = COALESCE(pp.state, e.state)
 	)
 	AND (
 		e.sector_id IN (SELECT ssec.sector_id FROM selector_sector ssec WHERE ssec.cur_user = CURRENT_USER)
