@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import json
-import operator
 from functools import partial
 
 from qgis.PyQt.QtCore import QDate
