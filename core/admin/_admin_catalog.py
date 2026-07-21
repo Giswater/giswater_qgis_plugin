@@ -62,9 +62,13 @@ def fetch_schema_names_with_sys_version(fetcher: RowFetcher = _tools_db_fetch) -
 
 def fetch_sys_version_schemas(
     project_type: Optional[str] = None,
-    fetcher: RowFetcher = _tools_db_fetch,
+    fetcher: RowFetcher = _tools_db_fetch_per_schema,
 ) -> list[tuple[str, str]]:
-    """Return [(schema_name, project_type), ...] for accessible ws/ud-like schemas."""
+    """Return [(schema_name, project_type), ...] for accessible ws/ud-like schemas.
+
+    Always probe project_type via @fetcher (same connection as the schema list).
+    Default fetcher suppresses per-schema permission errors on the main dao.
+    """
     schema_names = fetch_schema_names_with_sys_version(fetcher)
     if not schema_names:
         return []
@@ -73,8 +77,9 @@ def fetch_sys_version_schemas(
     for schema_name in schema_names:
         if schema_name in _SATELLITE_SCHEMAS:
             continue
-        rows = _tools_db_fetch_per_schema(
+        rows = fetcher(
             f"SELECT project_type FROM {_quote_ident(schema_name)}.sys_version LIMIT 1",
+            None,
         )
         if rows and rows[0] and rows[0][0] is not None:
             result.append((str(schema_name), str(rows[0][0])))
