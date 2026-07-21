@@ -18,6 +18,7 @@ from .toolbars import buttons
 from .utils import tools_gw
 from .threads.project_layers_config import GwProjectLayersConfig
 from .threads.project_check import GwProjectCheckTask
+from .threads.combo_loader import clear_combo_query_cache
 from .shared.psector import GwPsector
 from .shared.search import GwSearchLocatorFilter
 from .. import global_vars
@@ -42,6 +43,7 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
+        clear_combo_query_cache()
         global_vars.project_loaded = False
         if show_warning:
             msg = "Project read started"

@@ -3914,6 +3914,19 @@ def _should_use_async_combo_fill(widget, field, dialog=None) -> bool:
     return parent_val not in (None, '', -1)
 
 
+def _should_defer_filtered_child_load(field, dialog) -> bool:
+    """Skip the first SQL load when ``connect_isparent_combos`` will refresh this child."""
+    if dialog is None or isdeleted(dialog) or not isinstance(field, dict):
+        return False
+    if not dialog.property('_gw_defer_filtered_child_combos'):
+        return False
+    if not _is_async_combo_field(field):
+        return False
+    if not _get_async_combo_query_filter(field):
+        return False
+    return bool(_get_async_combo_parent_id(field))
+
+
 def _find_form_combo(dialog, field_or_name, columnname=None):
     """Locate a form combo by widgetname / columnname."""
     if dialog is None or isdeleted(dialog):
@@ -3939,11 +3952,16 @@ def _find_form_combo(dialog, field_or_name, columnname=None):
     return None
 
 
-def _refresh_isparent_children_when_ready(
-    dialog, parent_widget, refresh_fn, refresh_args=(), _attempt=0
-) -> None:
-    """Run ``refresh_fn`` once the parent combo has rows and a valid id."""
-    max_attempts = 80  # 80 x 50 ms ~= 4 s
+def _run_isparent_refresh_if_ready(dialog, parent_widget, refresh) -> None:
+    """Run ``refresh`` when the parent combo already has a value.
+
+    Async parent combos are still loading here on form open; they trigger
+    ``refresh`` via ``currentIndexChanged`` once ``apply_rows`` finishes.
+    """
+    if dialog is None or isdeleted(dialog) or parent_widget is None or isdeleted(parent_widget):
+        return
+    if getattr(parent_widget, '_gw_is_async_combo', False) and not parent_widget.property('rows_loaded'):
+        return
 
     combo_id = tools_qt.get_combo_value(dialog, parent_widget, 0)
     if combo_id in (None, '', -1):
@@ -3951,25 +3969,10 @@ def _refresh_isparent_children_when_ready(
         col = parent_widget.property('columnname')
         if isinstance(form_values, dict) and col:
             combo_id = form_values.get(str(col))
-    rows_loaded = (
-        not getattr(parent_widget, '_gw_is_async_combo', False)
-        or bool(parent_widget.property('rows_loaded'))
-    )
-    if combo_id in (None, '', -1) or not rows_loaded:
-        if _attempt < max_attempts:
-            QTimer.singleShot(
-                50,
-                partial(
-                    _refresh_isparent_children_when_ready,
-                    dialog,
-                    parent_widget,
-                    refresh_fn,
-                    refresh_args,
-                    _attempt + 1,
-                ),
-            )
+    if combo_id in (None, '', -1):
         return
-    refresh_fn(dialog, parent_widget, *refresh_args)
+
+    refresh()
 
 
 def connect_isparent_combos(dialog, fields, refresh_fn, *refresh_args) -> None:
@@ -3993,13 +3996,7 @@ def connect_isparent_combos(dialog, fields, refresh_fn, *refresh_args) -> None:
         widget.currentIndexChanged.connect(bound)
         QTimer.singleShot(
             0,
-            partial(
-                _refresh_isparent_children_when_ready,
-                dialog,
-                widget,
-                refresh_fn,
-                refresh_args,
-            ),
+            partial(_run_isparent_refresh_if_ready, dialog, widget, bound),
         )
 
 
@@ -4136,8 +4133,11 @@ def _fill_async_combo(widget, field, index_to_compare=0, dialog=None):
     widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
 
     selected_id = _resolve_combo_selected_id(field)
-    query = _build_async_combo_query(widget, field, dialog)
-    widget.start_loading(query)
+    if _should_defer_filtered_child_load(field, dialog):
+        widget.start_loading('')
+    else:
+        query = _build_async_combo_query(widget, field, dialog)
+        widget.start_loading(query)
     if selected_id not in (None, ''):
         widget.set_pending_selection(selected_id, index_to_compare)
     return widget
@@ -4221,8 +4221,6 @@ def resolve_combo_valuemap(field):
         valuemap[str(row_idval if row_idval is not None else row_id)] = str(row_id)
     return valuemap
 
-# endregion
-
 
 def _child_combo_selected_id(dialog, field):
     """Pick the id to select when (re)loading a filtered child combo.
@@ -4256,6 +4254,8 @@ def _child_combo_selected_id(dialog, field):
             return _resolve_combo_selected_id(field)
 
     return saved
+
+# endregion
 
 
 def fill_combo_child(dialog, combo_child):

@@ -772,6 +772,7 @@ class GwInfo(QObject):
                 layout_orientations[layout_name] = orientation
 
         current_layout = ""
+        self.dlg_cf.setProperty('_gw_defer_filtered_child_combos', not reload_epa)
         tools_gw.set_form_field_values(self.dlg_cf, result.get('fields'))
         for field in complet_result['body']['data']['fields']:
 
@@ -851,6 +852,7 @@ class GwInfo(QObject):
 
         if reload_epa:
             return
+        self.dlg_cf.setProperty('_gw_defer_filtered_child_combos', False)
         # Manage combo parents and children:
         tools_gw.connect_isparent_combos(
             self.dlg_cf,

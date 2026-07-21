@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.core import QgsApplication
 
-from ..threads.combo_loader import GwComboLoaderTask
+from ..threads.combo_loader import GwComboLoaderTask, get_combo_rows_cached
 
 
 # Pair of (id, idval) strings stored per row. Tuples are cheap and immutable.
@@ -724,6 +724,15 @@ class GwAsyncComboBox(QComboBox):
 
         # Bump token: older tasks finishing later will be ignored.
         self._token += 1
+        token = self._token
+
+        cached_rows = get_combo_rows_cached(query)
+        if cached_rows is not None:
+            self._loading = False
+            self._task = None
+            self.apply_rows(cached_rows)
+            return
+
         self._loading = True
         self.setProperty('rows_loaded', False)
         self._show_placeholder(self.tr('Loading...'))
@@ -737,7 +746,7 @@ class GwAsyncComboBox(QComboBox):
             self._task = None
 
         description = f"GwAsyncComboBox load {self.objectName() or '(no name)'}"
-        task = GwComboLoaderTask(description, query, self._token)
+        task = GwComboLoaderTask(description, query, token)
         task.rows_loaded.connect(self._on_rows_loaded)
         self._task = task
         QgsApplication.taskManager().addTask(task)
@@ -816,9 +825,17 @@ class GwAsyncComboBox(QComboBox):
         if error:
             # Show a single, clearly disabled-looking row. We don't disable
             # the widget so the user can still type/retry via parent combo.
-            self._list_model.set_rows([('', self.tr('Error loading values'))])
-            self.setProperty('rows_loaded', True)
-            self._loading = False
+            self.blockSignals(True)
+            try:
+                self._list_model.set_rows([('', self.tr('Error loading values'))])
+                self.setProperty('rows_loaded', True)
+                self._loading = False
+            finally:
+                self.blockSignals(False)
+            try:
+                self.currentIndexChanged.emit(self.currentIndex())
+            except Exception:
+                pass
             return
         self.apply_rows(rows)
 
