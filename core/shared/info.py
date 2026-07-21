@@ -772,6 +772,7 @@ class GwInfo(QObject):
                 layout_orientations[layout_name] = orientation
 
         current_layout = ""
+        tools_gw.set_form_field_values(self.dlg_cf, result.get('fields'))
         for field in complet_result['body']['data']['fields']:
 
             if field.get('hidden'):
