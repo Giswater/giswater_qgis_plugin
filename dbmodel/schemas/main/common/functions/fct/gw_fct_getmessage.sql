@@ -68,6 +68,8 @@ v_table_id text;
 v_column_id text;
 v_cur_user text;
 v_ui_lang text;
+v_ml_pref jsonb;
+v_ml_project_type text;
 v_i18n_ms text;
 v_i18n_ht text;
 v_i18n_ds text;
@@ -191,11 +193,19 @@ BEGIN
 
 	-- Apply multilang UI translations for sys_message
 	v_schema := 'SCHEMA_NAME';
-	v_ui_lang := gw_fct_get_utils_language_ui();
+	v_ui_lang := NULL;
+	v_ml_project_type := NULL;
+	IF to_regnamespace('multilang') IS NOT NULL THEN
+		v_ml_pref := multilang.gw_fct_get_multilang_language('SCHEMA_NAME');
+		IF v_ml_pref IS NOT NULL THEN
+			v_ui_lang := v_ml_pref->>'lang';
+			v_ml_project_type := v_ml_pref->>'project_type';
+		END IF;
+	END IF;
 	IF v_ui_lang IS NOT NULL THEN
 		SELECT i.ms, i.ht INTO v_i18n_ms, v_i18n_ht
 		FROM multilang.sys_message i
-		WHERE i.schema_name = v_schema
+		WHERE i.project_type = v_ml_project_type
 		  AND i.context = 'sys_message'
 		  AND i.source = v_message_id::text
 		  AND i.lang = v_ui_lang
@@ -219,7 +229,7 @@ BEGIN
 		IF v_ui_lang IS NOT NULL THEN
 			SELECT i.ds INTO v_i18n_ds
 			FROM multilang.sys_function i
-			WHERE i.schema_name = v_schema
+			WHERE i.project_type = v_ml_project_type
 			  AND i.context = 'sys_function'
 			  AND i.source = v_function_id::text
 			  AND i.lang = v_ui_lang

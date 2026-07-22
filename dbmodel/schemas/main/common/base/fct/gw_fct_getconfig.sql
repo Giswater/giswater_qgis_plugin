@@ -70,6 +70,8 @@ v_debug_vars json;
 v_debug json;
 v_msgerr json;
 v_ui_lang text;
+v_ml_pref jsonb;
+v_ml_project_type text;
 v_i18n_lb text;
 v_i18n_tt text;
 v_schema text;
@@ -321,13 +323,21 @@ BEGIN
 
 		-- Apply multilang UI translations for sys_param_user
 		v_schema := 'SCHEMA_NAME';
-		v_ui_lang := gw_fct_get_utils_language_ui();
+		v_ui_lang := NULL;
+		v_ml_project_type := NULL;
+		IF to_regnamespace('multilang') IS NOT NULL THEN
+			v_ml_pref := multilang.gw_fct_get_multilang_language('SCHEMA_NAME');
+			IF v_ml_pref IS NOT NULL THEN
+				v_ui_lang := v_ml_pref->>'lang';
+				v_ml_project_type := v_ml_pref->>'project_type';
+			END IF;
+		END IF;
 		IF v_ui_lang IS NOT NULL THEN
 			FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array))
 			LOOP
 				SELECT i.lb, i.tt INTO v_i18n_lb, v_i18n_tt
 				FROM multilang.sys_param_user i
-				WHERE i.schema_name = v_schema
+				WHERE i.project_type = v_ml_project_type
 				  AND i.context = 'sys_param_user'
 				  AND i.source = aux_json->>'widgetname'
 				  AND i.lang = v_ui_lang
@@ -344,7 +354,7 @@ BEGIN
 
 			SELECT i.lb, i.tt INTO v_i18n_lb, v_i18n_tt
 			FROM multilang.config_form_tabs i
-			WHERE i.schema_name = v_schema
+			WHERE i.project_type = v_ml_project_type
 			  AND i.formname = 'config'
 			  AND i.source = rec_tab.tabname
 			  AND i.context = 'config_form_tabs'
@@ -412,13 +422,21 @@ BEGIN
 
 		-- Apply multilang UI translations for config_param_system
 		v_schema := 'SCHEMA_NAME';
-		v_ui_lang := gw_fct_get_utils_language_ui();
+		v_ui_lang := NULL;
+		v_ml_project_type := NULL;
+		IF to_regnamespace('multilang') IS NOT NULL THEN
+			v_ml_pref := multilang.gw_fct_get_multilang_language('SCHEMA_NAME');
+			IF v_ml_pref IS NOT NULL THEN
+				v_ui_lang := v_ml_pref->>'lang';
+				v_ml_project_type := v_ml_pref->>'project_type';
+			END IF;
+		END IF;
 		IF v_ui_lang IS NOT NULL AND fields_array IS NOT NULL THEN
 			FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array))
 			LOOP
 				SELECT i.lb, i.tt INTO v_i18n_lb, v_i18n_tt
 				FROM multilang.config_param_system i
-				WHERE i.schema_name = v_schema
+				WHERE i.project_type = v_ml_project_type
 				  AND i.context = 'config_param_system'
 				  AND i.source = aux_json->>'widgetname'
 				  AND i.lang = v_ui_lang
@@ -435,7 +453,7 @@ BEGIN
 
 			SELECT i.lb, i.tt INTO v_i18n_lb, v_i18n_tt
 			FROM multilang.config_form_tabs i
-			WHERE i.schema_name = v_schema
+			WHERE i.project_type = v_ml_project_type
 			  AND i.formname = 'config'
 			  AND i.source = rec_tab.tabname
 			  AND i.context = 'config_form_tabs'

@@ -164,6 +164,8 @@ v_flwreg_type text;
 v_arc_searchnodes double precision;
 v_talblenameorigin text;
 v_ui_lang text;
+v_ml_pref jsonb;
+v_ml_project_type text;
 v_i18n_lb text;
 v_i18n_tt text;
 v_tab_idx integer;
@@ -642,12 +644,20 @@ BEGIN
 	EXECUTE v_querystring INTO form_tabs;
 
 	-- Apply multilang UI translations for config_form_tabs
-	v_ui_lang := gw_fct_get_utils_language_ui();
+	v_ui_lang := NULL;
+	v_ml_project_type := NULL;
+	IF to_regnamespace('multilang') IS NOT NULL THEN
+		v_ml_pref := multilang.gw_fct_get_multilang_language('SCHEMA_NAME');
+		IF v_ml_pref IS NOT NULL THEN
+			v_ui_lang := v_ml_pref->>'lang';
+			v_ml_project_type := v_ml_pref->>'project_type';
+		END IF;
+	END IF;
 	IF v_ui_lang IS NOT NULL AND form_tabs IS NOT NULL THEN
 		FOR v_tab_idx IN 1..array_length(form_tabs, 1) LOOP
 			SELECT i.lb, i.tt INTO v_i18n_lb, v_i18n_tt
 			FROM multilang.config_form_tabs i
-			WHERE i.schema_name = v_schemaname
+			WHERE i.project_type = v_ml_project_type
 			  AND i.formname = form_tabs[v_tab_idx]->>'formname'
 			  AND i.source = form_tabs[v_tab_idx]->>'tabName'
 			  AND i.context = 'config_form_tabs'

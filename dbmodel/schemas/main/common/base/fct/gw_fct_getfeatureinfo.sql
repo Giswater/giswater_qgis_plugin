@@ -56,6 +56,8 @@ v_errcontext text;
 v_querystring text;
 v_msgerr json;
 v_ui_lang text;
+v_ml_pref jsonb;
+v_ml_project_type text;
 v_i18n_lb text;
 v_i18n_tt text;
 v_i18n_widgetcontrols jsonb;
@@ -184,13 +186,21 @@ BEGIN
 	END IF;
 
 	-- Apply multilang UI translations for info dialog fields
-	v_ui_lang := gw_fct_get_utils_language_ui();
+	v_ui_lang := NULL;
+	v_ml_project_type := NULL;
+	IF to_regnamespace('multilang') IS NOT NULL THEN
+		v_ml_pref := multilang.gw_fct_get_multilang_language('SCHEMA_NAME');
+		IF v_ml_pref IS NOT NULL THEN
+			v_ui_lang := v_ml_pref->>'lang';
+			v_ml_project_type := v_ml_pref->>'project_type';
+		END IF;
+	END IF;
 	IF v_ui_lang IS NOT NULL AND fields_array IS NOT NULL THEN
 		FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array))
 		LOOP
 			SELECT i.lb, i.tt INTO v_i18n_lb, v_i18n_tt
 			FROM multilang.config_form_fields i
-			WHERE i.schema_name = 'SCHEMA_NAME'
+			WHERE i.project_type = v_ml_project_type
 			  AND (
 				i.formname = v_table_id
 				OR i.formname = replace(v_idname, '_id', '')
@@ -218,7 +228,7 @@ BEGIN
 
 			SELECT i."text" INTO v_i18n_widgetcontrols
 			FROM multilang.config_form_fields_json i
-			WHERE i.schema_name = 'SCHEMA_NAME'
+			WHERE i.project_type = v_ml_project_type
 			  AND (
 				i.formname = v_table_id
 				OR i.formname = replace(v_idname, '_id', '')
