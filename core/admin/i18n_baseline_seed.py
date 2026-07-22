@@ -61,13 +61,13 @@ _PROJECT_TYPE_TABLES: dict[str, tuple[str, ...]] = {
     ),
 }
 
-# Backward-compatible default used by older callers/tests (WS bundle).
-SEED_TABLE_FILES: tuple[str, ...] = _PROJECT_TYPE_TABLES["ws"]
-
 UPDATE_HEADER_RE = re.compile(
     r"UPDATE\s+(?P<context>\w+)\s+AS\s+t\s+SET\s+(?P<set_clause>.+?)\s+FROM\s*\(\s*VALUES\s*",
     re.IGNORECASE | re.DOTALL,
 )
+
+# Matches ") AS v(" outside of string literals (found via quote-aware scan).
+ALIAS_CLAUSE_RE = re.compile(r"\)\s*AS\s+v\s*\(", re.IGNORECASE)
 
 SET_ASSIGN_RE = re.compile(
     r"(?P<target>\w+)\s*=\s*(?:REPLACE\s*\(\s*)?v\.(?P<alias>\w+)",
@@ -104,17 +104,17 @@ _CONTEXT_I18N_OVERRIDES: dict[str, dict[str, str]] = {
 
 # ON CONFLICT target columns per multilang table (must match DDL PK).
 _TABLE_CONFLICT_KEYS: dict[str, tuple[str, ...]] = {
-    "config_form_fields": ("tabname", "context", "formname", "formtype", "schema_name", "source", "lang"),
+    "config_form_fields": ("tabname", "context", "formname", "formtype", "project_type", "source", "lang"),
     "config_form_fields_json": (
-        "tabname", "context", "formname", "formtype", "schema_name", "source", "hint", "lang",
+        "tabname", "context", "formname", "formtype", "project_type", "source", "hint", "lang",
     ),
-    "config_form_tabs": ("schema_name", "context", "formname", "source", "lang"),
-    "config_param_system": ("schema_name", "context", "source", "lang"),
-    "sys_fprocess": ("schema_name", "context", "source", "lang"),
-    "sys_function": ("schema_name", "context", "source", "lang"),
-    "sys_message": ("schema_name", "context", "source", "lang"),
-    "sys_param_user": ("schema_name", "context", "source", "lang"),
-    "sys_table": ("schema_name", "context", "source", "lang"),
+    "config_form_tabs": ("project_type", "context", "formname", "source", "lang"),
+    "config_param_system": ("project_type", "context", "source", "lang"),
+    "sys_fprocess": ("project_type", "context", "source", "lang"),
+    "sys_function": ("project_type", "context", "source", "lang"),
+    "sys_message": ("project_type", "context", "source", "lang"),
+    "sys_param_user": ("project_type", "context", "source", "lang"),
+    "sys_table": ("project_type", "context", "source", "lang"),
 }
 
 # Multilang columns that must be double-quoted in generated SQL.
@@ -183,6 +183,28 @@ def normalize_project_type(project_type: str | None) -> str | None:
     return None
 
 
+def normalize_language_id(locale: str | None) -> str:
+    """Normalize locale to multilang.cat_language / row lang id (en_us)."""
+    if not locale:
+        return SEED_LANGUAGE_ID
+    text = str(locale).strip().replace("-", "_")
+    parts = text.split("_", 1)
+    if len(parts) == 2 and parts[0] and parts[1]:
+        return f"{parts[0].lower()}_{parts[1].lower()}"
+    return text.lower()
+
+
+def normalize_language_folder(locale: str | None) -> str:
+    """Normalize locale to bundled i18n folder name (en_US)."""
+    if not locale:
+        return SEED_LANGUAGE_FOLDER
+    text = str(locale).strip().replace("-", "_")
+    parts = text.split("_", 1)
+    if len(parts) == 2 and parts[0] and parts[1]:
+        return f"{parts[0].lower()}_{parts[1].upper()}"
+    return text
+
+
 def project_type_has_baseline(
     sql_root: str,
     project_type: str,
@@ -220,8 +242,40 @@ def seed_table_files_for_project_type(
     return tuple(tables)
 
 
+def _parse_sql_string_literal(inner: str, start: int, *, escape: bool = False) -> tuple[str, int]:
+    """Parse a SQL string starting after the opening quote; return (value, next_index)."""
+    length = len(inner)
+    i = start
+    chars: list[str] = []
+    while i < length:
+        ch = inner[i]
+        if escape and ch == "\\" and i + 1 < length:
+            nxt = inner[i + 1]
+            if nxt == "n":
+                chars.append("\n")
+            elif nxt == "t":
+                chars.append("\t")
+            elif nxt == "r":
+                chars.append("\r")
+            elif nxt in ("\\", "'"):
+                chars.append(nxt)
+            else:
+                chars.append(nxt)
+            i += 2
+            continue
+        if ch == "'":
+            if i + 1 < length and inner[i + 1] == "'":
+                chars.append("'")
+                i += 2
+                continue
+            return "".join(chars), i + 1
+        chars.append(ch)
+        i += 1
+    return "".join(chars), i
+
+
 def parse_sql_value_tuple(raw: str) -> list[Any]:
-    """Parse one SQL VALUES tuple: (a, 'b', NULL, 1)."""
+    """Parse one SQL VALUES tuple: (a, 'b', NULL, 1) or (1, E'text', NULL)."""
     text = raw.strip()
     if not text.startswith("(") or not text.endswith(")"):
         raise ValueError(f"Invalid tuple: {raw[:80]!r}")
@@ -236,24 +290,24 @@ def parse_sql_value_tuple(raw: str) -> list[Any]:
         if i >= length:
             break
 
-        if inner[i] == "'":
-            i += 1
-            chars: list[str] = []
-            while i < length:
-                ch = inner[i]
-                if ch == "'":
-                    if i + 1 < length and inner[i + 1] == "'":
-                        chars.append("'")
-                        i += 2
-                        continue
-                    i += 1
-                    break
-                chars.append(ch)
-                i += 1
-            values.append("".join(chars))
+        # PostgreSQL escape-string: E'...' / e'...'
+        if (
+            i + 1 < length
+            and inner[i] in "Ee"
+            and inner[i + 1] == "'"
+        ):
+            value, i = _parse_sql_string_literal(inner, i + 2, escape=True)
+            values.append(value)
             continue
 
-        if inner[i:].upper().startswith("NULL"):
+        if inner[i] == "'":
+            value, i = _parse_sql_string_literal(inner, i + 1, escape=False)
+            values.append(value)
+            continue
+
+        if inner[i:].upper().startswith("NULL") and (
+            i + 4 >= length or inner[i + 4] in " \t\n\r,)"
+        ):
             values.append(None)
             i += 4
             continue
@@ -263,6 +317,8 @@ def parse_sql_value_tuple(raw: str) -> list[Any]:
             i += 1
         token = inner[start:i].strip()
         if not token:
+            # Unexpected char (e.g. stray ')'); advance to avoid infinite loop.
+            i += 1
             continue
         if re.fullmatch(r"-?\d+", token):
             values.append(int(token))
@@ -313,25 +369,55 @@ def split_value_tuples(values_blob: str) -> list[str]:
     return tuples
 
 
-def _parse_single_update_chunk(chunk: str) -> ParsedUpdateBlock | None:
-    header = UPDATE_HEADER_RE.match(chunk)
-    if not header:
-        return None
+def _find_alias_clause(sql_text: str, start: int) -> re.Match[str] | None:
+    """Find ``) AS v(`` starting at/after *start*, skipping SQL string literals."""
+    in_quote = False
+    idx = start
+    length = len(sql_text)
 
+    while idx < length:
+        ch = sql_text[idx]
+        if ch == "'":
+            if not in_quote:
+                in_quote = True
+            elif idx + 1 < length and sql_text[idx + 1] == "'":
+                idx += 2
+                continue
+            else:
+                in_quote = False
+            idx += 1
+            continue
+
+        if in_quote:
+            idx += 1
+            continue
+
+        match = ALIAS_CLAUSE_RE.match(sql_text, idx)
+        if match is not None:
+            return match
+        idx += 1
+
+    return None
+
+
+def _parse_update_from_header(
+    sql_text: str,
+    header: re.Match[str],
+) -> ParsedUpdateBlock | None:
     values_start = header.end()
-    alias_marker = ") AS v("
-    alias_pos = chunk.find(alias_marker, values_start)
-    if alias_pos == -1:
+    alias_match = _find_alias_clause(sql_text, values_start)
+    if alias_match is None:
         return None
 
-    values_blob = chunk[values_start:alias_pos]
-    alias_close = chunk.find(")", alias_pos + len(alias_marker))
+    values_blob = sql_text[values_start: alias_match.start()]
+    aliases_start = alias_match.end()
+    alias_close = sql_text.find(")", aliases_start)
     if alias_close == -1:
         return None
 
     aliases = [
         part.strip()
-        for part in chunk[alias_pos + len(alias_marker): alias_close].split(",")
+        for part in sql_text[aliases_start:alias_close].split(",")
         if part.strip()
     ]
     context = header.group("context")
@@ -366,21 +452,16 @@ def _parse_single_update_chunk(chunk: str) -> ParsedUpdateBlock | None:
 
 
 def parse_update_blocks(sql_text: str) -> list[ParsedUpdateBlock]:
-    blocks: list[ParsedUpdateBlock] = []
-    search_from = 0
-    marker = "UPDATE "
+    """Parse ``UPDATE … AS t SET … FROM (VALUES …) AS v(…)`` blocks.
 
-    while True:
-        idx = sql_text.find(marker, search_from)
-        if idx == -1:
-            break
-        next_idx = sql_text.find(marker, idx + len(marker))
-        chunk = sql_text[idx: next_idx if next_idx != -1 else len(sql_text)]
-        block = _parse_single_update_chunk(chunk)
+    Uses the real UPDATE header regex so the word UPDATE inside translated
+    string literals (e.g. ``'… FOR UPDATE operation'``) is ignored.
+    """
+    blocks: list[ParsedUpdateBlock] = []
+    for header in UPDATE_HEADER_RE.finditer(sql_text):
+        block = _parse_update_from_header(sql_text, header)
         if block is not None:
             blocks.append(block)
-        search_from = idx + len(marker)
-
     return blocks
 
 
@@ -422,14 +503,17 @@ def blocks_to_multilang_rows(
     table: str,
     blocks: Iterable[ParsedUpdateBlock],
     *,
-    schema_name: str,
+    project_type: str = "",
     lang: str = SEED_LANGUAGE_ID,
+    # Backward-compatible alias (ignored when project_type is set).
+    schema_name: str | None = None,
 ) -> list[MultilangRow]:
     rows: list[MultilangRow] = []
+    stamped_type = str(project_type or schema_name or "")
     for block in blocks:
         for raw in block.rows:
             values: dict[str, Any] = {
-                "schema_name": schema_name,
+                "project_type": stamped_type,
                 "context": block.context,
                 "lang": lang,
             }
@@ -520,7 +604,20 @@ def blocks_to_multilang_rows(
     return rows
 
 
-def build_insert_sql(table: str, rows: Sequence[MultilangRow], *, batch_size: int = 200) -> list[str]:
+def build_insert_sql(
+    table: str,
+    rows: Sequence[MultilangRow],
+    *,
+    batch_size: int = 500,
+    on_conflict: str = "update",
+) -> list[str]:
+    """Build batched INSERT statements.
+
+    on_conflict:
+      - ``update``: ON CONFLICT DO UPDATE (schema create/reseed)
+      - ``nothing``: ON CONFLICT DO NOTHING
+      - ``none``: plain INSERT (caller must delete existing rows first)
+    """
     rows = _dedupe_rows_by_conflict_key(table, rows)
     if not rows:
         return []
@@ -529,13 +626,17 @@ def build_insert_sql(table: str, rows: Sequence[MultilangRow], *, batch_size: in
     if not conflict_keys:
         return []
 
+    mode = str(on_conflict or "update").strip().lower()
+    if mode not in ("update", "nothing", "none"):
+        mode = "update"
+
     statements: list[str] = []
     for start in range(0, len(rows), batch_size):
         chunk = rows[start: start + batch_size]
         columns = list(chunk[0].values.keys())
         update_cols = [
             col for col in columns
-            if col not in conflict_keys and col not in ("schema_name", "context", "lang")
+            if col not in conflict_keys and col not in ("project_type", "context", "lang")
         ]
 
         values_sql: list[str] = []
@@ -547,40 +648,57 @@ def build_insert_sql(table: str, rows: Sequence[MultilangRow], *, batch_size: in
                 literals.append(_sql_literal(val, as_json=as_json))
             values_sql.append(f"({', '.join(literals)})")
 
-        conflict = ", ".join(_quote_sql_col(key) for key in conflict_keys)
         quoted_columns = ", ".join(_quote_sql_col(col) for col in columns)
-        update_clause = ", ".join(
-            f"{_quote_sql_col(col)} = EXCLUDED.{_quote_sql_col(col)}"
-            for col in update_cols
-        )
-        sql = (
-            f"INSERT INTO multilang.{table} ({quoted_columns}) "
-            f"VALUES {', '.join(values_sql)} "
-            f"ON CONFLICT ({conflict}) DO UPDATE SET {update_clause};"
-        )
+        values_clause = ", ".join(values_sql)
+        if mode == "none":
+            sql = (
+                f"INSERT INTO multilang.{table} ({quoted_columns}) "
+                f"VALUES {values_clause};"
+            )
+        else:
+            conflict = ", ".join(_quote_sql_col(key) for key in conflict_keys)
+            if mode == "nothing" or not update_cols:
+                conflict_sql = f"ON CONFLICT ({conflict}) DO NOTHING"
+            else:
+                update_clause = ", ".join(
+                    f"{_quote_sql_col(col)} = EXCLUDED.{_quote_sql_col(col)}"
+                    for col in update_cols
+                )
+                conflict_sql = f"ON CONFLICT ({conflict}) DO UPDATE SET {update_clause}"
+            sql = (
+                f"INSERT INTO multilang.{table} ({quoted_columns}) "
+                f"VALUES {values_clause} "
+                f"{conflict_sql};"
+            )
         statements.append(sql)
     return statements
 
 
-def load_baseline_rows(
+def load_baseline_rows_for_project_type(
     sql_root: str,
-    *,
-    schema_name: str,
     project_type: str,
-    lang: str = SEED_LANGUAGE_ID,
+    *,
+    lang_id: str = SEED_LANGUAGE_ID,
+    lang_folder: str | None = None,
 ) -> list[MultilangRow]:
-    """Load and convert baseline files for one schema and its project type."""
+    """Parse baseline SQL once for a project type; project_type is left empty."""
+    folder = lang_folder or SEED_LANGUAGE_FOLDER
     pt = normalize_project_type(project_type)
-    if not pt or not project_type_has_baseline(sql_root, pt):
+    if not pt:
         return []
 
-    i18n_dir = baseline_i18n_dir(sql_root, pt)
-    if not i18n_dir:
+    i18n_dir = baseline_i18n_dir(sql_root, pt, lang=folder)
+    if not i18n_dir or not os.path.isdir(i18n_dir):
         return []
 
     all_rows: list[MultilangRow] = []
-    for baseline_file in seed_table_files_for_project_type(pt, sql_root):
+    for baseline_file in _PROJECT_TYPE_TABLES.get(pt, ()):
+        target = BASELINE_TO_MULTILANG_TABLE.get(baseline_file)
+        if not target or target not in _TABLE_CONFLICT_KEYS:
+            continue
         path = os.path.join(i18n_dir, f"{baseline_file}.sql")
+        if not os.path.isfile(path):
+            continue
         with open(path, encoding="utf-8") as handle:
             sql_text = handle.read()
         blocks = parse_update_blocks(sql_text)
@@ -588,30 +706,31 @@ def load_baseline_rows(
             blocks_to_multilang_rows(
                 baseline_file,
                 blocks,
-                schema_name=schema_name,
-                lang=lang,
+                project_type="",
+                lang=lang_id,
             )
         )
     return all_rows
 
 
-def seed_sql_for_schema(
-    sql_root: str,
-    schema_name: str,
-    *,
+def rows_for_project_type(
+    template_rows: Sequence[MultilangRow],
     project_type: str,
-    lang: str = SEED_LANGUAGE_ID,
-) -> list[str]:
-    pt = normalize_project_type(project_type)
-    if not pt or not project_type_has_baseline(sql_root, pt):
-        return []
+) -> list[MultilangRow]:
+    """Shallow-copy template rows with project_type stamped."""
+    pt = str(project_type or "").strip().lower()
+    return [
+        MultilangRow(table=row.table, values={**row.values, "project_type": pt})
+        for row in template_rows
+    ]
 
-    rows = load_baseline_rows(
-        sql_root,
-        schema_name=schema_name,
-        project_type=pt,
-        lang=lang,
-    )
+
+def _statements_from_rows(
+    rows: Sequence[MultilangRow],
+    *,
+    on_conflict: str = "update",
+    batch_size: int = 500,
+) -> list[str]:
     by_table: dict[str, list[MultilangRow]] = {}
     for row in rows:
         by_table.setdefault(row.table, []).append(row)
@@ -619,12 +738,80 @@ def seed_sql_for_schema(
     statements: list[str] = []
     for target_table in MULTILANG_UI_TABLES:
         table_rows = by_table.get(target_table) or []
-        statements.extend(build_insert_sql(target_table, table_rows))
+        statements.extend(
+            build_insert_sql(
+                target_table,
+                table_rows,
+                batch_size=batch_size,
+                on_conflict=on_conflict,
+            )
+        )
     return statements
+
+
+def seed_sql_for_project_types(
+    sql_root: str,
+    project_types: Sequence[str],
+    *,
+    lang: str = SEED_LANGUAGE_ID,
+    on_conflict: str = "update",
+    batch_size: int = 500,
+) -> list[tuple[str, list[str]]]:
+    """Build seed SQL for many project types, parsing each baseline once.
+
+    Returns a list of ``(project_type, statements)`` in the same order as
+    ``project_types``.
+    """
+    lang_id = normalize_language_id(lang)
+    lang_folder = normalize_language_folder(lang)
+
+    templates: dict[str, list[MultilangRow]] = {}
+    result: list[tuple[str, list[str]]] = []
+    for project_type in project_types:
+        pt = normalize_project_type(project_type)
+        if not pt:
+            result.append((str(project_type or ""), []))
+            continue
+        if pt not in templates:
+            templates[pt] = load_baseline_rows_for_project_type(
+                sql_root,
+                pt,
+                lang_id=lang_id,
+                lang_folder=lang_folder,
+            )
+        template = templates[pt]
+        if not template:
+            result.append((pt, []))
+            continue
+        rows = rows_for_project_type(template, pt)
+        result.append(
+            (
+                pt,
+                _statements_from_rows(
+                    rows, on_conflict=on_conflict, batch_size=batch_size,
+                ),
+            )
+        )
+    return result
+
+
+_fingerprint_cache: dict[str, str] = {}
+
+
+def invalidate_baseline_fingerprint_cache(sql_root: str | None = None) -> None:
+    """Drop cached baseline fingerprints (all, or for one sql_root)."""
+    if sql_root is None:
+        _fingerprint_cache.clear()
+    else:
+        _fingerprint_cache.pop(sql_root, None)
 
 
 def compute_baseline_fingerprint(sql_root: str) -> str:
     """Fingerprint of bundled en_US baseline SQL files (content + mtime)."""
+    cached = _fingerprint_cache.get(sql_root)
+    if cached is not None:
+        return cached
+
     digest = hashlib.sha256()
     for pt in sorted(TRANSLATABLE_PROJECT_TYPES):
         table_files = seed_table_files_for_project_type(pt, sql_root)
@@ -641,7 +828,9 @@ def compute_baseline_fingerprint(sql_root: str) -> str:
             with open(path, "rb") as handle:
                 for chunk in iter(lambda: handle.read(65536), b""):
                     digest.update(chunk)
-    return digest.hexdigest()
+    fingerprint = digest.hexdigest()
+    _fingerprint_cache[sql_root] = fingerprint
+    return fingerprint
 
 
 def baseline_needs_reseed(sql_root: str, stored_fingerprint: str | None) -> bool:
@@ -650,11 +839,8 @@ def baseline_needs_reseed(sql_root: str, stored_fingerprint: str | None) -> bool
     return compute_baseline_fingerprint(sql_root) != stored_fingerprint
 
 
-MULTILANG_SEED_TABLES: tuple[str, ...] = MULTILANG_UI_TABLES
-
-
-def parse_stored_seeded_schemas(addparam: Any) -> set[str]:
-    """Read seeded schema names from multilang.sys_version.addparam."""
+def parse_stored_seeded_project_types(addparam: Any) -> set[str]:
+    """Read seeded project types from multilang.sys_version.addparam."""
     if not addparam:
         return set()
     try:
@@ -663,35 +849,163 @@ def parse_stored_seeded_schemas(addparam: Any) -> set[str]:
         return set()
     if not isinstance(data, dict):
         return set()
-    raw = data.get("seeded_schemas") or []
+    raw = data.get("seeded_project_types")
+    if raw is None:
+        # Backward compatible with older addparam payloads.
+        raw = data.get("seeded_schemas") or []
     if not isinstance(raw, list):
         return set()
-    return {str(name) for name in raw if name}
+    return {str(name).strip().lower() for name in raw if name}
 
 
-def fetch_seeded_schema_names_from_multilang(
+def fetch_seeded_project_types_from_multilang(
     fetcher: Callable[[str, Optional[list]], Optional[list[tuple]]],
 ) -> set[str]:
-    """Return schema names that currently have rows in multilang seed tables."""
-    names: set[str] = set()
-    for table in MULTILANG_UI_TABLES:
-        rows = fetcher(
-            f"SELECT DISTINCT schema_name FROM multilang.{table} "
-            "WHERE schema_name IS NOT NULL AND BTRIM(schema_name) <> ''",
-            None,
-        )
-        if rows:
-            names.update(str(row[0]) for row in rows if row and row[0])
-    return names
+    """Return project types that currently have rows in multilang seed tables."""
+    if not MULTILANG_UI_TABLES:
+        return set()
+    parts = [
+        f"SELECT project_type FROM multilang.{table} "
+        "WHERE project_type IS NOT NULL AND BTRIM(project_type) <> ''"
+        for table in MULTILANG_UI_TABLES
+    ]
+    sql = (
+        "SELECT DISTINCT lower(btrim(project_type)) FROM ("
+        + " UNION ALL ".join(parts)
+        + ") AS seeded"
+    )
+    rows = fetcher(sql, None)
+    if not rows:
+        return set()
+    return {str(row[0]).strip().lower() for row in rows if row and row[0]}
 
 
-def delete_schema_seed_sql(schema_names: Iterable[str]) -> list[str]:
-    """Build DELETE statements for removed network schemas."""
+def delete_project_type_seed_sql(project_types: Iterable[str]) -> list[str]:
+    """Build DELETE statements for removed project types."""
     statements: list[str] = []
-    for schema_name in schema_names:
-        esc = str(schema_name).replace("'", "''")
-        for table in MULTILANG_SEED_TABLES:
+    for project_type in project_types:
+        esc = str(project_type).replace("'", "''").strip().lower()
+        if not esc:
+            continue
+        for table in MULTILANG_UI_TABLES:
             statements.append(
-                f"DELETE FROM multilang.{table} WHERE schema_name = '{esc}';"
+                f"DELETE FROM multilang.{table} WHERE project_type = '{esc}';"
             )
     return statements
+
+
+def _locale_display_name(lang_id: str, folder: str) -> str | None:
+    """Return display name from bundled config.sqlite locales table, if available."""
+    try:
+        import sqlite3
+
+        plugin_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+        db_path = os.path.join(plugin_dir, "resources", "gis", "config.sqlite")
+        if not os.path.isfile(db_path):
+            return None
+        with sqlite3.connect(db_path) as conn:
+            row = conn.execute(
+                "SELECT name FROM locales WHERE locale = ? OR lower(locale) = ? LIMIT 1",
+                (folder, lang_id),
+            ).fetchone()
+        if row and row[0]:
+            return str(row[0])
+    except Exception:
+        return None
+    return None
+
+
+def ensure_cat_language_sql(lang: str, idval: str | None = None) -> str:
+    """INSERT ON CONFLICT DO NOTHING for multilang.cat_language."""
+    lang_id = normalize_language_id(lang)
+    if idval is not None:
+        complete_name = idval
+    else:
+        folder = normalize_language_folder(lang)
+        complete_name = _locale_display_name(lang_id, folder) or folder
+    esc_id = lang_id.replace("'", "''")
+    esc_val = str(complete_name).replace("'", "''")
+    return (
+        f"INSERT INTO multilang.cat_language (id, idval) "
+        f"VALUES ('{esc_id}', '{esc_val}') "
+        "ON CONFLICT (id) DO NOTHING;"
+    )
+
+
+def build_change_lang_sql(
+    schema_name: str,
+    language: str,
+    *,
+    multilang_exists: bool,
+    project_type: str | None = None,
+    sql_schema_name: str | None = None,
+) -> str:
+    """Build SQL to update project language and optional multilang user preference.
+
+    When ``multilang_exists`` is False, only ``sys_version.language`` is updated.
+    Preference rows store both schema_name and project_type.
+    """
+    lang = str(language or "").replace("'", "''")
+    schema_sql = (sql_schema_name or str(schema_name or "")).strip()
+    schema_value = str(schema_name or "").replace('"', "").replace("'", "''").strip()
+    pt = normalize_project_type(project_type) or ""
+    statements = [f"UPDATE {schema_sql}.sys_version SET language = '{lang}';"]
+    if multilang_exists and schema_value and pt:
+        lang_id = normalize_language_id(language).replace("'", "''")
+        esc_pt = pt.replace("'", "''")
+        statements.append(ensure_cat_language_sql(language))
+        statements.append(
+            "INSERT INTO multilang.cat_user_lang "
+            "(schema_name, project_type, username, lang) "
+            f"VALUES ('{schema_value}', '{esc_pt}', current_user, '{lang_id}') "
+            "ON CONFLICT (schema_name, username) DO UPDATE "
+            "SET lang = EXCLUDED.lang, "
+            "project_type = EXCLUDED.project_type, "
+            "updated_on = now(), updated_by = CURRENT_USER;"
+        )
+    return "".join(statements)
+
+
+def delete_language_seed_sql(lang: str, *, drop_catalog: bool = True) -> list[str]:
+    """Build DELETE statements for one language across multilang seed tables."""
+    lang_id = normalize_language_id(lang)
+    esc = lang_id.replace("'", "''")
+    statements: list[str] = []
+    for table in MULTILANG_UI_TABLES:
+        statements.append(f"DELETE FROM multilang.{table} WHERE lang = '{esc}';")
+    if drop_catalog:
+        statements.append(f"DELETE FROM multilang.cat_language WHERE id = '{esc}';")
+    return statements
+
+
+def fetch_seeded_language_ids(
+    fetcher: Callable[[str, Optional[list]], Optional[list[tuple]]],
+) -> set[str]:
+    """Return language ids present in multilang.cat_language."""
+    rows = fetcher("SELECT id FROM multilang.cat_language", None)
+    if not rows:
+        return set()
+    return {normalize_language_id(str(row[0])) for row in rows if row and row[0]}
+
+
+def language_baselines_exist(sql_root: str, lang: str) -> bool:
+    """True when at least one project type has bundled SQL for this language folder."""
+    lang_folder = normalize_language_folder(lang)
+    return any(
+        project_type_has_baseline(sql_root, pt, lang=lang_folder)
+        for pt in TRANSLATABLE_PROJECT_TYPES
+    )
+
+
+def seeded_project_types_out_of_sync(current: set[str], stored: set[str]) -> bool:
+    """True when project-type sets differ from the last multilang seed."""
+    return {str(x).lower() for x in (current or ())} != {str(x).lower() for x in (stored or ())}
+
+
+def translatable_project_types_with_baseline(sql_root: str) -> list[str]:
+    """Return sorted project types that have bundled baseline SQL."""
+    return sorted(
+        pt
+        for pt in TRANSLATABLE_PROJECT_TYPES
+        if project_type_has_baseline(sql_root, pt)
+    )
