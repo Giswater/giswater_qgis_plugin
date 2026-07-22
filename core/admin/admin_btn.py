@@ -2832,22 +2832,30 @@ class GwAdminButton:
 
     def _open_manage_schemas(self):
         from .manage_schemas_dlg import GwManageSchemasDialog
+
+        dlg = getattr(self, '_manage_schemas_dlg', None)
+        if dlg is not None and not isdeleted(dlg) and dlg.isVisible():
+            tools_gw.focus_open_dialog(dlg)
+            return
+
         dlg = GwManageSchemasDialog(self, parent=self.dlg_readsql)
         tools_gw.load_settings(dlg)
-        dlg.apply_fixed_geometry()
+        dlg.apply_scroll_geometry()
         self._manage_schemas_refresh = dlg._refresh_inventory
         self._manage_schemas_update_system_info = dlg._update_system_info
         self._manage_schemas_sync_connection = dlg._sync_connection_combo
         self._manage_schemas_dlg = dlg
         lib_vars.session_vars["message_parent"] = dlg
-        try:
-            dlg.exec()
-        finally:
+        dlg.finished.connect(self._on_manage_schemas_closed)
+        tools_gw.open_dialog(dlg, dlg_name='admin_manage_schemas')
+
+    def _on_manage_schemas_closed(self, *_args):
+        if lib_vars.session_vars.get("message_parent") is getattr(self, '_manage_schemas_dlg', None):
             lib_vars.session_vars["message_parent"] = None
-            self._manage_schemas_refresh = None
-            self._manage_schemas_update_system_info = None
-            self._manage_schemas_sync_connection = None
-            self._manage_schemas_dlg = None
+        self._manage_schemas_refresh = None
+        self._manage_schemas_update_system_info = None
+        self._manage_schemas_sync_connection = None
+        self._manage_schemas_dlg = None
 
     def _open_create_project(self):
         """"""
@@ -3145,36 +3153,48 @@ class GwAdminButton:
                 tools_qt.show_info_box(f"Delete schema failed: {fx.error}", "Error")
 
     def _multilang_stored_seeded_schemas(self) -> set[str]:
-        from .i18n_baseline_seed import fetch_seeded_schema_names_from_multilang
+        """Project types recorded at last multilang seed (prefer addparam)."""
+        from .i18n_baseline_seed import (
+            fetch_seeded_project_types_from_multilang,
+            parse_stored_seeded_project_types,
+        )
 
         if not admin_catalog.schema_exists("multilang"):
             return set()
-        return fetch_seeded_schema_names_from_multilang(
+
+        row = tools_db.get_row(
+            "SELECT addparam FROM multilang.sys_version ORDER BY id DESC LIMIT 1"
+        )
+        if row and row[0]:
+            try:
+                addparam = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+            except (TypeError, ValueError):
+                addparam = None
+            if isinstance(addparam, dict) and (
+                "seeded_project_types" in addparam or "seeded_schemas" in addparam
+            ):
+                return parse_stored_seeded_project_types(addparam)
+
+        # Legacy multilang schemas without seeded_project_types in addparam.
+        return fetch_seeded_project_types_from_multilang(
             fetcher=admin_catalog._tools_db_fetch,
         )
 
     def _multilang_current_seed_targets(self, inventory_rows=None) -> set[str]:
-        from .i18n_languages import _I18N_SCHEMAS
-        schemas = set()
-        for row in inventory_rows:
-            kind = row.get("kind").lower()
-            schema = row.get("schema")
-            if not kind or kind == "am" or kind not in _I18N_SCHEMAS.keys():
-                continue
-            schemas.add(schema)
+        """Project types that should be present in multilang seed (ws/ud/am/cm)."""
+        from .i18n_baseline_seed import translatable_project_types_with_baseline
 
-        return schemas
+        return set(translatable_project_types_with_baseline(self.sql_dir))
 
     def _multilang_schemas_out_of_sync(self, inventory_rows=None) -> bool:
-        """True when network schemas differ from the last multilang seed."""
+        """True when project types differ from the last multilang seed."""
+        from .i18n_baseline_seed import seeded_project_types_out_of_sync
 
         if not admin_catalog.schema_exists("multilang"):
             return False
         current = self._multilang_current_seed_targets(inventory_rows)
         stored = self._multilang_stored_seeded_schemas()
-        print(f"current: {current}")
-        print(f"stored: {stored}")
-        return current != stored
+        return seeded_project_types_out_of_sync(current, stored)
 
     def _multilang_baseline_changed(self) -> bool:
         """True when bundled en_US baseline SQL differs from the last seed."""
@@ -4272,6 +4292,8 @@ class GwAdminButton:
         if admin_catalog.schema_exists('multilang'):
             tools_qgis.show_message("Schema multilang already exists.", Qgis.MessageLevel.Info)
             return False
+        from .i18n_baseline_seed import invalidate_baseline_fingerprint_cache
+        invalidate_baseline_fingerprint_cache(self.sql_dir)
         bp = BuildParams(
             schema_name='multilang',
             srid=str(self.project_epsg or "25831"),
@@ -4321,6 +4343,8 @@ class GwAdminButton:
 
     def _update_i18n(self, on_done=None, manage_schemas_dlg=None):
         """Run multilang schema update and re-seed baseline translations."""
+        from .i18n_baseline_seed import invalidate_baseline_fingerprint_cache
+        invalidate_baseline_fingerprint_cache(self.sql_dir)
         row = tools_db.get_row(
             "SELECT giswater FROM multilang.sys_version ORDER BY id DESC LIMIT 1"
         )
