@@ -29,7 +29,7 @@ CREATE TABLE cat_language (
 
 CREATE TABLE config_form_fields (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     formname text NOT NULL,
     formtype text NOT NULL,
@@ -41,13 +41,13 @@ CREATE TABLE config_form_fields (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT config_form_fields_id_uniq UNIQUE (id),
-    CONSTRAINT config_form_fields_pkey PRIMARY KEY (tabname, context, formname, formtype, schema_name, "source", lang),
+    CONSTRAINT config_form_fields_pkey PRIMARY KEY (tabname, context, formname, formtype, project_type, "source", lang),
     CONSTRAINT config_form_fields_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE config_form_fields_json (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     formname text NOT NULL,
     formtype text NOT NULL,
@@ -59,13 +59,13 @@ CREATE TABLE config_form_fields_json (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT config_form_fields_json_id_uniq UNIQUE (id),
-    CONSTRAINT config_form_fields_json_pkey PRIMARY KEY (tabname, context, formname, formtype, schema_name, "source", hint, lang),
+    CONSTRAINT config_form_fields_json_pkey PRIMARY KEY (tabname, context, formname, formtype, project_type, "source", hint, lang),
     CONSTRAINT config_form_fields_json_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE config_form_tabs (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     formname text NOT NULL,
     "source" text NOT NULL,
@@ -75,13 +75,13 @@ CREATE TABLE config_form_tabs (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT config_form_tabs_id_uniq UNIQUE (id),
-    CONSTRAINT config_form_tabs_pkey PRIMARY KEY (schema_name, context, formname, "source", lang),
+    CONSTRAINT config_form_tabs_pkey PRIMARY KEY (project_type, context, formname, "source", lang),
     CONSTRAINT config_form_tabs_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE config_param_system (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     "source" text NOT NULL,
     lang text NOT NULL DEFAULT 'en_us',
@@ -90,13 +90,13 @@ CREATE TABLE config_param_system (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT config_param_system_id_uniq UNIQUE (id),
-    CONSTRAINT config_param_system_pkey PRIMARY KEY (schema_name, context, "source", lang),
+    CONSTRAINT config_param_system_pkey PRIMARY KEY (project_type, context, "source", lang),
     CONSTRAINT config_param_system_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE sys_fprocess (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     "source" text NOT NULL,
     lang text NOT NULL DEFAULT 'en_us',
@@ -106,13 +106,13 @@ CREATE TABLE sys_fprocess (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT sys_fprocess_id_uniq UNIQUE (id),
-    CONSTRAINT sys_fprocess_pkey PRIMARY KEY (schema_name, context, "source", lang),
+    CONSTRAINT sys_fprocess_pkey PRIMARY KEY (project_type, context, "source", lang),
     CONSTRAINT sys_fprocess_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE sys_function (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     "source" text NOT NULL,
     lang text NOT NULL DEFAULT 'en_us',
@@ -120,13 +120,13 @@ CREATE TABLE sys_function (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT sys_function_id_uniq UNIQUE (id),
-    CONSTRAINT sys_function_pkey PRIMARY KEY (schema_name, context, "source", lang),
+    CONSTRAINT sys_function_pkey PRIMARY KEY (project_type, context, "source", lang),
     CONSTRAINT sys_function_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE sys_message (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     "source" text NOT NULL,
     lang text NOT NULL DEFAULT 'en_us',
@@ -135,13 +135,13 @@ CREATE TABLE sys_message (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT sys_message_id_uniq UNIQUE (id),
-    CONSTRAINT sys_message_pkey PRIMARY KEY (schema_name, context, "source", lang),
+    CONSTRAINT sys_message_pkey PRIMARY KEY (project_type, context, "source", lang),
     CONSTRAINT sys_message_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE sys_param_user (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     "source" text NOT NULL,
     lang text NOT NULL DEFAULT 'en_us',
@@ -150,13 +150,13 @@ CREATE TABLE sys_param_user (
     lb text NULL,
     tt text NULL,
     CONSTRAINT sys_param_user_id_uniq UNIQUE (id),
-    CONSTRAINT sys_param_user_pkey PRIMARY KEY (schema_name, context, "source", lang),
+    CONSTRAINT sys_param_user_pkey PRIMARY KEY (project_type, context, "source", lang),
     CONSTRAINT sys_param_user_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
 
 CREATE TABLE sys_table (
     id serial4 NOT NULL,
-    schema_name text NOT NULL,
+    project_type text NOT NULL,
     context text NOT NULL,
     "source" text NOT NULL,
     lang text NOT NULL DEFAULT 'en_us',
@@ -165,9 +165,24 @@ CREATE TABLE sys_table (
     updated_by text DEFAULT CURRENT_USER NULL,
     updated_on timestamptz DEFAULT now() NULL,
     CONSTRAINT sys_table_id_uniq UNIQUE (id),
-    CONSTRAINT sys_table_pkey PRIMARY KEY (schema_name, context, "source", lang),
+    CONSTRAINT sys_table_pkey PRIMARY KEY (project_type, context, "source", lang),
     CONSTRAINT sys_table_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
 );
+
+CREATE TABLE cat_user_lang (
+    id serial4 NOT NULL,
+    schema_name text NOT NULL,
+    project_type text NOT NULL,
+    lang text NOT NULL DEFAULT 'en_us',
+    username text NOT NULL,
+    updated_by text DEFAULT CURRENT_USER NULL,
+    updated_on timestamptz DEFAULT now() NULL,
+    CONSTRAINT cat_user_lang_id_uniq UNIQUE (id),
+    CONSTRAINT cat_user_lang_pkey PRIMARY KEY (schema_name, username),
+    CONSTRAINT cat_user_lang_lang_fkey FOREIGN KEY (lang) REFERENCES cat_language(id)
+);
+
+CREATE INDEX idx_cat_user_lang_project_type ON cat_user_lang USING btree (project_type);
 
 CREATE INDEX idx_config_form_fields_lang ON config_form_fields USING btree (lang);
 CREATE INDEX idx_config_form_fields_json_lang ON config_form_fields_json USING btree (lang);
