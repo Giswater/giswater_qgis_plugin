@@ -200,7 +200,7 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_integrate_am.clicked.connect(partial(self._integrate_am))
         self.btn_integrate_am_sample.clicked.connect(partial(self._integrate_am_sample))
         self.btn_update_am.clicked.connect(partial(self._update_am))
-        self.btn_delete_am.clicked.connect(partial(self.admin._delete_other_schema, 'am'))
+        self.btn_delete_am.clicked.connect(partial(self._delete_other_schema, 'am'))
         self.btn_create_cm.clicked.connect(partial(self._create_cm))
         self.btn_update_cm.clicked.connect(partial(self._update_cm))
         self.btn_cm_integrate.clicked.connect(partial(self._integrate_cm))
@@ -209,12 +209,12 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         self.btn_delete_cm.clicked.connect(partial(self._delete_cm))
         self.btn_i18n_create.clicked.connect(partial(self.admin._create_i18n))
         self.btn_i18n_update.clicked.connect(partial(self.admin._update_i18n))
-        self.btn_i18n_delete.clicked.connect(partial(self.admin._delete_other_schema, 'multilang'))
+        self.btn_i18n_delete.clicked.connect(partial(self._delete_other_schema, 'multilang'))
         self.btn_create_audit.clicked.connect(partial(self._create_audit))
         self.btn_update_audit.clicked.connect(partial(self.admin._update_audit))
         self.btn_activate_audit.clicked.connect(partial(self._activate_audit))
         self.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
-        self.btn_delete_audit.clicked.connect(partial(self.admin._delete_other_schema, 'audit'))
+        self.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
         self.btn_close.clicked.connect(self.close)
         selection = self.tbl_network.selectionModel()
         if selection is not None:
@@ -635,7 +635,7 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
     def _delete_cm(self) -> None:
         cm_row = self._satellite_row(kind="CM")
         schema_name = str((cm_row or {}).get("schema") or admin_catalog.find_cm_schema() or "cm")
-        self.admin._delete_other_schema(schema_name)
+        self._delete_other_schema(schema_name)
 
     def _activate_audit(self) -> None:
         parent, parent_type = self._parent_context()
@@ -680,3 +680,7 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             tools_qt.show_info_box("Select a network anchor to copy cibs data.")
             return
         self.admin._copy_cibs_data(parent_schema=parent)
+
+    def _delete_other_schema(self, schema_name: str):
+        self.admin._delete_other_schema(schema_name)
+        self._refresh_inventory()
