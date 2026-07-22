@@ -1597,7 +1597,19 @@ class GwAdminButton:
         update_info = getattr(self, "_manage_schemas_update_system_info", None)
         if update_info:
             update_info()
+        self._ensure_language_packages_for_connection(force=True)
         return True
+
+    def _ensure_language_packages_for_connection(self, *, force: bool = False) -> None:
+        """Start automatic language-file provisioning for the active DB connection."""
+        try:
+            from .i18n_provision import ensure_language_packages_after_connection
+            ensure_language_packages_after_connection(force=force)
+        except Exception as exc:
+            msg = "Automatic language provisioning failed to start: {0}"
+            msg_params = (exc,)
+            tools_log.log_warning(msg, msg_params=msg_params)
+            self._i18n_provision_after_load = False
 
     def _start_admin_load_sync(self, connection_name):
         self._extensions_checked = False
@@ -1703,6 +1715,10 @@ class GwAdminButton:
         manage_cmb = getattr(self, "_manage_schemas_sync_connection", None)
         if manage_cmb:
             manage_cmb(connection_name)
+
+        force = bool(getattr(self, "_i18n_provision_after_load", False))
+        self._i18n_provision_after_load = False
+        self._ensure_language_packages_for_connection(force=force)
 
     def _finalize_admin_permissions_and_status(self):
         message = ''
@@ -2490,6 +2506,8 @@ class GwAdminButton:
         self.username = self._get_user_connection(connection_name)
         tools_db.current_user = None
         self._schema_cache.pop(connection_name, None)
+        # Re-check language packages after the new connection finishes loading.
+        self._i18n_provision_after_load = True
         self._start_admin_load(connection_name, try_set_connection=True, show_dialog=True)
 
     def _set_last_connection(self, connection_name):
