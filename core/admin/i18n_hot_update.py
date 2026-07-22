@@ -470,7 +470,6 @@ class GwAdminI18NHotUpdate():
         filter_widget.setFixedHeight(needed_h)
         filter_widget.updateGeometry()
 
-
     def _populate_language_combo(self, *, mode: str) -> None:
         if mode == "multilang":
             cmb_language = self.dlg_qm.cmb_language_multilang
