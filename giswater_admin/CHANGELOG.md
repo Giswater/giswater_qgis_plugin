@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `gw project create` — generate QGIS `.qgs` projects from an existing ws/ud schema via headless PyQGIS (`qgs_runner`), with cross-platform QGIS Python discovery (`QGIS_PYTHON` override supported).
+
 ### Fixed
 
 - Schema upgrade failing with `must be owner of function` during `reload_fct_ftrg` when update patches redefined functions as the installer superuser.
+- Headless/CLI project generation using `ws`/`ud` as `project_type` for `gw_fct_get_project_layers` (must use `config_typevalue` idval, usually `Basic`), which produced empty `.qgs` files.
+- Headless project TOC nesting feature-type groups under `NETWORK`; align with Admin (`force_create_group=False`, layers directly under `NETWORK`).
+
 ## [0.3.0] - 2026-06-19
 
 ### Added
