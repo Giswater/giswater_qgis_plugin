@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-23
+
 ### Added
 
 - `gw project create` — generate QGIS `.qgs` projects from an existing ws/ud schema via headless PyQGIS (`qgs_runner`), with cross-platform QGIS Python discovery (`QGIS_PYTHON` override supported).
@@ -72,7 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Timing reports and structured log output for automation and CI.
 - Legacy command aliases (`create`, `update`, `drop`, `status`, `init-db`, `update-network`, `audit …`) with stderr deprecation warnings.
 
-[unreleased]: https://github.com/giswater/plugin/compare/cli-v0.3.0...main
+[unreleased]: https://github.com/giswater/plugin/compare/cli-v0.4.0...main
+[0.4.0]: https://github.com/giswater/plugin/compare/cli-v0.3.0...cli-v0.4.0
 [0.3.0]: https://github.com/giswater/plugin/compare/cli-v0.2.0...cli-v0.3.0
 [0.2.0]: https://github.com/giswater/plugin/compare/cli-v0.1.1...cli-v0.2.0
 [0.1.1]: https://github.com/giswater/plugin/compare/cli-v0.1.0...cli-v0.1.1
