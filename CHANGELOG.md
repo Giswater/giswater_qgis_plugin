@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.16.0] - 2026-07-24
+
 ### Added
 
 - Add force reconnect parameter to `gw_fct_setlinktonetwork` function.
@@ -546,7 +548,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Form change detection and caching improvements.
 - Large-scale flake8 and typing standardization.
 
-[unreleased]: https://github.com/giswater/plugin/compare/v4.15.4...main
+[unreleased]: https://github.com/giswater/plugin/compare/v4.16.0...main
+[4.16.0]: https://github.com/giswater/plugin/compare/v4.15.4...v4.16.0
 [4.15.4]: https://github.com/giswater/plugin/compare/v4.15.3...v4.15.4
 [4.15.3]: https://github.com/giswater/plugin/compare/v4.15.2...v4.15.3
 [4.15.2]: https://github.com/giswater/plugin/compare/v4.15.1...v4.15.2
