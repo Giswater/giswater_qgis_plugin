@@ -963,7 +963,8 @@ AS SELECT inp_shortpipe.node_id,
     v_rpt_arc_stats.reaction_max,
     v_rpt_arc_stats.reaction_min,
     v_rpt_arc_stats.ffactor_max,
-    v_rpt_arc_stats.ffactor_min
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.arc_id AS nodarc_id
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN inp_shortpipe USING (node_id)
