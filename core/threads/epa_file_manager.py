@@ -608,7 +608,7 @@ class GwEpaFileManager(GwTask):
                     ");"
                 )
 
-                rows = tools_db.get_rows(sql)
+                rows = tools_db.get_rows(sql, is_thread=True)
                 if rows and rows[0] and rows[0][0]:
                     result = rows[0][0]
                     if isinstance(result, str):
