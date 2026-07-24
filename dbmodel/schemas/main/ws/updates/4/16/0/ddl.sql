@@ -87,7 +87,7 @@ CREATE TABLE rpt_arc_stats_current (
 	length numeric NULL,
 	tot_headloss_max numeric(12, 2) NULL,
 	tot_headloss_min numeric(12, 2) NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT rpt_arc_stats_current_pkey PRIMARY KEY (arc_id, result_id),
 	CONSTRAINT rpt_arc_stats_current_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -111,7 +111,7 @@ CREATE TABLE rpt_node_stats_current (
 	quality_max numeric NULL,
 	quality_min numeric NULL,
 	quality_avg numeric(12, 2) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT rpt_node_stats_current_pkey PRIMARY KEY (node_id, result_id),
 	CONSTRAINT rpt_node_stats_current_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -157,7 +157,7 @@ CREATE TABLE rpt_arc_stats (
 	length numeric NULL,
 	tot_headloss_max numeric(12, 2) NULL,
 	tot_headloss_min numeric(12, 2) NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id),
 	CONSTRAINT rpt_arc_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -196,7 +196,7 @@ CREATE TABLE rpt_node_stats (
 	quality_min numeric NULL,
 	t_quality_min varchar(100) NULL,
 	quality_avg numeric(12, 2) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT rpt_node_stats_pkey PRIMARY KEY (node_id, result_id),
 	CONSTRAINT rpt_node_stats_result_id_fkey FOREIGN KEY (result_id) REFERENCES rpt_cat_result(result_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
