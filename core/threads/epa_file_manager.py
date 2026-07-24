@@ -556,6 +556,7 @@ class GwEpaFileManager(GwTask):
 
     def _import_rpt_with_hydraulic_engine(self, runner):
         """ Import result file with hydraulic engine """
+
         import hydraulic_engine as he
 
         tools_log.log_info(f"Import simulation results........: {self.file_rpt}")
@@ -569,7 +570,7 @@ class GwEpaFileManager(GwTask):
                 only_extrema = False
 
             # Call import function
-            tools_log.log_info("Import simulation results into database")
+            tools_log.log_info(f"Import simulation results into database")
             # Create connection
             dao_db_credentials = tools_db.dao_db_credentials
             if dao_db_credentials is None:
@@ -589,31 +590,16 @@ class GwEpaFileManager(GwTask):
                 client=dao,
                 only_extrema=only_extrema,
             )
-            tools_log.log_info("Import simulation results finished")
+            tools_log.log_info(f"Import simulation results finished")
 
             # Build result JSON
             try:
                 # gw_fct_rpt2pg_log expects temp_audit_check_data to exist;
                 # normally created by gw_fct_rpt2pg_main, which the hydraulic engine path bypasses
-                tools_db.execute_sql(
-                    "CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data "
-                    "(LIKE audit_check_data INCLUDING ALL)", is_thread=True
-                )
-
-                sql = (
-                    "SELECT gw_fct_rpt2pg_log("
-                    f"'{self.result_name}', "
-                    "'{\"status\":\"Accepted\"}'::json"
-                    ");"
-                )
-
-                rows = tools_db.get_rows(sql, is_thread=True)
-                if rows and rows[0] and rows[0][0]:
-                    result = rows[0][0]
-                    if isinstance(result, str):
-                        result = json.loads(result)
-                    self.rpt_result = result
-                    self.message = self.rpt_result.get("message", {}).get("text")
+                parameters = f"'{self.result_name}', " + " '" + '{"status":"Accepted"}' + "'::json"
+                rows = tools_gw.execute_procedure('gw_fct_rpt2pg_log', parameters=parameters, is_thread=True)
+                self.rpt_result = rows
+                self.message = self.rpt_result.get("message", {}).get("text")
             except Exception as e:
                 self.error_msg = str(e)
                 return False
