@@ -597,7 +597,7 @@ class GwEpaFileManager(GwTask):
                 # normally created by gw_fct_rpt2pg_main, which the hydraulic engine path bypasses
                 tools_db.execute_sql(
                     "CREATE TEMP TABLE IF NOT EXISTS temp_audit_check_data "
-                    "(LIKE audit_check_data INCLUDING ALL)"
+                    "(LIKE audit_check_data INCLUDING ALL)", is_thread=True
                 )
 
                 sql = (
