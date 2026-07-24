@@ -94,20 +94,20 @@ class GwEpaFileManager(GwTask):
 
         # Try to import hydraulic engine
         try:
-            import hydraulic_engine as he
+            from importlib.util import find_spec
             from hydraulic_engine.utils import tools_log as he_tools_log
+            has_hydraulic_engine = find_spec("hydraulic_engine") is not None
             # Set logger for hydraulic engine
             he_tools_log.set_logger("hydraulic_engine", min_log_level=10)
-            has_hydraulic_engine = True
         except ImportError:
             has_hydraulic_engine = False
 
         if has_hydraulic_engine and global_vars.project_type == 'ws':
-            tools_log.log_info(f"Hydraulic engine imported successfully")
+            tools_log.log_info("Hydraulic engine imported successfully")
         elif global_vars.project_type == 'ud':
-            tools_log.log_info(f"Hydraulic engine not compatible with project type 'ud'. Using default EPA software.")
+            tools_log.log_info("Hydraulic engine not compatible with project type 'ud'. Using default EPA software.")
         else:
-            tools_log.log_info(f"Hydraulic engine not imported. Using default EPA software.")
+            tools_log.log_info("Hydraulic engine not imported. Using default EPA software.")
 
         if status and self.go2epa_execute_epa:
             if not has_hydraulic_engine or global_vars.project_type == 'ud':
@@ -120,7 +120,7 @@ class GwEpaFileManager(GwTask):
                     status = False
 
         if status and self.go2epa_import_result:
-            tools_log.log_info(f"Task 'Go2Epa' execute function 'def _import_rpt'")
+            tools_log.log_info("Task 'Go2Epa' execute function 'def _import_rpt'")
             if not has_hydraulic_engine or global_vars.project_type == 'ud':
                 msg_params = ("_import_rpt",)
                 tools_log.log_info(msg, msg_params=msg_params)
@@ -443,7 +443,7 @@ class GwEpaFileManager(GwTask):
         if self.isCanceled():
             return None
 
-        tools_log.log_info(f"Execute EPA software")
+        tools_log.log_info("Execute EPA software")
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
@@ -556,7 +556,6 @@ class GwEpaFileManager(GwTask):
 
     def _import_rpt_with_hydraulic_engine(self, runner):
         """ Import result file with hydraulic engine """
-
         import hydraulic_engine as he
 
         tools_log.log_info(f"Import simulation results........: {self.file_rpt}")
@@ -570,7 +569,7 @@ class GwEpaFileManager(GwTask):
                 only_extrema = False
 
             # Call import function
-            tools_log.log_info(f"Import simulation results into database")
+            tools_log.log_info("Import simulation results into database")
             # Create connection
             dao_db_credentials = tools_db.dao_db_credentials
             if dao_db_credentials is None:
@@ -590,7 +589,7 @@ class GwEpaFileManager(GwTask):
                 client=dao,
                 only_extrema=only_extrema,
             )
-            tools_log.log_info(f"Import simulation results finished")
+            tools_log.log_info("Import simulation results finished")
 
             # Build result JSON
             try:

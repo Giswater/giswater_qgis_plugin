@@ -488,7 +488,7 @@ def upload_detection_records(
     batch_size: int | None = None,
 ) -> int:
     if not records:
-        print(f"No records to upload")
+        print("No records to upload")
         return 0
     if dry_run:
         print(f"DRY-RUN POST {path}: {len(records)} record(s)")

@@ -147,8 +147,8 @@ class GwGo2EpaButton(GwAction):
 
         # Execute EPA: Windows always; Linux only for WS (hydraulic_engine). UD needs native SWMM exe.
         try:
-            import hydraulic_engine
-            has_hydraulic_engine = True
+            from importlib.util import find_spec
+            has_hydraulic_engine = find_spec("hydraulic_engine") is not None
         except ImportError:
             has_hydraulic_engine = False
 
@@ -156,7 +156,6 @@ class GwGo2EpaButton(GwAction):
             tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
             self.dlg_go2epa.chk_exec.setEnabled(False)
             self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
-
 
         self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
