@@ -7451,6 +7451,13 @@ def _delete_feature_lot(dialog, feature_type, list_id, lot_id, state=None):
     widget = tools_qt.get_widget(dialog, f"tbl_campaign_lot_x_{feature_type}")
     tablename = widget.property('tablename') or f"cm.om_campaign_lot_x_{feature_type}"
 
+    # Set action=4 so BEFORE DELETE trigger allows hard delete (vs soft-delete to action=3)
+    sql = (f"UPDATE {tablename} SET action = 4 "
+           f"WHERE {feature_type}_id IN ({list_id}) AND lot_id = '{lot_id}'")
+    if state is not None:
+        sql += f""" AND "state" = '{state}'"""
+    tools_db.execute_sql(sql)
+
     sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND lot_id = '{lot_id}'")
     # Add state if needed
