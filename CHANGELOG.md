@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix `vf_element` view to use `COALESCE(pp.state, e.state)` instead of `e.state` with plan_psector_x_node.
 - Fix `admin_catalog` to check if audit schema is fully installed.
 - Fix `update` to use the correct language from `sys_version` table.
+- Fix `gw_fct_create_querytables` and `gw_fct_manage_temp_tables` functions to create indexes on the geometry columns.
 
 ## [4.15.4] - 2026-07-21
 
