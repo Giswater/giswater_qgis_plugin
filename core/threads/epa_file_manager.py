@@ -570,7 +570,7 @@ class GwEpaFileManager(GwTask):
                 only_extrema = False
 
             # Call import function
-            tools_log.log_info(f"Import simulation results into database")
+            tools_log.log_info("Import simulation results into database")
             # Create connection
             dao_db_credentials = tools_db.dao_db_credentials
             if dao_db_credentials is None:
@@ -590,7 +590,7 @@ class GwEpaFileManager(GwTask):
                 client=dao,
                 only_extrema=only_extrema,
             )
-            tools_log.log_info(f"Import simulation results finished")
+            tools_log.log_info("Import simulation results finished")
 
             # Build result JSON
             try:
