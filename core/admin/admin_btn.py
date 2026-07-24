@@ -4170,7 +4170,8 @@ class GwAdminButton:
             aux = admin_catalog.fetch_aux_schema_flags()
         am_exists = aux.get('am', False)
         cm_exists = aux.get('cm', False)
-        audit_exists = aux.get('audit', False)
+        audit_namespace = aux.get('audit', False)
+        audit_full = admin_catalog.is_audit_fully_installed()
 
         self.dlg_readsql.btn_create_asset.setEnabled(
             project_type == "ws" and schema_name != "null" and not am_exists
@@ -4183,10 +4184,10 @@ class GwAdminButton:
 
         self.dlg_readsql.btn_update_cm.setEnabled(cm_exists)
 
-        self.dlg_readsql.btn_create_audit.setEnabled(schema_name != "null" and not audit_exists)
-        self.dlg_readsql.btn_activate_audit.setEnabled(schema_name != "null" and audit_exists)
-        self.dlg_readsql.btn_reload_audit_triggers.setEnabled(schema_name != "null" and audit_exists)
-        self.dlg_readsql.btn_delete_audit.setEnabled(audit_exists)
+        self.dlg_readsql.btn_create_audit.setEnabled(schema_name != "null" and not audit_full)
+        self.dlg_readsql.btn_activate_audit.setEnabled(schema_name != "null" and audit_full)
+        self.dlg_readsql.btn_reload_audit_triggers.setEnabled(schema_name != "null" and audit_full)
+        self.dlg_readsql.btn_delete_audit.setEnabled(audit_namespace)
 
     def _manage_utils(self):
         if self._admin_catalog_cache and self._admin_catalog_cache.sys_version_schemas:

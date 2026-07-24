@@ -360,6 +360,13 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
             parts.append(f"{tools_qt.tr('Last update')}: {updated}")
         return " · ".join(parts)
 
+    def _format_audit_info(self, row: dict | None) -> str:
+        if not row:
+            return tools_qt.tr("Not installed")
+        if admin_catalog.is_audit_stub():
+            return tools_qt.tr("Partial (required by CM)")
+        return self._format_satellite_dates(row)
+
     def _update_satellite_panel(
         self,
         group_attr: str,
@@ -371,7 +378,10 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         group = getattr(self, group_attr, None)
         if group is not None:
             group.setTitle(self._satellite_group_title(group_name, row, default_schema))
-        self._set_info_label(label_attr, self._format_satellite_dates(row))
+        if group_attr == "grb_audit":
+            self._set_info_label(label_attr, self._format_audit_info(row))
+        else:
+            self._set_info_label(label_attr, self._format_satellite_dates(row))
 
     def _satellite_row(self, *, kind: str | None = None, schema: str | None = None) -> dict | None:
         return admin_catalog.find_inventory_row(
@@ -444,7 +454,8 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         cibs_exists = cibs_row is not None
         am_exists = am_row is not None
         cm_exists = cm_row is not None
-        audit_exists = audit_row is not None
+        audit_namespace = audit_row is not None
+        audit_full = admin_catalog.is_audit_fully_installed()
         i18n_exists = i18n_row is not None
 
         self.btn_utils_create.setEnabled(not utils_exists)
@@ -516,13 +527,13 @@ class GwManageSchemasDialog(GwAdminManageSchemasUi):
         )
         self.btn_i18n_delete.setEnabled(i18n_exists)
 
-        self.btn_create_audit.setEnabled(not audit_exists)
+        self.btn_create_audit.setEnabled(not audit_full)
         self.btn_update_audit.setEnabled(
-            audit_exists and self._needs_update(str((audit_row or {}).get("version") or ""))
+            audit_full and self._needs_update(str((audit_row or {}).get("version") or ""))
         )
-        self.btn_activate_audit.setEnabled(audit_exists and has_network_parent)
-        self.btn_reload_audit_triggers.setEnabled(audit_exists and has_network_parent)
-        self.btn_delete_audit.setEnabled(audit_exists)
+        self.btn_activate_audit.setEnabled(audit_full and has_network_parent)
+        self.btn_reload_audit_triggers.setEnabled(audit_full and has_network_parent)
+        self.btn_delete_audit.setEnabled(audit_namespace)
 
         self.btn_update_network.setEnabled(self._network_has_pending_updates(parent))
         has_selection = bool(parent) and parent_kind in ("WS", "UD")

@@ -106,6 +106,17 @@ def schema_exists(name: str, fetcher: RowFetcher = _tools_db_fetch) -> bool:
     return bool(row and row[0] and row[0][0])
 
 
+def is_audit_fully_installed(fetcher: RowFetcher = _tools_db_fetch) -> bool:
+    """True when full audit DDL is present (not just the CM dependency stub)."""
+    row = fetcher("SELECT to_regclass('audit.log') IS NOT NULL", None)
+    return bool(row and row[0] and row[0][0])
+
+
+def is_audit_stub(fetcher: RowFetcher = _tools_db_fetch) -> bool:
+    """True when audit namespace exists but full audit structure was never loaded."""
+    return schema_exists("audit", fetcher) and not is_audit_fully_installed(fetcher)
+
+
 def schema_names_matching(pattern: str, fetcher: RowFetcher = _tools_db_fetch) -> list[str]:
     """ILIKE match on namespace names (pg_catalog)."""
     sql = """
