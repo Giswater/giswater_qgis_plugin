@@ -29,34 +29,18 @@ jobs:
       GW_SCHEMA_DUMP: /workspace/dbmodel/gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}.dump
 
     steps:
-      - name: Skip matrix cell (workflow_dispatch filter)
-        id: filter
-        run: |
-          active=true
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            req="${{ github.event.inputs.pg_version }}"
-            if [[ "${req}" != "all" && "${req}" != "${{ matrix.pg_version }}" ]]; then
-              active=false
-            fi
-          fi
-          echo "active=${active}" >> "${GITHUB_OUTPUT}"
-
       - name: Checkout repository
-        if: steps.filter.outputs.active == 'true'
         uses: actions/checkout@v6
 
       - name: Build Docker images
-        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml build --quiet postgres runner
 
       - name: Start Postgres
-        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml up -d postgres --wait
 
       - name: Bootstrap, dump, and pgTAP
-        if: steps.filter.outputs.active == 'true'
         working-directory: dbmodel
         run: |
           chmod +x test/*.sh ../scripts/gw_*.sh ../scripts/gw_bootstrap_network.sh ../scripts/verify_dbmodel_ci_checks.sh 2>/dev/null || chmod +x test/*.sh
@@ -64,7 +48,7 @@ jobs:
             bash /workspace/dbmodel/test/pgtap_main_inner.sh ${{ matrix.project }}
 
       - name: Upload schema dump artifact
-        if: steps.filter.outputs.active == 'true' && success()
+        if: success()
         uses: actions/upload-artifact@v7
         with:
           name: gw-schema-pg${{ matrix.pg_version }}-${{ matrix.project }}
@@ -72,11 +56,12 @@ jobs:
           retention-days: 2
 
       - name: Stop Postgres
-        if: always() && steps.filter.outputs.active == 'true'
+        if: always()
         working-directory: dbmodel
         run: docker compose -f docker-compose.test.yml down
-    
+
   run-i18n-searcher:
+    needs: pgtap-main
     runs-on: ubuntu-latest
     name: Run i18n searcher
     env:
@@ -113,7 +98,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: giswater/plugin
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.ref }}
           path: plugin
 
       - name: Bootstrap sample network (ws, ud) with language no_TR
@@ -178,7 +163,7 @@ jobs:
           SOURCE_EVENT="${{ github.event_name }}"
           PUBLISH_MODE="latest"
           VERSION=""
-          REF="${{ github.event.inputs.ref || github.ref }}"
+          REF="${{ github.ref }}"
 
           if [ "$SOURCE_EVENT" = "release" ]; then
             PUBLISH_MODE="release"
