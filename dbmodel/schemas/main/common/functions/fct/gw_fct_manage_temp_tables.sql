@@ -229,10 +229,13 @@ BEGIN
             IF v_project_type = 'WS' THEN
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_mincut (
                     id int4 NOT NULL,
+                    work_order varchar(50) NULL,
                     expl_id int4 NULL,
                     macroexpl_id int4 NULL,
                     muni_id int4 NULL,
                     minsector_id int4 NULL,
+                    forecast_start timestamp NULL,
+                    forecast_end timestamp NULL,
                     CONSTRAINT temp_t_mincut_pkey PRIMARY KEY (id)
                 );
             END IF;
