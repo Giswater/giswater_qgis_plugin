@@ -145,11 +145,18 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.btn_hs_ds.clicked.connect(
             partial(self._sector_selection))
 
-        # Check OS and enable/disable checkbox execute EPA software
-        if sys.platform != "win32":
+        # Execute EPA: Windows always; Linux only for WS (hydraulic_engine). UD needs native SWMM exe.
+        try:
+            import hydraulic_engine
+            has_hydraulic_engine = True
+        except ImportError:
+            has_hydraulic_engine = False
+
+        if sys.platform != "win32" and (not has_hydraulic_engine or self.project_type == "ud"):
             tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
             self.dlg_go2epa.chk_exec.setEnabled(False)
             self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
+
 
         self._set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
@@ -243,6 +250,12 @@ class GwGo2EpaButton(GwAction):
 
         if not export_checked and not exec_checked and not import_result_checked:
             msg = "You need to select at least one process"
+            title = "Go2Epa"
+            tools_qt.show_info_box(msg, title)
+            return False
+
+        if import_result_checked and not exec_checked:
+            msg = "Import results requires Execute EPA software"
             title = "Go2Epa"
             tools_qt.show_info_box(msg, title)
             return False

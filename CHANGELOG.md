@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add force reconnect parameter to `gw_fct_setlinktonetwork` function.
+- Integrate `hydraulic_engine` in Go2Epa for WS (EPANET) execute and result import; UD and missing package keep the classic EPA path.
+- Allow Execute EPA on Linux for WS when `hydraulic_engine` is installed; keep it Windows-only for UD.
+- Require Execute EPA when Import results is selected in Go2Epa.
+- Add `inp_report_onlymaxmin_values` EPA option to store only max/min results when importing with hydraulic_engine.
+- Add `hydraulic_engine` dependency to `requirements.txt`.
 
 ### Fixed
 
