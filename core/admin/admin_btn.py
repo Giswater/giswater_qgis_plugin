@@ -1112,13 +1112,22 @@ class GwAdminButton:
                 commit=False,
             )
 
+        row = tools_db.get_row(
+            f"SELECT giswater, language, epsg FROM {schema_name}.sys_version "
+            "ORDER BY id DESC LIMIT 1"
+        ) if schema_name else None
+        current_version = str(
+            (row[0] if row and row[0] else None) or self.project_version or "0.0.0"
+        )
+        self._update_from_version = current_version
+
         self._refresh_update_dialog_state(running=True)
         bp = BuildParams(
             schema_name=schema_name,
-            srid=str(self.project_epsg or "25831"),
-            locale=self.locale,
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
+            locale=str(row[1] if row and row[1] else self.locale),
             plugin_version=str(self.plugin_version),
-            project_version=str(self.project_version or "0.0.0"),
+            project_version=current_version,
             run_mode='upgrade',
             profile='update',
             sql_root=self.sql_dir,
@@ -4255,6 +4264,8 @@ class GwAdminButton:
         ud_schema='',
         copy_source='',
         project_version='0.0.0',
+        locale=None,
+        srid=None,
         on_done=None,
     ):
         register_is_new = 'true' if profile == 'empty' else 'false'
@@ -4268,10 +4279,10 @@ class GwAdminButton:
             ud_schema if profile == 'integrate_ud' else ''
         )
 
-        srid = str(getattr(self, 'project_epsg', None) or '25831')
-        locale = self.locale
+        srid = str(srid or getattr(self, 'project_epsg', None) or '25831')
+        locale = str(locale or self.locale)
         parent_schema = ws_schema or ud_schema
-        if parent_schema:
+        if parent_schema and profile != 'update':
             row = tools_db.get_row(
                 f"SELECT giswater, language, epsg FROM {parent_schema}.sys_version "
                 "ORDER BY id DESC LIMIT 1"
@@ -4434,7 +4445,7 @@ class GwAdminButton:
     def _update_utils(self, schema_name=None, on_done=None):
         """Run the utils 'update' profile in place."""
         row = tools_db.get_row(
-            "SELECT giswater FROM utils.sys_version ORDER BY id DESC LIMIT 1"
+            "SELECT giswater, language, epsg FROM utils.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
         network_parents = admin_catalog.get_utils_network_parents()
@@ -4446,6 +4457,8 @@ class GwAdminButton:
             ws_schema=ws_list[0] if ws_list else '',
             ud_schema=ud_list[0] if ud_list else '',
             project_version=str(current_version),
+            locale=str(row[1] if row and row[1] else self.locale),
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
             on_done=on_done,
         )
 
@@ -4473,13 +4486,14 @@ class GwAdminButton:
     def _update_i18n(self, on_done=None):
         """Run the i18n 'update' profile in place."""
         row = tools_db.get_row(
-            "SELECT giswater FROM multilang.sys_version ORDER BY id DESC LIMIT 1"
+            "SELECT giswater, language, epsg FROM multilang.sys_version "
+            "ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
         bp = BuildParams(
             schema_name='multilang',
-            srid=str(self.project_epsg or "25831"),
-            locale=self.locale,
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
+            locale=str(row[1] if row and row[1] else self.locale),
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',
@@ -4497,13 +4511,13 @@ class GwAdminButton:
     def _update_cibs(self, on_done=None):
         """Run the cibs 'update' profile in place."""
         row = tools_db.get_row(
-            "SELECT giswater FROM cibs.sys_version ORDER BY id DESC LIMIT 1"
+            "SELECT giswater, language, epsg FROM cibs.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
         bp = BuildParams(
             schema_name='cibs',
-            srid=str(self.project_epsg or "25831"),
-            locale=self.locale,
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
+            locale=str(row[1] if row and row[1] else self.locale),
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',
@@ -4521,13 +4535,13 @@ class GwAdminButton:
     def _update_audit(self, on_done=None):
         """Run the audit 'update' profile in place."""
         row = tools_db.get_row(
-            "SELECT giswater FROM audit.sys_version ORDER BY id DESC LIMIT 1"
+            "SELECT giswater, language, epsg FROM audit.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
         bp = BuildParams(
             schema_name='audit',
-            srid=str(self.project_epsg or "25831"),
-            locale=self.locale,
+            srid=str(row[2] if row and row[2] else self.project_epsg or "25831"),
+            locale=str(row[1] if row and row[1] else self.locale),
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',
@@ -4553,7 +4567,7 @@ class GwAdminButton:
     def _update_asset(self, parent_schema=None, parent_type=None, on_done=None):
         """Run the am 'update' profile in place (semver upgrade)."""
         row = tools_db.get_row(
-            "SELECT giswater FROM am.sys_version ORDER BY id DESC LIMIT 1"
+            "SELECT giswater, language, epsg FROM am.sys_version ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
 
@@ -4566,8 +4580,8 @@ class GwAdminButton:
 
         bp = BuildParams(
             schema_name='am',
-            srid="0",
-            locale=self.locale,
+            srid=str(row[2] if row and row[2] else "0"),
+            locale=str(row[1] if row and row[1] else self.locale),
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',
@@ -4585,7 +4599,8 @@ class GwAdminButton:
         """Run the cm 'update' profile in place (semver upgrade)."""
         cm_schema = cm_schema or admin_catalog.find_cm_schema() or "cm"
         row = tools_db.get_row(
-            f"SELECT giswater FROM {cm_schema}.sys_version ORDER BY id DESC LIMIT 1"
+            f"SELECT giswater, language, epsg FROM {cm_schema}.sys_version "
+            "ORDER BY id DESC LIMIT 1"
         )
         current_version = row[0] if row and row[0] else "0.0.0"
 
@@ -4593,8 +4608,8 @@ class GwAdminButton:
 
         bp = BuildParams(
             schema_name=cm_schema,
-            srid="0",
-            locale=self.locale,
+            srid=str(row[2] if row and row[2] else "0"),
+            locale=str(row[1] if row and row[1] else self.locale),
             plugin_version=str(self.plugin_version),
             project_version=str(current_version),
             profile='update',

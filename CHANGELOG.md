@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix selector performance on large projects: optimize `vf_node`/`vf_arc`/`vf_connec`/`vf_element`/`vf_link` filters and stop probing `ve_node` inside `gw_fct_setselectors` (check-all exploitations was multi-second).
 - Fix `vf_element` view to use `COALESCE(pp.state, e.state)` instead of `e.state` with plan_psector_x_node.
 - Fix `admin_catalog` to check if audit schema is fully installed.
+- Fix `update` to use the correct language from `sys_version` table.
 
 ## [4.15.4] - 2026-07-21
 
