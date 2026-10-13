@@ -57,6 +57,28 @@ BEGIN
 				p_parent, v_table
 			);
 		END LOOP;
+
+		EXECUTE format('DROP VIEW IF EXISTS %I.v_ui_cmms_attachment', p_parent);
+		EXECUTE format('DROP VIEW IF EXISTS %I.v_ui_cmms_visit', p_parent);
+
+		IF to_regclass(format('%I.config_form_tabs', p_parent)) IS NOT NULL THEN
+			EXECUTE format('DELETE FROM %I.config_form_tabs WHERE tabname = %L', p_parent, 'tab_cmms');
+		END IF;
+		IF to_regclass(format('%I.config_form_fields', p_parent)) IS NOT NULL THEN
+			EXECUTE format('DELETE FROM %I.config_form_fields WHERE tabname = %L', p_parent, 'tab_cmms');
+		END IF;
+		IF to_regclass(format('%I.config_form_tableview', p_parent)) IS NOT NULL THEN
+			EXECUTE format(
+				'DELETE FROM %I.config_form_tableview WHERE objectname IN (%L, %L)',
+				p_parent, 'v_ui_cmms_visit', 'v_ui_cmms_attachment'
+			);
+		END IF;
+		IF to_regclass(format('%I.sys_table', p_parent)) IS NOT NULL THEN
+			EXECUTE format(
+				'DELETE FROM %I.sys_table WHERE id IN (%L, %L)',
+				p_parent, 'v_ui_cmms_visit', 'v_ui_cmms_attachment'
+			);
+		END IF;
 	END IF;
 
 	SELECT id INTO v_id FROM cmms.sys_version ORDER BY id DESC LIMIT 1;

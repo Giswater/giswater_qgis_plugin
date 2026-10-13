@@ -670,8 +670,10 @@ def _sql_literal(value: str) -> str:
 
 
 def _drop_pre_sql(schema: str) -> str:
-    """Remember project_type and unlink cmms rows before a ws/ud drop.
+    """Remember project_type and unlink cmms rows before the drop.
 
+    A ws/ud drop unlinks that parent. A cmms drop unlinks every parent listed
+    in cmms.sys_version, so parent views are gone before the schema goes.
     The DO block swallows unlink errors so a missing function cannot abort
     the drop transaction.
     """
@@ -681,6 +683,8 @@ DO $gw_drop_pre$
 DECLARE
   v_schema text := {literal};
   v_kind text;
+  v_parent text;
+  v_parents jsonb;
 BEGIN
   CREATE TEMP TABLE IF NOT EXISTS gw_drop_kind (kind text);
   TRUNCATE gw_drop_kind;
@@ -699,6 +703,23 @@ BEGIN
       PERFORM cmms.gw_fct_cmms_unlink_parent(v_schema);
     EXCEPTION WHEN OTHERS THEN
       RAISE WARNING 'cmms.gw_fct_cmms_unlink_parent(%) failed: %', v_schema, SQLERRM;
+    END;
+  ELSIF v_kind = 'cmms'
+     AND to_regprocedure('cmms.gw_fct_cmms_unlink_parent(text)') IS NOT NULL THEN
+    BEGIN
+      SELECT COALESCE(addparam -> 'parent_schemas', '[]'::jsonb)
+      INTO v_parents
+      FROM cmms.sys_version
+      ORDER BY id DESC
+      LIMIT 1;
+
+      FOR v_parent IN
+        SELECT jsonb_array_elements_text(COALESCE(v_parents, '[]'::jsonb))
+      LOOP
+        PERFORM cmms.gw_fct_cmms_unlink_parent(v_parent);
+      END LOOP;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE WARNING 'cmms.gw_fct_cmms_unlink_parent failed: %', SQLERRM;
     END;
   END IF;
 END
@@ -792,6 +813,7 @@ def drop_schema(
 
     Best-effort link cleanup, never fails the drop:
     - ws/ud: ``cmms.gw_fct_cmms_unlink_parent`` before the drop
+    - cmms: unlink every parent in ``parent_schemas`` before the drop
     - any other project type: strip ``satellites.<kind>`` from parents after
     """
     safe = schema.replace('"', '').replace(';', '').replace("'", "")

@@ -116,6 +116,7 @@ class GwInfo(QObject):
             self.tab_connections_loaded = False
             self.tab_hydrometer_loaded = False
             self.tab_hydrometer_val_loaded = False
+            self.tab_cmms_loaded = False
             self.tab_visit_loaded = False
             self.tab_event_loaded = False
             self.tab_document_loaded = False
@@ -2728,6 +2729,12 @@ class GwInfo(QObject):
             filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
             self.tab_hydrometer_val_loaded = True
+        # Tab 'CMMS visits'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_cmms' and not self.tab_cmms_loaded:
+            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_cmms')
+            filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
+            self.tab_cmms_loaded = True
         # Tab 'Visit'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_visit' and not self.tab_visit_loaded:
             self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_visit')

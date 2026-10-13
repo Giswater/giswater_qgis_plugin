@@ -25,6 +25,9 @@ phases:
       - source: "schemas/addon/cmms/integration/{{ parent_type }}/integration.sql"
         recursive: false
         schema_override: "{{ parent_schema }}"
+      - source: "schemas/addon/cmms/integration/common/integration.sql"
+        recursive: false
+        schema_override: "{{ parent_schema }}"
 
   - id: reload_fct_ftrg
     type: sql_dir

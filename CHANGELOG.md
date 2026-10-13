@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- CMMS visits tab on the feature info form. Integrating CMMS adds `tab_cmms` with the feature's visits and its attachments (direct ones and those from its visits). Unlinking or dropping CMMS removes the tab.
 - Link cmms visits and attachments to a ws/ud feature through `asset_feature_map`. A link to a missing feature is rejected. Deleting the feature keeps the visit and marks the link; changing the feature id follows the new id.
 
 ### Fixed

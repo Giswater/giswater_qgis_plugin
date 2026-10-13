@@ -111,6 +111,111 @@ SELECT '00000000-0000-0000-0000-000000000011', id
 FROM asset_feature_map
 WHERE ext_feature_id = 'ext-node-1';
 
+INSERT INTO attachment (id, name, path)
+VALUES
+    ('00000000-0000-0000-0000-000000000021', 'visit-photo', '/tmp/visit-photo.jpg'),
+    ('00000000-0000-0000-0000-000000000022', 'direct-photo', '/tmp/direct-photo.jpg');
+
+INSERT INTO attachment_x_visit (attachment_id, visit_id)
+VALUES ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000011');
+
+INSERT INTO attachment_x_feature (attachment_id, asset_feature_map_id)
+SELECT '00000000-0000-0000-0000-000000000022', id
+FROM asset_feature_map
+WHERE ext_feature_id = 'ext-node-1';
+
+-- Same definition as cmms/integration/common/integration.sql. search_path puts
+-- the views in ws_fake and binds 'node'::regclass to ws_fake.node.
+SET search_path = ws_fake, public, pg_catalog;
+DROP VIEW IF EXISTS v_ui_cmms_attachment;
+DROP VIEW IF EXISTS v_ui_cmms_visit;
+CREATE VIEW v_ui_cmms_visit AS
+SELECT
+    m.feature_id,
+    m.feature_type,
+    v.id AS visit_id,
+    v.ext_visit_id,
+    v.type,
+    v.status,
+    v.title,
+    v.description,
+    v.start_date,
+    v.end_date,
+    EXISTS (
+        SELECT 1 FROM cmms.attachment_x_visit ax
+        WHERE ax.visit_id = v.id
+    ) AS has_attachment
+FROM cmms.asset_feature_map m
+JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
+JOIN cmms.visit v ON v.id = vx.visit_id
+WHERE m.feature_deleted_at IS NULL
+    AND m.schema_name = (
+        SELECT relnamespace::regnamespace::text
+        FROM pg_class
+        WHERE oid = 'node'::regclass
+    );
+CREATE VIEW v_ui_cmms_attachment AS
+SELECT
+    m.feature_id,
+    m.feature_type,
+    NULL::uuid AS visit_id,
+    a.id AS attachment_id,
+    a.name,
+    a.attachment_type,
+    a.content_type,
+    a.description,
+    a.uploaded_at,
+    a.uploaded_by,
+    a.path
+FROM cmms.asset_feature_map m
+JOIN cmms.attachment_x_feature axf ON axf.asset_feature_map_id = m.id
+JOIN cmms.attachment a ON a.id = axf.attachment_id
+WHERE m.feature_deleted_at IS NULL
+    AND m.schema_name = (
+        SELECT relnamespace::regnamespace::text
+        FROM pg_class
+        WHERE oid = 'node'::regclass
+    )
+UNION ALL
+SELECT
+    m.feature_id,
+    m.feature_type,
+    vx.visit_id,
+    a.id AS attachment_id,
+    a.name,
+    a.attachment_type,
+    a.content_type,
+    a.description,
+    a.uploaded_at,
+    a.uploaded_by,
+    a.path
+FROM cmms.asset_feature_map m
+JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
+JOIN cmms.attachment_x_visit axv ON axv.visit_id = vx.visit_id
+JOIN cmms.attachment a ON a.id = axv.attachment_id
+WHERE m.feature_deleted_at IS NULL
+    AND m.schema_name = (
+        SELECT relnamespace::regnamespace::text
+        FROM pg_class
+        WHERE oid = 'node'::regclass
+    );
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = 1),
+    1,
+    'the live feature has one cmms visit'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_attachment WHERE feature_id = 1),
+    2,
+    'direct and visit attachments both show'
+);
+SELECT ok(
+    (SELECT visit_id IS NULL FROM ws_fake.v_ui_cmms_attachment WHERE name = 'direct-photo'),
+    'a direct attachment has no visit_id'
+);
+
 DELETE FROM ws_fake.node WHERE node_id = 1;
 
 SELECT ok(
@@ -118,6 +223,12 @@ SELECT ok(
      FROM asset_feature_map
      WHERE ext_feature_id = 'ext-node-1'),
     'deleting the feature orphans the mapping'
+);
+
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = 1),
+    0,
+    'an orphaned mapping drops out of the visit view'
 );
 
 SELECT is(
@@ -189,10 +300,53 @@ SELECT has_trigger(
     'the parent node carries the cmms delete trigger'
 );
 
+CREATE TABLE ws_fake.config_form_tabs (formname text, tabname text);
+CREATE TABLE ws_fake.config_form_fields (formname text, tabname text);
+CREATE TABLE ws_fake.config_form_tableview (objectname text);
+CREATE TABLE ws_fake.sys_table (id text);
+INSERT INTO ws_fake.config_form_tabs VALUES ('ve_node', 'tab_cmms'), ('ve_arc', 'tab_event');
+INSERT INTO ws_fake.config_form_fields VALUES ('node', 'tab_cmms'), ('node', 'tab_data');
+INSERT INTO ws_fake.config_form_tableview VALUES ('v_ui_cmms_visit'), ('v_ui_cmms_attachment'), ('keep_me');
+INSERT INTO ws_fake.sys_table VALUES ('v_ui_cmms_visit'), ('v_ui_cmms_attachment'), ('node');
+
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.config_form_tabs WHERE formname = 've_node' AND tabname = 'tab_cmms'),
+    1,
+    'tab_cmms is configured for ve_node'
+);
+
 SELECT is(
     (SELECT gw_fct_cmms_unlink_parent('ws_fake')::jsonb ->> 'status'),
     'Accepted',
     'unlink of a still-present parent is accepted'
+);
+
+SELECT hasnt_view('ws_fake', 'v_ui_cmms_visit', 'unlink drops the visit view');
+SELECT hasnt_view('ws_fake', 'v_ui_cmms_attachment', 'unlink drops the attachment view');
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.config_form_tabs WHERE tabname = 'tab_cmms'),
+    0,
+    'unlink removes the tab_cmms rows'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.config_form_tabs WHERE tabname = 'tab_event'),
+    1,
+    'unlink leaves the other tabs'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.config_form_fields WHERE tabname = 'tab_cmms'),
+    0,
+    'unlink removes the tab_cmms fields'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.config_form_tableview WHERE objectname IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment')),
+    0,
+    'unlink removes the cmms tableview config'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.sys_table WHERE id IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment')),
+    0,
+    'unlink removes the cmms sys_table rows'
 );
 
 SELECT hasnt_trigger(

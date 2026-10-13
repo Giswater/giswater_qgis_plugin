@@ -129,7 +129,7 @@ def test_cmms_empty_and_integrate_phase_ids(manifests_path, dbmodel_path):
         "register_version",
     ]
     counts = {phase.id: count for phase, count in planned}
-    assert counts["integrate_cmms"] == 1
+    assert counts["integrate_cmms"] == 2
     # register_version is the only cmms.sys_version insert. integration.sql
     # must only stamp the parent satellite flag.
     for parent_type in ("ws", "ud"):

@@ -58,6 +58,8 @@ def test_drop_runs_unlink_then_drop_then_remove_satellite() -> None:
     pre = next(sql for sql in conn.sql if "gw_drop_pre" in sql)
     post = next(sql for sql in conn.sql if "gw_drop_post" in sql)
     assert "gw_fct_cmms_unlink_parent" in pre
+    assert "v_kind = 'cmms'" in pre
+    assert "parent_schemas" in pre
     assert "removeSatellite" in post
     assert labels[-1] == "reset"
 
