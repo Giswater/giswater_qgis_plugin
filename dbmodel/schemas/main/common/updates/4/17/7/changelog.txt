@@ -1,1 +1,2 @@
 - `gw_fct_workspacemanager` drops sector 0 (Undefined) from `selector_sector` before the snapshot and does not restore it. Saved `cat_workspace` sector arrays lose that 0 so CHECK still matches (#974).
+- Fid 377 D-W roughness range is 0.001 to 0.9 (#975).

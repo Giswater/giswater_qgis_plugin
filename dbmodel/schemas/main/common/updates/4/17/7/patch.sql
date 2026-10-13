@@ -41,3 +41,14 @@ FROM (
 	WHERE elem.sector_ids @> '[0]'::jsonb
 ) AS cleaned
 WHERE cw.id = cleaned.id;
+
+UPDATE sys_fprocess SET query_text = '
+SELECT * FROM (WITH
+	rgh as (SELECT min(roughness), max(roughness) FROM cat_mat_roughness),
+	hdl as (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter=''inp_options_headloss'')
+	SELECT
+		case when value = ''D-W'' and (min < 0.001 or max > 0.9) then 1
+				when value = ''H-W'' and (min < 110 or max > 150) then 1
+				when value = ''C-M'' and (min < 0.011 or max > 0.017) then 1
+				else 0 END roughness
+		from rgh, hdl) a WHERE roughness = 1' WHERE fid = 377;
