@@ -100,8 +100,10 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('WORKSPACE MANAGER'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-----------------------------');
 
-	-- sector 0 (Undefined) is forced by gw_fct_setselectors; never snapshot or restore it
-	DELETE FROM selector_sector WHERE sector_id = 0 AND cur_user = current_user;
+	IF v_action <> 'CHECK' THEN
+		-- sector 0 (Undefined) is forced by gw_fct_setselectors; never snapshot or restore it
+		DELETE FROM selector_sector WHERE sector_id = 0 AND cur_user = current_user;
+	END IF;
 
 	IF v_action = 'CREATE' OR v_action = 'CHECK' OR v_action = 'UPDATE' THEN
 
