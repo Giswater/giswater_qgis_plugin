@@ -1006,19 +1006,19 @@ BEGIN
 		ON CONFLICT (typevalue, id) DO NOTHING;
 
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_node_output_compare', 'id', 'role_om', NULL, '36', 5, 'Node Result - Compare', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
+		VALUES('v_asset_ws_node_output_compare', 'id', 'role_om', NULL, '36', 5, 'Comparison Node Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_node_output', 'id', 'role_om', NULL, '36', 4, 'Node Result - Main', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
+		VALUES('v_asset_ws_node_output', 'id', 'role_om', NULL, '36', 4, 'Selected Node Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_node_corporate', 'id', 'role_om', NULL, '36', 3, 'Node Corporate Assets', NULL, NULL, NULL, 'am', NULL)
+		VALUES('v_asset_ws_node_corporate', 'id', 'role_om', NULL, '36', 3, 'Corporate Node Plan', NULL, NULL, NULL, 'am', NULL)
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_node_input', 'id', 'role_om', NULL, '36', 2, 'Node Input Assets', NULL, NULL, NULL, 'am', NULL)
+		VALUES('v_asset_ws_node_input', 'id', 'role_om', NULL, '36', 2, 'Node Planning Inputs', NULL, NULL, NULL, 'am', NULL)
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('ext_ws_node_asset', 'id', 'role_om', NULL, '36', 1, 'Existing Node Assets', NULL, NULL, NULL, 'am', NULL)
+		VALUES('ext_ws_node_asset', 'id', 'role_om', NULL, '36', 1, 'Existing Node Inventory', NULL, NULL, NULL, 'am', NULL)
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 	$sys$, v_parent);
 END $$;
@@ -1048,43 +1048,43 @@ BEGIN
 		ON CONFLICT (typevalue, id) DO UPDATE SET idval = EXCLUDED.idval, addparam = EXCLUDED.addparam;
 
 		-- ARC layers
-		UPDATE %1$I.sys_table SET context = '35', orderby = 7, alias = 'Arc Result - Compare', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 7, alias = 'Comparison Arc Result', "source" = 'am'
 		WHERE id = 'v_asset_ws_arc_output_compare';
-		UPDATE %1$I.sys_table SET context = '35', orderby = 6, alias = 'Arc Result - Main', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 6, alias = 'Selected Arc Result', "source" = 'am'
 		WHERE id = 'v_asset_ws_arc_output';
-		UPDATE %1$I.sys_table SET context = '35', orderby = 5, alias = 'Arc Corporate Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 5, alias = 'Corporate Arc Plan', "source" = 'am'
 		WHERE id = 'v_asset_ws_arc_corporate';
-		UPDATE %1$I.sys_table SET context = '35', orderby = 4, alias = 'Arc Assets Result', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 4, alias = 'All Arc Calculation Results', "source" = 'am'
 		WHERE id = 'ws_arc_output';
-		UPDATE %1$I.sys_table SET context = '35', orderby = 3, alias = 'Arc Input Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 3, alias = 'Arc Failure Rates and Inputs', "source" = 'am'
 		WHERE id = 'v_asset_ws_arc_input';
-		UPDATE %1$I.sys_table SET context = '35', orderby = 2, alias = 'Leaks', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 2, alias = 'Leak History Points', "source" = 'am'
 		WHERE id = 'leaks';
-		UPDATE %1$I.sys_table SET context = '35', orderby = 1, alias = 'Existing Arc Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '35', orderby = 1, alias = 'Existing Arc Inventory', "source" = 'am'
 		WHERE id = 'ext_ws_arc_asset';
 
 		-- NODE layers
-		UPDATE %1$I.sys_table SET context = '36', orderby = 5, alias = 'Node Result - Compare', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '36', orderby = 5, alias = 'Comparison Node Result', "source" = 'am'
 		WHERE id = 'v_asset_ws_node_output_compare';
-		UPDATE %1$I.sys_table SET context = '36', orderby = 4, alias = 'Node Result - Main', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '36', orderby = 4, alias = 'Selected Node Result', "source" = 'am'
 		WHERE id = 'v_asset_ws_node_output';
-		UPDATE %1$I.sys_table SET context = '36', orderby = 3, alias = 'Node Corporate Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '36', orderby = 3, alias = 'Corporate Node Plan', "source" = 'am'
 		WHERE id = 'v_asset_ws_node_corporate';
-		UPDATE %1$I.sys_table SET context = '36', orderby = 2, alias = 'Node Input Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '36', orderby = 2, alias = 'Node Planning Inputs', "source" = 'am'
 		WHERE id = 'v_asset_ws_node_input';
-		UPDATE %1$I.sys_table SET context = '36', orderby = 1, alias = 'Existing Node Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '36', orderby = 1, alias = 'Existing Node Inventory', "source" = 'am'
 		WHERE id = 'ext_ws_node_asset';
 
 		-- LINK layers
-		UPDATE %1$I.sys_table SET context = '38', orderby = 5, alias = 'Link Result - Compare', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '38', orderby = 5, alias = 'Comparison Link Result', "source" = 'am'
 		WHERE id = 'v_asset_ws_link_output_compare';
-		UPDATE %1$I.sys_table SET context = '38', orderby = 4, alias = 'Link Result - Main', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '38', orderby = 4, alias = 'Selected Link Result', "source" = 'am'
 		WHERE id = 'v_asset_ws_link_output';
-		UPDATE %1$I.sys_table SET context = '38', orderby = 3, alias = 'Link Corporate Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '38', orderby = 3, alias = 'Corporate Link Plan', "source" = 'am'
 		WHERE id = 'v_asset_ws_link_corporate';
-		UPDATE %1$I.sys_table SET context = '38', orderby = 2, alias = 'Link Input Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '38', orderby = 2, alias = 'Link Planning Inputs', "source" = 'am'
 		WHERE id = 'v_asset_ws_link_input';
-		UPDATE %1$I.sys_table SET context = '38', orderby = 1, alias = 'Existing Link Assets', "source" = 'am'
+		UPDATE %1$I.sys_table SET context = '38', orderby = 1, alias = 'Existing Link Inventory', "source" = 'am'
 		WHERE id = 'ext_ws_link_asset';
 
 		-- CONFIG tables
@@ -1734,19 +1734,19 @@ BEGIN
 		WHERE typevalue = 'sys_table_context' AND id = '37';
 
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_link_output_compare', 'id', 'role_om', NULL, '38', 5, 'Link Result - Compare', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
+		VALUES('v_asset_ws_link_output_compare', 'id', 'role_om', NULL, '38', 5, 'Comparison Link Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_link_output', 'id', 'role_om', NULL, '38', 4, 'Link Result - Main', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
+		VALUES('v_asset_ws_link_output', 'id', 'role_om', NULL, '38', 4, 'Selected Link Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_link_corporate', 'id', 'role_om', NULL, '38', 3, 'Link Corporate Assets', NULL, NULL, NULL, 'am', NULL)
+		VALUES('v_asset_ws_link_corporate', 'id', 'role_om', NULL, '38', 3, 'Corporate Link Plan', NULL, NULL, NULL, 'am', NULL)
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('v_asset_ws_link_input', 'id', 'role_om', NULL, '38', 2, 'Link Input Assets', NULL, NULL, NULL, 'am', NULL)
+		VALUES('v_asset_ws_link_input', 'id', 'role_om', NULL, '38', 2, 'Link Planning Inputs', NULL, NULL, NULL, 'am', NULL)
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 		INSERT INTO %1$I.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-		VALUES('ext_ws_link_asset', 'id', 'role_om', NULL, '38', 1, 'Existing Link Assets', NULL, NULL, NULL, 'am', NULL)
+		VALUES('ext_ws_link_asset', 'id', 'role_om', NULL, '38', 1, 'Existing Link Inventory', NULL, NULL, NULL, 'am', NULL)
 		ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 
 		INSERT INTO %1$I.sys_style (layername, styleconfig_id, styletype, stylevalue, active)
@@ -2224,6 +2224,59 @@ BEGIN
 
 	GRANT ALL ON TABLE am.v_ud_arc_pathology TO role_basic;
 	GRANT ALL ON TABLE am.v_ud_inspection_score TO role_basic;
+END $$;
+
+-- Use task-oriented AM layer names in the parent project TOC.
+DO $$
+DECLARE
+	v_parent text;
+BEGIN
+	SELECT NULLIF(btrim(addparam->>'parentSchema'), '')
+	INTO v_parent
+	FROM am.sys_version
+	ORDER BY id DESC
+	LIMIT 1;
+
+	IF v_parent IS NULL OR to_regnamespace(v_parent) IS NULL THEN
+		RAISE NOTICE 'AM layer alias update skipped: parent schema not found';
+		RETURN;
+	END IF;
+
+	EXECUTE format($sql$
+		UPDATE %1$I.sys_table AS t
+		SET alias = v.alias
+		FROM (VALUES
+			('leaks', 'Leak History Points'),
+			('v_asset_ws_arc_output_compare', 'Comparison Arc Result'),
+			('v_asset_ws_arc_output', 'Selected Arc Result'),
+			('v_asset_ws_arc_corporate', 'Corporate Arc Plan'),
+			('ws_arc_output', 'All Arc Calculation Results'),
+			('v_asset_ws_arc_input', 'Arc Failure Rates and Inputs'),
+			('ext_ws_arc_asset', 'Existing Arc Inventory'),
+			('v_asset_ws_node_output_compare', 'Comparison Node Result'),
+			('v_asset_ws_node_output', 'Selected Node Result'),
+			('v_asset_ws_node_corporate', 'Corporate Node Plan'),
+			('v_asset_ws_node_input', 'Node Planning Inputs'),
+			('ext_ws_node_asset', 'Existing Node Inventory'),
+			('v_asset_ws_link_output_compare', 'Comparison Link Result'),
+			('v_asset_ws_link_output', 'Selected Link Result'),
+			('v_asset_ws_link_corporate', 'Corporate Link Plan'),
+			('v_asset_ws_link_input', 'Link Planning Inputs'),
+			('ext_ws_link_asset', 'Existing Link Inventory'),
+			('v_asset_ud_arc_output_compare', 'Comparison Arc Result'),
+			('v_asset_ud_arc_output', 'Selected Arc Result'),
+			('v_asset_ud_arc_corporate', 'Corporate Arc Plan'),
+			('ud_arc_output', 'All Arc Calculation Results'),
+			('v_asset_ud_arc_input', 'Arc Planning Inputs'),
+			('ext_ud_arc_asset', 'Existing Arc Inventory'),
+			('v_asset_ud_node_output_compare', 'Comparison Node Result'),
+			('v_asset_ud_node_output', 'Selected Node Result'),
+			('v_asset_ud_node_corporate', 'Corporate Node Plan'),
+			('v_asset_ud_node_input', 'Node Planning Inputs'),
+			('ext_ud_node_asset', 'Existing Node Inventory')
+		) AS v(id, alias)
+		WHERE t.id = v.id
+	$sql$, v_parent);
 END $$;
 
 

@@ -1778,24 +1778,19 @@ class GwCalculatePriority(GwTask):
         # Second iteration
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
         second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
-        replacement_year = date.today().year + 1
-        cum_cost_constr = 0
-        cum_length = 0
-
+        second_iteration = assign_replacement_years(
+            second_iteration,
+            self.result_budget,
+            date.today().year + 1,
+            self.target_year,
+            cost_key="cost_constr",
+            cumulative_key="cum_cost_constr",
+        )
+        year_lengths = {}
         for arc in second_iteration:
-            # Assign arc to current year before checking for overflow
-            cum_cost_constr += arc["cost_constr"]
-            cum_length += arc["length"]
-
-            arc["replacement_year"] = replacement_year
-            arc["cum_cost_constr"] = cum_cost_constr
-            arc["cum_length"] = cum_length
-
-            # If the budget is exceeded, increment the year for the *next* arc
-            if cum_cost_constr > self.result_budget:
-                replacement_year += 1
-                cum_cost_constr = 0
-                cum_length = 0
+            replacement_year = arc["replacement_year"]
+            year_lengths[replacement_year] = year_lengths.get(replacement_year, 0) + float(arc["length"] or 0)
+            arc["cum_length"] = year_lengths[replacement_year]
 
         for arc in arcs:
             # Check if the arc is in second_iteration, and update it
@@ -2433,15 +2428,12 @@ class GwCalculatePriority(GwTask):
         # Second iteration: assign replacement_year by yearly budget, ordered by mandatory then val_2
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
         second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
-        replacement_year = today_year + 1
-        cum_cost = 0
-        for node in second_iteration:
-            cum_cost += node["estimated_cost"]
-            node["replacement_year"] = replacement_year
-            node["cum_cost"] = cum_cost
-            if cum_cost > self.result_budget:
-                replacement_year += 1
-                cum_cost = 0
+        second_iteration = assign_replacement_years(
+            second_iteration,
+            self.result_budget,
+            today_year + 1,
+            self.target_year,
+        )
 
         for node in nodes:
             matching_node = next(
@@ -2822,15 +2814,12 @@ class GwCalculatePriority(GwTask):
 
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
         second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
-        replacement_year = today_year + 1
-        cum_cost = 0
-        for link in second_iteration:
-            cum_cost += link["estimated_cost"]
-            link["replacement_year"] = replacement_year
-            link["cum_cost"] = cum_cost
-            if cum_cost > self.result_budget:
-                replacement_year += 1
-                cum_cost = 0
+        second_iteration = assign_replacement_years(
+            second_iteration,
+            self.result_budget,
+            today_year + 1,
+            self.target_year,
+        )
 
         for link in links:
             matching = next(

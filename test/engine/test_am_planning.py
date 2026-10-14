@@ -38,3 +38,25 @@ def test_assign_replacement_years_stops_at_horizon():
     selected = assign_replacement_years(assets, 100, 2027, 2028)
 
     assert len(selected) == 2
+
+
+def test_assign_replacement_years_supports_arc_cost_columns():
+    assets = [
+        {"cost_constr": 62},
+        {"cost_constr": 180},
+        {"cost_constr": 140},
+        {"cost_constr": 95},
+        {"cost_constr": 27},
+    ]
+
+    selected = assign_replacement_years(
+        assets,
+        400,
+        2027,
+        2028,
+        cost_key="cost_constr",
+        cumulative_key="cum_cost_constr",
+    )
+
+    assert [asset["replacement_year"] for asset in selected] == [2027, 2027, 2027, 2028, 2028]
+    assert [asset["cum_cost_constr"] for asset in selected] == [62, 242, 382, 95, 122]

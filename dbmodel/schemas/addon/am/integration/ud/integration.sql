@@ -652,38 +652,38 @@ GRANT ALL ON TABLE am.v_ud_arc_am TO role_basic;
 GRANT ALL ON TABLE am.v_ud_node_am TO role_basic;
 
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_arc_output_compare', 'id', 'role_om', NULL, '35', 7, 'UD Arc Result - Compare', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
+VALUES('v_asset_ud_arc_output_compare', 'id', 'role_om', NULL, '35', 7, 'Comparison Arc Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_arc_output', 'id', 'role_om', NULL, '35', 6, 'UD Arc Result - Main', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
+VALUES('v_asset_ud_arc_output', 'id', 'role_om', NULL, '35', 6, 'Selected Arc Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_arc_corporate', 'id', 'role_om', NULL, '35', 5, 'UD Arc Corporate Assets', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
+VALUES('v_asset_ud_arc_corporate', 'id', 'role_om', NULL, '35', 5, 'Corporate Arc Plan', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('ud_arc_output', 'id', 'role_om', NULL, '35', 4, 'UD Arc Assets Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
+VALUES('ud_arc_output', 'id', 'role_om', NULL, '35', 4, 'All Arc Calculation Results', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "dnomSymbol": "dnom", "allOthers": false, "symbolField": "replacement_year"}')
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_arc_input', 'id', 'role_om', NULL, '35', 3, 'UD Arc Input Assets', NULL, NULL, NULL, 'am', NULL)
+VALUES('v_asset_ud_arc_input', 'id', 'role_om', NULL, '35', 3, 'Arc Planning Inputs', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('ext_ud_arc_asset', 'id', 'role_om', NULL, '35', 1, 'UD Existing Arc Assets', NULL, NULL, NULL, 'am', NULL)
+VALUES('ext_ud_arc_asset', 'id', 'role_om', NULL, '35', 1, 'Existing Arc Inventory', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_node_output_compare', 'id', 'role_om', NULL, '36', 5, 'UD Node Result - Compare', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
+VALUES('v_asset_ud_node_output_compare', 'id', 'role_om', NULL, '36', 5, 'Comparison Node Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_node_output', 'id', 'role_om', NULL, '36', 4, 'UD Node Result - Main', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
+VALUES('v_asset_ud_node_output', 'id', 'role_om', NULL, '36', 4, 'Selected Node Result', NULL, NULL, NULL, 'am', '{"refreshSymbology": true, "allOthers": false, "symbolField": "replacement_year"}')
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, addparam = EXCLUDED.addparam, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_node_corporate', 'id', 'role_om', NULL, '36', 3, 'UD Node Corporate Assets', NULL, NULL, NULL, 'am', NULL)
+VALUES('v_asset_ud_node_corporate', 'id', 'role_om', NULL, '36', 3, 'Corporate Node Plan', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_asset_ud_node_input', 'id', 'role_om', NULL, '36', 2, 'UD Node Input Assets', NULL, NULL, NULL, 'am', NULL)
+VALUES('v_asset_ud_node_input', 'id', 'role_om', NULL, '36', 2, 'Node Planning Inputs', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 INSERT INTO PARENT_SCHEMA.sys_table (id, descript, sys_role, project_template, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('ext_ud_node_asset', 'id', 'role_om', NULL, '36', 1, 'UD Existing Node Assets', NULL, NULL, NULL, 'am', NULL)
+VALUES('ext_ud_node_asset', 'id', 'role_om', NULL, '36', 1, 'Existing Node Inventory', NULL, NULL, NULL, 'am', NULL)
 ON CONFLICT (id) DO UPDATE SET context = EXCLUDED.context, orderby = EXCLUDED.orderby, alias = EXCLUDED.alias, "source" = EXCLUDED.source;
 
 -- Reuse WS QML if this AM was already integrated with WS; otherwise layers load unstyled.
