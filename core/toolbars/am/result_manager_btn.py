@@ -399,7 +399,6 @@ class GwResultManagerButton(GwAction):
             return
 
         self.dlg_status = GwStatusSelectorUi(self)
-        self.dlg_status.lbl_result.setText(f"{result_id}: {result_name}")
         rows = tools_db.get_rows("SELECT id, idval FROM am.value_status")
         tools_qt.fill_combo_values(self.dlg_status.cmb_status, rows, 1)
         tools_qt.set_combo_value(self.dlg_status.cmb_status, status, 0, add_new=False)
@@ -409,6 +408,11 @@ class GwResultManagerButton(GwAction):
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
         tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector")
+        # open_dialog translates lbl_result back to the .ui placeholder.
+        label = str(result_name or result_id)
+        self.dlg_status.lbl_result.setWordWrap(True)
+        self.dlg_status.lbl_result.setText(label)
+        self.dlg_status.lbl_result.setToolTip(label)
 
     def _set_corporate(self):
         """ Toggle corporate flag and resolve exploitation conflicts """
