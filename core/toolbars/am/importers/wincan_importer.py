@@ -46,12 +46,13 @@ class WincanImporter(InspectionImporter):
             if not code or severity is None:
                 continue
             distance = self._num(self._child_text(element, ("distance", "pk", "position")))
+            pk_start = self._num(self._child_text(element, ("startposition", "pk_start")))
             rows.append({
                 "asset_id": self._blank(self._child_text(element, ("pipeid", "assetid"))) or asset_id,
                 "feature_type": "ARC",
                 "code": code.upper(),
                 "severity": severity,
-                "pk_start": self._num(self._child_text(element, ("startposition", "pk_start"))) or distance,
+                "pk_start": distance if pk_start is None else pk_start,
                 "pk_end": self._num(self._child_text(element, ("endposition", "pk_end"))),
                 "pk": distance,
                 "clock_start": self._num(self._child_text(element, ("clockposition", "clock", "clock_start"))),

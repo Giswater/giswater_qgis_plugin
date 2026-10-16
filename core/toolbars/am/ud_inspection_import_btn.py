@@ -99,7 +99,7 @@ class GwUdInspectionImportButton(GwAction):
             id_col = f"{parent_table}_id"
             asset_id = self._sql_text(row["asset_id"])
             exists = tools_db.get_row(
-                f"SELECT 1 FROM {parent_table} WHERE {id_col} = {asset_id}",
+                f"SELECT 1 FROM {parent_table} WHERE {id_col}::text = {asset_id}",
                 log_info=False,
             )
             if not exists:
