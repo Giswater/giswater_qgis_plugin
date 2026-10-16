@@ -85,6 +85,7 @@ BEGIN
 	v_querytext := v_querytext ||
 		' WHERE (now()::date - (CASE WHEN a.builtdate IS NULL THEN ''1900-01-01''::date ELSE a.builtdate END))/365 >= cmr.init_age
 		AND (now()::date - (CASE WHEN a.builtdate IS NULL THEN ''1900-01-01''::date ELSE a.builtdate END))/365 <= cmr.end_age
+		AND a.epa_type <> ''UNDEFINED''
 		AND vst.is_operative = TRUE';
 
 	IF v_networkmode = 1 THEN
@@ -179,6 +180,7 @@ BEGIN
 				WHERE a.arc_id = c.arc_id::text
 			)
 			AND vst.is_operative = TRUE
+			AND c.epa_type <> 'UNDEFINED'
 		;
 
 		RAISE NOTICE 'Inserting links on temp_t_arc table';

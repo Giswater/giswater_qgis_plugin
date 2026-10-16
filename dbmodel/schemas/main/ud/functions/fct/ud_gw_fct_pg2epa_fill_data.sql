@@ -87,7 +87,8 @@ BEGIN
 		LEFT JOIN cat_material cm ON ca.matcat_id = cm.id
 		LEFT JOIN cat_material cma ON a.matcat_id = cma.id
 		LEFT JOIN inp_conduit ic ON a.arc_id = ic.arc_id
-	WHERE vst.is_operative = TRUE;
+	WHERE vst.is_operative = TRUE
+	AND a.epa_type <> 'UNDEFINED';
 
 	-- Insert on node temp_t_node table
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
