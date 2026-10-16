@@ -4764,7 +4764,11 @@ def _fill_async_combo(widget, field, index_to_compare=0, dialog=None):
     widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
 
     selected_id = _resolve_combo_selected_id(field)
-    if _should_defer_filtered_child_load(field, dialog):
+    # Toolbox children (parentname + filterquery) are filled by
+    # toolbox_btn._filter_combo_values. Loading dvQueryText here as well
+    # repeats the leading `select null` and the popup later refetches it.
+    waits_for_parent = bool(field.get('filterquery') and field.get('parentname'))
+    if _should_defer_filtered_child_load(field, dialog) or waits_for_parent:
         widget.start_loading('')
     else:
         query = _build_async_combo_query(widget, field, dialog)

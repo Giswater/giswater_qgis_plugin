@@ -705,21 +705,31 @@ class GwToolBoxButton(GwAction):
     def _filter_combo_values(self, dialog, combo):
         parent_name = combo.property('parentname')
         parent_combo = dialog.findChild(QComboBox, parent_name)
-        if parent_combo:
-            parent_data = parent_combo.currentData()
-            parent_value = parent_data[0] if parent_data else parent_combo.currentText()
-            filter_query = combo.property('filterquery')
-            if filter_query:
-                filter_query = filter_query.replace('{parent_value}', parent_value)
-            result = tools_db.get_rows(filter_query)
-            combo.setCurrentIndex(0)
+        if not parent_combo:
+            return
+        parent_data = parent_combo.currentData()
+        if isinstance(parent_data, (list, tuple)):
+            parent_value = parent_data[0] if parent_data else None
+        else:
+            parent_value = parent_data
+        if parent_value in (None, '', 'None', -1):
+            return
+        filter_query = combo.property('filterquery')
+        if not filter_query:
+            return
+        filter_query = filter_query.replace('{parent_value}', str(parent_value))
+        # Popup open reloads `_gw_combo_query`. Keep that on the filtered SQL,
+        # otherwise it fetches dvQueryText and brings a second empty lot row.
+        if hasattr(combo, 'set_reload_query'):
+            combo.set_reload_query(filter_query)
+        result = tools_db.get_rows(filter_query)
+        if not result:
             combo.clear()
-            if result:
-                combolist = []
-                for i in range(0, len(result)):
-                    elem = [result[i][0], result[i][1]]
-                    combolist.append(elem)
-                tools_qt.fill_combo_values(combo, combolist)
+            return
+        combolist = []
+        for i in range(0, len(result)):
+            combolist.append([result[i][0], result[i][1]])
+        tools_qt.fill_combo_values(combo, combolist)
 
     def _populate_cmb_type(self, feature_types):
 
