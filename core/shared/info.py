@@ -2928,7 +2928,11 @@ class GwInfo(QObject):
             return False, False
         widget = tools_gw.add_tableview_header(widget, fields, headers)
         widget = tools_gw.fill_tableview_rows(widget, fields)
-        tools_qt.set_tableview_config(widget, edit_triggers=QTableView.EditTrigger.DoubleClicked, section_resize_mode=QHeaderView.ResizeMode.Interactive)
+        # EPA tables are edited in place. A double click on the CMMS tables opens a dialog.
+        edit_triggers = QTableView.EditTrigger.DoubleClicked
+        if 'tab_cmms' in widgetname:
+            edit_triggers = QTableView.EditTrigger.NoEditTriggers
+        tools_qt.set_tableview_config(widget, edit_triggers=edit_triggers, section_resize_mode=QHeaderView.ResizeMode.Interactive)
         widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, Qt.SortOrder.DescendingOrder)
         if 'tab_epa' in widgetname:
             widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))

@@ -50,7 +50,8 @@ SELECT
 	a.description,
 	a.uploaded_at,
 	a.uploaded_by,
-	a.path
+	a.path,
+	a.thumbnail_path
 FROM cmms.asset_feature_map m
 JOIN cmms.attachment_x_feature axf ON axf.asset_feature_map_id = m.id
 JOIN cmms.attachment a ON a.id = axf.attachment_id
@@ -72,7 +73,8 @@ SELECT
 	a.description,
 	a.uploaded_at,
 	a.uploaded_by,
-	a.path
+	a.path,
+	a.thumbnail_path
 FROM cmms.asset_feature_map m
 JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
 JOIN cmms.attachment_x_visit axv ON axv.visit_id = vx.visit_id
@@ -105,6 +107,9 @@ WHERE typevalue = 'layout_name_typevalue'
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
 VALUES
 	('tabname_typevalue', 'tab_cmms', 'tab_cmms', 'tabCmms', NULL),
+	('formtype_typevalue', 'cmms_visit', 'cmms_visit', 'cmmsVisit', NULL),
+	('formtype_typevalue', 'cmms_attachment', 'cmms_attachment', 'cmmsAttachment', NULL),
+	('layout_name_typevalue', 'lyt_cmms_main', 'lyt_cmms_main', 'layoutCmmsMain', NULL),
 	('layout_name_typevalue', 'lyt_cmms_v_1', 'lyt_cmms_v_1', 'layoutCmmsV1', '{"lytOrientation":"horizontal"}'::json),
 	('layout_name_typevalue', 'lyt_cmms_v_2', 'lyt_cmms_v_2', 'layoutCmmsV2', '{"lytOrientation":"horizontal"}'::json),
 	('layout_name_typevalue', 'lyt_cmms_v_3', 'lyt_cmms_v_3', 'layoutCmmsV3', NULL),
@@ -117,10 +122,11 @@ DELETE FROM config_form_fields WHERE tabname = 'tab_cmms';
 
 INSERT INTO config_form_fields (
 	formname, formtype, tabname, columnname, layoutname, layoutorder, widgettype,
-	ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, linkedobject, hidden
+	ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction, linkedobject, hidden
 )
 SELECT f.formname, 'form_feature', 'tab_cmms', 'tbl_visit', 'lyt_cmms_v_3', 1, 'tableview',
-	false, false, false, false, false, '{"saveValue": false}'::json, 'v_ui_cmms_visit', false
+	false, false, false, false, false, '{"saveValue": false}'::json,
+	'{"functionName": "open_cmms_visit"}'::json, 'v_ui_cmms_visit', false
 FROM unnest(ARRAY['node', 'arc', 'connec', 'link', 'gully']) AS f(formname)
 WHERE f.formname <> 'gully' OR to_regclass('gully') IS NOT NULL;
 
@@ -130,10 +136,56 @@ INSERT INTO config_form_fields (
 )
 SELECT f.formname, 'form_feature', 'tab_cmms', 'tbl_attachment', 'lyt_cmms_a_3', 1, 'tableview',
 	false, false, false, false, false, '{"saveValue": false}'::json,
-	'{"functionName": "open_selected_path", "parameters": {"targetwidget": "tab_cmms_tbl_attachment", "columnfind": "path"}}'::json,
-	'v_ui_cmms_attachment', false
+	'{"functionName": "open_cmms_attachment"}'::json, 'v_ui_cmms_attachment', false
 FROM unnest(ARRAY['node', 'arc', 'connec', 'link', 'gully']) AS f(formname)
 WHERE f.formname <> 'gully' OR to_regclass('gully') IS NOT NULL;
+
+DELETE FROM config_form_fields WHERE formtype IN ('cmms_visit', 'cmms_attachment');
+
+INSERT INTO config_form_fields (
+	formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype,
+	label, tooltip, ismandatory, isparent, iseditable, isautoupdate, isfilter, widgetcontrols, widgetfunction,
+	linkedobject, hidden
+)
+VALUES
+	('generic', 'cmms_visit', 'tab_none', 'visit_id', 'lyt_cmms_main', 1, 'string', 'text',
+		'Visit id', 'Visit id', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'ext_visit_id', 'lyt_cmms_main', 2, 'string', 'text',
+		'External id', 'External id', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'type', 'lyt_cmms_main', 3, 'string', 'text',
+		'Type', 'Type', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'status', 'lyt_cmms_main', 4, 'string', 'text',
+		'Status', 'Status', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'title', 'lyt_cmms_main', 5, 'string', 'text',
+		'Title', 'Title', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'start_date', 'lyt_cmms_main', 6, 'string', 'text',
+		'Start date', 'Start date', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'end_date', 'lyt_cmms_main', 7, 'string', 'text',
+		'End date', 'End date', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'description', 'lyt_cmms_main', 8, 'string', 'textarea',
+		'Description', 'Description', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_visit', 'tab_none', 'tbl_attachment', 'lyt_cmms_main', 9, NULL, 'tableview',
+		'Attachments', 'Attachments', false, false, false, false, false, '{"saveValue": false}'::json,
+		'{"functionName": "open_cmms_attachment"}'::json, 'v_ui_cmms_attachment', false),
+	('generic', 'cmms_attachment', 'tab_none', 'name', 'lyt_cmms_main', 1, 'string', 'text',
+		'Name', 'Name', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'attachment_type', 'lyt_cmms_main', 2, 'string', 'text',
+		'Type', 'Type', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'content_type', 'lyt_cmms_main', 3, 'string', 'text',
+		'Content type', 'Content type', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'uploaded_at', 'lyt_cmms_main', 4, 'string', 'text',
+		'Uploaded at', 'Uploaded at', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'uploaded_by', 'lyt_cmms_main', 5, 'string', 'text',
+		'Uploaded by', 'Uploaded by', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'path', 'lyt_cmms_main', 6, 'string', 'text',
+		'Path', 'Path', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'description', 'lyt_cmms_main', 7, 'string', 'textarea',
+		'Description', 'Description', false, false, false, false, false, NULL, NULL, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'btn_open', 'lyt_cmms_main', 8, NULL, 'button',
+		NULL, 'Open', false, false, true, false, false, '{"text": "Open"}'::json,
+		'{"functionName": "open_cmms_attachment_file"}'::json, NULL, false),
+	('generic', 'cmms_attachment', 'tab_none', 'thumbnail_path', 'lyt_cmms_main', 9, 'string', 'text',
+		'Thumbnail path', 'Thumbnail path', false, false, false, false, false, NULL, NULL, NULL, true);
 
 DELETE FROM config_form_tableview
 WHERE objectname IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment');
@@ -161,7 +213,8 @@ VALUES
 	('info form', 'utils', 'v_ui_cmms_attachment', 'description', 7, true, 'Description'),
 	('info form', 'utils', 'v_ui_cmms_attachment', 'uploaded_at', 8, true, 'Uploaded at'),
 	('info form', 'utils', 'v_ui_cmms_attachment', 'uploaded_by', 9, true, 'Uploaded by'),
-	('info form', 'utils', 'v_ui_cmms_attachment', 'path', 10, true, 'Path');
+	('info form', 'utils', 'v_ui_cmms_attachment', 'path', 10, true, 'Path'),
+	('info form', 'utils', 'v_ui_cmms_attachment', 'thumbnail_path', 11, false, 'Thumbnail path');
 
 INSERT INTO config_form_tabs (formname, tabname, label, tooltip, sys_role, tabactions, device, orderby)
 SELECT f.formname, 'tab_cmms', 'Visits', 'CMMS visits and attachments', 'role_basic',
