@@ -6176,6 +6176,10 @@ Do you want to proceed?</translation>
 			<translation>Toggle Active</translation>
 		</message>
 		<message>
+			<source>Toggle doable</source>
+			<translation>Toggle doable</translation>
+		</message>
+		<message>
 			<source>Toggle validated</source>
 			<translation>Toggle validated</translation>
 		</message>
