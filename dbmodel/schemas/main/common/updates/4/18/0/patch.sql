@@ -28,3 +28,5 @@ VALUES (
     true, 12, 'utils', false, false, 'boolean', 'check', false, true, 'lyt_topology'
 )
 ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO sys_label (id, idval, label_type) VALUES (4005, 'NEW', 'python') ON CONFLICT (id) DO NOTHING;
