@@ -20,6 +20,52 @@ from ....libs import tools_qt, tools_db, tools_qgis, tools_os, lib_vars
 from ....libs.tools_qt import GwEditDialog
 
 
+def _sql_literal(value):
+    return "'" + str(value).replace("'", "''") + "'"
+
+
+def child_results_for_parents(parent_ids):
+    """Results whose parent_id is one of parent_ids."""
+    if not parent_ids:
+        return []
+    quoted = ", ".join(_sql_literal(parent_id) for parent_id in parent_ids)
+    sql = f"SELECT result_id FROM rpt_cat_result WHERE parent_id IN ({quoted}) ORDER BY result_id"
+    rows = tools_db.get_rows(sql)
+    if not rows:
+        return []
+    return [str(row[0]) for row in rows if row and row[0] is not None]
+
+
+def confirm_unlink_children(child_ids):
+    """Warn before deleting results that other results use as parent. Cancel aborts."""
+    if not child_ids:
+        return True
+    inf_text = ", ".join(child_ids)
+    msg = (
+        "These results are used as parent by other results. "
+        "Deleting them will remove that parent link. The child results will remain. "
+        "Continue?"
+    )
+    title = "Delete results"
+    return bool(tools_qt.show_question(msg, title, inf_text))
+
+
+def confirm_overwrite_parent_unlink(result_id):
+    """After overwrite Yes: if result_id has child results, warn before any work starts."""
+    children = child_results_for_parents([result_id])
+    if not children:
+        return True
+    inf_text = ", ".join(children)
+    msg = (
+        "Result '{0}' is the parent of other results. "
+        "Overwriting it will remove that parent link. The child results will remain. "
+        "Continue?"
+    )
+    title = "Overwrite result"
+    msg_params = (str(result_id),)
+    return bool(tools_qt.show_question(msg, title, inf_text, msg_params=msg_params))
+
+
 class GwGo2EpaManagerButton(GwAction):
     """ Button 43: Go2epa maanger """
 
@@ -413,34 +459,14 @@ class GwGo2EpaManagerButton(GwAction):
             result_ids.append(str(id_))
         return result_ids
 
-    @staticmethod
-    def _sql_literal(value):
-        return "'" + str(value).replace("'", "''") + "'"
-
     def _child_results_for_parents(self, parent_ids):
         """Results whose parent_id is one of parent_ids."""
-        if not parent_ids:
-            return []
-        quoted = ", ".join(self._sql_literal(parent_id) for parent_id in parent_ids)
-        sql = f"SELECT result_id FROM rpt_cat_result WHERE parent_id IN ({quoted}) ORDER BY result_id"
-        rows = tools_db.get_rows(sql)
-        if not rows:
-            return []
-        return [str(row[0]) for row in rows if row and row[0] is not None]
+        return child_results_for_parents(parent_ids)
 
     def _confirm_delete(self, result_ids, child_ids):
-        """Confirm delete. A parent with children gets one warning; cancel aborts.
-
-        Unlink itself is ON DELETE SET NULL on rpt_cat_result.parent_id.
-        """
+        """Confirm delete. A parent with children gets one warning; cancel aborts."""
         if child_ids:
-            inf_text = ", ".join(child_ids)
-            msg = (
-                "These results are the parent of other results. "
-                "Those children will be unlinked. Do you want to continue?"
-            )
-            title = "Unlink child results"
-            return bool(tools_qt.show_question(msg, title, inf_text))
+            return confirm_unlink_children(child_ids)
         inf_text = ", ".join(result_ids)
         msg = "Are you sure you want to delete these records?"
         title = "Delete records"
@@ -463,7 +489,7 @@ class GwGo2EpaManagerButton(GwAction):
         if not self._confirm_delete(result_ids, child_ids):
             return
 
-        list_id = ", ".join(self._sql_literal(result_id) for result_id in result_ids)
+        list_id = ", ".join(_sql_literal(result_id) for result_id in result_ids)
         sql = f"DELETE FROM {table_name} WHERE {column_id} IN ({list_id})"
         tools_db.execute_sql(sql)
         self._fill_manager_table()
