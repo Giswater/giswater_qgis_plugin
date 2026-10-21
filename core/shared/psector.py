@@ -1117,8 +1117,13 @@ class GwPsector:
         errors = []
         scale = tools_qt.get_text(self.dlg_plan_psector, "tab_general_scale", return_string_null=False)
         atlas_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_atlas_id", return_string_null=False)
-        parent_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_parent_id", return_string_null=False)
         rotation = tools_qt.get_text(self.dlg_plan_psector, "tab_general_rotation", return_string_null=False)
+        parent_id = tools_qt.get_widget_value(self.dlg_plan_psector, "tab_general_parent_id")
+        # Combo with no selection returns -1; a line edit returns the typed text.
+        if parent_id in (None, "", -1, "-1"):
+            parent_id = ""
+        else:
+            parent_id = str(parent_id)
 
         if rotation != "":
             try:
@@ -1141,16 +1146,14 @@ class GwPsector:
                 msg = "Atlas ID must be an integer."
                 errors.append(tools_qt.tr(msg))
 
-        if parent_id != "":
+        if parent_id is not None and parent_id != "":
             try:
                 int(parent_id)
+                if not self._validate_parent_id(parent_id):
+                    msg = "Parent ID does not exist."
+                    errors.append(tools_qt.tr(msg))
             except ValueError:
                 msg = "Parent ID must be an integer."
-                errors.append(tools_qt.tr(msg))
-
-        if parent_id is not None and parent_id != "":
-            if not self._validate_parent_id(parent_id):
-                msg = "Parent ID does not exist."
                 errors.append(tools_qt.tr(msg))
 
         if errors:
