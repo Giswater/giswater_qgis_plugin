@@ -401,6 +401,51 @@ class GwGo2EpaManagerButton(GwAction):
 
         self._fill_manager_table()
 
+    def _selected_result_ids(self, widget, column_id):
+        """Return result_id values for the selected table rows."""
+        selected_list = widget.selectionModel().selectedRows()
+        result_ids = []
+        col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
+        for index in selected_list:
+            id_ = widget.model().index(index.row(), col).data()
+            if id_ is None or str(id_) == "":
+                continue
+            result_ids.append(str(id_))
+        return result_ids
+
+    @staticmethod
+    def _sql_literal(value):
+        return "'" + str(value).replace("'", "''") + "'"
+
+    def _child_results_for_parents(self, parent_ids):
+        """Results whose parent_id is one of parent_ids."""
+        if not parent_ids:
+            return []
+        quoted = ", ".join(self._sql_literal(parent_id) for parent_id in parent_ids)
+        sql = f"SELECT result_id FROM rpt_cat_result WHERE parent_id IN ({quoted}) ORDER BY result_id"
+        rows = tools_db.get_rows(sql)
+        if not rows:
+            return []
+        return [str(row[0]) for row in rows if row and row[0] is not None]
+
+    def _confirm_delete(self, result_ids, child_ids):
+        """Confirm delete. A parent with children gets one warning; cancel aborts.
+
+        Unlink itself is ON DELETE SET NULL on rpt_cat_result.parent_id.
+        """
+        if child_ids:
+            inf_text = ", ".join(child_ids)
+            msg = (
+                "These results are the parent of other results. "
+                "Those children will be unlinked. Do you want to continue?"
+            )
+            title = "Unlink child results"
+            return bool(tools_qt.show_question(msg, title, inf_text))
+        inf_text = ", ".join(result_ids)
+        msg = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        return bool(tools_qt.show_question(msg, title, inf_text))
+
     def _multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
@@ -408,31 +453,20 @@ class GwGo2EpaManagerButton(GwAction):
         :param column_id: Refers to the id of the source table
         """
 
-        # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
-        if len(selected_list) == 0:
+        result_ids = self._selected_result_ids(widget, column_id)
+        if len(result_ids) == 0:
             msg = "Any record selected"
             tools_qgis.show_warning(msg, dialog=self.dlg_manager)
             return
 
-        inf_text = ""
-        list_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
-            id_ = widget.model().index(row, col).data()
-            inf_text += f"{id_}, "
-            list_id += f"'{id_}', "
-        inf_text = inf_text[:-2]
-        list_id = list_id[:-2]
-        msg = "Are you sure you want to delete these records?"
-        title = "Delete records"
-        answer = tools_qt.show_question(msg, title, inf_text)
-        if answer:
-            sql = f"DELETE FROM {table_name}"
-            sql += f" WHERE {column_id} IN ({list_id})"
-            tools_db.execute_sql(sql)
-            self._fill_manager_table()
+        child_ids = self._child_results_for_parents(result_ids)
+        if not self._confirm_delete(result_ids, child_ids):
+            return
+
+        list_id = ", ".join(self._sql_literal(result_id) for result_id in result_ids)
+        sql = f"DELETE FROM {table_name} WHERE {column_id} IN ({list_id})"
+        tools_db.execute_sql(sql)
+        self._fill_manager_table()
 
     def _toggle_rpt_archived(self, widget, column_id):
         """ Call gw_fct_set_rpt_archived with selected result_id
