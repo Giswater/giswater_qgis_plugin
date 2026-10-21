@@ -200,7 +200,7 @@ class GwGo2EpaManagerButton(GwAction):
             )
 
         exec_date = tools_qt.get_calendar_date(
-            self.dlg_manager, self.dlg_manager.date_exec_from, date_format='dd-MM-yyyy'
+            self.dlg_manager, self.dlg_manager.date_exec_from, date_format='yyyy-MM-dd'
         )
         if exec_date:
             filter_fields += (
