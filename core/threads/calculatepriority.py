@@ -1151,15 +1151,11 @@ class GwCalculatePriority(GwTask):
             return "SPOT_REPAIR"
         return "MAINTENANCE"
 
-    def _ud_plan(self, feat):
-        """SQL fragment for the inspection columns of one UD result row.
+    def _ud_facts(self, feat):
+        """Condition, action and inspection priority for one UD asset.
 
-        Action is the worst CCTV intervention on the overlay. Without CCTV it falls
-        back to _ud_action. recommended_action and intervention_type both store that
-        value. Completeness is how many of the 8 criteria are filled. Priority is 5
-        when there is no CCTV and no structural score, 4 below 50% complete, 2 below
-        75%, otherwise 1. The inspection year is next year only for priority >= 4.
-        data_quality is copied from the parent survey; this method does not compute it.
+        Priority is 5 with no CCTV and no structural score, 4 below 50% complete,
+        2 below 75%, otherwise 1. The inspection year is next year only for priority >= 4.
         """
         criteria = (
             "age", "incident_count", "structural_raw", "operational_raw",
@@ -1183,12 +1179,35 @@ class GwCalculatePriority(GwTask):
         else:
             priority = 1
         inspect_year = date.today().year + 1 if priority >= 4 else None
+        return {
+            "action": action,
+            "priority": priority,
+            "completeness": completeness,
+            "missing": missing,
+            "reasons": reasons,
+            "observations": observations,
+            "inspect_year": inspect_year,
+            "severe": int(feat.get("severe_observation_count") or 0),
+        }
+
+    def _ud_plan(self, feat):
+        """SQL fragment for the inspection columns of one UD result row.
+
+        data_quality is copied from the parent survey; this method does not compute it.
+        """
+        facts = self._ud_facts(feat)
+        action = facts["action"]
+        priority = facts["priority"]
+        completeness = facts["completeness"]
+        missing = facts["missing"]
+        reasons = facts["reasons"]
+        inspect_year = facts["inspect_year"]
+        observation_count = facts["observations"]
+        severe_observation_count = facts["severe"]
         inspection_id = feat.get("inspection_id")
         inspection_sql = "NULL" if inspection_id is None else str(int(inspection_id))
         year_sql = "NULL" if inspect_year is None else str(inspect_year)
         inspection_date_sql = self._sql_text(feat.get("inspection_date"))
-        observation_count = int(feat.get("observation_count") or 0)
-        severe_observation_count = int(feat.get("severe_observation_count") or 0)
         data_quality = feat.get("data_quality")
         data_quality_sql = "NULL" if data_quality is None else str(int(data_quality))
         return (
@@ -1413,15 +1432,33 @@ class GwCalculatePriority(GwTask):
             self.target_year,
         )
 
+        # IVI uses the WS asset shape. No UD pressure, so the medium useful-life band.
+        for feat in features:
+            feat["cost_constr"] = float(feat.get("estimated_cost") or 0)
+            feat["total_expected_useful_life"] = float(
+                self.config_material.get_age(feat["matcat_id"], 60) or 0
+            )
+        catalog_report = (
+            self._invalid_nodecat_id_report(invalid_cat)
+            if self.asset_type == "NODE"
+            else self._invalid_arccat_id_report(invalid_cat)
+        )
+        self.statistics_report = "\n\n".join(
+            filter(
+                None,
+                [
+                    self._ud_summary(features),
+                    self._ud_year_report(features),
+                    self._ud_condition_report(features),
+                    catalog_report,
+                    self._invalid_material_report(invalid_material),
+                ],
+            )
+        )
+
         self.df = pd.DataFrame(second_iteration).reset_index(drop=True)
         self._emit_report(tools_qt.tr("Updating tables") + " (4/4)...")
         self.setProgress(40)
-
-        skipped = invalid_cat["qtd"] + invalid_material["qtd"]
-        self.statistics_report = tools_qt.tr(
-            "UD {0}: {1} assets scored ({2} skipped).",
-            list_params=(self.asset_type, len(second_iteration), skipped),
-        )
 
         self.result_id = self._save_result_info()
         if not self.result_id:
@@ -3060,3 +3097,84 @@ class GwCalculatePriority(GwTask):
                     )
                 )
         return self._format_report(tools_qt.tr("SUMMARY"), rows)
+
+    def _ud_summary(self, features):
+        """Budget, how many assets enter the plan, and the year span of that plan."""
+        selected = [feat for feat in features if feat.get("replacement_year")]
+        total_cost = sum(float(feat.get("estimated_cost") or 0) for feat in selected)
+        replacement_cost = sum(float(feat.get("estimated_cost") or 0) for feat in features)
+        replacement_rate = (
+            self.result_budget / replacement_cost * 100 if replacement_cost > 0 else 0
+        )
+        ivi_target_year = self._calculate_ivi(features, self.target_year, True)
+        years = [int(feat["replacement_year"]) for feat in selected]
+        if self.asset_type == "NODE":
+            evaluated = tools_qt.tr("Nodes evaluated:")
+            selected_label = tools_qt.tr("Nodes selected for replacement:")
+            ivi_label = tools_qt.tr("IVI NODE (Horizon year):")
+        else:
+            evaluated = tools_qt.tr("Pipes evaluated:")
+            selected_label = tools_qt.tr("Pipes selected for replacement:")
+            ivi_label = tools_qt.tr("IVI (Horizon year):")
+        rows = [
+            (tools_qt.tr("Investment (€/year):"), f"{self.result_budget:.2f}"),
+            (tools_qt.tr("Horizon year:"), f"{self.target_year}"),
+            (evaluated, f"{len(features)}"),
+            (selected_label, f"{len(selected)}"),
+            (tools_qt.tr("Strategic:"), str(sum(1 for feat in features if feat.get("strategic")))),
+            (tools_qt.tr("Mandatory:"), str(sum(1 for feat in features if feat.get("mandatory")))),
+            (tools_qt.tr("Total renewal cost (€):"), f"{replacement_cost:.2f}"),
+            (tools_qt.tr("Selected renewal cost (€):"), f"{total_cost:.2f}"),
+            (ivi_label, f"{ivi_target_year:.3f}"),
+            (tools_qt.tr("Replacement rate (%/year):"), f"{replacement_rate:.2f}"),
+        ]
+        if years:
+            rows.append((tools_qt.tr("First replacement year:"), str(min(years))))
+            rows.append((tools_qt.tr("Last replacement year:"), str(max(years))))
+        return self._format_report(tools_qt.tr("SUMMARY"), rows)
+
+    def _ud_year_report(self, features):
+        """How many assets and how much money each replacement year takes."""
+        by_year = {}
+        for feat in features:
+            year = feat.get("replacement_year")
+            if not year:
+                continue
+            bucket = by_year.setdefault(int(year), [0, 0.0])
+            bucket[0] += 1
+            bucket[1] += float(feat.get("estimated_cost") or 0)
+        if not by_year:
+            return ""
+        noun = tools_qt.tr("nodes") if self.asset_type == "NODE" else tools_qt.tr("pipes")
+        rows = [
+            (str(year), f"{count} {noun}   {cost:.2f} €")
+            for year, (count, cost) in sorted(by_year.items())
+        ]
+        return self._format_report(tools_qt.tr("PLAN BY YEAR"), rows)
+
+    def _ud_condition_report(self, features):
+        """CCTV coverage, recommended actions and pipes that still need an inspection."""
+        facts = [self._ud_facts(feat) for feat in features]
+        with_cctv = sum(1 for fact in facts if fact["observations"] > 0)
+        severe = sum(fact["severe"] for fact in facts)
+        priority_high = sum(1 for fact in facts if fact["priority"] >= 4)
+        actions = {}
+        for fact in facts:
+            actions[fact["action"] or "-"] = actions.get(fact["action"] or "-", 0) + 1
+        rows = [
+            (tools_qt.tr("With CCTV:"), str(with_cctv)),
+            (tools_qt.tr("Without CCTV:"), str(len(features) - with_cctv)),
+            (tools_qt.tr("Severe observations:"), str(severe)),
+            (tools_qt.tr("Inspection priority 4 or 5:"), str(priority_high)),
+        ]
+        for action in ("FULL_REPLACEMENT", "REHABILITATION", "SPOT_REPAIR", "MAINTENANCE"):
+            if actions.get(action):
+                rows.append((f"{action}:", str(actions[action])))
+        text = self._format_report(tools_qt.tr("CONDITION"), rows)
+        if self.asset_type != "NODE":
+            storms = [feat.get("storm_raw") for feat in features]
+            if storms and all(value is None or float(value) == 0 for value in storms):
+                text += "\n\n" + tools_qt.tr(
+                    "Storm impact is 0 on every pipe, so that criterion does not separate them."
+                )
+        return text

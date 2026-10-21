@@ -46,18 +46,97 @@ ON CONFLICT (nodecat_id, project_type) DO UPDATE SET
 	cost_rehab = EXCLUDED.cost_rehab,
 	compliance = EXCLUDED.compliance;
 
--- A few operative assets so CCTV, breakdowns and the input override are visible
--- without running the importer. Re-integrate does not duplicate them.
+-- Sample catalogs are inserted with matcat_id null. The dialog Material column and the
+-- inventory view read it, so copy the material already used on the operative assets.
+UPDATE PARENT_SCHEMA.cat_arc c
+SET matcat_id = picked.matcat_id
+FROM (
+	SELECT DISTINCT ON (a.arccat_id)
+		a.arccat_id::text AS arccat_id,
+		a.matcat_id
+	FROM PARENT_SCHEMA.arc a
+	JOIN PARENT_SCHEMA.cat_material m
+		ON m.id = a.matcat_id AND COALESCE(m.active, true) AND 'ARC' = ANY(m.feature_type)
+	WHERE a.state = 1
+		AND a.matcat_id IS NOT NULL
+	GROUP BY a.arccat_id, a.matcat_id
+	ORDER BY a.arccat_id, count(*) DESC, a.matcat_id
+) picked
+WHERE c.id::text = picked.arccat_id
+	AND c.matcat_id IS NULL;
+
+UPDATE PARENT_SCHEMA.cat_node c
+SET matcat_id = picked.matcat_id
+FROM (
+	SELECT DISTINCT ON (n.nodecat_id)
+		n.nodecat_id::text AS nodecat_id,
+		n.matcat_id
+	FROM PARENT_SCHEMA.node n
+	JOIN PARENT_SCHEMA.cat_material m
+		ON m.id = n.matcat_id AND COALESCE(m.active, true) AND 'NODE' = ANY(m.feature_type)
+	WHERE n.state = 1
+		AND n.matcat_id IS NOT NULL
+	GROUP BY n.nodecat_id, n.matcat_id
+	ORDER BY n.nodecat_id, count(*) DESC, n.matcat_id
+) picked
+WHERE c.id::text = picked.nodecat_id
+	AND c.matcat_id IS NULL;
+
+-- Trunk sewers are the operative collectors of 1 m or more. The exercise asks the
+-- user to mark two more of these as strategic; one is already flagged below.
+INSERT INTO PARENT_SCHEMA.man_type_function (function_type, feature_type, featurecat_id, observ, active)
+SELECT 'Trunk sewer', '{ARC}'::text[], NULL::text[], 'Collector of a large area', true
+WHERE NOT EXISTS (
+	SELECT 1 FROM PARENT_SCHEMA.man_type_function m WHERE m.function_type = 'Trunk sewer'
+);
+
+UPDATE PARENT_SCHEMA.arc a
+SET function_type = 'Trunk sewer'
+FROM PARENT_SCHEMA.cat_arc c
+WHERE c.id::text = a.arccat_id::text
+	AND a.state = 1
+	AND a.arc_type IN ('CONDUIT', 'SIPHON')
+	AND COALESCE(c.geom1, 0) >= 1
+	AND (a.function_type IS NULL OR a.function_type = 'St. Function');
+
+-- CCTV, breakdowns and the input override, visible without the importer.
+-- Inspection 9001 is replaced on re-integrate so the three pipes stay the three
+-- largest trunk sewers (RC200), not whatever arc_id sorts first.
+-- The delete trigger writes a dummy score of 1; clear that on the pipes that just lost the inspection.
+CREATE TEMP TABLE IF NOT EXISTS am_ud_sample_cctv_reset (arc_id varchar(16));
+TRUNCATE am_ud_sample_cctv_reset;
+INSERT INTO am_ud_sample_cctv_reset (arc_id)
+SELECT DISTINCT arc_id FROM am.ud_arc_pathology WHERE inspection_id = 9001;
+
+DELETE FROM am.ud_arc_pathology WHERE inspection_id = 9001;
+
+UPDATE am.ud_arc_input i
+SET structural_raw = NULL,
+	operational_raw = NULL,
+	estimated_cost = NULL,
+	inspection_id = NULL,
+	inspection_date = NULL
+FROM pg_temp.am_ud_sample_cctv_reset r
+WHERE i.arc_id = r.arc_id
+	AND NOT EXISTS (
+		SELECT 1 FROM am.ud_arc_pathology p
+		WHERE p.arc_id = i.arc_id AND COALESCE(p.active, true)
+	);
+
 INSERT INTO am.ud_arc_pathology (
 	arc_id, pathology_id, inspection_id, pk_start, pk_end, severity, observation, inspection_date
 )
 SELECT asset.arc_id, cat.pathology_id, 9001, obs.pk_start, obs.pk_end, obs.severity,
 	obs.observation, DATE '2024-06-01'
 FROM (
-	SELECT arc_id::varchar(16) AS arc_id, row_number() OVER (ORDER BY arc_id) AS n
-	FROM PARENT_SCHEMA.arc
-	WHERE state = 1
-	ORDER BY arc_id
+	SELECT a.arc_id::varchar(16) AS arc_id,
+		row_number() OVER (ORDER BY c.geom1 DESC, a.arc_id::integer) AS n
+	FROM PARENT_SCHEMA.arc a
+	JOIN PARENT_SCHEMA.cat_arc c ON c.id::text = a.arccat_id::text
+	WHERE a.state = 1
+		AND a.arc_type = 'CONDUIT'
+		AND COALESCE(c.geom1, 0) >= 1
+	ORDER BY c.geom1 DESC, a.arc_id::integer
 	LIMIT 3
 ) asset
 JOIN (
@@ -115,11 +194,28 @@ WHERE a.state = 1
 ORDER BY a.arc_id
 LIMIT 2;
 
+-- Drop the previous sample flag (lowest arc_id) so only one pipe stays strategic.
+UPDATE am.ud_arc_input
+SET strategic = NULL, mandatory = NULL, compliance = NULL
+WHERE strategic IS TRUE
+	AND mandatory IS TRUE
+	AND compliance IS TRUE
+	AND data_quality = 2
+	AND arc_id <> (
+		SELECT a.arc_id::varchar(16)
+		FROM PARENT_SCHEMA.arc a
+		WHERE a.state = 1
+			AND a.function_type = 'Trunk sewer'
+		ORDER BY a.arc_id::integer
+		LIMIT 1
+	);
+
 INSERT INTO am.ud_arc_input (arc_id, strategic, mandatory, compliance, data_quality)
-SELECT arc_id::varchar(16), true, true, true, 2
-FROM PARENT_SCHEMA.arc
-WHERE state = 1
-ORDER BY arc_id
+SELECT a.arc_id::varchar(16), true, true, true, 2
+FROM PARENT_SCHEMA.arc a
+WHERE a.state = 1
+	AND a.function_type = 'Trunk sewer'
+ORDER BY a.arc_id::integer
 LIMIT 1
 ON CONFLICT (arc_id) DO UPDATE SET
 	strategic = EXCLUDED.strategic,

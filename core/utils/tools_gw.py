@@ -1553,7 +1553,15 @@ def refresh_categorized_layer_symbology_classes(layer, addparam=None):
         sl = src_symbol.symbolLayer(0)
         # Support only layers with width (line symbols)
         if sl and hasattr(sl, "setDataDefinedProperty"):
-            expression = f'case when {dnom_symbol} is not null then -4.862 + 0.977 * ln("{dnom_symbol}" + 159.243) else 0.25 end'
+            # Fitted on the WS band (~60–300 mm → ~0.4–1.1 mm stroke).
+            # UD geom1 is metres (0.2–2.0). *1000 draws a 2 m sewer at ~2.6 mm.
+            # Values under 10 are metres, mapped into that same band.
+            field = dnom_symbol.replace('"', '')
+            expression = (
+                f'with_variable(\'dmm\', if("{field}" is null, null, '
+                f'if("{field}" < 10, 40 + "{field}" * 130, "{field}")), '
+                f'if(@dmm is null, 0.25, -4.862 + 0.977 * ln(@dmm + 159.243)))'
+            )
             sl.setDataDefinedProperty(
                 QgsSymbolLayer.Property.PropertyStrokeWidth,
                 QgsProperty.fromExpression(expression)

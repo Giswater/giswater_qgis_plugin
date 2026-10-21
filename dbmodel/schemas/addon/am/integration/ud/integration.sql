@@ -269,7 +269,7 @@ SELECT
 	a.builtdate,
 	a.arccat_id,
 	cat.geom1 AS dnom,
-	cat.matcat_id,
+	COALESCE(a.matcat_id, cat.matcat_id) AS matcat_id,
 	a.function_type,
 	a.code,
 	a.expl_id,
@@ -326,7 +326,7 @@ SELECT
 	n.omzone_id::varchar AS presszone_id,
 	n.builtdate,
 	n.nodecat_id,
-	cn.matcat_id,
+	COALESCE(n.matcat_id, cn.matcat_id) AS matcat_id,
 	COALESCE(cn.node_type, n.epa_type) AS node_type,
 	n.code,
 	n.expl_id,
@@ -721,3 +721,15 @@ WHERE layername IN ('v_asset_ws_node_output_compare', 'v_asset_ws_arc_output_com
 ORDER BY CASE WHEN layername = 'v_asset_ws_node_output_compare' THEN 0 ELSE 1 END
 LIMIT 1
 ON CONFLICT (layername, styleconfig_id) DO NOTHING;
+
+-- Same flag the WS integrate writes: Linked column reads parent sys_version.addparam.satellites.
+SELECT "SCHEMA_NAME".gw_fct_admin_sys_version_register(json_build_object(
+	'data', json_build_object(
+		'gwVersion', (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1),
+		'mergeAddparam', json_build_object(
+			'satellites', json_build_object(
+				'am', json_build_object('enabled', true, 'schema', 'am')
+			)
+		)
+	)
+)::json);
