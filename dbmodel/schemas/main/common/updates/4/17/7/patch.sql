@@ -60,3 +60,22 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('info_epa', 'ud', 'inp_dwf', 'pat2', 4, true, NULL, 'Pattern 2', NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('info_epa', 'ud', 'inp_dwf', 'pat3', 5, true, NULL, 'Pattern 3', NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('info_epa', 'ud', 'inp_dwf', 'pat4', 6, true, NULL, 'Pattern 4', NULL, NULL);
+
+-- parent_id must match result_id (varchar(50)) before the self-FK can be created.
+ALTER TABLE rpt_cat_result ALTER COLUMN parent_id TYPE varchar(50);
+
+-- Clear orphans so ADD CONSTRAINT cannot fail on upgraded databases.
+UPDATE rpt_cat_result r
+SET parent_id = NULL
+WHERE parent_id IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM rpt_cat_result p WHERE p.result_id = r.parent_id
+  );
+
+ALTER TABLE rpt_cat_result DROP CONSTRAINT IF EXISTS rpt_cat_result_parent_id_fkey;
+ALTER TABLE rpt_cat_result ADD CONSTRAINT rpt_cat_result_parent_id_fkey
+  FOREIGN KEY (parent_id) REFERENCES rpt_cat_result(result_id)
+  ON UPDATE CASCADE ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS idx_rpt_cat_result_parent_id
+  ON rpt_cat_result USING btree (parent_id);
