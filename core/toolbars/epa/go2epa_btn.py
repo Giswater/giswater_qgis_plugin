@@ -27,6 +27,7 @@ from .... import global_vars
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 from ..dialog import GwAction
 from .epa_tools.go2iber import Go2Iber
+from .go2epa_manager_btn import confirm_overwrite_parent_unlink
 
 
 class GwGo2EpaButton(GwAction):
@@ -322,6 +323,8 @@ class GwGo2EpaButton(GwAction):
                 title = "Alert"
                 answer = tools_qt.show_question(msg, title)
                 if not answer:
+                    return False
+                if not confirm_overwrite_parent_unlink(result_name):
                     return False
 
         return True
