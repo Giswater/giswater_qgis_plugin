@@ -3342,11 +3342,20 @@ BEGIN
 				)
 				DELETE FROM %I mzg
 				WHERE EXISTS (
-					SELECT 1 
-					FROM affected_node an 
+					SELECT 1
+					FROM affected_node an
 					WHERE mzg.mapzone_type = %L
-					AND mzg.node_id = an.node_id);
-			$sql$, v_mapzone_graph_table, v_class);
+					AND mzg.node_id = an.node_id
+					%s
+				);
+			$sql$,
+				v_mapzone_graph_table,
+				v_class,
+				CASE WHEN v_netscenario IS NOT NULL
+					THEN format('AND mzg.netscenario_id = %L', v_netscenario)
+					ELSE ''
+				END
+			);
 
 			IF v_netscenario IS NOT NULL THEN
 				INSERT INTO plan_netscenario_mapzone_graph (node_id, netscenario_id, mapzone_id, mapzone_type, flow_sign)
