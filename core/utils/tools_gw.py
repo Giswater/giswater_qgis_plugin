@@ -1167,10 +1167,14 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         sub_sub_group = sub_sub_group.capitalize()
 
     if the_geom == "rast":
-        connString = f"PG: dbname={tools_db.dao_db_credentials['db']} host={tools_db.dao_db_credentials['host']} " \
-                     f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
-                     f"port={tools_db.dao_db_credentials['port']} mode=2 schema={tools_db.dao_db_credentials['schema']} " \
-                     f"column={the_geom} table={tablename}"
+        creds = tools_db.dao_db_credentials
+        q = tools_db._libpq_quote
+        connString = (
+            f"PG: dbname={q(creds['db'])} host={q(creds['host'])} "
+            f"user={q(creds['user'])} password={q(creds['password'])} "
+            f"port={creds['port']} mode=2 schema={q(creds['schema'])} "
+            f"column={q(the_geom)} table={q(tablename)}"
+        )
         if alias:
             tablename = alias
         layer = QgsRasterLayer(connString, tablename)
@@ -4760,7 +4764,11 @@ def _fill_async_combo(widget, field, index_to_compare=0, dialog=None):
     widget.set_null_value_enabled(_get_async_combo_is_null_value(field))
 
     selected_id = _resolve_combo_selected_id(field)
-    if _should_defer_filtered_child_load(field, dialog):
+    # Toolbox children (parentname + filterquery) are filled by
+    # toolbox_btn._filter_combo_values. Loading dvQueryText here as well
+    # repeats the leading `select null` and the popup later refetches it.
+    waits_for_parent = bool(field.get('filterquery') and field.get('parentname'))
+    if _should_defer_filtered_child_load(field, dialog) or waits_for_parent:
         widget.start_loading('')
     else:
         query = _build_async_combo_query(widget, field, dialog)
@@ -6327,6 +6335,33 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         class_object.highlight_features_method(class_object, dialog, table_object)
 
 
+def _rehighlight_filtered_selection(class_object, selected_fids, filtered_fids):
+    """Re-highlight only when a context filter actually dropped features.
+
+    An unchanged set must keep the selection on every layer (element is ve_man_genelem + ve_man_frelem).
+    """
+
+    if not filtered_fids or set(filtered_fids) == set(str(fid) for fid in selected_fids):
+        return
+
+    for layer in class_object.rel_layers[class_object.rel_feature_type]:
+        if not layer:
+            continue
+        field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
+        if field_idx == -1:
+            continue
+        request = QgsFeatureRequest().setFlags(QgsFeatureRequest.Flag.NoGeometry).setSubsetOfAttributes([field_idx])
+        matching_qgis_fids = []
+        for feature in layer.getFeatures(request):
+            feature_id = str(feature.attribute(field_idx))
+            if feature_id in filtered_fids:
+                matching_qgis_fids.append(feature.id())
+        layer.removeSelection()
+        if matching_qgis_fids:
+            layer.select(matching_qgis_fids)
+        layer.triggerRepaint()
+
+
 def _process_map_selection(class_object, selection_mode, field_id):
     """Process map selection with filtering logic and database queries"""
     if not class_object.rel_layers:
@@ -6344,28 +6379,7 @@ def _process_map_selection(class_object, selection_mode, field_id):
     # Apply filtering logic early to get only allowed features for highlighting
     # This ensures the map selection only highlights features that can actually be inserted
     filtered_fids = _filter_ids_by_context(class_object, selection_mode, class_object.rel_feature_type, selected_fids)
-
-    # Convert filtered string IDs back to QGIS feature IDs for map selection
-    if filtered_fids:
-        # Get the layer to work with
-        layer = class_object.rel_layers[class_object.rel_feature_type][0]
-
-        # Find QGIS feature IDs that correspond to the filtered database feature IDs
-        field_idx = layer.fields().indexOf(f"{class_object.rel_feature_type}_id")
-        if field_idx != -1:
-            # Get all features to find matching QGIS feature IDs
-            request = QgsFeatureRequest().setFlags(QgsFeatureRequest.Flag.NoGeometry).setSubsetOfAttributes([field_idx])
-            matching_qgis_fids = []
-
-            for feature in layer.getFeatures(request):
-                feature_id = str(feature.attribute(field_idx))
-                if feature_id in filtered_fids:
-                    matching_qgis_fids.append(feature.id())
-
-            # Clear selection and re-select only the filtered features
-            layer.removeSelection()
-            if matching_qgis_fids:
-                layer.select(matching_qgis_fids)
+    _rehighlight_filtered_selection(class_object, selected_fids, filtered_fids)
 
     # Use original selected_fids for processing (filtering will be applied in SQL)
     # Get context-specific filter for SQL
@@ -7578,6 +7592,10 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     # Select features with previous filter
     # Build a list of feature id's and select them
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.rel_layers)
+    for layer in class_object.rel_layers.get(feature_type) or []:
+        if layer:
+            layer.triggerRepaint()
+    global_vars.canvas.refresh()
 
     # Reset rubberband
     if selection_mode == GwSelectionMode.PSECTOR:

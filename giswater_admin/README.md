@@ -461,7 +461,7 @@ Use `--version X.Y.Z` everywhere (replaces `--plugin-version` / `--to-version`).
 
 ### `db init`
 
-Creates extensions in order: `postgis` → `postgis_raster` → `tablefunc` → `pgrouting` → `unaccent` (optional `postgres_fdw` with `--with-fdw`). Also creates the Giswater role hierarchy if missing and `GRANT CREATE ON DATABASE` to `role_system` so a `role_system` member can create schemas afterwards. Requires a PostgreSQL **superuser**. Run **once per database** before the first schema create.
+Creates extensions in order: `postgis` → `postgis_topology` → `postgis_raster` → `tablefunc` → `pgrouting` → `unaccent` → `fuzzystrmatch` → `intarray` (optional `postgres_fdw` with `--with-fdw`). Also creates the Giswater role hierarchy if missing and `GRANT CREATE ON DATABASE` to `role_system` so a `role_system` member can create schemas afterwards. Requires a PostgreSQL **superuser**. Run **once per database** before the first schema create.
 
 | Option | Description |
 |--------|-------------|
@@ -534,8 +534,15 @@ Shared satellite schemas (`utils`, `cibs`, `cm`, `cmms`, `am`, `audit`).
 
 Bootstrap a standalone addon (no parent wiring yet).
 
+| Option | Description |
+|--------|-------------|
+| `--type` | **Required.** Addon kind (`utils`, `cibs`, `am`, …). |
+| `--name` | Schema name (default: same as `--type`). |
+| `--srid` | EPSG for geometry columns. Default: unique `sys_version.epsg` of existing ws/ud schemas, else `25831`. |
+
 ```bash
 gw schema addon create --type utils --conn "$CONN"
+gw schema addon create --type utils --srid 32748 --conn "$CONN"
 gw schema addon create --type cibs --name cibs --conn "$CONN"
 gw schema addon create --type audit --conn "$CONN"
 ```
@@ -549,6 +556,7 @@ Wire an addon into one ws/ud parent. Run once per parent (e.g. integrate utils w
 | `--type` | **Required.** `utils` \| `cibs` \| `cm` \| `cmms` \| `am` \| `audit` |
 | `--parent` | **Required.** Parent ws or ud schema name. |
 | `--name` | Addon schema name (default: same as `--type`). |
+| `--srid` | EPSG for geometry columns. Default: parent `sys_version.epsg`. |
 
 ```bash
 gw schema addon integrate --type utils --parent ws --conn "$CONN"

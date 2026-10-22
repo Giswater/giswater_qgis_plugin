@@ -1057,7 +1057,7 @@ BEGIN
 				) sub;
 
 				IF message IS NOT NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"3", "fid": '||v_checks_fid||'}}$$);';
+					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4532", "function":"2706","parameters":{"node_list":"\n' || message || '"}, "tempTable":"t_", "criticity":"2", "fid": '||v_checks_fid||'}}$$);';
 				ELSE
 					EXECUTE 'SELECT gw_fct_getmessage($${"data":{"message":"4534", "function":"2706","parameters":null, "tempTable":"t_", "criticity":"1", "fid": '||v_checks_fid||'}}$$);';
 				END IF;
@@ -3312,11 +3312,13 @@ BEGIN
 			
 			SELECT gw_fct_synoptic_core(v_data) INTO v_response;
 
-			/* TODO 
-			IF v_response.... THEN
-				RETURN v_response;
+			IF v_response->>'status' IS DISTINCT FROM 'Accepted' THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"4758", "function":"3508","parameters":{"error":"'||
+				replace(COALESCE(v_response->'message'->>'text', 'unknown'), '"', '')||
+				'"}, "is_process":true}}$$);' INTO v_audit_result;
+				RETURN COALESCE(v_audit_result::json, v_response);
 			END IF;
-			*/
 
 			EXECUTE format($sql$
 				WITH affected_mapzone AS (
@@ -3339,11 +3341,20 @@ BEGIN
 				)
 				DELETE FROM %I mzg
 				WHERE EXISTS (
-					SELECT 1 
-					FROM affected_node an 
+					SELECT 1
+					FROM affected_node an
 					WHERE mzg.mapzone_type = %L
-					AND mzg.node_id = an.node_id);
-			$sql$, v_mapzone_graph_table, v_class);
+					AND mzg.node_id = an.node_id
+					%s
+				);
+			$sql$,
+				v_mapzone_graph_table,
+				v_class,
+				CASE WHEN v_netscenario IS NOT NULL
+					THEN format('AND mzg.netscenario_id = %L', v_netscenario)
+					ELSE ''
+				END
+			);
 
 			IF v_netscenario IS NOT NULL THEN
 				INSERT INTO plan_netscenario_mapzone_graph (node_id, netscenario_id, mapzone_id, mapzone_type, flow_sign)

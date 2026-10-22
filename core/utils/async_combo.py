@@ -1411,6 +1411,19 @@ class GwAsyncComboBox(QComboBox):
         """Toggle whether an empty placeholder row is prepended to the data."""
         self._is_null_value = bool(is_null)
 
+    def set_reload_query(self, query: str) -> None:
+        """SQL the popup refetches. Toolbox children replace the unfiltered dvQueryText."""
+        self._gw_combo_query = query or None
+
+    def selected_id(self):
+        """Row id. While the list is still loading, the selection queued by the form."""
+        if not self.property('rows_loaded'):
+            return self._pending_selected_id
+        data = self.itemData(self.currentIndex())
+        if isinstance(data, (list, tuple)):
+            return data[0] if data else None
+        return data
+
     def set_pending_selection(self, value, index: int = 0, apply_if_loaded: bool = True) -> None:
         """Defer selection until the items finish loading.
 
@@ -1490,12 +1503,21 @@ class GwAsyncComboBox(QComboBox):
         self._loading = False
 
         items: List[_ComboRow] = []
+        seen_blank = False
         if self._is_null_value:
             items.append(('', ''))
+            seen_blank = True
         for row in rows or []:
             row_id = '' if row[0] is None else str(row[0])
             idval = row[1] if len(row) > 1 and row[1] is not None else row_id
-            items.append((row_id, str(idval)))
+            idval = str(idval)
+            # SQL `select null, ''` plus isNullValue, or the same null loaded
+            # by dvQueryText and again by filterquery, must stay one row.
+            if row_id == '' and idval == '':
+                if seen_blank:
+                    continue
+                seen_blank = True
+            items.append((row_id, idval))
 
         # New row set invalidates any hidden-rows bookkeeping from a
         # previous model state.

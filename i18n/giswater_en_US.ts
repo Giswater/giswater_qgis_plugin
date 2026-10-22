@@ -5349,8 +5349,16 @@ Do you want to copy its values to the current node?
 			<translation>Service database connection error (QSqlDatabase). Please open plugin log file to get more details</translation>
 		</message>
 		<message>
+			<source>Set closest point (multiple)</source>
+			<translation>Set closest point (multiple)</translation>
+		</message>
+		<message>
 			<source>Set rpt archived execution successful.</source>
 			<translation>Set rpt archived execution successful.</translation>
+		</message>
+		<message>
+			<source>Set user click (single)</source>
+			<translation>Set user click (single)</translation>
 		</message>
 		<message>
 			<source>SHAPE</source>
@@ -6174,6 +6182,10 @@ Do you want to proceed?</translation>
 		<message>
 			<source>Toggle Active</source>
 			<translation>Toggle Active</translation>
+		</message>
+		<message>
+			<source>Toggle doable</source>
+			<translation>Toggle doable</translation>
 		</message>
 		<message>
 			<source>Toggle validated</source>

@@ -53,6 +53,77 @@ END $$;
 
 _RESET_ROLE_SQL = "RESET ROLE;"
 
+# After RESET ROLE, addon update patches create objects as the installer login,
+# so default privileges set by role_system do not apply. Re-grant and reassign.
+_ADDON_PRIVILEGES_SQL = """
+DO $priv$
+DECLARE
+  r record;
+  sch text := 'SCHEMA_NAME';
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = sch) THEN
+    RETURN;
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_basic') THEN
+    EXECUTE format('GRANT USAGE ON SCHEMA %I TO role_basic', sch);
+    EXECUTE format('GRANT SELECT ON ALL TABLES IN SCHEMA %I TO role_basic', sch);
+    EXECUTE format('GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA %I TO role_basic', sch);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'role_system') THEN
+    RETURN;
+  END IF;
+  -- Tables first so SERIAL/IDENTITY sequences follow the table owner.
+  -- PG16 rejects ALTER SEQUENCE OWNER on sequences linked to a table.
+  FOR r IN
+    SELECT c.relname, c.relkind
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    JOIN pg_roles o ON o.oid = c.relowner
+    WHERE n.nspname = sch
+      AND c.relkind IN ('r', 'p', 'v', 'm')
+      AND o.rolname IS DISTINCT FROM 'role_system'
+    ORDER BY CASE c.relkind WHEN 'v' THEN 1 WHEN 'm' THEN 1 ELSE 0 END
+  LOOP
+    IF r.relkind = 'v' THEN
+      EXECUTE format('ALTER VIEW %I.%I OWNER TO role_system', sch, r.relname);
+    ELSIF r.relkind = 'm' THEN
+      EXECUTE format('ALTER MATERIALIZED VIEW %I.%I OWNER TO role_system', sch, r.relname);
+    ELSE
+      EXECUTE format('ALTER TABLE %I.%I OWNER TO role_system', sch, r.relname);
+    END IF;
+  END LOOP;
+  FOR r IN
+    SELECT c.relname
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    JOIN pg_roles o ON o.oid = c.relowner
+    WHERE n.nspname = sch
+      AND c.relkind = 'S'
+      AND o.rolname IS DISTINCT FROM 'role_system'
+      AND NOT EXISTS (
+        SELECT 1
+        FROM pg_depend d
+        WHERE d.classid = 'pg_class'::regclass
+          AND d.objid = c.oid
+          AND d.deptype IN ('a', 'i')
+      )
+  LOOP
+    EXECUTE format('ALTER SEQUENCE %I.%I OWNER TO role_system', sch, r.relname);
+  END LOOP;
+  FOR r IN
+    SELECT p.oid::regprocedure::text AS sig
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    JOIN pg_roles o ON o.oid = p.proowner
+    WHERE n.nspname = sch
+      AND o.rolname IS DISTINCT FROM 'role_system'
+  LOOP
+    EXECUTE format('ALTER FUNCTION %s OWNER TO role_system', r.sig);
+  END LOOP;
+END
+$priv$;
+"""
+
 
 @dataclass
 class BuildParams:
@@ -273,6 +344,20 @@ class SchemaBuilder:
 
             if self._is_cancelled() and not result.cancelled:
                 result.cancelled = True
+            if (
+                result.ok
+                and not result.cancelled
+                and self.manifest.kind not in ("ws", "ud")
+            ):
+                fx = sql_runner.execute_inline(
+                    self.conn,
+                    apply_subs(_ADDON_PRIVILEGES_SQL, self._subs),
+                    label="run:addon_privileges",
+                    commit=self.commit_each_file,
+                )
+                result.phases.append(
+                    PhaseResult(phase_id="addon_privileges", files=[fx])
+                )
             self.progress_cb(seen, total, "done", None)
             return result
         finally:
@@ -799,6 +884,102 @@ BEGIN
   END LOOP;
 END
 $gw_drop_post$;
+"""
+
+
+def rename_parent_links_sql(old: str, new: str) -> str:
+    """Point every satellite link at a renamed ws/ud parent.
+
+    Rewrites parent_schemas and network_parents.ws/ud in the latest
+    sys_version row of each schema, and the legacy utils current-schema
+    parameters. Per-schema errors only warn, so the rename never aborts.
+    """
+    old_lit = _sql_literal(old)
+    new_lit = _sql_literal(new)
+    return f"""
+DO $gw_rename_links$
+DECLARE
+  v_schema text;
+  v_id integer;
+  v_addparam jsonb;
+  v_names jsonb;
+  v_kind text;
+  v_old text := {old_lit};
+  v_new text := {new_lit};
+BEGIN
+  FOR v_schema IN
+    SELECT n.nspname
+    FROM pg_namespace n
+    JOIN pg_class c ON c.relnamespace = n.oid
+    WHERE c.relname = 'sys_version'
+      AND c.relkind = 'r'
+      AND n.nspname <> 'information_schema'
+      AND n.nspname NOT LIKE 'pg_%'
+  LOOP
+    BEGIN
+      EXECUTE format(
+        'SELECT id, COALESCE(addparam, ''{{}}''::jsonb) '
+        'FROM %I.sys_version ORDER BY id DESC LIMIT 1',
+        v_schema
+      ) INTO v_id, v_addparam;
+
+      IF v_id IS NULL
+         OR NOT (v_addparam ? 'parent_schemas' OR v_addparam ? 'network_parents') THEN
+        CONTINUE;
+      END IF;
+
+      IF v_addparam ? 'parent_schemas' THEN
+        SELECT COALESCE(
+          jsonb_agg(DISTINCT CASE WHEN elem = v_old THEN v_new ELSE elem END),
+          '[]'::jsonb
+        )
+        INTO v_names
+        FROM jsonb_array_elements_text(
+          COALESCE(v_addparam -> 'parent_schemas', '[]'::jsonb)
+        ) AS elem;
+        v_addparam := jsonb_set(v_addparam, '{{parent_schemas}}', v_names, true);
+      END IF;
+
+      IF v_addparam ? 'network_parents' THEN
+        FOREACH v_kind IN ARRAY ARRAY['ws', 'ud']
+        LOOP
+          IF COALESCE(v_addparam -> 'network_parents', '{{}}'::jsonb) ? v_kind THEN
+            SELECT COALESCE(
+              jsonb_agg(DISTINCT CASE WHEN elem = v_old THEN v_new ELSE elem END),
+              '[]'::jsonb
+            )
+            INTO v_names
+            FROM jsonb_array_elements_text(
+              COALESCE(v_addparam -> 'network_parents' -> v_kind, '[]'::jsonb)
+            ) AS elem;
+            v_addparam := jsonb_set(
+              v_addparam, ARRAY['network_parents', v_kind], v_names, true
+            );
+          END IF;
+        END LOOP;
+      END IF;
+
+      EXECUTE format(
+        'UPDATE %I.sys_version SET addparam = $1 WHERE id = $2',
+        v_schema
+      ) USING v_addparam, v_id;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE WARNING 'parent link rename on % failed: %', v_schema, SQLERRM;
+    END;
+  END LOOP;
+
+  IF to_regclass('utils.config_param_system') IS NOT NULL THEN
+    BEGIN
+      UPDATE utils.config_param_system
+      SET value = v_new
+      WHERE parameter IN ('ws_current_schema', 'ud_current_schema')
+        AND value = v_old;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE WARNING 'utils current schema rename failed: %', SQLERRM;
+    END;
+  END IF;
+END
+$gw_rename_links$;
 """
 
 

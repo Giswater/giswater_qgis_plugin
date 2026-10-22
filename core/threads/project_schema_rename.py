@@ -12,6 +12,7 @@ from qgis.PyQt.QtCore import Qt, pyqtSignal
 from qgis.PyQt.sip import isdeleted
 
 from .task import GwTask
+from ...giswater_admin.engine import rename_parent_links_sql
 from ...libs import lib_vars, tools_db, tools_log, tools_qgis, tools_qt
 
 _SCHEMA_NAME_RE = re.compile(r'^[a-z0-9_]+$')
@@ -138,7 +139,7 @@ class GwRenameSchemaTask(GwTask):
                 return False
             if not self._exec(conn, self._lastprocess_sql(new_schema_name)):
                 return False
-            if not self._sync_cmms_parent_name(conn, schema, new_schema_name):
+            if not self._sync_parent_links(conn, schema, new_schema_name):
                 return False
         if not self._exec(conn, "RESET ROLE"):
             return False
@@ -148,45 +149,29 @@ class GwRenameSchemaTask(GwTask):
     def _is_network_schema(self):
         return str(self.params.get('project_type') or '').lower() in ('ws', 'ud')
 
-    def _sync_cmms_parent_name(self, conn, schema, new_schema_name):
-        """Rewrite cmms.sys_version parent_schemas after a parent rename.
-
-        The v_ui_cmms_* views follow the rename on their own: they reference
-        the parent tables by oid. A failure here must not undo the rename.
-        The DO block swallows function errors; a statement abort rolls back
-        only to the savepoint.
-        """
-        if not self._exec(conn, "SAVEPOINT cmms_rename_parent"):
+    def _sync_parent_links(self, conn, schema, new_schema_name):
+        """A failure here must not undo the rename."""
+        if not self._exec(conn, "SAVEPOINT rename_parent_links"):
             return False
-        sql = (
-            "DO $cmms_rename$\n"
-            "BEGIN\n"
-            "  IF to_regprocedure('cmms.gw_fct_cmms_rename_parent(text, text)') IS NOT NULL THEN\n"
-            f"    PERFORM cmms.gw_fct_cmms_rename_parent('{schema}', '{new_schema_name}');\n"
-            "  END IF;\n"
-            "EXCEPTION WHEN OTHERS THEN\n"
-            "  RAISE WARNING 'cmms rename_parent failed: %', SQLERRM;\n"
-            "END\n"
-            "$cmms_rename$;"
-        )
         ok = tools_db.execute_sql(
-            sql, commit=False, is_thread=True, show_exception=False, aux_conn=conn,
+            rename_parent_links_sql(schema, new_schema_name),
+            commit=False, is_thread=True, show_exception=False, aux_conn=conn,
         )
         if not ok:
             tools_db.execute_sql(
-                "ROLLBACK TO SAVEPOINT cmms_rename_parent",
+                "ROLLBACK TO SAVEPOINT rename_parent_links",
                 commit=False, is_thread=True, show_exception=False, aux_conn=conn,
             )
             err = lib_vars.session_vars.get('last_error')
-            msg = "cmms parent rename sync failed: {0}"
+            msg = "parent link rename sync failed: {0}"
             tools_log.log_warning(msg, msg_params=(err,))
         released = tools_db.execute_sql(
-            "RELEASE SAVEPOINT cmms_rename_parent",
+            "RELEASE SAVEPOINT rename_parent_links",
             commit=False, is_thread=True, show_exception=False, aux_conn=conn,
         )
         if not released:
             err = lib_vars.session_vars.get('last_error')
-            msg = "cmms parent rename sync failed: {0}"
+            msg = "parent link rename sync failed: {0}"
             tools_log.log_warning(msg, msg_params=(err,))
             return False
         return True
