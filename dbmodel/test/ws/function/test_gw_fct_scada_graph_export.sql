@@ -14,7 +14,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(10);
 
 DROP TABLE IF EXISTS temp_om_scada_graph;
-DROP TABLE IF EXISTS temp_om_scada_vertice;
+DROP TABLE IF EXISTS temp_vertice;
 
 SELECT is(
     (gw_fct_scada_graph_export($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
@@ -28,7 +28,7 @@ ALTER TABLE temp_om_scada_graph ADD COLUMN error_message TEXT;
 ALTER TABLE temp_om_scada_graph ADD COLUMN is_real boolean DEFAULT true;
 ALTER TABLE temp_om_scada_graph ADD COLUMN is_multilevel boolean DEFAULT false;
 
-CREATE TEMP TABLE temp_om_scada_vertice (
+CREATE TEMP TABLE temp_vertice (
     node_id integer,
     group_id integer,
     level_id integer,
@@ -37,7 +37,7 @@ CREATE TEMP TABLE temp_om_scada_vertice (
     is_real boolean DEFAULT true
 );
 
-INSERT INTO temp_om_scada_graph (node_1, node_2, group_id, expl_id, active, the_geom, is_real, is_multilevel)
+INSERT INTO temp_om_scada_graph (node_1, node_2, synoptic_id, expl_id, active, the_geom, is_real, is_multilevel)
 VALUES
     (
         -901, -902, 10, ARRAY[1], true,
@@ -50,17 +50,17 @@ VALUES
         true, false
     );
 
-INSERT INTO temp_om_scada_vertice (node_id, group_id, level_id, position_id, position_aux, is_real)
+INSERT INTO temp_vertice (node_id, group_id, level_id, position_id, position_aux, is_real)
 VALUES
     (-901, 10, 1, 1, 1, true),
     (-902, 10, 1, 2, 2, true),
     (-903, 20, 1, 1, 1, true),
     (-904, 20, 1, 2, 2, true);
 
--- Export deletes JSON rows whose group_id is gone from om_scada_graph.
--- Skip builder (dijkstra + NULL layout) so phantom node ids keep group_id.
+-- Export deletes JSON rows whose synoptic_id is gone from om_scada_graph.
+-- Skip builder (dijkstra + NULL layout) so phantom node ids keep synoptic_id.
 ALTER TABLE om_scada_graph DISABLE TRIGGER USER;
-INSERT INTO om_scada_graph (node_1, node_2, group_id, expl_id, active)
+INSERT INTO om_scada_graph (node_1, node_2, synoptic_id, expl_id, active)
 VALUES
     (-901, -902, 10, ARRAY[1], true),
     (-903, -904, 20, ARRAY[2], true);

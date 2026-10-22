@@ -3301,7 +3301,7 @@ BEGIN
 				CASE WHEN flow_sign = 1 THEN mapzone_id ELSE node_id END AS orig_node_2
 			FROM temp_pgr_mapzone_graph;
 			
-			--update group_id, level_id, position_id
+			--update synoptic_id, level_id, position_id
 			v_data :=
 			jsonb_build_object(
 				'data',

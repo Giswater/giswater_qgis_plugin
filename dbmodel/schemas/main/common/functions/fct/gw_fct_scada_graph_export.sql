@@ -16,11 +16,13 @@ AS $function$
 /*
 
 Called from gw_fct_scada_graph_check on commitChanges=true (same session).
-One om_scada_graph_json row per distinct group_id (one synoptic).
-Reads temp_om_scada_graph;
+One om_scada_graph_json row per distinct synoptic_id (one synoptic).
+Reads temp_om_scada_graph. JSON key groupId and om_scada_graph_json.group_id
+stay; they are the same value as synoptic_id.
+attributes.synopticGeometry is rebuilt from synoptic_geom (SRID 0 layout).
 Exploitation scoping is already done in check. Do not re-filter by explId here.
-Does not delete JSON rows of groups that are still in om_scada_graph
-(other exploitations). Drops only group_ids gone from om_scada_graph.
+Does not delete JSON rows of synoptics that are still in om_scada_graph
+(other exploitations). Drops only synoptic_ids gone from om_scada_graph.
 
  */
 
@@ -52,33 +54,33 @@ BEGIN
 
 	WITH scada_groups AS (
 		SELECT
-			g.group_id,
+			g.synoptic_id,
 			COALESCE((
 				SELECT ARRAY(
 					SELECT DISTINCT e
 					FROM temp_om_scada_graph t
 					CROSS JOIN LATERAL unnest(t.expl_id) AS e
-					WHERE t.group_id = g.group_id
+					WHERE t.synoptic_id = g.synoptic_id
 						AND t.is_real = TRUE
 						AND e IS NOT NULL
 					ORDER BY e
 				)
 			), '{}'::int4[]) AS expl_id
 		FROM (
-			SELECT DISTINCT group_id
+			SELECT DISTINCT synoptic_id
 			FROM temp_om_scada_graph
-			WHERE group_id IS NOT NULL
+			WHERE synoptic_id IS NOT NULL
 		) g
 	),
 	links AS (
-		SELECT s.group_id, json_agg(s.link ORDER BY s.level_id, s.position_id) AS links
+		SELECT s.synoptic_id, json_agg(s.link ORDER BY s.level_id, s.position_id) AS links
 		FROM (
 			SELECT
-				g.group_id,
+				g.synoptic_id,
 				v.level_id,
 				v.position_id,
 				json_build_object(
-					'groupId', g.group_id,
+					'groupId', g.synoptic_id,
 					'fromNode', g.node_1,
 					'nodeType1', g.node_type_1,
 					'nodeName1', n1.sys_code,
@@ -91,23 +93,32 @@ BEGIN
 					'explId2', n2.expl_id,
 					'dma_id_2', n2.dma_id,
 					'dma_name_2', d2.name,
-					'attributes', CASE WHEN g.attrib IS JSON THEN g.attrib::json ELSE NULL END,
+					'attributes', CASE
+						WHEN g.synoptic_geom IS NULL AND (g.attrib IS NULL OR NOT g.attrib IS JSON) THEN NULL
+						ELSE (
+							COALESCE(CASE WHEN g.attrib IS JSON THEN g.attrib::jsonb END, '{}'::jsonb)
+							|| CASE
+								WHEN g.synoptic_geom IS NULL THEN '{}'::jsonb
+								ELSE jsonb_build_object('synopticGeometry', ST_AsGeoJSON(g.synoptic_geom)::jsonb)
+							END
+						)::json
+					END,
 					'explId', g.expl_id
 				) AS link
 			FROM temp_om_scada_graph g
-			JOIN temp_om_scada_vertice v ON g.node_1 = v.node_id
+			JOIN temp_vertice v ON g.node_1 = v.node_id
 			LEFT JOIN node n1 ON n1.node_id = g.node_1
 			LEFT JOIN dma d1 ON d1.dma_id = n1.dma_id
 			LEFT JOIN node n2 ON n2.node_id = g.node_2
 			LEFT JOIN dma d2 ON d2.dma_id = n2.dma_id
-			WHERE g.group_id IS NOT NULL
+			WHERE g.synoptic_id IS NOT NULL
 				AND g.is_real = TRUE
 		) s
-		GROUP BY s.group_id
+		GROUP BY s.synoptic_id
 	)
 	INSERT INTO om_scada_graph_json (group_id, expl_id, om_scada_graph_json, insert_tstamp, update_tstamp)
 	SELECT
-		g.group_id,
+		g.synoptic_id,
 		g.expl_id,
 		json_build_object(
 			'networkInfo', json_build_object(
@@ -115,14 +126,14 @@ BEGIN
 				'entity', '',
 				'generatedDate', now(),
 				'schemaDate', v_schema_date,
-				'groupId', g.group_id
+				'groupId', g.synoptic_id
 			),
 			'links', COALESCE(l.links, '[]'::json)
 		),
 		now(),
 		now()
 	FROM scada_groups g
-	JOIN links l ON l.group_id = g.group_id
+	JOIN links l ON l.synoptic_id = g.synoptic_id
 	ON CONFLICT (group_id) DO UPDATE
 	SET expl_id = excluded.expl_id,
 		om_scada_graph_json = excluded.om_scada_graph_json,
@@ -130,7 +141,7 @@ BEGIN
 
 	DELETE FROM om_scada_graph_json j
 	WHERE NOT EXISTS (
-		SELECT 1 FROM om_scada_graph g WHERE g.group_id = j.group_id
+		SELECT 1 FROM om_scada_graph g WHERE g.synoptic_id = j.group_id
 	);
 
 	SELECT COALESCE(
