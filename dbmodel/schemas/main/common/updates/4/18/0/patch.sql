@@ -302,3 +302,22 @@ ON CONFLICT (id) DO UPDATE SET
 	sys_role = EXCLUDED.sys_role,
 	alias = EXCLUDED.alias,
 	addparam = EXCLUDED.addparam;
+
+-- gw_fct_scada_graph_export has no callers. om_scada_graph_json only existed
+-- as its output. _om_scada_graph_json_ is the 4.17.0 rename leftover (#977).
+DROP FUNCTION IF EXISTS gw_fct_scada_graph_export(json);
+DROP FUNCTION IF EXISTS gw_fct_scada_graph_export();
+DROP TABLE IF EXISTS om_scada_graph_json;
+DROP TABLE IF EXISTS _om_scada_graph_json_;
+
+DELETE FROM sys_function WHERE function_name = 'gw_fct_scada_graph_export';
+
+UPDATE sys_function
+SET descript = 'Checks or fixes om_scada_graph against the network (toolbox: Scada graph analysis).'
+WHERE id = 3548;
+
+UPDATE sys_function
+SET descript = 'Creates a scada graph edge (insert + trigger fill).'
+WHERE id = 3560;
+
+DELETE FROM sys_message WHERE id IN (4708, 4732, 4734, 4736);

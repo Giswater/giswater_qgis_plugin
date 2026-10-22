@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `synoptic_id` and `synoptic_geom` to `mapzone_graph` / `plan_netscenario_mapzone_graph` for mapzone synoptic layout (#965).
 - Synoptic layers `v_synoptic_line_<type>` and `v_synoptic_point_<type>` for scada, dma, sector, and the project-specific mapzones (ws: dqa, presszone, supplyzone; ud: dwfzone). SCADA geometry is the schematic `synoptic_geom` (SRID 0). Mapzone lines join the border node to the zone polygon; `flow_sign` keeps the direction (`1` node→zone, `-1` zone→node) (#977).
 
+### Removed
+
+- `gw_fct_scada_graph_export` and `om_scada_graph_json`. The check no longer reports a saved JSON (#977).
+
 ### Changed
 
 - `om_scada_graph.group_id` renamed to `synoptic_id`. Schematic layout moves from `attrib.synopticGeometry` to `synoptic_geom geometry(LineString, 0)`. `v_om_scada_graph` is recreated. `temp_pgr_mapzone_synoptic.group_id` is also `synoptic_id`; `mapzone_graph` has no `group_id` (#977).
