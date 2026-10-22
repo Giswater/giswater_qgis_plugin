@@ -3364,6 +3364,45 @@ BEGIN
 				SELECT node_id, mapzone_id, mapzone_type, flow_sign FROM temp_pgr_mapzone_graph;
 			END IF;
 
+			-- update synoptic_id and synoptic_geom in mapzone_graph
+			EXECUTE format($sql$
+				UPDATE %I m
+				SET synoptic_id   = t.synoptic_id,
+					synoptic_geom = ST_SetSRID(ST_GeomFromGeoJSON((t.attrib::json)->>'synopticGeometry'), 0)
+				FROM temp_pgr_mapzone_synoptic t
+				WHERE m.mapzone_type = %L
+				AND m.flow_sign    = 1
+				AND m.node_id      = t.node_1
+				AND m.mapzone_id   = t.node_2
+				%s;
+			$sql$,
+				v_mapzone_graph_table,
+				v_class,
+				CASE WHEN v_netscenario IS NOT NULL
+					THEN format('AND m.netscenario_id = %L', v_netscenario)
+					ELSE ''
+				END
+			);
+
+			EXECUTE format($sql$
+				UPDATE %I m
+				SET synoptic_id   = t.synoptic_id,
+					synoptic_geom = ST_Reverse(ST_SetSRID(ST_GeomFromGeoJSON((t.attrib::json)->>'synopticGeometry'), 0))
+				FROM temp_pgr_mapzone_synoptic t
+				WHERE m.mapzone_type = %L
+				AND m.flow_sign    = -1
+				AND m.node_id      = t.node_2
+				AND m.mapzone_id   = t.node_1
+				%s;
+			$sql$,
+				v_mapzone_graph_table,
+				v_class,
+				CASE WHEN v_netscenario IS NOT NULL
+					THEN format('AND m.netscenario_id = %L', v_netscenario)
+					ELSE ''
+				END
+			);
+
 			-- update macromapzones
 			IF v_class = 'DWFZONE' THEN
 				WITH
