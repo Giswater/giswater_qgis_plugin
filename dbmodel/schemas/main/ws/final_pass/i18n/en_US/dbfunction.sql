@@ -374,6 +374,7 @@ UPDATE sys_function AS t SET descript = v.descript FROM (
     (3566, 'Build SQL AND clauses from filterFields json for list and feature queries'),
     (3568, 'Resolve config_form_list query_text and metadata for a listname'),
     (3570, 'Build SQL canvas extend filter for a geometry expression'),
-    (3572, 'BEFORE UPDATE trigger: always set updated_at and updated_by from clock_timestamp() and current_user')
+    (3572, 'BEFORE UPDATE trigger: always set updated_at and updated_by from clock_timestamp() and current_user'),
+    (3574, 'Builds synoptic layout (level_id, position_id). Both graphs store synoptic_id. SCADA also stores synoptic_geom; MAPZONE keeps the layout line in attrib.synopticGeometry.')
 ) AS v(id, descript)
 WHERE t.id = v.id;
