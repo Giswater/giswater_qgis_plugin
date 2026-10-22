@@ -7,84 +7,9 @@ or (at your option) any later version.
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- 'node'::regclass is stored as an OID, so a schema rename still resolves
--- asset_feature_map.schema_name to this parent.
-DROP VIEW IF EXISTS v_ui_cmms_attachment;
-DROP VIEW IF EXISTS v_ui_cmms_visit;
-
-CREATE VIEW v_ui_cmms_visit AS
-SELECT
-	m.feature_id,
-	m.feature_type,
-	v.id AS visit_id,
-	v.ext_visit_id,
-	v.type,
-	v.status,
-	v.title,
-	v.description,
-	v.start_date,
-	v.end_date,
-	EXISTS (
-		SELECT 1 FROM cmms.attachment_x_visit ax
-		WHERE ax.visit_id = v.id
-	) AS has_attachment
-FROM cmms.asset_feature_map m
-JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
-JOIN cmms.visit v ON v.id = vx.visit_id
-WHERE m.feature_deleted_at IS NULL
-	AND m.schema_name = (
-		SELECT relnamespace::regnamespace::text
-		FROM pg_class
-		WHERE oid = 'node'::regclass
-	);
-
-CREATE VIEW v_ui_cmms_attachment AS
-SELECT
-	m.feature_id,
-	m.feature_type,
-	NULL::uuid AS visit_id,
-	a.id AS attachment_id,
-	a.name,
-	a.attachment_type,
-	a.content_type,
-	a.description,
-	a.uploaded_at,
-	a.uploaded_by,
-	a.path,
-	a.thumbnail_path
-FROM cmms.asset_feature_map m
-JOIN cmms.attachment_x_feature axf ON axf.asset_feature_map_id = m.id
-JOIN cmms.attachment a ON a.id = axf.attachment_id
-WHERE m.feature_deleted_at IS NULL
-	AND m.schema_name = (
-		SELECT relnamespace::regnamespace::text
-		FROM pg_class
-		WHERE oid = 'node'::regclass
-	)
-UNION ALL
-SELECT
-	m.feature_id,
-	m.feature_type,
-	vx.visit_id,
-	a.id AS attachment_id,
-	a.name,
-	a.attachment_type,
-	a.content_type,
-	a.description,
-	a.uploaded_at,
-	a.uploaded_by,
-	a.path,
-	a.thumbnail_path
-FROM cmms.asset_feature_map m
-JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
-JOIN cmms.attachment_x_visit axv ON axv.visit_id = vx.visit_id
-JOIN cmms.attachment a ON a.id = axv.attachment_id
-WHERE m.feature_deleted_at IS NULL
-	AND m.schema_name = (
-		SELECT relnamespace::regnamespace::text
-		FROM pg_class
-		WHERE oid = 'node'::regclass
-	);
+-- Views join this parent's features to cmms on sys_code. Table refs are oids,
+-- so renaming the parent schema does not break them.
+SELECT cmms.gw_fct_cmms_create_parent_views('SCHEMA_NAME');
 
 INSERT INTO sys_table (id, descript, sys_role, source)
 VALUES

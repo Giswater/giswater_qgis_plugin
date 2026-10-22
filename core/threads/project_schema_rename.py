@@ -149,10 +149,12 @@ class GwRenameSchemaTask(GwTask):
         return str(self.params.get('project_type') or '').lower() in ('ws', 'ud')
 
     def _sync_cmms_parent_name(self, conn, schema, new_schema_name):
-        """Rewrite cmms parent_schemas and asset_feature_map.schema_name.
+        """Rewrite cmms.sys_version parent_schemas after a parent rename.
 
-        A failure here must not undo the rename. The DO block swallows
-        function errors; a statement abort rolls back only to the savepoint.
+        The v_ui_cmms_* views follow the rename on their own: they reference
+        the parent tables by oid. A failure here must not undo the rename.
+        The DO block swallows function errors; a statement abort rolls back
+        only to the savepoint.
         """
         if not self._exec(conn, "SAVEPOINT cmms_rename_parent"):
             return False

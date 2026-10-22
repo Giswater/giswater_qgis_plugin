@@ -39,46 +39,95 @@ VALUES ('00000000-0000-0000-0000-000000000001', 'inspection', 'open');
 INSERT INTO attachment (id, name)
 VALUES ('00000000-0000-0000-0000-000000000002', 'photo');
 
--- feature_deleted_at skips the parent-existence check. These schemas are not loaded.
-INSERT INTO asset_feature_map (id, ext_feature_id, feature_id, feature_type, schema_name, feature_deleted_at)
-VALUES
-    (91001, 'ext-old', 1, 'NODE', 'ws_old', now()),
-    (91002, 'ext-keep', 2, 'ARC', 'ud_keep', now());
+INSERT INTO visit_x_feature (visit_id, sys_code)
+VALUES ('00000000-0000-0000-0000-000000000001', 'SC-OLD');
 
-INSERT INTO visit_x_feature (visit_id, asset_feature_map_id)
-VALUES ('00000000-0000-0000-0000-000000000001', 91001);
+INSERT INTO attachment_x_feature (attachment_id, sys_code)
+VALUES ('00000000-0000-0000-0000-000000000002', 'SC-OLD');
 
-INSERT INTO attachment_x_feature (attachment_id, asset_feature_map_id)
-VALUES ('00000000-0000-0000-0000-000000000002', 91001);
+CREATE SCHEMA ws_old AUTHORIZATION role_system;
+
+SET ROLE role_system;
+CREATE TABLE ws_old.node (
+    node_id character varying(16) PRIMARY KEY,
+    sys_code text
+);
+INSERT INTO ws_old.node (node_id, sys_code) VALUES ('1', 'SC-OLD');
+CREATE TABLE ws_old.config_form_tabs (formname text, tabname text);
+CREATE TABLE ws_old.config_form_fields (formname text, tabname text);
+CREATE TABLE ws_old.config_form_tableview (objectname text);
+CREATE TABLE ws_old.sys_table (id text);
+INSERT INTO ws_old.config_form_tabs VALUES ('ve_node', 'tab_cmms'), ('ve_arc', 'tab_event');
+INSERT INTO ws_old.config_form_fields VALUES ('node', 'tab_cmms'), ('node', 'tab_data');
+INSERT INTO ws_old.config_form_tableview VALUES ('v_ui_cmms_visit'), ('v_ui_cmms_attachment'), ('keep_me');
+INSERT INTO ws_old.sys_table VALUES ('v_ui_cmms_visit'), ('v_ui_cmms_attachment'), ('node');
+RESET ROLE;
+
+SELECT lives_ok(
+    $$SELECT gw_fct_cmms_create_parent_views('ws_old')$$,
+    'the parent gets the cmms views'
+);
 
 SELECT is(
-    (SELECT gw_fct_cmms_unlink_parent('ws_old')::jsonb ->> 'asset_feature_map')::int,
+    (SELECT gw_fct_cmms_unlink_parent('ws_old')::jsonb ->> 'status'),
+    'Accepted',
+    'unlink of a still-present parent is accepted'
+);
+
+SELECT hasnt_view('ws_old', 'v_ui_cmms_visit', 'unlink drops the visit view');
+SELECT hasnt_view('ws_old', 'v_ui_cmms_attachment', 'unlink drops the attachment view');
+
+SELECT is(
+    (SELECT count(*)::int FROM ws_old.config_form_tabs WHERE tabname = 'tab_cmms'),
+    0,
+    'unlink removes the tab_cmms rows'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_old.config_form_tabs WHERE tabname = 'tab_event'),
     1,
-    'unlink removes the parent asset_feature_map row'
+    'unlink leaves the other tabs'
 );
-
 SELECT is(
-    (SELECT count(*)::int FROM asset_feature_map WHERE schema_name = 'ws_old'),
+    (SELECT count(*)::int FROM ws_old.config_form_fields WHERE tabname = 'tab_cmms'),
     0,
-    'no asset_feature_map rows left for the unlinked parent'
+    'unlink removes the tab_cmms fields'
 );
-
 SELECT is(
-    (SELECT count(*)::int FROM visit_x_feature),
-    0,
-    'visit_x_feature rows for the unlinked parent are gone'
-);
-
-SELECT is(
-    (SELECT count(*)::int FROM attachment_x_feature),
-    0,
-    'attachment_x_feature rows for the unlinked parent are gone'
-);
-
-SELECT is(
-    (SELECT count(*)::int FROM asset_feature_map WHERE schema_name = 'ud_keep'),
+    (SELECT count(*)::int FROM ws_old.config_form_fields WHERE tabname = 'tab_data'),
     1,
-    'other parents stay mapped'
+    'unlink leaves the other fields'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_old.config_form_tableview
+     WHERE objectname IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment')),
+    0,
+    'unlink removes the cmms tableview config'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_old.config_form_tableview WHERE objectname = 'keep_me'),
+    1,
+    'unlink leaves the other tableview rows'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_old.sys_table WHERE id IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment')),
+    0,
+    'unlink removes the cmms sys_table rows'
+);
+SELECT is(
+    (SELECT count(*)::int FROM ws_old.sys_table WHERE id = 'node'),
+    1,
+    'unlink leaves the other sys_table rows'
+);
+
+SELECT is(
+    (SELECT count(*)::int FROM visit_x_feature WHERE sys_code = 'SC-OLD'),
+    1,
+    'unlink keeps the visit link'
+);
+SELECT is(
+    (SELECT count(*)::int FROM attachment_x_feature WHERE sys_code = 'SC-OLD'),
+    1,
+    'unlink keeps the attachment link'
 );
 
 SELECT ok(
@@ -98,15 +147,15 @@ SELECT ok(
 );
 
 SELECT is(
-    (SELECT gw_fct_cmms_rename_parent('ud_keep', 'ud_new')::jsonb ->> 'asset_feature_map')::int,
-    1,
-    'rename rewrites one asset_feature_map row'
+    (SELECT gw_fct_cmms_rename_parent('ud_keep', 'ud_new')::jsonb ->> 'status'),
+    'Accepted',
+    'rename is accepted'
 );
 
 SELECT is(
-    (SELECT schema_name FROM asset_feature_map WHERE id = 91002),
-    'ud_new',
-    'asset_feature_map.schema_name follows the rename'
+    (SELECT count(*)::int FROM visit_x_feature WHERE sys_code = 'SC-OLD'),
+    1,
+    'rename does not touch the visit link'
 );
 
 SELECT ok(

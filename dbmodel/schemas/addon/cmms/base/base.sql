@@ -76,47 +76,19 @@ CREATE INDEX IF NOT EXISTS attachment_properties_gin ON cmms.attachment USING GI
 CREATE INDEX IF NOT EXISTS attachment_the_geom_gist ON cmms.attachment USING GIST (the_geom);
 
 -- =================================================================================
--- TAULA asset_feature_map
---  - Mapping proveïdor (ext_feature_id) <-> feature intern (feature_id) per schema.
---  - feature_type: ARC / NODE / CONNEC / LINK / GULLY / ELEMENT
---  - feature_deleted_at: the parent feature was deleted; the row and its links stay.
---    One live row per (schema_name, feature_type, feature_id).
--- =================================================================================
-CREATE TABLE IF NOT EXISTS cmms.asset_feature_map (
-  id BIGSERIAL PRIMARY KEY,
-  ext_feature_id TEXT NOT NULL,
-  feature_id INTEGER NOT NULL,
-  feature_type VARCHAR(30) NOT NULL CHECK (feature_type IN ('ARC','NODE','CONNEC','LINK','GULLY','ELEMENT')),
-  schema_name VARCHAR(63) NOT NULL,
-  properties jsonb NOT NULL DEFAULT '{}'::jsonb,
-  created_by VARCHAR(255),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_by VARCHAR(255),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  feature_deleted_at TIMESTAMPTZ,
-  CONSTRAINT asset_feature_unique UNIQUE (ext_feature_id, feature_id, feature_type, schema_name)
-);
-
-CREATE INDEX IF NOT EXISTS asset_feature_map_ext_feature_id_idx ON cmms.asset_feature_map (ext_feature_id);
-CREATE INDEX IF NOT EXISTS asset_feature_map_feature_id_idx ON cmms.asset_feature_map (feature_id);
-CREATE INDEX IF NOT EXISTS asset_feature_map_schema_feature_idx ON cmms.asset_feature_map (schema_name, feature_type);
-CREATE INDEX IF NOT EXISTS asset_feature_map_properties_gin ON cmms.asset_feature_map USING GIN (properties);
-CREATE UNIQUE INDEX IF NOT EXISTS asset_feature_map_live_feature_unique
-  ON cmms.asset_feature_map (schema_name, feature_type, feature_id)
-  WHERE feature_deleted_at IS NULL;
-
--- =================================================================================
 -- TAULA attachment_x_feature
+-- sys_code is the asset id shared with ws/ud (and any other system). It is not
+-- a foreign key: the parent may not exist yet, and deleting a feature leaves
+-- the link in place. A parent view joins its features on sys_code.
 -- =================================================================================
 CREATE TABLE IF NOT EXISTS cmms.attachment_x_feature (
   id BIGSERIAL NOT NULL,
   attachment_id UUID NOT NULL,
-  asset_feature_map_id BIGINT NOT NULL,
+  sys_code TEXT NOT NULL,
   is_last BOOLEAN NOT NULL DEFAULT false,
   CONSTRAINT attachment_x_feature_pkey PRIMARY KEY (id),
-  CONSTRAINT attachment_x_feature_unique UNIQUE (asset_feature_map_id, attachment_id),
-  CONSTRAINT attachment_x_feature_attachment_id_fkey FOREIGN KEY (attachment_id) REFERENCES cmms.attachment(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT attachment_x_feature_asset_feature_map_id_fkey FOREIGN KEY (asset_feature_map_id) REFERENCES cmms.asset_feature_map(id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT attachment_x_feature_unique UNIQUE (sys_code, attachment_id),
+  CONSTRAINT attachment_x_feature_attachment_id_fkey FOREIGN KEY (attachment_id) REFERENCES cmms.attachment(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS attachment_x_feature_attachment_idx ON cmms.attachment_x_feature (attachment_id);
@@ -138,17 +110,16 @@ CREATE TABLE IF NOT EXISTS cmms.attachment_x_visit (
 CREATE INDEX IF NOT EXISTS attachment_x_visit_attachment_idx ON cmms.attachment_x_visit (attachment_id);
 
 -- =================================================================================
--- TAULA visit_x_feature (visites N-N amb actius mapejats)
+-- TAULA visit_x_feature
 -- =================================================================================
 CREATE TABLE IF NOT EXISTS cmms.visit_x_feature (
   id BIGSERIAL NOT NULL,
   visit_id UUID NOT NULL,
-  asset_feature_map_id BIGINT NOT NULL,
+  sys_code TEXT NOT NULL,
   is_last BOOLEAN NOT NULL DEFAULT false,
   CONSTRAINT visit_x_feature_pkey PRIMARY KEY (id),
-  CONSTRAINT visit_x_feature_unique UNIQUE (asset_feature_map_id, visit_id),
-  CONSTRAINT visit_x_feature_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES cmms.visit(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT visit_x_feature_asset_feature_map_id_fkey FOREIGN KEY (asset_feature_map_id) REFERENCES cmms.asset_feature_map(id) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT visit_x_feature_unique UNIQUE (sys_code, visit_id),
+  CONSTRAINT visit_x_feature_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES cmms.visit(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS visit_x_feature_visit_idx ON cmms.visit_x_feature (visit_id);
@@ -157,17 +128,6 @@ DROP TRIGGER IF EXISTS trg_visit_set_updated_at ON cmms.visit;
 CREATE TRIGGER trg_visit_set_updated_at
   BEFORE UPDATE ON cmms.visit
   FOR EACH ROW EXECUTE PROCEDURE cmms.set_updated_at_column();
-
-DROP TRIGGER IF EXISTS trg_asset_feature_map_set_updated_at ON cmms.asset_feature_map;
-CREATE TRIGGER trg_asset_feature_map_set_updated_at
-  BEFORE UPDATE ON cmms.asset_feature_map
-  FOR EACH ROW EXECUTE PROCEDURE cmms.set_updated_at_column();
-
-DROP TRIGGER IF EXISTS trg_asset_feature_map_validate ON cmms.asset_feature_map;
-CREATE TRIGGER trg_asset_feature_map_validate
-  BEFORE INSERT OR UPDATE OF schema_name, feature_type, feature_id, feature_deleted_at
-  ON cmms.asset_feature_map
-  FOR EACH ROW EXECUTE PROCEDURE cmms.gw_trg_cmms_asset_feature_map_validate();
 
 GRANT SELECT ON ALL TABLES IN SCHEMA cmms TO role_basic;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA cmms TO role_cmms;

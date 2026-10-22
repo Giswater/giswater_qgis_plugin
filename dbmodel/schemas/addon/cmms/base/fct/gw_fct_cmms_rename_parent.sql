@@ -5,21 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+-- parent_schemas is the only cmms text that stores the parent name.
+-- v_ui_cmms_* reference the parent tables by oid, so the rename carries them.
 CREATE OR REPLACE FUNCTION cmms.gw_fct_cmms_rename_parent(p_old text, p_new text)
 RETURNS json AS
 $BODY$
 DECLARE
-	v_map integer := 0;
 	v_id integer;
 BEGIN
 	IF p_old IS NULL OR p_new IS NULL OR btrim(p_old) = '' OR btrim(p_new) = '' OR p_old = p_new THEN
-		RETURN json_build_object('status', 'Accepted', 'asset_feature_map', 0);
+		RETURN json_build_object('status', 'Accepted');
 	END IF;
-
-	UPDATE cmms.asset_feature_map
-	SET schema_name = p_new
-	WHERE schema_name = p_old;
-	GET DIAGNOSTICS v_map = ROW_COUNT;
 
 	SELECT id INTO v_id FROM cmms.sys_version ORDER BY id DESC LIMIT 1;
 	IF v_id IS NOT NULL THEN
@@ -36,7 +32,7 @@ BEGIN
 		WHERE id = v_id;
 	END IF;
 
-	RETURN json_build_object('status', 'Accepted', 'asset_feature_map', v_map);
+	RETURN json_build_object('status', 'Accepted');
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;

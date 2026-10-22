@@ -63,11 +63,10 @@ SELECT lives_ok(
     'role_cmms can insert visit'
 );
 
--- feature_deleted_at skips the parent-existence check. This test only covers the grant.
 SELECT lives_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name, feature_deleted_at)
-      VALUES ('ext-1', 1, 'NODE', 'ws_demo', now())$$,
-    'role_cmms can insert asset_feature_map (uses the sequence)'
+    $$INSERT INTO visit_x_feature (visit_id, sys_code)
+      SELECT id, 'ext-1' FROM visit WHERE type = 'inspection'$$,
+    'role_cmms can insert visit_x_feature (uses the sequence)'
 );
 
 SELECT lives_ok(
@@ -76,8 +75,8 @@ SELECT lives_ok(
 );
 
 SELECT lives_ok(
-    $$DELETE FROM asset_feature_map WHERE ext_feature_id = 'ext-1'$$,
-    'role_cmms can delete asset_feature_map'
+    $$DELETE FROM visit_x_feature WHERE sys_code = 'ext-1'$$,
+    'role_cmms can delete visit_x_feature'
 );
 
 SELECT throws_ok(

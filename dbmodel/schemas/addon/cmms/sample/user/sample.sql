@@ -50,8 +50,8 @@ or (at your option) any later version.
 --   a visit with nothing
 --   two visits that share one attachment
 --   an attachment with nothing
---   one orphan asset_feature_map per type (feature_deleted_at set) with a
---   visit and a direct attachment; v_ui_cmms_* must hide them
+--   one link per type whose sys_code matches no feature, with a visit and a
+--   direct attachment; v_ui_cmms_* must hide them
 
 BEGIN;
 
@@ -133,11 +133,11 @@ BEGIN
 END;
 $fn$;
 
-CREATE OR REPLACE FUNCTION pg_temp.cmms_link_visit(p_visit uuid, p_map bigint) RETURNS void
+CREATE OR REPLACE FUNCTION pg_temp.cmms_link_visit(p_visit uuid, p_sys_code text) RETURNS void
 LANGUAGE sql
 SET search_path = cmms, public
 AS $fn$
-	INSERT INTO cmms.visit_x_feature (visit_id, asset_feature_map_id) VALUES (p_visit, p_map);
+	INSERT INTO cmms.visit_x_feature (visit_id, sys_code) VALUES (p_visit, p_sys_code);
 $fn$;
 
 CREATE OR REPLACE FUNCTION pg_temp.cmms_link_att_visit(p_att uuid, p_visit uuid) RETURNS void
@@ -147,11 +147,11 @@ AS $fn$
 	INSERT INTO cmms.attachment_x_visit (attachment_id, visit_id) VALUES (p_att, p_visit);
 $fn$;
 
-CREATE OR REPLACE FUNCTION pg_temp.cmms_link_att_feature(p_att uuid, p_map bigint) RETURNS void
+CREATE OR REPLACE FUNCTION pg_temp.cmms_link_att_feature(p_att uuid, p_sys_code text) RETURNS void
 LANGUAGE sql
 SET search_path = cmms, public
 AS $fn$
-	INSERT INTO cmms.attachment_x_feature (attachment_id, asset_feature_map_id) VALUES (p_att, p_map);
+	INSERT INTO cmms.attachment_x_feature (attachment_id, sys_code) VALUES (p_att, p_sys_code);
 $fn$;
 
 DO $sample$
@@ -168,10 +168,10 @@ DECLARE
 	v_type_i int;
 	v_slot_i int;
 	v_srid int;
-	v_ids int[];
-	v_fid int;
-	v_map_id bigint;
-	v_reused boolean;
+	v_ids text[];
+	v_codes text[];
+	v_fid text;
+	v_sys_code text;
 	v_geom geometry;
 	v_has_state boolean;
 	v_sql text;
@@ -219,14 +219,13 @@ BEGIN
 
 	DELETE FROM cmms.visit WHERE properties ->> 'sample' = 'cmms_combo';
 	DELETE FROM cmms.attachment WHERE properties ->> 'sample' = 'cmms_combo';
-	DELETE FROM cmms.asset_feature_map WHERE properties ->> 'sample' = 'cmms_combo';
 
 	CREATE TEMP TABLE cmms_sample_slot (
 		schema_name text,
 		feature_type text,
 		slot text,
-		feature_id int,
-		map_id bigint,
+		feature_id text,
+		sys_code text,
 		primary_visit uuid,
 		ref_att uuid,
 		exp_visits int,
@@ -249,59 +248,76 @@ BEGIN
 						AND column_name = 'state'
 				) INTO v_has_state;
 
-				v_ids := ARRAY[]::int[];
+				v_ids := ARRAY[]::text[];
+				v_codes := ARRAY[]::text[];
 				IF v_has_state THEN
 					v_state_sql := 'AND t.state = 1';
 					v_sql := format($pick$
-						SELECT COALESCE(array_agg(s.fid ORDER BY s.mapped, s.fid), ARRAY[]::int[])
+						SELECT COALESCE(array_agg(s.fid ORDER BY s.fid), ARRAY[]::text[]),
+							COALESCE(array_agg(s.sys_code ORDER BY s.fid), ARRAY[]::text[])
 						FROM (
-							SELECT t.%1$I::int AS fid,
-								EXISTS (
-									SELECT 1 FROM cmms.asset_feature_map AS m
-									WHERE m.schema_name = %2$L
-										AND m.feature_type = %3$L
-										AND m.feature_id = t.%1$I::int
-										AND m.feature_deleted_at IS NULL
-								) AS mapped
-							FROM %2$I.%4$I AS t
-							WHERE CASE
-								WHEN t.%1$I::text ~ %5$L THEN t.%1$I::text::bigint BETWEEN 0 AND 2147483647
-								ELSE false
-							END
-								%6$s
-							ORDER BY 2, 1
+							SELECT t.%1$I::text AS fid, t.sys_code
+							FROM %2$I.%3$I AS t
+							WHERE t.sys_code IS NOT NULL
+								AND btrim(t.sys_code) <> ''
+								AND NOT EXISTS (
+									SELECT 1 FROM cmms.visit_x_feature AS vx
+									WHERE vx.sys_code = t.sys_code
+								)
+								AND NOT EXISTS (
+									SELECT 1 FROM cmms.attachment_x_feature AS ax
+									WHERE ax.sys_code = t.sys_code
+								)
+								AND NOT EXISTS (
+									SELECT 1 FROM cmms_sample_slot AS sl
+									WHERE sl.sys_code = t.sys_code
+								)
+								AND (
+									SELECT count(*) FROM %2$I.%3$I AS d
+									WHERE d.sys_code = t.sys_code
+								) = 1
+								%4$s
+							ORDER BY t.%1$I
 							LIMIT 8
 						) AS s
-					$pick$, v_idcol, v_parent, v_type, lower(v_type), '^[0-9]+$', v_state_sql);
-					EXECUTE v_sql INTO v_ids;
+					$pick$, v_idcol, v_parent, lower(v_type), v_state_sql);
+					EXECUTE v_sql INTO v_ids, v_codes;
 				END IF;
 
 				IF cardinality(v_ids) = 0 THEN
 					v_sql := format($pick$
-						SELECT COALESCE(array_agg(s.fid ORDER BY s.mapped, s.fid), ARRAY[]::int[])
+						SELECT COALESCE(array_agg(s.fid ORDER BY s.fid), ARRAY[]::text[]),
+							COALESCE(array_agg(s.sys_code ORDER BY s.fid), ARRAY[]::text[])
 						FROM (
-							SELECT t.%1$I::int AS fid,
-								EXISTS (
-									SELECT 1 FROM cmms.asset_feature_map AS m
-									WHERE m.schema_name = %2$L
-										AND m.feature_type = %3$L
-										AND m.feature_id = t.%1$I::int
-										AND m.feature_deleted_at IS NULL
-								) AS mapped
-							FROM %2$I.%4$I AS t
-							WHERE CASE
-								WHEN t.%1$I::text ~ %5$L THEN t.%1$I::text::bigint BETWEEN 0 AND 2147483647
-								ELSE false
-							END
-							ORDER BY 2, 1
+							SELECT t.%1$I::text AS fid, t.sys_code
+							FROM %2$I.%3$I AS t
+							WHERE t.sys_code IS NOT NULL
+								AND btrim(t.sys_code) <> ''
+								AND NOT EXISTS (
+									SELECT 1 FROM cmms.visit_x_feature AS vx
+									WHERE vx.sys_code = t.sys_code
+								)
+								AND NOT EXISTS (
+									SELECT 1 FROM cmms.attachment_x_feature AS ax
+									WHERE ax.sys_code = t.sys_code
+								)
+								AND NOT EXISTS (
+									SELECT 1 FROM cmms_sample_slot AS sl
+									WHERE sl.sys_code = t.sys_code
+								)
+								AND (
+									SELECT count(*) FROM %2$I.%3$I AS d
+									WHERE d.sys_code = t.sys_code
+								) = 1
+							ORDER BY t.%1$I
 							LIMIT 8
 						) AS s
-					$pick$, v_idcol, v_parent, v_type, lower(v_type), '^[0-9]+$');
-					EXECUTE v_sql INTO v_ids;
+					$pick$, v_idcol, v_parent, lower(v_type));
+					EXECUTE v_sql INTO v_ids, v_codes;
 				END IF;
 
 				IF cardinality(v_ids) = 0 THEN
-					RAISE NOTICE '% %: no numeric feature ids, live slots skipped', v_parent, v_type;
+					RAISE NOTICE '% %: no features with a unique sys_code, live slots skipped', v_parent, v_type;
 				ELSIF cardinality(v_ids) < cardinality(v_slots) THEN
 					RAISE NOTICE '% %: % features, slots past that are skipped',
 						v_parent, v_type, cardinality(v_ids);
@@ -309,6 +325,7 @@ BEGIN
 
 				FOR v_slot_i IN 1..least(cardinality(v_ids), cardinality(v_slots)) LOOP
 					v_fid := v_ids[v_slot_i];
+					v_sys_code := v_codes[v_slot_i];
 					v_slot := v_slots[v_slot_i];
 					v_geom := NULL;
 					v_primary := NULL;
@@ -317,17 +334,13 @@ BEGIN
 					v_exp_direct := NULL;
 					v_exp_has := NULL;
 					v_exp_dup := NULL;
-					v_reused := false;
 
 					IF v_slot IN ('visit', 'attach_one') AND v_srid IS NOT NULL THEN
 						BEGIN
 							EXECUTE format(
 								'SELECT ST_Multi(ST_Force2D(ST_Buffer(ST_Envelope(t.the_geom), 1)))
 								 FROM %1$I.%2$I AS t
-								 WHERE CASE
-									WHEN t.%3$I::text ~ ''^[0-9]+$'' THEN t.%3$I::int = $1
-									ELSE false
-								 END',
+								 WHERE t.%3$I::text = $1',
 								v_parent, lower(v_type), v_idcol
 							) INTO v_geom USING v_fid;
 							IF v_geom IS NULL
@@ -342,34 +355,6 @@ BEGIN
 						END;
 					END IF;
 
-					-- A conflict returns no row. Clear the previous id so it cannot leak through.
-					v_map_id := NULL;
-					INSERT INTO cmms.asset_feature_map (
-						ext_feature_id, feature_id, feature_type, schema_name, properties, created_by
-					) VALUES (
-						format('sample:%s:%s:%s:%s', v_parent, v_type, v_slot, v_fid),
-						v_fid, v_type, v_parent,
-						jsonb_build_object('sample', 'cmms_combo', 'case', v_slot),
-						'cmms_sample'
-					)
-					ON CONFLICT (schema_name, feature_type, feature_id) WHERE feature_deleted_at IS NULL
-					DO NOTHING
-					RETURNING id INTO v_map_id;
-
-					IF v_map_id IS NULL THEN
-						v_reused := true;
-						SELECT id INTO v_map_id
-						FROM cmms.asset_feature_map
-						WHERE schema_name = v_parent
-							AND feature_type = v_type
-							AND feature_id = v_fid
-							AND feature_deleted_at IS NULL;
-					END IF;
-					IF v_map_id IS NULL THEN
-						RAISE NOTICE 'skip % % %: feature disappeared', v_parent, v_type, v_fid;
-						CONTINUE;
-					END IF;
-
 					CASE v_slot
 					WHEN 'visit' THEN
 						v_primary := pg_temp.cmms_ins_visit(
@@ -379,7 +364,7 @@ BEGIN
 							'Visits: 1 row, has_attachment false. Attachments: empty.',
 							now() - interval '3 days', NULL, v_geom, 'visit'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_primary, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_primary, v_sys_code);
 						v_exp_visits := 1;
 						v_exp_atts := 0;
 						v_exp_direct := 0;
@@ -392,7 +377,7 @@ BEGIN
 							'Visits: 2 rows, both has_attachment false. The newer link is_last.',
 							now() - interval '20 days', NULL, NULL, 'visits'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_primary, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_primary, v_sys_code);
 						v_visit2 := pg_temp.cmms_ins_visit(
 							NULL,
 							'repair', 'closed',
@@ -400,7 +385,7 @@ BEGIN
 							'No ext_visit_id. end_date equals start_date.',
 							now() - interval '1 day', now() - interval '1 day', NULL, 'visits'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_visit2, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_visit2, v_sys_code);
 						v_exp_visits := 2;
 						v_exp_atts := 0;
 						v_exp_direct := 0;
@@ -412,7 +397,7 @@ BEGIN
 							'photo', 'image/jpeg', NULL, v_geom,
 							'{"lat": 41.387, "lon": 2.170}'::jsonb
 						);
-						PERFORM pg_temp.cmms_link_att_feature(v_att, v_map_id);
+						PERFORM pg_temp.cmms_link_att_feature(v_att, v_sys_code);
 						v_exp_visits := 0;
 						v_exp_atts := 1;
 						v_exp_direct := 1;
@@ -420,12 +405,12 @@ BEGIN
 						PERFORM pg_temp.cmms_link_att_feature(pg_temp.cmms_ins_attachment(
 							format('%s %s %s photo', v_parent, v_type, v_fid),
 							format('%s-%s-%s-many-1', v_parent, v_type, v_fid)
-						), v_map_id);
+						), v_sys_code);
 						PERFORM pg_temp.cmms_link_att_feature(pg_temp.cmms_ins_attachment(
 							format('%s %s %s document, no path', v_parent, v_type, v_fid),
 							format('%s-%s-%s-many-2', v_parent, v_type, v_fid),
 							'document', 'application/pdf', ''
-						), v_map_id);
+						), v_sys_code);
 						v_exp_visits := 0;
 						v_exp_atts := 2;
 						v_exp_direct := 2;
@@ -438,7 +423,7 @@ BEGIN
 							now() - interval '4 days', now() - interval '4 days' + interval '2 hours',
 							NULL, 'visit_attach'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_primary, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_primary, v_sys_code);
 						PERFORM pg_temp.cmms_link_att_visit(pg_temp.cmms_ins_attachment(
 							format('%s %s %s visit photo', v_parent, v_type, v_fid),
 							format('%s-%s-%s-via-visit', v_parent, v_type, v_fid)
@@ -455,7 +440,7 @@ BEGIN
 							'Two visits, only this one has attachments. One file is both direct and on this visit, so it is listed twice.',
 							now() - interval '6 days', NULL, NULL, 'mixed'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_primary, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_primary, v_sys_code);
 						v_att := pg_temp.cmms_ins_attachment(
 							format('%s %s %s mixed A1', v_parent, v_type, v_fid),
 							format('%s-%s-%s-mixed-a1', v_parent, v_type, v_fid)
@@ -475,18 +460,18 @@ BEGIN
 							'Second visit on the same feature. has_attachment false.',
 							NULL, NULL, NULL, 'mixed'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_visit2, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_visit2, v_sys_code);
 						PERFORM pg_temp.cmms_link_att_feature(pg_temp.cmms_ins_attachment(
 							format('%s %s %s mixed direct', v_parent, v_type, v_fid),
 							format('%s-%s-%s-mixed-direct', v_parent, v_type, v_fid),
 							'document', 'application/pdf',
 							format('/tmp/cmms-sample/%s-%s-%s-mixed-direct.pdf', v_parent, v_type, v_fid)
-						), v_map_id);
+						), v_sys_code);
 						v_att := pg_temp.cmms_ins_attachment(
 							format('%s %s %s mixed both ways', v_parent, v_type, v_fid),
 							format('%s-%s-%s-mixed-both', v_parent, v_type, v_fid)
 						);
-						PERFORM pg_temp.cmms_link_att_feature(v_att, v_map_id);
+						PERFORM pg_temp.cmms_link_att_feature(v_att, v_sys_code);
 						PERFORM pg_temp.cmms_link_att_visit(v_att, v_primary);
 						v_exp_visits := 2;
 						v_exp_atts := 5;
@@ -501,30 +486,20 @@ BEGIN
 							'Also receives the same-type and cross-type shared visits when those slots exist.',
 							now() - interval '2 days', NULL, NULL, 'multi_a'
 						);
-						PERFORM pg_temp.cmms_link_visit(v_primary, v_map_id);
+						PERFORM pg_temp.cmms_link_visit(v_primary, v_sys_code);
 					WHEN 'multi_b' THEN
 						v_primary := NULL;
 					ELSE
 						RAISE EXCEPTION 'unknown slot %', v_slot;
 					END CASE;
 
-					IF v_reused THEN
-						RAISE NOTICE '% % % slot=% reuses an existing map; view counts are not checked',
-							v_parent, v_type, v_fid, v_slot;
-						v_exp_visits := NULL;
-						v_exp_atts := NULL;
-						v_exp_direct := NULL;
-						v_exp_has := NULL;
-						v_exp_dup := NULL;
-					ELSE
-						RAISE NOTICE '% % %  %', v_parent, v_type, v_fid, v_slot;
-					END IF;
+					RAISE NOTICE '% % %  %', v_parent, v_type, v_fid, v_slot;
 
 					INSERT INTO cmms_sample_slot (
-						schema_name, feature_type, slot, feature_id, map_id, primary_visit,
+						schema_name, feature_type, slot, feature_id, sys_code, primary_visit,
 						exp_visits, exp_atts, exp_direct, exp_has, exp_dup
 					) VALUES (
-						v_parent, v_type, v_slot, v_fid, v_map_id, v_primary,
+						v_parent, v_type, v_slot, v_fid, v_sys_code, v_primary,
 						v_exp_visits, v_exp_atts, v_exp_direct, v_exp_has, v_exp_dup
 					);
 				END LOOP;
@@ -532,29 +507,16 @@ BEGIN
 				RAISE NOTICE '% %: table does not exist, live slots skipped', v_parent, v_type;
 			END IF;
 
-			-- Deleted feature: links stay in cmms and must not show in the parent views.
-			INSERT INTO cmms.asset_feature_map (
-				ext_feature_id, feature_id, feature_type, schema_name,
-				properties, created_by, feature_deleted_at
-			) VALUES (
-				format('sample:%s:%s:orphan', v_parent, v_type),
-				-910000 - v_type_i,
-				v_type,
-				v_parent,
-				jsonb_build_object('sample', 'cmms_combo', 'case', 'orphan'),
-				'cmms_sample',
-				now()
-			)
-			RETURNING id INTO v_map_id;
-
+			-- sys_code matches no feature. The link stays in cmms and must not show.
+			v_sys_code := format('sample:%s:%s:orphan', v_parent, v_type);
 			v_visit := pg_temp.cmms_ins_visit(
 				format('sample:%s:%s:orphan', v_parent, v_type),
 				'inspection', 'cancelled',
 				format('%s %s — orphan visit (hidden)', v_parent, v_type),
-				'Linked to a map with feature_deleted_at set. Must not appear in v_ui_cmms_visit.',
+				'Linked by a sys_code that matches no feature. Must not appear in v_ui_cmms_visit.',
 				now(), NULL, NULL, 'orphan'
 			);
-			PERFORM pg_temp.cmms_link_visit(v_visit, v_map_id);
+			PERFORM pg_temp.cmms_link_visit(v_visit, v_sys_code);
 			PERFORM pg_temp.cmms_link_att_visit(pg_temp.cmms_ins_attachment(
 				format('%s %s orphan via visit', v_parent, v_type),
 				format('%s-%s-orphan-visit', v_parent, v_type)
@@ -563,19 +525,20 @@ BEGIN
 				format('%s %s orphan direct', v_parent, v_type),
 				format('%s-%s-orphan-direct', v_parent, v_type),
 				'document', 'application/pdf', ''
-			), v_map_id);
+			), v_sys_code);
 
 			INSERT INTO cmms_sample_slot (
-				schema_name, feature_type, slot, feature_id, map_id, exp_visits, exp_atts, exp_direct
+				schema_name, feature_type, slot, feature_id, sys_code, primary_visit,
+				exp_visits, exp_atts, exp_direct
 			) VALUES (
-				v_parent, v_type, 'orphan', -910000 - v_type_i, v_map_id, 0, 0, 0
+				v_parent, v_type, 'orphan', NULL, v_sys_code, v_visit, 0, 0, 0
 			);
 		END LOOP;
 
 		-- One visit on two features of this type.
 		FOR rec IN
-			SELECT a.feature_type, a.feature_id AS fid_a, a.map_id AS map_a, a.primary_visit,
-				b.feature_id AS fid_b, b.map_id AS map_b
+			SELECT a.feature_type, a.feature_id AS fid_a, a.sys_code AS code_a, a.primary_visit,
+				b.feature_id AS fid_b, b.sys_code AS code_b
 			FROM cmms_sample_slot AS a
 			JOIN cmms_sample_slot AS b
 				ON b.schema_name = a.schema_name
@@ -591,15 +554,15 @@ BEGIN
 				'Same visit on multi A and multi B. Its attachment is also on multi A private visit and direct on multi B only.',
 				now() - interval '2 days', NULL, NULL, 'pair'
 			);
-			PERFORM pg_temp.cmms_link_visit(v_visit, rec.map_a);
-			PERFORM pg_temp.cmms_link_visit(v_visit, rec.map_b);
+			PERFORM pg_temp.cmms_link_visit(v_visit, rec.code_a);
+			PERFORM pg_temp.cmms_link_visit(v_visit, rec.code_b);
 			v_att := pg_temp.cmms_ins_attachment(
 				format('%s %s shared by two visits', v_parent, rec.feature_type),
 				format('%s-%s-pair', v_parent, rec.feature_type)
 			);
 			PERFORM pg_temp.cmms_link_att_visit(v_att, v_visit);
 			PERFORM pg_temp.cmms_link_att_visit(v_att, rec.primary_visit);
-			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.map_b);
+			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.code_b);
 
 			v_att := pg_temp.cmms_ins_attachment(
 				format('%s %s direct on both features', v_parent, rec.feature_type),
@@ -607,15 +570,15 @@ BEGIN
 				'document', 'application/pdf',
 				format('/tmp/cmms-sample/%s-%s-both.pdf', v_parent, rec.feature_type)
 			);
-			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.map_a);
-			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.map_b);
+			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.code_a);
+			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.code_b);
 
 			v_att := pg_temp.cmms_ins_attachment(
 				format('%s %s visit on A, direct on B', v_parent, rec.feature_type),
 				format('%s-%s-split', v_parent, rec.feature_type)
 			);
 			PERFORM pg_temp.cmms_link_att_visit(v_att, rec.primary_visit);
-			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.map_b);
+			PERFORM pg_temp.cmms_link_att_feature(v_att, rec.code_b);
 			RAISE NOTICE '% % pair % + %', v_parent, rec.feature_type, rec.fid_a, rec.fid_b;
 		END LOOP;
 
@@ -640,10 +603,10 @@ BEGIN
 			);
 			PERFORM pg_temp.cmms_link_att_visit(v_att, v_visit);
 			FOR rec IN
-				SELECT map_id FROM cmms_sample_slot
+				SELECT sys_code FROM cmms_sample_slot
 				WHERE schema_name = v_parent AND slot = 'multi_a'
 			LOOP
-				PERFORM pg_temp.cmms_link_visit(v_visit, rec.map_id);
+				PERFORM pg_temp.cmms_link_visit(v_visit, rec.sys_code);
 			END LOOP;
 			RAISE NOTICE '% cross-type visit on % multi A features', v_parent, v_n;
 		END IF;
@@ -664,10 +627,10 @@ BEGIN
 				now() - interval '1 day', NULL, NULL, 'cross_bare'
 			);
 			FOR rec IN
-				SELECT map_id FROM cmms_sample_slot
+				SELECT sys_code FROM cmms_sample_slot
 				WHERE schema_name = v_parent AND slot = 'multi_b'
 			LOOP
-				PERFORM pg_temp.cmms_link_visit(v_visit, rec.map_id);
+				PERFORM pg_temp.cmms_link_visit(v_visit, rec.sys_code);
 			END LOOP;
 			v_att := pg_temp.cmms_ins_attachment(
 				format('%s cross-type direct', v_parent),
@@ -676,10 +639,10 @@ BEGIN
 				format('/tmp/cmms-sample/%s-cross-direct.pdf', v_parent)
 			);
 			FOR rec IN
-				SELECT map_id FROM cmms_sample_slot
+				SELECT sys_code FROM cmms_sample_slot
 				WHERE schema_name = v_parent AND slot = 'multi_b'
 			LOOP
-				PERFORM pg_temp.cmms_link_att_feature(v_att, rec.map_id);
+				PERFORM pg_temp.cmms_link_att_feature(v_att, rec.sys_code);
 			END LOOP;
 			RAISE NOTICE '% cross-type bare visit and direct attachment on % multi B features', v_parent, v_n;
 		END IF;
@@ -702,12 +665,12 @@ BEGIN
 		);
 		PERFORM pg_temp.cmms_link_att_visit(v_att, v_visit);
 		FOR rec IN
-			SELECT DISTINCT ON (schema_name) schema_name, feature_type, feature_id, map_id
+			SELECT DISTINCT ON (schema_name) schema_name, feature_type, feature_id, sys_code
 			FROM cmms_sample_slot
 			WHERE slot = 'multi_a'
 			ORDER BY schema_name, CASE feature_type WHEN 'NODE' THEN 0 ELSE 1 END, feature_type
 		LOOP
-			PERFORM pg_temp.cmms_link_visit(v_visit, rec.map_id);
+			PERFORM pg_temp.cmms_link_visit(v_visit, rec.sys_code);
 			RAISE NOTICE 'cross-parent visit also on % % %', rec.schema_name, rec.feature_type, rec.feature_id;
 		END LOOP;
 	END IF;
@@ -752,28 +715,34 @@ BEGIN
 	);
 	INSERT INTO cmms_sample_slot (slot, ref_att) VALUES ('unlinked_att', v_att);
 
-	-- is_last: exactly one true link per sample-owned feature / visit.
+	-- is_last: exactly one true link per sample-owned sys_code / visit.
 	UPDATE cmms.visit_x_feature AS vx
 	SET is_last = (vx.id = sub.max_id)
 	FROM (
-		SELECT vx2.asset_feature_map_id, max(vx2.id) AS max_id
+		SELECT vx2.sys_code, max(vx2.id) AS max_id
 		FROM cmms.visit_x_feature AS vx2
-		JOIN cmms.asset_feature_map AS m ON m.id = vx2.asset_feature_map_id
-		WHERE m.properties ->> 'sample' = 'cmms_combo'
-		GROUP BY vx2.asset_feature_map_id
+		JOIN cmms.visit AS v ON v.id = vx2.visit_id
+		WHERE v.properties ->> 'sample' = 'cmms_combo'
+		GROUP BY vx2.sys_code
 	) AS sub
-	WHERE vx.asset_feature_map_id = sub.asset_feature_map_id;
+	WHERE vx.sys_code = sub.sys_code
+		AND vx.visit_id IN (
+			SELECT id FROM cmms.visit WHERE properties ->> 'sample' = 'cmms_combo'
+		);
 
 	UPDATE cmms.attachment_x_feature AS ax
 	SET is_last = (ax.id = sub.max_id)
 	FROM (
-		SELECT ax2.asset_feature_map_id, max(ax2.id) AS max_id
+		SELECT ax2.sys_code, max(ax2.id) AS max_id
 		FROM cmms.attachment_x_feature AS ax2
-		JOIN cmms.asset_feature_map AS m ON m.id = ax2.asset_feature_map_id
-		WHERE m.properties ->> 'sample' = 'cmms_combo'
-		GROUP BY ax2.asset_feature_map_id
+		JOIN cmms.attachment AS a ON a.id = ax2.attachment_id
+		WHERE a.properties ->> 'sample' = 'cmms_combo'
+		GROUP BY ax2.sys_code
 	) AS sub
-	WHERE ax.asset_feature_map_id = sub.asset_feature_map_id;
+	WHERE ax.sys_code = sub.sys_code
+		AND ax.attachment_id IN (
+			SELECT id FROM cmms.attachment WHERE properties ->> 'sample' = 'cmms_combo'
+		);
 
 	UPDATE cmms.attachment_x_visit AS ax
 	SET is_last = (ax.id = sub.max_id)
@@ -787,24 +756,39 @@ BEGIN
 	WHERE ax.visit_id = sub.visit_id;
 
 	FOR rec IN
-		SELECT id FROM cmms.asset_feature_map WHERE properties ->> 'sample' = 'cmms_combo'
+		SELECT DISTINCT s.sys_code
+		FROM (
+			SELECT vx.sys_code
+			FROM cmms.visit_x_feature AS vx
+			JOIN cmms.visit AS v ON v.id = vx.visit_id
+			WHERE v.properties ->> 'sample' = 'cmms_combo'
+			UNION
+			SELECT ax.sys_code
+			FROM cmms.attachment_x_feature AS ax
+			JOIN cmms.attachment AS a ON a.id = ax.attachment_id
+			WHERE a.properties ->> 'sample' = 'cmms_combo'
+		) AS s
 	LOOP
-		SELECT count(*)::int, count(*) FILTER (WHERE is_last)::int
+		SELECT count(*)::int, count(*) FILTER (WHERE vx.is_last)::int
 		INTO v_links, v_last
-		FROM cmms.visit_x_feature
-		WHERE asset_feature_map_id = rec.id;
+		FROM cmms.visit_x_feature AS vx
+		JOIN cmms.visit AS v ON v.id = vx.visit_id
+		WHERE vx.sys_code = rec.sys_code
+			AND v.properties ->> 'sample' = 'cmms_combo';
 		IF v_links > 0 AND v_last IS DISTINCT FROM 1 THEN
 			v_failed := v_failed + 1;
-			RAISE WARNING 'map % visit is_last count is %, expected 1 of %', rec.id, v_last, v_links;
+			RAISE WARNING 'sys_code % visit is_last count is %, expected 1 of %', rec.sys_code, v_last, v_links;
 		END IF;
 
-		SELECT count(*)::int, count(*) FILTER (WHERE is_last)::int
+		SELECT count(*)::int, count(*) FILTER (WHERE ax.is_last)::int
 		INTO v_links, v_last
-		FROM cmms.attachment_x_feature
-		WHERE asset_feature_map_id = rec.id;
+		FROM cmms.attachment_x_feature AS ax
+		JOIN cmms.attachment AS a ON a.id = ax.attachment_id
+		WHERE ax.sys_code = rec.sys_code
+			AND a.properties ->> 'sample' = 'cmms_combo';
 		IF v_links > 0 AND v_last IS DISTINCT FROM 1 THEN
 			v_failed := v_failed + 1;
-			RAISE WARNING 'map % attachment is_last count is %, expected 1 of %', rec.id, v_last, v_links;
+			RAISE WARNING 'sys_code % attachment is_last count is %, expected 1 of %', rec.sys_code, v_last, v_links;
 		END IF;
 	END LOOP;
 
@@ -878,10 +862,18 @@ BEGIN
 			IF rec.slot = 'orphan' THEN
 				SELECT count(*)::int INTO v_base_links
 				FROM cmms.visit_x_feature
-				WHERE asset_feature_map_id = rec.map_id;
+				WHERE sys_code = rec.sys_code;
 				IF v_base_links IS DISTINCT FROM 1 THEN
 					v_failed := v_failed + 1;
-					RAISE WARNING 'orphan map % lost its visit link', rec.map_id;
+					RAISE WARNING 'orphan % lost its visit link', rec.sys_code;
+				END IF;
+				EXECUTE format(
+					'SELECT count(*)::int FROM %I.v_ui_cmms_visit WHERE visit_id = $1',
+					rec.schema_name
+				) INTO v_got_visits USING rec.primary_visit;
+				IF v_got_visits <> 0 THEN
+					v_failed := v_failed + 1;
+					RAISE WARNING 'orphan visit % is visible on %', rec.primary_visit, rec.schema_name;
 				END IF;
 			END IF;
 		EXCEPTION WHEN OTHERS THEN
@@ -928,10 +920,12 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'cmms sample checks passed';
-	RAISE NOTICE 'visits %  attachments %  maps %',
+	RAISE NOTICE 'visits %  attachments %  feature links %',
 		(SELECT count(*) FROM cmms.visit WHERE properties ->> 'sample' = 'cmms_combo'),
 		(SELECT count(*) FROM cmms.attachment WHERE properties ->> 'sample' = 'cmms_combo'),
-		(SELECT count(*) FROM cmms.asset_feature_map WHERE properties ->> 'sample' = 'cmms_combo');
+		(SELECT count(*) FROM cmms.visit_x_feature AS vx
+			JOIN cmms.visit AS v ON v.id = vx.visit_id
+			WHERE v.properties ->> 'sample' = 'cmms_combo');
 END;
 $sample$;
 
@@ -953,14 +947,13 @@ FROM cmms.attachment AS a
 WHERE a.properties ->> 'sample' = 'cmms_combo'
 ORDER BY a.name;
 
-SELECT m.schema_name, m.feature_type, m.feature_id,
-	m.properties ->> 'case' AS case_name,
-	m.feature_deleted_at IS NOT NULL AS orphan,
-	(SELECT count(*) FROM cmms.visit_x_feature AS v WHERE v.asset_feature_map_id = m.id) AS visits,
-	(SELECT count(*) FROM cmms.attachment_x_feature AS a WHERE a.asset_feature_map_id = m.id) AS direct_attachments
-FROM cmms.asset_feature_map AS m
-WHERE m.properties ->> 'sample' = 'cmms_combo'
-ORDER BY m.schema_name, m.feature_type, orphan, m.feature_id;
+SELECT s.schema_name, s.feature_type, s.feature_id, s.slot, s.sys_code,
+	s.feature_id IS NULL AS unmatched,
+	(SELECT count(*) FROM cmms.visit_x_feature AS v WHERE v.sys_code = s.sys_code) AS visits,
+	(SELECT count(*) FROM cmms.attachment_x_feature AS a WHERE a.sys_code = s.sys_code) AS direct_attachments
+FROM cmms_sample_slot AS s
+WHERE s.schema_name IS NOT NULL
+ORDER BY s.schema_name, s.feature_type, unmatched, s.feature_id;
 
 DO $drop$
 DECLARE

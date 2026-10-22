@@ -16,100 +16,26 @@ SELECT * FROM no_plan();
 CREATE SCHEMA ws_fake AUTHORIZATION role_system;
 
 SET ROLE role_system;
-CREATE TABLE ws_fake.node (node_id int4 PRIMARY KEY);
-CREATE TABLE ws_fake.element (element_id int4 PRIMARY KEY);
-INSERT INTO ws_fake.node (node_id) VALUES (1), (2), (3);
-INSERT INTO ws_fake.element (element_id) VALUES (7);
+CREATE TABLE ws_fake.node (
+    node_id character varying(16) PRIMARY KEY,
+    sys_code text
+);
+INSERT INTO ws_fake.node (node_id, sys_code) VALUES
+    ('1', 'SC-1'),
+    ('2', 'SC-1'),
+    ('3', 'SC-3');
 RESET ROLE;
 
-DO $cmms_feature_sync$
-DECLARE
-    v_parent constant text := 'ws_fake';
-    v_table text;
-    v_id_column text;
-BEGIN
-    FOREACH v_table IN ARRAY ARRAY['node', 'arc', 'connec', 'link', 'gully', 'element']
-    LOOP
-        IF to_regclass(format('%I.%I', v_parent, v_table)) IS NULL THEN
-            CONTINUE;
-        END IF;
-        v_id_column := v_table || '_id';
-        EXECUTE format(
-            'DROP TRIGGER IF EXISTS gw_trg_cmms_feature_sync_delete ON %I.%I',
-            v_parent, v_table
-        );
-        EXECUTE format(
-            'DROP TRIGGER IF EXISTS gw_trg_cmms_feature_sync_id ON %I.%I',
-            v_parent, v_table
-        );
-        EXECUTE format(
-            'CREATE TRIGGER gw_trg_cmms_feature_sync_delete '
-            'AFTER DELETE ON %I.%I '
-            'FOR EACH ROW EXECUTE PROCEDURE cmms.gw_trg_cmms_feature_sync(%L)',
-            v_parent, v_table, v_id_column
-        );
-        EXECUTE format(
-            'CREATE TRIGGER gw_trg_cmms_feature_sync_id '
-            'AFTER UPDATE OF %I ON %I.%I '
-            'FOR EACH ROW WHEN (OLD.%I IS DISTINCT FROM NEW.%I) '
-            'EXECUTE PROCEDURE cmms.gw_trg_cmms_feature_sync(%L)',
-            v_id_column, v_parent, v_table, v_id_column, v_id_column, v_id_column
-        );
-    END LOOP;
-END
-$cmms_feature_sync$;
-
 SELECT lives_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-node-1', 1, 'NODE', 'ws_fake')$$,
-    'a live mapping to an existing node is accepted'
-);
-
-SELECT throws_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-missing', 999, 'NODE', 'ws_fake')$$,
-    '23503'::char(5),
-    NULL,
-    'a mapping to a missing feature is rejected'
-);
-
-SELECT throws_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-noschema', 1, 'NODE', 'no_such_parent')$$,
-    '23503'::char(5),
-    NULL,
-    'a mapping to a missing schema is rejected'
-);
-
-SELECT throws_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-gully', 1, 'GULLY', 'ws_fake')$$,
-    '23503'::char(5),
-    NULL,
-    'GULLY is rejected when the parent has no gully table'
-);
-
-SELECT lives_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-element', 7, 'ELEMENT', 'ws_fake')$$,
-    'ELEMENT is a valid feature type'
-);
-
-SELECT throws_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-node-1-dup', 1, 'NODE', 'ws_fake')$$,
-    '23505'::char(5),
-    NULL,
-    'a second live mapping of the same feature is rejected'
+    $$SELECT gw_fct_cmms_create_parent_views('ws_fake')$$,
+    'parent views are built from the feature tables'
 );
 
 INSERT INTO visit (id, type, status)
 VALUES ('00000000-0000-0000-0000-000000000011', 'inspection', 'open');
 
-INSERT INTO visit_x_feature (visit_id, asset_feature_map_id)
-SELECT '00000000-0000-0000-0000-000000000011', id
-FROM asset_feature_map
-WHERE ext_feature_id = 'ext-node-1';
+INSERT INTO visit_x_feature (visit_id, sys_code)
+VALUES ('00000000-0000-0000-0000-000000000011', 'SC-1');
 
 INSERT INTO attachment (id, name, path)
 VALUES
@@ -119,248 +45,71 @@ VALUES
 INSERT INTO attachment_x_visit (attachment_id, visit_id)
 VALUES ('00000000-0000-0000-0000-000000000021', '00000000-0000-0000-0000-000000000011');
 
-INSERT INTO attachment_x_feature (attachment_id, asset_feature_map_id)
-SELECT '00000000-0000-0000-0000-000000000022', id
-FROM asset_feature_map
-WHERE ext_feature_id = 'ext-node-1';
-
--- Same definition as cmms/integration/common/integration.sql. search_path puts
--- the views in ws_fake and binds 'node'::regclass to ws_fake.node.
-SET search_path = ws_fake, public, pg_catalog;
-DROP VIEW IF EXISTS v_ui_cmms_attachment;
-DROP VIEW IF EXISTS v_ui_cmms_visit;
-CREATE VIEW v_ui_cmms_visit AS
-SELECT
-    m.feature_id,
-    m.feature_type,
-    v.id AS visit_id,
-    v.ext_visit_id,
-    v.type,
-    v.status,
-    v.title,
-    v.description,
-    v.start_date,
-    v.end_date,
-    EXISTS (
-        SELECT 1 FROM cmms.attachment_x_visit ax
-        WHERE ax.visit_id = v.id
-    ) AS has_attachment
-FROM cmms.asset_feature_map m
-JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
-JOIN cmms.visit v ON v.id = vx.visit_id
-WHERE m.feature_deleted_at IS NULL
-    AND m.schema_name = (
-        SELECT relnamespace::regnamespace::text
-        FROM pg_class
-        WHERE oid = 'node'::regclass
-    );
-CREATE VIEW v_ui_cmms_attachment AS
-SELECT
-    m.feature_id,
-    m.feature_type,
-    NULL::uuid AS visit_id,
-    a.id AS attachment_id,
-    a.name,
-    a.attachment_type,
-    a.content_type,
-    a.description,
-    a.uploaded_at,
-    a.uploaded_by,
-    a.path
-FROM cmms.asset_feature_map m
-JOIN cmms.attachment_x_feature axf ON axf.asset_feature_map_id = m.id
-JOIN cmms.attachment a ON a.id = axf.attachment_id
-WHERE m.feature_deleted_at IS NULL
-    AND m.schema_name = (
-        SELECT relnamespace::regnamespace::text
-        FROM pg_class
-        WHERE oid = 'node'::regclass
-    )
-UNION ALL
-SELECT
-    m.feature_id,
-    m.feature_type,
-    vx.visit_id,
-    a.id AS attachment_id,
-    a.name,
-    a.attachment_type,
-    a.content_type,
-    a.description,
-    a.uploaded_at,
-    a.uploaded_by,
-    a.path
-FROM cmms.asset_feature_map m
-JOIN cmms.visit_x_feature vx ON vx.asset_feature_map_id = m.id
-JOIN cmms.attachment_x_visit axv ON axv.visit_id = vx.visit_id
-JOIN cmms.attachment a ON a.id = axv.attachment_id
-WHERE m.feature_deleted_at IS NULL
-    AND m.schema_name = (
-        SELECT relnamespace::regnamespace::text
-        FROM pg_class
-        WHERE oid = 'node'::regclass
-    );
-SET search_path = "SCHEMA_NAME", public, pg_catalog;
+INSERT INTO attachment_x_feature (attachment_id, sys_code)
+VALUES ('00000000-0000-0000-0000-000000000022', 'SC-1');
 
 SELECT is(
-    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = 1),
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = '1'),
     1,
-    'the live feature has one cmms visit'
+    'the feature with that sys_code has one cmms visit'
 );
+
 SELECT is(
-    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_attachment WHERE feature_id = 1),
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = '2'),
+    1,
+    'a second feature with the same sys_code shows the same visit'
+);
+
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = '3'),
+    0,
+    'a feature with another sys_code has no visit'
+);
+
+SELECT is(
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_attachment WHERE feature_id = '1'),
     2,
     'direct and visit attachments both show'
 );
+
 SELECT ok(
-    (SELECT visit_id IS NULL FROM ws_fake.v_ui_cmms_attachment WHERE name = 'direct-photo'),
+    (SELECT visit_id IS NULL FROM ws_fake.v_ui_cmms_attachment
+     WHERE feature_id = '1' AND name = 'direct-photo'),
     'a direct attachment has no visit_id'
 );
 
-DELETE FROM ws_fake.node WHERE node_id = 1;
-
-SELECT ok(
-    (SELECT feature_deleted_at IS NOT NULL
-     FROM asset_feature_map
-     WHERE ext_feature_id = 'ext-node-1'),
-    'deleting the feature orphans the mapping'
-);
+UPDATE ws_fake.node SET node_id = '20' WHERE node_id = '1';
 
 SELECT is(
-    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = 1),
-    0,
-    'an orphaned mapping drops out of the visit view'
-);
-
-SELECT is(
-    (SELECT count(*)::int
-     FROM visit_x_feature v
-     JOIN asset_feature_map m ON m.id = v.asset_feature_map_id
-     WHERE m.ext_feature_id = 'ext-node-1'),
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit WHERE feature_id = '20'),
     1,
-    'the visit link survives the feature delete'
+    'changing the feature id keeps the visit on the new id'
 );
-
-INSERT INTO ws_fake.node (node_id) VALUES (1);
-
-SELECT lives_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-node-1b', 1, 'NODE', 'ws_fake')$$,
-    'a new live mapping is allowed once the previous one is orphaned'
-);
-
-INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-VALUES ('ext-node-2', 2, 'NODE', 'ws_fake');
-
-UPDATE ws_fake.node SET node_id = 20 WHERE node_id = 2;
 
 SELECT is(
-    (SELECT feature_id FROM asset_feature_map WHERE ext_feature_id = 'ext-node-2'),
-    20,
-    'changing the feature id rewrites feature_id'
-);
-
-SET ROLE role_cmms;
-SELECT lives_ok(
-    $$INSERT INTO asset_feature_map (ext_feature_id, feature_id, feature_type, schema_name)
-      VALUES ('ext-from-cmms', 3, 'NODE', 'ws_fake')$$,
-    'role_cmms can map a feature it cannot select'
-);
-RESET ROLE;
-
-CREATE ROLE cmms_link_tester NOLOGIN;
-GRANT USAGE ON SCHEMA ws_fake TO cmms_link_tester;
-GRANT SELECT, DELETE ON ws_fake.node TO cmms_link_tester;
--- USAGE only: the table resolves, and the write is a privilege error.
-GRANT USAGE ON SCHEMA cmms TO cmms_link_tester;
-
-SET ROLE cmms_link_tester;
-SELECT lives_ok(
-    $$DELETE FROM ws_fake.node WHERE node_id = 3$$,
-    'a role without cmms grants can delete the parent feature'
-);
-SELECT throws_ok(
-    $$UPDATE asset_feature_map SET properties = '{}'::jsonb WHERE ext_feature_id = 'ext-from-cmms'$$,
-    '42501'::char(5),
-    NULL,
-    'that role cannot write asset_feature_map itself'
-);
-RESET ROLE;
-
-SELECT ok(
-    (SELECT feature_deleted_at IS NOT NULL
-     FROM asset_feature_map
-     WHERE ext_feature_id = 'ext-from-cmms'),
-    'the delete still orphans the mapping'
-);
-
-SELECT has_trigger(
-    'ws_fake',
-    'node',
-    'gw_trg_cmms_feature_sync_delete',
-    'the parent node carries the cmms delete trigger'
-);
-
-CREATE TABLE ws_fake.config_form_tabs (formname text, tabname text);
-CREATE TABLE ws_fake.config_form_fields (formname text, tabname text);
-CREATE TABLE ws_fake.config_form_tableview (objectname text);
-CREATE TABLE ws_fake.sys_table (id text);
-INSERT INTO ws_fake.config_form_tabs VALUES ('ve_node', 'tab_cmms'), ('ve_arc', 'tab_event');
-INSERT INTO ws_fake.config_form_fields VALUES ('node', 'tab_cmms'), ('node', 'tab_data');
-INSERT INTO ws_fake.config_form_tableview VALUES ('v_ui_cmms_visit'), ('v_ui_cmms_attachment'), ('keep_me');
-INSERT INTO ws_fake.sys_table VALUES ('v_ui_cmms_visit'), ('v_ui_cmms_attachment'), ('node');
-
-SELECT is(
-    (SELECT count(*)::int FROM ws_fake.config_form_tabs WHERE formname = 've_node' AND tabname = 'tab_cmms'),
+    (SELECT count(*)::int FROM visit_x_feature WHERE sys_code = 'SC-1'),
     1,
-    'tab_cmms is configured for ve_node'
+    'changing the feature id does not rewrite cmms'
 );
 
-SELECT is(
-    (SELECT gw_fct_cmms_unlink_parent('ws_fake')::jsonb ->> 'status'),
-    'Accepted',
-    'unlink of a still-present parent is accepted'
-);
+DELETE FROM ws_fake.node WHERE sys_code = 'SC-1';
 
-SELECT hasnt_view('ws_fake', 'v_ui_cmms_visit', 'unlink drops the visit view');
-SELECT hasnt_view('ws_fake', 'v_ui_cmms_attachment', 'unlink drops the attachment view');
 SELECT is(
-    (SELECT count(*)::int FROM ws_fake.config_form_tabs WHERE tabname = 'tab_cmms'),
+    (SELECT count(*)::int FROM ws_fake.v_ui_cmms_visit),
     0,
-    'unlink removes the tab_cmms rows'
+    'deleting the features hides the visit'
 );
+
 SELECT is(
-    (SELECT count(*)::int FROM ws_fake.config_form_tabs WHERE tabname = 'tab_event'),
+    (SELECT count(*)::int FROM visit_x_feature WHERE sys_code = 'SC-1'),
     1,
-    'unlink leaves the other tabs'
-);
-SELECT is(
-    (SELECT count(*)::int FROM ws_fake.config_form_fields WHERE tabname = 'tab_cmms'),
-    0,
-    'unlink removes the tab_cmms fields'
-);
-SELECT is(
-    (SELECT count(*)::int FROM ws_fake.config_form_tableview WHERE objectname IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment')),
-    0,
-    'unlink removes the cmms tableview config'
-);
-SELECT is(
-    (SELECT count(*)::int FROM ws_fake.sys_table WHERE id IN ('v_ui_cmms_visit', 'v_ui_cmms_attachment')),
-    0,
-    'unlink removes the cmms sys_table rows'
+    'deleting the features keeps the cmms link'
 );
 
-SELECT hasnt_trigger(
-    'ws_fake',
-    'node',
-    'gw_trg_cmms_feature_sync_delete',
-    'unlink drops the parent delete trigger'
-);
-
-SELECT hasnt_trigger(
-    'ws_fake',
-    'node',
-    'gw_trg_cmms_feature_sync_id',
-    'unlink drops the parent id trigger'
+SELECT is(
+    (SELECT count(*)::int FROM attachment_x_feature WHERE sys_code = 'SC-1'),
+    1,
+    'deleting the features keeps the attachment link'
 );
 
 SELECT * FROM finish();

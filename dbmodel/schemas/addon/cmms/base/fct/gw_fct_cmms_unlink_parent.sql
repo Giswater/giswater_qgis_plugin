@@ -5,59 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 */
 
+-- Drop the parent-side views and tab config. cmms rows stay: they are keyed
+-- by sys_code, so integrating this parent again (or another parent that
+-- carries the same codes) shows them with no copy step.
 CREATE OR REPLACE FUNCTION cmms.gw_fct_cmms_unlink_parent(p_parent text)
 RETURNS json AS
 $BODY$
 DECLARE
-	v_visit integer := 0;
-	v_attachment integer := 0;
-	v_map integer := 0;
 	v_id integer;
-	v_table text;
 BEGIN
 	IF p_parent IS NULL OR btrim(p_parent) = '' THEN
-		RETURN json_build_object(
-			'status', 'Accepted',
-			'asset_feature_map', 0,
-			'visit_x_feature', 0,
-			'attachment_x_feature', 0
-		);
+		RETURN json_build_object('status', 'Accepted');
 	END IF;
 
-	-- Junction tables have no schema_name. They hang off asset_feature_map.
-	DELETE FROM cmms.visit_x_feature AS v
-	USING cmms.asset_feature_map AS m
-	WHERE v.asset_feature_map_id = m.id
-		AND m.schema_name = p_parent;
-	GET DIAGNOSTICS v_visit = ROW_COUNT;
-
-	DELETE FROM cmms.attachment_x_feature AS a
-	USING cmms.asset_feature_map AS m
-	WHERE a.asset_feature_map_id = m.id
-		AND m.schema_name = p_parent;
-	GET DIAGNOSTICS v_attachment = ROW_COUNT;
-
-	DELETE FROM cmms.asset_feature_map WHERE schema_name = p_parent;
-	GET DIAGNOSTICS v_map = ROW_COUNT;
-
-	-- Triggers hang off the parent tables. A schema drop removes them;
-	-- an unlink that keeps the parent must drop them here.
 	IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = p_parent) THEN
-		FOREACH v_table IN ARRAY ARRAY['node', 'arc', 'connec', 'link', 'gully', 'element']
-		LOOP
-			IF to_regclass(format('%I.%I', p_parent, v_table)) IS NULL THEN
-				CONTINUE;
-			END IF;
-			EXECUTE format(
-				'DROP TRIGGER IF EXISTS gw_trg_cmms_feature_sync_delete ON %I.%I',
-				p_parent, v_table
-			);
-			EXECUTE format(
-				'DROP TRIGGER IF EXISTS gw_trg_cmms_feature_sync_id ON %I.%I',
-				p_parent, v_table
-			);
-		END LOOP;
-
 		EXECUTE format('DROP VIEW IF EXISTS %I.v_ui_cmms_attachment', p_parent);
 		EXECUTE format('DROP VIEW IF EXISTS %I.v_ui_cmms_visit', p_parent);
 
@@ -97,12 +58,7 @@ BEGIN
 		WHERE id = v_id;
 	END IF;
 
-	RETURN json_build_object(
-		'status', 'Accepted',
-		'asset_feature_map', v_map,
-		'visit_x_feature', v_visit,
-		'attachment_x_feature', v_attachment
-	);
+	RETURN json_build_object('status', 'Accepted');
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
