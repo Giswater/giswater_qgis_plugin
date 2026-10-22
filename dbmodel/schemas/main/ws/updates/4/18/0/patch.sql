@@ -93,7 +93,7 @@ SELECT
 FROM mapzone_graph g
 JOIN node n ON n.node_id = g.node_id
 LEFT JOIN cat_node cn ON cn.id = n.nodecat_id
-LEFT JOIN presszone z ON z.presszone_id = g.mapzone_id::text
+LEFT JOIN presszone z ON z.presszone_id = g.mapzone_id
 WHERE g.mapzone_type = 'PRESSZONE';
 
 CREATE OR REPLACE VIEW v_synoptic_point_presszone AS
@@ -125,7 +125,7 @@ FROM (
 	FROM mapzone_graph
 	WHERE mapzone_type = 'PRESSZONE'
 ) g
-LEFT JOIN presszone z ON z.presszone_id = g.mapzone_id::text;
+LEFT JOIN presszone z ON z.presszone_id = g.mapzone_id;
 
 CREATE OR REPLACE VIEW v_synoptic_line_supplyzone AS
 SELECT
